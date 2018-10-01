@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Models.Db {
@@ -21,7 +21,7 @@ namespace Contensive.Processor.Models.Db {
         //-- const
         public const string contentName = "Navigator Entries";
         public const string contentTableName = "ccMenuEntries";
-        private const string contentDataSource = "default";
+        public const string contentDataSource = "default";
         //
         //====================================================================================================
         // -- instance properties
@@ -112,8 +112,8 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public void invalidatePrimaryCache(CoreController core, int recordId) {
-            invalidateCache<NavigatorEntryModel>(core, recordId);
+        public static void invalidateRecordCache(CoreController core, int recordId) {
+            invalidateRecordCache<NavigatorEntryModel>(core, recordId);
         }
         //
         //====================================================================================================
@@ -134,6 +134,16 @@ namespace Contensive.Processor.Models.Db {
         //====================================================================================================
         public static NavigatorEntryModel createDefault(CoreController core) {
             return createDefault<NavigatorEntryModel>(core);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Return a cache key used to represent the table. ONLY used for invalidation. Add this as a dependent key if you want that key cleared when ANY record in the table is changed.
+        /// </summary>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        public static string getTableInvalidationKey(CoreController core) {
+            return getTableCacheKey<NavigatorEntryModel>(core);
         }
     }
 }

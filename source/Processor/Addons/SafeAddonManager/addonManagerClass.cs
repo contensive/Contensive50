@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Addons.SafeAddonManager {
@@ -91,10 +91,10 @@ namespace Contensive.Addons.SafeAddonManager {
                 string FormInput = null;
                 int Cnt = 0;
                 int Ptr = 0;
-                stringBuilderLegacyController UploadTab = new stringBuilderLegacyController();
-                stringBuilderLegacyController ModifyTab = new stringBuilderLegacyController();
+                StringBuilderLegacyController UploadTab = new StringBuilderLegacyController();
+                StringBuilderLegacyController ModifyTab = new StringBuilderLegacyController();
                 int RowPtr = 0;
-                stringBuilderLegacyController Body = null;
+                StringBuilderLegacyController Body = null;
                 string[,] Cells = null;
                 int ColumnCnt = 0;
                 string[] ColCaption = null;
@@ -105,7 +105,7 @@ namespace Contensive.Addons.SafeAddonManager {
                 string BodyHTML = null;
                 int CS = 0;
                 string UserError = null;
-                stringBuilderLegacyController Content = new stringBuilderLegacyController();
+                StringBuilderLegacyController Content = new StringBuilderLegacyController();
                 string Button = null;
                 string Caption = null;
                 string Description = null;
@@ -142,7 +142,7 @@ namespace Contensive.Addons.SafeAddonManager {
                         Content.Add(AdminUIController.getFormBodyAdminOnly());
                     } else {
                         //
-                        InstallFolder = "temp\\CollectionUpload" + encodeText(genericController.GetRandomInteger(core));
+                        InstallFolder = "temp\\CollectionUpload" + encodeText(GenericController.GetRandomInteger(core));
                         privateFilesInstallPath = InstallFolder + "\\";
                         if (Button == constants.ButtonOK) {
                             //
@@ -497,7 +497,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                     // block the reset because we will loose the error message
                                     //
                                     //IISResetRequired = False
-                                    errorController.addUserError(core, "This Add-on Collection did not install correctly, " + ErrorMessage);
+                                    ErrorController.addUserError(core, "This Add-on Collection did not install correctly, " + ErrorMessage);
                                 } else {
                                     //
                                     // Save the first collection as the installed collection
@@ -519,9 +519,9 @@ namespace Contensive.Addons.SafeAddonManager {
                                 UpgradeOK = CollectionController.installCollectionsFromPrivateFolder(core, privateFilesInstallPath, ref ErrorMessage, ref InstalledCollectionGuidList, false, true, ref nonCriticalErrorList);
                                 if (!UpgradeOK) {
                                     if (string.IsNullOrEmpty(ErrorMessage)) {
-                                        errorController.addUserError(core, "The Add-on Collection did not install correctly, but no detailed error message was given.");
+                                        ErrorController.addUserError(core, "The Add-on Collection did not install correctly, but no detailed error message was given.");
                                     } else {
-                                        errorController.addUserError(core, "The Add-on Collection did not install correctly, " + ErrorMessage);
+                                        ErrorController.addUserError(core, "The Add-on Collection did not install correctly, " + ErrorMessage);
                                     }
                                 } else {
                                     foreach (string installedCollectionGuid in InstalledCollectionGuidList) {
@@ -595,9 +595,9 @@ namespace Contensive.Addons.SafeAddonManager {
                                 LocalCollectionXML = CollectionController.getLocalCollectionStoreListXml(core);
                                 LocalCollections.LoadXml(LocalCollectionXML);
                                 foreach (XmlNode CDef_Node in LocalCollections.DocumentElement.ChildNodes) {
-                                    if (genericController.vbLCase(CDef_Node.Name) == "collection") {
+                                    if (GenericController.vbLCase(CDef_Node.Name) == "collection") {
                                         foreach (XmlNode CollectionNode in CDef_Node.ChildNodes) {
-                                            if (genericController.vbLCase(CollectionNode.Name) == "guid") {
+                                            if (GenericController.vbLCase(CollectionNode.Name) == "guid") {
                                                 OnServerGuidList += "," + CollectionNode.InnerText;
                                                 break;
                                             }
@@ -613,29 +613,29 @@ namespace Contensive.Addons.SafeAddonManager {
                                     UserError = "There was an error reading the Collection Library. The site may be unavailable.";
                                     HandleClassAppendLog("AddonManager", UserError);
                                     status += "<br>" + UserError;
-                                    errorController.addUserError(core, UserError);
+                                    ErrorController.addUserError(core, UserError);
                                     parseError = true;
                                 }
                                 Ptr = 0;
                                 if (!parseError) {
-                                    if (genericController.vbLCase(LibCollections.DocumentElement.Name) != genericController.vbLCase(CollectionListRootNode)) {
+                                    if (GenericController.vbLCase(LibCollections.DocumentElement.Name) != GenericController.vbLCase(CollectionListRootNode)) {
                                         UserError = "There was an error reading the Collection Library file. The '" + CollectionListRootNode + "' element was not found.";
                                         HandleClassAppendLog("AddonManager", UserError);
                                         status += "<br>" + UserError;
-                                        errorController.addUserError(core, UserError);
+                                        ErrorController.addUserError(core, UserError);
                                     } else {
                                         //
                                         // Go through file to validate the XML, and build status message -- since service process can not communicate to user
                                         //
                                         RowPtr = 0;
                                         foreach (XmlNode CDef_Node in LibCollections.DocumentElement.ChildNodes) {
-                                            switch (genericController.vbLCase(CDef_Node.Name)) {
+                                            switch (GenericController.vbLCase(CDef_Node.Name)) {
                                                 case "collection":
                                                     //
                                                     // Read the collection
                                                     //
                                                     foreach (XmlNode CollectionNode in CDef_Node.ChildNodes) {
-                                                        switch (genericController.vbLCase(CollectionNode.Name)) {
+                                                        switch (GenericController.vbLCase(CollectionNode.Name)) {
                                                             case "name":
                                                                 //
                                                                 // Name
@@ -671,7 +671,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                                                 // Version
                                                                 //
                                                                 CollectionLastChangeDate = CollectionNode.InnerText;
-                                                                if (dateController.IsDate(CollectionLastChangeDate)) {
+                                                                if (DateController.IsDate(CollectionLastChangeDate)) {
                                                                     DateValue = DateTime.Parse(CollectionLastChangeDate);
                                                                     CollectionLastChangeDate = DateValue.ToShortDateString();
                                                                 }
@@ -709,7 +709,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                                             Cells3[RowPtr, 2] = CollectionLastChangeDate + "&nbsp;";
                                                             Cells3[RowPtr, 3] = CollectionDescription + "&nbsp;";
                                                         } else {
-                                                            IsOnServer = genericController.encodeBoolean(OnServerGuidList.IndexOf(CollectionGuid, System.StringComparison.OrdinalIgnoreCase) + 1);
+                                                            IsOnServer = GenericController.encodeBoolean(OnServerGuidList.IndexOf(CollectionGuid, System.StringComparison.OrdinalIgnoreCase) + 1);
                                                             CS = core.db.csOpen("Add-on Collections", GuidFieldName + "=" + core.db.encodeSQLText(CollectionGuid));
                                                             IsOnSite = core.db.csOk(CS);
                                                             core.db.csClose(ref CS);
@@ -838,7 +838,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                 // Get the Upload Add-ons tab
                                 // --------------------------------------------------------------------------------
                                 //
-                                Body = new stringBuilderLegacyController();
+                                Body = new StringBuilderLegacyController();
                                 if (!DbUpToDate) {
                                     Body.Add("<p>Add-on upload is disabled because your site database needs to be updated.</p>");
                                 } else {
@@ -893,7 +893,7 @@ namespace Contensive.Addons.SafeAddonManager {
                     core.html.addTitle("Add-on Manager");
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return addonManager;
@@ -926,7 +926,7 @@ namespace Contensive.Addons.SafeAddonManager {
                     core.db.deleteContentRecord(cnNavigatorEntries, EntryID);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
         }
         //
@@ -946,9 +946,9 @@ namespace Contensive.Addons.SafeAddonManager {
                 Found = false;
                 ResultNode = Node.Attributes.GetNamedItem(Name);
                 if (ResultNode == null) {
-                    UcaseName = genericController.vbUCase(Name);
+                    UcaseName = GenericController.vbUCase(Name);
                     foreach (XmlAttribute NodeAttribute in Node.Attributes) {
-                        if (genericController.vbUCase(NodeAttribute.Name) == UcaseName) {
+                        if (GenericController.vbUCase(NodeAttribute.Name) == UcaseName) {
                             tempGetXMLAttribute = NodeAttribute.Value;
                             Found = true;
                             break;
@@ -966,7 +966,7 @@ namespace Contensive.Addons.SafeAddonManager {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             //ErrorTrap:
             HandleClassTrapError("GetXMLAttribute");
@@ -976,7 +976,7 @@ namespace Contensive.Addons.SafeAddonManager {
         //
         //
         private void HandleClassAppendLog(string MethodName, string Context) {
-            logController.logTrace(core, "addonManager: " + Context);
+            LogController.logTrace(core, "addonManager: " + Context);
         }
         //
         //===========================================================================
@@ -1001,7 +1001,7 @@ namespace Contensive.Addons.SafeAddonManager {
                 tempGetParentIDFromNameSpace = 0;
                 if (!string.IsNullOrEmpty(menuNameSpace)) {
                     //ParentName = ParentNameSpace
-                    Pos = genericController.vbInstr(1, menuNameSpace, ".");
+                    Pos = GenericController.vbInstr(1, menuNameSpace, ".");
                     if (Pos == 0) {
                         ParentName = menuNameSpace;
                         ParentNameSpace = "";
@@ -1030,7 +1030,7 @@ namespace Contensive.Addons.SafeAddonManager {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             //ErrorTrap:
             HandleClassTrapError("GetParentIDFromNameSpace");

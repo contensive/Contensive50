@@ -11,12 +11,12 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 using System.Text;
 //
 namespace Contensive.Processor.Controllers {
-    public class stringBuilderLegacyController {
+    public class StringBuilderLegacyController {
         private StringBuilder builder = new StringBuilder();
         public void Add(string NewString) {
             builder.Append(NewString);

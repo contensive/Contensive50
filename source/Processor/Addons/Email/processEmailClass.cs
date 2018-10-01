@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 using Contensive.Processor.Models.Domain;
 using Contensive.BaseClasses;
@@ -152,7 +152,7 @@ namespace Contensive.Addons.Email {
                 //
                 return;
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             //ErrorTrap:
             throw (new ApplicationException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "ProcessEmail_GroupEmail", Err.Number, Err.Source, Err.Description, True, True, "")
@@ -329,7 +329,7 @@ namespace Contensive.Addons.Email {
                     core.db.csClose(ref CSEmailBig);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
         }
         //
@@ -410,8 +410,8 @@ namespace Contensive.Addons.Email {
                         }
                         //
                         emailWorkingStyles = emailStyles;
-                        emailWorkingStyles = genericController.vbReplace(emailWorkingStyles, StyleSheetStart, StyleSheetStart + "<!-- ", 1, 99, 1);
-                        emailWorkingStyles = genericController.vbReplace(emailWorkingStyles, StyleSheetEnd, " // -->" + StyleSheetEnd, 1, 99, 1);
+                        emailWorkingStyles = GenericController.vbReplace(emailWorkingStyles, StyleSheetStart, StyleSheetStart + "<!-- ", 1, 99, 1);
+                        emailWorkingStyles = GenericController.vbReplace(emailWorkingStyles, StyleSheetEnd, " // -->" + StyleSheetEnd, 1, 99, 1);
                         //
                         // Create the clickflag to be added to all anchors
                         //
@@ -445,8 +445,8 @@ namespace Contensive.Addons.Email {
                             //EmailTemplateEncoded = core.html.convertActiveContent_internal(EmailTemplate, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, protocolHostLink, True, 0, "", CPUtilsClass.addonContext.ContextEmail, True, Nothing, False)
                             //EmailTemplateEncoded = core.csv_EncodeContent8(Nothing, EmailTemplate, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, "", 0, "", True, CPUtilsClass.addonContext.contextEmail)
                             //EmailTemplateEncoded = core.csv_encodecontent8(Nothing, EmailTemplate, MemberID, "", 0, 0, False, EmailAllowLinkEID, True, True, False, True, ClickFlagQuery, PrimaryLink, True, "", 0, ContentPlaceHolder, True, CPUtilsClass.addonContext.contextemail)
-                            if (genericController.vbInstr(1, EmailTemplateEncoded, fpoContentBox) != 0) {
-                                EmailBodyEncoded = genericController.vbReplace(EmailTemplateEncoded, fpoContentBox, EmailBodyEncoded);
+                            if (GenericController.vbInstr(1, EmailTemplateEncoded, fpoContentBox) != 0) {
+                                EmailBodyEncoded = GenericController.vbReplace(EmailTemplateEncoded, fpoContentBox, EmailBodyEncoded);
                             } else {
                                 EmailBodyEncoded = EmailTemplateEncoded + "<div style=\"padding:10px;\">" + EmailBodyEncoded + "</div>";
                             }
@@ -460,7 +460,7 @@ namespace Contensive.Addons.Email {
                         // Spam Footer under template
                         // remove the marker for any other place in the email then add it as needed
                         //
-                        EmailBodyEncoded = genericController.vbReplace(EmailBodyEncoded, rnEmailBlockRecipientEmail, "", 1, 99, 1);
+                        EmailBodyEncoded = GenericController.vbReplace(EmailBodyEncoded, rnEmailBlockRecipientEmail, "", 1, 99, 1);
                         if (AllowSpamFooter) {
                             //
                             // non-authorable, default true - leave it as an option in case there is an important exception
@@ -471,8 +471,8 @@ namespace Contensive.Addons.Email {
                         // open trigger under footer (so it does not shake as the image comes in)
                         //
                         EmailBodyEncoded = EmailBodyEncoded + openTriggerCode;
-                        EmailBodyEncoded = genericController.vbReplace(EmailBodyEncoded, "#member_id#", MemberID);
-                        EmailBodyEncoded = genericController.vbReplace(EmailBodyEncoded, "#member_email#", emailToAddress);
+                        EmailBodyEncoded = GenericController.vbReplace(EmailBodyEncoded, "#member_id#", MemberID);
+                        EmailBodyEncoded = GenericController.vbReplace(EmailBodyEncoded, "#member_email#", emailToAddress);
                         //
                         // Now convert URLS to absolute
                         //
@@ -558,7 +558,7 @@ namespace Contensive.Addons.Email {
         /// <param name="EmailStatusList"></param>
         private void queueConfirmationEmail(CoreController core, int ConfirmationMemberID, int EmailDropID, string EmailTemplate, bool EmailAllowLinkEID, string PrimaryLink, string EmailSubject, string emailBody, string emailStyles, string EmailFrom, string EmailStatusList) {
             try {
-                personModel person = personModel.create(core, ConfirmationMemberID);
+                PersonModel person = PersonModel.create(core, ConfirmationMemberID);
                 if ( person != null ) {
                     string ConfirmBody = ""
                         + "The follow email has been sent." 
@@ -581,7 +581,7 @@ namespace Contensive.Addons.Email {
                     EmailController.queuePersonEmail(core, person, EmailFrom, "Email confirmation from " + core.appConfig.domainList[0], ConfirmBody,"","",true, true, EmailDropID, EmailTemplate, EmailAllowLinkEID, ref sendStatus, queryStringForLinkAppend);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }

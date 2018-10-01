@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Controllers {
@@ -69,7 +69,7 @@ namespace Contensive.Processor.Controllers {
                 prop.Value = value;
                 setProperty(key, prop);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -106,9 +106,9 @@ namespace Contensive.Processor.Controllers {
         //
         public double getNumber(string RequestName) {
             try {
-                return genericController.encodeNumber(getProperty(RequestName).Value);
+                return GenericController.encodeNumber(getProperty(RequestName).Value);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -117,9 +117,9 @@ namespace Contensive.Processor.Controllers {
         //
         public int getInteger(string RequestName) {
             try {
-                return genericController.encodeInteger(getProperty(RequestName).Value);
+                return GenericController.encodeInteger(getProperty(RequestName).Value);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -128,9 +128,9 @@ namespace Contensive.Processor.Controllers {
         //
         public string getText(string RequestName) {
             try {
-                return genericController.encodeText(getProperty(RequestName).Value);
+                return GenericController.encodeText(getProperty(RequestName).Value);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -139,9 +139,9 @@ namespace Contensive.Processor.Controllers {
         //
         public string getRenderedActiveContent(string RequestName) {
             try {
-                return ActiveContentController.processWysiwygResponseForSave(core, genericController.encodeText(getProperty(RequestName).Value));
+                return ActiveContentController.processWysiwygResponseForSave(core, GenericController.encodeText(getProperty(RequestName).Value));
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -150,9 +150,9 @@ namespace Contensive.Processor.Controllers {
         //
         public bool getBoolean(string RequestName) {
             try {
-                return genericController.encodeBoolean(getProperty(RequestName).Value);
+                return GenericController.encodeBoolean(getProperty(RequestName).Value);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -161,9 +161,9 @@ namespace Contensive.Processor.Controllers {
         //
         public DateTime getDate(string RequestName) {
             try {
-                return genericController.encodeDate(getProperty(RequestName).Value);
+                return GenericController.encodeDate(getProperty(RequestName).Value);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -179,7 +179,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return new docPropertiesClass();
@@ -193,14 +193,14 @@ namespace Contensive.Processor.Controllers {
                 if (!string.IsNullOrEmpty(sourceKey)) {
                     returnResult = sourceKey.ToLower();
                     if (core.webServer.requestSpaceAsUnderscore) {
-                        returnResult = genericController.vbReplace(returnResult, " ", "_");
+                        returnResult = GenericController.vbReplace(returnResult, " ", "_");
                     }
                     if (core.webServer.requestDotAsUnderscore) {
-                        returnResult = genericController.vbReplace(returnResult, ".", "_");
+                        returnResult = GenericController.vbReplace(returnResult, ".", "_");
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -228,7 +228,7 @@ namespace Contensive.Processor.Controllers {
                     string nameValuePair = ampSplit[Ptr];
                     docPropertiesClass docProperty = new docPropertiesClass();
                     if (!string.IsNullOrEmpty(nameValuePair)) {
-                        if (genericController.vbInstr(1, nameValuePair, "=") != 0) {
+                        if (GenericController.vbInstr(1, nameValuePair, "=") != 0) {
                             ValuePair = nameValuePair.Split('=');
                             key = decodeResponseVariable(encodeText(ValuePair[0]));
                             if (!string.IsNullOrEmpty(key)) {
@@ -245,7 +245,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -259,7 +259,7 @@ namespace Contensive.Processor.Controllers {
             string returnString = "";
             try {
                 foreach (string key in getKeyList()) {
-                    returnString += "&" + genericController.encodeLegacyOptionStringArgument(key) + "=" + encodeLegacyOptionStringArgument(getProperty(key).Value);
+                    returnString += "&" + GenericController.encodeLegacyOptionStringArgument(key) + "=" + encodeLegacyOptionStringArgument(getProperty(key).Value);
                 }
             } catch (Exception ex) {
                 throw (ex);

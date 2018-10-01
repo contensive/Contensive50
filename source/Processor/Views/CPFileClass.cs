@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 using System.IO;
@@ -73,7 +73,7 @@ namespace Contensive.Processor {
         /// <returns></returns>
         [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", false)]
         public override string getVirtualFileLink(string virtualFilename) {
-            return genericController.getCdnFileLink(core, virtualFilename);
+            return GenericController.getCdnFileLink(core, virtualFilename);
         }
         //
         //==========================================================================================

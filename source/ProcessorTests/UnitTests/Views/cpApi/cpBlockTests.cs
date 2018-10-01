@@ -13,7 +13,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Contensive.Processor;
 using static Contensive.Processor.constants;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using Contensive.BaseClasses;
 using static Contensive.Processor.Tests.testConstants;
 

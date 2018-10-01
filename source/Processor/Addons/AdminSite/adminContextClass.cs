@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 using Contensive.Processor.Models.Domain;
 using Contensive.Addons.Tools;
@@ -242,7 +242,7 @@ namespace Contensive.Addons.AdminSite {
             try {
                 //
                 // Tab Control
-                allowAdminTabs = genericController.encodeBoolean(core.userProperty.getText("AllowAdminTabs", "1"));
+                allowAdminTabs = GenericController.encodeBoolean(core.userProperty.getText("AllowAdminTabs", "1"));
                 if (core.docProperties.getText("tabs") != "") {
                     if (core.docProperties.getBoolean("tabs") != allowAdminTabs) {
                         allowAdminTabs = !allowAdminTabs;
@@ -257,7 +257,7 @@ namespace Contensive.Addons.AdminSite {
                     if (adminContent == null) {
                         adminContent = new CDefModel();
                         adminContent.id = 0;
-                        errorController.addUserError(core, "There is no content with the requested id [" + requestedContentId + "]");
+                        ErrorController.addUserError(core, "There is no content with the requested id [" + requestedContentId + "]");
                         requestedContentId = 0;
                     }
                 }
@@ -310,20 +310,20 @@ namespace Contensive.Addons.AdminSite {
                 WherePairCount = 99;
                 int WCount = 0;
                 for (WCount = 0; WCount <= 99; WCount++) {
-                    WherePair[0, WCount] = genericController.encodeText(core.docProperties.getText("WL" + WCount));
+                    WherePair[0, WCount] = GenericController.encodeText(core.docProperties.getText("WL" + WCount));
                     if (WherePair[0, WCount] == "") {
                         WherePairCount = WCount;
                         break;
                     } else {
-                        WherePair[1, WCount] = genericController.encodeText(core.docProperties.getText("WR" + WCount));
-                        core.doc.addRefreshQueryString("wl" + WCount, genericController.encodeRequestVariable(WherePair[0, WCount]));
-                        core.doc.addRefreshQueryString("wr" + WCount, genericController.encodeRequestVariable(WherePair[1, WCount]));
+                        WherePair[1, WCount] = GenericController.encodeText(core.docProperties.getText("WR" + WCount));
+                        core.doc.addRefreshQueryString("wl" + WCount, GenericController.encodeRequestVariable(WherePair[0, WCount]));
+                        core.doc.addRefreshQueryString("wr" + WCount, GenericController.encodeRequestVariable(WherePair[1, WCount]));
                     }
                 }
                 //
                 // Read WhereClauseContent to WherePairCount
                 //
-                string WhereClauseContent = genericController.encodeText(core.docProperties.getText("wc"));
+                string WhereClauseContent = GenericController.encodeText(core.docProperties.getText("wc"));
                 if (!string.IsNullOrEmpty(WhereClauseContent)) {
                     //
                     // ***** really needs a server.URLDecode() function
@@ -392,10 +392,10 @@ namespace Contensive.Addons.AdminSite {
                         requestButton = "";
                         Admin_Action = AdminActionEditRefresh;
                         AdminForm = AdminFormEdit;
-                        int Pos = genericController.vbInstr(1, fieldEditorPreference, ":");
+                        int Pos = GenericController.vbInstr(1, fieldEditorPreference, ":");
                         if (Pos > 0) {
-                            int fieldEditorFieldId = genericController.encodeInteger(fieldEditorPreference.Left(Pos - 1));
-                            int fieldEditorAddonId = genericController.encodeInteger(fieldEditorPreference.Substring(Pos));
+                            int fieldEditorFieldId = GenericController.encodeInteger(fieldEditorPreference.Left(Pos - 1));
+                            int fieldEditorAddonId = GenericController.encodeInteger(fieldEditorPreference.Substring(Pos));
                             if (fieldEditorFieldId != 0) {
                                 bool editorOk = true;
                                 string SQL = "select id from ccfields where (active<>0) and id=" + fieldEditorFieldId;
@@ -447,7 +447,7 @@ namespace Contensive.Addons.AdminSite {
                                         if (Cnt > 0) {
                                             int Ptr = 0;
                                             for (Ptr = 1; Ptr < Cnt; Ptr++) {
-                                                Pos = genericController.vbInstr(1, Parts[Ptr], ",");
+                                                Pos = GenericController.vbInstr(1, Parts[Ptr], ",");
                                                 if (Pos == 0) {
                                                     Parts[Ptr] = "";
                                                 } else if (Pos > 0) {
@@ -469,7 +469,7 @@ namespace Contensive.Addons.AdminSite {
                 //SpellCheckSupported = false;
                 //SpellCheckRequest = false;
             } catch (Exception ex) {
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
             }
             return;
         }
@@ -492,7 +492,7 @@ namespace Contensive.Addons.AdminSite {
                     result = core.session.isAuthenticatedContentManager(core, ContentName);
                 }
             } catch (Exception ex) {
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
                 throw;
             }
             return result;

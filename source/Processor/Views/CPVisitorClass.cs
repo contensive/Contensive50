@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor {
@@ -54,7 +54,7 @@ namespace Contensive.Processor {
         public override bool ForceBrowserMobile
         {
             get {
-                return genericController.encodeBoolean(core.session.visitor.ForceBrowserMobile);
+                return GenericController.encodeBoolean(core.session.visitor.ForceBrowserMobile);
             }
         }
 
@@ -71,7 +71,7 @@ namespace Contensive.Processor {
         //=======================================================================================================
         //
         public override bool GetBoolean(string PropertyName, string DefaultValue = "") {
-            return genericController.encodeBoolean(GetProperty(PropertyName, DefaultValue));
+            return GenericController.encodeBoolean(GetProperty(PropertyName, DefaultValue));
         }
         //
         //=======================================================================================================
@@ -79,7 +79,7 @@ namespace Contensive.Processor {
         //=======================================================================================================
         //
         public override DateTime GetDate(string PropertyName, string DefaultValue = "") {
-            return genericController.encodeDate(GetProperty(PropertyName, DefaultValue));
+            return GenericController.encodeDate(GetProperty(PropertyName, DefaultValue));
         }
         //
         //=======================================================================================================
@@ -116,7 +116,7 @@ namespace Contensive.Processor {
         public override bool IsNew //Inherits BaseClasses.CPVisitorBaseClass.IsNew
         {
             get {
-                return core.session.visit.VisitorNew;
+                return core.session.visit.visitorNew;
             }
         }
 

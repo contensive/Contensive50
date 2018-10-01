@@ -8,11 +8,11 @@ using System.Collections.Generic;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Controllers {
-    public class dataTreeController {
+    public class DataTreeController {
         //========================================================================
         // This page and its contents are copyright by Kidwell McGowan Associates.
         //========================================================================
@@ -51,7 +51,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="core"></param>
         /// <remarks></remarks>
-        public dataTreeController(CoreController core) : base() {
+        public DataTreeController(CoreController core) : base() {
             this.core = core;
         }
         //
@@ -68,7 +68,7 @@ namespace Contensive.Processor.Controllers {
             //
             Private_IsEmpty = true;
             tempLoad = false;
-            Tier = new Contensive.Processor.Controllers.dataTreeController.TierNode[1];
+            Tier = new Contensive.Processor.Controllers.DataTreeController.TierNode[1];
             TierPtr = 0;
             Tier[0].Node = null;
             //Set Tier(0).Element = Nothing
@@ -91,7 +91,7 @@ namespace Contensive.Processor.Controllers {
                             break;
                     }
                 } catch (Exception ex) {
-                    logController.handleError( core,ex);
+                    LogController.handleError( core,ex);
                     loadOK = false;
                 }
                 if (loadOK) {
@@ -158,7 +158,7 @@ namespace Contensive.Processor.Controllers {
                 if (Private_IsEmpty) {
                     TierPtr = 1;
                     MSxml = new XmlDocument();
-                    Tier = new Contensive.Processor.Controllers.dataTreeController.TierNode[TierPtr + 1];
+                    Tier = new Contensive.Processor.Controllers.DataTreeController.TierNode[TierPtr + 1];
                     Tier[TierPtr].Node = MSxml.CreateElement(value);
                     Private_IsEmpty = false;
                     //Call AddChild(vNewValue)
@@ -192,7 +192,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -269,7 +269,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -391,9 +391,9 @@ namespace Contensive.Processor.Controllers {
             //
             AttrCnt = Tier[TierPtr].Node.Attributes.Count;
             if (AttrCnt > 0 && (!string.IsNullOrEmpty(AttrName))) {
-                UCaseAttrName = genericController.vbUCase(AttrName);
+                UCaseAttrName = GenericController.vbUCase(AttrName);
                 for (AttrPtr = 0; AttrPtr < AttrCnt; AttrPtr++) {
-                    if (UCaseAttrName == genericController.vbUCase(Tier[TierPtr].Node.Attributes[AttrPtr].Name)) {
+                    if (UCaseAttrName == GenericController.vbUCase(Tier[TierPtr].Node.Attributes[AttrPtr].Name)) {
                         tempGetAttr = Tier[TierPtr].Node.Attributes[AttrPtr].Value;
                         break;
                     }

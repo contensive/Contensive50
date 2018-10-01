@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor {
@@ -259,7 +259,7 @@ namespace Contensive.Processor {
         //
         public string form {
             get {
-                return genericController.convertNameValueDictToREquestString(cp.core.webServer.requestFormDict);
+                return GenericController.convertNameValueDictToREquestString(cp.core.webServer.requestFormDict);
             }
             set {
                 cp.core.webServer.requestFormDict.Clear();

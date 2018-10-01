@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 using Contensive.BaseClasses;
 using System.Linq;
@@ -18,7 +18,7 @@ namespace Contensive.Processor.Controllers {
     /// <summary>
     /// static class controller
     /// </summary>
-    public class quickEditController : IDisposable {
+    public class QuickEditController : IDisposable {
         //
         //=============================================================================
         /// <summary>
@@ -41,13 +41,13 @@ namespace Contensive.Processor.Controllers {
                 core.html.addStyleLink("/quickEditor/styles.css", "Quick Editor");
                 //
                 // -- First Active Record - Output Quick Editor form
-                Models.Domain.CDefModel CDef = Models.Domain.CDefModel.getCdef(core, pageContentModel.contentName);
-                bool IsEditLocked = core.workflow.GetEditLockStatus(pageContentModel.contentName, core.doc.pageController.page.id);
+                Models.Domain.CDefModel CDef = Models.Domain.CDefModel.getCdef(core, PageContentModel.contentName);
+                bool IsEditLocked = core.workflow.GetEditLockStatus(PageContentModel.contentName, core.doc.pageController.page.id);
                 string editLockMemberName = "";
                 DateTime editLockDateExpires = default(DateTime);
                 if (IsEditLocked) {
-                    editLockMemberName = core.workflow.GetEditLockMemberName(pageContentModel.contentName, core.doc.pageController.page.id);
-                    editLockDateExpires = genericController.encodeDate(core.workflow.GetEditLockMemberName(pageContentModel.contentName, core.doc.pageController.page.id));
+                    editLockMemberName = core.workflow.GetEditLockMemberName(PageContentModel.contentName, core.doc.pageController.page.id);
+                    editLockDateExpires = GenericController.encodeDate(core.workflow.GetEditLockMemberName(PageContentModel.contentName, core.doc.pageController.page.id));
                 }
                 bool IsModified = false;
                 bool IsSubmitted = false;
@@ -61,7 +61,7 @@ namespace Contensive.Processor.Controllers {
                 DateTime SubmittedDate = default(DateTime);
                 DateTime ApprovedDate = default(DateTime);
                 DateTime ModifiedDate = default(DateTime);
-                core.doc.getAuthoringStatus(pageContentModel.contentName, core.doc.pageController.page.id, ref IsSubmitted, ref IsApproved, ref SubmittedMemberName, ref ApprovedMemberName, ref IsInserted, ref IsDeleted, ref IsModified, ref ModifiedMemberName, ref ModifiedDate, ref SubmittedDate, ref ApprovedDate);
+                core.doc.getAuthoringStatus(PageContentModel.contentName, core.doc.pageController.page.id, ref IsSubmitted, ref IsApproved, ref SubmittedMemberName, ref ApprovedMemberName, ref IsInserted, ref IsDeleted, ref IsModified, ref ModifiedMemberName, ref ModifiedDate, ref SubmittedDate, ref ApprovedDate);
                 bool tempVar = false;
                 bool tempVar2 = false;
                 bool tempVar3 = false;
@@ -71,13 +71,13 @@ namespace Contensive.Processor.Controllers {
                 bool allowSave = false;
                 bool AllowDelete = false;
                 bool readOnlyField = false;
-                core.doc.getAuthoringPermissions(pageContentModel.contentName, core.doc.pageController.page.id, ref AllowInsert, ref AllowCancel, ref allowSave, ref AllowDelete, ref tempVar, ref tempVar2, ref tempVar3, ref tempVar4, ref readOnlyField);
-                bool AllowMarkReviewed = Models.Domain.CDefModel.isContentFieldSupported(core, pageContentModel.contentName, "DateReviewed");
+                core.doc.getAuthoringPermissions(PageContentModel.contentName, core.doc.pageController.page.id, ref AllowInsert, ref AllowCancel, ref allowSave, ref AllowDelete, ref tempVar, ref tempVar2, ref tempVar3, ref tempVar4, ref readOnlyField);
+                bool AllowMarkReviewed = Models.Domain.CDefModel.isContentFieldSupported(core, PageContentModel.contentName, "DateReviewed");
                 string OptionsPanelAuthoringStatus = core.session.getAuthoringStatusMessage(core, false, IsEditLocked, editLockMemberName, editLockDateExpires, IsApproved, ApprovedMemberName, IsSubmitted, SubmittedMemberName, IsDeleted, IsInserted, IsModified, ModifiedMemberName);
                 //
                 // Set Editing Authoring Control
                 //
-                core.workflow.SetEditLock(pageContentModel.contentName, core.doc.pageController.page.id);
+                core.workflow.SetEditLock(PageContentModel.contentName, core.doc.pageController.page.id);
                 //
                 // SubPanel: Authoring Status
                 //
@@ -114,18 +114,18 @@ namespace Contensive.Processor.Controllers {
                 if (core.doc.debug_iUserError != "") {
                     result += ""
                         + "\r<tr>"
-                        + cr2 + "<td colspan=2 class=\"qeRow\"><div class=\"qeHeadCon\">" + errorController.getUserError(core) + "</div></td>"
+                        + cr2 + "<td colspan=2 class=\"qeRow\"><div class=\"qeHeadCon\">" + ErrorController.getUserError(core) + "</div></td>"
                         + "\r</tr>";
                 }
                 if (readOnlyField) {
                     result += ""
                     + "\r<tr>"
-                    + cr2 + "<td colspan=\"2\" class=\"qeRow\">" + getQuickEditingBody(core, pageContentModel.contentName, OrderByClause, AllowPageList, true, rootPageId, readOnlyField, AllowReturnLink, pageContentModel.contentName, ArchivePages, contactMemberID) + "</td>"
+                    + cr2 + "<td colspan=\"2\" class=\"qeRow\">" + getQuickEditingBody(core, PageContentModel.contentName, OrderByClause, AllowPageList, true, rootPageId, readOnlyField, AllowReturnLink, PageContentModel.contentName, ArchivePages, contactMemberID) + "</td>"
                     + "\r</tr>";
                 } else {
                     result += ""
                     + "\r<tr>"
-                    + cr2 + "<td colspan=\"2\" class=\"qeRow\">" + getQuickEditingBody(core, pageContentModel.contentName, OrderByClause, AllowPageList, true, rootPageId, readOnlyField, AllowReturnLink, pageContentModel.contentName, ArchivePages, contactMemberID) + "</td>"
+                    + cr2 + "<td colspan=\"2\" class=\"qeRow\">" + getQuickEditingBody(core, PageContentModel.contentName, OrderByClause, AllowPageList, true, rootPageId, readOnlyField, AllowReturnLink, PageContentModel.contentName, ArchivePages, contactMemberID) + "</td>"
                     + "\r</tr>";
                 }
                 result += "\r<tr>"
@@ -141,10 +141,10 @@ namespace Contensive.Processor.Controllers {
                     PageList = "&nbsp;(there are no parent pages)";
                 } else {
                     PageList = "<ul class=\"qeListUL\"><li class=\"qeListLI\">Current Page</li></ul>";
-                    foreach (pageContentModel testPage in Enumerable.Reverse(core.doc.pageController.pageToRootList)) {
+                    foreach (PageContentModel testPage in Enumerable.Reverse(core.doc.pageController.pageToRootList)) {
                         string Link = testPage.name;
                         if (string.IsNullOrEmpty(Link)) {
-                            Link = "no name #" + genericController.encodeText(testPage.id);
+                            Link = "no name #" + GenericController.encodeText(testPage.id);
                         }
                         Link = "<a href=\"" + testPage.PageLink + "\">" + Link + "</a>";
                         PageList = "<ul class=\"qeListUL\"><li class=\"qeListLI\">" + Link + PageList + "</li></ul>";
@@ -162,17 +162,17 @@ namespace Contensive.Processor.Controllers {
                 CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext {
                     addonType = CPUtilsBaseClass.addonContext.ContextPage,
                     hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
-                        contentName = pageContentModel.contentName,
+                        contentName = PageContentModel.contentName,
                         fieldName = "",
                         recordId = core.doc.pageController.page.id
                     },
-                    instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(core, core.doc.pageController.page.ChildListInstanceOptions),
+                    instanceArguments = GenericController.convertAddonArgumentstoDocPropertiesList(core, core.doc.pageController.page.ChildListInstanceOptions),
                     instanceGuid = PageChildListInstanceID,
                     errorContextMessage = "calling child page addon in quick editing editor"
                 };
                 PageList = core.addon.execute(addon, executeContext);
                 //PageList = core.addon.execute_legacy2(core.siteProperties.childListAddonID, "", page.ChildListInstanceOptions, CPUtilsBaseClass.addonContext.ContextPage, pageContentModel.contentName, page.id, "", PageChildListInstanceID, False, -1, "", AddonStatusOK, Nothing)
-                if (genericController.vbInstr(1, PageList, "<ul", 1) == 0) {
+                if (GenericController.vbInstr(1, PageList, "<ul", 1) == 0) {
                     PageList = "(there are no child pages)";
                 }
                 result += "\r<tr>"
@@ -181,7 +181,7 @@ namespace Contensive.Processor.Controllers {
                     + "\r</tr>";
                 result = ""
                     + "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
-                    + genericController.nop(result) + "\r</table>";
+                    + GenericController.nop(result) + "\r</table>";
                 result = ""
                     + ButtonList + result + ButtonList;
                 result = core.html.getPanel(result);
@@ -191,11 +191,11 @@ namespace Contensive.Processor.Controllers {
                 result += ""
                     + HtmlController.inputHidden("Type", FormTypePageAuthoring)
                     + HtmlController.inputHidden("ID", core.doc.pageController.page.id)
-                    + HtmlController.inputHidden("ContentName", pageContentModel.contentName);
+                    + HtmlController.inputHidden("ContentName", PageContentModel.contentName);
                 result = HtmlController.formMultipart(core, result, core.webServer.requestQueryString, "", "ccForm");
                 result = "<div class=\"ccCon\">" + result + "</div>";
             } catch (Exception ex) {
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
             }
             return result;
         }
@@ -239,7 +239,7 @@ namespace Contensive.Processor.Controllers {
             GC.SuppressFinalize(this);
         }
         //
-        ~quickEditController() {
+        ~QuickEditController() {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(false);
             //todo  NOTE: The base class Finalize method is automatically called from the destructor:

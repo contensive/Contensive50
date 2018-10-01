@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor {
@@ -75,7 +75,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override bool GetBoolean(string propertyName, string DefaultValue = "") {
-            return core.siteProperties.getBoolean(propertyName, genericController.encodeBoolean(DefaultValue));
+            return core.siteProperties.getBoolean(propertyName, GenericController.encodeBoolean(DefaultValue));
         }
         public override bool GetBoolean(string propertyName, bool DefaultValue ) {
             return core.siteProperties.getBoolean(propertyName, DefaultValue);
@@ -85,7 +85,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override DateTime GetDate(string propertyName, string DefaultValue = "") {
-            return core.siteProperties.getDate(propertyName, genericController.encodeDate(DefaultValue));
+            return core.siteProperties.getDate(propertyName, GenericController.encodeDate(DefaultValue));
         }
         public override DateTime GetDate(string propertyName, DateTime DefaultValue) {
             return core.siteProperties.getDate(propertyName, DefaultValue);
@@ -94,7 +94,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override int GetInteger(string propertyName, string DefaultValue = "") {
-            return core.siteProperties.getInteger(propertyName, genericController.encodeInteger(DefaultValue));
+            return core.siteProperties.getInteger(propertyName, GenericController.encodeInteger(DefaultValue));
         }
         public override int GetInteger(string propertyName, int DefaultValue ) {
             return core.siteProperties.getInteger(propertyName, DefaultValue);
@@ -103,7 +103,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override double GetNumber(string propertyName, string DefaultValue = "") {
-            return core.siteProperties.getNumber(propertyName, genericController.encodeNumber(DefaultValue));
+            return core.siteProperties.getNumber(propertyName, GenericController.encodeNumber(DefaultValue));
         }
         public override double GetNumber(string propertyName, double DefaultValue) {
             return core.siteProperties.getNumber(propertyName, DefaultValue);
@@ -150,7 +150,7 @@ namespace Contensive.Processor {
         //
         public override bool TrapErrors {
             get {
-                return genericController.encodeBoolean(GetProperty("TrapErrors", "1"));
+                return GenericController.encodeBoolean(GetProperty("TrapErrors", "1"));
             }
         }
         //
@@ -226,7 +226,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override string EncodeAppRootPath(string Link) {
-            return genericController.encodeVirtualPath(genericController.encodeText(Link), core.appConfig.cdnFileUrl, appRootPath, core.webServer.requestDomain);
+            return GenericController.encodeVirtualPath(GenericController.encodeText(Link), core.appConfig.cdnFileUrl, appRootPath, core.webServer.requestDomain);
         }
         //
         //====================================================================================================
@@ -236,31 +236,31 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override void LogActivity(string Message, int UserID, int OrganizationID) {
-            logController.addSiteActivity(core, Message, 0, UserID, OrganizationID);
+            LogController.addSiteActivity(core, Message, 0, UserID, OrganizationID);
         }
         //
         //====================================================================================================
         //
         public override void LogWarning(string name, string description, string typeOfWarningKey, string instanceKey) {
-            logController.addSiteWarning(core, name, description, "", 0, description, typeOfWarningKey, instanceKey);
+            LogController.addSiteWarning(core, name, description, "", 0, description, typeOfWarningKey, instanceKey);
         }
         //
         //====================================================================================================
         //
         public override void LogAlarm(string cause) {
-            logController.logFatal(core, "logAlarm: " + cause);
+            LogController.logFatal(core, "logAlarm: " + cause);
         }
         //
         //====================================================================================================
         //
         public override void ErrorReport(string Message) {
-            logController.handleException(core, new ApplicationException("Unexpected exception"), logController.logLevel.Error, Message, 2);
+            LogController.handleException(core, new ApplicationException("Unexpected exception"), LogController.logLevel.Error, Message, 2);
         }
         //
         //====================================================================================================
         //
         public override void ErrorReport(System.Exception Ex, string Message = "") {
-            logController.handleException(core, Ex, logController.logLevel.Error, Message, 2);
+            LogController.handleException(core, Ex, LogController.logLevel.Error, Message, 2);
         }
         //
         //====================================================================================================
@@ -269,7 +269,7 @@ namespace Contensive.Processor {
             try {
                 var ExportCSVAddon = Models.Db.AddonModel.create(core, addonGuidExportCSV);
                 if (ExportCSVAddon == null) {
-                    logController.handleError( core,new ApplicationException("ExportCSV addon not found. Task could not be added to task queue."));
+                    LogController.handleError( core,new ApplicationException("ExportCSV addon not found. Task could not be added to task queue."));
                 } else {
                     var docProperties = new Dictionary<string, string>();
                     docProperties.Add("sql", SQL);
@@ -280,7 +280,7 @@ namespace Contensive.Processor {
                         addonName = ExportCSVAddon.name,
                         args = docProperties
                     };
-                    taskSchedulerController.addTaskToQueue(core, taskCommandBuildCsv, cmdDetail, false);
+                    TaskSchedulerController.addTaskToQueue(core, taskCommandBuildCsv, cmdDetail, false);
                 }
             } catch (Exception) {
                 throw;
@@ -290,7 +290,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override void TestPoint(string Message) {
-            debugController.testPoint(core, Message);
+            DebugController.testPoint(core, Message);
         }
         //
         //====================================================================================================
@@ -311,7 +311,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override void addLinkAlias(string linkAlias, int pageId, string queryStringSuffix = "") {
-            linkAliasController.addLinkAlias(core, linkAlias, pageId, queryStringSuffix);
+            LinkAliasController.addLinkAlias(core, linkAlias, pageId, queryStringSuffix);
         }
         //
         //====================================================================================================
@@ -334,7 +334,7 @@ namespace Contensive.Processor {
                 var tmpList = new List<string> { };
                 returnOk = CollectionController.installCollectionsFromPrivateFile(core, privatePathFilename, ref returnUserError, ref ignoreReturnedCollectionGuid, false, true, ref tmpList);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 if (!core.siteProperties.trapErrors) {
                     throw;
                 }

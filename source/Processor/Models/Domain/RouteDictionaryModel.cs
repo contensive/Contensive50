@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Models.Domain {
@@ -37,7 +37,7 @@ namespace Contensive.Processor.Models.Domain {
                     string physicalFile = "~/" + core.siteProperties.serverPageDefault;
                     //
                     // -- admin route
-                    string adminRoute = genericController.normalizeRoute(core.appConfig.adminRoute);
+                    string adminRoute = GenericController.normalizeRoute(core.appConfig.adminRoute);
                     if (!string.IsNullOrWhiteSpace(adminRoute)) {
                         result.Add(adminRoute, new BaseClasses.CPSiteBaseClass.routeClass() {
                             physicalRoute = physicalFile,
@@ -49,10 +49,10 @@ namespace Contensive.Processor.Models.Domain {
                     // -- remote methods
                     List<Contensive.Processor.Models.Db.AddonModel> remoteMethods = Contensive.Processor.Models.Db.AddonModel.createList_RemoteMethods(core, new List<string>());
                     foreach (Contensive.Processor.Models.Db.AddonModel remoteMethod in remoteMethods) {
-                        string route = genericController.normalizeRoute(remoteMethod.name);
+                        string route = GenericController.normalizeRoute(remoteMethod.name);
                         if (!string.IsNullOrWhiteSpace(route)) {
                             if (result.ContainsKey(route)) {
-                                logController.handleWarn( core,new ApplicationException("Route [" + route + "] cannot be added because it is a matches the Admin Route or another Remote Method."));
+                                LogController.handleWarn( core,new ApplicationException("Route [" + route + "] cannot be added because it is a matches the Admin Route or another Remote Method."));
                             } else {
                                 result.Add(route, new BaseClasses.CPSiteBaseClass.routeClass() {
                                     physicalRoute = physicalFile,
@@ -65,12 +65,12 @@ namespace Contensive.Processor.Models.Domain {
                     }
                     //
                     // -- link forwards
-                    List<Models.Db.linkForwardModel> linkForwards = linkForwardModel.createList(core, "name Is Not null");
-                    foreach (Models.Db.linkForwardModel linkForward in linkForwards) {
-                        string route = genericController.normalizeRoute(linkForward.name);
+                    List<Models.Db.LinkForwardModel> linkForwards = LinkForwardModel.createList(core, "name Is Not null");
+                    foreach (Models.Db.LinkForwardModel linkForward in linkForwards) {
+                        string route = GenericController.normalizeRoute(linkForward.name);
                         if (!string.IsNullOrEmpty(route)) {
                             if (result.ContainsKey(route)) {
-                                logController.handleError( core,new ApplicationException("Link Foward Route [" + route + "] cannot be added because it is a matches the Admin Route, a Remote Method or another Link Forward."));
+                                LogController.handleError( core,new ApplicationException("Link Foward Route [" + route + "] cannot be added because it is a matches the Admin Route, a Remote Method or another Link Forward."));
                             } else {
                                 result.Add(route, new BaseClasses.CPSiteBaseClass.routeClass() {
                                     physicalRoute = physicalFile,
@@ -83,12 +83,12 @@ namespace Contensive.Processor.Models.Domain {
                     }
                     //
                     // -- link aliases
-                    List<Models.Db.linkAliasModel> linkAliasList = linkAliasModel.createList(core, "name Is Not null");
-                    foreach (Models.Db.linkAliasModel linkAlias in linkAliasList) {
-                        string route = genericController.normalizeRoute(linkAlias.name);
+                    List<Models.Db.LinkAliasModel> linkAliasList = LinkAliasModel.createList(core, "name Is Not null");
+                    foreach (Models.Db.LinkAliasModel linkAlias in linkAliasList) {
+                        string route = GenericController.normalizeRoute(linkAlias.name);
                         if (!string.IsNullOrEmpty(route)) {
                             if (result.ContainsKey(route)) {
-                                logController.handleError( core,new ApplicationException("Link Alias route [" + route + "] cannot be added because it is a matches the Admin Route, a Remote Method, a Link Forward o another Link Alias."));
+                                LogController.handleError( core,new ApplicationException("Link Alias route [" + route + "] cannot be added because it is a matches the Admin Route, a Remote Method, a Link Forward o another Link Alias."));
                             } else {
                                 result.Add(route, new BaseClasses.CPSiteBaseClass.routeClass() {
                                     physicalRoute = physicalFile,
@@ -102,7 +102,7 @@ namespace Contensive.Processor.Models.Domain {
                     setCache(core, result);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -111,8 +111,8 @@ namespace Contensive.Processor.Models.Domain {
         public static void setCache(CoreController core, Dictionary<string, BaseClasses.CPSiteBaseClass.routeClass> routeDictionary) {
             var dependentKeyList = new List<string>();
             dependentKeyList.Add(Models.Db.AddonModel.contentTableName);
-            dependentKeyList.Add(Models.Db.linkAliasModel.contentTableName);
-            dependentKeyList.Add(Models.Db.linkForwardModel.contentTableName);
+            dependentKeyList.Add(Models.Db.LinkAliasModel.contentTableName);
+            dependentKeyList.Add(Models.Db.LinkForwardModel.contentTableName);
             core.cache.setObject(cacheNameRouteDictionary, routeDictionary,dependentKeyList);
         }
         //

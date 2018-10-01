@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Controllers {
@@ -16,7 +16,7 @@ namespace Contensive.Processor.Controllers {
     /// <summary>
     /// static class controller
     /// </summary>
-    public class xmlController {
+    public class XmlController {
         //
         //====================================================================================================
         /// <summary>
@@ -33,9 +33,9 @@ namespace Contensive.Processor.Controllers {
                 Found = false;
                 ResultNode = Node.Attributes.GetNamedItem(Name);
                 if (ResultNode == null) {
-                    UcaseName = genericController.vbUCase(Name);
+                    UcaseName = GenericController.vbUCase(Name);
                     foreach (XmlAttribute NodeAttribute in Node.Attributes) {
-                        if (genericController.vbUCase(NodeAttribute.Name) == UcaseName) {
+                        if (GenericController.vbUCase(NodeAttribute.Name) == UcaseName) {
                             returnAttr = NodeAttribute.Value;
                             Found = true;
                             break;
@@ -49,7 +49,7 @@ namespace Contensive.Processor.Controllers {
                     Found = true;
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnAttr;
@@ -64,13 +64,13 @@ namespace Contensive.Processor.Controllers {
         //====================================================================================================
         //
         public static bool GetXMLAttributeBoolean(CoreController core, bool Found, XmlNode Node, string Name, bool DefaultIfNotFound) {
-            return genericController.encodeBoolean(GetXMLAttribute(core, Found, Node, Name, encodeText(DefaultIfNotFound)));
+            return GenericController.encodeBoolean(GetXMLAttribute(core, Found, Node, Name, encodeText(DefaultIfNotFound)));
         }
         //
         //====================================================================================================
         //
         public static int GetXMLAttributeInteger(CoreController core, bool Found, XmlNode Node, string Name, int DefaultIfNotFound) {
-            return genericController.encodeInteger(GetXMLAttribute(core, Found, Node, Name, DefaultIfNotFound.ToString()));
+            return GenericController.encodeInteger(GetXMLAttribute(core, Found, Node, Name, DefaultIfNotFound.ToString()));
         }
 
     }

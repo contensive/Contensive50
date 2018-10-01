@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor {
@@ -156,7 +156,7 @@ namespace Contensive.Processor {
         //
         public override string SelectContent(string HtmlName, string HtmlValue, string ContentName, string SQLCriteria = "", string NoneCaption = "", string HtmlClass = "", string HtmlId = "") {
             string tempSelectContent = null;
-            tempSelectContent = core.html.selectFromContent(HtmlName, genericController.encodeInteger(HtmlValue), ContentName, SQLCriteria, NoneCaption);
+            tempSelectContent = core.html.selectFromContent(HtmlName, GenericController.encodeInteger(HtmlValue), ContentName, SQLCriteria, NoneCaption);
             if (!string.IsNullOrEmpty(HtmlClass)) {
                 tempSelectContent = tempSelectContent.Replace("<select ", "<select class=\"" + HtmlClass + "\" ");
             }
@@ -170,7 +170,7 @@ namespace Contensive.Processor {
         //
         public override string SelectList(string HtmlName, string HtmlValue, string OptionList, string NoneCaption = "", string HtmlClass = "", string HtmlId = "") {
             string tempSelectList = null;
-            tempSelectList = HtmlController.selectFromList( core, HtmlName, genericController.encodeInteger( HtmlValue ), OptionList.Split(','), NoneCaption, HtmlId);
+            tempSelectList = HtmlController.selectFromList( core, HtmlName, GenericController.encodeInteger( HtmlValue ), OptionList.Split(','), NoneCaption, HtmlId);
             if (!string.IsNullOrEmpty(HtmlClass)) {
                 tempSelectList = tempSelectList.Replace("<select ", "<select class=\"" + HtmlClass + "\" ");
             }
@@ -214,7 +214,7 @@ namespace Contensive.Processor {
         // ====================================================================================================
         //
         public override string InputText(string HtmlName, string HtmlValue = "", string Height = "", string Width = "", bool IsPassword = false, string HtmlClass = "", string HtmlId = "") {
-            string returnValue = HtmlController.inputText( core,HtmlName, HtmlValue, genericController.encodeInteger(Height), genericController.encodeInteger(Width), HtmlId, IsPassword, false, HtmlClass);
+            string returnValue = HtmlController.inputText( core,HtmlName, HtmlValue, GenericController.encodeInteger(Height), GenericController.encodeInteger(Width), HtmlId, IsPassword, false, HtmlClass);
             returnValue = returnValue.Replace(" SIZE=\"60\"", "");
             return returnValue;
         }
@@ -248,12 +248,12 @@ namespace Contensive.Processor {
             string post = null;
             string target = null;
             //
-            posStart = genericController.vbInstr(1, SourceHtml, "<![CDATA[", 1);
+            posStart = GenericController.vbInstr(1, SourceHtml, "<![CDATA[", 1);
             if (posStart == 0) {
                 //
                 // no cdata
                 //
-                posStart = genericController.vbInstr(1, SourceHtml, "<textarea", 1);
+                posStart = GenericController.vbInstr(1, SourceHtml, "<textarea", 1);
                 if (posStart == 0) {
                     //
                     // no textarea
@@ -268,7 +268,7 @@ namespace Contensive.Processor {
                     //
                     // text area found, isolate it and indent before and after
                     //
-                    posEnd = genericController.vbInstr(posStart, SourceHtml, "</textarea>", 1);
+                    posEnd = GenericController.vbInstr(posStart, SourceHtml, "</textarea>", 1);
                     pre = SourceHtml.Left(posStart - 1);
                     if (posEnd == 0) {
                         target = SourceHtml.Substring(posStart - 1);
@@ -283,7 +283,7 @@ namespace Contensive.Processor {
                 //
                 // cdata found, isolate it and indent before and after
                 //
-                posEnd = genericController.vbInstr(posStart, SourceHtml, "]]>", 1);
+                posEnd = GenericController.vbInstr(posStart, SourceHtml, "]]>", 1);
                 pre = SourceHtml.Left(posStart - 1);
                 if (posEnd == 0) {
                     target = SourceHtml.Substring(posStart - 1);
@@ -326,11 +326,11 @@ namespace Contensive.Processor {
                             + "<div  class=\"ccHintWrapperContent\">"
                             + "<b>Administrator</b>"
                             + "<BR>"
-                            + "<BR>" + genericController.encodeText(innerHtml) + "</div>"
+                            + "<BR>" + GenericController.encodeText(innerHtml) + "</div>"
                         + "</div>";
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex, "Unexpected error in cp.html.adminHint()");
+                LogController.handleError( core,ex, "Unexpected error in cp.html.adminHint()");
             }
             return returnString;
         }

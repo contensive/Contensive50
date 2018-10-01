@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Controllers {
@@ -54,7 +54,7 @@ namespace Contensive.Processor.Controllers {
         private MenuEntryType[] iEntry;
         private string iMenuCloseString;
         private string UsedEntries; 
-        private keyPtrController EntryIndexName;
+        private KeyPtrController EntryIndexName;
          //
         // ----- RollOverFlyout storage
         //
@@ -70,7 +70,7 @@ namespace Contensive.Processor.Controllers {
         public MenuFlyoutController(CoreController core) : base() {
             this.core = core;
             //
-            EntryIndexName = new keyPtrController();
+            EntryIndexName = new KeyPtrController();
             Random rnd = new Random();
             MenuFlyoutNamePrefix = "id" + rnd.Next(9999).ToString();
             MenuFlyoutIcon_Local = "&nbsp;&#187;";
@@ -117,7 +117,7 @@ namespace Contensive.Processor.Controllers {
                         break;
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnHtml;
@@ -167,7 +167,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 result = GetMenuFlyout(MenuName, MenuStyle, StyleSheetPrefix);
             } catch( Exception ex ) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -182,8 +182,8 @@ namespace Contensive.Processor.Controllers {
                 string iEntryName = null;
                 string UcaseEntryName = null;
                 //
-                iEntryName = genericController.vbReplace(encodeEmpty(EntryName, ""), ",", " ");
-                UcaseEntryName = genericController.vbUCase(iEntryName);
+                iEntryName = GenericController.vbReplace(encodeEmpty(EntryName, ""), ",", " ");
+                UcaseEntryName = GenericController.vbUCase(iEntryName);
                 //
                 if ((!string.IsNullOrEmpty(iEntryName)) && ((UsedEntries + ",").IndexOf("," + UcaseEntryName + ",")  == -1)) {
                     UsedEntries = UsedEntries + "," + UcaseEntryName;
@@ -206,7 +206,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     iEntry[iEntryCount].CaptionImage = encodeEmpty(CaptionImageLink, "");
                     iEntry[iEntryCount].Name = UcaseEntryName;
-                    iEntry[iEntryCount].ParentName = genericController.vbUCase(encodeEmpty(ParentiEntryName, ""));
+                    iEntry[iEntryCount].ParentName = GenericController.vbUCase(encodeEmpty(ParentiEntryName, ""));
                     iEntry[iEntryCount].ImageOver = ImageOverLink;
                     iEntry[iEntryCount].NewWindow = NewWindow;
                     EntryIndexName.setPtr(UcaseEntryName, iEntryCount);
@@ -216,7 +216,7 @@ namespace Contensive.Processor.Controllers {
                 return;
                 //
             } catch( Exception ex ) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             //ErrorTrap:
             //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
@@ -246,7 +246,7 @@ namespace Contensive.Processor.Controllers {
                 int EndOfLine = 0;
                 //
                 tempReadLine = "";
-                EndOfLine = genericController.vbInstr(StartPosition, Source, "\r\n");
+                EndOfLine = GenericController.vbInstr(StartPosition, Source, "\r\n");
                 if (EndOfLine != 0) {
                     tempReadLine = Source.Substring(StartPosition - 1, EndOfLine);
                     StartPosition = EndOfLine + 2;
@@ -255,7 +255,7 @@ namespace Contensive.Processor.Controllers {
                 return tempReadLine;
                 //
             } catch( Exception ex ) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             //ErrorTrap:
             //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
@@ -298,7 +298,7 @@ namespace Contensive.Processor.Controllers {
                     if (string.IsNullOrEmpty(LocalStyleSheetPrefix)) {
                         LocalStyleSheetPrefix = "ccFlyout";
                     }
-                    UcaseMenuName = genericController.vbUCase(MenuName);
+                    UcaseMenuName = GenericController.vbUCase(MenuName);
                     for (EntryPointer = 0; EntryPointer < iEntryCount; EntryPointer++) {
                         if (iEntry[EntryPointer].Name == UcaseMenuName) {
                             break;
@@ -308,7 +308,7 @@ namespace Contensive.Processor.Controllers {
                         MouseClickCode = "";
                         MouseOverCode = "";
                         MouseOutCode = "";
-                        ImageID = "img" + encodeText(genericController.GetRandomInteger(core)) + "s";
+                        ImageID = "img" + encodeText(GenericController.GetRandomInteger(core)) + "s";
                         FlyoutStyle = LocalStyleSheetPrefix + "Button";
                         //
                         switch (MenuStyle) {
@@ -445,7 +445,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -539,7 +539,7 @@ namespace Contensive.Processor.Controllers {
                 return tempGetMenuFlyoutPanel;
                 //
             } catch( Exception ex ) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             //ErrorTrap:
             //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
@@ -581,14 +581,14 @@ namespace Contensive.Processor.Controllers {
             string Image = null;
             string ImageOver = "";
             //
-            Image = genericController.encodeText(ImageLink);
+            Image = GenericController.encodeText(ImageLink);
             if (!string.IsNullOrEmpty(Image)) {
-                ImageOver = genericController.encodeText(ImageOverLink);
+                ImageOver = GenericController.encodeText(ImageOverLink);
                 if (Image == ImageOver) {
                     ImageOver = "";
                 }
             }
-            core.menuFlyout.AddEntry(genericController.encodeText(Name), ParentName, Image, ImageOver, Link, Caption, "", NewWindow);
+            core.menuFlyout.AddEntry(GenericController.encodeText(Name), ParentName, Image, ImageOver, Link, Caption, "", NewWindow);
         }
         //
         //========================================================================
@@ -607,11 +607,11 @@ namespace Contensive.Processor.Controllers {
                     result += core.menuFlyout.GetMenuClose();
                     MenuFlyoutIcon = core.siteProperties.getText("MenuFlyoutIcon", "&#187;");
                     if (MenuFlyoutIcon != "&#187;") {
-                        result = genericController.vbReplace(result, "&#187;</a>", MenuFlyoutIcon + "</a>");
+                        result = GenericController.vbReplace(result, "&#187;</a>", MenuFlyoutIcon + "</a>");
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }

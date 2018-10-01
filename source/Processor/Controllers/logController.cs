@@ -16,7 +16,7 @@ namespace Contensive.Processor.Controllers {
     /// nlog: http://nlog-project.org/
     /// base configuration from: https://brutaldev.com/post/logging-setup-in-5-minutes-with-nlog
     /// </summary>
-    public static class logController {
+    public static class LogController {
         //
         public enum logLevel {
             /// <summary>
@@ -47,9 +47,9 @@ namespace Contensive.Processor.Controllers {
         //
         private static string LogFileCopyPrep(string Source) {
             string Copy = Source;
-            Copy = genericController.vbReplace(Copy, "\r\n", " ");
-            Copy = genericController.vbReplace(Copy, "\n", " ");
-            Copy = genericController.vbReplace(Copy, "\r", " ");
+            Copy = GenericController.vbReplace(Copy, "\r\n", " ");
+            Copy = GenericController.vbReplace(Copy, "\n", " ");
+            Copy = GenericController.vbReplace(Copy, "\r", " ");
             return Copy;
         }
         //
@@ -157,7 +157,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- log with even so we can pass in the type of our wrapper
                 LogEventInfo logEvent = new LogEventInfo(nLogLevel, nlogLogger.Name, message);
-                nlogLogger.Log(typeof(logController), logEvent);
+                nlogLogger.Log(typeof(LogController), logEvent);
             } catch (Exception) {
                 // -- ignore errors in error handling
             } finally {
@@ -300,7 +300,7 @@ namespace Contensive.Processor.Controllers {
                 return;
                 //
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             //ErrorTrap:
             throw (new Exception("Unexpected exception"));
@@ -364,7 +364,7 @@ namespace Contensive.Processor.Controllers {
                 + "";
             DataTable dt = core.db.executeQuery(SQL);
             if (dt.Rows.Count > 0) {
-                warningId = genericController.encodeInteger(dt.Rows[0]["id"]);
+                warningId = GenericController.encodeInteger(dt.Rows[0]["id"]);
             }
             //
             if (warningId != 0) {
@@ -429,7 +429,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // append to daily trace log
                 //
-                logController.log(core, errMsg, level);
+                LogController.log(core, errMsg, level);
                 //
                 // add to doc exception list to display at top of webpage
                 //

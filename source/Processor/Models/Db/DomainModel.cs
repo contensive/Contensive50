@@ -9,7 +9,7 @@ namespace Contensive.Processor.Models.Db {
         //-- const
         public const string contentName = "domains";
         public const string contentTableName = "ccdomains";
-        private const string contentDataSource = "default";
+        public const string contentDataSource = "default";
         //
         //====================================================================================================
         /// <summary>
@@ -124,8 +124,8 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public void invalidatePrimaryCache(CoreController core, int recordId) {
-            invalidateCache<DomainModel>(core, recordId);
+        public static void invalidateRecordCache(CoreController core, int recordId) {
+            invalidateRecordCache<DomainModel>(core, recordId);
         }
         //
         //====================================================================================================
@@ -163,6 +163,16 @@ namespace Contensive.Processor.Models.Db {
             Normal = 1,
             ForwardToUrl = 2,
             ForwardToReplacementDomain = 3
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Return a cache key used to represent the table. ONLY used for invalidation. Add this as a dependent key if you want that key cleared when ANY record in the table is changed.
+        /// </summary>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        public static string getTableInvalidationKey(CoreController core) {
+            return getTableCacheKey<DomainModel>(core);
         }
     }
 }

@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 using Contensive.BaseClasses;
 //
@@ -72,7 +72,7 @@ namespace Contensive.Processor {
                 cs = core.db.csInsertRecord(ContentName, OpeningMemberID);
                 success = core.db.csOk(cs);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return success;
@@ -89,7 +89,7 @@ namespace Contensive.Processor {
                 cs = core.db.csOpen(ContentName, "id=" + recordId, "", ActiveOnly, 0, false, false, SelectFieldList, 1, 1);
                 success = core.db.csOk(cs);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return success;
@@ -113,7 +113,7 @@ namespace Contensive.Processor {
                 cs = core.db.csOpen(ContentName, SQLCriteria, SortFieldList, ActiveOnly, 0, false, false, SelectFieldList, pageSize, PageNumber);
                 success = core.db.csOk(cs);
             } catch (Exception ex) {
-                logController.handleError( core,ex); // "Unexpected error in cs.Open") : Throw
+                LogController.handleError( core,ex); // "Unexpected error in cs.Open") : Throw
                 throw;
             }
             return success;
@@ -130,7 +130,7 @@ namespace Contensive.Processor {
                 cs = core.db.csOpenGroupUsers(GroupList, SQLCriteria, SortFieldList, ActiveOnly, PageSize, PageNumber);
                 success = OK();
             } catch (Exception ex) {
-                logController.handleError( core,ex); // "Unexpected error in cs.OpenGroupUsers")
+                LogController.handleError( core,ex); // "Unexpected error in cs.OpenGroupUsers")
                 throw;
             }
             return success;
@@ -149,7 +149,7 @@ namespace Contensive.Processor {
                 cs = core.db.csOpenGroupUsers(groupList, SQLCriteria, SortFieldList, ActiveOnly, PageSize, PageNumber);
                 success = OK();
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return success;
@@ -175,7 +175,7 @@ namespace Contensive.Processor {
                 cs = core.db.csOpenSql(sql,"Default");
                 success = core.db.csOk(cs);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return success;
@@ -196,7 +196,7 @@ namespace Contensive.Processor {
                 }
                 success = core.db.csOk(cs);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return success;
@@ -217,7 +217,7 @@ namespace Contensive.Processor {
                 }
                 success = core.db.csOk(cs);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return success;
@@ -232,7 +232,7 @@ namespace Contensive.Processor {
                     cs = -1;
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -240,7 +240,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override object GetFormInput(string ContentName, string FieldName, string Height = "", string Width = "", string HtmlId = "") {
-            return core.html.inputCs(cs, ContentName, FieldName, genericController.encodeInteger(Height), genericController.encodeInteger(Width), HtmlId);
+            return core.html.inputCs(cs, ContentName, FieldName, GenericController.encodeInteger(Height), GenericController.encodeInteger(Width), HtmlId);
         }
         //
         //====================================================================================================
@@ -249,7 +249,7 @@ namespace Contensive.Processor {
             try {
                 core.db.csDeleteRecord(cs);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -260,7 +260,7 @@ namespace Contensive.Processor {
             try {
                 return core.db.csIsFieldSupported(cs, FieldName);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -271,7 +271,7 @@ namespace Contensive.Processor {
             try {
                 core.db.csGoFirst(cs, false);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -282,7 +282,7 @@ namespace Contensive.Processor {
             try {
                 return DbController.csGetRecordAddLink(core, cs, PresetNameValueList, AllowPaste);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -293,7 +293,7 @@ namespace Contensive.Processor {
             try {
                 return core.db.csGetBoolean(cs, FieldName);
             } catch (Exception ex) {
-                logController.handleError( core,ex); // "Unexpected error in cs.GetBoolean")
+                LogController.handleError( core,ex); // "Unexpected error in cs.GetBoolean")
                 throw;
             }
         }
@@ -304,7 +304,7 @@ namespace Contensive.Processor {
             try {
                 return core.db.csGetDate(cs, FieldName);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -315,7 +315,7 @@ namespace Contensive.Processor {
             try {
                 return core.db.csGetRecordEditLink(cs, allowCut);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -326,7 +326,7 @@ namespace Contensive.Processor {
             try {
                 return core.db.csGetFieldFilename(cs, fieldName, OriginalFilename, ContentName);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -337,7 +337,7 @@ namespace Contensive.Processor {
             try {
                 return core.db.csGetInteger(cs, FieldName);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -348,7 +348,7 @@ namespace Contensive.Processor {
             try {
                 return core.db.csGetNumber(cs, FieldName);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -359,7 +359,7 @@ namespace Contensive.Processor {
             try {
                 return core.db.csGetRowCount(cs);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -370,7 +370,7 @@ namespace Contensive.Processor {
             try {
                 return core.db.csGetSource(cs);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -381,7 +381,7 @@ namespace Contensive.Processor {
             try {
                 return core.db.csGet(cs, FieldName);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -392,7 +392,7 @@ namespace Contensive.Processor {
             try {
                 return core.db.csGet(cs, FieldName);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -404,7 +404,7 @@ namespace Contensive.Processor {
             try {
                 return core.db.csGetText(cs, FieldName);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -415,7 +415,7 @@ namespace Contensive.Processor {
             try {
                 core.db.csGoNext(cs);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -427,7 +427,7 @@ namespace Contensive.Processor {
                 core.db.csGoNext(cs);
                 return core.db.csOk(cs);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -438,7 +438,7 @@ namespace Contensive.Processor {
             try {
                 return core.db.csOk(cs);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -449,7 +449,7 @@ namespace Contensive.Processor {
             try {
                 core.db.csSave(cs);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -480,7 +480,7 @@ namespace Contensive.Processor {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -491,7 +491,7 @@ namespace Contensive.Processor {
             try {
                 core.db.csSet(cs, FieldName, FieldValue);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -502,7 +502,7 @@ namespace Contensive.Processor {
             try {
                 core.db.csSetTextFile(cs, FieldName, Copy, ContentName);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -513,7 +513,7 @@ namespace Contensive.Processor {
             try {
                 DbController.csSetFormInput(core, cs, FieldName, RequestName);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }

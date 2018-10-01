@@ -11,69 +11,69 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Models.Db {
-    public class taskModel : BaseModel {
+    public class TaskModel : BaseModel {
         //
         //====================================================================================================
         //-- const
         public const string contentName = "tasks";
         public const string contentTableName = "ccTasks";
-        private const string contentDataSource = "default";
+        public const string contentDataSource = "default";
         //
         //====================================================================================================
         //
-        public string Command { get; set; }
-        public string DataSource { get; set; }
-        public DateTime DateCompleted { get; set; }
-        public DateTime DateStarted { get; set; }
-        public string Filename { get; set; }
-        public string ImportMapFilename { get; set; }
-        public string NotifyEmail { get; set; }
-        public string ResultMessage { get; set; }
-        public string SQLQuery { get; set; }
+        public string command { get; set; }
+        public string dataSource { get; set; }
+        public DateTime dateCompleted { get; set; }
+        public DateTime dateStarted { get; set; }
+        public string filename { get; set; }
+        public string importMapFilename { get; set; }
+        public string notifyEmail { get; set; }
+        public string resultMessage { get; set; }
+        public string sqlQuery { get; set; }
         public string cmdDetail { get; set; }
         //
         //====================================================================================================
-        public static taskModel add(CoreController core) {
-            return add<taskModel>(core);
+        public static TaskModel add(CoreController core) {
+            return add<TaskModel>(core);
         }
         //
         //====================================================================================================
-        public static taskModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<taskModel>(core, ref callersCacheNameList);
+        public static TaskModel add(CoreController core, ref List<string> callersCacheNameList) {
+            return add<TaskModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static taskModel create(CoreController core, int recordId) {
-            return create<taskModel>(core, recordId);
+        public static TaskModel create(CoreController core, int recordId) {
+            return create<TaskModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static taskModel create(CoreController core, int recordId, ref List<string> callersCacheNameList) {
-            return create<taskModel>(core, recordId, ref callersCacheNameList);
+        public static TaskModel create(CoreController core, int recordId, ref List<string> callersCacheNameList) {
+            return create<TaskModel>(core, recordId, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static taskModel create(CoreController core, string recordGuid) {
-            return create<taskModel>(core, recordGuid);
+        public static TaskModel create(CoreController core, string recordGuid) {
+            return create<TaskModel>(core, recordGuid);
         }
         //
         //====================================================================================================
-        public static taskModel create(CoreController core, string recordGuid, ref List<string> callersCacheNameList) {
-            return create<taskModel>(core, recordGuid, ref callersCacheNameList);
+        public static TaskModel create(CoreController core, string recordGuid, ref List<string> callersCacheNameList) {
+            return create<TaskModel>(core, recordGuid, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static taskModel createByName(CoreController core, string recordName) {
-            return createByName<taskModel>(core, recordName);
+        public static TaskModel createByName(CoreController core, string recordName) {
+            return createByName<TaskModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static taskModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<taskModel>(core, recordName, ref callersCacheNameList);
+        public static TaskModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByName<TaskModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================
@@ -83,52 +83,62 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static void delete(CoreController core, int recordId) {
-            delete<taskModel>(core, recordId);
+            delete<TaskModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static void delete(CoreController core, string ccGuid) {
-            delete<taskModel>(core, ccGuid);
+            delete<TaskModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static List<taskModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
-            return createList<taskModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
+        public static List<TaskModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
+            return createList<TaskModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static List<taskModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy) {
-            return createList<taskModel>(core, sqlCriteria, sqlOrderBy);
+        public static List<TaskModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy) {
+            return createList<TaskModel>(core, sqlCriteria, sqlOrderBy);
         }
         //
         //====================================================================================================
-        public static List<taskModel> createList(CoreController core, string sqlCriteria) {
-            return createList<taskModel>(core, sqlCriteria);
+        public static List<TaskModel> createList(CoreController core, string sqlCriteria) {
+            return createList<TaskModel>(core, sqlCriteria);
         }
         //
         //====================================================================================================
-        public void invalidatePrimaryCache(CoreController core, int recordId) {
-            invalidateCache<taskModel>(core, recordId);
+        public static void invalidateRecordCache(CoreController core, int recordId) {
+            invalidateRecordCache<TaskModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return BaseModel.getRecordName<taskModel>(core, recordId);
+            return BaseModel.getRecordName<TaskModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return BaseModel.getRecordName<taskModel>(core, ccGuid);
+            return BaseModel.getRecordName<TaskModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return BaseModel.getRecordId<taskModel>(core, ccGuid);
+            return BaseModel.getRecordId<TaskModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static taskModel createDefault(CoreController core) {
-            return createDefault<taskModel>(core);
+        public static TaskModel createDefault(CoreController core) {
+            return createDefault<TaskModel>(core);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Return a cache key used to represent the table. ONLY used for invalidation. Add this as a dependent key if you want that key cleared when ANY record in the table is changed.
+        /// </summary>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        public static string getTableInvalidationKey(CoreController core) {
+            return getTableCacheKey<TaskModel>(core);
         }
     }
 }

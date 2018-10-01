@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 using System.Threading;
@@ -159,7 +159,7 @@ namespace Contensive.Addons.Tools {
                 int MenuEntryID = 0;
                 int MenuHeaderID = 0;
                 int MenuDirection = 0;
-                stringBuilderLegacyController Stream = new stringBuilderLegacyController();
+                StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 //
                 Button = core.docProperties.getText("Button");
                 if (Button == ButtonCancelAll) {
@@ -307,7 +307,7 @@ namespace Contensive.Addons.Tools {
                     tempGetForm = Stream.Text;
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return tempGetForm;
         }
@@ -319,7 +319,7 @@ namespace Contensive.Addons.Tools {
         private string GetForm_Root() {
             string result = "";
             try {
-                stringBuilderLegacyController Stream = new stringBuilderLegacyController();
+                StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 string ButtonList;
                 //
                 ButtonList = ButtonCancelAll;
@@ -350,7 +350,7 @@ namespace Contensive.Addons.Tools {
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
                 //result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result; 
         }
@@ -376,7 +376,7 @@ namespace Contensive.Addons.Tools {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return tempGetForm_RootRow;
         }
@@ -393,7 +393,7 @@ namespace Contensive.Addons.Tools {
                 int ContentID = 0;
                 string TableName = "";
                 string ContentName = "";
-                stringBuilderLegacyController Stream = new stringBuilderLegacyController();
+                StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 string ButtonList = null;
                 string Description = null;
                 string Caption = null;
@@ -417,9 +417,9 @@ namespace Contensive.Addons.Tools {
                     TableName = core.docProperties.getText("TableName");
                     //
                     Stream.Add(SpanClassAdminSmall);
-                    Stream.Add("<P>Creating content [" + ContentName + "] on table [" + TableName + "] on Datasource [" + datasource.Name + "].</P>");
-                    if ((!string.IsNullOrEmpty(ContentName)) & (!string.IsNullOrEmpty(TableName)) & (!string.IsNullOrEmpty(datasource.Name))) {
-                        core.db.createSQLTable(datasource.Name, TableName);
+                    Stream.Add("<P>Creating content [" + ContentName + "] on table [" + TableName + "] on Datasource [" + datasource.name + "].</P>");
+                    if ((!string.IsNullOrEmpty(ContentName)) & (!string.IsNullOrEmpty(TableName)) & (!string.IsNullOrEmpty(datasource.name))) {
+                        core.db.createSQLTable(datasource.name, TableName);
                         core.db.createContentFromSQLTable(datasource, TableName, ContentName);
                         core.cache.invalidateAll();
                         core.doc.clearMetaData();
@@ -455,7 +455,7 @@ namespace Contensive.Addons.Tools {
                 }
                 Stream.Add(SpanClassAdminNormal);
                 Stream.Add("Data Source<br>");
-                Stream.Add(core.html.selectFromContent("DataSourceID", datasource.ID, "Data Sources", "", "Default"));
+                Stream.Add(core.html.selectFromContent("DataSourceID", datasource.id, "Data Sources", "", "Default"));
                 Stream.Add("<br><br>");
                 Stream.Add("Content Name<br>");
                 Stream.Add(HtmlController.inputText( core,"ContentName", ContentName, 1, 40));
@@ -466,7 +466,7 @@ namespace Contensive.Addons.Tools {
                 Stream.Add("</SPAN>");
                 result = AdminUIController.getBody(core,Caption, ButtonList, "", false, false, Description, "", 10, Stream.Text);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -501,7 +501,7 @@ namespace Contensive.Addons.Tools {
                 bool ReloadCDef = false;
                 int InheritedFieldCount = 0;
                 string Caption = null;
-                stringBuilderLegacyController Stream = new stringBuilderLegacyController();
+                StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 string ButtonList = null;
                 string FormPanel = "";
                 //
@@ -518,7 +518,7 @@ namespace Contensive.Addons.Tools {
                 TargetFieldID = core.docProperties.getInteger("fi");
                 ContentID = core.docProperties.getInteger(RequestNameToolContentID);
                 //ColumnPointer = core.main_GetStreamInteger("dtcn")
-                FieldNameToAdd = genericController.vbUCase(core.docProperties.getText(RequestNameAddField));
+                FieldNameToAdd = GenericController.vbUCase(core.docProperties.getText(RequestNameAddField));
                 FieldIDToAdd = core.docProperties.getInteger(RequestNameAddFieldID);
                 ButtonList = ButtonCancel + "," + ButtonSelect;
                 ReloadCDef = core.docProperties.getBoolean("ReloadCDef");
@@ -1064,7 +1064,7 @@ namespace Contensive.Addons.Tools {
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
                 //result =  adminUIController.getToolFormOpen(core, ButtonList) +  + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -1105,7 +1105,7 @@ namespace Contensive.Addons.Tools {
                 string Button = null;
                 bool FieldRequired = false;
                 bool FieldAuthorable = false;
-                stringBuilderLegacyController Stream = new stringBuilderLegacyController();
+                StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 string ButtonList = null;
                 //
                 const string ButtonFix = "Make Corrections";
@@ -1129,7 +1129,7 @@ namespace Contensive.Addons.Tools {
                     for (DiagActionPointer = 0; DiagActionPointer <= iDiagActionCount; DiagActionPointer++) {
                         DiagAction = core.docProperties.getText("DiagAction" + DiagActionPointer);
                         Stream.Add("Perform Action " + DiagActionPointer + " - " + DiagAction + "<br>");
-                        switch (genericController.encodeInteger(DiagArgument(DiagAction, 0))) {
+                        switch (GenericController.encodeInteger(DiagArgument(DiagAction, 0))) {
                             case DiagActionSetFieldType:
                                 //
                                 // ----- Set Field Type
@@ -1159,7 +1159,7 @@ namespace Contensive.Addons.Tools {
                                 // ----- Delete Record
                                 //
                                 ContentName = DiagArgument(DiagAction, 1);
-                                RecordID = genericController.encodeInteger(DiagArgument(DiagAction, 2));
+                                RecordID = GenericController.encodeInteger(DiagArgument(DiagAction, 2));
                                 core.db.deleteContentRecord(ContentName, RecordID);
                                 //end case
                                 break;
@@ -1181,7 +1181,7 @@ namespace Contensive.Addons.Tools {
                                 // ----- Set Field Inactive
                                 //
                                 ContentName = DiagArgument(DiagAction, 1);
-                                RecordID = genericController.encodeInteger(DiagArgument(DiagAction, 2));
+                                RecordID = GenericController.encodeInteger(DiagArgument(DiagAction, 2));
                                 CS = core.db.csOpen(ContentName, "(ID=" + RecordID + ")");
                                 if (core.db.csOk(CS)) {
                                     core.db.csSet(CS, "active", 0);
@@ -1194,7 +1194,7 @@ namespace Contensive.Addons.Tools {
                                 // ----- Set Field not-required
                                 //
                                 ContentName = DiagArgument(DiagAction, 1);
-                                RecordID = genericController.encodeInteger(DiagArgument(DiagAction, 2));
+                                RecordID = GenericController.encodeInteger(DiagArgument(DiagAction, 2));
                                 CS = core.db.csOpen(ContentName, "(ID=" + RecordID + ")");
                                 if (core.db.csOk(CS)) {
                                     core.db.csSet(CS, "required", 0);
@@ -1490,7 +1490,7 @@ namespace Contensive.Addons.Tools {
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
                 //result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -1543,7 +1543,7 @@ namespace Contensive.Addons.Tools {
                         //
                         core.db.csGoFirst(CSPointer);
                         while (core.db.csOk(CSPointer)) {
-                            switch (genericController.vbUCase(core.db.csGetText(CSPointer, "name"))) {
+                            switch (GenericController.vbUCase(core.db.csGetText(CSPointer, "name"))) {
                                 case "ACTIVE":
                                     core.db.csSet(CSPointer, "IndexColumn", 0);
                                     core.db.csSet(CSPointer, "IndexWidth", 20);
@@ -1615,7 +1615,7 @@ namespace Contensive.Addons.Tools {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
         }
         //
@@ -1630,7 +1630,7 @@ namespace Contensive.Addons.Tools {
                 string ParentContentName = null;
                 string ChildContentName = "";
                 bool AddAdminMenuEntry = false;
-                stringBuilderLegacyController Stream = new stringBuilderLegacyController();
+                StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 string ButtonList = ButtonCancel + "," + ButtonRun;
                 //
                 Stream.Add(AdminUIController.getToolFormTitle("Create a Child Content from a Content Definition", "This tool creates a Content Definition based on another Content Definition."));
@@ -1700,7 +1700,7 @@ namespace Contensive.Addons.Tools {
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
                 //result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -1712,7 +1712,7 @@ namespace Contensive.Addons.Tools {
         private string GetForm_ClearContentWatchLinks() {
             string result = "";
             try {
-                stringBuilderLegacyController Stream = new stringBuilderLegacyController();
+                StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 string ButtonList;
                 //
                 ButtonList = ButtonCancel + ",Clear Content Watch Links";
@@ -1732,7 +1732,7 @@ namespace Contensive.Addons.Tools {
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
                 //result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -1747,7 +1747,7 @@ namespace Contensive.Addons.Tools {
             try {
                 int CSContent = 0;
                 Processor.Models.Domain.CDefModel CD = null;
-                stringBuilderLegacyController Stream = new stringBuilderLegacyController();
+                StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 string[,] ContentNameArray = null;
                 int ContentNameCount = 0;
                 string TableName = null;
@@ -1787,7 +1787,7 @@ namespace Contensive.Addons.Tools {
                 returnValue = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
                 //returnValue = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnValue;
@@ -1829,7 +1829,7 @@ namespace Contensive.Addons.Tools {
                 DiagActionCount = DiagActionCount + 1;
                 result =  core.html.getPanel(Panel);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -1853,7 +1853,7 @@ namespace Contensive.Addons.Tools {
             EndOfList = false;
             CommandStartPosition = 1;
             while ((CommandCount < CommandPosition) && (!EndOfList)) {
-                CommandStartPosition = genericController.vbInstr(CommandStartPosition, CommandList, ",");
+                CommandStartPosition = GenericController.vbInstr(CommandStartPosition, CommandList, ",");
                 if (CommandStartPosition == 0) {
                     EndOfList = true;
                 }
@@ -1861,7 +1861,7 @@ namespace Contensive.Addons.Tools {
                 CommandCount = CommandCount + 1;
             }
             if (!EndOfList) {
-                CommandEndPosition = genericController.vbInstr(CommandStartPosition, CommandList, ",");
+                CommandEndPosition = GenericController.vbInstr(CommandStartPosition, CommandList, ",");
                 if (CommandEndPosition == 0) {
                     tempDiagArgument = CommandList.Substring(CommandStartPosition - 1);
                 } else {
@@ -1893,7 +1893,7 @@ namespace Contensive.Addons.Tools {
                 int RecordCount = 0;
                 string SQL = null;
                 int CS = 0;
-                stringBuilderLegacyController Stream = new stringBuilderLegacyController();
+                StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 string ButtonList;
                 //
                 ButtonList = ButtonCancel + "," + ButtonRun;
@@ -1942,7 +1942,7 @@ namespace Contensive.Addons.Tools {
                             NextTicks = NextTicks + core.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                             //
                             TestTicks = core.doc.appStopWatch.ElapsedMilliseconds;
-                            TestCopy = genericController.encodeText(dr["NAME"]);
+                            TestCopy = GenericController.encodeText(dr["NAME"]);
                             ReadTicks = ReadTicks + core.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                             //
                             RecordCount = RecordCount + 1;
@@ -1974,7 +1974,7 @@ namespace Contensive.Addons.Tools {
                         while (core.db.csOk(CS)) {
                             //
                             TestTicks = core.doc.appStopWatch.ElapsedMilliseconds;
-                            TestCopy = genericController.encodeText(core.db.csGetValue(CS, "Name"));
+                            TestCopy = GenericController.encodeText(core.db.csGetValue(CS, "Name"));
                             ReadTicks = ReadTicks + core.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                             //
                             TestTicks = core.doc.appStopWatch.ElapsedMilliseconds;
@@ -2010,7 +2010,7 @@ namespace Contensive.Addons.Tools {
                         while (core.db.csOk(CS)) {
                             //
                             TestTicks = core.doc.appStopWatch.ElapsedMilliseconds;
-                            TestCopy = genericController.encodeText(core.db.csGetValue(CS, "Name"));
+                            TestCopy = GenericController.encodeText(core.db.csGetValue(CS, "Name"));
                             ReadTicks = ReadTicks + core.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                             //
                             TestTicks = core.doc.appStopWatch.ElapsedMilliseconds;
@@ -2035,7 +2035,7 @@ namespace Contensive.Addons.Tools {
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
                 //result =  adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -2050,10 +2050,10 @@ namespace Contensive.Addons.Tools {
                 tempLocal_GetContentID = 0;
                 DataTable dt = core.db.executeQuery("Select ID from ccContent where name=" + core.db.encodeSQLText(ContentName));
                 if (dt.Rows.Count > 0) {
-                    tempLocal_GetContentID = genericController.encodeInteger(dt.Rows[0][0]);
+                    tempLocal_GetContentID = GenericController.encodeInteger(dt.Rows[0][0]);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return tempLocal_GetContentID;
         }
@@ -2071,10 +2071,10 @@ namespace Contensive.Addons.Tools {
                 tempLocal_GetContentNameByID = "";
                 dt = core.db.executeQuery("Select name from ccContent where id=" + ContentID);
                 if (dt.Rows.Count > 0) {
-                    tempLocal_GetContentNameByID = genericController.encodeText(dt.Rows[0][0]);
+                    tempLocal_GetContentNameByID = GenericController.encodeText(dt.Rows[0][0]);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return tempLocal_GetContentNameByID;
         }
@@ -2092,10 +2092,10 @@ namespace Contensive.Addons.Tools {
                 tempLocal_GetContentTableName = "";
                 RS = core.db.executeQuery("Select ccTables.Name as TableName from ccContent Left Join ccTables on ccContent.ContentTableID=ccTables.ID where ccContent.name=" + core.db.encodeSQLText(ContentName));
                 if (RS.Rows.Count > 0) {
-                    tempLocal_GetContentTableName = genericController.encodeText(RS.Rows[0][0]);
+                    tempLocal_GetContentTableName = GenericController.encodeText(RS.Rows[0][0]);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return tempLocal_GetContentTableName;
         }
@@ -2115,14 +2115,14 @@ namespace Contensive.Addons.Tools {
                     + " where ccContent.name=" + core.db.encodeSQLText(ContentName);
                 DataTable RS = core.db.executeQuery(SQL);
                 if (DbController.isDataTableOk(RS)) {
-                    tempLocal_GetContentDataSource = genericController.encodeText(RS.Rows[0]["Name"]);
+                    tempLocal_GetContentDataSource = GenericController.encodeText(RS.Rows[0]["Name"]);
                 }
                 if (string.IsNullOrEmpty(tempLocal_GetContentDataSource)) {
                     tempLocal_GetContentDataSource = "Default";
                 }
                 DbController.closeDataTable(RS);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return tempLocal_GetContentDataSource;
         }
@@ -2148,7 +2148,7 @@ namespace Contensive.Addons.Tools {
                 string[,] arrayOfSchema = null;
                 string CellData = null;
                 string TableName = "";
-                stringBuilderLegacyController Stream = new stringBuilderLegacyController();
+                StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 string ButtonList = null;
                 DataTable RSSchema = null;
                 var tmpList = new List<string> { };
@@ -2175,7 +2175,7 @@ namespace Contensive.Addons.Tools {
                     //ConnectionString = core.db.getmain_GetConnectionString(DataSourceName)
                     //
                     Stream.Add(SpanClassAdminSmall + "<br><br>");
-                    Stream.Add(DateTime.Now + " Opening Table Schema on DataSource [" + datasource.Name + "]<br>");
+                    Stream.Add(DateTime.Now + " Opening Table Schema on DataSource [" + datasource.name + "]<br>");
                     //
                     RSSchema = core.db.getTableSchemaData(TableName);
                     Stream.Add(DateTime.Now + " GetSchema executed successfully<br>");
@@ -2372,7 +2372,7 @@ namespace Contensive.Addons.Tools {
                 //
                 Stream.Add("<br><br>");
                 Stream.Add("Data Source<br>");
-                Stream.Add(core.html.selectFromContent("DataSourceID", datasource.ID, "Data Sources", "", "Default"));
+                Stream.Add(core.html.selectFromContent("DataSourceID", datasource.id, "Data Sources", "", "Default"));
                 //
                 //Stream.Add( core.main_GetFormInputHidden(RequestNameAdminForm, AdminFormToolSchema)
                 Stream.Add("</SPAN>");
@@ -2380,7 +2380,7 @@ namespace Contensive.Addons.Tools {
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
                 //result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -2490,12 +2490,12 @@ namespace Contensive.Addons.Tools {
                         Rows = core.db.convertDataTabletoArray(RSSchema);
                         RowMax = Rows.GetUpperBound(1);
                         for (RowPointer = 0; RowPointer <= RowMax; RowPointer++) {
-                            IndexName = genericController.encodeText(Rows[5, RowPointer]);
+                            IndexName = GenericController.encodeText(Rows[5, RowPointer]);
                             if (!string.IsNullOrEmpty(IndexName)) {
                                 result += HtmlController.tableRowStart();
-                                Copy = HtmlController.checkbox("DropIndex." + RowPointer, false) + HtmlController.inputHidden("DropIndexName." + RowPointer, IndexName) + genericController.encodeText(IndexName);
+                                Copy = HtmlController.checkbox("DropIndex." + RowPointer, false) + HtmlController.inputHidden("DropIndexName." + RowPointer, IndexName) + GenericController.encodeText(IndexName);
                                 result += HtmlController.td(Copy,"",0, TableRowEven);
-                                result += HtmlController.td(genericController.encodeText(Rows[17, RowPointer]),"",0, TableRowEven);
+                                result += HtmlController.td(GenericController.encodeText(Rows[17, RowPointer]),"",0, TableRowEven);
                                 result += HtmlController.td("&nbsp;","",0, TableRowEven);
                                 result += kmaEndTableRow;
                                 TableRowEven = !TableRowEven;
@@ -2522,7 +2522,7 @@ namespace Contensive.Addons.Tools {
                         RowMax = Rows.GetUpperBound(1);
                         for (RowPointer = 0; RowPointer <= RowMax; RowPointer++) {
                             result += HtmlController.tableRowStart();
-                            Copy = HtmlController.checkbox("AddIndex." + RowPointer, false) + HtmlController.inputHidden("AddIndexFieldName." + RowPointer, Rows[3, RowPointer]) + genericController.encodeText(Rows[3, RowPointer]);
+                            Copy = HtmlController.checkbox("AddIndex." + RowPointer, false) + HtmlController.inputHidden("AddIndexFieldName." + RowPointer, Rows[3, RowPointer]) + GenericController.encodeText(Rows[3, RowPointer]);
                             result += HtmlController.td(Copy,"",0, TableRowEven);
                             result += HtmlController.td("&nbsp;","",0, TableRowEven);
                             result += HtmlController.td("&nbsp;","",0, TableRowEven);
@@ -2547,7 +2547,7 @@ namespace Contensive.Addons.Tools {
                 result = AdminUIController.getToolForm(core, result, ButtonList);
                 //result = adminUIController.getToolFormOpen(core, ButtonList) + result + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -2623,7 +2623,7 @@ namespace Contensive.Addons.Tools {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -2640,13 +2640,13 @@ namespace Contensive.Addons.Tools {
                 tempGetForm_LogFiles = tempGetForm_LogFiles + "<P></P>";
                 //
                 string QueryOld = ".asp?";
-                string QueryNew = genericController.modifyQueryString(QueryOld, RequestNameAdminForm, AdminFormToolLogFileView, true);
-                tempGetForm_LogFiles = tempGetForm_LogFiles + genericController.vbReplace(GetForm_LogFiles_Details(), QueryOld, QueryNew + "&", 1, 99, 1);
+                string QueryNew = GenericController.modifyQueryString(QueryOld, RequestNameAdminForm, AdminFormToolLogFileView, true);
+                tempGetForm_LogFiles = tempGetForm_LogFiles + GenericController.vbReplace(GetForm_LogFiles_Details(), QueryOld, QueryNew + "&", 1, 99, 1);
                 //
                 tempGetForm_LogFiles = AdminUIController.getToolForm(core, tempGetForm_LogFiles, ButtonList);
                 //tempGetForm_LogFiles = adminUIController.getToolFormOpen(core, ButtonList) + tempGetForm_LogFiles + (adminUIController.getToolFormClose(core, ButtonList));
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return tempGetForm_LogFiles;
         }
@@ -2770,9 +2770,9 @@ namespace Contensive.Addons.Tools {
                                 FileDate = LineSplit[3];
                                 FileURL = StartPath + CurrentPath + "\\" + Filename;
                                 QueryString = core.doc.refreshQueryString;
-                                QueryString = genericController.modifyQueryString(QueryString, RequestNameAdminForm, encodeText(AdminFormTool), true);
-                                QueryString = genericController.modifyQueryString(QueryString, "at", AdminFormToolLogFileView, true);
-                                QueryString = genericController.modifyQueryString(QueryString, "SourceFile", FileURL, true);
+                                QueryString = GenericController.modifyQueryString(QueryString, RequestNameAdminForm, encodeText(AdminFormTool), true);
+                                QueryString = GenericController.modifyQueryString(QueryString, "at", AdminFormToolLogFileView, true);
+                                QueryString = GenericController.modifyQueryString(QueryString, "SourceFile", FileURL, true);
                                 CellCopy = "<A href=\"" + core.webServer.requestPath + "?" + QueryString + "\" target=\"_blank\">" + Filename + "</A>";
                                 result += GetForm_LogFiles_Details_GetRow(SpacerImage, CellCopy, FileSize, FileDate, RowEven);
                             }
@@ -2782,7 +2782,7 @@ namespace Contensive.Addons.Tools {
                     result += GetTableEnd;
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -2796,7 +2796,7 @@ namespace Contensive.Addons.Tools {
             //
             string ClassString = null;
             //
-            if (genericController.encodeBoolean(RowEven)) {
+            if (GenericController.encodeBoolean(RowEven)) {
                 RowEven = false;
                 ClassString = " class=\"ccPanelRowEven\" ";
             } else {
@@ -2804,12 +2804,12 @@ namespace Contensive.Addons.Tools {
                 ClassString = " class=\"ccPanelRowOdd\" ";
             }
             //
-            Cell0 = genericController.encodeText(Cell0);
+            Cell0 = GenericController.encodeText(Cell0);
             if (string.IsNullOrEmpty(Cell0)) {
                 Cell0 = "&nbsp;";
             }
             //
-            Cell1 = genericController.encodeText(Cell1);
+            Cell1 = GenericController.encodeText(Cell1);
             //
             if (string.IsNullOrEmpty(Cell1)) {
                 tempGetForm_LogFiles_Details_GetRow = "<tr><TD" + ClassString + " Colspan=\"4\">" + Cell0 + "</td></tr>";
@@ -2828,7 +2828,7 @@ namespace Contensive.Addons.Tools {
             string result = "";
             try {
                 //
-                stringBuilderLegacyController Stream = new stringBuilderLegacyController();
+                StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 string ButtonList;
                 //
                 ButtonList = ButtonCancel + "," + ButtonSaveandInvalidateCache;
@@ -2857,7 +2857,7 @@ namespace Contensive.Addons.Tools {
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
                 //result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -2871,7 +2871,7 @@ namespace Contensive.Addons.Tools {
             string tempGetForm_Restart = null;
             try {
                 //
-                stringBuilderLegacyController Stream = new stringBuilderLegacyController();
+                StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 string ButtonList;
                 // Dim runAtServer As runAtServerClass
                 //
@@ -2889,14 +2889,14 @@ namespace Contensive.Addons.Tools {
                 } else {
                     //
                     // Restart
-                    logController.logDebug(core, "Restarting Contensive");
+                    LogController.logDebug(core, "Restarting Contensive");
                     core.webServer.redirect("/ccLib/Popup/WaitForIISReset.htm");
                     Thread.Sleep(2000);
                     //
-                    taskSchedulerController.addTaskToQueue(core, taskQueueCommandEnumModule.runAddon, new cmdDetailClass() {
+                    TaskSchedulerController.addTaskToQueue(core, taskQueueCommandEnumModule.runAddon, new cmdDetailClass() {
                         addonId = 0,
                         addonName = "commandRestart",
-                        args = genericController.convertAddonArgumentstoDocPropertiesList(core, "")
+                        args = GenericController.convertAddonArgumentstoDocPropertiesList(core, "")
                     }, false);
                 }
                 //
@@ -2909,7 +2909,7 @@ namespace Contensive.Addons.Tools {
                 tempGetForm_Restart = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
                 //tempGetForm_Restart =  adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return tempGetForm_Restart;
         }
@@ -2956,7 +2956,7 @@ namespace Contensive.Addons.Tools {
         private string GetForm_LoadTemplates() {
             string result = "";
             try {
-                stringBuilderLegacyController Stream = new stringBuilderLegacyController();
+                StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 string ButtonList = null;
                 bool AllowImageImport = false;
                 bool AllowStyleImport = false;
@@ -2996,7 +2996,7 @@ namespace Contensive.Addons.Tools {
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
                 //result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -3282,7 +3282,7 @@ namespace Contensive.Addons.Tools {
                 AddonModel addon = AddonModel.create(core, "{B966103C-DBF4-4655-856A-3D204DEF6B21}");
                 string Content = core.addon.execute(addon, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                     addonType = Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
-                    instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(core, InstanceOptionString),
+                    instanceArguments = GenericController.convertAddonArgumentstoDocPropertiesList(core, InstanceOptionString),
                     instanceGuid = "-2",
                     errorContextMessage = "executing File Manager addon within Content File Manager"
                 });
@@ -3290,7 +3290,7 @@ namespace Contensive.Addons.Tools {
                 string ButtonList = ButtonApply + "," + ButtonCancel;
                 result = AdminUIController.getBody(core,"Content File Manager", ButtonList, "", false, false, Description, "", 0, Content);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -3306,7 +3306,7 @@ namespace Contensive.Addons.Tools {
                 AddonModel addon = AddonModel.create(core, "{B966103C-DBF4-4655-856A-3D204DEF6B21}");
                 string Content = core.addon.execute(addon, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                     addonType = Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
-                    instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(core, InstanceOptionString),
+                    instanceArguments = GenericController.convertAddonArgumentstoDocPropertiesList(core, InstanceOptionString),
                     instanceGuid = "-2",
                     errorContextMessage = "executing File Manager within website file manager"
                 });
@@ -3314,7 +3314,7 @@ namespace Contensive.Addons.Tools {
                 string ButtonList = ButtonApply + "," + ButtonCancel;
                 result = AdminUIController.getBody(core,"Website File Manager", ButtonList, "", false, false, Description, "", 0, Content);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -3336,7 +3336,7 @@ namespace Contensive.Addons.Tools {
                 int RowPtr = 0;
                 int RecordID = 0;
                 int CS = 0;
-                stringBuilderLegacyController Stream = new stringBuilderLegacyController();
+                StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 // Dim runAtServer As New runAtServerClass(core)
                 string CDefList = "";
                 string FindText = "";
@@ -3358,7 +3358,7 @@ namespace Contensive.Addons.Tools {
                     if (RowCnt > 0) {
                         for (RowPtr = 0; RowPtr < RowCnt; RowPtr++) {
                             if (core.docProperties.getBoolean("Cdef" + RowPtr)) {
-                                lcName = genericController.vbLCase(core.docProperties.getText("CDefName" + RowPtr));
+                                lcName = GenericController.vbLCase(core.docProperties.getText("CDefName" + RowPtr));
                                 if (IsDeveloper || (lcName == "page content") || (lcName == "copy content") || (lcName == "page templates")) {
                                     CDefList = CDefList + "," + lcName;
                                 }
@@ -3373,8 +3373,8 @@ namespace Contensive.Addons.Tools {
                         cmdDetailClass cmdDetail = new cmdDetailClass();
                         cmdDetail.addonId = 0;
                         cmdDetail.addonName = "GetForm_FindAndReplace";
-                        cmdDetail.args = genericController.convertAddonArgumentstoDocPropertiesList(core, QS);
-                        taskSchedulerController.addTaskToQueue(core, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
+                        cmdDetail.args = GenericController.convertAddonArgumentstoDocPropertiesList(core, QS);
+                        TaskSchedulerController.addTaskToQueue(core, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
                         Stream.Add("Find and Replace has been requested for content definitions [" + CDefList + "], finding [" + FindText + "] and replacing with [" + ReplaceText + "]");
                     }
                 } else {
@@ -3411,10 +3411,10 @@ namespace Contensive.Addons.Tools {
                 CS = core.db.csOpen("Content");
                 while (core.db.csOk(CS)) {
                     RecordName = core.db.csGetText(CS, "Name");
-                    lcName = genericController.vbLCase(RecordName);
+                    lcName = GenericController.vbLCase(RecordName);
                     if (IsDeveloper || (lcName == "page content") || (lcName == "copy content") || (lcName == "page templates")) {
                         RecordID = core.db.csGetInteger(CS, "ID");
-                        if (genericController.vbInstr(1, "," + CDefList + ",", "," + RecordName + ",") != 0) {
+                        if (GenericController.vbInstr(1, "," + CDefList + ",", "," + RecordName + ",") != 0) {
                             TopHalf = TopHalf + "<div>" + HtmlController.checkbox("Cdef" + RowPtr, true) + HtmlController.inputHidden("CDefName" + RowPtr, RecordName) + "&nbsp;" + core.db.csGetText(CS, "Name") + "</div>";
                         } else {
                             BottomHalf = BottomHalf + "<div>" + HtmlController.checkbox("Cdef" + RowPtr, false) + HtmlController.inputHidden("CDefName" + RowPtr, RecordName) + "&nbsp;" + core.db.csGetText(CS, "Name") + "</div>";
@@ -3429,7 +3429,7 @@ namespace Contensive.Addons.Tools {
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonCancel + "," + ButtonFindAndReplace);
                 //result = adminUIController.getToolFormOpen(core, ) + Stream.Text + adminUIController.getToolFormClose(core, ButtonCancel + "," + ButtonFindAndReplace);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -3440,7 +3440,7 @@ namespace Contensive.Addons.Tools {
             string result = "";
             try {
                 string Button = null;
-                stringBuilderLegacyController s = new stringBuilderLegacyController();
+                StringBuilderLegacyController s = new StringBuilderLegacyController();
                 //
                 s.Add(AdminUIController.getToolFormTitle("IIS Reset", "Reset the webserver."));
                 //
@@ -3452,14 +3452,14 @@ namespace Contensive.Addons.Tools {
                     //
                     //
                     //
-                    logController.logDebug(core, "Restarting IIS");
+                    LogController.logDebug(core, "Restarting IIS");
                     core.webServer.redirect("/ccLib/Popup/WaitForIISReset.htm");
                     Thread.Sleep(2000);
                     cmdDetailClass cmdDetail = new cmdDetailClass();
                     cmdDetail.addonId = 0;
                     cmdDetail.addonName = "GetForm_IISReset";
-                    cmdDetail.args = genericController.convertAddonArgumentstoDocPropertiesList(core, "");
-                    taskSchedulerController.addTaskToQueue(core, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
+                    cmdDetail.args = GenericController.convertAddonArgumentstoDocPropertiesList(core, "");
+                    TaskSchedulerController.addTaskToQueue(core, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
                 }
                 //
                 // Display form
@@ -3467,7 +3467,7 @@ namespace Contensive.Addons.Tools {
                 result = AdminUIController.getToolForm(core, s.Text, ButtonCancel + "," + ButtonIISReset);
                 //result = adminUIController.getToolFormOpen(core, ButtonCancel + "," + ButtonIISReset) + s.Text + adminUIController.getToolFormClose(core, ButtonCancel + "," + ButtonIISReset);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -3480,20 +3480,20 @@ namespace Contensive.Addons.Tools {
             string result = "";
             try {
                 string Button = null;
-                stringBuilderLegacyController s;
-                s = new stringBuilderLegacyController();
+                StringBuilderLegacyController s;
+                s = new StringBuilderLegacyController();
                 s.Add(AdminUIController.getToolFormTitle("Create GUID", "Use this tool to create a GUID. This is useful when creating new Addons."));
                 //
                 // Process the form
                 Button = core.docProperties.getText("button");
                 //
-                s.Add(HtmlController.inputText( core,"GUID", genericController.getGUID(), 1, 80));
+                s.Add(HtmlController.inputText( core,"GUID", GenericController.getGUID(), 1, 80));
                 //
                 // Display form
                 result = AdminUIController.getToolForm(core, s.Text, ButtonCancel + "," + ButtonCreateGUID);
                 //result = adminUIController.getToolFormOpen(core, ButtonCancel + "," + ButtonCreateGUID) + s.Text + adminUIController.getToolFormClose(core, ButtonCancel + "," + ButtonCreateGUID);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }

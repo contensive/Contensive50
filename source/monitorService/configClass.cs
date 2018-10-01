@@ -10,7 +10,7 @@ using System.Xml.Linq;
 using Contensive.Processor;
 using static Contensive.Processor.constants;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 
 namespace Contensive.MonitorService {
     public class monitorConfigClass {
@@ -80,11 +80,11 @@ namespace Contensive.MonitorService {
                     }
                 }
                 if (!string.IsNullOrEmpty(config)) {
-                    Lines = genericController.stringSplit(config, Environment.NewLine);
+                    Lines = GenericController.stringSplit(config, Environment.NewLine);
                     LineCnt = Lines.GetUpperBound(0) + 1;
                     for (LinePtr = 0; LinePtr < LineCnt; LinePtr++) {
                         LineBuffer = Lines[LinePtr];
-                        Pos = genericController.vbInstr(1, LineBuffer, "//");
+                        Pos = GenericController.vbInstr(1, LineBuffer, "//");
                         if (Pos != 0) {
                             LineBuffer = LineBuffer.Substring(0, Pos - 1);
                         }
@@ -302,7 +302,7 @@ namespace Contensive.MonitorService {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError(cpCore, ex);
+                LogController.handleError(cpCore, ex);
             }
             return return_isInSchedule;
         }

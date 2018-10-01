@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor {
@@ -72,7 +72,7 @@ namespace Contensive.Processor {
                 string sendStatus = "";
                 EmailController.queueAdHocEmail(core, ToAddress, FromAddress, Subject, Body, "", "", "", SendImmediately, BodyIsHTML, 0, ref sendStatus);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -88,7 +88,7 @@ namespace Contensive.Processor {
             try {
                 EmailController.queueFormEmail(core, ToAddress, FromAddress, Subject);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -107,7 +107,7 @@ namespace Contensive.Processor {
             try {
                 EmailController.queueGroupEmail(core, GroupList, FromAddress, Subject, Body, SendImmediately, BodyIsHTML);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -116,7 +116,7 @@ namespace Contensive.Processor {
         //
         public override void sendPassword(string UserEmailAddress) {
             string sendStatus = "";
-            loginController.sendPassword(core, UserEmailAddress, ref sendStatus);
+            LoginController.sendPassword(core, UserEmailAddress, ref sendStatus);
         }
         //
         //====================================================================================================
@@ -131,7 +131,7 @@ namespace Contensive.Processor {
             int userId = 0;
             if (toUserId.IsNumeric()) {
                 userId = int.Parse(toUserId);
-                personModel person = personModel.create(core, userId);
+                PersonModel person = PersonModel.create(core, userId);
                 if ( person != null ) {
                     string sendStatus = "";
                     string queryStringForLinkAppend = "";

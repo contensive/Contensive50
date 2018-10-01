@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor {
@@ -54,7 +54,7 @@ namespace Contensive.Processor {
         public override bool CookieSupport
         {
             get {
-                return core.session.visit.CookieSupport;
+                return core.session.visit.cookieSupport;
             }
         }
         //
@@ -81,7 +81,7 @@ namespace Contensive.Processor {
         public override DateTime LastTime
         {
             get {
-                return core.session.visit.LastVisitTime;
+                return core.session.visit.lastVisitTime;
             }
         }
         //
@@ -90,7 +90,7 @@ namespace Contensive.Processor {
         public override int LoginAttempts
         {
             get {
-                return core.session.visit.LoginAttempts;
+                return core.session.visit.loginAttempts;
             }
         }
         //
@@ -108,7 +108,7 @@ namespace Contensive.Processor {
         public override int Pages
         {
             get {
-                return core.session.visit.PageVisits;
+                return core.session.visit.pageVisits;
             }
         }
         //
@@ -117,7 +117,7 @@ namespace Contensive.Processor {
         public override string Referer
         {
             get {
-                return core.session.visit.HTTP_REFERER;
+                return core.session.visit.http_referer;
             }
         }
         //
@@ -134,7 +134,7 @@ namespace Contensive.Processor {
         //=======================================================================================================
         //
         public override bool GetBoolean(string PropertyName, string DefaultValue = "") {
-            return genericController.encodeBoolean(GetProperty(PropertyName, DefaultValue));
+            return GenericController.encodeBoolean(GetProperty(PropertyName, DefaultValue));
         }
         //
         //=======================================================================================================
@@ -142,7 +142,7 @@ namespace Contensive.Processor {
         //=======================================================================================================
         //
         public override DateTime GetDate(string PropertyName, string DefaultValue = "") {
-            return genericController.encodeDate(GetProperty(PropertyName, DefaultValue));
+            return GenericController.encodeDate(GetProperty(PropertyName, DefaultValue));
         }
         //
         //=======================================================================================================
@@ -172,14 +172,14 @@ namespace Contensive.Processor {
         public override int StartDateValue
         {
             get {
-                return core.session.visit.StartDateValue;
+                return core.session.visit.startDateValue;
             }
         }
 
         public override DateTime StartTime
         {
             get {
-                return core.session.visit.StartTime;
+                return core.session.visit.startTime;
             }
         }
         //

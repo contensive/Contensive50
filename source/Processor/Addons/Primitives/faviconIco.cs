@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Addons.Primitives {
@@ -38,7 +38,7 @@ namespace Contensive.Addons.Primitives {
                     return string.Empty;
                 } else {
                     core.doc.continueProcessing = false;
-                    return core.webServer.redirect(genericController.getCdnFileLink(core, Filename), "favicon request", false, false);
+                    return core.webServer.redirect(GenericController.getCdnFileLink(core, Filename), "favicon request", false, false);
                 }
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);

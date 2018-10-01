@@ -95,7 +95,7 @@ namespace Contensive.Processor {
         //
         public string statusMessage {
                 get {
-                    return genericController.GetApplicationStatusMessage(core.appConfig.appStatus);
+                    return GenericController.GetApplicationStatusMessage(core.appConfig.appStatus);
                 }
             }
         //
@@ -161,7 +161,7 @@ namespace Contensive.Processor {
         public string executeAddon(string addonNameOrGuid, Contensive.BaseClasses.CPUtilsBaseClass.addonContext addonContext = Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple) {
             string result = "";
             try {
-                if (genericController.isGuid(addonNameOrGuid)) {
+                if (GenericController.isGuid(addonNameOrGuid)) {
                     //
                     // -- call by guid
                     AddonModel addon = Models.Db.AddonModel.create(core, addonNameOrGuid);
@@ -185,7 +185,7 @@ namespace Contensive.Processor {
                     } else if (addonNameOrGuid.IsNumeric() ) {
                         //
                         // -- compatibility - call by id
-                        result = executeAddon(genericController.encodeInteger(addonNameOrGuid), addonContext);
+                        result = executeAddon(GenericController.encodeInteger(addonNameOrGuid), addonContext);
                     } else {
                         throw new ApplicationException("Addon [" + addonNameOrGuid + "] could not be found.");
                     }

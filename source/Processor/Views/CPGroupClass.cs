@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor {
@@ -61,25 +61,25 @@ namespace Contensive.Processor {
         //
         public override void Add(string GroupNameOrGuid, string groupCaption = "") {
             try {
-                groupController.group_add2(core, GroupNameOrGuid, groupCaption);
+                GroupController.group_add2(core, GroupNameOrGuid, groupCaption);
             } catch (Exception ex) {
-                logController.handleError( core,ex, "Unexpected error in cp.group.add()");
+                LogController.handleError( core,ex, "Unexpected error in cp.group.add()");
             }
         }
         //
         // Add User
         //
         public override void AddUser(string GroupNameIdOrGuid) {
-            groupController.group_AddUser(core, GroupNameIdOrGuid, 0, DateTime.MinValue);
+            GroupController.group_AddUser(core, GroupNameIdOrGuid, 0, DateTime.MinValue);
         }
         public override void AddUser(string GroupNameIdOrGuid, int UserId) {
-            groupController.group_AddUser(core, GroupNameIdOrGuid, UserId, DateTime.MinValue);
+            GroupController.group_AddUser(core, GroupNameIdOrGuid, UserId, DateTime.MinValue);
         }
         public override void AddUser(string GroupNameIdOrGuid, int UserId, DateTime DateExpires) {
             try {
-                groupController.group_AddUser(core, GroupNameIdOrGuid, UserId, DateExpires);
+                GroupController.group_AddUser(core, GroupNameIdOrGuid, UserId, DateExpires);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
         }
         //
@@ -89,7 +89,7 @@ namespace Contensive.Processor {
             try {
                 GroupModel.delete(core, GroupNameIdOrGuid);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
         }
         //
@@ -100,7 +100,7 @@ namespace Contensive.Processor {
             try {
                 returnInteger = core.db.getRecordID("groups", GroupNameIdOrGuid);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return returnInteger;
         }
@@ -113,7 +113,7 @@ namespace Contensive.Processor {
                 if (GroupIdOrGuid.IsNumeric()) {
                     //
                     // -- record Id
-                    returnText = core.db.getRecordName("groups", genericController.encodeInteger(GroupIdOrGuid));
+                    returnText = core.db.getRecordName("groups", GenericController.encodeInteger(GroupIdOrGuid));
                 } else {
                     //
                     // -- record guid

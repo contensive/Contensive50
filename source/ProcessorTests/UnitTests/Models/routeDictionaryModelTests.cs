@@ -18,13 +18,13 @@ namespace Contensive.Processor.Tests.UnitTests.Models {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
                 cp.core.db.executeNonQuery("delete from " + AddonModel.contentTableName);
-                cp.core.db.executeNonQuery("delete from " + linkAliasModel.contentTableName);
-                cp.core.db.executeNonQuery("delete from " + linkForwardModel.contentTableName);
+                cp.core.db.executeNonQuery("delete from " + LinkAliasModel.contentTableName);
+                cp.core.db.executeNonQuery("delete from " + LinkForwardModel.contentTableName);
                 // act
                 var routes = RouteDictionaryModel.create(cp.core);
                 // assert only one route, matching the default admin route
                 Assert.AreEqual(1, routes.Count);
-                Assert.AreEqual(genericController.normalizeRoute(cp.core.appConfig.adminRoute), routes.First().Key);
+                Assert.AreEqual(GenericController.normalizeRoute(cp.core.appConfig.adminRoute), routes.First().Key);
             }
         }
 

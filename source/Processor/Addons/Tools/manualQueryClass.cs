@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Addons.Tools {
@@ -36,7 +36,7 @@ namespace Contensive.Addons.Tools {
             string returnHtml = "";
             CoreController core = cp.core;
             try {
-                stringBuilderLegacyController Stream = new stringBuilderLegacyController();
+                StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 Stream.Add(AdminUIController.getToolFormTitle("Run Manual Query", "This tool runs an SQL statement on a selected datasource. If there is a result set, the set is printed in a table."));
                 //
                 // Get the members SQL Queue
@@ -90,23 +90,23 @@ namespace Contensive.Addons.Tools {
                     //
                     // Run the SQL
                     //
-                    string errBefore = errorController.getDocExceptionHtmlList(core);
+                    string errBefore = ErrorController.getDocExceptionHtmlList(core);
                     if (!string.IsNullOrWhiteSpace(errBefore)) {
                         // -- error in interface, should be fixed before attempting query
                         Stream.Add("<br>" + DateTime.Now + " SQL NOT executed. The following errors were detected before execution");
                         Stream.Add(errBefore);
                     } else {
-                        Stream.Add("<p>" + DateTime.Now + " Executing sql [" + SQL + "] on DataSource [" + datasource.Name + "]");
+                        Stream.Add("<p>" + DateTime.Now + " Executing sql [" + SQL + "] on DataSource [" + datasource.name + "]");
                         DataTable dt = null;
                         try {
-                            dt = core.db.executeQuery(SQL, datasource.Name, PageSize * (PageNumber - 1), PageSize);
+                            dt = core.db.executeQuery(SQL, datasource.name, PageSize * (PageNumber - 1), PageSize);
                         } catch (Exception ex) {
                             //
                             // ----- error
                             Stream.Add("<br>" + DateTime.Now + " SQL execution returned the following error");
                             Stream.Add("<br>" + ex.Message);
                         }
-                        string errSql = errorController.getDocExceptionHtmlList(core);
+                        string errSql = ErrorController.getDocExceptionHtmlList(core);
                         if (!string.IsNullOrWhiteSpace(errSql)) {
                             Stream.Add("<br>" + DateTime.Now + " SQL execution returned the following error");
                             Stream.Add("<br>" + errSql);
@@ -163,7 +163,7 @@ namespace Contensive.Addons.Tools {
                                         } else if (string.IsNullOrEmpty(CellData)) {
                                             Stream.Add(ColumnStart + "[empty]" + ColumnEnd);
                                         } else {
-                                            Stream.Add(ColumnStart + HtmlController.encodeHtml(genericController.encodeText(CellData)) + ColumnEnd);
+                                            Stream.Add(ColumnStart + HtmlController.encodeHtml(GenericController.encodeText(CellData)) + ColumnEnd);
                                         }
                                     }
                                     Stream.Add(RowEnd);
@@ -191,7 +191,7 @@ namespace Contensive.Addons.Tools {
                 //
                 // -- data source
                 bool isEmptyList = false;
-                Stream.Add(AdminUIController.getToolFormInputRow(core, "Data Source", AdminUIController.getDefaultEditor_LookupContent(core, "DataSourceID", datasource.ID, Processor.Models.Domain.CDefModel.getContentId(core, "data sources"), ref isEmptyList)));
+                Stream.Add(AdminUIController.getToolFormInputRow(core, "Data Source", AdminUIController.getDefaultEditor_LookupContent(core, "DataSourceID", datasource.id, Processor.Models.Domain.CDefModel.getContentId(core, "data sources"), ref isEmptyList)));
                 {
                     //
                     // -- sql list
@@ -222,7 +222,7 @@ namespace Contensive.Addons.Tools {
                 // -- assemble form
                 returnHtml = AdminUIController.getToolForm(core, Stream.Text, ButtonCancel + "," + ButtonRun);
             } catch (Exception ex) {
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
                 throw;
             }
             return returnHtml;

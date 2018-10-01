@@ -11,17 +11,17 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Models.Db {
-    public class organizationModel : BaseModel {
+    public class OrganizationModel : BaseModel {
         //
         //====================================================================================================
         //-- const
         public const string contentName = "organizations";
         public const string contentTableName = "organizations";
-        private const string contentDataSource = "default";
+        public const string contentDataSource = "default";
         //
         //====================================================================================================
         // -- instance properties
@@ -46,43 +46,43 @@ namespace Contensive.Processor.Models.Db {
         public string Zip { get; set; }
         //
         //====================================================================================================
-        public static organizationModel add(CoreController core) {
-            return add<organizationModel>(core);
+        public static OrganizationModel add(CoreController core) {
+            return add<OrganizationModel>(core);
         }
         //
         //====================================================================================================
-        public static organizationModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<organizationModel>(core, ref callersCacheNameList);
+        public static OrganizationModel add(CoreController core, ref List<string> callersCacheNameList) {
+            return add<OrganizationModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static organizationModel create(CoreController core, int recordId) {
-            return create<organizationModel>(core, recordId);
+        public static OrganizationModel create(CoreController core, int recordId) {
+            return create<OrganizationModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static organizationModel create(CoreController core, int recordId, ref List<string> callersCacheNameList) {
-            return create<organizationModel>(core, recordId, ref callersCacheNameList);
+        public static OrganizationModel create(CoreController core, int recordId, ref List<string> callersCacheNameList) {
+            return create<OrganizationModel>(core, recordId, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static organizationModel create(CoreController core, string recordGuid) {
-            return create<organizationModel>(core, recordGuid);
+        public static OrganizationModel create(CoreController core, string recordGuid) {
+            return create<OrganizationModel>(core, recordGuid);
         }
         //
         //====================================================================================================
-        public static organizationModel create(CoreController core, string recordGuid, ref List<string> callersCacheNameList) {
-            return create<organizationModel>(core, recordGuid, ref callersCacheNameList);
+        public static OrganizationModel create(CoreController core, string recordGuid, ref List<string> callersCacheNameList) {
+            return create<OrganizationModel>(core, recordGuid, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static organizationModel createByName(CoreController core, string recordName) {
-            return createByName<organizationModel>(core, recordName);
+        public static OrganizationModel createByName(CoreController core, string recordName) {
+            return createByName<OrganizationModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static organizationModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<organizationModel>(core, recordName, ref callersCacheNameList);
+        public static OrganizationModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByName<OrganizationModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================
@@ -92,52 +92,62 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static void delete(CoreController core, int recordId) {
-            delete<organizationModel>(core, recordId);
+            delete<OrganizationModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static void delete(CoreController core, string ccGuid) {
-            delete<organizationModel>(core, ccGuid);
+            delete<OrganizationModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static List<organizationModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
-            return createList<organizationModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
+        public static List<OrganizationModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
+            return createList<OrganizationModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static List<organizationModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy) {
-            return createList<organizationModel>(core, sqlCriteria, sqlOrderBy);
+        public static List<OrganizationModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy) {
+            return createList<OrganizationModel>(core, sqlCriteria, sqlOrderBy);
         }
         //
         //====================================================================================================
-        public static List<organizationModel> createList(CoreController core, string sqlCriteria) {
-            return createList<organizationModel>(core, sqlCriteria);
+        public static List<OrganizationModel> createList(CoreController core, string sqlCriteria) {
+            return createList<OrganizationModel>(core, sqlCriteria);
         }
         //
         //====================================================================================================
-        public void invalidatePrimaryCache(CoreController core, int recordId) {
-            invalidateCache<organizationModel>(core, recordId);
+        public static void invalidateRecordCache(CoreController core, int recordId) {
+            invalidateRecordCache<OrganizationModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return BaseModel.getRecordName<organizationModel>(core, recordId);
+            return BaseModel.getRecordName<OrganizationModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return BaseModel.getRecordName<organizationModel>(core, ccGuid);
+            return BaseModel.getRecordName<OrganizationModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return BaseModel.getRecordId<organizationModel>(core, ccGuid);
+            return BaseModel.getRecordId<OrganizationModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static organizationModel createDefault(CoreController core) {
-            return createDefault<organizationModel>(core);
+        public static OrganizationModel createDefault(CoreController core) {
+            return createDefault<OrganizationModel>(core);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Return a cache key used to represent the table. ONLY used for invalidation. Add this as a dependent key if you want that key cleared when ANY record in the table is changed.
+        /// </summary>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        public static string getTableInvalidationKey(CoreController core) {
+            return getTableCacheKey<OrganizationModel>(core);
         }
     }
 }

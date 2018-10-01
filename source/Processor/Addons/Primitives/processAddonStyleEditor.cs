@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Addons.Primitives {
@@ -39,7 +39,7 @@ namespace Contensive.Addons.Primitives {
                             //
                             // Clear Caches
                             //
-                            core.cache.invalidateAllInContent(AddonModel.contentName);
+                            AddonModel.invalidateRecordCache(core, addonId);
                         }
                     }
                 }

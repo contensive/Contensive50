@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Addons.Primitives {
@@ -44,7 +44,7 @@ namespace Contensive.Addons.Primitives {
                         //
                         int StyleSN = core.siteProperties.getInteger("StylesheetSerialNumber", 0);
                         StyleSN = StyleSN + 1;
-                        core.siteProperties.setProperty("StylesheetSerialNumber", genericController.encodeText(StyleSN));
+                        core.siteProperties.setProperty("StylesheetSerialNumber", GenericController.encodeText(StyleSN));
                         //
                         // Save new public stylesheet
                         //

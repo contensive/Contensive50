@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Addons.Tools {
@@ -36,7 +36,7 @@ namespace Contensive.Addons.Tools {
             string tempGetForm_MetaKeywordTool = "";
                 CoreController core = cp.core;
             try {
-                stringBuilderLegacyController Content = new stringBuilderLegacyController();
+                StringBuilderLegacyController Content = new StringBuilderLegacyController();
                 string Copy = null;
                 string Button = null;
                 string Description = null;
@@ -72,7 +72,7 @@ namespace Contensive.Addons.Tools {
                             int CS = 0;
                             KeywordList = core.docProperties.getText("KeywordList");
                             if (!string.IsNullOrEmpty(KeywordList)) {
-                                KeywordList = genericController.vbReplace(KeywordList, "\r\n", ",");
+                                KeywordList = GenericController.vbReplace(KeywordList, "\r\n", ",");
                                 Keywords = KeywordList.Split(',');
                                 Cnt = Keywords.GetUpperBound(0) + 1;
                                 for (Ptr = 0; Ptr < Cnt; Ptr++) {
@@ -125,7 +125,7 @@ namespace Contensive.Addons.Tools {
                 // ----- Error Trap
                 //
             } catch (Exception ex) {
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
             }
             return tempGetForm_MetaKeywordTool;
         }

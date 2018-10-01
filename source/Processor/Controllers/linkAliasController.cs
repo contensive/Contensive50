@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 using Contensive.BaseClasses;
 //
@@ -28,7 +28,7 @@ namespace Contensive.Processor.Controllers {
     ///   When you make the menus, look up the most recent Link Alias entry with the pageID, and a blank QueryStringSuffix
     ///   The Link Alias table no longer needs the Link field.
     /// </summary>
-    public class linkAliasController {
+    public class LinkAliasController {
         //
         //====================================================================================================
         /// <summary>
@@ -36,7 +36,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public static string getLinkAlias(CoreController core, int PageID, string QueryStringSuffix, string DefaultLink) {
             string linkAlias = DefaultLink;
-            List<Models.Db.linkAliasModel> linkAliasList = linkAliasModel.createList(core, PageID, QueryStringSuffix);
+            List<Models.Db.LinkAliasModel> linkAliasList = LinkAliasModel.createList(core, PageID, QueryStringSuffix);
             if (linkAliasList.Count > 0) {
                 linkAlias = linkAliasList.First().name;
                 if (linkAlias.Left(1) != "/") {
@@ -92,7 +92,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     int Ptr = 0;
                     while (WorkingLinkAlias.Contains("\t\t") && (Ptr < 100)) {
-                        WorkingLinkAlias = genericController.vbReplace(WorkingLinkAlias, "\t\t", "\t");
+                        WorkingLinkAlias = GenericController.vbReplace(WorkingLinkAlias, "\t\t", "\t");
                         Ptr = Ptr + 1;
                     }
                     if (WorkingLinkAlias.Substring(WorkingLinkAlias.Length - 1) == "\t") {
@@ -101,7 +101,7 @@ namespace Contensive.Processor.Controllers {
                     if (WorkingLinkAlias.Left(1) == "\t") {
                         WorkingLinkAlias = WorkingLinkAlias.Substring(1);
                     }
-                    WorkingLinkAlias = genericController.vbReplace(WorkingLinkAlias, "\t", "-");
+                    WorkingLinkAlias = GenericController.vbReplace(WorkingLinkAlias, "\t", "-");
                     if (!string.IsNullOrEmpty(WorkingLinkAlias)) {
                         //
                         // Make sure there is not a folder or page in the wwwroot that matches this Alias
@@ -110,7 +110,7 @@ namespace Contensive.Processor.Controllers {
                             WorkingLinkAlias = "/" + WorkingLinkAlias;
                         }
                         //
-                        if (genericController.vbLCase(WorkingLinkAlias) == genericController.vbLCase("/" + core.appConfig.name)) {
+                        if (GenericController.vbLCase(WorkingLinkAlias) == GenericController.vbLCase("/" + core.appConfig.name)) {
                             //
                             // This alias points to the cclib folder
                             //
@@ -119,7 +119,7 @@ namespace Contensive.Processor.Controllers {
                                     + "The Link Alias being created (" + WorkingLinkAlias + ") can not be used because there is a virtual directory in your website directory that already uses this name."
                                     + " Please change it to ensure the Link Alias is unique. To set or change the Link Alias, use the Link Alias tab and select a name not used by another page.";
                             }
-                        } else if (genericController.vbLCase(WorkingLinkAlias) == "/cclib") {
+                        } else if (GenericController.vbLCase(WorkingLinkAlias) == "/cclib") {
                             //
                             // This alias points to the cclib folder
                             //
@@ -223,7 +223,7 @@ namespace Contensive.Processor.Controllers {
                             }
                             int linkAliasId = core.db.csGetInteger(CS, "id");
                             core.db.csClose(ref CS);
-                            core.cache.invalidateContent_Entity(core, linkAliasModel.contentTableName, linkAliasId);
+                            core.cache.invalidateDbRecord(linkAliasId, LinkAliasModel.contentTableName);
                             //
                             // -- force route reload if this is a webserver page
                             Models.Domain.RouteDictionaryModel.invalidateCache(core);
@@ -232,7 +232,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError(core, ex, "addLinkAlias exception, hint [" + hint + "]");
+                LogController.handleError(core, ex, "addLinkAlias exception, hint [" + hint + "]");
                 throw;
             }
         }

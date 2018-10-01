@@ -11,7 +11,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using Contensive.Processor.Models.Domain;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Controllers {
@@ -232,7 +232,7 @@ namespace Contensive.Processor.Controllers {
                     connectionStringDict.Add(key, returnConnString);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnConnString;
@@ -296,7 +296,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnConnString;
@@ -336,11 +336,11 @@ namespace Contensive.Processor.Controllers {
                 } else if (core.serverConfig == null) {
                     //
                     // -- server config fail
-                    logController.handleError( core,new ApplicationException("Cannot execute Sql in dbController without an application"));
+                    LogController.handleError( core,new ApplicationException("Cannot execute Sql in dbController without an application"));
                 } else if (core.appConfig == null) {
                     //
                     // -- server config fail
-                    logController.handleError( core,new ApplicationException("Cannot execute Sql in dbController without an application"));
+                    LogController.handleError( core,new ApplicationException("Cannot execute Sql in dbController without an application"));
                 } else {
                     string connString = getConnectionStringADONET(core.appConfig.name, dataSourceName);
                     //returnData = executeSql_noErrorHandling(sql, getConnectionStringADONET(core.appConfig.name, dataSourceName), startRecord, maxRecords, recordsAffected)
@@ -366,7 +366,7 @@ namespace Contensive.Processor.Controllers {
                 }
             } catch (Exception ex) {
                 ApplicationException newEx = new ApplicationException("Exception [" + ex.Message + "] executing sql [" + sql + "], datasource [" + dataSourceName + "], startRecord [" + startRecord + "], maxRecords [" + maxRecords + "]", ex);
-                logController.handleError( core,newEx);
+                LogController.handleError( core,newEx);
             }
             return returnData;
         }
@@ -439,7 +439,7 @@ namespace Contensive.Processor.Controllers {
                     dbVerified = true;
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -466,7 +466,7 @@ namespace Contensive.Processor.Controllers {
                     dbVerified = true;
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -484,7 +484,7 @@ namespace Contensive.Processor.Controllers {
                 string SQL = "update " + TableName + " set " + sqlList.getNameValueList() + " where " + Criteria + ";";
                 executeNonQuery(SQL, DataSourceName);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -502,11 +502,11 @@ namespace Contensive.Processor.Controllers {
             try {
                 using (DataTable dt = insertTableRecordGetDataTable(DataSourceName, TableName, MemberID)) {
                     if (dt.Rows.Count > 0) {
-                        returnId = genericController.encodeInteger(dt.Rows[0]["id"]);
+                        returnId = GenericController.encodeInteger(dt.Rows[0]["id"]);
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnId;
@@ -526,7 +526,7 @@ namespace Contensive.Processor.Controllers {
                 SqlFieldListClass sqlList = new SqlFieldListClass();
                 //string CreateKeyString = null;
                 //string sqlDateAdded = null;
-                string sqlGuid = encodeSQLText( genericController.getGUID());
+                string sqlGuid = encodeSQLText( GenericController.getGUID());
                 string sqlDateAdded = encodeSQLDate(DateTime.Now);
                 //CreateKeyString = encodeSQLNumber(genericController.GetRandomInteger(core));
                 sqlList.add("ccguid", sqlGuid);
@@ -543,7 +543,7 @@ namespace Contensive.Processor.Controllers {
                 returnDt = openTable(DataSourceName, TableName, "(DateAdded=" + sqlDateAdded + ")and(ccguid=" + sqlGuid + ")", "ID DESC", "", 1);
                 //returnDt = openTable(DataSourceName, TableName, "(DateAdded=" + DateAddedString + ")and(CreateKey=" + CreateKeyString + ")", "ID DESC", "", 1);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnDt;
@@ -564,7 +564,7 @@ namespace Contensive.Processor.Controllers {
                     dt.Dispose();
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -600,7 +600,7 @@ namespace Contensive.Processor.Controllers {
                 //SQL &= ";"
                 returnDataTable = executeQuery(SQL, DataSourceName, (PageNumber - 1) * PageSize, PageSize);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnDataTable;
@@ -622,10 +622,10 @@ namespace Contensive.Processor.Controllers {
                 if ((core.serverConfig.enableLogging) && (core.appConfig.appStatus == AppConfigModel.AppStatusEnum.ok)) {
                     if (core.siteProperties.allowTransactionLog) {
                         string LogEntry = ("duration [" + ElapsedMilliseconds + "ms], sql [" + sql + "]").Replace("\r", "").Replace("\n", "");
-                        logController.logDebug(core, "dbController: " + LogEntry);
+                        LogController.logDebug(core, "dbController: " + LogEntry);
                     }
                     if (ElapsedMilliseconds > sqlSlowThreshholdMsec) {
-                        logController.logWarn(core, ("dbController: Slow Query " + ElapsedMilliseconds + "ms, sql: [" + sql + "]").Replace("\r", "").Replace("\n", ""));
+                        LogController.logWarn(core, ("dbController: Slow Query " + ElapsedMilliseconds + "ms, sql: [" + sql + "]").Replace("\r", "").Replace("\n", ""));
                     }
                 }
                 saveTransactionLog_InProcess = false;
@@ -648,7 +648,7 @@ namespace Contensive.Processor.Controllers {
                     returnOK = (null != tableSchema.columns.Find(x => x.COLUMN_NAME.ToLower() == FieldName.ToLower()));
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnOK;
@@ -666,7 +666,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 ReturnOK = (!(Models.Domain.TableSchemaModel.getTableSchema(core, TableName, DataSourceName) == null));
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return ReturnOK;
@@ -686,14 +686,14 @@ namespace Contensive.Processor.Controllers {
         public void createSQLTable(string DataSourceName, string TableName, bool AllowAutoIncrement = true) {
             try {
                 //
-                logController.logTrace(core, "createSqlTable, DataSourceName [" + DataSourceName + "], TableName [" + TableName + "]");
+                LogController.logTrace(core, "createSqlTable, DataSourceName [" + DataSourceName + "], TableName [" + TableName + "]");
                 //
                 if (string.IsNullOrEmpty(TableName)) {
                     //
                     // tablename required
                     //
                     throw new ArgumentException("Tablename can not be blank.");
-                } else if (genericController.vbInstr(1, TableName, ".") != 0) {
+                } else if (GenericController.vbInstr(1, TableName, ".") != 0) {
                     //
                     // Remote table -- remote system controls remote tables
                     //
@@ -742,7 +742,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 Models.Domain.TableSchemaModel.tableSchemaListClear(core);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -773,7 +773,7 @@ namespace Contensive.Processor.Controllers {
                     // Bad fieldtype
                     //
                     throw new ArgumentException("invalid fieldtype [" + fieldType + "]");
-                } else if (genericController.vbInstr(1, TableName, ".") != 0) {
+                } else if (GenericController.vbInstr(1, TableName, ".") != 0) {
                     //
                     // External table
                     //
@@ -806,7 +806,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -823,7 +823,7 @@ namespace Contensive.Processor.Controllers {
                 core.cache.invalidateAll();
                 core.doc.clearMetaData();
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -858,7 +858,7 @@ namespace Contensive.Processor.Controllers {
                     executeQuery("ALTER TABLE " + TableName + " DROP COLUMN " + FieldName + ";", DataSourceName);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -888,7 +888,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -906,7 +906,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 csClose(ref CS);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnRecordName;
@@ -919,13 +919,13 @@ namespace Contensive.Processor.Controllers {
         public string getRecordName(string contentName, string recordGuid) {
             string returnRecordName = "";
             try {
-                csController cs = new csController(core);
+                CsController cs = new CsController(core);
                 if (cs.open(contentName, "(ccguid=" + encodeSQLText(recordGuid) + ")")) {
                     returnRecordName = cs.getText("Name");
                 }
                 cs.close();
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnRecordName;
@@ -949,7 +949,7 @@ namespace Contensive.Processor.Controllers {
                     csClose(ref cs);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnValue;
@@ -1040,7 +1040,7 @@ namespace Contensive.Processor.Controllers {
                         throw new ApplicationException("Can Not proceed because the field being created has an invalid FieldType [" + fieldType + "]");
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnType;
@@ -1080,7 +1080,7 @@ namespace Contensive.Processor.Controllers {
                 }
 
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -1100,7 +1100,7 @@ namespace Contensive.Processor.Controllers {
                 tempisCdefField = DbController.isDataTableOk(dt);
                 dt.Dispose();
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnOk;
@@ -1163,7 +1163,7 @@ namespace Contensive.Processor.Controllers {
                         break;
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnType;
@@ -1178,7 +1178,7 @@ namespace Contensive.Processor.Controllers {
         public int getFieldTypeIdFromFieldTypeName(string FieldTypeName) {
             int returnTypeId = 0;
             try {
-                switch (genericController.vbLCase(FieldTypeName)) {
+                switch (GenericController.vbLCase(FieldTypeName)) {
                     case constants.FieldTypeNameLcaseBoolean:
                         returnTypeId = constants.FieldTypeIdBoolean;
                         break;
@@ -1264,7 +1264,7 @@ namespace Contensive.Processor.Controllers {
                         break;
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnTypeId;
@@ -1299,16 +1299,16 @@ namespace Contensive.Processor.Controllers {
                     } else if (CDef.id <= 0) {
                         throw (new ApplicationException("No content found For [" + ContentName + "]"));
                     } else {
-                        sqlOrderBy = genericController.encodeEmpty(sqlOrderBy, CDef.defaultSortMethod);
-                        sqlSelectFieldList = genericController.encodeEmpty(sqlSelectFieldList, CDef.selectCommaList);
+                        sqlOrderBy = GenericController.encodeEmpty(sqlOrderBy, CDef.defaultSortMethod);
+                        sqlSelectFieldList = GenericController.encodeEmpty(sqlSelectFieldList, CDef.selectCommaList);
                         //
                         // verify the sortfields are in this table
                         if (!string.IsNullOrEmpty(sqlOrderBy)) {
                             string[] SortFields = sqlOrderBy.Split(',');
                             for (int ptr = 0; ptr < SortFields.GetUpperBound(0) + 1; ptr++) {
                                 string SortField = SortFields[ptr].ToLower();
-                                SortField = genericController.vbReplace(SortField, "asc", "", 1, 99, 1);
-                                SortField = genericController.vbReplace(SortField, "desc", "", 1, 99, 1);
+                                SortField = GenericController.vbReplace(SortField, "asc", "", 1, 99, 1);
+                                SortField = GenericController.vbReplace(SortField, "desc", "", 1, 99, 1);
                                 SortField = SortField.Trim(' ');
                                 if (!CDef.selectList.Contains(SortField)) {
                                     throw (new ApplicationException("The field [" + SortField + "] was used in sqlOrderBy for content [" + ContentName + "], but the content does not include this field."));
@@ -1323,7 +1323,7 @@ namespace Contensive.Processor.Controllers {
                         } else {
                             //
                             // remove tablename from contentcontrolcriteria - if in workflow mode, and authoringtable is different, this would be wrong, also makes sql smaller, and is not necessary
-                            sqlContentCriteria = genericController.vbReplace(sqlContentCriteria, CDef.contentTableName + ".", "");
+                            sqlContentCriteria = GenericController.vbReplace(sqlContentCriteria, CDef.contentTableName + ".", "");
                         }
                         if (!string.IsNullOrEmpty(sqlCriteria)) {
                             sqlContentCriteria = sqlContentCriteria + "and(" + sqlCriteria + ")";
@@ -1335,25 +1335,25 @@ namespace Contensive.Processor.Controllers {
                         }
                         //
                         // ----- Process Select Fields, make sure ContentControlID,ID,Name,Active are included
-                        sqlSelectFieldList = genericController.vbReplace(sqlSelectFieldList, "\t", " ");
-                        while (genericController.vbInstr(1, sqlSelectFieldList, " ,") != 0) {
-                            sqlSelectFieldList = genericController.vbReplace(sqlSelectFieldList, " ,", ",");
+                        sqlSelectFieldList = GenericController.vbReplace(sqlSelectFieldList, "\t", " ");
+                        while (GenericController.vbInstr(1, sqlSelectFieldList, " ,") != 0) {
+                            sqlSelectFieldList = GenericController.vbReplace(sqlSelectFieldList, " ,", ",");
                         }
-                        while (genericController.vbInstr(1, sqlSelectFieldList, ", ") != 0) {
-                            sqlSelectFieldList = genericController.vbReplace(sqlSelectFieldList, ", ", ",");
+                        while (GenericController.vbInstr(1, sqlSelectFieldList, ", ") != 0) {
+                            sqlSelectFieldList = GenericController.vbReplace(sqlSelectFieldList, ", ", ",");
                         }
                         if ((!string.IsNullOrEmpty(sqlSelectFieldList)) && (sqlSelectFieldList.IndexOf("*", System.StringComparison.OrdinalIgnoreCase) == -1)) {
-                            string TestUcaseFieldList = genericController.vbUCase("," + sqlSelectFieldList + ",");
-                            if (genericController.vbInstr(1, TestUcaseFieldList, ",CONTENTCONTROLID,", 1) == 0) {
+                            string TestUcaseFieldList = GenericController.vbUCase("," + sqlSelectFieldList + ",");
+                            if (GenericController.vbInstr(1, TestUcaseFieldList, ",CONTENTCONTROLID,", 1) == 0) {
                                 sqlSelectFieldList = sqlSelectFieldList + ",ContentControlID";
                             }
-                            if (genericController.vbInstr(1, TestUcaseFieldList, ",NAME,", 1) == 0) {
+                            if (GenericController.vbInstr(1, TestUcaseFieldList, ",NAME,", 1) == 0) {
                                 sqlSelectFieldList = sqlSelectFieldList + ",Name";
                             }
-                            if (genericController.vbInstr(1, TestUcaseFieldList, ",ID,", 1) == 0) {
+                            if (GenericController.vbInstr(1, TestUcaseFieldList, ",ID,", 1) == 0) {
                                 sqlSelectFieldList = sqlSelectFieldList + ",ID";
                             }
-                            if (genericController.vbInstr(1, TestUcaseFieldList, ",ACTIVE,", 1) == 0) {
+                            if (GenericController.vbInstr(1, TestUcaseFieldList, ",ACTIVE,", 1) == 0) {
                                 sqlSelectFieldList = sqlSelectFieldList + ",ACTIVE";
                             }
                         }
@@ -1405,7 +1405,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnCs;
@@ -1418,15 +1418,8 @@ namespace Contensive.Processor.Controllers {
         /// <param name="CSPointer"></param>
         public void csDeleteRecord(int CSPointer) {
             try {
-                //
-                int LiveRecordID = 0;
-                int ContentID = 0;
-                string ContentName = null;
-                string ContentDataSourceName = null;
-                string ContentTableName = null;
-                string[] SQLName = new string[6];
-                string[] SQLValue = new string[6];
-                string Filename = null;
+                //string[] SQLName = new string[6];
+                //string[] SQLValue = new string[6];
                 //
                 if (!csOk(CSPointer)) {
                     //
@@ -1435,16 +1428,17 @@ namespace Contensive.Processor.Controllers {
                     //
                     throw new ArgumentException("csv_ContentSet Is Not Updateable");
                 } else {
-                    ContentID = contentSetStore[CSPointer].CDef.id;
-                    ContentName = contentSetStore[CSPointer].CDef.name;
-                    ContentTableName = contentSetStore[CSPointer].CDef.contentTableName;
-                    ContentDataSourceName = contentSetStore[CSPointer].CDef.contentDataSourceName;
+                    int ContentID = contentSetStore[CSPointer].CDef.id;
+                    string ContentName = contentSetStore[CSPointer].CDef.name;
+                    string ContentTableName = contentSetStore[CSPointer].CDef.contentTableName;
+                    string ContentDataSourceName = contentSetStore[CSPointer].CDef.contentDataSourceName;
                     if (string.IsNullOrEmpty(ContentName)) {
                         throw new ArgumentException("csv_ContentSet Is Not based On a Content Definition");
                     } else {
-                        LiveRecordID = csGetInteger(CSPointer, "ID");
                         //
-                        // delete any files (only if filename is part of select)
+                        int LiveRecordID = csGetInteger(CSPointer, "ID");
+                        //
+                        // delete any files (if filename is part of select)
                         //
                         string fieldName = null;
                         Models.Domain.CDefFieldModel field = null;
@@ -1452,6 +1446,7 @@ namespace Contensive.Processor.Controllers {
                             if (contentSetStore[CSPointer].CDef.fields.ContainsKey(selectedFieldName.ToLower())) {
                                 field = contentSetStore[CSPointer].CDef.fields[selectedFieldName.ToLower()];
                                 fieldName = field.nameLc;
+                                string Filename = null;
                                 switch (field.fieldTypeId) {
                                     case constants.FieldTypeIdFile:
                                     case constants.FieldTypeIdFileImage:
@@ -1483,10 +1478,11 @@ namespace Contensive.Processor.Controllers {
                         //
                         // non-workflow mode, delete the live record
                         //
-                        deleteTableRecord(ContentTableName, LiveRecordID, ContentDataSourceName);
+                        deprecate_argsreversed_deleteTableRecord(ContentTableName, LiveRecordID, ContentDataSourceName);
                         //
                         // -- invalidate the special cache name used to detect a change in any record
-                        core.cache.invalidateAllInContent(ContentName);
+                        // todo remove all these. do not invalidate the table for a record delete. it is up to the object to set invaliation dependencies
+                        //core.cache.invalidateAllInTable(ContentTableName);
                         //if (workflowController.csv_AllowAutocsv_ClearContentTimeStamp) {
                         //    core.cache.invalidateContent(Controllers.cacheController.getCacheKey_Entity(ContentTableName, "id", LiveRecordID.ToString()));
                         //    //Call core.cache.invalidateObject(ContentName)
@@ -1495,7 +1491,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -1541,7 +1537,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 csInitData(returnCs);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnCs;
@@ -1600,7 +1596,7 @@ namespace Contensive.Processor.Controllers {
                     writeCache = null
                 };
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnCs;
@@ -1634,7 +1630,7 @@ namespace Contensive.Processor.Controllers {
                     CSPointer = -1;
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -1671,7 +1667,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -1686,7 +1682,7 @@ namespace Contensive.Processor.Controllers {
                 contentSetStore[CSPointer].writeCache = new Dictionary<string, string>();
                 contentSetStore[CSPointer].readCacheRowPtr = 0;
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -1728,13 +1724,13 @@ namespace Contensive.Processor.Controllers {
                                 throw new ApplicationException("Field [" + fieldNameTrim + "] was not found in sql [" + contentSet.Source + "]");
                             }
                         } else {
-                            returnValue = genericController.encodeText(contentSet.dt.Rows[contentSet.readCacheRowPtr][fieldNameTrim.ToLower()]);
+                            returnValue = GenericController.encodeText(contentSet.dt.Rows[contentSet.readCacheRowPtr][fieldNameTrim.ToLower()]);
                         }
                     }
                     contentSet.LastUsed = DateTime.Now;
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnValue;
@@ -1756,7 +1752,7 @@ namespace Contensive.Processor.Controllers {
                     returnFieldName = csGetNextFieldName(CSPointer);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnFieldName;
@@ -1781,7 +1777,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnFieldName;
@@ -1805,7 +1801,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnFieldTypeid;
@@ -1832,7 +1828,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -1851,7 +1847,7 @@ namespace Contensive.Processor.Controllers {
                     returnResult = string.Join(",", contentSetStore[CSPointer].fieldNames);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -1873,10 +1869,10 @@ namespace Contensive.Processor.Controllers {
                     throw new ArgumentException("dataset is not valid");
                 } else {
                     string CSSelectFieldList = csGetSelectFieldList(CSPointer);
-                    returnResult = genericController.isInDelimitedString(CSSelectFieldList, FieldName, ",");
+                    returnResult = GenericController.isInDelimitedString(CSSelectFieldList, FieldName, ",");
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -1909,7 +1905,7 @@ namespace Contensive.Processor.Controllers {
                 } else if (string.IsNullOrEmpty(FieldName)) {
                     throw new ArgumentException("Fieldname Is blank");
                 } else {
-                    fieldNameUpper = genericController.vbUCase(FieldName.Trim(' '));
+                    fieldNameUpper = GenericController.vbUCase(FieldName.Trim(' '));
                     returnFilename = csGetValue(CSPointer, fieldNameUpper);
                     if (!string.IsNullOrEmpty(returnFilename)) {
                         //
@@ -1942,7 +1938,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         if (tempVar.resultColumnCount > 0) {
                             for (var FieldPointer = 0; FieldPointer < tempVar.resultColumnCount; FieldPointer++) {
-                                if (genericController.vbUCase(tempVar.fieldNames[FieldPointer]) == "ID") {
+                                if (GenericController.vbUCase(tempVar.fieldNames[FieldPointer]) == "ID") {
                                     RecordID = csGetInteger(CSPointer, "ID");
                                     break;
                                 }
@@ -2000,7 +1996,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnFilename;
@@ -2009,31 +2005,31 @@ namespace Contensive.Processor.Controllers {
         //====================================================================================================
         //
         public string csGetText(int CSPointer, string FieldName) {
-            return genericController.encodeText(csGetValue(CSPointer, FieldName));
+            return GenericController.encodeText(csGetValue(CSPointer, FieldName));
         }
         //
         //====================================================================================================
         //
         public int csGetInteger(int CSPointer, string FieldName) {
-            return genericController.encodeInteger(csGetValue(CSPointer, FieldName));
+            return GenericController.encodeInteger(csGetValue(CSPointer, FieldName));
         }
         //
         //====================================================================================================
         //
         public double csGetNumber(int CSPointer, string FieldName) {
-            return genericController.encodeNumber(csGetValue(CSPointer, FieldName));
+            return GenericController.encodeNumber(csGetValue(CSPointer, FieldName));
         }
         //
         //====================================================================================================
         //
         public DateTime csGetDate(int CSPointer, string FieldName) {
-            return genericController.encodeDate(csGetValue(CSPointer, FieldName));
+            return GenericController.encodeDate(csGetValue(CSPointer, FieldName));
         }
         //
         //====================================================================================================
         //
         public bool csGetBoolean(int CSPointer, string FieldName) {
-            return genericController.encodeBoolean(csGetValue(CSPointer, FieldName));
+            return GenericController.encodeBoolean(csGetValue(CSPointer, FieldName));
         }
         //
         //====================================================================================================
@@ -2074,7 +2070,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -2123,7 +2119,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -2144,7 +2140,7 @@ namespace Contensive.Processor.Controllers {
                     result = dr[FieldName].ToString();
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -2172,7 +2168,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 csClose(ref CS);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -2200,7 +2196,7 @@ namespace Contensive.Processor.Controllers {
                     csClose(ref CSPointer);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -2237,7 +2233,7 @@ namespace Contensive.Processor.Controllers {
                         List<string> invaldiateObjectList = new List<string>();
                         CSPointer = csOpen(ContentName, Criteria, "", false, MemberID, true, true);
                         while (csOk(CSPointer)) {
-                            invaldiateObjectList.Add(Controllers.CacheController.getCacheKey_Entity(CDef.contentTableName, "id", csGetInteger(CSPointer, "id").ToString()));
+                            invaldiateObjectList.Add(CacheController.getCacheKey_forDbRecord(csGetInteger(CSPointer, "id"), CDef.contentTableName, CDef.contentDataSourceName));
                             csDeleteRecord(CSPointer);
                             csGoNext(CSPointer);
                         }
@@ -2246,7 +2242,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -2296,7 +2292,7 @@ namespace Contensive.Processor.Controllers {
                                 Models.Domain.CDefFieldModel field = keyValuePair.Value;
                                 FieldName = field.nameLc;
                                 if ((!string.IsNullOrEmpty(FieldName)) && (!string.IsNullOrEmpty(field.defaultValue))) {
-                                    switch (genericController.vbUCase(FieldName)) {
+                                    switch (GenericController.vbUCase(FieldName)) {
                                         case "CREATEKEY":
                                         case "DATEADDED":
                                         case "CREATEDBY":
@@ -2323,18 +2319,18 @@ namespace Contensive.Processor.Controllers {
                                                     //
                                                     break;
                                                 case constants.FieldTypeIdBoolean:
-                                                    sqlList.add(FieldName, encodeSQLBoolean(genericController.encodeBoolean(field.defaultValue)));
+                                                    sqlList.add(FieldName, encodeSQLBoolean(GenericController.encodeBoolean(field.defaultValue)));
                                                     break;
                                                 case constants.FieldTypeIdCurrency:
                                                 case constants.FieldTypeIdFloat:
-                                                    sqlList.add(FieldName, encodeSQLNumber(genericController.encodeNumber(field.defaultValue)));
+                                                    sqlList.add(FieldName, encodeSQLNumber(GenericController.encodeNumber(field.defaultValue)));
                                                     break;
                                                 case constants.FieldTypeIdInteger:
                                                 case constants.FieldTypeIdMemberSelect:
-                                                    sqlList.add(FieldName, encodeSQLNumber(genericController.encodeInteger(field.defaultValue)));
+                                                    sqlList.add(FieldName, encodeSQLNumber(GenericController.encodeInteger(field.defaultValue)));
                                                     break;
                                                 case constants.FieldTypeIdDate:
-                                                    sqlList.add(FieldName, encodeSQLDate(genericController.encodeDate(field.defaultValue)));
+                                                    sqlList.add(FieldName, encodeSQLDate(GenericController.encodeDate(field.defaultValue)));
                                                     break;
                                                 case constants.FieldTypeIdLookup:
                                                     //
@@ -2342,7 +2338,7 @@ namespace Contensive.Processor.Controllers {
                                                     // This is a problem - the defaults should come in as the ID values, not the names
                                                     //   so a select can be added to the default configuration page
                                                     //
-                                                    DefaultValueText = genericController.encodeText(field.defaultValue);
+                                                    DefaultValueText = GenericController.encodeText(field.defaultValue);
                                                     if (string.IsNullOrEmpty(DefaultValueText)) {
                                                         DefaultValueText = "null";
                                                     } else {
@@ -2352,10 +2348,10 @@ namespace Contensive.Processor.Controllers {
                                                                 DefaultValueText = getRecordID(LookupContentName, DefaultValueText).ToString();
                                                             }
                                                         } else if (field.lookupList != "") {
-                                                            UCaseDefaultValueText = genericController.vbUCase(DefaultValueText);
+                                                            UCaseDefaultValueText = GenericController.vbUCase(DefaultValueText);
                                                             lookups = field.lookupList.Split(',');
                                                             for (Ptr = 0; Ptr <= lookups.GetUpperBound(0); Ptr++) {
-                                                                if (UCaseDefaultValueText == genericController.vbUCase(lookups[Ptr])) {
+                                                                if (UCaseDefaultValueText == GenericController.vbUCase(lookups[Ptr])) {
                                                                     DefaultValueText = (Ptr + 1).ToString();
                                                                 }
                                                             }
@@ -2376,7 +2372,7 @@ namespace Contensive.Processor.Controllers {
                             }
                         }
                         //
-                        string sqlGuid = encodeSQLText(genericController.getGUID());
+                        string sqlGuid = encodeSQLText(GenericController.getGUID());
                         //string CreateKeyString = encodeSQLNumber(genericController.GetRandomInteger(core));
                         string sqlDateAdded = encodeSQLDate(DateTime.Now);
                         //
@@ -2395,14 +2391,14 @@ namespace Contensive.Processor.Controllers {
                         //
                         // ----- Clear Time Stamp because a record changed
                         // 20171213 added back for integration test (had not noted why it was commented out
-                        core.cache.invalidateAllInContent(ContentName);
+                        //core.cache.invalidateAllInContent(ContentName);
                         //If coreWorkflowClass.csv_AllowAutocsv_ClearContentTimeStamp Then
                         //    Call core.cache.invalidateObject(ContentName)
                         //End If
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnCs;
@@ -2423,7 +2419,7 @@ namespace Contensive.Processor.Controllers {
                     returnResult = csOpen(ContentName, "(ID=" + encodeSQLNumber(RecordID) + ")", "", false, MemberID, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -2448,7 +2444,7 @@ namespace Contensive.Processor.Controllers {
                     returnResult = contentSetStore[CSPointer].IsOpen & (contentSetStore[CSPointer].readCacheRowPtr >= 0) && (contentSetStore[CSPointer].readCacheRowPtr < contentSetStore[CSPointer].readCacheRowCnt);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -2483,7 +2479,7 @@ namespace Contensive.Processor.Controllers {
                     DestRecordID = csGetInteger(CSDestination, "ID");
                     FieldName = csGetFirstFieldName(CSSource);
                     while (!string.IsNullOrEmpty(FieldName)) {
-                        switch (genericController.vbUCase(FieldName)) {
+                        switch (GenericController.vbUCase(FieldName)) {
                             case "ID":
                                 break;
                             default:
@@ -2536,7 +2532,7 @@ namespace Contensive.Processor.Controllers {
                     csSave(CSDestination);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -2556,7 +2552,7 @@ namespace Contensive.Processor.Controllers {
                     returnResult = contentSetStore[CSPointer].Source;
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -2599,7 +2595,7 @@ namespace Contensive.Processor.Controllers {
                         // Not updateable -- Just return what is there as a string
                         //
                         try {
-                            fieldValue = genericController.encodeText(csGetValue(CSPointer, FieldName));
+                            fieldValue = GenericController.encodeText(csGetValue(CSPointer, FieldName));
                         } catch (Exception ex) {
                             throw new ApplicationException("Error [" + ex.Message + "] reading field [" + FieldName.ToLower() + "] In source [" + tempVar.Source + "");
                         }
@@ -2611,7 +2607,7 @@ namespace Contensive.Processor.Controllers {
                         Models.Domain.CDefFieldModel field = null;
                         if (!tempVar.CDef.fields.ContainsKey(FieldName.ToLower())) {
                             try {
-                                fieldValue = genericController.encodeText(csGetValue(CSPointer, FieldName));
+                                fieldValue = GenericController.encodeText(csGetValue(CSPointer, FieldName));
                             } catch (Exception ex) {
                                 throw new ApplicationException("Error [" + ex.Message + "] reading field [" + FieldName.ToLower() + "] In content [" + tempVar.CDef.name + "] With custom field list [" + tempVar.SelectTableFieldList + "");
                             }
@@ -2628,7 +2624,7 @@ namespace Contensive.Processor.Controllers {
                                 string SQL = null;
                                 DataTable rs = null;
                                 if (tempVar.CDef.fields.ContainsKey("id")) {
-                                    RecordID = genericController.encodeInteger(csGetValue(CSPointer, "id"));
+                                    RecordID = GenericController.encodeInteger(csGetValue(CSPointer, "id"));
                                     ContentName = Models.Domain.CDefModel.getContentNameByID(core, field.manyToManyRuleContentID);
                                     DbTable = Models.Domain.CDefModel.getContentTablename(core, ContentName);
                                     SQL = "Select " + field.ManyToManyRuleSecondaryField + " from " + DbTable + " where " + field.ManyToManyRulePrimaryField + "=" + RecordID;
@@ -2647,7 +2643,7 @@ namespace Contensive.Processor.Controllers {
                                 //fieldTypeId = fieldTypeId;
                             } else {
                                 FieldValueVariant = csGetValue(CSPointer, FieldName);
-                                if (!genericController.IsNull(FieldValueVariant)) {
+                                if (!GenericController.IsNull(FieldValueVariant)) {
                                     //
                                     // Field is good
                                     //
@@ -2656,7 +2652,7 @@ namespace Contensive.Processor.Controllers {
                                             //
                                             //
                                             //
-                                            if (genericController.encodeBoolean(FieldValueVariant)) {
+                                            if (GenericController.encodeBoolean(FieldValueVariant)) {
                                                 fieldValue = "Yes";
                                             } else {
                                                 fieldValue = "No";
@@ -2667,11 +2663,11 @@ namespace Contensive.Processor.Controllers {
                                             //
                                             //
                                             //
-                                            if (dateController.IsDate(FieldValueVariant)) {
+                                            if (DateController.IsDate(FieldValueVariant)) {
                                                 //
                                                 // formatdatetime returns 'wednesday june 5, 1990', which fails IsDate()!!
                                                 //
-                                                fieldValue = genericController.encodeDate(FieldValueVariant).ToString();
+                                                fieldValue = GenericController.encodeDate(FieldValueVariant).ToString();
                                             }
                                             break;
                                         case FieldTypeIdLookup:
@@ -2685,7 +2681,7 @@ namespace Contensive.Processor.Controllers {
                                                 if (!string.IsNullOrEmpty(LookupContentName)) {
                                                     //
                                                     // -- First try Lookup Content
-                                                    CSLookup = csOpen(LookupContentName, "ID=" + encodeSQLNumber(genericController.encodeInteger(FieldValueVariant)), "", true, 0, false, false, "name", 1);
+                                                    CSLookup = csOpen(LookupContentName, "ID=" + encodeSQLNumber(GenericController.encodeInteger(FieldValueVariant)), "", true, 0, false, false, "name", 1);
                                                     if (csOk(CSLookup)) {
                                                         fieldValue = csGetText(CSLookup, "name");
                                                     }
@@ -2693,7 +2689,7 @@ namespace Contensive.Processor.Controllers {
                                                 } else if (!string.IsNullOrEmpty(LookupList)) {
                                                     //
                                                     // -- Next try lookup list
-                                                    FieldValueInteger = genericController.encodeInteger(FieldValueVariant) - 1;
+                                                    FieldValueInteger = GenericController.encodeInteger(FieldValueVariant) - 1;
                                                     if (FieldValueInteger >= 0) {
                                                         lookups = LookupList.Split(',');
                                                         if (lookups.GetUpperBound(0) >= FieldValueInteger) {
@@ -2708,7 +2704,7 @@ namespace Contensive.Processor.Controllers {
                                             //
                                             //
                                             if (FieldValueVariant.IsNumeric()) {
-                                                fieldValue = getRecordName("people", genericController.encodeInteger(FieldValueVariant));
+                                                fieldValue = getRecordName("people", GenericController.encodeInteger(FieldValueVariant));
                                             }
                                             break;
                                         case FieldTypeIdCurrency:
@@ -2724,7 +2720,7 @@ namespace Contensive.Processor.Controllers {
                                             //
                                             //
                                             //
-                                            fieldValue = core.cdnFiles.readFileText(genericController.encodeText(FieldValueVariant));
+                                            fieldValue = core.cdnFiles.readFileText(GenericController.encodeText(FieldValueVariant));
                                             break;
                                         case FieldTypeIdFileCSS:
                                         case FieldTypeIdFileXML:
@@ -2732,7 +2728,7 @@ namespace Contensive.Processor.Controllers {
                                             //
                                             //
                                             //
-                                            fieldValue = core.cdnFiles.readFileText(genericController.encodeText(FieldValueVariant));
+                                            fieldValue = core.cdnFiles.readFileText(GenericController.encodeText(FieldValueVariant));
                                             //NeedsHTMLEncode = False
                                             break;
                                         case FieldTypeIdText:
@@ -2741,7 +2737,7 @@ namespace Contensive.Processor.Controllers {
                                             //
                                             //
                                             //
-                                            fieldValue = genericController.encodeText(FieldValueVariant);
+                                            fieldValue = GenericController.encodeText(FieldValueVariant);
                                             break;
                                         case FieldTypeIdFile:
                                         case FieldTypeIdFileImage:
@@ -2753,7 +2749,7 @@ namespace Contensive.Processor.Controllers {
                                             //
                                             //
                                             //
-                                            fieldValue = genericController.encodeText(FieldValueVariant);
+                                            fieldValue = GenericController.encodeText(FieldValueVariant);
                                             //NeedsHTMLEncode = False
                                             break;
                                         case FieldTypeIdRedirect:
@@ -2775,7 +2771,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return fieldValue;
@@ -2879,10 +2875,10 @@ namespace Contensive.Processor.Controllers {
                                         pathFilenameOriginal = csGetText(CSPointer, FieldNameLc);
                                         PathFilename = pathFilenameOriginal;
                                         BlankTest = FieldValue;
-                                        BlankTest = genericController.vbReplace(BlankTest, " ", "");
-                                        BlankTest = genericController.vbReplace(BlankTest, "\r", "");
-                                        BlankTest = genericController.vbReplace(BlankTest, "\n", "");
-                                        BlankTest = genericController.vbReplace(BlankTest, "\t", "");
+                                        BlankTest = GenericController.vbReplace(BlankTest, " ", "");
+                                        BlankTest = GenericController.vbReplace(BlankTest, "\r", "");
+                                        BlankTest = GenericController.vbReplace(BlankTest, "\n", "");
+                                        BlankTest = GenericController.vbReplace(BlankTest, "\t", "");
                                         if (string.IsNullOrEmpty(BlankTest)) {
                                             if (!string.IsNullOrEmpty(PathFilename)) {
                                                 core.cdnFiles.deleteFile(PathFilename);
@@ -2911,16 +2907,16 @@ namespace Contensive.Processor.Controllers {
                                                         path = PathFilename.Left(Pos);
                                                         FilenameRev = 1;
                                                         if (!fileNameNoExt.IsNumeric()) {
-                                                            Pos = genericController.vbInstr(1, fileNameNoExt, ".r", 1);
+                                                            Pos = GenericController.vbInstr(1, fileNameNoExt, ".r", 1);
                                                             if (Pos > 0) {
-                                                                FilenameRev = genericController.encodeInteger(fileNameNoExt.Substring(Pos + 1));
+                                                                FilenameRev = GenericController.encodeInteger(fileNameNoExt.Substring(Pos + 1));
                                                                 FilenameRev = FilenameRev + 1;
                                                                 fileNameNoExt = fileNameNoExt.Left(Pos - 1);
                                                             }
                                                         }
                                                         fileName = fileNameNoExt + ".r" + FilenameRev + "." + FileExt;
                                                         //PathFilename = PathFilename & dstFilename
-                                                        path = genericController.convertCdnUrlToCdnPathFilename(path);
+                                                        path = GenericController.convertCdnUrlToCdnPathFilename(path);
                                                         //srcSysFile = config.physicalFilePath & genericController.vbReplace(srcPathFilename, "/", "\")
                                                         //dstSysFile = config.physicalFilePath & genericController.vbReplace(PathFilename, "/", "\")
                                                         PathFilename = path + fileName;
@@ -2929,7 +2925,7 @@ namespace Contensive.Processor.Controllers {
                                                 }
                                             }
                                             if ((!string.IsNullOrEmpty(pathFilenameOriginal)) & (pathFilenameOriginal != PathFilename)) {
-                                                pathFilenameOriginal = genericController.convertCdnUrlToCdnPathFilename(pathFilenameOriginal);
+                                                pathFilenameOriginal = GenericController.convertCdnUrlToCdnPathFilename(pathFilenameOriginal);
                                                 core.cdnFiles.deleteFile(pathFilenameOriginal);
                                             }
                                             core.cdnFiles.saveFile(PathFilename, FieldValue);
@@ -2940,7 +2936,7 @@ namespace Contensive.Processor.Controllers {
                                     case FieldTypeIdBoolean:
                                         //
                                         // Boolean - sepcial case, block on typed GetAlways set
-                                        if (genericController.encodeBoolean(FieldValue) != csGetBoolean(CSPointer, FieldNameLc)) {
+                                        if (GenericController.encodeBoolean(FieldValue) != csGetBoolean(CSPointer, FieldNameLc)) {
                                             SetNeeded = true;
                                         }
                                         break;
@@ -2948,10 +2944,10 @@ namespace Contensive.Processor.Controllers {
                                         //
                                         // Set if text of value changes
                                         //
-                                        if (genericController.encodeText(FieldValue) != csGetText(CSPointer, FieldNameLc)) {
+                                        if (GenericController.encodeText(FieldValue) != csGetText(CSPointer, FieldNameLc)) {
                                             SetNeeded = true;
                                             if (FieldValue.Length > 255) {
-                                                logController.handleError( core,new ApplicationException("Text length too long saving field [" + FieldName + "], length [" + FieldValue.Length + "], but max for Text field is 255. Save will be attempted"));
+                                                LogController.handleError( core,new ApplicationException("Text length too long saving field [" + FieldName + "], length [" + FieldValue.Length + "], but max for Text field is 255. Save will be attempted"));
                                             }
                                         }
                                         break;
@@ -2960,10 +2956,10 @@ namespace Contensive.Processor.Controllers {
                                         //
                                         // Set if text of value changes
                                         //
-                                        if (genericController.encodeText(FieldValue) != csGetText(CSPointer, FieldNameLc)) {
+                                        if (GenericController.encodeText(FieldValue) != csGetText(CSPointer, FieldNameLc)) {
                                             SetNeeded = true;
                                             if (FieldValue.Length > 65535) {
-                                                logController.handleError( core,new ApplicationException("Text length too long saving field [" + FieldName + "], length [" + FieldValue.Length + "], but max for LongText and Html is 65535. Save will be attempted"));
+                                                LogController.handleError( core,new ApplicationException("Text length too long saving field [" + FieldName + "], length [" + FieldValue.Length + "], but max for LongText and Html is 65535. Save will be attempted"));
                                             }
                                         }
                                         break;
@@ -2971,7 +2967,7 @@ namespace Contensive.Processor.Controllers {
                                         //
                                         // Set if text of value changes
                                         //
-                                        if (genericController.encodeText(FieldValue) != csGetText(CSPointer, FieldNameLc)) {
+                                        if (GenericController.encodeText(FieldValue) != csGetText(CSPointer, FieldNameLc)) {
                                             SetNeeded = true;
                                         }
                                         break;
@@ -2994,7 +2990,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -3024,7 +3020,7 @@ namespace Contensive.Processor.Controllers {
                     contentSetStore[CSPointer].writeCache.Clear();
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -3074,25 +3070,25 @@ namespace Contensive.Processor.Controllers {
                         string UniqueViolationFieldList = "";
                         foreach (var keyValuePair in contentSet.writeCache) {
                             string FieldName = keyValuePair.Key;
-                            string UcaseFieldName = genericController.vbUCase(FieldName);
+                            string UcaseFieldName = GenericController.vbUCase(FieldName);
                             object writeCacheValue = keyValuePair.Value;
                             if (UcaseFieldName == "MODIFIEDBY") {
                                 //
                                 // capture and block it - it is hardcoded in sql
                                 //
                                 AuthorableFieldUpdate = true;
-                                sqlModifiedBy = genericController.encodeInteger(writeCacheValue);
+                                sqlModifiedBy = GenericController.encodeInteger(writeCacheValue);
                             } else if (UcaseFieldName == "MODIFIEDDATE") {
                                 //
                                 // capture and block it - it is hardcoded in sql
                                 //
                                 AuthorableFieldUpdate = true;
-                                sqlModifiedDate = genericController.encodeDate(writeCacheValue);
+                                sqlModifiedDate = GenericController.encodeDate(writeCacheValue);
                             } else {
                                 //
                                 // let these field be added to the sql
                                 //
-                                LiveRecordInactive = (UcaseFieldName == "ACTIVE" && (!genericController.encodeBoolean(writeCacheValue)));
+                                LiveRecordInactive = (UcaseFieldName == "ACTIVE" && (!GenericController.encodeBoolean(writeCacheValue)));
                                 FieldFoundCount += 1;
                                 Models.Domain.CDefFieldModel field = contentSet.CDef.fields[FieldName.ToLower()];
                                 string SQLSetPair = "";
@@ -3148,7 +3144,7 @@ namespace Contensive.Processor.Controllers {
                                         break;
                                     case FieldTypeIdLongText:
                                     case FieldTypeIdHTML:
-                                        SQLSetPair = FieldName + "=" + encodeSQLText(genericController.encodeText(writeCacheValue));
+                                        SQLSetPair = FieldName + "=" + encodeSQLText(GenericController.encodeText(writeCacheValue));
                                         break;
                                     default:
                                         //
@@ -3169,7 +3165,7 @@ namespace Contensive.Processor.Controllers {
                                             }
                                         }
                                     }
-                                    if (field.uniqueName & (genericController.encodeText(writeCacheValue) != "")) {
+                                    if (field.uniqueName & (GenericController.encodeText(writeCacheValue) != "")) {
                                         //
                                         // ----- set up for unique name check
                                         //
@@ -3177,7 +3173,7 @@ namespace Contensive.Processor.Controllers {
                                             SQLCriteriaUnique += "Or";
                                             UniqueViolationFieldList += ",";
                                         }
-                                        string writeCacheValueText = genericController.encodeText(writeCacheValue);
+                                        string writeCacheValueText = GenericController.encodeText(writeCacheValue);
                                         if (writeCacheValueText.Length < 255) {
                                             UniqueViolationFieldList += field.nameLc + "=\"" + writeCacheValueText + "\"";
                                         } else {
@@ -3256,7 +3252,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // ----- reset the ContentTimeStamp to csv_ClearBake
                                 //
-                                core.cache.invalidate(Controllers.CacheController.getCacheKey_Entity(LiveTableName, "id", LiveRecordID.ToString()));
+                                core.cache.invalidate(CacheController.getCacheKey_forDbRecord(LiveRecordID, LiveTableName, LiveDataSourceName));
                                 //
                                 // ----- mark the record NOT UpToDate for SpiderDocs
                                 //
@@ -3270,11 +3266,11 @@ namespace Contensive.Processor.Controllers {
                         contentSet.LastUsed = DateTime.Now;
                         //
                         // -- invalidate the special cache name used to detect a change in any record
-                        core.cache.invalidateAllInContent(ContentName);
+                        core.cache.invalidateDbRecord(LiveRecordID, LiveTableName);
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -3301,7 +3297,7 @@ namespace Contensive.Processor.Controllers {
                         csStore.fieldNames = new String[csStore.resultColumnCount];
                         int ColumnPtr = 0;
                         foreach (DataColumn dc in csStore.dt.Columns) {
-                            csStore.fieldNames[ColumnPtr] = genericController.vbUCase(dc.ColumnName);
+                            csStore.fieldNames[ColumnPtr] = GenericController.vbUCase(dc.ColumnName);
                             ColumnPtr += 1;
                         }
                         // refactor -- convert interal storage to dt and assign -- will speedup open
@@ -3311,7 +3307,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -3332,7 +3328,7 @@ namespace Contensive.Processor.Controllers {
                     returnResult = (contentSetStore[CSPointer].readCacheRowPtr >= contentSetStore[CSPointer].readCacheRowCnt);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -3350,24 +3346,24 @@ namespace Contensive.Processor.Controllers {
             try {
                 switch (fieldType) {
                     case FieldTypeIdBoolean:
-                        returnResult = encodeSQLBoolean(genericController.encodeBoolean(expression));
+                        returnResult = encodeSQLBoolean(GenericController.encodeBoolean(expression));
                         break;
                     case FieldTypeIdCurrency:
                     case FieldTypeIdFloat:
-                        returnResult = encodeSQLNumber(genericController.encodeNumber(expression));
+                        returnResult = encodeSQLNumber(GenericController.encodeNumber(expression));
                         break;
                     case FieldTypeIdAutoIdIncrement:
                     case FieldTypeIdInteger:
                     case FieldTypeIdLookup:
                     case FieldTypeIdMemberSelect:
-                        returnResult = encodeSQLNumber(genericController.encodeInteger(expression));
+                        returnResult = encodeSQLNumber(GenericController.encodeInteger(expression));
                         break;
                     case FieldTypeIdDate:
-                        returnResult = encodeSQLDate(genericController.encodeDate(expression));
+                        returnResult = encodeSQLDate(GenericController.encodeDate(expression));
                         break;
                     case FieldTypeIdLongText:
                     case FieldTypeIdHTML:
-                        returnResult = encodeSQLText(genericController.encodeText(expression));
+                        returnResult = encodeSQLText(GenericController.encodeText(expression));
                         break;
                     case FieldTypeIdFile:
                     case FieldTypeIdFileImage:
@@ -3381,15 +3377,15 @@ namespace Contensive.Processor.Controllers {
                     case FieldTypeIdFileXML:
                     case FieldTypeIdFileCSS:
                     case FieldTypeIdFileHTML:
-                        returnResult = encodeSQLText(genericController.encodeText(expression));
+                        returnResult = encodeSQLText(GenericController.encodeText(expression));
                         break;
                     default:
-                        logController.handleError( core,new ApplicationException("Unknown Field Type [" + fieldType + ""));
-                        returnResult = encodeSQLText(genericController.encodeText(expression));
+                        LogController.handleError( core,new ApplicationException("Unknown Field Type [" + fieldType + ""));
+                        returnResult = encodeSQLText(GenericController.encodeText(expression));
                         break;
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -3406,11 +3402,11 @@ namespace Contensive.Processor.Controllers {
             if (expression == null) {
                 returnResult = "null";
             } else {
-                returnResult = genericController.encodeText(expression);
+                returnResult = GenericController.encodeText(expression);
                 if (string.IsNullOrEmpty(returnResult)) {
                     returnResult = "null";
                 } else {
-                    returnResult = "'" + genericController.vbReplace(returnResult, "'", "''") + "'";
+                    returnResult = "'" + GenericController.vbReplace(returnResult, "'", "''") + "'";
                 }
             }
             return returnResult;
@@ -3450,7 +3446,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -3485,7 +3481,7 @@ namespace Contensive.Processor.Controllers {
                     returnResult = SQLTrue;
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -3538,7 +3534,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -3607,7 +3603,7 @@ namespace Contensive.Processor.Controllers {
                     returnResult = csOpenSql(SQL,"Default", PageSize, PageNumber);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -3627,11 +3623,11 @@ namespace Contensive.Processor.Controllers {
                 if (!DbController.isDataTableOk(dt)) {
                     throw new ApplicationException("Content [" + ContentName + "] was not found in ccContent table");
                 } else {
-                    returnResult = genericController.encodeInteger(dt.Rows[0]["ContentTableID"]);
+                    returnResult = GenericController.encodeInteger(dt.Rows[0]["ContentTableID"]);
                 }
                 dt.Dispose();
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -3645,7 +3641,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="TableName"></param>
         /// <param name="RecordID"></param>
         //
-        public void deleteTableRecord(string TableName, int RecordID, string DataSourceName) {
+        public void deleteTableRecord(int RecordID, string TableName, string DataSourceName = "") {
             try {
                 if (string.IsNullOrEmpty(TableName.Trim())) {
                     throw new ApplicationException("tablename cannot be blank");
@@ -3655,19 +3651,23 @@ namespace Contensive.Processor.Controllers {
                     deleteTableRecords(TableName, "ID=" + RecordID, DataSourceName);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
-        //
-        //==================================================================================================
-        /// <summary>
-        /// Remove this record from all watch lists
-        /// </summary>
-        /// <param name="ContentID"></param>
-        /// <param name="RecordID"></param>
-        //
-        public void deleteContentRules(int ContentID, int RecordID) {
+        // todo deprecate
+        public void deprecate_argsreversed_deleteTableRecord(string TableName, int RecordID, string DataSourceName = "") {
+            deleteTableRecord(RecordID, TableName, DataSourceName);
+        }
+            //
+            //==================================================================================================
+            /// <summary>
+            /// Remove this record from all watch lists
+            /// </summary>
+            /// <param name="ContentID"></param>
+            /// <param name="RecordID"></param>
+            //
+            public void deleteContentRules(int ContentID, int RecordID) {
             try {
                 string ContentRecordKey = null;
                 string Criteria = null;
@@ -3687,7 +3687,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // ----- Table Specific rules
                     //
-                    switch (genericController.vbUCase(TableName)) {
+                    switch (GenericController.vbUCase(TableName)) {
                         case "CCCALENDARS":
                             //
                             deleteContentRecords("Calendar Event Rules", "CalendarID=" + RecordID);
@@ -3747,7 +3747,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -3766,7 +3766,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 returnResult = contentSetStore[CSPointer].readCache;
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -3786,7 +3786,7 @@ namespace Contensive.Processor.Controllers {
                     returnResult = contentSetStore[CSPointer].readCacheRowCnt;
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -3813,7 +3813,7 @@ namespace Contensive.Processor.Controllers {
                     executeQuery(SQL, DataSourceName);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -3834,7 +3834,7 @@ namespace Contensive.Processor.Controllers {
                     returnResult = contentSetStore[CSPointer].ContentName;
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -3928,7 +3928,7 @@ namespace Contensive.Processor.Controllers {
                         break;
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex); // "Unexpected exception")
+                LogController.handleError( core,ex); // "Unexpected exception")
                 throw;
             }
             return returnFieldTypeName;
@@ -3958,7 +3958,7 @@ namespace Contensive.Processor.Controllers {
                     csClose(ref CS);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -3979,7 +3979,7 @@ namespace Contensive.Processor.Controllers {
                 csClose(ref CS);
                 //
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnRows;
@@ -4033,7 +4033,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnList;
@@ -4054,7 +4054,7 @@ namespace Contensive.Processor.Controllers {
                     returnDt = connSQL.GetSchema("Tables", new[] { core.appConfig.name, null, tableName, null });
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnDt;
@@ -4079,7 +4079,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnDt;
@@ -4103,7 +4103,7 @@ namespace Contensive.Processor.Controllers {
                 returnDt = executeQuery("sys.sp_helpindex @objname = N'" + tableName + "'");
                 // EXEC sys.sp_helpindex @objname = N'cccontent' returns index_name, index_keys (comma delimited field list)
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnDt;
@@ -4120,13 +4120,13 @@ namespace Contensive.Processor.Controllers {
             try {
                 if (nameIdOrGuid.IsNumeric()) {
                     sqlCriteria = "id=" + encodeSQLNumber(double.Parse(nameIdOrGuid));
-                } else if (genericController.common_isGuid(nameIdOrGuid)) {
+                } else if (GenericController.common_isGuid(nameIdOrGuid)) {
                     sqlCriteria = "ccGuid=" + encodeSQLText(nameIdOrGuid);
                 } else {
                     sqlCriteria = "name=" + encodeSQLText(nameIdOrGuid);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return sqlCriteria;
@@ -4143,11 +4143,11 @@ namespace Contensive.Processor.Controllers {
             try {
                 DataTable dt = executeQuery("Select ID from ccContent where name=" + encodeSQLText(ContentName));
                 if (dt.Rows.Count > 0) {
-                    returnContentId = genericController.encodeInteger(dt.Rows[0]["id"]);
+                    returnContentId = GenericController.encodeInteger(dt.Rows[0]["id"]);
                 }
                 dt.Dispose();
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnContentId;
@@ -4168,16 +4168,16 @@ namespace Contensive.Processor.Controllers {
                 //string CreateKeyString = core.db.encodeSQLNumber(genericController.GetRandomInteger(core));
                 //
                 // Read in a record from the table to get fields
-                DataTable dt = core.db.openTable(DataSource.Name, TableName, "", "", "", 1);
+                DataTable dt = core.db.openTable(DataSource.name, TableName, "", "", "", 1);
                 if (dt.Rows.Count == 0) {
                     dt.Dispose();
                     //
                     // --- no records were found, add a blank if we can
                     //
-                    dt = core.db.insertTableRecordGetDataTable(DataSource.Name, TableName, core.session.user.id);
+                    dt = core.db.insertTableRecordGetDataTable(DataSource.name, TableName, core.session.user.id);
                     if (dt.Rows.Count > 0) {
-                        int RecordID = genericController.encodeInteger(dt.Rows[0]["ID"]);
-                        core.db.executeQuery("Update " + TableName + " Set active=0 where id=" + RecordID + ";", DataSource.Name);
+                        int RecordID = GenericController.encodeInteger(dt.Rows[0]["ID"]);
+                        core.db.executeQuery("Update " + TableName + " Set active=0 where id=" + RecordID + ";", DataSource.name);
                     }
                 }
                 string SQL = "";
@@ -4202,7 +4202,7 @@ namespace Contensive.Processor.Controllers {
                         if (dt.Rows.Count == 0) {
                             throw new ApplicationException("Content Definition [" + ContentName + "] could Not be selected by name after it was inserted");
                         } else {
-                            ContentID = genericController.encodeInteger(dt.Rows[0]["ID"]);
+                            ContentID = GenericController.encodeInteger(dt.Rows[0]["ID"]);
                             core.db.executeQuery("update ccContent Set CreateKey=0 where id=" + ContentID);
                         }
                         dt.Dispose();
@@ -4223,10 +4223,10 @@ namespace Contensive.Processor.Controllers {
                     foreach (DataColumn dcTableColumns in dt.Columns) {
                         //
                         // ----- see if the field is already in the content fields
-                        string UcaseTableColumnName = genericController.vbUCase(dcTableColumns.ColumnName);
+                        string UcaseTableColumnName = GenericController.vbUCase(dcTableColumns.ColumnName);
                         bool ContentFieldFound = false;
                         foreach (DataRow drContentRecords in dtFields.Rows) {
-                            if (genericController.vbUCase(genericController.encodeText(drContentRecords["name"])) == UcaseTableColumnName) {
+                            if (GenericController.vbUCase(GenericController.encodeText(drContentRecords["name"])) == UcaseTableColumnName) {
                                 ContentFieldFound = true;
                                 break;
                             }
@@ -4235,7 +4235,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // create the content field
                             //
-                            createContentFieldFromTableField(ContentName, dcTableColumns.ColumnName, genericController.encodeInteger(dcTableColumns.DataType));
+                            createContentFieldFromTableField(ContentName, dcTableColumns.ColumnName, GenericController.encodeInteger(dcTableColumns.DataType));
                         } else {
                             //
                             // touch field so upgrade does not delete it
@@ -4248,7 +4248,7 @@ namespace Contensive.Processor.Controllers {
                 // Fill ContentControlID fields with new ContentID
                 //
                 SQL = "Update " + TableName + " Set ContentControlID=" + ContentID + " where (ContentControlID Is null);";
-                core.db.executeQuery(SQL, DataSource.Name);
+                core.db.executeQuery(SQL, DataSource.name);
                 //
                 // ----- Load CDef
                 //       Load only if the previous state of autoload was true
@@ -4258,7 +4258,7 @@ namespace Contensive.Processor.Controllers {
                 core.doc.clearMetaData();
                 dt.Dispose();
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -4285,7 +4285,7 @@ namespace Contensive.Processor.Controllers {
                     htmlContent = false
                 };
                 //
-                switch (genericController.vbUCase(FieldName)) {
+                switch (GenericController.vbUCase(FieldName)) {
                     //
                     // --- Core fields
                     //
@@ -4464,7 +4464,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 Models.Domain.CDefModel.verifyCDefField_ReturnID(core, ContentName, field);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -4494,14 +4494,14 @@ namespace Contensive.Processor.Controllers {
                     foreach (DataRow dr in dt.Rows) {
                         cPtr = 0;
                         foreach (DataColumn cell in dt.Columns) {
-                            rows[cPtr, rPtr] = genericController.encodeText(dr[cell]);
+                            rows[cPtr, rPtr] = GenericController.encodeText(dr[cell]);
                             cPtr += 1;
                         }
                         rPtr += 1;
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return rows;
@@ -4554,7 +4554,7 @@ namespace Contensive.Processor.Controllers {
                 SQL = "select count(*) as RecordCount from " + TableName + " where " + Criteria;
                 DataTable dt = executeQuery(SQL);
                 if (dt.Rows.Count > 0) {
-                    CurrentCount = genericController.encodeInteger(dt.Rows[0][0]);
+                    CurrentCount = GenericController.encodeInteger(dt.Rows[0][0]);
                 }
                 while ((CurrentCount != 0) & (PreviousCount != CurrentCount) && (LoopCount < iChunkCount)) {
                     if (getDataSourceType(DataSourceName) == DataSourceTypeODBCMySQL) {
@@ -4567,7 +4567,7 @@ namespace Contensive.Processor.Controllers {
                     SQL = "select count(*) as RecordCount from " + TableName + " where " + Criteria;
                     dt = executeQuery(SQL);
                     if (dt.Rows.Count > 0) {
-                        CurrentCount = genericController.encodeInteger(dt.Rows[0][0]);
+                        CurrentCount = GenericController.encodeInteger(dt.Rows[0][0]);
                     }
                     LoopCount = LoopCount + 1;
                 }
@@ -4575,12 +4575,12 @@ namespace Contensive.Processor.Controllers {
                     //
                     // records did not delete
                     //
-                    logController.handleError( core,new ApplicationException("Error deleting record chunks. No records were deleted and the process was not complete."));
+                    LogController.handleError( core,new ApplicationException("Error deleting record chunks. No records were deleted and the process was not complete."));
                 } else if (LoopCount >= iChunkCount) {
                     //
                     // records did not delete
                     //
-                    logController.handleError( core,new ApplicationException("Error deleting record chunks. The maximum chunk count was exceeded while deleting records."));
+                    LogController.handleError( core,new ApplicationException("Error deleting record chunks. The maximum chunk count was exceeded while deleting records."));
                 }
             }
         }
@@ -4624,10 +4624,10 @@ namespace Contensive.Processor.Controllers {
                         //
                         KeySplit = ContentRecordKey.Split('.');
                         if (KeySplit.GetUpperBound(0) == 1) {
-                            ContentID = genericController.encodeInteger(KeySplit[0]);
+                            ContentID = GenericController.encodeInteger(KeySplit[0]);
                             if (ContentID != 0) {
                                 ContentName = Models.Domain.CDefModel.getContentNameByID(core, ContentID);
-                                RecordID = genericController.encodeInteger(KeySplit[1]);
+                                RecordID = GenericController.encodeInteger(KeySplit[1]);
                                 if (!string.IsNullOrEmpty(ContentName) & RecordID != 0) {
                                     if (Models.Domain.CDefModel.getContentTablename(core, ContentName) == "ccPageContent") {
                                         CSPointer = core.db.csOpenRecord(ContentName, RecordID, false, false, "TemplateID,ParentID");
@@ -4657,7 +4657,7 @@ namespace Contensive.Processor.Controllers {
                                                 DataSource = Models.Domain.CDefModel.getContentDataSource(core, ContentName);
                                                 CSPointer = csOpenSql_rev(DataSource, "Select ContentControlID from " + TableName + " where ID=" + RecordID);
                                                 if (csOk(CSPointer)) {
-                                                    ParentContentID = genericController.encodeInteger(csGetText(CSPointer, "ContentControlID"));
+                                                    ParentContentID = GenericController.encodeInteger(csGetText(CSPointer, "ContentControlID"));
                                                 }
                                                 csClose(ref CSPointer);
                                                 if (ParentContentID != 0) {
@@ -4673,7 +4673,7 @@ namespace Contensive.Processor.Controllers {
                             }
                         }
                         if (!string.IsNullOrEmpty(result)) {
-                            result = genericController.modifyLinkQuery(result, rnPageId, RecordID.ToString(), true);
+                            result = GenericController.modifyLinkQuery(result, rnPageId, RecordID.ToString(), true);
                         }
                     }
                 }
@@ -4682,9 +4682,9 @@ namespace Contensive.Processor.Controllers {
                     result = DefaultLink;
                 }
                 //
-                result = genericController.encodeVirtualPath(result, core.appConfig.cdnFileUrl, appRootPath, core.webServer.requestDomain);
+                result = GenericController.encodeVirtualPath(result, core.appConfig.cdnFileUrl, appRootPath, core.webServer.requestDomain);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -4751,7 +4751,7 @@ namespace Contensive.Processor.Controllers {
         //       The rest are the archive records.
         //
         public int csOpenRecord(string ContentName, int RecordID, bool WorkflowAuthoringMode = false, bool WorkflowEditingMode = false, string SelectFieldList = "") {
-            return csOpen(genericController.encodeText(ContentName), "(ID=" + core.db.encodeSQLNumber(RecordID) + ")", "", false, core.session.user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1);
+            return csOpen(GenericController.encodeText(ContentName), "(ID=" + core.db.encodeSQLNumber(RecordID) + ")", "", false, core.session.user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1);
         }
         //
         // ====================================================================================================
@@ -4774,8 +4774,8 @@ namespace Contensive.Processor.Controllers {
             {
                 throw (new Exception("Contensive database was created with version " + core.siteProperties.dataBuildVersion + ". main_SetContentCopy requires an builder."));
             } else {
-                iCopyName = genericController.encodeText(CopyName);
-                iContent = genericController.encodeText(Content);
+                iCopyName = GenericController.encodeText(CopyName);
+                iContent = GenericController.encodeText(Content);
                 CS = csOpen(ContentName, "name=" + encodeSQLText(iCopyName));
                 if (!csOk(CS)) {
                     csClose(ref CS);
@@ -4797,7 +4797,7 @@ namespace Contensive.Processor.Controllers {
             int ContentControlID = 0;
             int iCSPointer;
             //
-            iCSPointer = genericController.encodeInteger(CSPointer);
+            iCSPointer = GenericController.encodeInteger(CSPointer);
             if (iCSPointer == -1) {
                 throw (new ApplicationException("csGetRecordEditLink called with invalid iCSPointer")); // handleLegacyError14(MethodName, "")
             } else {
@@ -4812,7 +4812,7 @@ namespace Contensive.Processor.Controllers {
                     ContentControlID = (core.db.csGetInteger(iCSPointer, "contentcontrolid"));
                     ContentName = Models.Domain.CDefModel.getContentNameByID(core, ContentControlID);
                     if (!string.IsNullOrEmpty(ContentName)) {
-                        result = AdminUIController.getRecordEditLink(core,ContentName, RecordID, genericController.encodeBoolean(AllowCut), RecordName, core.session.isEditing(ContentName));
+                        result = AdminUIController.getRecordEditLink(core,ContentName, RecordID, GenericController.encodeBoolean(AllowCut), RecordName, core.session.isEditing(ContentName));
                     }
                 }
             }
@@ -4862,8 +4862,8 @@ namespace Contensive.Processor.Controllers {
                         if (!string.IsNullOrEmpty(Filename)) {
                             Path = core.db.csGetFieldFilename(CSPointer, FieldName, Filename, "", core.db.csGetFieldTypeId(CSPointer, FieldName));
                             core.db.csSet(CSPointer, FieldName, Path);
-                            Path = genericController.vbReplace(Path, "\\", "/");
-                            Path = genericController.vbReplace(Path, "/" + Filename, "");
+                            Path = GenericController.vbReplace(Path, "\\", "/");
+                            Path = GenericController.vbReplace(Path, "/" + Filename, "");
                             core.cdnFiles.upload(LocalRequestName, Path, ref Filename);
                         }
                         break;
@@ -4922,13 +4922,13 @@ namespace Contensive.Processor.Controllers {
                 if (csPtr >= 0) {
                     string ContentName = core.db.csGetContentName(csPtr);
                     if (string.IsNullOrEmpty(ContentName)) {
-                        logController.logWarn(core, "getRecordAddLink was called with a ContentSet that was created with an SQL statement. The function requires a ContentSet opened with an OpenCSContent.");
+                        LogController.logWarn(core, "getRecordAddLink was called with a ContentSet that was created with an SQL statement. The function requires a ContentSet opened with an OpenCSContent.");
                     } else {
                         result = AdminUIController.getRecordAddLink(core,ContentName, PresetNameValueList, AllowPaste);
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
             }
             return result;
         }

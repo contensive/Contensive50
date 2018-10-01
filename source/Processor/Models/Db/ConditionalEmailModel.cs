@@ -10,7 +10,7 @@ namespace Contensive.Processor.Models.Db {
         //-- const
         public const string contentName = "conditional email";
         public const string contentTableName = "ccemail";
-        private const string contentDataSource = "default";
+        public const string contentDataSource = "default";
         //
         //====================================================================================================
         //
@@ -91,8 +91,8 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public void invalidatePrimaryCache(CoreController core, int recordId) {
-            invalidateCache<ConditionalEmailModel>(core, recordId);
+        public static void invalidateRecordCache(CoreController core, int recordId) {
+            invalidateRecordCache<ConditionalEmailModel>(core, recordId);
         }
         //
         //====================================================================================================
@@ -113,6 +113,16 @@ namespace Contensive.Processor.Models.Db {
         //====================================================================================================
         public static ConditionalEmailModel createDefault(CoreController core) {
             return createDefault<ConditionalEmailModel>(core);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Return a cache key used to represent the table. ONLY used for invalidation. Add this as a dependent key if you want that key cleared when ANY record in the table is changed.
+        /// </summary>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        public static string getTableInvalidationKey(CoreController core) {
+            return getTableCacheKey<ConditionalEmailModel>(core);
         }
     }
 }

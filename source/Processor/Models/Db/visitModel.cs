@@ -11,84 +11,84 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Models.Db {
-    public class visitModel : BaseModel {
+    public class VisitModel : BaseModel {
         //
         //====================================================================================================
         //-- const
         public const string contentName = "visits";
         public const string contentTableName = "ccvisits";
-        private const string contentDataSource = "default";
+        public const string contentDataSource = "default";
         //
         //====================================================================================================
         // -- instance properties
-        public bool Bot { get; set; }
-        public string Browser { get; set; }
+        public bool bot { get; set; }
+        public string browser { get; set; }
         
-        public bool CookieSupport { get; set; }
-        public bool ExcludeFromAnalytics { get; set; }
-        public string HTTP_FROM { get; set; }
-        public string HTTP_REFERER { get; set; }
-        public string HTTP_VIA { get; set; }
-        public DateTime LastVisitTime { get; set; }
-        public int LoginAttempts { get; set; }
-        public int MemberID { get; set; }
-        public bool MemberNew { get; set; }
-        public bool Mobile { get; set; }
-        public int PageVisits { get; set; }
-        public string RefererPathPage { get; set; }
-        public string REMOTE_ADDR { get; set; }
-        public string RemoteName { get; set; }
-        public int StartDateValue { get; set; }
-        public DateTime StartTime { get; set; }
-        public DateTime StopTime { get; set; }
-        public int TimeToLastHit { get; set; }
-        public bool VerboseReporting { get; set; }
-        public bool VisitAuthenticated { get; set; }
-        public int VisitorID { get; set; }
-        public bool VisitorNew { get; set; }
+        public bool cookieSupport { get; set; }
+        public bool excludeFromAnalytics { get; set; }
+        public string http_from { get; set; }
+        public string http_referer { get; set; }
+        public string http_via { get; set; }
+        public DateTime lastVisitTime { get; set; }
+        public int loginAttempts { get; set; }
+        public int memberID { get; set; }
+        public bool memberNew { get; set; }
+        public bool mobile { get; set; }
+        public int pageVisits { get; set; }
+        public string refererPathPage { get; set; }
+        public string remote_addr { get; set; }
+        public string remoteName { get; set; }
+        public int startDateValue { get; set; }
+        public DateTime startTime { get; set; }
+        public DateTime stopTime { get; set; }
+        public int timeToLastHit { get; set; }
+        public bool verboseReporting { get; set; }
+        public bool visitAuthenticated { get; set; }
+        public int visitorID { get; set; }
+        public bool visitorNew { get; set; }
         //
         //====================================================================================================
-        public static visitModel add(CoreController core) {
-            return add<visitModel>(core);
+        public static VisitModel add(CoreController core) {
+            return add<VisitModel>(core);
         }
         //
         //====================================================================================================
-        public static visitModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<visitModel>(core, ref callersCacheNameList);
+        public static VisitModel add(CoreController core, ref List<string> callersCacheNameList) {
+            return add<VisitModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static visitModel create(CoreController core, int recordId) {
-            return create<visitModel>(core, recordId);
+        public static VisitModel create(CoreController core, int recordId) {
+            return create<VisitModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static visitModel create(CoreController core, int recordId, ref List<string> callersCacheNameList) {
-            return create<visitModel>(core, recordId, ref callersCacheNameList);
+        public static VisitModel create(CoreController core, int recordId, ref List<string> callersCacheNameList) {
+            return create<VisitModel>(core, recordId, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static visitModel create(CoreController core, string recordGuid) {
-            return create<visitModel>(core, recordGuid);
+        public static VisitModel create(CoreController core, string recordGuid) {
+            return create<VisitModel>(core, recordGuid);
         }
         //
         //====================================================================================================
-        public static visitModel create(CoreController core, string recordGuid, ref List<string> callersCacheNameList) {
-            return create<visitModel>(core, recordGuid, ref callersCacheNameList);
+        public static VisitModel create(CoreController core, string recordGuid, ref List<string> callersCacheNameList) {
+            return create<VisitModel>(core, recordGuid, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static visitModel createByName(CoreController core, string recordName) {
-            return createByName<visitModel>(core, recordName);
+        public static VisitModel createByName(CoreController core, string recordName) {
+            return createByName<VisitModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static visitModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<visitModel>(core, recordName, ref callersCacheNameList);
+        public static VisitModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByName<VisitModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================
@@ -98,52 +98,52 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static void delete(CoreController core, int recordId) {
-            delete<visitModel>(core, recordId);
+            delete<VisitModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static void delete(CoreController core, string ccGuid) {
-            delete<visitModel>(core, ccGuid);
+            delete<VisitModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static List<visitModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
-            return createList<visitModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
+        public static List<VisitModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
+            return createList<VisitModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static List<visitModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy) {
-            return createList<visitModel>(core, sqlCriteria, sqlOrderBy);
+        public static List<VisitModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy) {
+            return createList<VisitModel>(core, sqlCriteria, sqlOrderBy);
         }
         //
         //====================================================================================================
-        public static List<visitModel> createList(CoreController core, string sqlCriteria) {
-            return createList<visitModel>(core, sqlCriteria);
+        public static List<VisitModel> createList(CoreController core, string sqlCriteria) {
+            return createList<VisitModel>(core, sqlCriteria);
         }
         //
         //====================================================================================================
-        public void invalidatePrimaryCache(CoreController core, int recordId) {
-            invalidateCache<visitModel>(core, recordId);
+        public static void invalidateRecordCache(CoreController core, int recordId) {
+            invalidateRecordCache<VisitModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return BaseModel.getRecordName<visitModel>(core, recordId);
+            return BaseModel.getRecordName<VisitModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return BaseModel.getRecordName<visitModel>(core, ccGuid);
+            return BaseModel.getRecordName<VisitModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return BaseModel.getRecordId<visitModel>(core, ccGuid);
+            return BaseModel.getRecordId<VisitModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static visitModel createDefault(CoreController core) {
-            return createDefault<visitModel>(core);
+        public static VisitModel createDefault(CoreController core) {
+            return createDefault<VisitModel>(core);
         }
         //
         //====================================================================================================
@@ -154,12 +154,22 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="visitId"></param>
         /// <param name="visitorId"></param>
         /// <returns></returns>
-        public static visitModel getLastVisitByVisitor(CoreController core, int visitId, int visitorId) {
+        public static VisitModel getLastVisitByVisitor(CoreController core, int visitId, int visitorId) {
             var visitList = createList(core, "(id<>" + visitId + ")and(VisitorID=" + visitorId + ")", "id desc");
             if ( visitList.Count>0) {
                 return visitList.First();
             }
             return null;
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Return a cache key used to represent the table. ONLY used for invalidation. Add this as a dependent key if you want that key cleared when ANY record in the table is changed.
+        /// </summary>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        public static string getTableInvalidationKey(CoreController core) {
+            return getTableCacheKey<VisitModel>(core);
         }
     }
 }

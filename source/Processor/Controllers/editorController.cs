@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Controllers {
@@ -20,7 +20,7 @@ namespace Contensive.Processor.Controllers {
     /// <summary>
     /// static class controller
     /// </summary>
-    public class editorController : IDisposable {
+    public class EditorController : IDisposable {
         //
         //
         //========================================================================
@@ -89,9 +89,9 @@ namespace Contensive.Processor.Controllers {
             int intRecordId = 0;
             string strFieldName = null;
             //
-            intContentName = genericController.encodeText(ContentName);
-            intRecordId = genericController.encodeInteger(RecordID);
-            strFieldName = genericController.encodeText(FieldName);
+            intContentName = GenericController.encodeText(ContentName);
+            intRecordId = GenericController.encodeInteger(RecordID);
+            strFieldName = GenericController.encodeText(FieldName);
             //
             EditorPanel = "";
             ContentID = Models.Domain.CDefModel.getContentId(core, intContentName);
@@ -111,7 +111,7 @@ namespace Contensive.Processor.Controllers {
                         EditorPanel = EditorPanel + HtmlController.inputHidden("cid", ContentID);
                         EditorPanel = EditorPanel + HtmlController.inputHidden("ID", intRecordId);
                         EditorPanel = EditorPanel + HtmlController.inputHidden("fn", strFieldName);
-                        EditorPanel = EditorPanel + genericController.encodeText(FormElements);
+                        EditorPanel = EditorPanel + GenericController.encodeText(FormElements);
                         EditorPanel = EditorPanel + core.html.getFormInputHTML("ContentCopy", Copy, "3", "45", false, true);
                         //EditorPanel = EditorPanel & main_GetFormInputActiveContent( "ContentCopy", Copy, 3, 45)
                         ButtonPanel = core.html.getPanelButtons(ButtonCancel + "," + ButtonSave, "button");
@@ -152,9 +152,9 @@ namespace Contensive.Processor.Controllers {
                     + " where (t.active<>0)and(a.active<>0) order by t.id";
                 RS = core.db.executeQuery(SQL);
                 foreach (DataRow dr in RS.Rows) {
-                    fieldTypeID = genericController.encodeInteger(dr["contentfieldtypeid"]);
+                    fieldTypeID = GenericController.encodeInteger(dr["contentfieldtypeid"]);
                     if (fieldTypeID <= FieldTypeIdMax) {
-                        editorAddonIds[fieldTypeID] = genericController.encodeText(dr["editorAddonId"]);
+                        editorAddonIds[fieldTypeID] = GenericController.encodeText(dr["editorAddonId"]);
                     }
                 }
                 //
@@ -162,17 +162,17 @@ namespace Contensive.Processor.Controllers {
                 SQL = "select contentfieldtypeid, max(addonId) as editorAddonId from ccAddonContentFieldTypeRules group by contentfieldtypeid";
                 RS = core.db.executeQuery(SQL);
                 foreach (DataRow dr in RS.Rows) {
-                    fieldTypeID = genericController.encodeInteger(dr["contentfieldtypeid"]);
+                    fieldTypeID = GenericController.encodeInteger(dr["contentfieldtypeid"]);
                     if (fieldTypeID <= FieldTypeIdMax) {
                         if (string.IsNullOrEmpty(editorAddonIds[fieldTypeID])) {
-                            editorAddonIds[fieldTypeID] = genericController.encodeText(dr["editorAddonId"]);
+                            editorAddonIds[fieldTypeID] = GenericController.encodeText(dr["editorAddonId"]);
                         }
 
                     }
                 }
                 result = string.Join(",", editorAddonIds);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -194,7 +194,7 @@ namespace Contensive.Processor.Controllers {
             GC.SuppressFinalize(this);
         }
         //
-        ~editorController() {
+        ~EditorController() {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(false);
             //todo  NOTE: The base class Finalize method is automatically called from the destructor:

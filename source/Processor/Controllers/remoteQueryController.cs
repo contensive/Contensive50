@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Controllers {
@@ -20,7 +20,7 @@ namespace Contensive.Processor.Controllers {
     /// <summary>
     /// static class controller
     /// </summary>
-    public class remoteQueryController : IDisposable {
+    public class RemoteQueryController : IDisposable {
         //
         //
         //
@@ -36,7 +36,7 @@ namespace Contensive.Processor.Controllers {
             }
             CS = core.db.csInsertRecord("Remote Queries");
             if (core.db.csOk(CS)) {
-                RemoteKey = genericController.getGUIDString();
+                RemoteKey = GenericController.getGUIDString();
                 DataSourceID = core.db.getRecordID("Data Sources", DataSourceName);
                 core.db.csSet(CS, "remotekey", RemoteKey);
                 core.db.csSet(CS, "datasourceid", DataSourceID);
@@ -55,7 +55,7 @@ namespace Contensive.Processor.Controllers {
         //
         public static string main_FormatRemoteQueryOutput(CoreController core, GoogleDataType gd, RemoteFormatEnum RemoteFormat) {
             //
-            stringBuilderLegacyController s = null;
+            StringBuilderLegacyController s = null;
             string ColDelim = null;
             string RowDelim = null;
             int ColPtr = 0;
@@ -63,7 +63,7 @@ namespace Contensive.Processor.Controllers {
             //
             // Select output format
             //
-            s = new stringBuilderLegacyController();
+            s = new StringBuilderLegacyController();
             switch (RemoteFormat) {
                 case RemoteFormatEnum.RemoteFormatJsonNameValue:
                     //
@@ -110,7 +110,7 @@ namespace Contensive.Processor.Controllers {
                         ColDelim = "";
                         for (ColPtr = 0; ColPtr <= gd.col.Count; ColPtr++) {
                             var tempVar2 = gd.col[ColPtr];
-                            s.Add(ColDelim + "{id: '" + genericController.EncodeJavascriptStringSingleQuote(tempVar2.Id) + "', label: '" + genericController.EncodeJavascriptStringSingleQuote(tempVar2.Label) + "', type: '" + genericController.EncodeJavascriptStringSingleQuote(tempVar2.Type) + "'}");
+                            s.Add(ColDelim + "{id: '" + GenericController.EncodeJavascriptStringSingleQuote(tempVar2.Id) + "', label: '" + GenericController.EncodeJavascriptStringSingleQuote(tempVar2.Label) + "', type: '" + GenericController.EncodeJavascriptStringSingleQuote(tempVar2.Type) + "'}");
                             ColDelim = ",";
                         }
                         s.Add("],rows:[");
@@ -121,7 +121,7 @@ namespace Contensive.Processor.Controllers {
                             ColDelim = "";
                             for (ColPtr = 0; ColPtr <= gd.col.Count; ColPtr++) {
                                 var tempVar3 = gd.row[RowPtr].Cell[ColPtr];
-                                s.Add(ColDelim + "{v: '" + genericController.EncodeJavascriptStringSingleQuote(tempVar3.v) + "'}");
+                                s.Add(ColDelim + "{v: '" + GenericController.EncodeJavascriptStringSingleQuote(tempVar3.v) + "'}");
                                 ColDelim = ",";
                             }
                             s.Add("]}");
@@ -152,7 +152,7 @@ namespace Contensive.Processor.Controllers {
             GC.SuppressFinalize(this);
         }
         //
-        ~remoteQueryController() {
+        ~RemoteQueryController() {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(false);
             //todo  NOTE: The base class Finalize method is automatically called from the destructor:

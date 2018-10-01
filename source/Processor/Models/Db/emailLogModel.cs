@@ -10,7 +10,7 @@ namespace Contensive.Processor.Models.Db {
         //-- const
         public const string contentName = "email log";
         public const string contentTableName = "ccEmailLog";
-        private const string contentDataSource = "default";
+        public const string contentDataSource = "default";
         //
         //====================================================================================================
         // -- instance properties
@@ -97,8 +97,8 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public void invalidatePrimaryCache(CoreController core, int recordId) {
-            invalidateCache<EmailLogModel>(core, recordId);
+        public static void invalidateRecordCache(CoreController core, int recordId) {
+            invalidateRecordCache<EmailLogModel>(core, recordId);
         }
         //
         //====================================================================================================
@@ -119,6 +119,16 @@ namespace Contensive.Processor.Models.Db {
         //====================================================================================================
         public static EmailLogModel createDefault(CoreController core) {
             return createDefault<EmailLogModel>(core);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Return a cache key used to represent the table. ONLY used for invalidation. Add this as a dependent key if you want that key cleared when ANY record in the table is changed.
+        /// </summary>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        public static string getTableInvalidationKey(CoreController core) {
+            return getTableCacheKey<EmailLogModel>(core);
         }
     }
 }

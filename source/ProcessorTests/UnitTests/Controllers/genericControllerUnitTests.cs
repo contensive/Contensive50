@@ -20,7 +20,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         public void Controllers_encodeJavascript_test() {
             // arrange
             // act
-            string result1 = genericController.EncodeJavascriptStringSingleQuote("a'b");
+            string result1 = GenericController.EncodeJavascriptStringSingleQuote("a'b");
             // assert
             Assert.AreEqual("a\\u0027b", result1);
         }
@@ -30,10 +30,10 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             // arrange
             // act
             // assert
-            Assert.AreEqual("toy", genericController.getSingular_Sortof("toys"));
-            Assert.AreEqual("toy", genericController.getSingular_Sortof("toies"));
-            Assert.AreEqual("TOY", genericController.getSingular_Sortof("TOYS"));
-            Assert.AreEqual("TOY", genericController.getSingular_Sortof("TOIES"));
+            Assert.AreEqual("toy", GenericController.getSingular_Sortof("toys"));
+            Assert.AreEqual("toy", GenericController.getSingular_Sortof("toies"));
+            Assert.AreEqual("TOY", GenericController.getSingular_Sortof("TOYS"));
+            Assert.AreEqual("TOY", GenericController.getSingular_Sortof("TOIES"));
         }
         //
         [TestMethod]
@@ -41,14 +41,14 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             // arrange
             // act
             // assert
-            Assert.AreEqual("Asdf Asdf 1234 Abcd", genericController.encodeInitialCaps("asdf asdf 1234 ABCD"));
+            Assert.AreEqual("Asdf Asdf 1234 Abcd", GenericController.encodeInitialCaps("asdf asdf 1234 ABCD"));
         }
         //
         [TestMethod]
         public void Controllers_getLinkedText_test() {
             // arrange
             // act
-            string result1 = genericController.getLinkedText("<a href=\"goHere\">", "abc<link>zzzz</link>def");
+            string result1 = GenericController.getLinkedText("<a href=\"goHere\">", "abc<link>zzzz</link>def");
             // assert
             Assert.AreEqual("abc<a href=\"goHere\">zzzz</A>def", result1);
         }
@@ -57,8 +57,8 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         public void Controllers_ConvertLinkToShortLink_test() {
             // arrange
             // act
-            string result1 = genericController.ConvertLinkToShortLink("/c/d.html", "domain.com", "/a/b");
-            string result2 = genericController.ConvertLinkToShortLink("HTTP://ServerHost/ServerVirtualPath/folder/page", "ServerHost", "/ServerVirtualPath");
+            string result1 = GenericController.ConvertLinkToShortLink("/c/d.html", "domain.com", "/a/b");
+            string result2 = GenericController.ConvertLinkToShortLink("HTTP://ServerHost/ServerVirtualPath/folder/page", "ServerHost", "/ServerVirtualPath");
             // assert
             Assert.AreEqual("/c/d.html", result1);
             Assert.AreEqual("/folder/page", result2);
@@ -69,8 +69,8 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             // arrange
             // act
             // assert
-            Assert.AreEqual("Yes", genericController.getYesNo(true));
-            Assert.AreEqual("No", genericController.getYesNo(false));
+            Assert.AreEqual("Yes", GenericController.getYesNo(true));
+            Assert.AreEqual("No", GenericController.getYesNo(false));
         }
         //
         [TestMethod]
@@ -79,9 +79,9 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
 
             // act
             // assert
-            Assert.AreEqual(1, genericController.getFirstNonZeroInteger(1,2));
-            Assert.AreEqual(1, genericController.getFirstNonZeroInteger(2, 1));
-            Assert.AreEqual(2, genericController.getFirstNonZeroInteger(0, 2));
+            Assert.AreEqual(1, GenericController.getFirstNonZeroInteger(1,2));
+            Assert.AreEqual(1, GenericController.getFirstNonZeroInteger(2, 1));
+            Assert.AreEqual(2, GenericController.getFirstNonZeroInteger(0, 2));
         }
         //
         [TestMethod]
@@ -92,9 +92,9 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             DateTime theRenaissance = new DateTime(2003, 8, 5);
 
             // act
-            DateTime result1 = genericController.getFirstNonZeroDate(zeroDate, newBeginning);
-            DateTime result2 = genericController.getFirstNonZeroDate(newBeginning, theRenaissance);
-            DateTime result3 = genericController.getFirstNonZeroDate(newBeginning, DateTime.MinValue);
+            DateTime result1 = GenericController.getFirstNonZeroDate(zeroDate, newBeginning);
+            DateTime result2 = GenericController.getFirstNonZeroDate(newBeginning, theRenaissance);
+            DateTime result3 = GenericController.getFirstNonZeroDate(newBeginning, DateTime.MinValue);
             // assert
             Assert.AreEqual(zeroDate, result1);
             Assert.AreEqual(newBeginning, result2);
@@ -105,9 +105,9 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         public void Controllers_decodeUrl_test() {
             const string pattern1 = "a/b c";
             // arrange
-            string test1 = genericController.encodeURL(pattern1);
+            string test1 = GenericController.encodeURL(pattern1);
             // act
-            string result1 = genericController.decodeURL(test1);
+            string result1 = GenericController.decodeURL(test1);
             // assert
             Assert.AreEqual(pattern1, result1);
         }
@@ -118,17 +118,17 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             // act
 
             // assert
-            Assert.AreEqual("abc", genericController.decodeResponseVariable(genericController.encodeRequestVariable("abc")));
-            Assert.AreEqual("a b", genericController.decodeResponseVariable(genericController.encodeRequestVariable("a b")));
-            Assert.AreEqual("a=b", genericController.decodeResponseVariable(genericController.encodeRequestVariable("a=b")));
+            Assert.AreEqual("abc", GenericController.decodeResponseVariable(GenericController.encodeRequestVariable("abc")));
+            Assert.AreEqual("a b", GenericController.decodeResponseVariable(GenericController.encodeRequestVariable("a b")));
+            Assert.AreEqual("a=b", GenericController.decodeResponseVariable(GenericController.encodeRequestVariable("a=b")));
         }
         //
         [TestMethod]
         public void Controllers_encodeRequestVariable_test() {
             // arrange
             // act
-            string result1 = genericController.encodeRequestVariable("abc");
-            string result2 = genericController.encodeRequestVariable("a b=c");
+            string result1 = GenericController.encodeRequestVariable("abc");
+            string result2 = GenericController.encodeRequestVariable("a b=c");
             // assert
             Assert.AreEqual("abc", result1);
             Assert.AreEqual("a%20b%3Dc", result2);
@@ -138,8 +138,8 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         public void Controllers_encodeQuerySting_test() {
             // arrange
             // act
-            string result1 = genericController.encodeQueryString("a=b&c=d");
-            string result2 = genericController.encodeQueryString("a=b 2&c=d");
+            string result1 = GenericController.encodeQueryString("a=b&c=d");
+            string result2 = GenericController.encodeQueryString("a=b 2&c=d");
             // assert
             Assert.AreEqual("a=b&c=d", result1);
             Assert.AreEqual("a=b%202&c=d", result2);
@@ -149,8 +149,8 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         public void Controllers_encodeUrl_test() {
             // arrange
             // act
-            string result1 = genericController.encodeURL("http://www.a.com/b/c.html");
-            string result2 = genericController.encodeURL("1 2.html");
+            string result1 = GenericController.encodeURL("http://www.a.com/b/c.html");
+            string result2 = GenericController.encodeURL("1 2.html");
             // assert
             Assert.AreEqual("http%3A%2F%2Fwww.a.com%2Fb%2Fc.html", result1);
             Assert.AreEqual("1+2.html", result2);
@@ -161,12 +161,12 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             // arrange
             // act
             // assert
-            Assert.IsTrue(genericController.isInDelimitedString("1,2,3,4,5", "1", ","));
-            Assert.IsTrue(genericController.isInDelimitedString("1,2,3,4,5", "3", ","));
-            Assert.IsTrue(genericController.isInDelimitedString("1,2,3,4,5", "5", ","));
-            Assert.IsFalse(genericController.isInDelimitedString("1,2,3,4,5", "6", ","));
-            Assert.IsTrue(genericController.isInDelimitedString("1 2 3 4 5", "1", " "));
-            Assert.IsTrue(genericController.isInDelimitedString("1\r\n2\r\n3", "2", "\r\n"));
+            Assert.IsTrue(GenericController.isInDelimitedString("1,2,3,4,5", "1", ","));
+            Assert.IsTrue(GenericController.isInDelimitedString("1,2,3,4,5", "3", ","));
+            Assert.IsTrue(GenericController.isInDelimitedString("1,2,3,4,5", "5", ","));
+            Assert.IsFalse(GenericController.isInDelimitedString("1,2,3,4,5", "6", ","));
+            Assert.IsTrue(GenericController.isInDelimitedString("1 2 3 4 5", "1", " "));
+            Assert.IsTrue(GenericController.isInDelimitedString("1\r\n2\r\n3", "2", "\r\n"));
         }
         //
         [TestMethod]
@@ -174,7 +174,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             // arrange
             // act
             // assert
-            Assert.AreEqual("0123", genericController.getIntegerString(123, 4));
+            Assert.AreEqual("0123", GenericController.getIntegerString(123, 4));
         }
         //
         [TestMethod]
@@ -182,8 +182,8 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
                 // act
-                int test1 = genericController.GetRandomInteger(cp.core);
-                int test2 = genericController.GetRandomInteger(cp.core);
+                int test1 = GenericController.GetRandomInteger(cp.core);
+                int test2 = GenericController.GetRandomInteger(cp.core);
                 // assert
                 Assert.AreNotEqual(test1, test2);
             }
@@ -195,10 +195,10 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             // arrange
             const string test1 = "a=1&b=2&c=3";
             // act
-            string result1 = genericController.getValueFromNameValueString("a", test1, "0", "&");
-            string result2 = genericController.getValueFromNameValueString("b", test1, "0", "&");
-            string result3 = genericController.getValueFromNameValueString("c", test1, "0", "&");
-            string result4 = genericController.getValueFromNameValueString("d", test1, "0", "&");
+            string result1 = GenericController.getValueFromNameValueString("a", test1, "0", "&");
+            string result2 = GenericController.getValueFromNameValueString("b", test1, "0", "&");
+            string result3 = GenericController.getValueFromNameValueString("c", test1, "0", "&");
+            string result4 = GenericController.getValueFromNameValueString("d", test1, "0", "&");
             // assert
             Assert.AreEqual("1", result1);
             Assert.AreEqual("2", result2);
@@ -211,7 +211,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             // arrange
             const string test1 = "http://www.a.com/b/c.html?d=e";
             //
-            string expect1 = Newtonsoft.Json.JsonConvert.SerializeObject( new genericController.urlDetailsClass() {
+            string expect1 = Newtonsoft.Json.JsonConvert.SerializeObject( new GenericController.urlDetailsClass() {
                 filename = "c.html",
                 host = "www.a.com",
                 port = "80",
@@ -220,7 +220,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 queryString = "?d=e"
             });
             // act
-            string result1 = Newtonsoft.Json.JsonConvert.SerializeObject(genericController.splitUrl(test1));
+            string result1 = Newtonsoft.Json.JsonConvert.SerializeObject(GenericController.splitUrl(test1));
             // assert
             Assert.AreEqual(expect1, result1);
         }
@@ -237,7 +237,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             string querystring = "";
             string port = "";
             // act
-            genericController.splitUrl(url1, ref protocol, ref host, ref port, ref path, ref page, ref querystring);
+            GenericController.splitUrl(url1, ref protocol, ref host, ref port, ref path, ref page, ref querystring);
             // assert
             Assert.AreEqual("http://", protocol);
             Assert.AreEqual("www.a.com", host);
@@ -260,10 +260,10 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             string expect3 = Newtonsoft.Json.JsonConvert.SerializeObject(new string[] { "1", "", "3" });
             string expect4 = Newtonsoft.Json.JsonConvert.SerializeObject(new string[] { "1", "", "", "4" });
             // act
-            string result1 = Newtonsoft.Json.JsonConvert.SerializeObject(genericController.splitNewLine(test1));
-            string result2 = Newtonsoft.Json.JsonConvert.SerializeObject(genericController.splitNewLine(test2));
-            string result3 = Newtonsoft.Json.JsonConvert.SerializeObject(genericController.splitNewLine(test3));
-            string result4 = Newtonsoft.Json.JsonConvert.SerializeObject(genericController.splitNewLine(test4));
+            string result1 = Newtonsoft.Json.JsonConvert.SerializeObject(GenericController.splitNewLine(test1));
+            string result2 = Newtonsoft.Json.JsonConvert.SerializeObject(GenericController.splitNewLine(test2));
+            string result3 = Newtonsoft.Json.JsonConvert.SerializeObject(GenericController.splitNewLine(test3));
+            string result4 = Newtonsoft.Json.JsonConvert.SerializeObject(GenericController.splitNewLine(test4));
             // assert
             Assert.AreEqual(result1, expect1);
             Assert.AreEqual(result2, expect2);
@@ -282,9 +282,9 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             string expect2 = "<div><a href=\"http://www.bad.com/page.html\"></div>";
             string expect3 = "<div><a href=\"https://www.good.com/page.html\"></div>";
             // act
-            string result1 = genericController.convertLinksToAbsolute(content1, link1);
-            string result2 = genericController.convertLinksToAbsolute(content2, link1);
-            string result3 = genericController.convertLinksToAbsolute(content1, link2);
+            string result1 = GenericController.convertLinksToAbsolute(content1, link1);
+            string result2 = GenericController.convertLinksToAbsolute(content2, link1);
+            string result3 = GenericController.convertLinksToAbsolute(content1, link2);
             // assert
             Assert.AreEqual(expect1, result1);
             Assert.AreEqual(expect2, result2);
@@ -309,10 +309,10 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             // arrange
             string testLink1 = "http://www.test.com/path/page.aspx?a=1&b=2";
             // act
-            string result1 = genericController.modifyLinkQuery(testLink1, "c", "3", false);
-            string result2 = genericController.modifyLinkQuery(testLink1, "c", "3", true);
-            string result3 = genericController.modifyLinkQuery(testLink1, "a", "3", true);
-            string result4 = genericController.modifyLinkQuery(testLink1, "a", "3", false);
+            string result1 = GenericController.modifyLinkQuery(testLink1, "c", "3", false);
+            string result2 = GenericController.modifyLinkQuery(testLink1, "c", "3", true);
+            string result3 = GenericController.modifyLinkQuery(testLink1, "a", "3", true);
+            string result4 = GenericController.modifyLinkQuery(testLink1, "a", "3", false);
             // assert
             Assert.AreEqual("http://www.test.com/path/page.aspx?a=1&b=2", result1);
             Assert.AreEqual("http://www.test.com/path/page.aspx?a=1&b=2&c=3", result2);
@@ -325,12 +325,12 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             // arrange
             string testLink1 = "a=1&b=2";
             // act
-            string result1 = genericController.modifyQueryString(testLink1, "c", true, false);
-            string result2 = genericController.modifyQueryString(testLink1, "c", false, false);
-            string result3 = genericController.modifyQueryString(testLink1, "c", true, true);
-            string result4 = genericController.modifyQueryString(testLink1, "c", false, true);
-            string result5 = genericController.modifyQueryString(testLink1, "a", true, false);
-            string result6 = genericController.modifyQueryString(testLink1, "a", true, true);
+            string result1 = GenericController.modifyQueryString(testLink1, "c", true, false);
+            string result2 = GenericController.modifyQueryString(testLink1, "c", false, false);
+            string result3 = GenericController.modifyQueryString(testLink1, "c", true, true);
+            string result4 = GenericController.modifyQueryString(testLink1, "c", false, true);
+            string result5 = GenericController.modifyQueryString(testLink1, "a", true, false);
+            string result6 = GenericController.modifyQueryString(testLink1, "a", true, true);
             // assert
             Assert.AreEqual("a=1&b=2", result1);
             Assert.AreEqual("a=1&b=2", result2);
@@ -345,12 +345,12 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             // arrange
             string testLink1 = "a=1&b=2";
             // act
-            string result1 = genericController.modifyQueryString(testLink1, "c", 3, false);
-            string result2 = genericController.modifyQueryString(testLink1, "c", 3, true);
-            string result3 = genericController.modifyQueryString(testLink1, "a", 3, false);
-            string result4 = genericController.modifyQueryString(testLink1, "a", 3, true);
-            string result5 = genericController.modifyQueryString(testLink1, "b", 3, false);
-            string result6 = genericController.modifyQueryString(testLink1, "b", 3, true);
+            string result1 = GenericController.modifyQueryString(testLink1, "c", 3, false);
+            string result2 = GenericController.modifyQueryString(testLink1, "c", 3, true);
+            string result3 = GenericController.modifyQueryString(testLink1, "a", 3, false);
+            string result4 = GenericController.modifyQueryString(testLink1, "a", 3, true);
+            string result5 = GenericController.modifyQueryString(testLink1, "b", 3, false);
+            string result6 = GenericController.modifyQueryString(testLink1, "b", 3, true);
             // assert
             Assert.AreEqual("a=1&b=2", result1);
             Assert.AreEqual("a=1&b=2&c=3", result2);
@@ -365,12 +365,12 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             // arrange
             string testLink1 = "a=1&b=2";
             // act
-            string result1 = genericController.modifyQueryString(testLink1, "c", "3", false);
-            string result2 = genericController.modifyQueryString(testLink1, "c", "3", true);
-            string result3 = genericController.modifyQueryString(testLink1, "a", "3", false);
-            string result4 = genericController.modifyQueryString(testLink1, "a", "3", true);
-            string result5 = genericController.modifyQueryString(testLink1, "b", "3", false);
-            string result6 = genericController.modifyQueryString(testLink1, "b", "3", true);
+            string result1 = GenericController.modifyQueryString(testLink1, "c", "3", false);
+            string result2 = GenericController.modifyQueryString(testLink1, "c", "3", true);
+            string result3 = GenericController.modifyQueryString(testLink1, "a", "3", false);
+            string result4 = GenericController.modifyQueryString(testLink1, "a", "3", true);
+            string result5 = GenericController.modifyQueryString(testLink1, "b", "3", false);
+            string result6 = GenericController.modifyQueryString(testLink1, "b", "3", true);
             // assert
             Assert.AreEqual("a=1&b=2", result1);
             Assert.AreEqual("a=1&b=2&c=3", result2);
@@ -387,9 +387,9 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             DateTime newBeginning = new DateTime(1999, 2, 2);
             DateTime theRenaissance = new DateTime(2003, 8, 5);
             // act
-            DateTime date1 = genericController.encodeEmptyDate("", zeroDate);
-            DateTime date2 = genericController.encodeEmptyDate("8/7/1990", newBeginning);
-            DateTime date3 = genericController.encodeEmptyDate("123245", theRenaissance);
+            DateTime date1 = GenericController.encodeEmptyDate("", zeroDate);
+            DateTime date2 = GenericController.encodeEmptyDate("8/7/1990", newBeginning);
+            DateTime date3 = GenericController.encodeEmptyDate("123245", theRenaissance);
             // assert
             Assert.AreEqual(zeroDate, date1);
             Assert.AreEqual(zeroDate, date2);
@@ -400,10 +400,10 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         public void Controllers_encodeEmptyInteger_test() {
             // arrange
             // act
-            int test1 = genericController.encodeEmptyInteger("1", 2);
-            int test2 = genericController.encodeEmptyInteger("", 2);
-            int test3 = genericController.encodeEmptyInteger(" ", 3);
-            int test4 = genericController.encodeEmptyInteger("abcdefg", 4);
+            int test1 = GenericController.encodeEmptyInteger("1", 2);
+            int test2 = GenericController.encodeEmptyInteger("", 2);
+            int test3 = GenericController.encodeEmptyInteger(" ", 3);
+            int test4 = GenericController.encodeEmptyInteger("abcdefg", 4);
             // assert
             Assert.AreEqual(1, test1);
             Assert.AreEqual(2, test2);
@@ -415,9 +415,9 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         public void Controllers_encodeEmpty_test() {
             // arrange
             // act
-            string test1 = genericController.encodeEmpty("1", "2");
-            string test2 = genericController.encodeEmpty("", "3");
-            string test3 = genericController.encodeEmpty("4", "");
+            string test1 = GenericController.encodeEmpty("1", "2");
+            string test2 = GenericController.encodeEmpty("", "3");
+            string test3 = GenericController.encodeEmpty("4", "");
             // assert
             Assert.AreEqual("1", test1);
             Assert.AreEqual("3", test2);
@@ -429,31 +429,31 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             // arrange
             // act
             // assert
-            Assert.IsFalse(genericController.isGuid(""));
-            Assert.IsFalse(genericController.isGuid(" "));
-            Assert.IsTrue(genericController.isGuid("{C70BA82B-B314-466E-B29C-EAAD9C788C86}"));
-            Assert.IsTrue(genericController.isGuid("C70BA82B-B314-466E-B29C-EAAD9C788C86"));
-            Assert.IsTrue(genericController.isGuid("C70BA82BB314466EB29CEAAD9C788C86"));
-            Assert.IsFalse(genericController.isGuid("C70BA82BB314466EB29CEAAD9C788C860"));
+            Assert.IsFalse(GenericController.isGuid(""));
+            Assert.IsFalse(GenericController.isGuid(" "));
+            Assert.IsTrue(GenericController.isGuid("{C70BA82B-B314-466E-B29C-EAAD9C788C86}"));
+            Assert.IsTrue(GenericController.isGuid("C70BA82B-B314-466E-B29C-EAAD9C788C86"));
+            Assert.IsTrue(GenericController.isGuid("C70BA82BB314466EB29CEAAD9C788C86"));
+            Assert.IsFalse(GenericController.isGuid("C70BA82BB314466EB29CEAAD9C788C860"));
         }
         //
         [TestMethod]
         public void Controllers_getGUID_test() {
             // arrange
             // act
-            string test1 = genericController.getGUID();
-            string test2 = genericController.getGUID(true);
-            string test3 = genericController.getGUID(false);
+            string test1 = GenericController.getGUID();
+            string test2 = GenericController.getGUID(true);
+            string test3 = GenericController.getGUID(false);
             // assert
-            Assert.IsTrue(genericController.isGuid(test1));
+            Assert.IsTrue(GenericController.isGuid(test1));
             Assert.AreEqual(38, test1.Length);
             //
-            Assert.IsTrue(genericController.isGuid(test2));
+            Assert.IsTrue(GenericController.isGuid(test2));
             Assert.AreEqual(38, test2.Length);
             Assert.AreEqual("{", test2.Substring(0, 1));
             Assert.AreEqual("}", test2.Substring(37, 1));
             //
-            Assert.IsTrue(genericController.isGuid(test3));
+            Assert.IsTrue(GenericController.isGuid(test3));
             Assert.AreNotEqual("{", test3.Substring(0, 1));
         }
         //
@@ -477,11 +477,11 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             string in4 = "1,,2";
             string in5 = "1 \" 2 \" 3 \" 4\" \"5 \"";
             // act
-            string[] out1 = genericController.SplitDelimited(in1, " ");
-            string[] out2 = genericController.SplitDelimited(in2, " ");
-            string[] out3 = genericController.SplitDelimited(in3, ",");
-            string[] out4 = genericController.SplitDelimited(in4, ",");
-            string[] out5 = genericController.SplitDelimited(in5, " ");
+            string[] out1 = GenericController.SplitDelimited(in1, " ");
+            string[] out2 = GenericController.SplitDelimited(in2, " ");
+            string[] out3 = GenericController.SplitDelimited(in3, ",");
+            string[] out4 = GenericController.SplitDelimited(in4, ",");
+            string[] out5 = GenericController.SplitDelimited(in5, " ");
             // assert
             Assert.AreEqual(3, out1.Length);
             Assert.AreEqual(3, out2.Length);

@@ -11,17 +11,17 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Models.Db {
-    public class siteSectionModel : BaseModel {
+    public class SiteSectionModel : BaseModel {
         //
         //====================================================================================================
         //-- const
         public const string contentName = "site sections";
         public const string contentTableName = "ccSections";
-        private const string contentDataSource = "default"; 
+        public const string contentDataSource = "default"; 
         //
         //====================================================================================================
         // -- instance properties
@@ -41,43 +41,43 @@ namespace Contensive.Processor.Models.Db {
         public int TemplateID { get; set; }
         //
         //====================================================================================================
-        public static siteSectionModel add(CoreController core) {
-            return add<siteSectionModel>(core);
+        public static SiteSectionModel add(CoreController core) {
+            return add<SiteSectionModel>(core);
         }
         //
         //====================================================================================================
-        public static siteSectionModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<siteSectionModel>(core, ref callersCacheNameList);
+        public static SiteSectionModel add(CoreController core, ref List<string> callersCacheNameList) {
+            return add<SiteSectionModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static siteSectionModel create(CoreController core, int recordId) {
-            return create<siteSectionModel>(core, recordId);
+        public static SiteSectionModel create(CoreController core, int recordId) {
+            return create<SiteSectionModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static siteSectionModel create(CoreController core, int recordId, ref List<string> callersCacheNameList) {
-            return create<siteSectionModel>(core, recordId, ref callersCacheNameList);
+        public static SiteSectionModel create(CoreController core, int recordId, ref List<string> callersCacheNameList) {
+            return create<SiteSectionModel>(core, recordId, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static siteSectionModel create(CoreController core, string recordGuid) {
-            return create<siteSectionModel>(core, recordGuid);
+        public static SiteSectionModel create(CoreController core, string recordGuid) {
+            return create<SiteSectionModel>(core, recordGuid);
         }
         //
         //====================================================================================================
-        public static siteSectionModel create(CoreController core, string recordGuid, ref List<string> callersCacheNameList) {
-            return create<siteSectionModel>(core, recordGuid, ref callersCacheNameList);
+        public static SiteSectionModel create(CoreController core, string recordGuid, ref List<string> callersCacheNameList) {
+            return create<SiteSectionModel>(core, recordGuid, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static siteSectionModel createByName(CoreController core, string recordName) {
-            return createByName<siteSectionModel>(core, recordName);
+        public static SiteSectionModel createByName(CoreController core, string recordName) {
+            return createByName<SiteSectionModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static siteSectionModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<siteSectionModel>(core, recordName, ref callersCacheNameList);
+        public static SiteSectionModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByName<SiteSectionModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================
@@ -87,52 +87,62 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static void delete(CoreController core, int recordId) {
-            delete<siteSectionModel>(core, recordId);
+            delete<SiteSectionModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static void delete(CoreController core, string ccGuid) {
-            delete<siteSectionModel>(core, ccGuid);
+            delete<SiteSectionModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static List<siteSectionModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
-            return createList<siteSectionModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
+        public static List<SiteSectionModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
+            return createList<SiteSectionModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static List<siteSectionModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy) {
-            return createList<siteSectionModel>(core, sqlCriteria, sqlOrderBy);
+        public static List<SiteSectionModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy) {
+            return createList<SiteSectionModel>(core, sqlCriteria, sqlOrderBy);
         }
         //
         //====================================================================================================
-        public static List<siteSectionModel> createList(CoreController core, string sqlCriteria) {
-            return createList<siteSectionModel>(core, sqlCriteria);
+        public static List<SiteSectionModel> createList(CoreController core, string sqlCriteria) {
+            return createList<SiteSectionModel>(core, sqlCriteria);
         }
         //
         //====================================================================================================
-        public void invalidatePrimaryCache(CoreController core, int recordId) {
-            invalidateCache<siteSectionModel>(core, recordId);
+        public static void invalidateRecordCache(CoreController core, int recordId) {
+            invalidateRecordCache<SiteSectionModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return BaseModel.getRecordName<siteSectionModel>(core, recordId);
+            return BaseModel.getRecordName<SiteSectionModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return BaseModel.getRecordName<siteSectionModel>(core, ccGuid);
+            return BaseModel.getRecordName<SiteSectionModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return BaseModel.getRecordId<siteSectionModel>(core, ccGuid);
+            return BaseModel.getRecordId<SiteSectionModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static siteSectionModel createDefault(CoreController core) {
-            return createDefault<siteSectionModel>(core);
+        public static SiteSectionModel createDefault(CoreController core) {
+            return createDefault<SiteSectionModel>(core);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Return a cache key used to represent the table. ONLY used for invalidation. Add this as a dependent key if you want that key cleared when ANY record in the table is changed.
+        /// </summary>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        public static string getTableInvalidationKey(CoreController core) {
+            return getTableCacheKey<SiteSectionModel>(core);
         }
     }
 }

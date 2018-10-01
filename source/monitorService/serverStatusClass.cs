@@ -10,14 +10,14 @@ using System.Xml.Linq;
 using Contensive.Processor;
 using Contensive.Processor.Controllers;
 using Contensive.Processor.Models.Domain;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 using static Contensive.MonitorService.constants;
 using static Contensive.BaseClasses.CPFileSystemBaseClass;
 
 namespace Contensive.MonitorService {
     public class StatusServerClass {
-        private ipDaemonController cmdListener = new ipDaemonController();
+        private IpDaemonController cmdListener = new IpDaemonController();
         private CoreController cpCore;
         //
         public static AppLogType[] AppLog;
@@ -100,7 +100,7 @@ namespace Contensive.MonitorService {
                 errors = new string[1];
                 //
                 ClearAppErrors = (RequestPath.ToLower().Substring(0, 6) == "/reset");
-                DisplayStatusMethod = ClearAppErrors || (RequestPath.ToLower().Substring(0, monitorConfig.StatusMethod.Length + 1) == "/" + genericController.vbLCase(monitorConfig.StatusMethod));
+                DisplayStatusMethod = ClearAppErrors || (RequestPath.ToLower().Substring(0, monitorConfig.StatusMethod.Length + 1) == "/" + GenericController.vbLCase(monitorConfig.StatusMethod));
                 logMessage = "GetStatusPage hit, RequestPath=" + RequestPath + ", from " + remoteHost;
                 if (!(DisplayStatusMethod || ClearAppErrors)) {
                     //
@@ -201,7 +201,7 @@ namespace Contensive.MonitorService {
                         List<FileDetail> LogFileStruct = cpCore.appRootFiles.getFileList(cp.core.serverConfig.programFilesPath + "logs");
                         foreach (FileDetail logFile in LogFileStruct) {
                             if (logFile.Size > LargestLogSize) {
-                                LargestLogSize = genericController.encodeInteger(logFile.Size);
+                                LargestLogSize = GenericController.encodeInteger(logFile.Size);
                             }
                             if (logFile.Size > monitorConfig.LogFileSizeMax) {
                                 Array.Resize(ref errors, ErrorCount + 1);
@@ -424,7 +424,7 @@ namespace Contensive.MonitorService {
         //
         //
         private void appendMonitorLog(string message) {
-            logController.logError(cpCore, "Monitor-serverStatus:" + message);
+            LogController.logError(cpCore, "Monitor-serverStatus:" + message);
         }
         //
         //

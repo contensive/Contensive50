@@ -62,7 +62,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
                 var addon = Processor.Models.Db.AddonModel.add(cp.core);
-                addon.copy = "test" + genericController.GetRandomInteger(cp.core).ToString();
+                addon.copy = "test" + GenericController.GetRandomInteger(cp.core).ToString();
                 addon.save(cp.core);
                 // act
                 string result = cp.core.addon.execute(addon, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {

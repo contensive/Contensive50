@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Models.Domain {
@@ -77,10 +77,10 @@ namespace Contensive.Processor.Models.Domain {
                                 if (dt.Rows.Count > 0) {
                                     foreach (DataRow row in dt.Rows) {
                                         tableSchema.columns.Add(new ColumnSchemaModel() {
-                                            COLUMN_NAME = genericController.encodeText(row["COLUMN_NAME"]).ToLower(),
-                                            DATA_TYPE = genericController.encodeText(row["DATA_TYPE"]).ToLower(),
-                                            CHARACTER_MAXIMUM_LENGTH = genericController.encodeInteger(row["CHARACTER_MAXIMUM_LENGTH"]),
-                                            DATETIME_PRECISION = genericController.encodeInteger(row["DATETIME_PRECISION"])
+                                            COLUMN_NAME = GenericController.encodeText(row["COLUMN_NAME"]).ToLower(),
+                                            DATA_TYPE = GenericController.encodeText(row["DATA_TYPE"]).ToLower(),
+                                            CHARACTER_MAXIMUM_LENGTH = GenericController.encodeInteger(row["CHARACTER_MAXIMUM_LENGTH"]),
+                                            DATETIME_PRECISION = GenericController.encodeInteger(row["DATETIME_PRECISION"])
                                         });
                                     }
                                 }
@@ -90,9 +90,9 @@ namespace Contensive.Processor.Models.Domain {
                                 dt = core.db.getIndexSchemaData(TableName);
                                 if (dt.Rows.Count > 0) {
                                     foreach (DataRow row in dt.Rows) {
-                                        string index_keys = genericController.encodeText(row["index_keys"]).ToLower();
+                                        string index_keys = GenericController.encodeText(row["index_keys"]).ToLower();
                                         tableSchema.indexes.Add(new IndexSchemaModel() {
-                                            index_name = genericController.encodeText(row["INDEX_NAME"]).ToLower(),
+                                            index_name = GenericController.encodeText(row["INDEX_NAME"]).ToLower(),
                                             index_keys = index_keys,
                                             indexKeyList = index_keys.Split(',').Select(s => s.Trim()).ToList()
                                         });
@@ -110,7 +110,7 @@ namespace Contensive.Processor.Models.Domain {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return tableSchema;

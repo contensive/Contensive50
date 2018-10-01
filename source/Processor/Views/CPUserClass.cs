@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 using Contensive.Processor.Models.Domain;
 //
@@ -77,7 +77,7 @@ namespace Contensive.Processor {
         public override int Id {
             get {
                 if (CP.core.session.user.id==0) {
-                    var user = personModel.add(core);
+                    var user = PersonModel.add(core);
                     user.CreatedByVisit = true;
                     user.save(core);
                     SessionController.recognizeById(core, user.id, ref CP.core.session);
@@ -173,7 +173,7 @@ namespace Contensive.Processor {
                     result = IsInGroupList(groupId.ToString(), userId);
                 }
             } catch (Exception ex) {
-                logController.handleError(CP.core,ex);
+                LogController.handleError(CP.core,ex);
                 result = false;
             }
             return result;
@@ -191,7 +191,7 @@ namespace Contensive.Processor {
                 }
                 result = CP.core.session.isMemberOfGroupIdList(core, userId, IsAuthenticated, GroupIDList, false);
             } catch (Exception ex) {
-                logController.handleError(CP.core,ex);
+                LogController.handleError(CP.core,ex);
                 result = false;
             }
             return result;
@@ -301,7 +301,7 @@ namespace Contensive.Processor {
         //
         public override bool IsNew {
             get {
-                return CP.core.session.visit.MemberNew;
+                return CP.core.session.visit.memberNew;
             }
         }
         //
@@ -368,7 +368,7 @@ namespace Contensive.Processor {
         //=======================================================================================================
         //
         public override bool GetBoolean(string PropertyName, string DefaultValue = "") {
-            return CP.core.userProperty.getBoolean(PropertyName, genericController.encodeBoolean(DefaultValue));
+            return CP.core.userProperty.getBoolean(PropertyName, GenericController.encodeBoolean(DefaultValue));
         }
         //
         //=======================================================================================================
@@ -376,7 +376,7 @@ namespace Contensive.Processor {
         //=======================================================================================================
         //
         public override DateTime GetDate(string PropertyName, string DefaultValue = "") {
-            return CP.core.userProperty.getDate(PropertyName, genericController.encodeDate(DefaultValue));
+            return CP.core.userProperty.getDate(PropertyName, GenericController.encodeDate(DefaultValue));
         }
         //
         //=======================================================================================================
@@ -384,7 +384,7 @@ namespace Contensive.Processor {
         //=======================================================================================================
         //
         public override int GetInteger(string PropertyName, string DefaultValue = "") {
-            return CP.core.userProperty.getInteger(PropertyName, genericController.encodeInteger(DefaultValue));
+            return CP.core.userProperty.getInteger(PropertyName, GenericController.encodeInteger(DefaultValue));
         }
         //
         //=======================================================================================================

@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Models.Domain {
@@ -161,7 +161,7 @@ namespace Contensive.Processor.Models.Domain {
                     returnModel = json_serializer.Deserialize<ServerConfigModel>(JSONTemp);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex, "exception in serverConfigModel.getObject");
+                LogController.handleError( core,ex, "exception in serverConfigModel.getObject");
             }
             return returnModel;
         }
@@ -207,7 +207,7 @@ namespace Contensive.Processor.Models.Domain {
                 string jsonTemp = core.json.Serialize(this);
                 core.programDataFiles.saveFile("config.json", jsonTemp);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return 0;
         }

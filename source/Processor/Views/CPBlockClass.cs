@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor {
@@ -42,11 +42,11 @@ namespace Contensive.Processor {
                 try {
                     htmlDoc = new Controllers.HtmlController(core);
                 } catch (Exception ex) {
-                    logController.handleError( core,ex, "Error creating object Controllers.htmlToolsController during cp.block constructor.");
+                    LogController.handleError( core,ex, "Error creating object Controllers.htmlToolsController during cp.block constructor.");
                     throw;
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -57,7 +57,7 @@ namespace Contensive.Processor {
             try {
                 accum = htmlString;
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -68,7 +68,7 @@ namespace Contensive.Processor {
             try {
                 accum += htmlString;
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -79,7 +79,7 @@ namespace Contensive.Processor {
             try {
                 accum = "";
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -97,10 +97,10 @@ namespace Contensive.Processor {
             try {
                 string a = accum;
                 if (!string.IsNullOrEmpty(findSelector)) {
-                    s = htmlParseStaticController.getInner(core, a, findSelector);
+                    s = HtmlParseStaticController.getInner(core, a, findSelector);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return s;
@@ -113,10 +113,10 @@ namespace Contensive.Processor {
             try {
                 string a = accum;
                 if (!string.IsNullOrEmpty(findSelector)) {
-                    s = htmlParseStaticController.getOuter(core, a, findSelector);
+                    s = HtmlParseStaticController.getOuter(core, a, findSelector);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return s;
@@ -130,7 +130,7 @@ namespace Contensive.Processor {
                 if (!string.IsNullOrEmpty(wwwFileName)) {
                     accum = cp.wwwFiles.read(wwwFileName);
                     if (!string.IsNullOrEmpty(accum)) {
-                        headTags = htmlParseStaticController.getTagInnerHTML(accum, "head", false);
+                        headTags = HtmlParseStaticController.getTagInnerHTML(accum, "head", false);
                         if (!string.IsNullOrEmpty(headTags)) {
                             foreach (string asset in stringSplit( headTags, "\r\n" )) {
                                 core.doc.htmlMetaContent_OtherTags.Add(new htmlMetaClass() {
@@ -139,11 +139,11 @@ namespace Contensive.Processor {
                                 });
                             }
                         }
-                        accum = htmlParseStaticController.getTagInnerHTML(accum, "body", false);
+                        accum = HtmlParseStaticController.getTagInnerHTML(accum, "body", false);
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -157,8 +157,8 @@ namespace Contensive.Processor {
                 if (copyRecordNameOrGuid.IsNumeric()) {
                     //
                     // -- recordId
-                    copy = CopyContentModel.create(core, genericController.encodeInteger(copyRecordNameOrGuid));
-                } else if (genericController.isGuid(copyRecordNameOrGuid)) {
+                    copy = CopyContentModel.create(core, GenericController.encodeInteger(copyRecordNameOrGuid));
+                } else if (GenericController.isGuid(copyRecordNameOrGuid)) {
                     //
                     // -- record guid
                     copy = CopyContentModel.create(core, copyRecordNameOrGuid);
@@ -171,7 +171,7 @@ namespace Contensive.Processor {
                     accum = copy.copy;
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -185,7 +185,7 @@ namespace Contensive.Processor {
                     accum = cp.wwwFiles.read(wwwFileName);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -195,25 +195,25 @@ namespace Contensive.Processor {
         public override void OpenLayout(string layoutRecordNameOrGuid) {
             try {
                 accum = "";
-                layoutModel copy;
+                LayoutModel copy;
                 if (layoutRecordNameOrGuid.IsNumeric()) {
                     //
                     // -- recordId
-                    copy = layoutModel.create(core, genericController.encodeInteger(layoutRecordNameOrGuid));
-                } else if (genericController.isGuid(layoutRecordNameOrGuid)) {
+                    copy = LayoutModel.create(core, GenericController.encodeInteger(layoutRecordNameOrGuid));
+                } else if (GenericController.isGuid(layoutRecordNameOrGuid)) {
                     //
                     // -- record guid
-                    copy = layoutModel.create(core, layoutRecordNameOrGuid);
+                    copy = LayoutModel.create(core, layoutRecordNameOrGuid);
                 } else {
                     //
                     // -- record name
-                    copy = layoutModel.createByName(core, layoutRecordNameOrGuid);
+                    copy = LayoutModel.createByName(core, layoutRecordNameOrGuid);
                 }
                 if (copy != null) {
-                    accum = copy.Layout;
+                    accum = copy.layout;
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -224,7 +224,7 @@ namespace Contensive.Processor {
             try {
                 accum = htmlString + accum;
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -233,9 +233,9 @@ namespace Contensive.Processor {
         //
         public override void SetInner(string findSelector, string htmlString) {
             try {
-                accum = htmlParseStaticController.setInner(core, accum, findSelector, htmlString);
+                accum = HtmlParseStaticController.setInner(core, accum, findSelector, htmlString);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -244,9 +244,9 @@ namespace Contensive.Processor {
         //
         public override void SetOuter(string findSelector, string htmlString) {
             try {
-                accum = htmlParseStaticController.setOuter(core, accum, findSelector, htmlString);
+                accum = HtmlParseStaticController.setOuter(core, accum, findSelector, htmlString);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }

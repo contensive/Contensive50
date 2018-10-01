@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 using Contensive.Processor.Models.Domain;
 //
@@ -177,9 +177,9 @@ namespace Contensive.Processor {
             /// Used for control section display
             /// </summary>
             public DateTime modifiedDate;
-            public personModel modifiedBy;
+            public PersonModel modifiedBy;
             public DateTime dateAdded;
-            public personModel createdBy;
+            public PersonModel createdBy;
             //public int RootPageID;
             //public bool SetPageNotFoundPageID;
             //public bool SetLandingPageID;
@@ -224,14 +224,14 @@ namespace Contensive.Processor {
             try {
                 result = Title;
                 if (core.doc.debug_iUserError != "") {
-                    Description += HtmlController.div( errorController.getUserError(core));
+                    Description += HtmlController.div( ErrorController.getUserError(core));
                 }
                 if (!string.IsNullOrEmpty(Description)) {
                     result += HtmlController.div(Description);
                     //result += htmlController.div(Description, "ccAdminInfoBar ccPanel3DReverse");
                 }
             } catch (Exception ex) {
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
             }
             result = HtmlController.div(result, "ccAdminTitleBar");
             return result;
@@ -266,7 +266,7 @@ namespace Contensive.Processor {
                 }
                 buttonsRight += getButtonDanger(ButtonDelete, JSOnClick, !info.allowDelete);
             } catch (Exception ex) {
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
             }
             return getButtonBar(core, buttonsLeft, buttonsRight);
         }
@@ -306,7 +306,7 @@ namespace Contensive.Processor {
                     + "";
                 //
             } catch (Exception ex) {
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
             }
             return s;
         }
@@ -329,7 +329,7 @@ namespace Contensive.Processor {
 
                 }
             } catch (Exception ex) {
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
             }
             return s;
         }
@@ -433,7 +433,7 @@ namespace Contensive.Processor {
                 if (NavEnd < PageCount) {
                     Nav = Nav + "<li class=\"delim\">&#187;</li><li onclick=\"bbj(this);\">" + PageCount + "</li>";
                 }
-                Nav = genericController.vbReplace(Nav, ">" + PageNumber + "<", " class=\"hit\">" + PageNumber + "<");
+                Nav = GenericController.vbReplace(Nav, ">" + PageNumber + "<", " class=\"hit\">" + PageNumber + "<");
                 string recordDetails = "";
                 switch (recordCnt) {
                     case 0:
@@ -453,7 +453,7 @@ namespace Contensive.Processor {
                     + "\r</div>";
                  result += Nav;
             } catch (Exception ex) {
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
             }
             return result;
         }
@@ -490,7 +490,7 @@ namespace Contensive.Processor {
                     + ButtonBar;
                 result = HtmlController.formMultipart(core, result, core.doc.refreshQueryString,"","ccForm");
             } catch (Exception ex) {
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
             }
             return result;
         }
@@ -506,7 +506,7 @@ namespace Contensive.Processor {
         public static string getEditPanel(CoreController core, bool AllowHeading, string PanelHeading, string PanelDescription, string PanelBody) {
             string result = "";
             try {
-                stringBuilderLegacyController FastString = new stringBuilderLegacyController();
+                StringBuilderLegacyController FastString = new StringBuilderLegacyController();
                 //
                 result += "<div class=\"ccPanel3DReverse ccAdminEditBody\">";
                 //
@@ -524,7 +524,7 @@ namespace Contensive.Processor {
                 //
                 result += PanelBody + "</div>";
             } catch (Exception ex) {
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
             }
             return result;
         }
@@ -602,7 +602,7 @@ namespace Contensive.Processor {
                 if (string.IsNullOrEmpty(Title)) {
                     Copy = "&nbsp;";
                 } else {
-                    Copy = genericController.vbReplace(Title, " ", "&nbsp;");
+                    Copy = GenericController.vbReplace(Title, " ", "&nbsp;");
                     //Copy = "<nobr>" & Title & "</nobr>"
                 }
                 Style = "VERTICAL-ALIGN:bottom;";
@@ -613,24 +613,24 @@ namespace Contensive.Processor {
                 //
                 switch (SortingState) {
                     case SortingStateEnum.SortableNotSet:
-                        QS = genericController.modifyQueryString(RefreshQueryString, "ColSort", ((int)SortingStateEnum.SortableSetAZ).ToString(), true);
-                        QS = genericController.modifyQueryString(QS, "ColPtr", ColumnPtr.ToString(), true);
+                        QS = GenericController.modifyQueryString(RefreshQueryString, "ColSort", ((int)SortingStateEnum.SortableSetAZ).ToString(), true);
+                        QS = GenericController.modifyQueryString(QS, "ColPtr", ColumnPtr.ToString(), true);
                         Copy = "<a href=\"?" + QS + "\" title=\"Sort A-Z\" class=\"ccAdminListCaption\">" + Copy + "</a>";
                         break;
                     case SortingStateEnum.SortableSetza:
-                        QS = genericController.modifyQueryString(RefreshQueryString, "ColSort", ((int)SortingStateEnum.SortableSetAZ).ToString(), true);
-                        QS = genericController.modifyQueryString(QS, "ColPtr", ColumnPtr.ToString(), true);
+                        QS = GenericController.modifyQueryString(RefreshQueryString, "ColSort", ((int)SortingStateEnum.SortableSetAZ).ToString(), true);
+                        QS = GenericController.modifyQueryString(QS, "ColPtr", ColumnPtr.ToString(), true);
                         Copy = "<a href=\"?" + QS + "\" title=\"Sort A-Z\" class=\"ccAdminListCaption\">" + Copy + "<img src=\"/ccLib/images/arrowup.gif\" width=8 height=8 border=0></a>";
                         break;
                     case SortingStateEnum.SortableSetAZ:
-                        QS = genericController.modifyQueryString(RefreshQueryString, "ColSort", ((int)SortingStateEnum.SortableSetza).ToString(), true);
-                        QS = genericController.modifyQueryString(QS, "ColPtr", ColumnPtr.ToString(), true);
+                        QS = GenericController.modifyQueryString(RefreshQueryString, "ColSort", ((int)SortingStateEnum.SortableSetza).ToString(), true);
+                        QS = GenericController.modifyQueryString(QS, "ColPtr", ColumnPtr.ToString(), true);
                         Copy = "<a href=\"?" + QS + "\" title=\"Sort Z-A\" class=\"ccAdminListCaption\">" + Copy + "<img src=\"/ccLib/images/arrowdown.gif\" width=8 height=8 border=0></a>";
                         break;
                 }
                 //
                 if (!string.IsNullOrEmpty(Width)) {
-                    WidthTest = genericController.encodeInteger(Width.ToLower().Replace("px", ""));
+                    WidthTest = GenericController.encodeInteger(Width.ToLower().Replace("px", ""));
                     if (WidthTest != 0) {
                         Style = Style + "width:" + WidthTest + "px;";
                         Copy += "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"" + WidthTest + "\" height=1 border=0>";
@@ -641,7 +641,7 @@ namespace Contensive.Processor {
                 }
                 result = "\r\n<td style=\"" + Style + "\" class=\"" + ClassStyle + "\">" + Copy + "</td>";
             } catch (Exception ex) {
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
             }
             return result;
         }
@@ -658,7 +658,7 @@ namespace Contensive.Processor {
             string VarText;
             //
             VarText = core.docProperties.getText("ColPtr");
-            tempGetReportSortColumnPtr = genericController.encodeInteger(VarText);
+            tempGetReportSortColumnPtr = GenericController.encodeInteger(VarText);
             if ((tempGetReportSortColumnPtr == 0) && (VarText != "0")) {
                 tempGetReportSortColumnPtr = DefaultSortColumnPtr;
             }
@@ -705,7 +705,7 @@ namespace Contensive.Processor {
                 //
                 result = getReport2(core, RowCount, ColCaption, ColAlign, ColWidth, Cells, PageSize, PageNumber, PreTableCopy, PostTableCopy, DataRowCount, ClassStyle, ColSortable, 0);
             } catch (Exception ex) {
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
             }
             return result;
         }
@@ -716,8 +716,8 @@ namespace Contensive.Processor {
             try {
                 string RQS = null;
                 int RowBAse = 0;
-                stringBuilderLegacyController Content = new stringBuilderLegacyController();
-                stringBuilderLegacyController Stream = new stringBuilderLegacyController();
+                StringBuilderLegacyController Content = new StringBuilderLegacyController();
+                StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 int ColumnCount = 0;
                 int ColumnPtr = 0;
                 string ColumnWidth = null;
@@ -835,27 +835,27 @@ namespace Contensive.Processor {
                         result += "<br>Go to Page ";
                         if (PagePointer != 1) {
                             WorkingQS = core.doc.refreshQueryString;
-                            WorkingQS = genericController.modifyQueryString(WorkingQS, "GotoPage", "1", true);
+                            WorkingQS = GenericController.modifyQueryString(WorkingQS, "GotoPage", "1", true);
                             result += "<a href=\"" + core.webServer.requestPage + "?" + WorkingQS + "\">1</A>...&nbsp;";
                         }
                         WorkingQS = core.doc.refreshQueryString;
-                        WorkingQS = genericController.modifyQueryString(WorkingQS, RequestNamePageSize, ReportPageSize.ToString(), true);
+                        WorkingQS = GenericController.modifyQueryString(WorkingQS, RequestNamePageSize, ReportPageSize.ToString(), true);
                         while ((PagePointer <= PageCount) && (LinkCount < 20)) {
                             if (PagePointer == ReportPageNumber) {
                                 result += PagePointer + "&nbsp;";
                             } else {
-                                WorkingQS = genericController.modifyQueryString(WorkingQS, RequestNamePageNumber, PagePointer.ToString(), true);
+                                WorkingQS = GenericController.modifyQueryString(WorkingQS, RequestNamePageNumber, PagePointer.ToString(), true);
                                 result += "<a href=\"" + core.webServer.requestPage + "?" + WorkingQS + "\">" + PagePointer + "</A>&nbsp;";
                             }
                             PagePointer = PagePointer + 1;
                             LinkCount = LinkCount + 1;
                         }
                         if (PagePointer < PageCount) {
-                            WorkingQS = genericController.modifyQueryString(WorkingQS, RequestNamePageNumber, PageCount.ToString(), true);
+                            WorkingQS = GenericController.modifyQueryString(WorkingQS, RequestNamePageNumber, PageCount.ToString(), true);
                             result += "...<a href=\"" + core.webServer.requestPage + "?" + WorkingQS + "\">" + PageCount + "</A>&nbsp;";
                         }
                         if (ReportPageNumber < PageCount) {
-                            WorkingQS = genericController.modifyQueryString(WorkingQS, RequestNamePageNumber, (ReportPageNumber + 1).ToString(), true);
+                            WorkingQS = GenericController.modifyQueryString(WorkingQS, RequestNamePageNumber, (ReportPageNumber + 1).ToString(), true);
                             result += "...<a href=\"" + core.webServer.requestPage + "?" + WorkingQS + "\">next</A>&nbsp;";
                         }
                         result += "<br>&nbsp;";
@@ -867,7 +867,7 @@ namespace Contensive.Processor {
                 + result + "</td></tr></table>"
                 + PostTableCopy + "";
             } catch (Exception ex) {
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
             }
             return result;
         }
@@ -915,7 +915,7 @@ namespace Contensive.Processor {
             return result;
         }
         //
-        public static string getEditForm_TitleBarDetails_EditorString(DateTime editDate, personModel editor, string notEditedMessage) {
+        public static string getEditForm_TitleBarDetails_EditorString(DateTime editDate, PersonModel editor, string notEditedMessage) {
             if ((editDate < new DateTime(1990, 1, 1))&(editor.id==0)) {
                 return notEditedMessage;
             } else if (editDate < new DateTime(1990, 1, 1)) {
@@ -1015,7 +1015,7 @@ namespace Contensive.Processor {
                     if ((headerInfo.recordLockExpiresDate == null) | (headerInfo.recordLockExpiresDate < DateTime.Now)) {
                         //
                         // Add Edit Locking to right panel
-                        personModel personLock = personModel.create(core, headerInfo.recordLockById);
+                        PersonModel personLock = PersonModel.create(core, headerInfo.recordLockById);
                         if (personLock != null) {
                             result += "<br><b>Record is locked by " + personLock.name + " until " + headerInfo.recordLockExpiresDate + "</b>";
                         }
@@ -1126,11 +1126,11 @@ namespace Contensive.Processor {
         public static string getDefaultEditor_LookupContent( CoreController core, string fieldName, int fieldValue, int lookupContentID, ref bool IsEmptyList, bool readOnly = false, string htmlId = "", string WhyReadOnlyMsg = "", bool fieldRequired = false, string sqlFilter = "") {
             string result = "";
             string LookupContentName = "";
-            if (lookupContentID != 0) LookupContentName = genericController.encodeText(Models.Domain.CDefModel.getContentNameByID(core, lookupContentID));
+            if (lookupContentID != 0) LookupContentName = GenericController.encodeText(Models.Domain.CDefModel.getContentNameByID(core, lookupContentID));
             if (readOnly) {
                 //
                 // ----- Lookup ReadOnly
-                result += (HtmlController.inputHidden(fieldName, genericController.encodeText(fieldValue)));
+                result += (HtmlController.inputHidden(fieldName, GenericController.encodeText(fieldValue)));
                 if (!string.IsNullOrEmpty(LookupContentName)) {
                     int CSLookup = core.db.csOpen2(LookupContentName, fieldValue, false, false, "Name,ContentControlID");
                     if (core.db.csOk(CSLookup)) {
@@ -1207,7 +1207,7 @@ namespace Contensive.Processor {
             if (readOnly) {
                 //
                 // ----- Lookup ReadOnly
-                result += (HtmlController.inputHidden(htmlName, genericController.encodeText(defaultValue)));
+                result += (HtmlController.inputHidden(htmlName, GenericController.encodeText(defaultValue)));
                 nameValueClass nameValue = lookupList.Find(x => x.name.ToLower() == htmlName.ToLower());
                 if (nameValue == null) {
                     result += "none";
@@ -1269,7 +1269,7 @@ namespace Contensive.Processor {
                 if (selectedRecordId == 0) {
                     EditorString += "None";
                 } else {
-                    var selectedUser = personModel.create(core, selectedRecordId);
+                    var selectedUser = PersonModel.create(core, selectedRecordId);
                     if ( selectedUser==null) {
                         EditorString += "Deleted";
                     } else {
@@ -1283,7 +1283,7 @@ namespace Contensive.Processor {
                 // -- editable
                 EditorString += core.html.selectUserFromGroup(htmlName, selectedRecordId, groupId, "", (fieldRequired) ? "" : "None", htmlId, "select form-control");
                 if (selectedRecordId != 0) {
-                    var selectedUser = personModel.create(core, selectedRecordId);
+                    var selectedUser = PersonModel.create(core, selectedRecordId);
                     if (selectedUser == null) {
                         EditorString += "Deleted";
                     } else {
@@ -1324,25 +1324,25 @@ namespace Contensive.Processor {
                 Dictionary<string, string> addonInstanceProperties = new Dictionary<string, string>();
                 core.addon.buildAddonOptionLists(ref addonInstanceProperties, ref ExpandedSelector, SitePropertyName + "=" + selector, instanceOptions, "0", true);
                 //buildAddonOptionLists(ref addonInstanceProperties, ref ExpandedSelector, SitePropertyName + "=" + selector, instanceOptions, "0", true);
-                int Pos = genericController.vbInstr(1, ExpandedSelector, "[");
+                int Pos = GenericController.vbInstr(1, ExpandedSelector, "[");
                 if (Pos != 0) {
                     //
                     // List of Options, might be select, radio or checkbox
                     //
-                    string LCaseOptionDefault = genericController.vbLCase(ExpandedSelector.Left(Pos - 1));
-                    int PosEqual = genericController.vbInstr(1, LCaseOptionDefault, "=");
+                    string LCaseOptionDefault = GenericController.vbLCase(ExpandedSelector.Left(Pos - 1));
+                    int PosEqual = GenericController.vbInstr(1, LCaseOptionDefault, "=");
 
                     if (PosEqual > 0) {
                         LCaseOptionDefault = LCaseOptionDefault.Substring(PosEqual);
                     }
 
-                    LCaseOptionDefault = genericController.decodeNvaArgument(LCaseOptionDefault);
+                    LCaseOptionDefault = GenericController.decodeNvaArgument(LCaseOptionDefault);
                     ExpandedSelector = ExpandedSelector.Substring(Pos);
-                    Pos = genericController.vbInstr(1, ExpandedSelector, "]");
+                    Pos = GenericController.vbInstr(1, ExpandedSelector, "]");
                     string OptionSuffix = "";
                     if (Pos > 0) {
                         if (Pos < ExpandedSelector.Length) {
-                            OptionSuffix = genericController.vbLCase((ExpandedSelector.Substring(Pos)).Trim(' '));
+                            OptionSuffix = GenericController.vbLCase((ExpandedSelector.Substring(Pos)).Trim(' '));
                         }
                         ExpandedSelector = ExpandedSelector.Left(Pos - 1);
                     }
@@ -1353,22 +1353,22 @@ namespace Contensive.Processor {
                     for (OptionPtr = 0; OptionPtr < OptionCnt; OptionPtr++) {
                         string OptionValue_AddonEncoded = OptionValues[OptionPtr].Trim(' ');
                         if (!string.IsNullOrEmpty(OptionValue_AddonEncoded)) {
-                            Pos = genericController.vbInstr(1, OptionValue_AddonEncoded, ":");
+                            Pos = GenericController.vbInstr(1, OptionValue_AddonEncoded, ":");
                             string OptionCaption = null;
                             string OptionValue = null;
                             if (Pos == 0) {
-                                OptionValue = genericController.decodeNvaArgument(OptionValue_AddonEncoded);
+                                OptionValue = GenericController.decodeNvaArgument(OptionValue_AddonEncoded);
                                 OptionCaption = OptionValue;
                             } else {
-                                OptionCaption = genericController.decodeNvaArgument(OptionValue_AddonEncoded.Left(Pos - 1));
-                                OptionValue = genericController.decodeNvaArgument(OptionValue_AddonEncoded.Substring(Pos));
+                                OptionCaption = GenericController.decodeNvaArgument(OptionValue_AddonEncoded.Left(Pos - 1));
+                                OptionValue = GenericController.decodeNvaArgument(OptionValue_AddonEncoded.Substring(Pos));
                             }
                             switch (OptionSuffix) {
                                 case "checkbox":
                                     //
                                     // Create checkbox addon_execute_getFormContent_decodeSelector
                                     //
-                                    bool selected = (genericController.vbInstr(1, "," + LCaseOptionDefault + ",", "," + genericController.vbLCase(OptionValue) + ",") != 0);
+                                    bool selected = (GenericController.vbInstr(1, "," + LCaseOptionDefault + ",", "," + GenericController.vbLCase(OptionValue) + ",") != 0);
                                     result = HtmlController.checkbox(SitePropertyName + OptionPtr, selected, "", false, "", false, OptionValue, OptionCaption);
                                     //if (genericController.vbInstr(1, "," + LCaseOptionDefault + ",", "," + genericController.vbLCase(OptionValue) + ",") != 0) {
                                     //    result += "<div style=\"white-space:nowrap\"><input type=\"checkbox\" name=\"" + SitePropertyName + OptionPtr + "\" value=\"" + OptionValue + "\" checked=\"checked\">" + OptionCaption + "</div>";
@@ -1380,7 +1380,7 @@ namespace Contensive.Processor {
                                     //
                                     // Create Radio addon_execute_getFormContent_decodeSelector
                                     //
-                                    if (genericController.vbLCase(OptionValue) == LCaseOptionDefault) {
+                                    if (GenericController.vbLCase(OptionValue) == LCaseOptionDefault) {
                                         result += "<div style=\"white-space:nowrap\"><input type=\"radio\" name=\"" + SitePropertyName + "\" value=\"" + OptionValue + "\" checked=\"checked\" >" + OptionCaption + "</div>";
                                     } else {
                                         result += "<div style=\"white-space:nowrap\"><input type=\"radio\" name=\"" + SitePropertyName + "\" value=\"" + OptionValue + "\" >" + OptionCaption + "</div>";
@@ -1390,7 +1390,7 @@ namespace Contensive.Processor {
                                     //
                                     // Create select addon_execute_result
                                     //
-                                    if (genericController.vbLCase(OptionValue) == LCaseOptionDefault) {
+                                    if (GenericController.vbLCase(OptionValue) == LCaseOptionDefault) {
                                         result += "<option value=\"" + OptionValue + "\" selected>" + OptionCaption + "</option>";
                                     } else {
                                         result += "<option value=\"" + OptionValue + "\">" + OptionCaption + "</option>";
@@ -1425,13 +1425,13 @@ namespace Contensive.Processor {
                     // Create Text addon_execute_result
                     //
 
-                    selector = genericController.decodeNvaArgument(selector);
+                    selector = GenericController.decodeNvaArgument(selector);
                     result = getDefaultEditor_Text(core, SitePropertyName, selector);
                 }
 
                 //FastString = null;
             } catch (Exception ex) {
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
             }
             return result;
         }
@@ -1749,7 +1749,7 @@ namespace Contensive.Processor {
                                 result += AdminUIController.getIconEditAdminLink(core, cdef, recordID);
                                 if (allowCut) {
                                     int ContentID = 0;
-                                    string WorkingLink = genericController.modifyLinkQuery(core.webServer.requestPage + "?" + core.doc.refreshQueryString, RequestNameCut, genericController.encodeText(ContentID) + "." + genericController.encodeText(recordID), true);
+                                    string WorkingLink = GenericController.modifyLinkQuery(core.webServer.requestPage + "?" + core.doc.refreshQueryString, RequestNameCut, GenericController.encodeText(ContentID) + "." + GenericController.encodeText(recordID), true);
                                     result += "<a class=\"ccRecordCutLink\" TabIndex=\"-1\" href=\"" + HtmlController.encodeHtml(WorkingLink) + "\"><img src=\"/ccLib/images/Contentcut.gif\" border=\"0\" alt=\"Cut this " + ContentCaption + " to clipboard\" title=\"Cut this " + ContentCaption + " to clipboard\" align=\"absmiddle\"></a>";
                                 }
                                 result = "<span class=\"ccRecordLinkCon\" style=\"white-space:nowrap;\">" + result + "</span>";
@@ -1758,7 +1758,7 @@ namespace Contensive.Processor {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
             }
             return result;
         }
@@ -1794,10 +1794,10 @@ namespace Contensive.Processor {
                 //
                 tempmain_GetRecordAddLink2 = "";
                 if (IsEditing) {
-                    iContentName = genericController.encodeText(ContentName);
-                    iPresetNameValueList = genericController.encodeText(PresetNameValueList);
-                    iPresetNameValueList = genericController.vbReplace(iPresetNameValueList, "&", ",");
-                    iAllowPaste = genericController.encodeBoolean(AllowPaste);
+                    iContentName = GenericController.encodeText(ContentName);
+                    iPresetNameValueList = GenericController.encodeText(PresetNameValueList);
+                    iPresetNameValueList = GenericController.vbReplace(iPresetNameValueList, "&", ",");
+                    iAllowPaste = GenericController.encodeBoolean(AllowPaste);
 
                     if (string.IsNullOrEmpty(iContentName)) {
                         throw (new ApplicationException("Method called with blank ContentName")); // handleLegacyError14(MethodName, "")
@@ -1810,7 +1810,7 @@ namespace Contensive.Processor {
                         if (!useFlyout) {
                             Link = "/" + core.appConfig.adminRoute + "?cid=" + iContentID + "&af=4&aa=2&ad=1";
                             if (!string.IsNullOrEmpty(PresetNameValueList)) {
-                                Link = Link + "&wc=" + genericController.encodeRequestVariable(PresetNameValueList);
+                                Link = Link + "&wc=" + GenericController.encodeRequestVariable(PresetNameValueList);
                             }
                             tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + "<a"
                                 + " TabIndex=-1"
@@ -1824,7 +1824,7 @@ namespace Contensive.Processor {
                                 + "></a>";
                         } else {
                             //
-                            MenuName = genericController.GetRandomInteger(core).ToString();
+                            MenuName = GenericController.GetRandomInteger(core).ToString();
                             core.menuFlyout.menu_AddEntry(MenuName, "", "/ccLib/images/IconContentAdd.gif", "", "", "", "stylesheet", "stylesheethover");
                             LowestRequiredMenuName = getRecordAddLink_AddMenuEntry(core, iContentName, iPresetNameValueList, "", MenuName, MenuName);
                         }
@@ -1834,35 +1834,35 @@ namespace Contensive.Processor {
                         if (iAllowPaste) {
                             ClipBoard = core.visitProperty.getText("Clipboard", "");
                             if (!string.IsNullOrEmpty(ClipBoard)) {
-                                Position = genericController.vbInstr(1, ClipBoard, ".");
+                                Position = GenericController.vbInstr(1, ClipBoard, ".");
                                 if (Position != 0) {
                                     ClipBoardArray = ClipBoard.Split('.');
                                     if (ClipBoardArray.GetUpperBound(0) > 0) {
-                                        ClipboardContentID = genericController.encodeInteger(ClipBoardArray[0]);
-                                        ClipChildRecordID = genericController.encodeInteger(ClipBoardArray[1]);
+                                        ClipboardContentID = GenericController.encodeInteger(ClipBoardArray[0]);
+                                        ClipChildRecordID = GenericController.encodeInteger(ClipBoardArray[1]);
                                         //iContentID = main_GetContentID(iContentName)
                                         if (Models.Domain.CDefModel.isWithinContent(core, ClipboardContentID, iContentID)) {
-                                            if (genericController.vbInstr(1, iPresetNameValueList, "PARENTID=", 1) != 0) {
+                                            if (GenericController.vbInstr(1, iPresetNameValueList, "PARENTID=", 1) != 0) {
                                                 //
                                                 // must test for main_IsChildRecord
                                                 //
                                                 BufferString = iPresetNameValueList;
-                                                BufferString = genericController.vbReplace(BufferString, "(", "");
-                                                BufferString = genericController.vbReplace(BufferString, ")", "");
-                                                BufferString = genericController.vbReplace(BufferString, ",", "&");
-                                                ParentID = genericController.encodeInteger(genericController.main_GetNameValue_Internal(core, BufferString, "Parentid"));
+                                                BufferString = GenericController.vbReplace(BufferString, "(", "");
+                                                BufferString = GenericController.vbReplace(BufferString, ")", "");
+                                                BufferString = GenericController.vbReplace(BufferString, ",", "&");
+                                                ParentID = GenericController.encodeInteger(GenericController.main_GetNameValue_Internal(core, BufferString, "Parentid"));
                                             }
 
 
-                                            if ((ParentID != 0) & (!pageContentController.isChildRecord(core, iContentName, ParentID, ClipChildRecordID))) {
+                                            if ((ParentID != 0) & (!PageContentController.isChildRecord(core, iContentName, ParentID, ClipChildRecordID))) {
                                                 //
                                                 // Can not paste as child of itself
                                                 //
                                                 PasteLink = core.webServer.requestPage + "?" + core.doc.refreshQueryString;
-                                                PasteLink = genericController.modifyLinkQuery(PasteLink, RequestNamePaste, "1", true);
-                                                PasteLink = genericController.modifyLinkQuery(PasteLink, RequestNamePasteParentContentID, iContentID.ToString(), true);
-                                                PasteLink = genericController.modifyLinkQuery(PasteLink, RequestNamePasteParentRecordID, ParentID.ToString(), true);
-                                                PasteLink = genericController.modifyLinkQuery(PasteLink, RequestNamePasteFieldList, iPresetNameValueList, true);
+                                                PasteLink = GenericController.modifyLinkQuery(PasteLink, RequestNamePaste, "1", true);
+                                                PasteLink = GenericController.modifyLinkQuery(PasteLink, RequestNamePasteParentContentID, iContentID.ToString(), true);
+                                                PasteLink = GenericController.modifyLinkQuery(PasteLink, RequestNamePasteParentRecordID, ParentID.ToString(), true);
+                                                PasteLink = GenericController.modifyLinkQuery(PasteLink, RequestNamePasteFieldList, iPresetNameValueList, true);
                                                 tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + "<a class=\"ccRecordCutLink\" TabIndex=\"-1\" href=\"" + HtmlController.encodeHtml(PasteLink) + "\"><img src=\"/ccLib/images/ContentPaste.gif\" border=\"0\" alt=\"Paste record in clipboard here\" title=\"Paste record in clipboard here\" align=\"absmiddle\"></a>";
                                             }
                                         }
@@ -1875,7 +1875,7 @@ namespace Contensive.Processor {
                         //
                         if (!string.IsNullOrEmpty(LowestRequiredMenuName)) {
                             tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + core.menuFlyout.getMenu(LowestRequiredMenuName, 0);
-                            tempmain_GetRecordAddLink2 = genericController.vbReplace(tempmain_GetRecordAddLink2, "class=\"ccFlyoutButton\" ", "", 1, 99, 1);
+                            tempmain_GetRecordAddLink2 = GenericController.vbReplace(tempmain_GetRecordAddLink2, "class=\"ccFlyoutButton\" ", "", 1, 99, 1);
                             if (!string.IsNullOrEmpty(PasteLink)) {
                                 tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + "<a TabIndex=-1 href=\"" + HtmlController.encodeHtml(PasteLink) + "\"><img src=\"/ccLib/images/ContentPaste.gif\" border=\"0\" alt=\"Paste content from clipboard\" align=\"absmiddle\"></a>";
                             }
@@ -1889,7 +1889,7 @@ namespace Contensive.Processor {
                         if (!string.IsNullOrEmpty(tempmain_GetRecordAddLink2)) {
                             tempmain_GetRecordAddLink2 = ""
                                 + "\r\n\t<div style=\"display:inline;\">"
-                                + genericController.nop(tempmain_GetRecordAddLink2) + "\r\n\t</div>";
+                                + GenericController.nop(tempmain_GetRecordAddLink2) + "\r\n\t</div>";
                         }
                         //
                         // ----- Add the flyout panels to the content to return
@@ -1897,15 +1897,15 @@ namespace Contensive.Processor {
                         //
                         if (!string.IsNullOrEmpty(LowestRequiredMenuName)) {
                             tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + core.menuFlyout.menu_GetClose();
-                            if (genericController.vbInstr(1, tempmain_GetRecordAddLink2, "IconContentAdd.gif", 1) != 0) {
-                                tempmain_GetRecordAddLink2 = genericController.vbReplace(tempmain_GetRecordAddLink2, "IconContentAdd.gif\" ", "IconContentAdd.gif\" align=\"absmiddle\" ");
+                            if (GenericController.vbInstr(1, tempmain_GetRecordAddLink2, "IconContentAdd.gif", 1) != 0) {
+                                tempmain_GetRecordAddLink2 = GenericController.vbReplace(tempmain_GetRecordAddLink2, "IconContentAdd.gif\" ", "IconContentAdd.gif\" align=\"absmiddle\" ");
                             }
                         }
-                        tempmain_GetRecordAddLink2 = genericController.vbReplace(tempmain_GetRecordAddLink2, "target=", "xtarget=", 1, 99, 1);
+                        tempmain_GetRecordAddLink2 = GenericController.vbReplace(tempmain_GetRecordAddLink2, "target=", "xtarget=", 1, 99, 1);
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
             }
             return tempmain_GetRecordAddLink2;
         }
@@ -1936,10 +1936,10 @@ namespace Contensive.Processor {
             if (string.IsNullOrEmpty(ContentName)) {
                 throw (new ApplicationException("main_GetRecordAddLink, ContentName is empty")); // handleLegacyError14(MethodName, "")
             } else {
-                if (MyContentNameList.IndexOf("," + genericController.vbUCase(ContentName) + ",") + 1 >= 0) {
+                if (MyContentNameList.IndexOf("," + GenericController.vbUCase(ContentName) + ",") + 1 >= 0) {
                     throw (new ApplicationException("result , Content Child [" + ContentName + "] is one of its own parents")); // handleLegacyError14(MethodName, "")
                 } else {
-                    MyContentNameList = MyContentNameList + "," + genericController.vbUCase(ContentName) + ",";
+                    MyContentNameList = MyContentNameList + "," + GenericController.vbUCase(ContentName) + ",";
                     //
                     // ----- Select the Content Record for the Menu Entry selected
                     //
@@ -2026,7 +2026,7 @@ namespace Contensive.Processor {
                             Link = "/" + core.appConfig.adminRoute + "?cid=" + ContentID + "&af=4&aa=2&ad=1";
                             if (!string.IsNullOrEmpty(PresetNameValueList)) {
                                 string NameValueList = PresetNameValueList;
-                                Link = Link + "&wc=" + genericController.encodeRequestVariable(PresetNameValueList);
+                                Link = Link + "&wc=" + GenericController.encodeRequestVariable(PresetNameValueList);
                             }
                         }
                         core.menuFlyout.menu_AddEntry(MenuName + ":" + ContentName, ParentMenuName, "", "", Link, ButtonCaption, "", "", true);

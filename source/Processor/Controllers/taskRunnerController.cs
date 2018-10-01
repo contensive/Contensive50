@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 using Contensive.Processor.Models.Domain;
 //
@@ -19,7 +19,7 @@ namespace Contensive.Processor.Controllers {
     /// <summary>
     /// taskRunner polls the task queue and runs commands when found
     /// </summary>
-    public class taskRunnerController : IDisposable {
+    public class TaskRunnerController : IDisposable {
         /// <summary>
         /// set in constructor. used to tag tasks assigned to this runner
         /// </summary>
@@ -46,8 +46,8 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="core"></param>
         /// <remarks></remarks>
-        public taskRunnerController() {
-            runnerGuid = genericController.getGUID();
+        public TaskRunnerController() {
+            runnerGuid = GenericController.getGUID();
         }
         //
         //========================================================================================================
@@ -112,7 +112,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     using (CPClass cpCluster = new CPClass()) {
                         if (!cpCluster.core.serverConfig.allowTaskRunnerService) {
-                            logController.logTrace(cpCluster.core, "taskRunner.processTimerTick, skip -- allowTaskRunnerService false");
+                            LogController.logTrace(cpCluster.core, "taskRunner.processTimerTick, skip -- allowTaskRunnerService false");
                         } else {
                             runTasks(cpCluster.core);
                         }
@@ -121,7 +121,7 @@ namespace Contensive.Processor.Controllers {
                 }
             } catch (Exception ex) {
                 using (CPClass cp = new CPClass()) {
-                    logController.handleError(cp.core,ex);
+                    LogController.handleError(cp.core,ex);
                 }
             }
         }
@@ -141,7 +141,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     using (CPClass cpApp = new CPClass(appKVP.Value.name)) {
                         //
-                        logController.logTrace(cpApp.core, "runTasks, appname=[" + appKVP.Value.name + "]");
+                        LogController.logTrace(cpApp.core, "runTasks, appname=[" + appKVP.Value.name + "]");
                         //
                         if (cpApp.core.appConfig.appStatus == AppConfigModel.AppStatusEnum.ok) {
                             try {
@@ -158,14 +158,14 @@ namespace Contensive.Processor.Controllers {
                                     if (recordsAffected == 0) {
                                         //
                                         // -- no tasks found
-                                        logController.logTrace(cpApp.core, "runTasks, appname=[" + appKVP.Value.name + "], no tasks");
+                                        LogController.logTrace(cpApp.core, "runTasks, appname=[" + appKVP.Value.name + "], no tasks");
                                     } else {
                                         Stopwatch swTask = new Stopwatch();
                                         swTask.Start();
                                         //
                                         // -- track multiple executions
                                         if (sequentialTaskCount>0) {
-                                            logController.logTrace(cpApp.core, "runTasks, appname=[" + appKVP.Value.name + "], multiple tasks run in a single cycle, sequentialTaskCount [" + sequentialTaskCount + "]");
+                                            LogController.logTrace(cpApp.core, "runTasks, appname=[" + appKVP.Value.name + "], multiple tasks run in a single cycle, sequentialTaskCount [" + sequentialTaskCount + "]");
                                         }
                                         //
                                         // -- two execution methods, 1) run task here, 2) start process and wait (so bad addon code does not memory link)
@@ -192,14 +192,14 @@ namespace Contensive.Processor.Controllers {
                                     sequentialTaskCount++;
                                 } while (recordsAffected > 0);
                             } catch (Exception ex) {
-                                logController.handleError(cpApp.core, ex);
+                                LogController.handleError(cpApp.core, ex);
                             }
                         }
                     }
                 }
                 Console.WriteLine("runTasks, exit (" + swProcess.ElapsedMilliseconds + "ms)");
             } catch (Exception ex) {
-                logController.handleError(serverCore, ex);
+                LogController.handleError(serverCore, ex);
             }
         }
         //
@@ -213,16 +213,16 @@ namespace Contensive.Processor.Controllers {
                 using (var cp = new Contensive.Processor.CPClass(appName)) {
                     //
                     // -- execute here
-                    foreach (var task in taskModel.createList(cp.core, "(cmdRunner=" + cp.core.db.encodeSQLText(runnerGuid) + ")and(datestarted is null)", "id")) {
+                    foreach (var task in TaskModel.createList(cp.core, "(cmdRunner=" + cp.core.db.encodeSQLText(runnerGuid) + ")and(datestarted is null)", "id")) {
                         //
-                        Console.WriteLine("runTask, runTask, task [" + task.name + "], command [" + task.Command + "], cmdDetail [" + task.cmdDetail + "]");
-                        logController.logTrace(cp.core, "runTask, task [" + task.name + "], command [" + task.Command + "], cmdDetail [" + task.cmdDetail + "]");
+                        Console.WriteLine("runTask, runTask, task [" + task.name + "], command [" + task.command + "], cmdDetail [" + task.cmdDetail + "]");
+                        LogController.logTrace(cp.core, "runTask, task [" + task.name + "], command [" + task.command + "], cmdDetail [" + task.cmdDetail + "]");
                         //
                         //tasksRemaining = true;
-                        task.DateStarted = DateTime.Now;
+                        task.dateStarted = DateTime.Now;
                         task.save(cp.core);
                         cmdDetailClass cmdDetail = cp.core.json.Deserialize<cmdDetailClass>(task.cmdDetail);
-                        switch ((task.Command.ToLower())) {
+                        switch ((task.command.ToLower())) {
                             case taskQueueCommandEnumModule.runAddon:
                                 cp.core.addon.execute(AddonModel.create(cp.core, cmdDetail.addonId), new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
                                     backgroundProcess = true,
@@ -232,7 +232,7 @@ namespace Contensive.Processor.Controllers {
                                 });
                                 break;
                         }
-                        task.DateCompleted = DateTime.Now;
+                        task.dateCompleted = DateTime.Now;
                         task.save(cp.core);
                     }
                 }
@@ -247,7 +247,7 @@ namespace Contensive.Processor.Controllers {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        ~taskRunnerController() {
+        ~TaskRunnerController() {
             Dispose(false);
             //todo  NOTE: The base class Finalize method is automatically called from the destructor:
             //base.Finalize();

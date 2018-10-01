@@ -17,7 +17,7 @@ namespace Contensive.Addons.AdminSite {
         public static string GetForm_ClearCache(CoreController core) {
             string returnHtml = "";
             try {
-                stringBuilderLegacyController Content = new stringBuilderLegacyController();
+                StringBuilderLegacyController Content = new StringBuilderLegacyController();
                 string Button = null;
                 ////adminUIController Adminui = new adminUIController(core);
                 string Description = null;
@@ -73,7 +73,7 @@ namespace Contensive.Addons.AdminSite {
                 returnHtml = AdminUIController.getBody(core, "Clear Cache", ButtonList, "", true, true, Description, "", 0, Content.Text);
                 Content = null;
             } catch (Exception ex) {
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
                 throw;
             }
             return returnHtml;

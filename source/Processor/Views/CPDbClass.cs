@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor {
@@ -45,14 +45,14 @@ namespace Contensive.Processor {
         //
         private void reportClassError(Exception ex, string methodName) {
             try {
-                logController.handleError(cp.core,ex, "Unexpected Trap Error in CP.DB." + methodName);
+                LogController.handleError(cp.core,ex, "Unexpected Trap Error in CP.DB." + methodName);
             } catch (Exception) {}
         }
         //
         //====================================================================================================
         //
         public override void Delete(string DataSourcename, string TableName, int RecordId) {
-            cp.core.db.deleteTableRecord(TableName, RecordId, DataSourcename);
+            cp.core.db.deprecate_argsreversed_deleteTableRecord(TableName, RecordId, DataSourcename);
         }
         //
         //====================================================================================================
@@ -168,7 +168,7 @@ namespace Contensive.Processor {
                     pageSize = 9999;
                 }
                 if (cs.Insert("Remote Queries")) {
-                    returnKey = genericController.getGUIDString();
+                    returnKey = GenericController.getGUIDString();
                     dataSourceID = cp.Content.GetRecordID("Data Sources", DataSourceName);
                     cs.SetField("remotekey", returnKey);
                     cs.SetField("datasourceid", dataSourceID.ToString());
@@ -181,7 +181,7 @@ namespace Contensive.Processor {
                 cs.Close();
                 //
             } catch (Exception ex) {
-                logController.handleError(cp.core,ex);
+                LogController.handleError(cp.core,ex);
             }
             return returnKey;
         }

@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Controllers {
@@ -20,7 +20,7 @@ namespace Contensive.Processor.Controllers {
     /// <summary>
     /// static class controller
     /// </summary>
-    public class groupController : IDisposable {
+    public class GroupController : IDisposable {
         //
         // ----- constants
         //
@@ -52,17 +52,17 @@ namespace Contensive.Processor.Controllers {
                 //
                 dt = core.db.executeQuery("SELECT ID FROM CCGROUPS WHERE NAME=" + sqlGroupName + "");
                 if (dt.Rows.Count > 0) {
-                    returnGroupId = genericController.encodeInteger(dt.Rows[0]["ID"]);
+                    returnGroupId = GenericController.encodeInteger(dt.Rows[0]["ID"]);
                 } else {
                     cid = Models.Domain.CDefModel.getContentId(core, "groups");
-                    createkey = genericController.GetRandomInteger(core);
+                    createkey = GenericController.GetRandomInteger(core);
                     sql = "insert into ccgroups (contentcontrolid,active,createkey,name,caption) values (" + cid + ",1," + createkey + "," + sqlGroupName + "," + sqlGroupName + ")";
                     core.db.executeQuery(sql);
                     //
                     sql = "select top 1 id from ccgroups where createkey=" + createkey + " order by id desc";
                     dt = core.db.executeQuery(sql);
                     if (dt.Rows.Count > 0) {
-                        returnGroupId = genericController.encodeInteger(dt.Rows[0][0]);
+                        returnGroupId = GenericController.encodeInteger(dt.Rows[0][0]);
                     }
                 }
                 dt.Dispose();
@@ -83,7 +83,7 @@ namespace Contensive.Processor.Controllers {
             int returnGroupId = 0;
             try {
                 //
-                csController cs = new csController(core);
+                CsController cs = new CsController(core);
                 bool IsAlreadyThere = false;
                 string sqlCriteria = core.db.getNameIdOrGuidSqlCriteria(GroupNameOrGuid);
                 string groupName = null;
@@ -101,12 +101,12 @@ namespace Contensive.Processor.Controllers {
                             throw (new ApplicationException("There was an error inserting a new group record"));
                         } else {
                             returnGroupId = cs.getInteger("id");
-                            if (genericController.isGuid(GroupNameOrGuid)) {
+                            if (GenericController.isGuid(GroupNameOrGuid)) {
                                 groupName = "Group " + cs.getInteger("id");
                                 groupGuid = GroupNameOrGuid;
                             } else {
                                 groupName = GroupNameOrGuid;
-                                groupGuid = genericController.getGUID();
+                                groupGuid = GenericController.getGUID();
                             }
                             if (string.IsNullOrEmpty(groupCaption)) {
                                 groupCaption = groupName;
@@ -141,7 +141,7 @@ namespace Contensive.Processor.Controllers {
                         if (userid == 0) {
                             userid = core.session.user.id;
                         }
-                        using (csController cs = new csController(core)) {
+                        using (CsController cs = new CsController(core)) {
                             cs.open("Member Rules", "(MemberID=" + userid.ToString() + ")and(GroupID=" + groupId.ToString() + ")", "", false);
                             if (!cs.ok()) {
                                 cs.close();
@@ -190,7 +190,7 @@ namespace Contensive.Processor.Controllers {
                         if (userid == 0) {
                             userid = core.session.user.id;
                         }
-                        using (csController cs = new csController(core)) {
+                        using (CsController cs = new CsController(core)) {
                             cs.open("Member Rules", "(MemberID=" + userid.ToString() + ")and(GroupID=" + GroupID.ToString() + ")", "", false);
                             if (!cs.ok()) {
                                 cs.close();
@@ -228,7 +228,7 @@ namespace Contensive.Processor.Controllers {
             int tempgroup_GetGroupID = 0;
             DataTable dt = null;
             //
-            string iGroupName = genericController.encodeText(GroupName);
+            string iGroupName = GenericController.encodeText(GroupName);
             tempgroup_GetGroupID = 0;
             if (!string.IsNullOrEmpty(iGroupName)) {
                 //
@@ -236,7 +236,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 dt = core.db.executeQuery("select top 1 id from ccGroups where name=" + core.db.encodeSQLText(iGroupName));
                 if (dt.Rows.Count > 0) {
-                    tempgroup_GetGroupID = genericController.encodeInteger(dt.Rows[0][0]);
+                    tempgroup_GetGroupID = GenericController.encodeInteger(dt.Rows[0][0]);
                 }
             }
             return tempgroup_GetGroupID;
@@ -250,7 +250,7 @@ namespace Contensive.Processor.Controllers {
             string tempgroup_GetGroupName = null;
             //
             int CS = 0;
-            int iGroupID = genericController.encodeInteger(GroupID);
+            int iGroupID = GenericController.encodeInteger(GroupID);
             //
             tempgroup_GetGroupName = "";
             if (iGroupID > 0) {
@@ -259,7 +259,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 CS = core.db.csOpen2("Groups", iGroupID);
                 if (core.db.csOk(CS)) {
-                    tempgroup_GetGroupName = genericController.encodeText(core.db.csGetValue(CS, "Name"));
+                    tempgroup_GetGroupName = GenericController.encodeText(core.db.csGetValue(CS, "Name"));
                 }
                 core.db.csClose(ref CS);
             }
@@ -276,17 +276,17 @@ namespace Contensive.Processor.Controllers {
             string iGroupName = null;
             string iGroupCaption = null;
             //
-            iGroupName = genericController.encodeText(GroupName);
-            iGroupCaption = genericController.encodeEmpty(GroupCaption, iGroupName);
+            iGroupName = GenericController.encodeText(GroupName);
+            iGroupCaption = GenericController.encodeEmpty(GroupCaption, iGroupName);
             //
             tempgroup_Add = -1;
             DataTable dt = core.db.executeQuery("SELECT ID FROM ccgroups WHERE NAME=" + core.db.encodeSQLText(iGroupName));
             if (dt.Rows.Count > 0) {
-                tempgroup_Add = genericController.encodeInteger(dt.Rows[0][0]);
+                tempgroup_Add = GenericController.encodeInteger(dt.Rows[0][0]);
             } else {
                 CS = core.db.csInsertRecord("Groups", SystemMemberID);
                 if (core.db.csOk(CS)) {
-                    tempgroup_Add = genericController.encodeInteger(core.db.csGetValue(CS, "ID"));
+                    tempgroup_Add = GenericController.encodeInteger(core.db.csGetValue(CS, "ID"));
                     core.db.csSet(CS, "name", iGroupName);
                     core.db.csSet(CS, "caption", iGroupCaption);
                     core.db.csSet(CS, "active", true);
@@ -316,7 +316,7 @@ namespace Contensive.Processor.Controllers {
             string iGroupName = null;
             DateTime iDateExpires = default(DateTime);
             //
-            iGroupName = genericController.encodeText(GroupName);
+            iGroupName = GenericController.encodeText(GroupName);
             iDateExpires = DateExpires;
             if (!string.IsNullOrEmpty(iGroupName)) {
                 GroupID = group_GetGroupID(core, iGroupName);
@@ -357,7 +357,7 @@ namespace Contensive.Processor.Controllers {
             int GroupID = 0;
             string iGroupName;
             //
-            iGroupName = genericController.encodeText(GroupName);
+            iGroupName = GenericController.encodeText(GroupName);
             //
             if (!string.IsNullOrEmpty(iGroupName)) {
                 GroupID = group_GetGroupID(core, iGroupName);
@@ -388,7 +388,7 @@ namespace Contensive.Processor.Controllers {
             GC.SuppressFinalize(this);
         }
         //
-        ~groupController() {
+        ~GroupController() {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(false);
             //todo  NOTE: The base class Finalize method is automatically called from the destructor:

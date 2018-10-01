@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor {
@@ -48,14 +48,19 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         /// <summary>
-        /// clear cacheDataSourceTag. A cache DataSource Tag is a tag that represents a source of data used to build a cache object, like a database table.
+        /// clear all cache entries related to all tables used by a comma delimited list of content.
         /// </summary>
         /// <param name="ContentNameList"></param>
         /// <remarks></remarks>
         public override void Clear(string ContentNameList) {
-            if (string.IsNullOrEmpty(ContentNameList)) {
-                foreach (var contentName in new List<string>(ContentNameList.Split(','))) {
-                    core.cache.invalidateAllInContent(contentName);
+            if (!string.IsNullOrEmpty(ContentNameList)) {
+                List<string> tableNameList = new List<string>();
+                foreach (var contentName in new List<string>(ContentNameList.ToLower().Split(','))) {
+                    string tableName = Models.Domain.CDefModel.getContentTablename(core, contentName).ToLower();
+                    if (!tableNameList.Contains(tableName)) {
+                        tableNameList.Add(tableName);
+                        core.cache.invalidateAllKeysInTable(tableName);
+                    }
                 }
             }
         }
@@ -99,7 +104,7 @@ namespace Contensive.Processor {
                     core.cache.setObject(key, Value, invalidationDate, invalidationTagList);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -113,19 +118,19 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override int getInteger(string key) {
-            return genericController.encodeInteger(getObject(key));
+            return GenericController.encodeInteger(getObject(key));
         }
         //
         //====================================================================================================
         //
         public override bool getBoolean(string key) {
-            return genericController.encodeBoolean(getObject(key));
+            return GenericController.encodeBoolean(getObject(key));
         }
         //
         //====================================================================================================
         //
         public override DateTime getDate(string key) {
-            return genericController.encodeDate(getObject(key));
+            return GenericController.encodeDate(getObject(key));
         }
         //
         //====================================================================================================
@@ -137,7 +142,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override string getText(string key) {
-            return genericController.encodeText(getObject(key));
+            return GenericController.encodeText(getObject(key));
         }
         //
         //====================================================================================================
@@ -176,7 +181,7 @@ namespace Contensive.Processor {
         /// <param name="value"></param>
         /// <param name="invalidationDate"></param>
         public override void setKey(string key, object value, DateTime invalidationDate) {
-            core.cache.setObject(key, value, invalidationDate, "");
+            core.cache.setObject(key, value, invalidationDate, new List<string> { });
         }
         //
         //====================================================================================================
@@ -211,11 +216,12 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override void setKey(string key, object Value, DateTime invalidationDate, string tag) {
-            core.cache.setObject(key, Value, invalidationDate, tag);
+            List<string> depKeyList = (string.IsNullOrWhiteSpace(tag) ? new List<string> { } : tag.Split(',').ToList());
+            core.cache.setObject(key, Value, invalidationDate, depKeyList);
         }
         //
         public override void InvalidateContentRecord(string contentName, int recordId) {
-            core.cache.invalidateContent_Entity(cp.core, contentName, recordId);
+            core.cache.invalidateDbRecord(recordId, Models.Domain.CDefModel.getContentTablename( core,  contentName));
         }
         #region  IDisposable Support 
         //

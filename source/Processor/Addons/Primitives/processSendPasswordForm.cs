@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Addons.Primitives {
@@ -28,7 +28,7 @@ namespace Contensive.Addons.Primitives {
             try {
                 CoreController core = ((CPClass)cp).core;
                 //
-                loginController.processFormSendPassword(core);
+                LoginController.processFormSendPassword(core);
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }

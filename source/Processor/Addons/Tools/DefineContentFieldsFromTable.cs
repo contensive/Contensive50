@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Addons.Tools {
@@ -39,7 +39,7 @@ namespace Contensive.Addons.Tools {
             string result = "";
             try {
                 string Button = core.docProperties.getText("Button");
-                stringBuilderLegacyController Stream = new stringBuilderLegacyController();
+                StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 //
                 Stream.Add(SpanClassAdminNormal + "<strong><A href=\"" + core.webServer.requestPage + "?af=" + AdminFormToolRoot + "\">Tools</A></strong></SPAN>");
                 Stream.Add(SpanClassAdminNormal + ":Create Content Fields from Table</SPAN>");
@@ -103,7 +103,7 @@ namespace Contensive.Addons.Tools {
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
                 //result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
             }
             return result;
         }

@@ -10,7 +10,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Controllers {
@@ -19,7 +19,7 @@ namespace Contensive.Processor.Controllers {
     /// <summary>
     /// static class controller
     /// </summary>
-    public class debugController : IDisposable {
+    public class DebugController : IDisposable {
         //
         //
         //========================================================================
@@ -43,7 +43,7 @@ namespace Contensive.Processor.Controllers {
                 if (logging) {
                     message = message.Replace("\r\n", " ").Replace("\r", " ").Replace("\n", " ");
                     message = (ElapsedTime).ToString("00.000") + "\t" + core.session.visit.id + "\t" + message;
-                    logController.logDebug(core, message);
+                    LogController.logDebug(core, message);
                 }
             }
         }
@@ -65,7 +65,7 @@ namespace Contensive.Processor.Controllers {
             GC.SuppressFinalize(this);
         }
         //
-        ~debugController() {
+        ~DebugController() {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(false);
             //todo  NOTE: The base class Finalize method is automatically called from the destructor:

@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 using Contensive.BaseClasses;
@@ -93,19 +93,19 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override string GetEditLink(string ContentName, string RecordID, bool AllowCut, string RecordName, bool IsEditing) {
-            return AdminUIController.getRecordEditLink(core,ContentName, genericController.encodeInteger(RecordID), AllowCut, RecordName, IsEditing);
+            return AdminUIController.getRecordEditLink(core,ContentName, GenericController.encodeInteger(RecordID), AllowCut, RecordName, IsEditing);
         }
         //
         //====================================================================================================
         //
         public override string GetLinkAliasByPageID(int PageID, string QueryStringSuffix, string DefaultLink) {
-            return linkAliasController.getLinkAlias(core, PageID, QueryStringSuffix, DefaultLink);
+            return LinkAliasController.getLinkAlias(core, PageID, QueryStringSuffix, DefaultLink);
         }
         //
         //====================================================================================================
         //
         public override string GetPageLink(int PageID, string QueryStringSuffix = "", bool AllowLinkAlias = true) {
-            return pageContentController.getPageLink(core, PageID, QueryStringSuffix, AllowLinkAlias, false);
+            return PageContentController.getPageLink(core, PageID, QueryStringSuffix, AllowLinkAlias, false);
         }
         //
         //====================================================================================================
@@ -147,13 +147,13 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override bool IsLocked(string ContentName, string RecordID) {
-            return core.workflow.isRecordLocked(ContentName, genericController.encodeInteger(RecordID), 0);
+            return core.workflow.isRecordLocked(ContentName, GenericController.encodeInteger(RecordID), 0);
         }
         //
         //====================================================================================================
         //
         public override bool IsChildContent(string ChildContentID, string ParentContentID) {
-            return Models.Domain.CDefModel.isWithinContent(cp.core, genericController.encodeInteger(ChildContentID), genericController.encodeInteger(ParentContentID));
+            return Models.Domain.CDefModel.isWithinContent(cp.core, GenericController.encodeInteger(ChildContentID), GenericController.encodeInteger(ParentContentID));
         }
         //
         //====================================================================================================
@@ -198,14 +198,14 @@ namespace Contensive.Processor {
         public override string getLayout(string layoutName) {
             string result = "";
             try {
-                csController cs = new csController(core);
+                CsController cs = new CsController(core);
                 cs.open("layouts", "name=" + cp.Db.EncodeSQLText(layoutName), "id", false, "layout");
                 if (cs.ok()) {
                     result = cs.getText("layout");
                 }
                 cs.close();
             } catch (Exception ex) {
-                logController.handleError( core,ex); // "Unexpected error in getLayout")
+                LogController.handleError( core,ex); // "Unexpected error in getLayout")
                 throw;
             }
             return result;
@@ -216,14 +216,14 @@ namespace Contensive.Processor {
         public override int AddRecord(string ContentName, string recordName) {
             int recordId = 0;
             try {
-                csController cs = new csController(core);
+                CsController cs = new CsController(core);
                 if (cs.insert(ContentName)) {
                     cs.setField("name", recordName);
                     recordId = cs.getInteger("id");
                 }
                 cs.close();
             } catch (Exception ex) {
-                logController.handleError( core,ex); // "Unexpected error in AddRecord")
+                LogController.handleError( core,ex); // "Unexpected error in AddRecord")
                 throw;
             }
             return recordId;
@@ -238,13 +238,13 @@ namespace Contensive.Processor {
         public override int AddRecord(string ContentName) {
             int recordId = 0;
             try {
-                csController cs = new csController(core);
+                CsController cs = new CsController(core);
                 if (cs.insert(ContentName)) {
                     recordId = cs.getInteger("id");
                 }
                 cs.close();
             } catch (Exception ex) {
-                logController.handleError( core,ex); // "Unexpected error in AddRecord")
+                LogController.handleError( core,ex); // "Unexpected error in AddRecord")
                 throw;
             }
             return recordId;

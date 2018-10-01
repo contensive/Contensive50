@@ -11,60 +11,60 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Models.Db {
-    public class sortMethodModel : BaseModel {
+    public class SortMethodModel : BaseModel {
         //
         //====================================================================================================
         //-- const
         public const string contentName = "sort methods";
         public const string contentTableName = "ccSortMethods";
-        private const string contentDataSource = "default";
+        public const string contentDataSource = "default";
         //
         //====================================================================================================
         // -- instance properties
         public string OrderByClause { get; set; }
         //
         //====================================================================================================
-        public static sortMethodModel add(CoreController core) {
-            return add<sortMethodModel>(core);
+        public static SortMethodModel add(CoreController core) {
+            return add<SortMethodModel>(core);
         }
         //
         //====================================================================================================
-        public static sortMethodModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<sortMethodModel>(core, ref callersCacheNameList);
+        public static SortMethodModel add(CoreController core, ref List<string> callersCacheNameList) {
+            return add<SortMethodModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static sortMethodModel create(CoreController core, int recordId) {
-            return create<sortMethodModel>(core, recordId);
+        public static SortMethodModel create(CoreController core, int recordId) {
+            return create<SortMethodModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static sortMethodModel create(CoreController core, int recordId, ref List<string> callersCacheNameList) {
-            return create<sortMethodModel>(core, recordId, ref callersCacheNameList);
+        public static SortMethodModel create(CoreController core, int recordId, ref List<string> callersCacheNameList) {
+            return create<SortMethodModel>(core, recordId, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static sortMethodModel create(CoreController core, string recordGuid) {
-            return create<sortMethodModel>(core, recordGuid);
+        public static SortMethodModel create(CoreController core, string recordGuid) {
+            return create<SortMethodModel>(core, recordGuid);
         }
         //
         //====================================================================================================
-        public static sortMethodModel create(CoreController core, string recordGuid, ref List<string> callersCacheNameList) {
-            return create<sortMethodModel>(core, recordGuid, ref callersCacheNameList);
+        public static SortMethodModel create(CoreController core, string recordGuid, ref List<string> callersCacheNameList) {
+            return create<SortMethodModel>(core, recordGuid, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static sortMethodModel createByName(CoreController core, string recordName) {
-            return createByName<sortMethodModel>(core, recordName);
+        public static SortMethodModel createByName(CoreController core, string recordName) {
+            return createByName<SortMethodModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static sortMethodModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<sortMethodModel>(core, recordName, ref callersCacheNameList);
+        public static SortMethodModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByName<SortMethodModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================
@@ -74,52 +74,62 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static void delete(CoreController core, int recordId) {
-            delete<sortMethodModel>(core, recordId);
+            delete<SortMethodModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static void delete(CoreController core, string ccGuid) {
-            delete<sortMethodModel>(core, ccGuid);
+            delete<SortMethodModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static List<sortMethodModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
-            return createList<sortMethodModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
+        public static List<SortMethodModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
+            return createList<SortMethodModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static List<sortMethodModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy) {
-            return createList<sortMethodModel>(core, sqlCriteria, sqlOrderBy);
+        public static List<SortMethodModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy) {
+            return createList<SortMethodModel>(core, sqlCriteria, sqlOrderBy);
         }
         //
         //====================================================================================================
-        public static List<sortMethodModel> createList(CoreController core, string sqlCriteria) {
-            return createList<sortMethodModel>(core, sqlCriteria);
+        public static List<SortMethodModel> createList(CoreController core, string sqlCriteria) {
+            return createList<SortMethodModel>(core, sqlCriteria);
         }
         //
         //====================================================================================================
         public void invalidateCacheSingleRecord(CoreController core, int recordId) {
-            invalidateCache<sortMethodModel>(core, recordId);
+            invalidateRecordCache<SortMethodModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return BaseModel.getRecordName<sortMethodModel>(core, recordId);
+            return BaseModel.getRecordName<SortMethodModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return BaseModel.getRecordName<sortMethodModel>(core, ccGuid);
+            return BaseModel.getRecordName<SortMethodModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return BaseModel.getRecordId<sortMethodModel>(core, ccGuid);
+            return BaseModel.getRecordId<SortMethodModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static sortMethodModel createDefault(CoreController core) {
-            return createDefault<sortMethodModel>(core);
+        public static SortMethodModel createDefault(CoreController core) {
+            return createDefault<SortMethodModel>(core);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Return a cache key used to represent the table. ONLY used for invalidation. Add this as a dependent key if you want that key cleared when ANY record in the table is changed.
+        /// </summary>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        public static string getTableInvalidationKey(CoreController core) {
+            return getTableCacheKey<SortMethodModel>(core);
         }
     }
 }

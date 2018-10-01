@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 using System.Net;
@@ -20,7 +20,7 @@ using System.Threading;
 
 namespace Contensive.Processor.Controllers {
     //
-    public class ipDaemonController {
+    public class IpDaemonController {
         //
         private dynamic cmdCallbackObject;
         private int cmdListenPort;

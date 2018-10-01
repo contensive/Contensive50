@@ -11,13 +11,13 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Controllers {
     //
     [Serializable()]
-    public class keyPtrController {
+    public class KeyPtrController {
         //
         // new serializable and deserialize
         //   declare a private instance of a class that holds everything
@@ -107,7 +107,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 ArrayPointer = -1;
                 if (store.ArrayCount > 0) {
-                    UcaseTargetKey = genericController.vbReplace(Key.ToUpper(), "\r\n", "");
+                    UcaseTargetKey = GenericController.vbReplace(Key.ToUpper(), "\r\n", "");
                     LowGuess = -1;
                     HighGuess = store.ArrayCount - 1;
                     while ((HighGuess - LowGuess) > 1) {
@@ -145,7 +145,7 @@ namespace Contensive.Processor.Controllers {
                 bool MatchFound = false;
                 string UcaseKey = null;
                 //
-                UcaseKey = genericController.vbReplace(Key.ToUpper(), "\r\n", "");
+                UcaseKey = GenericController.vbReplace(Key.ToUpper(), "\r\n", "");
                 store.ArrayPointer = GetArrayPointer(Key);
                 if (store.ArrayPointer > -1) {
                     MatchFound = true;
@@ -158,7 +158,7 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                     store.ArrayPointer = store.ArrayPointer + 1;
-                    returnKey = genericController.encodeInteger(store.PointerArray[store.ArrayPointer]);
+                    returnKey = GenericController.encodeInteger(store.PointerArray[store.ArrayPointer]);
                 }
             } catch (Exception ex) {
                 throw new indexException("GetPointer error", ex);
@@ -176,7 +176,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 string keyToSave;
                 //
-                keyToSave = genericController.vbReplace(Key.ToUpper(), "\r\n", "");
+                keyToSave = GenericController.vbReplace(Key.ToUpper(), "\r\n", "");
                 //
                 if (store.ArrayCount >= store.ArraySize) {
                     store.ArraySize = store.ArraySize + KeyPointerArrayChunk;
@@ -205,9 +205,9 @@ namespace Contensive.Processor.Controllers {
                 //
                 if (store.ArrayPointer < (store.ArrayCount - 1)) {
                     store.ArrayPointer = store.ArrayPointer + 1;
-                    UcaseKey = genericController.vbUCase(Key);
+                    UcaseKey = GenericController.vbUCase(Key);
                     if (store.UcaseKeyArray[store.ArrayPointer] == UcaseKey) {
-                        nextPointerMatch = genericController.encodeInteger(store.PointerArray[store.ArrayPointer]);
+                        nextPointerMatch = GenericController.encodeInteger(store.PointerArray[store.ArrayPointer]);
                     } else {
                         store.ArrayPointer = store.ArrayPointer - 1;
                     }
@@ -233,7 +233,7 @@ namespace Contensive.Processor.Controllers {
                 // GetFirstPointer = -1
                 if (store.ArrayCount > 0) {
                     store.ArrayPointer = 0;
-                    firstPointer = genericController.encodeInteger(store.PointerArray[store.ArrayPointer]);
+                    firstPointer = GenericController.encodeInteger(store.PointerArray[store.ArrayPointer]);
                 }
                 //
             } catch (Exception ex) {
@@ -257,7 +257,7 @@ namespace Contensive.Processor.Controllers {
                 //nextPointer = -1
                 if ((store.ArrayPointer + 1) < store.ArrayCount) {
                     store.ArrayPointer = store.ArrayPointer + 1;
-                    nextPointer = genericController.encodeInteger(store.PointerArray[store.ArrayPointer]);
+                    nextPointer = GenericController.encodeInteger(store.PointerArray[store.ArrayPointer]);
                 }
             } catch (Exception ex) {
                 throw new indexException("GetPointer error", ex);

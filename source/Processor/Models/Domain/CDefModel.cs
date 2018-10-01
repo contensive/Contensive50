@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Models.Domain {
@@ -236,7 +236,7 @@ namespace Contensive.Processor.Models.Domain {
                 if (dt.Rows.Count == 0) {
                     _childIdList = new List<int>();
                     foreach (DataRow parentrow in dt.Rows) {
-                        _childIdList.Add(genericController.encodeInteger( parentrow[0]));
+                        _childIdList.Add(GenericController.encodeInteger( parentrow[0]));
                     }
                 }
                 dt.Dispose();
@@ -324,26 +324,26 @@ namespace Contensive.Processor.Models.Domain {
                         //
                         string contentName = null;
                         DataRow row = dt.Rows[0];
-                        contentName = encodeText(genericController.encodeText(row[1])).Trim(' ');
-                        string contentTablename = genericController.encodeText(row[10]);
+                        contentName = encodeText(GenericController.encodeText(row[1])).Trim(' ');
+                        string contentTablename = GenericController.encodeText(row[10]);
                         result.name = contentName;
                         result.id = contentId;
-                        result.allowAdd = genericController.encodeBoolean(row[3]);
-                        result.developerOnly = genericController.encodeBoolean(row[4]);
-                        result.adminOnly = genericController.encodeBoolean(row[5]);
-                        result.allowDelete = genericController.encodeBoolean(row[6]);
-                        result.parentID = genericController.encodeInteger(row[7]);
-                        result.dropDownFieldList = genericController.vbUCase(genericController.encodeText(row[9]));
-                        result.contentTableName = genericController.encodeText(contentTablename);
+                        result.allowAdd = GenericController.encodeBoolean(row[3]);
+                        result.developerOnly = GenericController.encodeBoolean(row[4]);
+                        result.adminOnly = GenericController.encodeBoolean(row[5]);
+                        result.allowDelete = GenericController.encodeBoolean(row[6]);
+                        result.parentID = GenericController.encodeInteger(row[7]);
+                        result.dropDownFieldList = GenericController.vbUCase(GenericController.encodeText(row[9]));
+                        result.contentTableName = GenericController.encodeText(contentTablename);
                         result.contentDataSourceName = "default";
-                        result.allowCalendarEvents = genericController.encodeBoolean(row[15]);
-                        result.defaultSortMethod = genericController.encodeText(row[17]);
+                        result.allowCalendarEvents = GenericController.encodeBoolean(row[15]);
+                        result.defaultSortMethod = GenericController.encodeText(row[17]);
                         if (string.IsNullOrEmpty(result.defaultSortMethod)) {
                             result.defaultSortMethod = "name";
                         }
-                        result.editorGroupName = genericController.encodeText(row[18]);
-                        result.allowContentTracking = genericController.encodeBoolean(row[19]);
-                        result.allowTopicRules = genericController.encodeBoolean(row[20]);
+                        result.editorGroupName = GenericController.encodeText(row[18]);
+                        result.allowContentTracking = GenericController.encodeBoolean(row[19]);
+                        result.allowTopicRules = GenericController.encodeBoolean(row[20]);
                         // .AllowMetaContent = genericController.EncodeBoolean(row[21])
                         //
                         result.activeOnly = true;
@@ -446,8 +446,8 @@ namespace Contensive.Processor.Models.Domain {
                             List<string> usedFields = new List<string>();
                             foreach (DataRow rowWithinLoop in dt.Rows) {
                                 row = rowWithinLoop;
-                                string fieldName = genericController.encodeText(rowWithinLoop[13]);
-                                int fieldId = genericController.encodeInteger(rowWithinLoop[12]);
+                                string fieldName = GenericController.encodeText(rowWithinLoop[13]);
+                                int fieldId = GenericController.encodeInteger(rowWithinLoop[12]);
                                 string fieldNameLower = fieldName.ToLower();
                                 bool skipDuplicateField = false;
                                 if (usedFields.Contains(fieldNameLower)) {
@@ -478,15 +478,15 @@ namespace Contensive.Processor.Models.Domain {
                                     }
                                     Models.Domain.CDefFieldModel field = new Models.Domain.CDefFieldModel();
                                     int fieldIndexColumn = -1;
-                                    int fieldTypeId = genericController.encodeInteger(rowWithinLoop[15]);
-                                    if (genericController.encodeText(rowWithinLoop[4]) != "") {
-                                        fieldIndexColumn = genericController.encodeInteger(rowWithinLoop[4]);
+                                    int fieldTypeId = GenericController.encodeInteger(rowWithinLoop[15]);
+                                    if (GenericController.encodeText(rowWithinLoop[4]) != "") {
+                                        fieldIndexColumn = GenericController.encodeInteger(rowWithinLoop[4]);
                                     }
                                     //
                                     // translate htmlContent to fieldtypehtml
                                     //   this is also converted in upgrade, daily housekeep, addon install
                                     //
-                                    bool fieldHtmlContent = genericController.encodeBoolean(rowWithinLoop[25]);
+                                    bool fieldHtmlContent = GenericController.encodeBoolean(rowWithinLoop[25]);
                                     if (fieldHtmlContent) {
                                         if (fieldTypeId == FieldTypeIdLongText) {
                                             fieldTypeId = FieldTypeIdHTML;
@@ -494,55 +494,55 @@ namespace Contensive.Processor.Models.Domain {
                                             fieldTypeId = FieldTypeIdFileHTML;
                                         }
                                     }
-                                    field.active = genericController.encodeBoolean(rowWithinLoop[24]);
-                                    field.adminOnly = genericController.encodeBoolean(rowWithinLoop[8]);
-                                    field.authorable = genericController.encodeBoolean(rowWithinLoop[27]);
-                                    field.blockAccess = genericController.encodeBoolean(rowWithinLoop[38]);
-                                    field.caption = genericController.encodeText(rowWithinLoop[16]);
+                                    field.active = GenericController.encodeBoolean(rowWithinLoop[24]);
+                                    field.adminOnly = GenericController.encodeBoolean(rowWithinLoop[8]);
+                                    field.authorable = GenericController.encodeBoolean(rowWithinLoop[27]);
+                                    field.blockAccess = GenericController.encodeBoolean(rowWithinLoop[38]);
+                                    field.caption = GenericController.encodeText(rowWithinLoop[16]);
                                     field.dataChanged = false;
                                     //.Changed
                                     field.contentId = contentId;
-                                    field.defaultValue = genericController.encodeText(rowWithinLoop[22]);
-                                    field.developerOnly = genericController.encodeBoolean(rowWithinLoop[0]);
-                                    field.editSortPriority = genericController.encodeInteger(rowWithinLoop[10]);
-                                    field.editTabName = genericController.encodeText(rowWithinLoop[34]);
+                                    field.defaultValue = GenericController.encodeText(rowWithinLoop[22]);
+                                    field.developerOnly = GenericController.encodeBoolean(rowWithinLoop[0]);
+                                    field.editSortPriority = GenericController.encodeInteger(rowWithinLoop[10]);
+                                    field.editTabName = GenericController.encodeText(rowWithinLoop[34]);
                                     field.fieldTypeId = fieldTypeId;
                                     field.htmlContent = fieldHtmlContent;
                                     field.id = fieldId;
                                     field.indexColumn = fieldIndexColumn;
-                                    field.indexSortDirection = genericController.encodeInteger(rowWithinLoop[7]);
-                                    field.indexSortOrder = genericController.encodeInteger(rowWithinLoop[6]);
-                                    field.indexWidth = genericController.encodeText(genericController.encodeInteger(genericController.encodeText(rowWithinLoop[5]).Replace("%", "")));
+                                    field.indexSortDirection = GenericController.encodeInteger(rowWithinLoop[7]);
+                                    field.indexSortOrder = GenericController.encodeInteger(rowWithinLoop[6]);
+                                    field.indexWidth = GenericController.encodeText(GenericController.encodeInteger(GenericController.encodeText(rowWithinLoop[5]).Replace("%", "")));
                                     field.inherited = false;
-                                    field.installedByCollectionGuid = genericController.encodeText(rowWithinLoop[39]);
-                                    field.isBaseField = genericController.encodeBoolean(rowWithinLoop[38]);
+                                    field.installedByCollectionGuid = GenericController.encodeText(rowWithinLoop[39]);
+                                    field.isBaseField = GenericController.encodeBoolean(rowWithinLoop[38]);
                                     field.isModifiedSinceInstalled = false;
-                                    field.lookupContentID = genericController.encodeInteger(rowWithinLoop[18]);
+                                    field.lookupContentID = GenericController.encodeInteger(rowWithinLoop[18]);
                                     //.lookupContentName = ""
-                                    field.lookupList = genericController.encodeText(rowWithinLoop[37]);
-                                    field.manyToManyContentID = genericController.encodeInteger(rowWithinLoop[28]);
-                                    field.manyToManyRuleContentID = genericController.encodeInteger(rowWithinLoop[29]);
-                                    field.ManyToManyRulePrimaryField = genericController.encodeText(rowWithinLoop[30]);
-                                    field.ManyToManyRuleSecondaryField = genericController.encodeText(rowWithinLoop[31]);
-                                    field.memberSelectGroupId_set( core, genericController.encodeInteger(rowWithinLoop[36]));
+                                    field.lookupList = GenericController.encodeText(rowWithinLoop[37]);
+                                    field.manyToManyContentID = GenericController.encodeInteger(rowWithinLoop[28]);
+                                    field.manyToManyRuleContentID = GenericController.encodeInteger(rowWithinLoop[29]);
+                                    field.ManyToManyRulePrimaryField = GenericController.encodeText(rowWithinLoop[30]);
+                                    field.ManyToManyRuleSecondaryField = GenericController.encodeText(rowWithinLoop[31]);
+                                    field.memberSelectGroupId_set( core, GenericController.encodeInteger(rowWithinLoop[36]));
                                     field.nameLc = fieldNameLower;
-                                    field.notEditable = genericController.encodeBoolean(rowWithinLoop[26]);
-                                    field.password = genericController.encodeBoolean(rowWithinLoop[3]);
-                                    field.readOnly = genericController.encodeBoolean(rowWithinLoop[17]);
-                                    field.redirectContentID = genericController.encodeInteger(rowWithinLoop[19]);
+                                    field.notEditable = GenericController.encodeBoolean(rowWithinLoop[26]);
+                                    field.password = GenericController.encodeBoolean(rowWithinLoop[3]);
+                                    field.readOnly = GenericController.encodeBoolean(rowWithinLoop[17]);
+                                    field.redirectContentID = GenericController.encodeInteger(rowWithinLoop[19]);
                                     //.RedirectContentName(core) = ""
-                                    field.redirectID = genericController.encodeText(rowWithinLoop[21]);
-                                    field.redirectPath = genericController.encodeText(rowWithinLoop[20]);
-                                    field.required = genericController.encodeBoolean(rowWithinLoop[14]);
-                                    field.RSSTitleField = genericController.encodeBoolean(rowWithinLoop[32]);
-                                    field.RSSDescriptionField = genericController.encodeBoolean(rowWithinLoop[33]);
-                                    field.Scramble = genericController.encodeBoolean(rowWithinLoop[35]);
-                                    field.textBuffered = genericController.encodeBoolean(rowWithinLoop[2]);
-                                    field.uniqueName = genericController.encodeBoolean(rowWithinLoop[1]);
+                                    field.redirectID = GenericController.encodeText(rowWithinLoop[21]);
+                                    field.redirectPath = GenericController.encodeText(rowWithinLoop[20]);
+                                    field.required = GenericController.encodeBoolean(rowWithinLoop[14]);
+                                    field.RSSTitleField = GenericController.encodeBoolean(rowWithinLoop[32]);
+                                    field.RSSDescriptionField = GenericController.encodeBoolean(rowWithinLoop[33]);
+                                    field.Scramble = GenericController.encodeBoolean(rowWithinLoop[35]);
+                                    field.textBuffered = GenericController.encodeBoolean(rowWithinLoop[2]);
+                                    field.uniqueName = GenericController.encodeBoolean(rowWithinLoop[1]);
                                     //.ValueVariant
                                     //
-                                    field.helpCustom = genericController.encodeText(rowWithinLoop[41]);
-                                    field.helpDefault = genericController.encodeText(rowWithinLoop[40]);
+                                    field.helpCustom = GenericController.encodeText(rowWithinLoop[41]);
+                                    field.helpDefault = GenericController.encodeText(rowWithinLoop[40]);
                                     if (string.IsNullOrEmpty(field.helpCustom)) {
                                         field.helpMessage = field.helpDefault;
                                     } else {
@@ -571,7 +571,7 @@ namespace Contensive.Processor.Models.Domain {
                     setCache(core, contentId, result);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -590,13 +590,13 @@ namespace Contensive.Processor.Models.Domain {
                     foreach (KeyValuePair<string, Models.Domain.CDefFieldModel> keyValuePair in cdef.fields) {
                         Models.Domain.CDefFieldModel field = keyValuePair.Value;
                         FieldActive = field.active;
-                        FieldWidth = genericController.encodeInteger(field.indexWidth);
+                        FieldWidth = GenericController.encodeInteger(field.indexWidth);
                         if (FieldActive && (FieldWidth > 0)) {
                             FieldWidthTotal = FieldWidthTotal + FieldWidth;
                             adminColumn = new Models.Domain.CDefModel.CDefAdminColumnClass();
                             adminColumn.Name = field.nameLc;
                             adminColumn.SortDirection = field.indexSortDirection;
-                            adminColumn.SortPriority = genericController.encodeInteger(field.indexSortOrder);
+                            adminColumn.SortPriority = GenericController.encodeInteger(field.indexSortOrder);
                             adminColumn.Width = FieldWidth;
                             FieldWidthTotal = FieldWidthTotal + adminColumn.Width;
                             string key = (cnt + (adminColumn.SortPriority * 1000)).ToString().PadLeft(6, '0');
@@ -633,7 +633,7 @@ namespace Contensive.Processor.Models.Domain {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -651,7 +651,7 @@ namespace Contensive.Processor.Models.Domain {
                     returnId = core.doc.contentNameIdDictionary[contentName.ToLower()];
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnId;
@@ -671,7 +671,7 @@ namespace Contensive.Processor.Models.Domain {
                     returnCdef = getCdef(core, ContentId);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnCdef;
@@ -703,7 +703,7 @@ namespace Contensive.Processor.Models.Domain {
                     core.doc.cdefDictionary.Add(contentId.ToString(), returnCdef);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnCdef;
@@ -745,7 +745,7 @@ namespace Contensive.Processor.Models.Domain {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnCriteria;
@@ -780,7 +780,7 @@ namespace Contensive.Processor.Models.Domain {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnOK;
@@ -813,7 +813,7 @@ namespace Contensive.Processor.Models.Domain {
                 cidDataTable = core.db.executeQuery(SQL);
                 CIDCount = cidDataTable.Rows.Count;
                 for (CIDPointer = 0; CIDPointer < CIDCount; CIDPointer++) {
-                    ContentID = genericController.encodeInteger(cidDataTable.Rows[CIDPointer][0]);
+                    ContentID = GenericController.encodeInteger(cidDataTable.Rows[CIDPointer][0]);
                     returnList.Add(ContentID);
                     CDef = getCdef(core, ContentID);
                     if (CDef != null) {
@@ -821,7 +821,7 @@ namespace Contensive.Processor.Models.Domain {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnList;
@@ -852,7 +852,7 @@ namespace Contensive.Processor.Models.Domain {
                 SQL = "select ID from ccContent where name=" + core.db.encodeSQLText(ChildContentName) + ";";
                 rs = core.db.executeQuery(SQL);
                 if (DbController.isDataTableOk(rs)) {
-                    ChildContentID = genericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "ID"));
+                    ChildContentID = GenericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "ID"));
                     //
                     // mark the record touched so upgrade will not delete it
                     //
@@ -866,7 +866,7 @@ namespace Contensive.Processor.Models.Domain {
                     SQL = "select ID from ccContent where name=" + core.db.encodeSQLText(ParentContentName) + ";";
                     rs = core.db.executeQuery(SQL, DataSourceName);
                     if (DbController.isDataTableOk(rs)) {
-                        ParentContentID = genericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "ID"));
+                        ParentContentID = GenericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "ID"));
                         //
                         // mark the record touched so upgrade will not delete it
                         //
@@ -897,7 +897,7 @@ namespace Contensive.Processor.Models.Domain {
                                     DateNow = DateTime.Now;
                                     for (var FieldPointer = 0; FieldPointer <= Fields.GetUpperBound(0); FieldPointer++) {
                                         FieldName = Fields[FieldPointer];
-                                        switch (genericController.vbUCase(FieldName)) {
+                                        switch (GenericController.vbUCase(FieldName)) {
                                             case "ID":
                                                 // do nothing
                                                 break;
@@ -940,7 +940,7 @@ namespace Contensive.Processor.Models.Domain {
                 core.cache.invalidateAll();
                 core.doc.clearMetaData();
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
         }
         //
@@ -958,7 +958,7 @@ namespace Contensive.Processor.Models.Domain {
                     returnTableName = CDef.contentTableName;
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnTableName;
@@ -979,7 +979,7 @@ namespace Contensive.Processor.Models.Domain {
                     returnDataSource = CDef.contentDataSourceName;
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnDataSource;
@@ -1000,7 +1000,7 @@ namespace Contensive.Processor.Models.Domain {
                     returnName = cdef.name;
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnName;
@@ -1015,7 +1015,7 @@ namespace Contensive.Processor.Models.Domain {
             int returnContentId = 0;
             try {
                 //
-                logController.logTrace(core, "addContent, contentName [" + contentName + "], tableName [" + TableName + "]");
+                LogController.logTrace(core, "addContent, contentName [" + contentName + "], tableName [" + TableName + "]");
                 //
                 bool ContentIsBaseContent = false;
                 string NewGuid = null;
@@ -1042,7 +1042,7 @@ namespace Contensive.Processor.Models.Domain {
                         //
                         // Create the SQL table
                         //
-                        core.db.createSQLTable(datasource.Name, TableName);
+                        core.db.createSQLTable(datasource.name, TableName);
                         //
                         // Check for a Content Definition
                         //
@@ -1056,9 +1056,9 @@ namespace Contensive.Processor.Models.Domain {
                         SQL = "select ID,ccguid,IsBaseContent from ccContent where (name=" + core.db.encodeSQLText(contentName) + ") order by id;";
                         dt = core.db.executeQuery(SQL);
                         if (dt.Rows.Count > 0) {
-                            returnContentId = genericController.encodeInteger(dt.Rows[0]["ID"]);
-                            LcContentGuid = genericController.vbLCase(genericController.encodeText(dt.Rows[0]["ccguid"]));
-                            ContentIsBaseContent = genericController.encodeBoolean(dt.Rows[0]["IsBaseContent"]);
+                            returnContentId = GenericController.encodeInteger(dt.Rows[0]["ID"]);
+                            LcContentGuid = GenericController.vbLCase(GenericController.encodeText(dt.Rows[0]["ccguid"]));
+                            ContentIsBaseContent = GenericController.encodeBoolean(dt.Rows[0]["IsBaseContent"]);
                         }
                         dt.Dispose();
                         //
@@ -1071,7 +1071,7 @@ namespace Contensive.Processor.Models.Domain {
                             SQL = "select ID from ccContent where (name='content') order by id;";
                             dt = core.db.executeQuery(SQL);
                             if (dt.Rows.Count > 0) {
-                                ContentIDofContent = genericController.encodeInteger(dt.Rows[0]["ID"]);
+                                ContentIDofContent = GenericController.encodeInteger(dt.Rows[0]["ID"]);
                             }
                             dt.Dispose();
                         }
@@ -1082,7 +1082,7 @@ namespace Contensive.Processor.Models.Domain {
                             SQL = "select id from ccContent where (name=" + core.db.encodeSQLText(ParentName) + ") order by id;";
                             dt = core.db.executeQuery(SQL);
                             if (dt.Rows.Count > 0) {
-                                parentId = genericController.encodeInteger(dt.Rows[0][0]);
+                                parentId = GenericController.encodeInteger(dt.Rows[0][0]);
                             }
                             dt.Dispose();
                         }
@@ -1094,7 +1094,7 @@ namespace Contensive.Processor.Models.Domain {
                             SQL = "select id from ccAddonCollections where ccGuid=" + core.db.encodeSQLText(installedByCollectionGuid);
                             dt = core.db.executeQuery(SQL);
                             if (dt.Rows.Count > 0) {
-                                InstalledByCollectionID = genericController.encodeInteger(dt.Rows[0]["ID"]);
+                                InstalledByCollectionID = GenericController.encodeInteger(dt.Rows[0]["ID"]);
                             }
                         }
                         //
@@ -1119,7 +1119,7 @@ namespace Contensive.Processor.Models.Domain {
                             dt = core.db.executeQuery(SQL);
                             if (dt.Rows.Count <= 0) {
                                 //
-                                logController.logTrace(core, "addContent, create ccTable record, tableName [" + TableName + "]");
+                                LogController.logTrace(core, "addContent, create ccTable record, tableName [" + TableName + "]");
                                 //
                                 //
                                 // ----- no table definition found, create one
@@ -1139,12 +1139,12 @@ namespace Contensive.Processor.Models.Domain {
                                 sqlList = new SqlFieldListClass();
                                 sqlList.add("name", core.db.encodeSQLText(TableName));
                                 sqlList.add("active", SQLTrue);
-                                sqlList.add("DATASOURCEID", core.db.encodeSQLNumber(datasource.ID));
+                                sqlList.add("DATASOURCEID", core.db.encodeSQLNumber(datasource.id));
                                 sqlList.add("CONTENTCONTROLID", core.db.encodeSQLNumber(Models.Domain.CDefModel.getContentId(core, "Tables")));
                                 //
                                 core.db.updateTableRecord("Default", "ccTables", "ID=" + TableID, sqlList);
                             } else {
-                                TableID = genericController.encodeInteger(dt.Rows[0]["ID"]);
+                                TableID = GenericController.encodeInteger(dt.Rows[0]["ID"]);
                             }
                             //
                             // ----- Get Sort Method ID from SortMethod
@@ -1158,7 +1158,7 @@ namespace Contensive.Processor.Models.Domain {
                             } else {
                                 dt = core.db.openTable("Default", "ccSortMethods", "(name=" + core.db.encodeSQLText(iDefaultSortMethod) + ")and(active<>0)", "ID", "ID", 1, 1);
                                 if (dt.Rows.Count > 0) {
-                                    DefaultSortMethodID = genericController.encodeInteger(dt.Rows[0]["ID"]);
+                                    DefaultSortMethodID = GenericController.encodeInteger(dt.Rows[0]["ID"]);
                                 }
                             }
                             if (DefaultSortMethodID == 0) {
@@ -1167,7 +1167,7 @@ namespace Contensive.Processor.Models.Domain {
                                 //
                                 dt = core.db.openTable("Default", "ccSortMethods", "(OrderByClause=" + core.db.encodeSQLText(iDefaultSortMethod) + ")and(active<>0)", "ID", "ID", 1, 1);
                                 if (dt.Rows.Count > 0) {
-                                    DefaultSortMethodID = genericController.encodeInteger(dt.Rows[0]["ID"]);
+                                    DefaultSortMethodID = GenericController.encodeInteger(dt.Rows[0]["ID"]);
                                 }
                             }
                             //
@@ -1211,11 +1211,11 @@ namespace Contensive.Processor.Models.Domain {
                                 // if the new guid does no match te old guid
                                 //
                                 sqlList.add("ccGuid", core.db.encodeSQLText(NewGuid));
-                            } else if ((!string.IsNullOrEmpty(NewGuid)) & (LcContentGuid != genericController.vbLCase(NewGuid))) {
+                            } else if ((!string.IsNullOrEmpty(NewGuid)) & (LcContentGuid != GenericController.vbLCase(NewGuid))) {
                                 //
                                 // installing content definition with matching name, but different guid -- this is an error that needs to be fixed
                                 //
-                                logController.handleError( core,new ApplicationException("createContent call, content.name match found but content.ccGuid did not, name [" + contentName + "], newGuid [" + NewGuid + "], installedGuid [" + LcContentGuid + "] "));
+                                LogController.handleError( core,new ApplicationException("createContent call, content.name match found but content.ccGuid did not, name [" + contentName + "], newGuid [" + NewGuid + "], installedGuid [" + LcContentGuid + "] "));
                             }
                             core.db.updateTableRecord("Default", "ccContent", "ID=" + returnContentId, sqlList);
                             //
@@ -1384,15 +1384,15 @@ namespace Contensive.Processor.Models.Domain {
                             // ----- Load CDef
                             //
                             if (clearMetaCache) {
-                                core.cache.invalidateAllInContent(Models.Db.ContentModel.contentName.ToLower());
-                                core.cache.invalidateAllInContent(Models.Db.ContentFieldModel.contentName.ToLower());
+                                ContentModel.invalidateTableCache(core);
+                                ContentFieldModel.invalidateTableCache(core);
                                 core.doc.clearMetaData();
                             }
                         }
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnContentId;
@@ -1473,8 +1473,8 @@ namespace Contensive.Processor.Models.Domain {
                 SQL = "select ID,ContentTableID from ccContent where name=" + core.db.encodeSQLText(ContentName) + ";";
                 rs = core.db.executeQuery(SQL);
                 if (DbController.isDataTableOk(rs)) {
-                    ContentID = genericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "ID"));
-                    TableID = genericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "ContentTableID"));
+                    ContentID = GenericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "ID"));
+                    TableID = GenericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "ContentTableID"));
                 }
                 //
                 // test if field definition found or not
@@ -1485,8 +1485,8 @@ namespace Contensive.Processor.Models.Domain {
                 rs = core.db.executeQuery(SQL);
                 if (DbController.isDataTableOk(rs)) {
                     isNewFieldRecord = false;
-                    RecordID = genericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "ID"));
-                    RecordIsBaseField = genericController.encodeBoolean(core.db.getDataRowColumnName(rs.Rows[0], "IsBaseField"));
+                    RecordID = GenericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "ID"));
+                    RecordIsBaseField = GenericController.encodeBoolean(core.db.getDataRowColumnName(rs.Rows[0], "IsBaseField"));
                 }
                 //
                 // check if this is a non-base field updating a base field
@@ -1496,7 +1496,7 @@ namespace Contensive.Processor.Models.Domain {
                     //
                     // This update is not allowed
                     //
-                    logController.handleWarn( core,new ApplicationException("Warning, updating non-base field with base field, content [" + ContentName + "], field [" + field.nameLc + "]"));
+                    LogController.handleWarn( core,new ApplicationException("Warning, updating non-base field with base field, content [" + ContentName + "], field [" + field.nameLc + "]"));
                 }
                 if (true) {
                     //FieldAdminOnly = field.adminOnly
@@ -1506,7 +1506,7 @@ namespace Contensive.Processor.Models.Domain {
                     FieldReadOnly = field.readOnly;
                     fieldTypeId = field.fieldTypeId;
                     FieldAuthorable = field.authorable;
-                    DefaultValue = genericController.encodeText(field.defaultValue);
+                    DefaultValue = GenericController.encodeText(field.defaultValue);
                     NotEditable = field.notEditable;
                     LookupContentName = field.get_lookupContentName(core);
                     AdminIndexWidth = field.indexWidth;
@@ -1552,8 +1552,8 @@ namespace Contensive.Processor.Models.Domain {
                         if (!DbController.isDataTableOk(rs)) {
                             throw (new ApplicationException("Could Not create Field [" + field.nameLc + "] because table For tableID [" + TableID + "] was not found."));
                         } else {
-                            DataSourceID = genericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "DataSourceID"));
-                            TableName = genericController.encodeText(core.db.getDataRowColumnName(rs.Rows[0], "Name"));
+                            DataSourceID = GenericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "DataSourceID"));
+                            TableName = GenericController.encodeText(core.db.getDataRowColumnName(rs.Rows[0], "Name"));
                         }
                         rs.Dispose();
                         if (!string.IsNullOrEmpty(TableName)) {
@@ -1572,7 +1572,7 @@ namespace Contensive.Processor.Models.Domain {
                                     // resulting datasource does not have this data, then other errors will be generated anyway.
                                     //Call csv_HandleClassInternalError(MethodName, "Could Not create Field [" & field.name & "] because datasource For ID [" & DataSourceID & "] was not found.")
                                 } else {
-                                    DataSourceName = genericController.encodeText(core.db.getDataRowColumnName(rs.Rows[0], "Name"));
+                                    DataSourceName = GenericController.encodeText(core.db.getDataRowColumnName(rs.Rows[0], "Name"));
                                 }
                                 rs.Dispose();
                             }
@@ -1583,7 +1583,7 @@ namespace Contensive.Processor.Models.Domain {
                             if (!string.IsNullOrEmpty(installedByCollectionGuid)) {
                                 rs = core.db.executeQuery("Select id from ccAddonCollections where ccguid=" + core.db.encodeSQLText(installedByCollectionGuid) + ";");
                                 if (DbController.isDataTableOk(rs)) {
-                                    InstalledByCollectionID = genericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "Id"));
+                                    InstalledByCollectionID = GenericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "Id"));
                                 }
                                 rs.Dispose();
                             }
@@ -1649,7 +1649,7 @@ namespace Contensive.Processor.Models.Domain {
                                     if (!string.IsNullOrEmpty(LookupContentName)) {
                                         LookupContentID = Models.Domain.CDefModel.getContentId(core, LookupContentName);
                                         if (LookupContentID <= 0) {
-                                            logController.logError(core, "Could not create lookup field [" + field.nameLc + "] for content definition [" + ContentName + "] because no content definition was found For lookup-content [" + LookupContentName + "].");
+                                            LogController.logError(core, "Could not create lookup field [" + field.nameLc + "] for content definition [" + ContentName + "] because no content definition was found For lookup-content [" + LookupContentName + "].");
                                         }
                                     }
                                     sqlList.add("LOOKUPCONTENTID", core.db.encodeSQLNumber(LookupContentID)); // Pointer)
@@ -1662,7 +1662,7 @@ namespace Contensive.Processor.Models.Domain {
                                     if (!string.IsNullOrEmpty(ManyToManyContent)) {
                                         int ManyToManyContentID = Models.Domain.CDefModel.getContentId(core, ManyToManyContent);
                                         if (ManyToManyContentID <= 0) {
-                                            logController.logError(core, "Could not create many-to-many field [" + field.nameLc + "] for [" + ContentName + "] because no content definition was found For many-to-many-content [" + ManyToManyContent + "].");
+                                            LogController.logError(core, "Could not create many-to-many field [" + field.nameLc + "] for [" + ContentName + "] because no content definition was found For many-to-many-content [" + ManyToManyContent + "].");
                                         }
                                         sqlList.add("MANYTOMANYCONTENTID", core.db.encodeSQLNumber(ManyToManyContentID));
                                     }
@@ -1671,7 +1671,7 @@ namespace Contensive.Processor.Models.Domain {
                                     if (!string.IsNullOrEmpty(ManyToManyRuleContent)) {
                                         int ManyToManyRuleContentID = Models.Domain.CDefModel.getContentId(core, ManyToManyRuleContent);
                                         if (ManyToManyRuleContentID <= 0) {
-                                            logController.logError(core, "Could not create many-to-many field [" + field.nameLc + "] for [" + ContentName + "] because no content definition was found For many-to-many-rule-content [" + ManyToManyRuleContent + "].");
+                                            LogController.logError(core, "Could not create many-to-many field [" + field.nameLc + "] for [" + ContentName + "] because no content definition was found For many-to-many-rule-content [" + ManyToManyRuleContent + "].");
                                         }
                                         sqlList.add("MANYTOMANYRULECONTENTID", core.db.encodeSQLNumber(ManyToManyRuleContentID));
                                     }
@@ -1684,7 +1684,7 @@ namespace Contensive.Processor.Models.Domain {
                                     if (!string.IsNullOrEmpty(RedirectContentName)) {
                                         RedirectContentID = Models.Domain.CDefModel.getContentId(core, RedirectContentName);
                                         if (RedirectContentID <= 0) {
-                                            logController.logError(core, "Could not create redirect field [" + field.nameLc + "] for Content Definition [" + ContentName + "] because no content definition was found For redirect-content [" + RedirectContentName + "].");
+                                            LogController.logError(core, "Could not create redirect field [" + field.nameLc + "] for Content Definition [" + ContentName + "] because no content definition was found For redirect-content [" + RedirectContentName + "].");
                                         }
                                     }
                                     sqlList.add("REDIRECTCONTENTID", core.db.encodeSQLNumber(RedirectContentID)); // Pointer)
@@ -1717,7 +1717,7 @@ namespace Contensive.Processor.Models.Domain {
                 //
                 returnId = RecordID;
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnId;
@@ -1737,7 +1737,7 @@ namespace Contensive.Processor.Models.Domain {
                     returnOk = cdef.fields.ContainsKey(FieldName.ToLower());
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnOk;
@@ -1788,7 +1788,7 @@ namespace Contensive.Processor.Models.Domain {
             string RecordContentName = "";
             string DataSourceName = null;
             //
-            if (!genericController.isInDelimitedString(UsedIDString, RecordID.ToString(), ",")) {
+            if (!GenericController.isInDelimitedString(UsedIDString, RecordID.ToString(), ",")) {
                 ContentName = getContentNameByID(core, ContentID);
                 CS = core.db.csOpenRecord(ContentName, RecordID, false, false);
                 if (core.db.csOk(CS)) {
@@ -1835,7 +1835,7 @@ namespace Contensive.Processor.Models.Domain {
             try {
                 CDefModel Contentdefinition = CDefModel.getCdef(core, ContentName);
                 if ((string.IsNullOrEmpty(FieldName)) || (Contentdefinition.fields.Count < 1)) {
-                    throw (new ApplicationException("Content Name [" + genericController.encodeText(ContentName) + "] or FieldName [" + FieldName + "] was not valid")); 
+                    throw (new ApplicationException("Content Name [" + GenericController.encodeText(ContentName) + "] or FieldName [" + FieldName + "] was not valid")); 
                 } else {
                     foreach (KeyValuePair<string, Models.Domain.CDefFieldModel> keyValuePair in Contentdefinition.fields) {
                         Models.Domain.CDefFieldModel field = keyValuePair.Value;
@@ -1870,7 +1870,7 @@ namespace Contensive.Processor.Models.Domain {
                                     result = field.uniqueName.ToString();
                                     break;
                                 case "DEFAULT":
-                                    result = genericController.encodeText(field.defaultValue);
+                                    result = GenericController.encodeText(field.defaultValue);
                                     break;
                                 case "MEMBERSELECTGROUPID":
                                     result = field.memberSelectGroupId_get( core ).ToString() ;
@@ -1883,7 +1883,7 @@ namespace Contensive.Processor.Models.Domain {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
 
@@ -1898,8 +1898,8 @@ namespace Contensive.Processor.Models.Domain {
             string result = "";
             Models.Domain.CDefModel Contentdefinition;
             //
-            Contentdefinition = Models.Domain.CDefModel.getCdef(core, genericController.encodeText(ContentName));
-            switch (genericController.vbUCase(genericController.encodeText(PropertyName))) {
+            Contentdefinition = Models.Domain.CDefModel.getCdef(core, GenericController.encodeText(ContentName));
+            switch (GenericController.vbUCase(GenericController.encodeText(PropertyName))) {
                 case "CONTENTCONTROLCRITERIA":
                     result = Contentdefinition.contentControlCriteria;
                     break;
@@ -1985,10 +1985,10 @@ namespace Contensive.Processor.Models.Domain {
             CDefModel result = null;
             try {
                 try {
-                    string cacheName = Controllers.CacheController.getCacheKey_ComplexObject("cdef", contentId.ToString());
+                    string cacheName = Controllers.CacheController.getCacheKey_forObject("cdef", contentId.ToString());
                     result = core.cache.getObject<Models.Domain.CDefModel>(cacheName);
                 } catch (Exception ex) {
-                    logController.handleError( core,ex);
+                    LogController.handleError( core,ex);
                 }
             } catch (Exception) {}
             return result;
@@ -1997,7 +1997,7 @@ namespace Contensive.Processor.Models.Domain {
         //====================================================================================================
         //
         public static void setCache(CoreController core, int contentId, CDefModel cdef) {
-            string cacheName = Controllers.CacheController.getCacheKey_ComplexObject("cdef", contentId.ToString());
+            string cacheName = Controllers.CacheController.getCacheKey_forObject("cdef", contentId.ToString());
             //
             // -- make it dependant on cacheNameInvalidateAll. If invalidated, all cdef will invalidate
             List<string> dependantList = new List<string>();
@@ -2008,7 +2008,7 @@ namespace Contensive.Processor.Models.Domain {
         //====================================================================================================
         //
         public static void invalidateCache(CoreController core, int contentId) {
-            string cacheName = Controllers.CacheController.getCacheKey_ComplexObject("cdef", contentId.ToString());
+            string cacheName = Controllers.CacheController.getCacheKey_forObject("cdef", contentId.ToString());
             core.cache.invalidate(cacheName);
         }
         //

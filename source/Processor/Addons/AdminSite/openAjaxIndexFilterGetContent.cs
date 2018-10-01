@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Models.Domain;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Addons.AdminSite {
@@ -31,14 +31,14 @@ namespace Contensive.Addons.AdminSite {
 
                 //
                 core.visitProperty.setProperty("IndexFilterOpen", "1");
-                getHtmlBodyClass adminSite = new getHtmlBodyClass(core.cp_forAddonExecutionOnly);
+                GetHtmlBodyClass adminSite = new GetHtmlBodyClass(core.cp_forAddonExecutionOnly);
                 int ContentID = core.docProperties.getInteger("cid");
                 if (ContentID == 0) {
                     result = "No filter is available";
                 } else {
                     //cdefModel cdef = cdefModel.getCdef(core, ContentID);
                     var adminContext = new adminContextClass(core);
-                    result = adminSite.GetForm_IndexFilterContent(adminContext);
+                    result = adminSite.getForm_IndexFilterContent(adminContext);
                 }
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);

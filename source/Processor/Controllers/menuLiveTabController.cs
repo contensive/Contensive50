@@ -11,12 +11,12 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Controllers {
-    public class menuLiveTabController {
-        private menuComboTabController comboTab = new menuComboTabController();
+    public class MenuLiveTabController {
+        private MenuComboTabController comboTab = new MenuComboTabController();
         //
         public void AddEntry(string Caption, string LiveBody, string StylePrefix = "") {
             comboTab.AddEntry(Caption, "", "", LiveBody, false, "ccAdminTab");

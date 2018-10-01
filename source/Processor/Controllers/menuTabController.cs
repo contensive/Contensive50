@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Controllers {
@@ -23,7 +23,7 @@ namespace Contensive.Processor.Controllers {
     /// - disposable region at end
     /// - if disposable is not needed add: not IDisposable - not contained classes that need to be disposed
     /// </summary>
-    public class menuTabController : IDisposable {
+    public class MenuTabController : IDisposable {
         //
         // ----- objects passed in constructor, do not dispose
         //
@@ -39,7 +39,7 @@ namespace Contensive.Processor.Controllers {
         // ----- private globals
         //
         //
-        public menuTabController(CoreController core) : base() {
+        public MenuTabController(CoreController core) : base() {
             this.core = core;
         }
         //
@@ -73,7 +73,7 @@ namespace Contensive.Processor.Controllers {
                 Tabs[TabsCnt].LiveBody = "";
                 TabsCnt = TabsCnt + 1;
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -91,7 +91,7 @@ namespace Contensive.Processor.Controllers {
                 string TabID = null;
                 bool FirstLiveBodyShown = false;
                 string TabEdgeStyle = null;
-                menuLiveTabController LiveTab = new menuLiveTabController();
+                MenuLiveTabController LiveTab = new MenuLiveTabController();
                 string TabBlank = null;
                 string TabCurrent = null;
                 string TabStyle = null;
@@ -111,7 +111,7 @@ namespace Contensive.Processor.Controllers {
                     TabEdgeStyle = "ccTabEdge";
                     result += "<table border=0 cellspacing=0 cellpadding=0><tr>";
                     for (TabPtr = 0; TabPtr < TabsCnt; TabPtr++) {
-                        TabID = "Tab" + encodeText(genericController.GetRandomInteger(core));
+                        TabID = "Tab" + encodeText(GenericController.GetRandomInteger(core));
                         TabStyle = Tabs[TabPtr].StylePrefix;
                         TabHitStyle = TabStyle + "Hit";
                         TabLinkStyle = TabStyle + "Link";
@@ -137,20 +137,20 @@ namespace Contensive.Processor.Controllers {
                             }
                         }
                         TabCurrent = TabBlank;
-                        TabCurrent = genericController.vbReplace(TabCurrent, "Replace-TabID", TabID);
-                        TabCurrent = genericController.vbReplace(TabCurrent, "Replace-StyleEdge", TabEdgeStyle);
+                        TabCurrent = GenericController.vbReplace(TabCurrent, "Replace-TabID", TabID);
+                        TabCurrent = GenericController.vbReplace(TabCurrent, "Replace-StyleEdge", TabEdgeStyle);
 
                         if (Tabs[TabPtr].IsHit && (HitPtr == 0)) {
                             //
                             // This tab is hit
                             //
 
-                            TabCurrent = genericController.vbReplace(TabCurrent, "Replace-HotSpot", "<a href=\"" + TabLink + "\" Class=\"" + TabHitLinkStyle + "\">" + Tabs[TabPtr].Caption + "</a>");
-                            TabCurrent = genericController.vbReplace(TabCurrent, "Replace-StyleHit", TabHitStyle);
+                            TabCurrent = GenericController.vbReplace(TabCurrent, "Replace-HotSpot", "<a href=\"" + TabLink + "\" Class=\"" + TabHitLinkStyle + "\">" + Tabs[TabPtr].Caption + "</a>");
+                            TabCurrent = GenericController.vbReplace(TabCurrent, "Replace-StyleHit", TabHitStyle);
                         } else {
 
-                            TabCurrent = genericController.vbReplace(TabCurrent, "Replace-HotSpot", "<a href=\"" + TabLink + "\" Class=\"" + TabLinkStyle + "\">" + Tabs[TabPtr].Caption + "</a>");
-                            TabCurrent = genericController.vbReplace(TabCurrent, "Replace-StyleHit", TabStyle);
+                            TabCurrent = GenericController.vbReplace(TabCurrent, "Replace-HotSpot", "<a href=\"" + TabLink + "\" Class=\"" + TabLinkStyle + "\">" + Tabs[TabPtr].Caption + "</a>");
+                            TabCurrent = GenericController.vbReplace(TabCurrent, "Replace-StyleHit", TabStyle);
                         }
                         result += "<td valign=bottom>" + TabCurrent + "</td>";
                     }
@@ -162,7 +162,7 @@ namespace Contensive.Processor.Controllers {
                     TabsCnt = 0;
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -182,7 +182,7 @@ namespace Contensive.Processor.Controllers {
                 // code
                 //
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnValue;
@@ -205,7 +205,7 @@ namespace Contensive.Processor.Controllers {
             GC.SuppressFinalize(this);
         }
         //
-        ~menuTabController() {
+        ~MenuTabController() {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(false);
             //todo  NOTE: The base class Finalize method is automatically called from the destructor:

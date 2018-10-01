@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Addons.Login {
@@ -27,7 +27,7 @@ namespace Contensive.Addons.Login {
             string returnHtml = "";
             try {
                 bool forceDefaultLogin = cp.Doc.GetBoolean("Force Default Login");
-                returnHtml = loginController.getLoginForm(((CPClass)cp).core, forceDefaultLogin);
+                returnHtml = LoginController.getLoginForm(((CPClass)cp).core, forceDefaultLogin);
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }

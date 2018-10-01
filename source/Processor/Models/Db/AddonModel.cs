@@ -10,7 +10,7 @@ namespace Contensive.Processor.Models.Db {
         //-- const
         public const string contentName = "add-ons";
         public const string contentTableName = "ccaggregatefunctions";
-        private const string contentDataSource = "default";
+        public const string contentDataSource = "default";
         //
         //====================================================================================================
         // -- instance properties
@@ -37,7 +37,7 @@ namespace Contensive.Processor.Models.Db {
         public bool isInline { get; set; }
         public bool javascriptForceHead { get; set; }
         public string jsHeadScriptSrc { get; set; }
-        public fieldTypeJavascriptFile jsFilename { get; set; }
+        public FieldTypeJavascriptFile jsFilename { get; set; }
         //public string JavaScriptBodyEnd { get; set; }
         //Public Property JavaScriptOnLoad As String
         //public string JSBodyScriptSrc { get; set; }
@@ -65,7 +65,7 @@ namespace Contensive.Processor.Models.Db {
         public string scriptingEntryPoint { get; set; }
         public int scriptingLanguageID { get; set; }
         public string scriptingTimeout { get; set; }
-        public fieldTypeCSSFile stylesFilename { get; set; }
+        public FieldTypeCSSFile stylesFilename { get; set; }
         public string stylesLinkHref { get; set; }
         public bool template { get; set; }
         //====================================================================================================
@@ -83,7 +83,7 @@ namespace Contensive.Processor.Models.Db {
             AddonModel result = create<AddonModel>(core, recordId);
             if (result != null) {
                 if (string.IsNullOrEmpty(result.ccguid)) {
-                    result.ccguid = genericController.getGUID();
+                    result.ccguid = GenericController.getGUID();
                 }
             }
             return result;
@@ -94,7 +94,7 @@ namespace Contensive.Processor.Models.Db {
             AddonModel result = create<AddonModel>(core, recordId, ref callersCacheNameList);
             if (result != null) {
                 if (string.IsNullOrEmpty(result.ccguid)) {
-                    result.ccguid = genericController.getGUID();
+                    result.ccguid = GenericController.getGUID();
                 }
             }
             return result;
@@ -151,8 +151,14 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static void invalidateCache(CoreController core, int recordId) {
-            invalidateCache<AddonModel>(core, recordId);
+        public static void invalidateRecordCache(CoreController core, int recordId) {
+            invalidateRecordCache<AddonModel>(core, recordId);
+            Models.Domain.RouteDictionaryModel.invalidateCache(core);
+        }
+        //
+        //====================================================================================================
+        public static void invalidateTableCache(CoreController core) {
+            invalidateTableCache<AddonModel>(core);
             Models.Domain.RouteDictionaryModel.invalidateCache(core);
         }
         //
@@ -188,7 +194,7 @@ namespace Contensive.Processor.Models.Db {
             try {
                 result = createList(core, "(OnNewVisitEvent<>0)");
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -206,7 +212,7 @@ namespace Contensive.Processor.Models.Db {
             try {
                 result = createList(core, "(OnPageStartEvent<>0)");
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -224,7 +230,7 @@ namespace Contensive.Processor.Models.Db {
             try {
                 result = createList(core, "(remoteMethod=1)");
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -235,7 +241,7 @@ namespace Contensive.Processor.Models.Db {
             try {
                 result = createList(core, "(id in (select addonId from ccAddonPageRules where (pageId=" + pageId + ")))");
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -246,7 +252,7 @@ namespace Contensive.Processor.Models.Db {
             try {
                 result = createList(core, "(id in (select addonId from ccAddonTemplateRules where (templateId=" + templateId + ")))");
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -268,7 +274,7 @@ namespace Contensive.Processor.Models.Db {
                 if (!dictIdAddon.ContainsKey(addon.id)) {
                     dictIdAddon.Add(addon.id, addon);
                     if (string.IsNullOrEmpty(addon.ccguid)) {
-                        addon.ccguid = genericController.getGUID();
+                        addon.ccguid = GenericController.getGUID();
                         addon.save(core);
                     }
                     if (!dictGuidId.ContainsKey(addon.ccguid.ToLower())) {
@@ -344,6 +350,16 @@ namespace Contensive.Processor.Models.Db {
             //
             public List<AddonModel> getOnPageStartAddonList() {
                 return getAddonList(OnPageStartIdList);
+            }
+            //
+            //====================================================================================================
+            /// <summary>
+            /// Return a cache key used to represent the table. ONLY used for invalidation. Add this as a dependent key if you want that key cleared when ANY record in the table is changed.
+            /// </summary>
+            /// <param name="core"></param>
+            /// <returns></returns>
+            public static string getTableInvalidationKey(CoreController core) {
+                return getTableCacheKey<AddonModel>(core);
             }
         }
     }

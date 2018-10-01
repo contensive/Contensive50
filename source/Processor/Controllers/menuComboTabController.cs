@@ -11,11 +11,11 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Controllers {
-    public class menuComboTabController {
+    public class MenuComboTabController {
 
         private struct TabType {
             public string Caption;
@@ -88,7 +88,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // Create TabBar
                     //
-                    TabWrapperID = "TabWrapper" + genericController.GetRandomInteger(core);
+                    TabWrapperID = "TabWrapper" + GenericController.GetRandomInteger(core);
                     TabBlank = GetTabBlank();
                     result += "<script language=\"JavaScript\" src=\"/ccLib/clientside/ccDynamicTab.js\" type=\"text/javascript\"></script>\r\n";
                     result += "<table border=0 cellspacing=0 cellpadding=0 width=\"100%\"><tr>";
@@ -105,38 +105,38 @@ namespace Contensive.Processor.Controllers {
                         TabBodyWrapShowStyle = TabStyle + "BodyWrapShow";
                         TabBodyWrapHideStyle = TabStyle + "BodyWrapHide";
                         TabBodyCollectionWrapStyle = TabStyle + "BodyCollectionWrap";
-                        IDNumber = genericController.GetRandomInteger(core);
+                        IDNumber = GenericController.GetRandomInteger(core);
                         LiveBodyID = "TabContent" + IDNumber;
                         TabID = "Tab" + IDNumber;
                         //
                         // This tab is hit
                         //
                         result += "<td valign=bottom>" + TabBlank + "</td>";
-                        result = genericController.vbReplace(result, "Replace-TabID", TabID);
-                        result = genericController.vbReplace(result, "Replace-StyleEdge", TabEdgeStyle);
+                        result = GenericController.vbReplace(result, "Replace-TabID", TabID);
+                        result = GenericController.vbReplace(result, "Replace-StyleEdge", TabEdgeStyle);
                         if (!string.IsNullOrEmpty(TabAjaxLink)) {
                             //
                             // Ajax tab
                             //
-                            result = genericController.vbReplace(result, "Replace-HotSpot", "<a href=# Class=\"" + TabLinkStyle + "\" name=tabLink onClick=\"if(document.getElementById('unloaded_" + LiveBodyID + "')){GetURLAjax('" + TabAjaxLink + "','','" + LiveBodyID + "','','')};switchLiveTab2('" + LiveBodyID + "', this,'" + TabID + "','" + TabStyle + "','" + TabWrapperID + "');return false;\">" + Tabs[TabPtr].Caption + "</a>");
-                            result = genericController.vbReplace(result, "Replace-StyleHit", TabStyle);
+                            result = GenericController.vbReplace(result, "Replace-HotSpot", "<a href=# Class=\"" + TabLinkStyle + "\" name=tabLink onClick=\"if(document.getElementById('unloaded_" + LiveBodyID + "')){GetURLAjax('" + TabAjaxLink + "','','" + LiveBodyID + "','','')};switchLiveTab2('" + LiveBodyID + "', this,'" + TabID + "','" + TabStyle + "','" + TabWrapperID + "');return false;\">" + Tabs[TabPtr].Caption + "</a>");
+                            result = GenericController.vbReplace(result, "Replace-StyleHit", TabStyle);
                             TabBody = TabBody + "<div id=\"" + LiveBodyID + "\" class=\"" + TabBodyStyle + "\" style=\"display:none;text-align:center\"><div id=\"unloaded_" + LiveBodyID + "\"  style=\"text-align:center;padding-top:50px;\"><img src=\"/ccLib/images/ajax-loader-big.gif\" border=0 width=32 height=32></div></div>";
                             //TabBody = TabBody & "<div onload=""alert('" & LiveBodyID & " onload');"" id=""" & LiveBodyID & """ class=""" & TabBodyStyle & """ style=""display:none;text-align:center""><div id=""unloaded_" & LiveBodyID & """  style=""text-align:center;padding-top:50px;""><img src=""/ccLib/images/ajax-loader-big.gif"" border=0 width=32 height=32></div></div>"
                         } else if (!string.IsNullOrEmpty(TabLink)) {
                             //
                             // Link back to server tab
                             //
-                            result = genericController.vbReplace(result, "Replace-HotSpot", "<a href=\"" + TabLink + "\" Class=\"" + TabHitLinkStyle + "\">" + Tabs[TabPtr].Caption + "</a>");
+                            result = GenericController.vbReplace(result, "Replace-HotSpot", "<a href=\"" + TabLink + "\" Class=\"" + TabHitLinkStyle + "\">" + Tabs[TabPtr].Caption + "</a>");
                             //result = genericController.vbReplace(result, "Replace-HotSpot", "<a href=# Class=""" & TabLinkStyle & """ name=tabLink onClick=""switchLiveTab2('" & LiveBodyID & "', this,'" & TabID & "','" & TabStyle & "','" & TabWrapperID & "');return false;"">" & Tabs(TabPtr).Caption & "</a>")
-                            result = genericController.vbReplace(result, "Replace-StyleHit", TabStyle);
+                            result = GenericController.vbReplace(result, "Replace-StyleHit", TabStyle);
                         } else {
                             //
                             // Live Tab
                             //
                             if (!FirstLiveBodyShown) {
                                 FirstLiveBodyShown = true;
-                                result = genericController.vbReplace(result, "Replace-HotSpot", "<a href=# Class=\"" + TabHitLinkStyle + "\" name=tabLink onClick=\"switchLiveTab2('" + LiveBodyID + "', this,'" + TabID + "','" + TabStyle + "','" + TabWrapperID + "');return false;\">" + Tabs[TabPtr].Caption + "</a>");
-                                result = genericController.vbReplace(result, "Replace-StyleHit", TabHitStyle);
+                                result = GenericController.vbReplace(result, "Replace-HotSpot", "<a href=# Class=\"" + TabHitLinkStyle + "\" name=tabLink onClick=\"switchLiveTab2('" + LiveBodyID + "', this,'" + TabID + "','" + TabStyle + "','" + TabWrapperID + "');return false;\">" + Tabs[TabPtr].Caption + "</a>");
+                                result = GenericController.vbReplace(result, "Replace-StyleHit", TabHitStyle);
                                 JSClose = JSClose + "ActiveTabTableID=\"" + TabID + "\";ActiveContentDivID=\"" + LiveBodyID + "\";";
                                 TabBody = TabBody + "<div id=\"" + LiveBodyID + "\" class=\"" + TabBodyWrapShowStyle + "\">"
                                 + "<div class=\"" + TabBodyStyle + "\">"
@@ -144,8 +144,8 @@ namespace Contensive.Processor.Controllers {
                                 + "</div>"
                                 + "";
                             } else {
-                                result = genericController.vbReplace(result, "Replace-HotSpot", "<a href=# Class=\"" + TabLinkStyle + "\" name=tabLink onClick=\"switchLiveTab2('" + LiveBodyID + "', this,'" + TabID + "','" + TabStyle + "','" + TabWrapperID + "');return false;\">" + Tabs[TabPtr].Caption + "</a>");
-                                result = genericController.vbReplace(result, "Replace-StyleHit", TabStyle);
+                                result = GenericController.vbReplace(result, "Replace-HotSpot", "<a href=# Class=\"" + TabLinkStyle + "\" name=tabLink onClick=\"switchLiveTab2('" + LiveBodyID + "', this,'" + TabID + "','" + TabStyle + "','" + TabWrapperID + "');return false;\">" + Tabs[TabPtr].Caption + "</a>");
+                                result = GenericController.vbReplace(result, "Replace-StyleHit", TabStyle);
                                 TabBody = TabBody + "<div id=\"" + LiveBodyID + "\" class=\"" + TabBodyWrapHideStyle + "\">"
                                 + "<div class=\"" + TabBodyStyle + "\">"
                                 + Tabs[TabPtr].LiveBody + "</div>"

@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 using Contensive.BaseClasses;
@@ -67,7 +67,7 @@ namespace Contensive.Processor {
                 throw new ApplicationException("Installation upgrade through the cp interface is deprecated. Please use the command line tool.");
                 // Controllers.appBuilderController.upgrade(CP.core, isNewApp)
             } catch (Exception ex) {
-                logController.handleError(CP.core,ex);
+                LogController.handleError(CP.core,ex);
             }
         }
         //
@@ -86,13 +86,13 @@ namespace Contensive.Processor {
         // ====================================================================================================
         //
         public override string CreateGuid() {
-            return genericController.getGUID();
+            return GenericController.getGUID();
         }
         //
         // ====================================================================================================
         //
         public override string DecodeUrl(string Url) {
-            return genericController.decodeURL(Url);
+            return GenericController.decodeURL(Url);
         }
         //
         // ====================================================================================================
@@ -121,7 +121,7 @@ namespace Contensive.Processor {
         // ====================================================================================================
         //
         public override string EncodeUrl(string Source) {
-            return genericController.encodeURL(Source);
+            return GenericController.encodeURL(Source);
         }
         //
         // ====================================================================================================
@@ -147,31 +147,31 @@ namespace Contensive.Processor {
         // ====================================================================================================
         //
         public override int EncodeInteger(object Expression) {
-            return genericController.encodeInteger(Expression);
+            return GenericController.encodeInteger(Expression);
         }
         //
         // ====================================================================================================
         //
         public override double EncodeNumber(object Expression) {
-            return genericController.encodeNumber(Expression);
+            return GenericController.encodeNumber(Expression);
         }
         //
         // ====================================================================================================
         //
         public override string EncodeText(object Expression) {
-            return genericController.encodeText(Expression);
+            return GenericController.encodeText(Expression);
         }
         //
         // ====================================================================================================
         //
         public override bool EncodeBoolean(object Expression) {
-            return genericController.encodeBoolean(Expression);
+            return GenericController.encodeBoolean(Expression);
         }
         //
         // ====================================================================================================
         //
         public override DateTime EncodeDate(object Expression) {
-            return genericController.encodeDate(Expression);
+            return GenericController.encodeDate(Expression);
         }
         //
         // ====================================================================================================
@@ -179,8 +179,8 @@ namespace Contensive.Processor {
         private string ExecuteAddon(string IdGuidOrName, addonExecuteContext executeContext) {
             if (IdGuidOrName.IsNumeric()) {
                 executeContext.errorContextMessage += " addon id:" + IdGuidOrName;
-                return CP.core.addon.execute(Models.Db.AddonModel.create(CP.core, genericController.encodeInteger(IdGuidOrName)), executeContext);
-            } else if (genericController.isGuid(IdGuidOrName)) {
+                return CP.core.addon.execute(Models.Db.AddonModel.create(CP.core, GenericController.encodeInteger(IdGuidOrName)), executeContext);
+            } else if (GenericController.isGuid(IdGuidOrName)) {
                 executeContext.errorContextMessage += " addon guid:" + IdGuidOrName;
                 return CP.core.addon.execute(Models.Db.AddonModel.create(CP.core, IdGuidOrName), executeContext);
             } else {
@@ -226,7 +226,7 @@ namespace Contensive.Processor {
             return CP.core.addon.executeAsync(IdGuidOrName, CP.core.docProperties.getLegacyOptionStringFromVar());
         }
         [Obsolete("Deprecated, use AppendLog")] public override void AppendLogFile(string Text) {
-            logController.logInfo(CP.core, Text);
+            LogController.logInfo(CP.core, Text);
         }
         //
         // ====================================================================================================
@@ -237,67 +237,67 @@ namespace Contensive.Processor {
         /// <param name="Text"></param>
         [Obsolete("Deprecated, file logging is no longer supported. Use AppendLog(message) to log Info level messages")] public override void AppendLog(string pathFilename, string Text) {
             if ((!string.IsNullOrWhiteSpace(pathFilename)) & (!string.IsNullOrWhiteSpace(Text))) {
-                pathFilename = genericController.convertToDosSlash(pathFilename);
+                pathFilename = GenericController.convertToDosSlash(pathFilename);
                 string[] parts = pathFilename.Split('\\');
-                logController.logInfo(CP.core, "legacy logFile: [" + pathFilename + "], " + Text);
+                LogController.logInfo(CP.core, "legacy logFile: [" + pathFilename + "], " + Text);
             }
         }
         //
         // ====================================================================================================
         //
         public override void AppendLog(string Text) {
-            logController.logInfo(CP.core, Text);
+            LogController.logInfo(CP.core, Text);
         }
         //
         // ====================================================================================================
         //
         [Obsolete("Deprecated", false)]
         public override string ConvertLinkToShortLink(string URL, string ServerHost, string ServerVirtualPath) {
-            return genericController.ConvertLinkToShortLink(URL, ServerHost, ServerVirtualPath);
+            return GenericController.ConvertLinkToShortLink(URL, ServerHost, ServerVirtualPath);
         }
         //
         // ====================================================================================================
         //
         [Obsolete("Deprecated", false)]
         public override string ConvertShortLinkToLink(string url, string pathPagePrefix) {
-            return genericController.removeUrlPrefix(url, pathPagePrefix);
+            return GenericController.removeUrlPrefix(url, pathPagePrefix);
         }
         //
         // ====================================================================================================
         //
         [Obsolete("Deprecated. Use native methods to convert date formats.",false)]
         public override DateTime DecodeGMTDate(string GMTDate) {
-            return genericController.deprecatedDecodeGMTDate(GMTDate);
+            return GenericController.deprecatedDecodeGMTDate(GMTDate);
         }
         //
         // ====================================================================================================
         //
         public override string DecodeResponseVariable(string Source) {
-            return genericController.decodeResponseVariable(Source);
+            return GenericController.decodeResponseVariable(Source);
         }
         //
         // ====================================================================================================
         //
         public override string EncodeJavascript(string Source) {
-            return genericController.EncodeJavascriptStringSingleQuote(Source);
+            return GenericController.EncodeJavascriptStringSingleQuote(Source);
         }
         //
         // ====================================================================================================
         //
         public override string EncodeQueryString(string Source) {
-            return genericController.encodeQueryString(Source);
+            return GenericController.encodeQueryString(Source);
         }
         //
         // ====================================================================================================
         //
         public override string EncodeRequestVariable(string Source) {
-            return genericController.encodeRequestVariable(Source);
+            return GenericController.encodeRequestVariable(Source);
         }
         //
         // ====================================================================================================
         //
         public override string GetArgument(string Name, string ArgumentString, string DefaultValue = "", string Delimiter = "") {
-            return genericController.getValueFromNameValueString(Name, ArgumentString, DefaultValue, Delimiter);
+            return GenericController.getValueFromNameValueString(Name, ArgumentString, DefaultValue, Delimiter);
         }
         //
         // ====================================================================================================
@@ -312,31 +312,31 @@ namespace Contensive.Processor {
         // ====================================================================================================
         //
         public override DateTime GetFirstNonZeroDate(DateTime Date0, DateTime Date1) {
-            return genericController.getFirstNonZeroDate(Date0, Date1);
+            return GenericController.getFirstNonZeroDate(Date0, Date1);
         }
         //
         // ====================================================================================================
         //
         public override int GetFirstNonZeroInteger(int Integer0, int Integer1) {
-            return genericController.getFirstNonZeroInteger(Integer0, Integer1);
+            return GenericController.getFirstNonZeroInteger(Integer0, Integer1);
         }
         //
         // ====================================================================================================
         //
         public override string GetIntegerString(int Value, int DigitCount) {
-            return genericController.getIntegerString(Value, DigitCount);
+            return GenericController.getIntegerString(Value, DigitCount);
         }
         //
         // ====================================================================================================
         //
         public override string GetLine(string Body) {
-            return genericController.getLine(ref Body);
+            return GenericController.getLine(ref Body);
         }
         //
         // ====================================================================================================
         //
         public override int GetListIndex(string Item, string ListOfItems) {
-            return genericController.GetListIndex(Item, ListOfItems);
+            return GenericController.GetListIndex(Item, ListOfItems);
         }
         //
         // ====================================================================================================
@@ -348,25 +348,25 @@ namespace Contensive.Processor {
         // ====================================================================================================
         //
         public override int GetRandomInteger() {
-            return genericController.GetRandomInteger(CP.core);
+            return GenericController.GetRandomInteger(CP.core);
         }
         //
         // ====================================================================================================
         //
         public override bool IsInDelimitedString(string DelimitedString, string TestString, string Delimiter) {
-            return genericController.isInDelimitedString(DelimitedString, TestString, Delimiter);
+            return GenericController.isInDelimitedString(DelimitedString, TestString, Delimiter);
         }
         //
         // ====================================================================================================
         //
         public override string ModifyLinkQueryString(string Link, string QueryName, string QueryValue, bool AddIfMissing = true) {
-            return genericController.modifyLinkQuery(Link, QueryName, QueryValue, AddIfMissing);
+            return GenericController.modifyLinkQuery(Link, QueryName, QueryValue, AddIfMissing);
         }
         //
         // ====================================================================================================
         //
         public override string ModifyQueryString(string WorkingQuery, string QueryName, string QueryValue, bool AddIfMissing = true) {
-            return genericController.modifyQueryString(WorkingQuery, QueryName, QueryValue, AddIfMissing);
+            return GenericController.modifyQueryString(WorkingQuery, QueryName, QueryValue, AddIfMissing);
         }
         //
         // ====================================================================================================
@@ -381,7 +381,7 @@ namespace Contensive.Processor {
         /// <param name="Page"></param>
         /// <param name="QueryString"></param>
         public override void ParseURL(string SourceURL, ref string Protocol, ref string Host, ref string Port, ref string Path, ref string Page, ref string QueryString) {
-            genericController.splitUrl(SourceURL, ref Protocol, ref Host, ref Port, ref Path, ref Page, ref QueryString);
+            GenericController.splitUrl(SourceURL, ref Protocol, ref Host, ref Port, ref Path, ref Page, ref QueryString);
         }
         //
         // ====================================================================================================
@@ -395,13 +395,13 @@ namespace Contensive.Processor {
         /// <param name="Page"></param>
         /// <param name="QueryString"></param>
         public override void SeparateURL(string SourceURL, ref string Protocol, ref string Host, ref string Path, ref string Page, ref string QueryString) {
-            genericController.splitUrl(SourceURL, ref Protocol, ref Host, ref Path, ref Page, ref QueryString);
+            GenericController.splitUrl(SourceURL, ref Protocol, ref Host, ref Path, ref Page, ref QueryString);
         }
         //
         // ====================================================================================================
         //
         public override object SplitDelimited(string WordList, string Delimiter) {
-            return genericController.SplitDelimited(WordList, Delimiter);
+            return GenericController.SplitDelimited(WordList, Delimiter);
         }
         //
         // ====================================================================================================
@@ -420,7 +420,7 @@ namespace Contensive.Processor {
         // ====================================================================================================
         //
         public override bool isGuid(string guid) {
-            return genericController.common_isGuid(guid);
+            return GenericController.common_isGuid(guid);
         }
         // todo implement taskId return value, create cp.task object to track task status
         //====================================================================================================

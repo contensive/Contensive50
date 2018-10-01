@@ -11,17 +11,17 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Models.Db {
-    public class pageTemplateModel : BaseModel {
+    public class PageTemplateModel : BaseModel {
         //
         //====================================================================================================
         //-- const
         public const string contentName = "page templates";
         public const string contentTableName = "cctemplates";
-        private const string contentDataSource = "default";
+        public const string contentDataSource = "default";
         //
         //====================================================================================================
         // -- instance properties
@@ -37,43 +37,43 @@ namespace Contensive.Processor.Models.Db {
         // Public Property OtherHeadTags As String
         //
         //====================================================================================================
-        public static pageTemplateModel add(CoreController core) {
-            return add<pageTemplateModel>(core);
+        public static PageTemplateModel add(CoreController core) {
+            return add<PageTemplateModel>(core);
         }
         //
         //====================================================================================================
-        public static pageTemplateModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<pageTemplateModel>(core, ref callersCacheNameList);
+        public static PageTemplateModel add(CoreController core, ref List<string> callersCacheNameList) {
+            return add<PageTemplateModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static pageTemplateModel create(CoreController core, int recordId) {
-            return create<pageTemplateModel>(core, recordId);
+        public static PageTemplateModel create(CoreController core, int recordId) {
+            return create<PageTemplateModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static pageTemplateModel create(CoreController core, int recordId, ref List<string> callersCacheNameList) {
-            return create<pageTemplateModel>(core, recordId, ref callersCacheNameList);
+        public static PageTemplateModel create(CoreController core, int recordId, ref List<string> callersCacheNameList) {
+            return create<PageTemplateModel>(core, recordId, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static pageTemplateModel create(CoreController core, string recordGuid) {
-            return create<pageTemplateModel>(core, recordGuid);
+        public static PageTemplateModel create(CoreController core, string recordGuid) {
+            return create<PageTemplateModel>(core, recordGuid);
         }
         //
         //====================================================================================================
-        public static pageTemplateModel create(CoreController core, string recordGuid, ref List<string> callersCacheNameList) {
-            return create<pageTemplateModel>(core, recordGuid, ref callersCacheNameList);
+        public static PageTemplateModel create(CoreController core, string recordGuid, ref List<string> callersCacheNameList) {
+            return create<PageTemplateModel>(core, recordGuid, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static pageTemplateModel createByName(CoreController core, string recordName) {
-            return createByName<pageTemplateModel>(core, recordName);
+        public static PageTemplateModel createByName(CoreController core, string recordName) {
+            return createByName<PageTemplateModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static pageTemplateModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<pageTemplateModel>(core, recordName, ref callersCacheNameList);
+        public static PageTemplateModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByName<PageTemplateModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================
@@ -83,52 +83,62 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static void delete(CoreController core, int recordId) {
-            delete<pageTemplateModel>(core, recordId);
+            delete<PageTemplateModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static void delete(CoreController core, string ccGuid) {
-            delete<pageTemplateModel>(core, ccGuid);
+            delete<PageTemplateModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static List<pageTemplateModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
-            return createList<pageTemplateModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
+        public static List<PageTemplateModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
+            return createList<PageTemplateModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static List<pageTemplateModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy) {
-            return createList<pageTemplateModel>(core, sqlCriteria, sqlOrderBy);
+        public static List<PageTemplateModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy) {
+            return createList<PageTemplateModel>(core, sqlCriteria, sqlOrderBy);
         }
         //
         //====================================================================================================
-        public static List<pageTemplateModel> createList(CoreController core, string sqlCriteria) {
-            return createList<pageTemplateModel>(core, sqlCriteria);
+        public static List<PageTemplateModel> createList(CoreController core, string sqlCriteria) {
+            return createList<PageTemplateModel>(core, sqlCriteria);
         }
         //
         //====================================================================================================
-        public void invalidatePrimaryCache(CoreController core, int recordId) {
-            invalidateCache<pageTemplateModel>(core, recordId);
+        public static void invalidateRecordCache(CoreController core, int recordId) {
+            invalidateRecordCache<PageTemplateModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return BaseModel.getRecordName<pageTemplateModel>(core, recordId);
+            return BaseModel.getRecordName<PageTemplateModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return BaseModel.getRecordName<pageTemplateModel>(core, ccGuid);
+            return BaseModel.getRecordName<PageTemplateModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return BaseModel.getRecordId<pageTemplateModel>(core, ccGuid);
+            return BaseModel.getRecordId<PageTemplateModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static pageTemplateModel createDefault(CoreController core) {
-            return createDefault<pageTemplateModel>(core);
+        public static PageTemplateModel createDefault(CoreController core) {
+            return createDefault<PageTemplateModel>(core);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Return a cache key used to represent the table. ONLY used for invalidation. Add this as a dependent key if you want that key cleared when ANY record in the table is changed.
+        /// </summary>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        public static string getTableInvalidationKey(CoreController core) {
+            return getTableCacheKey<PageTemplateModel>(core);
         }
     }
 }

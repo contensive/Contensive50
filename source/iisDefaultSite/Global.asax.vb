@@ -19,12 +19,12 @@ Public Class Global_asax
     ''' <param name="e"></param>
     Sub Application_Start(ByVal sender As Object, ByVal e As EventArgs)
         Try
-            logController.forceNLog("Global.asax, Application_Start [" & configurationClass.getAppName() & "]", logController.logLevel.Trace)
+            LogController.forceNLog("Global.asax, Application_Start [" & configurationClass.getAppName() & "]", LogController.logLevel.Trace)
             Using cp As New Contensive.Processor.CPClass(configurationClass.getAppName())
                 DefaultSite.configurationClass.loadRouteMap(cp)
             End Using
         Catch ex As Exception
-            logController.forceNLog("Global.asax, Application_Start exception [" & configurationClass.getAppName() & "]" & getAppDescription("Application_Start ERROR exit") + ", ex [" & ex.ToString() & "]", Contensive.Processor.Controllers.logController.logLevel.Fatal)
+            LogController.forceNLog("Global.asax, Application_Start exception [" & configurationClass.getAppName() & "]" & getAppDescription("Application_Start ERROR exit") + ", ex [" & ex.ToString() & "]", Contensive.Processor.Controllers.LogController.logLevel.Fatal)
         End Try
     End Sub
     '
@@ -35,7 +35,7 @@ Public Class Global_asax
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     Sub Session_Start(ByVal sender As Object, ByVal e As EventArgs)
-        logController.forceNLog("Global.asax, Session_Start [" + e.ToString() + "]", logController.logLevel.Trace)
+        LogController.forceNLog("Global.asax, Session_Start [" + e.ToString() + "]", LogController.logLevel.Trace)
     End Sub
     '
     '====================================================================================================
@@ -45,7 +45,7 @@ Public Class Global_asax
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     Sub Application_BeginRequest(ByVal sender As Object, ByVal e As EventArgs)
-        logController.forceNLog("Global.asax, Application_BeginRequest [" + e.ToString() + "]", logController.logLevel.Trace)
+        LogController.forceNLog("Global.asax, Application_BeginRequest [" + e.ToString() + "]", LogController.logLevel.Trace)
     End Sub
     '
     '====================================================================================================
@@ -55,7 +55,7 @@ Public Class Global_asax
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     Sub Application_AuthenticateRequest(ByVal sender As Object, ByVal e As EventArgs)
-        logController.forceNLog("Global.asax, Application_AuthenticateRequest [" + e.ToString() + "]", logController.logLevel.Trace)
+        LogController.forceNLog("Global.asax, Application_AuthenticateRequest [" + e.ToString() + "]", LogController.logLevel.Trace)
     End Sub
     '
     '====================================================================================================
@@ -65,7 +65,7 @@ Public Class Global_asax
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     Sub Application_Error(ByVal sender As Object, ByVal e As EventArgs)
-        logController.forceNLog("Global.asax, Application_Error, Server.GetLastError().InnerException [" + Server.GetLastError().InnerException.ToString() + "]", logController.logLevel.Error)
+        LogController.forceNLog("Global.asax, Application_Error, Server.GetLastError().InnerException [" + Server.GetLastError().InnerException.ToString() + "]", LogController.logLevel.Error)
     End Sub
     '
     '====================================================================================================
@@ -75,7 +75,7 @@ Public Class Global_asax
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     Sub Session_End(ByVal sender As Object, ByVal e As EventArgs)
-        logController.forceNLog("Global.asax, Session_End [" + e.ToString() + "]", logController.logLevel.Trace)
+        LogController.forceNLog("Global.asax, Session_End [" + e.ToString() + "]", LogController.logLevel.Trace)
     End Sub
     '
     '====================================================================================================
@@ -85,7 +85,7 @@ Public Class Global_asax
     ''' <param name="sender"></param>
     ''' <param name="e"></param>
     Sub Application_End(ByVal sender As Object, ByVal e As EventArgs)
-        logController.forceNLog("Global.asax, Application_End [" + e.ToString() + "]", logController.logLevel.Trace)
+        LogController.forceNLog("Global.asax, Application_End [" + e.ToString() + "]", LogController.logLevel.Trace)
     End Sub
     '
     '====================================================================================================

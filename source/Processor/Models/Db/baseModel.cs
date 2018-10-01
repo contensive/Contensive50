@@ -65,7 +65,7 @@ namespace Contensive.Processor.Models.Db {
         //====================================================================================================
         //-- field types
         //
-        public abstract class fieldCdnFile {
+        public abstract class FieldCdnFile {
             //
             // -- 
             // during load
@@ -132,13 +132,13 @@ namespace Contensive.Processor.Models.Db {
             public CoreController internalcore { get; set; } = null;
         }
         //
-        public class fieldTypeTextFile : fieldCdnFile {
+        public class FieldTypeTextFile : FieldCdnFile {
         }
-        public class fieldTypeJavascriptFile : fieldCdnFile {
+        public class FieldTypeJavascriptFile : FieldCdnFile {
         }
-        public class fieldTypeCSSFile : fieldCdnFile {
+        public class FieldTypeCSSFile : FieldCdnFile {
         }
-        public class fieldTypeHTMLFile : fieldCdnFile {
+        public class FieldTypeHTMLFile : FieldCdnFile {
         }
         //
         //====================================================================================================
@@ -209,7 +209,7 @@ namespace Contensive.Processor.Models.Db {
         /// </summary>
         /// <param name="derivedType"></param>
         /// <returns></returns>
-        private static string derivedContentTableName(Type derivedType) {
+        private static string derivedTableName(Type derivedType) {
             FieldInfo fieldInfo = derivedType.GetField("contentTableName");
             if (fieldInfo == null) {
                 throw new ApplicationException("Class [" + derivedType.Name + "] must declare constant [contentTableName].");
@@ -224,10 +224,10 @@ namespace Contensive.Processor.Models.Db {
         /// </summary>
         /// <param name="derivedType"></param>
         /// <returns></returns>
-        private static string contentDataSource(Type derivedType) {
-            FieldInfo fieldInfo = derivedType.GetField("contentTableName");
+        private static string derivedDataSourceName(Type derivedType) {
+            FieldInfo fieldInfo = derivedType.GetField("contentDataSource");
             if (fieldInfo == null) {
-                throw new ApplicationException("Class [" + derivedType.Name + "] must declare constant [contentTableName].");
+                throw new ApplicationException("Class [" + derivedType.Name + "] must declare public constant [contentDataSource].");
             } else {
                 return fieldInfo.GetRawConstantValue().ToString();
             }
@@ -267,18 +267,18 @@ namespace Contensive.Processor.Models.Db {
                 if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
+                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
                 } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
+                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
                     Type instanceType = typeof(T);
                     string contentName = derivedContentName(instanceType);
                     result = create<T>(core, core.db.insertContentRecordGetID(contentName, core.session.user.id), ref callersCacheNameList);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
                 throw;
             }
@@ -310,18 +310,18 @@ namespace Contensive.Processor.Models.Db {
                 if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
+                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
                 } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
+                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
                     if (recordId > 0) {
                         Type instanceType = typeof(T);
                         string contentName = derivedContentName(instanceType);
-                        result = readModelCache<T>(core, "id", recordId.ToString());
+                        result = readRecordCache<T>(core, recordId);
                         if (result == null) {
-                            using (csController cs = new csController(core)) {
+                            using (CsController cs = new CsController(core)) {
                                 if (cs.open(contentName, "(id=" + recordId.ToString() + ")")) {
                                     result = loadRecord<T>(core, cs, ref callersCacheNameList);
                                 }
@@ -332,28 +332,28 @@ namespace Contensive.Processor.Models.Db {
                         if (result != null) {
                             foreach (PropertyInfo instanceProperty in result.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
                                 switch (instanceProperty.PropertyType.Name) {
-                                    case "fieldTypeTextFile":
-                                    case "fieldTypeJavascriptFile":
-                                    case "fieldTypeCSSFile":
-                                    case "fieldTypeHTMLFile":
+                                    case "FieldTypeTextFile":
+                                    case "FieldTypeJavascriptFile":
+                                    case "FieldTypeCSSFile":
+                                    case "FieldTypeHTMLFile":
                                         switch (instanceProperty.PropertyType.Name) {
-                                            case "fieldTypeJavascriptFile": {
-                                                    fieldTypeJavascriptFile fileProperty = (fieldTypeJavascriptFile)instanceProperty.GetValue(result);
+                                            case "FieldTypeJavascriptFile": {
+                                                    FieldTypeJavascriptFile fileProperty = (FieldTypeJavascriptFile)instanceProperty.GetValue(result);
                                                     fileProperty.internalcore = core;
                                                     break;
                                                 }
-                                            case "fieldTypeCSSFile": {
-                                                    fieldTypeCSSFile fileProperty = (fieldTypeCSSFile)instanceProperty.GetValue(result);
+                                            case "FieldTypeCSSFile": {
+                                                    FieldTypeCSSFile fileProperty = (FieldTypeCSSFile)instanceProperty.GetValue(result);
                                                     fileProperty.internalcore = core;
                                                     break;
                                                 }
-                                            case "fieldTypeHTMLFile": {
-                                                    fieldTypeHTMLFile fileProperty = (fieldTypeHTMLFile)instanceProperty.GetValue(result);
+                                            case "FieldTypeHTMLFile": {
+                                                    FieldTypeHTMLFile fileProperty = (FieldTypeHTMLFile)instanceProperty.GetValue(result);
                                                     fileProperty.internalcore = core;
                                                     break;
                                                 }
                                             default: {
-                                                    fieldTypeTextFile fileProperty = (fieldTypeTextFile)instanceProperty.GetValue(result);
+                                                    FieldTypeTextFile fileProperty = (FieldTypeTextFile)instanceProperty.GetValue(result);
                                                     fileProperty.internalcore = core;
                                                     break;
                                                 }
@@ -365,7 +365,7 @@ namespace Contensive.Processor.Models.Db {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -396,18 +396,18 @@ namespace Contensive.Processor.Models.Db {
                 if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
+                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
                 } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
+                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
                     if (!string.IsNullOrEmpty(recordGuid)) {
                         Type instanceType = typeof(T);
                         string contentName = derivedContentName(instanceType);
-                        result = readModelCache<T>(core, "ccguid", recordGuid);
+                        //result = readModelCache<T>(core, "ccguid", recordGuid);
                         if (result == null) {
-                            using (csController cs = new csController(core)) {
+                            using (CsController cs = new CsController(core)) {
                                 if (cs.open(contentName, "(ccGuid=" + core.db.encodeSQLText(recordGuid) + ")")) {
                                     result = loadRecord<T>(core, cs, ref callersCacheNameList);
                                 }
@@ -416,7 +416,7 @@ namespace Contensive.Processor.Models.Db {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
                 throw;
             }
@@ -448,18 +448,18 @@ namespace Contensive.Processor.Models.Db {
                 if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
+                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
                 } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
+                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
                     if (!string.IsNullOrEmpty(recordName)) {
                         Type instanceType = typeof(T);
                         string contentName = derivedContentName(instanceType);
-                        result = readModelCache<T>(core, "name", recordName);
+                        //result = readModelCache<T>(core, "name", recordName);
                         if (result == null) {
-                            using (csController cs = new csController(core)) {
+                            using (CsController cs = new CsController(core)) {
                                 if (cs.open(contentName, "(name=" + core.db.encodeSQLText(recordName) + ")", "id")) {
                                     result = loadRecord<T>(core, cs, ref callersCacheNameList);
                                 }
@@ -468,7 +468,7 @@ namespace Contensive.Processor.Models.Db {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -480,13 +480,13 @@ namespace Contensive.Processor.Models.Db {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="sqlCriteria"></param>
-        private static T loadRecord<T>(CoreController core, csController cs, ref List<string> callersCacheNameList) where T : BaseModel {
+        private static T loadRecord<T>(CoreController core, CsController cs, ref List<string> callersCacheKeyList) where T : BaseModel {
             T modelInstance = default(T);
             try {
                 if (cs.ok()) {
                     Type instanceType = typeof(T);
                     string contentName = derivedContentName(instanceType);
-                    string tableName = derivedContentTableName(instanceType);
+                    string tableName = derivedTableName(instanceType);
                     int recordId = cs.getInteger("id");
                     modelInstance = (T)Activator.CreateInstance(instanceType);
                     foreach (PropertyInfo modelProperty in modelInstance.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
@@ -515,47 +515,39 @@ namespace Contensive.Processor.Models.Db {
                                             modelProperty.SetValue(modelInstance, cs.getText(modelProperty.Name), null);
                                             break;
                                         }
-                                    case "fieldTypeTextFile": {
+                                    case "FieldTypeTextFile": {
                                             //
                                             // -- cdn files
-                                            fieldTypeTextFile instanceFileType = new fieldTypeTextFile();
-                                            instanceFileType.filename = cs.getValue(modelProperty.Name);
-                                            //If (Not String.IsNullOrEmpty(instanceFileType.filename)) Then
-                                            //    instanceFileType.content = core.cdnFiles.readFile(instanceFileType.filename)
-                                            //End If
+                                            FieldTypeTextFile instanceFileType = new FieldTypeTextFile {
+                                                filename = cs.getValue(modelProperty.Name)
+                                            };
                                             modelProperty.SetValue(modelInstance, instanceFileType);
                                             break;
                                         }
-                                    case "fieldTypeJavascriptFile": {
+                                    case "FieldTypeJavascriptFile": {
                                             //
                                             // -- cdn files
-                                            fieldTypeJavascriptFile instanceFileType = new fieldTypeJavascriptFile();
-                                            instanceFileType.filename = cs.getValue(modelProperty.Name);
-                                            //If (Not String.IsNullOrEmpty(instanceFileType.filename)) Then
-                                            //    instanceFileType.content = core.cdnFiles.readFile(instanceFileType.filename)
-                                            //End If
+                                            FieldTypeJavascriptFile instanceFileType = new FieldTypeJavascriptFile {
+                                                filename = cs.getValue(modelProperty.Name)
+                                            };
                                             modelProperty.SetValue(modelInstance, instanceFileType);
                                             break;
                                         }
-                                    case "fieldTypeCSSFile": {
+                                    case "FieldTypeCSSFile": {
                                             //
                                             // -- cdn files
-                                            fieldTypeCSSFile instanceFileType = new fieldTypeCSSFile();
-                                            instanceFileType.filename = cs.getValue(modelProperty.Name);
-                                            //If (Not String.IsNullOrEmpty(instanceFileType.filename)) Then
-                                            //    instanceFileType.content = core.cdnFiles.readFile(instanceFileType.filename)
-                                            //End If
+                                            FieldTypeCSSFile instanceFileType = new FieldTypeCSSFile {
+                                                filename = cs.getValue(modelProperty.Name)
+                                            };
                                             modelProperty.SetValue(modelInstance, instanceFileType);
                                             break;
                                         }
-                                    case "fieldTypeHTMLFile": {
+                                    case "FieldTypeHTMLFile": {
                                             //
                                             // -- private files
-                                            fieldTypeHTMLFile instanceFileType = new fieldTypeHTMLFile();
-                                            instanceFileType.filename = cs.getValue(modelProperty.Name);
-                                            //If (Not String.IsNullOrEmpty(instanceFileType.filename)) Then
-                                            //    instanceFileType.content = core.cdnFiles.readFile(instanceFileType.filename)
-                                            //End If
+                                            FieldTypeHTMLFile instanceFileType = new FieldTypeHTMLFile {
+                                                filename = cs.getValue(modelProperty.Name)
+                                            };
                                             modelProperty.SetValue(modelInstance, instanceFileType);
                                             break;
                                         }
@@ -572,20 +564,19 @@ namespace Contensive.Processor.Models.Db {
                         // -- set primary cache to the object created
                         // -- set secondary caches to the primary cache
                         // -- add all cachenames to the injected cachenamelist
-                        BaseModel baseInstance = modelInstance as BaseModel;
-                        if (baseInstance != null) {
-                            string cacheName0 = Controllers.CacheController.getCacheKey_Entity(tableName, "id", baseInstance.id.ToString());
-                            callersCacheNameList.Add(cacheName0);
-                            core.cache.setObject(cacheName0, modelInstance);
+                        if (modelInstance is BaseModel baseInstance) {
+                            string datasourceName = derivedDataSourceName(instanceType);
+                            string cacheKey = CacheController.getCacheKey_forDbRecord(baseInstance.id, tableName, datasourceName);
+                            callersCacheKeyList.Add(cacheKey);
+                            core.cache.setObject(cacheKey, modelInstance);
                             //
-                            string cacheName1 = Controllers.CacheController.getCacheKey_Entity(tableName, "ccguid", baseInstance.ccguid);
-                            callersCacheNameList.Add(cacheName1);
-                            core.cache.setAlias(cacheName1, cacheName0);
+                            string cachePtr = CacheController.getCachePtr_forDbRecord(baseInstance.ccguid, tableName, datasourceName);
+                            core.cache.setPtr(cachePtr, cacheKey);
                         }
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return modelInstance;
@@ -602,16 +593,17 @@ namespace Contensive.Processor.Models.Db {
                 if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
+                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
                 } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
+                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
-                    csController cs = new csController(core);
+                    CsController cs = new CsController(core);
                     Type instanceType = this.GetType();
                     string contentName = derivedContentName(instanceType);
-                    string tableName = derivedContentTableName(instanceType);
+                    string tableName = derivedTableName(instanceType);
+                    string datasourceName = derivedDataSourceName(instanceType);
                     if (id > 0) {
                         if (!cs.open(contentName, "id=" + id)) {
                             string message = "Unable to open record in content [" + contentName + "], with id [" + id + "]";
@@ -634,7 +626,7 @@ namespace Contensive.Processor.Models.Db {
                                 break;
                             case "ccguid":
                                 if (string.IsNullOrEmpty(ccguid)) {
-                                    ccguid = Controllers.genericController.getGUID();
+                                    ccguid = Controllers.GenericController.getGUID();
                                 }
                                 //string value = instanceProperty.GetValue(this, null).ToString();
                                 cs.setField(instanceProperty.Name, instanceProperty.GetValue(this, null).ToString());
@@ -661,19 +653,19 @@ namespace Contensive.Processor.Models.Db {
                                         double.TryParse(instanceProperty.GetValue(this, null).ToString(), out valueDbl);
                                         cs.setField(instanceProperty.Name, valueDbl);
                                         break;
-                                    case "fieldTypeTextFile":
-                                    case "fieldTypeJavascriptFile":
-                                    case "fieldTypeCSSFile":
-                                    case "fieldTypeHTMLFile":
+                                    case "FieldTypeTextFile":
+                                    case "FieldTypeJavascriptFile":
+                                    case "FieldTypeCSSFile":
+                                    case "FieldTypeHTMLFile":
                                         int fieldTypeId = 0;
                                         PropertyInfo contentProperty = null;
                                         PropertyInfo contentUpdatedProperty = null;
                                         bool contentUpdated = false;
                                         string content = "";
                                         switch (instanceProperty.PropertyType.Name) {
-                                            case "fieldTypeJavascriptFile": {
+                                            case "FieldTypeJavascriptFile": {
                                                     fieldTypeId = FieldTypeIdFileJavascript;
-                                                    fieldTypeJavascriptFile fileProperty = (fieldTypeJavascriptFile)instanceProperty.GetValue(this);
+                                                    FieldTypeJavascriptFile fileProperty = (FieldTypeJavascriptFile)instanceProperty.GetValue(this);
                                                     fileProperty.internalcore = core;
                                                     contentProperty = instanceProperty.PropertyType.GetProperty("content");
                                                     contentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
@@ -681,9 +673,9 @@ namespace Contensive.Processor.Models.Db {
                                                     content = (string)contentProperty.GetValue(fileProperty);
                                                     break;
                                                 }
-                                            case "fieldTypeCSSFile": {
+                                            case "FieldTypeCSSFile": {
                                                     fieldTypeId = FieldTypeIdFileCSS;
-                                                    fieldTypeCSSFile fileProperty = (fieldTypeCSSFile)instanceProperty.GetValue(this);
+                                                    FieldTypeCSSFile fileProperty = (FieldTypeCSSFile)instanceProperty.GetValue(this);
                                                     fileProperty.internalcore = core;
                                                     contentProperty = instanceProperty.PropertyType.GetProperty("content");
                                                     contentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
@@ -691,9 +683,9 @@ namespace Contensive.Processor.Models.Db {
                                                     content = (string)contentProperty.GetValue(fileProperty);
                                                     break;
                                                 }
-                                            case "fieldTypeHTMLFile": {
+                                            case "FieldTypeHTMLFile": {
                                                     fieldTypeId = FieldTypeIdFileHTML;
-                                                    fieldTypeHTMLFile fileProperty = (fieldTypeHTMLFile)instanceProperty.GetValue(this);
+                                                    FieldTypeHTMLFile fileProperty = (FieldTypeHTMLFile)instanceProperty.GetValue(this);
                                                     fileProperty.internalcore = core;
                                                     contentProperty = instanceProperty.PropertyType.GetProperty("content");
                                                     contentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
@@ -703,7 +695,7 @@ namespace Contensive.Processor.Models.Db {
                                                 }
                                             default: {
                                                     fieldTypeId = FieldTypeIdFileText;
-                                                    fieldTypeTextFile fileProperty = (fieldTypeTextFile)instanceProperty.GetValue(this);
+                                                    FieldTypeTextFile fileProperty = (FieldTypeTextFile)instanceProperty.GetValue(this);
                                                     fileProperty.internalcore = core;
                                                     contentProperty = instanceProperty.PropertyType.GetProperty("content");
                                                     contentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
@@ -731,7 +723,7 @@ namespace Contensive.Processor.Models.Db {
                                                 cs.setFieldFilename(instanceProperty.Name, filename);
                                             }
                                         }
-                                        //Case "fieldTypeJavascriptFile"
+                                        //Case "FieldTypeJavascriptFile"
                                         //    Dim textFileProperty As fieldTypeJavascriptFile = DirectCast(instanceProperty.GetValue(Me), fieldTypeJavascriptFile)
                                         //    textFileProperty.internalcore = core
                                         //    Dim copyProperty As PropertyInfo = instanceProperty.PropertyType.GetProperty("content")
@@ -749,7 +741,7 @@ namespace Contensive.Processor.Models.Db {
                                         //        ' -- save content
                                         //        cs.setFile(instanceProperty.Name, copy, contentName)
                                         //    End If
-                                        //Case "fieldTypeCSSFile"
+                                        //Case "FieldTypeCSSFile"
                                         //    Dim textFileProperty As fieldTypeCSSFile = DirectCast(instanceProperty.GetValue(Me), fieldTypeCSSFile)
                                         //    textFileProperty.internalcore = core
                                         //    Dim copyProperty As PropertyInfo = instanceProperty.PropertyType.GetProperty("content")
@@ -767,7 +759,7 @@ namespace Contensive.Processor.Models.Db {
                                         //        ' -- save content
                                         //        cs.setFile(instanceProperty.Name, copy, contentName)
                                         //    End If
-                                        //Case "fieldTypeHTMLFile"
+                                        //Case "FieldTypeHTMLFile"
                                         //    Dim textFileProperty As fieldTypeHTMLFile = DirectCast(instanceProperty.GetValue(Me), fieldTypeHTMLFile)
                                         //    textFileProperty.internalcore = core
                                         //    Dim copyProperty As PropertyInfo = instanceProperty.PropertyType.GetProperty("content")
@@ -796,17 +788,11 @@ namespace Contensive.Processor.Models.Db {
                     }
                     cs.close();
                     //
-                    // -- invalidate objects
-                    // -- no, the primary is invalidated by the cs.save()
-                    //core.cache.invalidateObject(controllers.cacheController.getModelCacheName(primaryContentTablename,"id", id.ToString))
-                    // -- no, the secondary points to the pirmary, which is invalidated. Dont waste resources invalidating
-                    //core.cache.invalidateObject(controllers.cacheController.getModelCacheName(primaryContentTablename,"ccguid", ccguid))
-                    //
                     // -- object is here, but the cache was invalidated, setting
-                    core.cache.setObject(Controllers.CacheController.getCacheKey_Entity(tableName, "id", this.id.ToString()), this);
+                    core.cache.setObject(CacheController.getCacheKey_forDbRecord(id, tableName, datasourceName), this);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return id;
@@ -823,22 +809,22 @@ namespace Contensive.Processor.Models.Db {
                 if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
+                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
                 } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
+                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
                     if (recordId > 0) {
                         Type instanceType = typeof(T);
                         string contentName = derivedContentName(instanceType);
-                        string tableName = derivedContentTableName(instanceType);
+                        string tableName = derivedTableName(instanceType);
                         core.db.deleteContentRecords(contentName, "id=" + recordId.ToString());
-                        core.cache.invalidate(Controllers.CacheController.getCacheKey_Entity(tableName, recordId));
+                        core.cache.invalidate(CacheController.getCacheKey_forDbRecord(recordId, tableName, derivedDataSourceName(instanceType)));
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -854,24 +840,24 @@ namespace Contensive.Processor.Models.Db {
                 if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
+                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
                 } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
+                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
                     if (!string.IsNullOrEmpty(ccguid)) {
                         Type instanceType = typeof(T);
                         string contentName = derivedContentName(instanceType);
                         BaseModel instance = create<BaseModel>(core, ccguid);
                         if (instance != null) {
-                            invalidateCache<T>(core, instance.id);
+                            invalidateRecordCache<T>(core, instance.id);
                             core.db.deleteContentRecords(contentName, "(ccguid=" + core.db.encodeSQLText(ccguid) + ")");
                         }
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -914,13 +900,13 @@ namespace Contensive.Processor.Models.Db {
                 if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
+                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
                 } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
+                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
-                    csController cs = new csController(core);
+                    CsController cs = new CsController(core);
                     string sql = getSelectSql<T>(null, sqlCriteria, sqlOrderBy);
                     //Dim ignoreCacheNames As New List(Of String)
                     //Dim instanceType As Type = GetType(T)
@@ -940,7 +926,7 @@ namespace Contensive.Processor.Models.Db {
                     cs.close();
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -948,30 +934,51 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         /// <summary>
-        /// invalidate the primary key (which depends on all secondary keys)
+        /// invalidate the cache entry for a record
         /// </summary>
         /// <param name="core"></param>
         /// <param name="recordId"></param>
-        protected static void invalidateCache<T>(CoreController core, int recordId) where T : BaseModel {
+        protected static void invalidateRecordCache<T>(CoreController core, int recordId) where T : BaseModel {
             try {
                 if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
+                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
                 } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
+                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
                     object instanceType = typeof(T);
-                    string tableName = derivedContentTableName((Type)instanceType);
-                    core.cache.invalidate(Controllers.CacheController.getCacheKey_Entity(tableName, recordId));
-                    //
-                    // -- the zero record cache means any record was updated. Can be used to invalidate arbitraty lists of records in the table
-                    core.cache.invalidate(Controllers.CacheController.getCacheKey_Entity(tableName, "id", "0"));
+                    core.cache.invalidateDbRecord( recordId, derivedTableName((Type)instanceType));
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// invalidate all cache entries for the table
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="recordId"></param>
+        protected static void invalidateTableCache<T>(CoreController core) where T : BaseModel {
+            try {
+                if (core.serverConfig == null) {
+                    //
+                    // -- cannot use models without an application
+                    LogController.handleError(core, new ApplicationException("Cannot use data models without a valid server configuration."));
+                } else if (core.appConfig == null) {
+                    //
+                    // -- cannot use models without an application
+                    LogController.handleError(core, new ApplicationException("Cannot use data models without a valid application configuration."));
+                } else {
+                    object instanceType = typeof(T);
+                    core.cache.invalidateAllKeysInTable(derivedTableName((Type)instanceType));
+                }
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
             }
         }
         //
@@ -987,16 +994,16 @@ namespace Contensive.Processor.Models.Db {
                 if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
+                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
                 } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
+                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
                     if (recordId > 0) {
                         Type instanceType = typeof(T);
-                        string tableName = derivedContentTableName(instanceType);
-                        using (csController cs = new csController(core)) {
+                        string tableName = derivedTableName(instanceType);
+                        using (CsController cs = new CsController(core)) {
                             if (cs.openSQL("select name from " + tableName + " where id=" + recordId.ToString())) {
                                 return cs.getText("name");
                             }
@@ -1004,7 +1011,7 @@ namespace Contensive.Processor.Models.Db {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return "";
         }
@@ -1021,16 +1028,16 @@ namespace Contensive.Processor.Models.Db {
                 if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
+                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
                 } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
+                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
                     if (!string.IsNullOrEmpty(ccGuid)) {
                         Type instanceType = typeof(T);
-                        string tableName = derivedContentTableName(instanceType);
-                        using (csController cs = new csController(core)) {
+                        string tableName = derivedTableName(instanceType);
+                        using (CsController cs = new CsController(core)) {
                             if (cs.openSQL("select name from " + tableName + " where ccguid=" + core.db.encodeSQLText(ccGuid))) {
                                 return cs.getText("name");
                             }
@@ -1038,7 +1045,7 @@ namespace Contensive.Processor.Models.Db {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return "";
         }
@@ -1055,16 +1062,16 @@ namespace Contensive.Processor.Models.Db {
                 if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
+                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
                 } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
+                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
                     if (!string.IsNullOrEmpty(ccGuid)) {
                         Type instanceType = typeof(T);
-                        string tableName = derivedContentTableName(instanceType);
-                        using (csController cs = new csController(core)) {
+                        string tableName = derivedTableName(instanceType);
+                        using (CsController cs = new CsController(core)) {
                             if (cs.openSQL("select id from " + tableName + " where ccguid=" + core.db.encodeSQLText(ccGuid))) {
                                 return cs.getInteger("id");
                             }
@@ -1072,13 +1079,18 @@ namespace Contensive.Processor.Models.Db {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return 0;
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Create a model object from the default values for each field
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="core"></param>
+        /// <returns></returns>
         protected static T createDefault<T>(CoreController core) where T : BaseModel {
             T instance = default(T);
             try {
@@ -1087,11 +1099,11 @@ namespace Contensive.Processor.Models.Db {
                 if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
+                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
                 } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    logController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
+                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
                     string contentName = derivedContentName(instanceType);
                     Models.Domain.CDefModel CDef = Models.Domain.CDefModel.getCdef(core, contentName);
@@ -1108,16 +1120,16 @@ namespace Contensive.Processor.Models.Db {
                                 default:
                                     switch (resultProperty.PropertyType.Name) {
                                         case "Int32":
-                                            resultProperty.SetValue(instance, genericController.encodeInteger(CDef.fields[resultProperty.Name].defaultValue), null);
+                                            resultProperty.SetValue(instance, GenericController.encodeInteger(CDef.fields[resultProperty.Name].defaultValue), null);
                                             break;
                                         case "Boolean":
-                                            resultProperty.SetValue(instance, genericController.encodeBoolean(CDef.fields[resultProperty.Name].defaultValue), null);
+                                            resultProperty.SetValue(instance, GenericController.encodeBoolean(CDef.fields[resultProperty.Name].defaultValue), null);
                                             break;
                                         case "DateTime":
-                                            resultProperty.SetValue(instance, genericController.encodeDate(CDef.fields[resultProperty.Name].defaultValue), null);
+                                            resultProperty.SetValue(instance, GenericController.encodeDate(CDef.fields[resultProperty.Name].defaultValue), null);
                                             break;
                                         case "Double":
-                                            resultProperty.SetValue(instance, genericController.encodeNumber(CDef.fields[resultProperty.Name].defaultValue), null);
+                                            resultProperty.SetValue(instance, GenericController.encodeNumber(CDef.fields[resultProperty.Name].defaultValue), null);
                                             break;
                                         default:
                                             resultProperty.SetValue(instance, CDef.fields[resultProperty.Name].defaultValue, null);
@@ -1129,18 +1141,16 @@ namespace Contensive.Processor.Models.Db {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return instance;
         }
         //
         //====================================================================================================
         //
-        private static T readModelCache<T>(CoreController core, string fieldName, string fieldValue) where T : BaseModel {
+        private static T readRecordCache<T>(CoreController core, int recordId) where T : BaseModel {
             Type instanceType = typeof(T);
-            string tableName = derivedContentTableName(instanceType);
-            string cacheName = Controllers.CacheController.getCacheKey_Entity(tableName, fieldName, fieldValue);
-            return core.cache.getObject<T>(cacheName);
+            return core.cache.getObject<T>(CacheController.getCacheKey_forDbRecord(recordId, derivedTableName(instanceType), derivedDataSourceName(instanceType)));
         }
         //
         //====================================================================================================
@@ -1148,7 +1158,7 @@ namespace Contensive.Processor.Models.Db {
         private static string getSelectSql<T>(List<string> fieldList = null, string criteria = "", string orderBy = "") where T : BaseModel {
             string result = "";
             Type instanceType = typeof(T);
-            string tableName = derivedContentTableName(instanceType);
+            string tableName = derivedTableName(instanceType);
             if (fieldList == null) {
                 fieldList = new List<string>();
                 T modelInstance = (T)Activator.CreateInstance(instanceType);
@@ -1164,6 +1174,10 @@ namespace Contensive.Processor.Models.Db {
                 result += " order by " + orderBy;
             }
             return result;
+        }
+        //
+        public static string getTableCacheKey<T>(CoreController core) {
+            return CacheController.getCacheKey_forDbTable(derivedTableName(typeof(T)));
         }
     }
 }

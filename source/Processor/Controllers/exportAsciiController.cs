@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 //
@@ -21,7 +21,7 @@ namespace Contensive.Processor.Controllers {
     /// <summary>
     /// static class controller
     /// </summary>
-    public class exportAsciiController : IDisposable {
+    public class ExportAsciiController : IDisposable {
         //
         // ----- constants
         //
@@ -51,9 +51,9 @@ namespace Contensive.Processor.Controllers {
                 System.Text.StringBuilder sb = new System.Text.StringBuilder();
                 string TestFilename;
                 //
-                TestFilename = "AsciiExport" + genericController.GetRandomInteger(core) + ".txt";
+                TestFilename = "AsciiExport" + GenericController.GetRandomInteger(core) + ".txt";
                 //
-                iContentName = genericController.encodeText(ContentName);
+                iContentName = GenericController.encodeText(ContentName);
                 if (PageSize == 0) {
                     PageSize = 1000;
                 }
@@ -66,7 +66,7 @@ namespace Contensive.Processor.Controllers {
                 core.webServer.setResponseContentType("text/plain");
                 core.html.enableOutputBuffer(false);
                 TableName = DbController.getDbObjectTableName(Models.Domain.CDefModel.getContentTablename(core, iContentName));
-                switch (genericController.vbUCase(TableName)) {
+                switch (GenericController.vbUCase(TableName)) {
                     case "CCMEMBERS":
                         //
                         // ----- People and member content export
@@ -83,8 +83,8 @@ namespace Contensive.Processor.Controllers {
                                 Delimiter = ",";
                                 FieldNameVariant = core.db.csGetFirstFieldName(CSPointer);
                                 while (!string.IsNullOrEmpty(FieldNameVariant)) {
-                                    FieldName = genericController.encodeText(FieldNameVariant);
-                                    UcaseFieldName = genericController.vbUCase(FieldName);
+                                    FieldName = GenericController.encodeText(FieldNameVariant);
+                                    UcaseFieldName = GenericController.vbUCase(FieldName);
                                     if ((UcaseFieldName != "USERNAME") & (UcaseFieldName != "PASSWORD")) {
                                         sb.Append(Delimiter + "\"" + FieldName + "\"");
                                     }
@@ -103,15 +103,15 @@ namespace Contensive.Processor.Controllers {
                                     Delimiter = ",";
                                     FieldNameVariant = core.db.csGetFirstFieldName(CSPointer);
                                     while (!string.IsNullOrEmpty(FieldNameVariant)) {
-                                        FieldName = genericController.encodeText(FieldNameVariant);
-                                        UcaseFieldName = genericController.vbUCase(FieldName);
+                                        FieldName = GenericController.encodeText(FieldNameVariant);
+                                        UcaseFieldName = GenericController.vbUCase(FieldName);
                                         if ((UcaseFieldName != "USERNAME") & (UcaseFieldName != "PASSWORD")) {
                                             Copy = core.db.csGet(CSPointer, FieldName);
                                             if (!string.IsNullOrEmpty(Copy)) {
-                                                Copy = genericController.vbReplace(Copy, "\"", "'");
-                                                Copy = genericController.vbReplace(Copy, "\r\n", " ");
-                                                Copy = genericController.vbReplace(Copy, "\r", " ");
-                                                Copy = genericController.vbReplace(Copy, "\n", " ");
+                                                Copy = GenericController.vbReplace(Copy, "\"", "'");
+                                                Copy = GenericController.vbReplace(Copy, "\r\n", " ");
+                                                Copy = GenericController.vbReplace(Copy, "\r", " ");
+                                                Copy = GenericController.vbReplace(Copy, "\n", " ");
                                             }
                                             sb.Append(Delimiter + "\"" + Copy + "\"");
                                         }
@@ -155,29 +155,29 @@ namespace Contensive.Processor.Controllers {
                                 Delimiter = "";
                                 FieldNameVariant = core.db.csGetFirstFieldName(CSPointer);
                                 while (!string.IsNullOrEmpty(FieldNameVariant)) {
-                                    switch (core.db.csGetFieldTypeId(CSPointer, genericController.encodeText(FieldNameVariant))) {
+                                    switch (core.db.csGetFieldTypeId(CSPointer, GenericController.encodeText(FieldNameVariant))) {
                                         case FieldTypeIdFileText:
                                         case FieldTypeIdFileCSS:
                                         case FieldTypeIdFileXML:
                                         case FieldTypeIdFileJavascript:
                                         case FieldTypeIdFileHTML:
-                                            Copy = csController.getTextEncoded(core, CSPointer, genericController.encodeText(FieldNameVariant));
+                                            Copy = CsController.getTextEncoded(core, CSPointer, GenericController.encodeText(FieldNameVariant));
                                             break;
                                         case FieldTypeIdLookup:
-                                            Copy = core.db.csGetLookup(CSPointer, genericController.encodeText(FieldNameVariant));
+                                            Copy = core.db.csGetLookup(CSPointer, GenericController.encodeText(FieldNameVariant));
                                             break;
                                         case FieldTypeIdRedirect:
                                         case FieldTypeIdManyToMany:
                                             break;
                                         default:
-                                            Copy = core.db.csGetText(CSPointer, genericController.encodeText(FieldNameVariant));
+                                            Copy = core.db.csGetText(CSPointer, GenericController.encodeText(FieldNameVariant));
                                             break;
                                     }
                                     if (!string.IsNullOrEmpty(Copy)) {
-                                        Copy = genericController.vbReplace(Copy, "\"", "'");
-                                        Copy = genericController.vbReplace(Copy, "\r\n", " ");
-                                        Copy = genericController.vbReplace(Copy, "\r", " ");
-                                        Copy = genericController.vbReplace(Copy, "\n", " ");
+                                        Copy = GenericController.vbReplace(Copy, "\"", "'");
+                                        Copy = GenericController.vbReplace(Copy, "\r\n", " ");
+                                        Copy = GenericController.vbReplace(Copy, "\r", " ");
+                                        Copy = GenericController.vbReplace(Copy, "\n", " ");
                                     }
                                     core.appRootFiles.appendFile(TestFilename, Delimiter + "\"" + Copy + "\"");
                                     Delimiter = ",";
@@ -194,7 +194,7 @@ namespace Contensive.Processor.Controllers {
                 result = core.appRootFiles.readFileText(TestFilename);
                 core.appRootFiles.deleteFile(TestFilename);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -216,7 +216,7 @@ namespace Contensive.Processor.Controllers {
             GC.SuppressFinalize(this);
         }
         //
-        ~exportAsciiController() {
+        ~ExportAsciiController() {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(false);
             //todo  NOTE: The base class Finalize method is automatically called from the destructor:

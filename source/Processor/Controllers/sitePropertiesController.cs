@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using Contensive.Processor.Models.Domain;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Controllers {
@@ -380,7 +380,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -433,7 +433,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 using (DataTable dt = core.db.executeQuery("select FieldValue from ccSetup where name=" + core.db.encodeSQLText(PropertyName) + " order by id")) {
                     if (dt.Rows.Count > 0) {
-                        returnString = genericController.encodeText(dt.Rows[0]["FieldValue"]);
+                        returnString = GenericController.encodeText(dt.Rows[0]["FieldValue"]);
                         return_propertyFound = true;
                     } else if (!string.IsNullOrEmpty(DefaultValue)) {
                         // do not set - set may have to save, and save needs contentId, which now loads ondemand, which checks cache, which does a getSiteProperty.
@@ -446,7 +446,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnString;
@@ -519,7 +519,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnString;
@@ -543,7 +543,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="DefaultValue"></param>
         /// <returns></returns>
         public int getInteger(string PropertyName, int DefaultValue = 0) {
-            return genericController.encodeInteger(getText(PropertyName, DefaultValue.ToString()));
+            return GenericController.encodeInteger(getText(PropertyName, DefaultValue.ToString()));
         }
         //
         //========================================================================
@@ -554,7 +554,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="DefaultValue"></param>
         /// <returns></returns>
         public double getNumber(string PropertyName, double DefaultValue = 0) {
-            return genericController.encodeNumber(getText(PropertyName, DefaultValue.ToString()));
+            return GenericController.encodeNumber(getText(PropertyName, DefaultValue.ToString()));
         }
         //
         //========================================================================
@@ -565,7 +565,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="DefaultValue"></param>
         /// <returns></returns>
         public bool getBoolean(string PropertyName, bool DefaultValue = false) {
-            return genericController.encodeBoolean(getText(PropertyName, DefaultValue.ToString()));
+            return GenericController.encodeBoolean(getText(PropertyName, DefaultValue.ToString()));
         }
         //
         //========================================================================
@@ -576,7 +576,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="DefaultValue"></param>
         /// <returns></returns>
         public DateTime getDate(string PropertyName, DateTime DefaultValue = default(DateTime)) {
-            return genericController.encodeDate(getText(PropertyName, DefaultValue.ToString()));
+            return GenericController.encodeDate(getText(PropertyName, DefaultValue.ToString()));
         }
         //
         //====================================================================================================
@@ -591,7 +591,7 @@ namespace Contensive.Processor.Controllers {
                 } else {
                     if (_allowCache_notCached == null) {
                         bool propertyFound = false;
-                        _allowCache_notCached = genericController.encodeBoolean(getTextFromDb("AllowBake", "0", ref propertyFound));
+                        _allowCache_notCached = GenericController.encodeBoolean(getTextFromDb("AllowBake", "0", ref propertyFound));
                     }
                     return encodeBoolean(_allowCache_notCached);
                 }
@@ -654,7 +654,7 @@ namespace Contensive.Processor.Controllers {
                 } else {
                     if (_nameValueDict == null) {
                         _nameValueDict = new Dictionary<string, string>();
-                        csController cs = new csController(core);
+                        CsController cs = new CsController(core);
                         if (cs.openSQL("select name,FieldValue from ccsetup where (active>0) order by id")) {
                             do {
                                 string name = cs.getText("name").Trim().ToLower();

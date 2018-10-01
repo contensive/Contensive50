@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Controllers {
@@ -146,7 +146,7 @@ namespace Contensive.Processor.Controllers {
                     SQL = "select id from cccontent where name=" + core.db.encodeSQLText(iContentName);
                     dt = core.db.executeQuery(SQL);
                     if (dt.Rows.Count > 0) {
-                        ContentID = genericController.encodeInteger(dt.Rows[0]["id"]);
+                        ContentID = GenericController.encodeInteger(dt.Rows[0]["id"]);
                     }
                 }
                 if (!string.IsNullOrEmpty(iContentName) && (ContentID == 0)) {
@@ -237,7 +237,7 @@ namespace Contensive.Processor.Controllers {
                         // ----- <cdef>
                         //
                         iContentName = encodeXmlAttributeFieldValue(appName, dr, "Name");
-                        ContentID = genericController.encodeInteger(dr["ID"]);
+                        ContentID = GenericController.encodeInteger(dr["ID"]);
                         sb.Append("\r\n\t<CDef");
                         sb.Append(" Name=\"" + iContentName + "\"");
                         if ((!encodeBoolean(dr["isBaseContent"])) || IncludeBaseFields) {
@@ -254,14 +254,14 @@ namespace Contensive.Processor.Controllers {
                             sb.Append(" AllowTopicRules=\"" + encodeXmlAttributeFieldValue(appName, dr, "AllowTopicRules") + "\"");
                             sb.Append(" AllowWorkflowAuthoring=\"" + encodeXmlAttributeFieldValue(appName, dr, "AllowWorkflowAuthoring") + "\"");
                             //
-                            AuthoringTableID = genericController.encodeInteger(dr["AuthoringTableID"]);
+                            AuthoringTableID = GenericController.encodeInteger(dr["AuthoringTableID"]);
                             TableName = "";
                             DataSourceName = "";
                             if (AuthoringTableID != 0) {
                                 for (Ptr = 0; Ptr < TableCnt; Ptr++) {
-                                    if (genericController.encodeInteger(Tables[0, Ptr]) == AuthoringTableID) {
-                                        TableName = genericController.encodeText(Tables[1, Ptr]);
-                                        DataSourceName = genericController.encodeText(Tables[2, Ptr]);
+                                    if (GenericController.encodeInteger(Tables[0, Ptr]) == AuthoringTableID) {
+                                        TableName = GenericController.encodeText(Tables[1, Ptr]);
+                                        DataSourceName = GenericController.encodeText(Tables[2, Ptr]);
                                         break;
                                     }
                                 }
@@ -269,21 +269,21 @@ namespace Contensive.Processor.Controllers {
                             if (string.IsNullOrEmpty(DataSourceName)) {
                                 DataSourceName = "Default";
                             }
-                            if (genericController.vbUCase(TableName) == "CCMENUENTRIES") {
+                            if (GenericController.vbUCase(TableName) == "CCMENUENTRIES") {
                                 FoundMenuTable = true;
                             }
                             sb.Append(" AuthoringDataSourceName=\"" + encodeXMLattribute(DataSourceName) + "\"");
                             sb.Append(" AuthoringTableName=\"" + encodeXMLattribute(TableName) + "\"");
                             //
-                            ContentTableID = genericController.encodeInteger(dr["ContentTableID"]);
+                            ContentTableID = GenericController.encodeInteger(dr["ContentTableID"]);
                             if (ContentTableID != AuthoringTableID) {
                                 if (ContentTableID != 0) {
                                     TableName = "";
                                     DataSourceName = "";
                                     for (Ptr = 0; Ptr < TableCnt; Ptr++) {
-                                        if (genericController.encodeInteger(Tables[0, Ptr]) == ContentTableID) {
-                                            TableName = genericController.encodeText(Tables[1, Ptr]);
-                                            DataSourceName = genericController.encodeText(Tables[2, Ptr]);
+                                        if (GenericController.encodeInteger(Tables[0, Ptr]) == ContentTableID) {
+                                            TableName = GenericController.encodeText(Tables[1, Ptr]);
+                                            DataSourceName = GenericController.encodeText(Tables[2, Ptr]);
                                             break;
                                         }
                                     }
@@ -295,18 +295,18 @@ namespace Contensive.Processor.Controllers {
                             sb.Append(" ContentDataSourceName=\"" + encodeXMLattribute(DataSourceName) + "\"");
                             sb.Append(" ContentTableName=\"" + encodeXMLattribute(TableName) + "\"");
                             //
-                            DefaultSortMethodID = genericController.encodeInteger(dr["DefaultSortMethodID"]);
+                            DefaultSortMethodID = GenericController.encodeInteger(dr["DefaultSortMethodID"]);
                             DefaultSortMethod = CacheLookup(DefaultSortMethodID, Sorts);
                             sb.Append(" DefaultSortMethod=\"" + encodeXMLattribute(DefaultSortMethod) + "\"");
                             //
                             sb.Append(" DeveloperOnly=\"" + encodeXmlAttributeFieldValue(appName, dr, "DeveloperOnly") + "\"");
                             sb.Append(" DropDownFieldList=\"" + encodeXmlAttributeFieldValue(appName, dr, "DropDownFieldList") + "\"");
                             //
-                            EditorGroupID = genericController.encodeInteger(dr["EditorGroupID"]);
+                            EditorGroupID = GenericController.encodeInteger(dr["EditorGroupID"]);
                             EditorGroupName = CacheLookup(EditorGroupID, Groups);
                             sb.Append(" EditorGroupName=\"" + encodeXMLattribute(EditorGroupName) + "\"");
                             //
-                            ParentID = genericController.encodeInteger(dr["ParentID"]);
+                            ParentID = GenericController.encodeInteger(dr["ParentID"]);
                             ParentName = CacheLookup(ParentID, Contents);
                             sb.Append(" Parent=\"" + encodeXMLattribute(ParentName) + "\"");
                             //
@@ -325,9 +325,9 @@ namespace Contensive.Processor.Controllers {
                         fieldId = 0;
                         while (CFieldPtr < CFieldCnt) {
                             LastFieldID = fieldId;
-                            fieldId = genericController.encodeInteger(CFields[f_ID, CFieldPtr]);
-                            FieldName = genericController.encodeText(CFields[f_Name, CFieldPtr]);
-                            FieldContentID = genericController.encodeInteger(CFields[f_contentid, CFieldPtr]);
+                            fieldId = GenericController.encodeInteger(CFields[f_ID, CFieldPtr]);
+                            FieldName = GenericController.encodeText(CFields[f_Name, CFieldPtr]);
+                            FieldContentID = GenericController.encodeInteger(CFields[f_contentid, CFieldPtr]);
                             if (FieldContentID > ContentID) {
                                 break;
                             } else if ((FieldContentID == ContentID) && (fieldId != LastFieldID)) {
@@ -368,23 +368,23 @@ namespace Contensive.Processor.Controllers {
                                         sb.Append(" IsBaseField=\"" + xmlValueBoolean(CFields[f_IsBaseField, CFieldPtr]) + "\"");
                                     }
                                     //
-                                    RecordID = genericController.encodeInteger(CFields[f_LookupContentID, CFieldPtr]);
+                                    RecordID = GenericController.encodeInteger(CFields[f_LookupContentID, CFieldPtr]);
                                     RecordName = CacheLookup(RecordID, Contents);
                                     sb.Append(" LookupContent=\"" + HtmlController.encodeHtml(RecordName) + "\"");
                                     //
-                                    RecordID = genericController.encodeInteger(CFields[f_RedirectContentID, CFieldPtr]);
+                                    RecordID = GenericController.encodeInteger(CFields[f_RedirectContentID, CFieldPtr]);
                                     RecordName = CacheLookup(RecordID, Contents);
                                     sb.Append(" RedirectContent=\"" + HtmlController.encodeHtml(RecordName) + "\"");
                                     //
-                                    RecordID = genericController.encodeInteger(CFields[f_ManyToManyContentID, CFieldPtr]);
+                                    RecordID = GenericController.encodeInteger(CFields[f_ManyToManyContentID, CFieldPtr]);
                                     RecordName = CacheLookup(RecordID, Contents);
                                     sb.Append(" ManyToManyContent=\"" + HtmlController.encodeHtml(RecordName) + "\"");
                                     //
-                                    RecordID = genericController.encodeInteger(CFields[f_ManyToManyRuleContentID, CFieldPtr]);
+                                    RecordID = GenericController.encodeInteger(CFields[f_ManyToManyRuleContentID, CFieldPtr]);
                                     RecordName = CacheLookup(RecordID, Contents);
                                     sb.Append(" ManyToManyRuleContent=\"" + HtmlController.encodeHtml(RecordName) + "\"");
                                     //
-                                    RecordID = genericController.encodeInteger(CFields[f_MemberSelectGroupId, CFieldPtr]);
+                                    RecordID = GenericController.encodeInteger(CFields[f_MemberSelectGroupId, CFieldPtr]);
                                     RecordName = "";
                                     if (RecordID>0) {
                                         RecordName = core.db.getRecordName("groups", RecordID);
@@ -429,7 +429,7 @@ namespace Contensive.Processor.Controllers {
                     tempGetXMLContentDefinition3 = "<" + CollectionFileRootNode + " name=\"Application\" guid=\"" + ApplicationCollectionGuid + "\">" + sb.ToString() + "\r\n</" + CollectionFileRootNode + ">";
                 }
             } catch( Exception ex ) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return tempGetXMLContentDefinition3;
         }
@@ -455,7 +455,7 @@ namespace Contensive.Processor.Controllers {
                     string IndexList = core.db.getSQLIndexList(DataSourceName, TableName);
                     //
                     if (!string.IsNullOrEmpty(IndexList)) {
-                        string[] ListRows = genericController.stringSplit(IndexList, "\r\n");
+                        string[] ListRows = GenericController.stringSplit(IndexList, "\r\n");
                         string IndexName = "";
                         int tempVar = ListRows.GetUpperBound(0) + 1;
                         string IndexFields = "";
@@ -511,7 +511,7 @@ namespace Contensive.Processor.Controllers {
                 core.db.csClose(ref CS);
                 result = sb.ToString();
             } catch( Exception ex ) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -527,7 +527,7 @@ namespace Contensive.Processor.Controllers {
                 s = s + GetXMLContentDefinition_AdminMenus_MenuEntries();
                 s = s + GetXMLContentDefinition_AdminMenus_NavigatorEntries();
             } catch( Exception ex ) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return s;
         }
@@ -561,8 +561,8 @@ namespace Contensive.Processor.Controllers {
                     NavIconType = 0;
                     NavIconTitle = "";
                     foreach (DataRow rsDr in dt.Rows) {
-                        RecordName = genericController.encodeText(rsDr["Name"]);
-                        ParentID = genericController.encodeInteger(rsDr["ParentID"]);
+                        RecordName = GenericController.encodeText(rsDr["Name"]);
+                        ParentID = GenericController.encodeInteger(rsDr["ParentID"]);
                         menuNameSpace = getMenuNameSpace(ParentID, "");
                         sb.Append("<NavigatorEntry Name=\"" + encodeXMLattribute(RecordName) + "\"");
                         sb.Append(" NameSpace=\"" + menuNameSpace + "\"");
@@ -574,7 +574,7 @@ namespace Contensive.Processor.Controllers {
                         sb.Append(" Active=\"" + encodeXmlAttributeFieldValue(appName, rsDr, "Active") + "\"");
                         sb.Append(" AddonName=\"" + encodeXmlAttributeFieldLookup(appName, rsDr, "AddonID", "ccAggregateFunctions") + "\"");
                         sb.Append(" SortOrder=\"" + encodeXmlAttributeFieldValue(appName, rsDr, "SortOrder") + "\"");
-                        NavIconType = genericController.encodeInteger(encodeXmlAttributeFieldValue(appName, rsDr, "NavIconType"));
+                        NavIconType = GenericController.encodeInteger(encodeXmlAttributeFieldValue(appName, rsDr, "NavIconType"));
                         NavIconTitle = encodeXmlAttributeFieldValue(appName, rsDr, "NavIconTitle");
                         sb.Append(" NavIconTitle=\"" + NavIconTitle + "\"");
                         SplitArray = (NavIconTypeList + ",help").Split(',');
@@ -588,7 +588,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 result = sb.ToString();
             } catch( Exception ex ) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -607,7 +607,7 @@ namespace Contensive.Processor.Controllers {
                 if (DbController.isDataTableOk(rs)) {
                     if (true) {
                         foreach (DataRow dr in rs.Rows) {
-                            string RecordName = genericController.encodeText(dr["Name"]);
+                            string RecordName = GenericController.encodeText(dr["Name"]);
                             sb.Append("<MenuEntry Name=\"" + encodeXMLattribute(RecordName) + "\"");
                             sb.Append(" ParentName=\"" + encodeXmlAttributeFieldLookup(appName, dr, "ParentID", "ccMenuEntries") + "\"");
                             sb.Append(" LinkPage=\"" + encodeXmlAttributeFieldValue(appName, dr, "LinkPage") + "\"");
@@ -625,7 +625,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 result = sb.ToString();
             } catch( Exception ex ) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -668,9 +668,9 @@ namespace Contensive.Processor.Controllers {
         private string encodeXMLattribute(string Source) {
             string tempEncodeXMLattribute = null;
             tempEncodeXMLattribute = HtmlController.encodeHtml(Source);
-            tempEncodeXMLattribute = genericController.vbReplace(tempEncodeXMLattribute, "\r\n", " ");
-            tempEncodeXMLattribute = genericController.vbReplace(tempEncodeXMLattribute, "\r", "");
-            return genericController.vbReplace(tempEncodeXMLattribute, "\n", "");
+            tempEncodeXMLattribute = GenericController.vbReplace(tempEncodeXMLattribute, "\r\n", " ");
+            tempEncodeXMLattribute = GenericController.vbReplace(tempEncodeXMLattribute, "\r", "");
+            return GenericController.vbReplace(tempEncodeXMLattribute, "\n", "");
         }
         //
         //
@@ -690,7 +690,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch( Exception ex ) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return tempGetTableRecordName;
         }
@@ -698,13 +698,13 @@ namespace Contensive.Processor.Controllers {
         //
         //
         private string encodeXmlAttributeFieldValue(string appName, DataRow dr, string FieldName) {
-            return encodeXMLattribute(genericController.encodeText(dr[FieldName]));
+            return encodeXMLattribute(GenericController.encodeText(dr[FieldName]));
         }
         //
         //
         //
         private string encodeXmlAttributeFieldLookup(string appName, DataRow dr, string FieldName, string TableName) {
-            return encodeXMLattribute(GetTableRecordName(TableName, genericController.encodeInteger(dr[FieldName])));
+            return encodeXMLattribute(GetTableRecordName(TableName, GenericController.encodeInteger(dr[FieldName])));
         }
         //
         //
@@ -721,8 +721,8 @@ namespace Contensive.Processor.Controllers {
                 //
                 appName = core.appConfig.name;
                 if (RecordID != 0) {
-                    if (genericController.vbInstr(1, "," + UsedIDString + ",", "," + RecordID + ",", 1) != 0) {
-                        logController.logError(core, "getMenuNameSpace, Circular reference found in UsedIDString [" + UsedIDString + "] getting ccMenuEntries namespace for recordid [" + RecordID + "]");
+                    if (GenericController.vbInstr(1, "," + UsedIDString + ",", "," + RecordID + ",", 1) != 0) {
+                        LogController.logError(core, "getMenuNameSpace, Circular reference found in UsedIDString [" + UsedIDString + "] getting ccMenuEntries namespace for recordid [" + RecordID + "]");
                         tempgetMenuNameSpace = "";
                     } else {
                         UsedIDString = UsedIDString + "," + RecordID;
@@ -730,8 +730,8 @@ namespace Contensive.Processor.Controllers {
                         if (RecordID != 0) {
                             rs = core.db.executeQuery("select Name,ParentID from ccMenuEntries where ID=" + RecordID);
                             if (DbController.isDataTableOk(rs)) {
-                                ParentID = genericController.encodeInteger(rs.Rows[0]["ParentID"]);
-                                RecordName = genericController.encodeText(rs.Rows[0]["Name"]);
+                                ParentID = GenericController.encodeInteger(rs.Rows[0]["ParentID"]);
+                                RecordName = GenericController.encodeText(rs.Rows[0]["Name"]);
                             }
                             if (DbController.isDataTableOk(rs)) {
                                 if (false) {
@@ -745,7 +745,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // circular reference
                                 //
-                                logController.logError(core, "getMenuNameSpace, Circular reference found (ParentID=RecordID) getting ccMenuEntries namespace for recordid [" + RecordID + "]");
+                                LogController.logError(core, "getMenuNameSpace, Circular reference found (ParentID=RecordID) getting ccMenuEntries namespace for recordid [" + RecordID + "]");
                                 tempgetMenuNameSpace = "";
                             } else {
                                 if (ParentID != 0) {
@@ -766,7 +766,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch( Exception ex ) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return tempgetMenuNameSpace;
         }
@@ -781,8 +781,8 @@ namespace Contensive.Processor.Controllers {
             tempCacheLookup = "";
             if (RecordID != 0) {
                 for (Ptr = 0; Ptr <= Cache.GetUpperBound(1); Ptr++) {
-                    if (genericController.encodeInteger(Cache[0, Ptr]) == RecordID) {
-                        tempCacheLookup = genericController.encodeText(Cache[1, Ptr]);
+                    if (GenericController.encodeInteger(Cache[0, Ptr]) == RecordID) {
+                        tempCacheLookup = GenericController.encodeText(Cache[1, Ptr]);
                         break;
                     }
                 }
@@ -793,13 +793,13 @@ namespace Contensive.Processor.Controllers {
         //
         //
         private string xmlValueText(object Source) {
-            return encodeXMLattribute(genericController.encodeText(Source));
+            return encodeXMLattribute(GenericController.encodeText(Source));
         }
         //
         //
         //
         private string xmlValueBoolean(object Source) {
-            return encodeText(genericController.encodeBoolean(genericController.encodeText(Source)));
+            return encodeText(GenericController.encodeBoolean(GenericController.encodeText(Source)));
         }
     }
 }

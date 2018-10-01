@@ -10,7 +10,7 @@ namespace Contensive.Processor {
     /// <summary>
     /// The prefered database access methods. A recordset-like construct. Create an instance and use it to read/write to the Db.
     /// </summary>
-    public class csController : IDisposable {
+    public class CsController : IDisposable {
         //
         private Contensive.Processor.Controllers.CoreController core;
         private int csPtr;
@@ -22,7 +22,7 @@ namespace Contensive.Processor {
         /// constructor
         /// </summary>
         /// <param name="core"></param>
-        public csController(CoreController core) {
+        public CsController(CoreController core) {
             this.core = core;
             openingMemberID = core.session.user.id;
         }
@@ -62,7 +62,7 @@ namespace Contensive.Processor {
                 csPtr = core.db.csInsertRecord(ContentName, openingMemberID);
                 success = core.db.csOk(csPtr);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return success;
@@ -78,7 +78,7 @@ namespace Contensive.Processor {
                 csPtr = core.db.csOpen(ContentName, SQLCriteria, SortFieldList, ActiveOnly,0,false,false,SelectFieldList, pageSize, PageNumber);
                 success = core.db.csOk(csPtr);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return success;
@@ -94,7 +94,7 @@ namespace Contensive.Processor {
                 csPtr = core.db.csOpenSql(sql,"Default");
                 success = core.db.csOk(csPtr);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return success;
@@ -108,7 +108,7 @@ namespace Contensive.Processor {
                     csPtr = -1;
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -148,7 +148,7 @@ namespace Contensive.Processor {
                     result = "";
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -245,7 +245,7 @@ namespace Contensive.Processor {
                     result = "";
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -259,7 +259,7 @@ namespace Contensive.Processor {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        ~csController() {
+        ~CsController() {
             Dispose(false);
             //todo  NOTE: The base class Finalize method is automatically called from the destructor:
             //base.Finalize();

@@ -10,7 +10,7 @@ using System.Xml.Linq;
 using Contensive.Processor;
 using static Contensive.Processor.constants;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using System.Reflection;
 using System.Timers;
 using System.Threading;
@@ -92,7 +92,7 @@ namespace Contensive.MonitorService {
             string tempGetDoc = null;
             try {
                 //
-                httpRequestController kmaHTTP = new httpRequestController();
+                HttpRequestController kmaHTTP = new HttpRequestController();
                 string URLWorking = null;
                 Stopwatch stopWatch = new Stopwatch();
                 //
@@ -101,7 +101,7 @@ namespace Contensive.MonitorService {
                 return_needsErrorRecovery = false;
                 kmaHTTP.userAgent = "Contensive Monitor";
                 HTTPLastError = 0;
-                URLWorking = Contensive.Processor.Controllers.genericController.encodeURL(Link);
+                URLWorking = Contensive.Processor.Controllers.GenericController.encodeURL(Link);
                 kmaHTTP.timeout = RequestTimeout;
                 tempGetDoc = kmaHTTP.getURL(ref URLWorking);
                 HTTPLastError = 0;
@@ -357,11 +357,11 @@ namespace Contensive.MonitorService {
                     tempmonitorAllSites_returnEmailBody = tempmonitorAllSites_returnEmailBody + Environment.NewLine + " Error, no Contensive Applications were found";
                     appendMonitorLog("GetApplicationList call returned no Contensive Applications were found");
                 } else {
-                    AppLine = genericController.stringSplit(AppList, Environment.NewLine );
+                    AppLine = GenericController.stringSplit(AppList, Environment.NewLine );
                     AppCnt = AppLine.GetUpperBound(0) + 1;
                     //hint = ""
                     while (AppPtr < AppCnt && (!AbortProcess)) {
-                        AppDetails = genericController.stringSplit(AppLine[AppPtr], "\t" );
+                        AppDetails = GenericController.stringSplit(AppLine[AppPtr], "\t" );
                         AppDetailsCnt = AppDetails.GetUpperBound(0) + 1;
                         if (AppDetailsCnt < AppListCount) {
                             //
@@ -619,7 +619,7 @@ namespace Contensive.MonitorService {
                         }
                         Cmd = "%comspec% /c IISReset";
                         try {
-                            genericController.executeCommandSync(Cmd);
+                            GenericController.executeCommandSync(Cmd);
                         } catch (Exception ex) {
                             appendMonitorLog("IISReset attempt failed, error=" + ex.ToString());
                         }
@@ -630,7 +630,7 @@ namespace Contensive.MonitorService {
                         appendMonitorLog("attempting IIS app pool recycle on " + appPoolName + ".");
                         Cmd = "%comspec% /c %systemroot%\\system32\\inetsrv\\appcmd recycle appPool " + appPoolName;
                         try {
-                            genericController.executeCommandSync(Cmd);
+                            GenericController.executeCommandSync(Cmd);
                         } catch (Exception ex) {
                             appendMonitorLog("IIS app pool recycle attempt failed, error=" + ex.ToString());
                         }
@@ -646,7 +646,7 @@ namespace Contensive.MonitorService {
         //
         //
         private void appendMonitorLog(string message) {
-            logController.logError(cpCore, "Monitor-siteCheck:" + message);
+            LogController.logError(cpCore, "Monitor-siteCheck:" + message);
         }
         //
         // ====================================================================================================

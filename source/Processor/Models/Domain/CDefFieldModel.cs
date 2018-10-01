@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Models.Domain {
@@ -285,7 +285,7 @@ namespace Contensive.Processor.Models.Domain {
                     _redirectContentName = "";
                     DataTable dt = core.db.executeQuery("select name from cccontent where id=" + redirectContentID.ToString());
                     if (dt.Rows.Count > 0) {
-                        _redirectContentName = genericController.encodeText(dt.Rows[0][0]);
+                        _redirectContentName = GenericController.encodeText(dt.Rows[0][0]);
                     }
                 }
             }
@@ -310,7 +310,7 @@ namespace Contensive.Processor.Models.Domain {
                     _manyToManyRuleContentName = "";
                     DataTable dt = core.db.executeQuery("select name from cccontent where id=" + manyToManyContentID.ToString());
                     if (dt.Rows.Count > 0) {
-                        _manyToManyContentName = genericController.encodeText(dt.Rows[0][0]);
+                        _manyToManyContentName = GenericController.encodeText(dt.Rows[0][0]);
                     }
                 }
             }
@@ -335,7 +335,7 @@ namespace Contensive.Processor.Models.Domain {
                     _manyToManyRuleContentName = "";
                     DataTable dt = core.db.executeQuery("select name from cccontent where id=" + manyToManyRuleContentID.ToString());
                     if (dt.Rows.Count > 0) {
-                        _manyToManyRuleContentName = genericController.encodeText(dt.Rows[0][0]);
+                        _manyToManyRuleContentName = GenericController.encodeText(dt.Rows[0][0]);
                     }
                 }
             }
@@ -357,7 +357,7 @@ namespace Contensive.Processor.Models.Domain {
                     _lookupContentName = "";
                     DataTable dt = core.db.executeQuery("select name from cccontent where id=" + lookupContentID.ToString());
                     if (dt.Rows.Count > 0) {
-                        _lookupContentName = genericController.encodeText(dt.Rows[0][0]);
+                        _lookupContentName = GenericController.encodeText(dt.Rows[0][0]);
                     }
                 }
             }
@@ -384,7 +384,7 @@ namespace Contensive.Processor.Models.Domain {
         public string memberSelectGroupName_get(CoreController core) {
             if (_memberSelectGroupName == null) {
                 if (_memberSelectGroupId != null) {
-                    _memberSelectGroupName = core.db.getRecordName("groups", genericController.encodeInteger(_memberSelectGroupId));
+                    _memberSelectGroupName = core.db.getRecordName("groups", GenericController.encodeInteger(_memberSelectGroupId));
                 };
             }
             return (_memberSelectGroupName as string);
@@ -404,10 +404,10 @@ namespace Contensive.Processor.Models.Domain {
         public int memberSelectGroupId_get(CoreController core) {
             if (_memberSelectGroupId == null) {
                 if (_memberSelectGroupName != null) {
-                    _memberSelectGroupId = core.db.getRecordID("groups", genericController.encodeText(_memberSelectGroupName));
+                    _memberSelectGroupId = core.db.getRecordID("groups", GenericController.encodeText(_memberSelectGroupName));
                 };
             }
-            return (genericController.encodeInteger(_memberSelectGroupId));
+            return (GenericController.encodeInteger(_memberSelectGroupId));
         }
         private string _memberSelectGroupName = null;
         private int? _memberSelectGroupId = null;

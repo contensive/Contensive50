@@ -9,7 +9,7 @@ using ICSharpCode.SharpZipLib.Zip;
 using System.Threading.Tasks;
 using Contensive.Processor.Models;
 using Contensive.Processor.Models.Domain;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 using Amazon.Runtime;
 using System.Linq;
@@ -77,7 +77,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="remotePathPrefix">If not isLocal, this is added to the remote content path. Ex a\ with content b\c.txt = a\b\c.txt</param>
         public FileController(CoreController core, bool isLocal, string rootLocalPath, string remotePathPrefix) {
             if (string.IsNullOrEmpty(rootLocalPath)) {
-                logController.handleError( core,new ArgumentException("Blank file system root path not permitted."));
+                LogController.handleError( core,new ArgumentException("Blank file system root path not permitted."));
             } else {
                 this.core = core;
                 this.isLocal = isLocal;
@@ -103,7 +103,7 @@ namespace Contensive.Processor.Controllers {
                 //    returnPath = Path.Combine(returnPath, pathFilename);
                 //}
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnPath;
@@ -131,7 +131,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -172,7 +172,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnContent;
@@ -206,7 +206,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnContent;
@@ -259,7 +259,7 @@ namespace Contensive.Processor.Controllers {
                         File.WriteAllText(convertToLocalAbsPath(pathFilename), textContent);
                     }
                 } catch (Exception ex) {
-                    logController.handleError( core,ex);
+                    LogController.handleError( core,ex);
                     throw;
                 }
                 if (!isLocal) {
@@ -267,7 +267,7 @@ namespace Contensive.Processor.Controllers {
                     copyLocalToRemote(pathFilename);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -316,7 +316,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
         }
         //
@@ -345,18 +345,18 @@ namespace Contensive.Processor.Controllers {
                 } else {
                     WorkingPath = normalizeDosPath(absPath);
                     if (!Directory.Exists(WorkingPath)) {
-                        Position = genericController.vbInstr(1, WorkingPath, "\\");
+                        Position = GenericController.vbInstr(1, WorkingPath, "\\");
                         while (Position != 0) {
                             PartialPath = WorkingPath.Left(Position - 1);
                             if (!Directory.Exists(PartialPath)) {
                                 Directory.CreateDirectory(PartialPath);
                             }
-                            Position = genericController.vbInstr(Position + 1, WorkingPath, "\\");
+                            Position = GenericController.vbInstr(Position + 1, WorkingPath, "\\");
                         }
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -375,7 +375,7 @@ namespace Contensive.Processor.Controllers {
                     verifyPath_remote(path);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -396,7 +396,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -412,7 +412,7 @@ namespace Contensive.Processor.Controllers {
                 // https://docs.aws.amazon.com/sdk-for-net/v2/developer-guide/s3-apis-intro.html
                 pathFilename = normalizeDosPathFilename(pathFilename);
                 if (!string.IsNullOrWhiteSpace(pathFilename)) {
-                    string remoteUnixPathFilename = genericController.convertToUnixSlash(joinPath(remotePathPrefix, pathFilename));
+                    string remoteUnixPathFilename = GenericController.convertToUnixSlash(joinPath(remotePathPrefix, pathFilename));
                     if ( fileExists_remote(pathFilename)) {
                         DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest {
                             BucketName = core.serverConfig.awsBucketName,
@@ -422,7 +422,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -441,7 +441,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -477,7 +477,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -563,7 +563,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -633,7 +633,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnFileList;
@@ -662,7 +662,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnList;
@@ -710,7 +710,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnFolders;
@@ -731,7 +731,7 @@ namespace Contensive.Processor.Controllers {
                     returnOK = fileExists_local(pathFilename);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnOK;
@@ -748,7 +748,7 @@ namespace Contensive.Processor.Controllers {
                 string absDosPathFilename = convertToLocalAbsPath(dosPathFilename);
                 returnOK = File.Exists(absDosPathFilename);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnOK;
@@ -778,7 +778,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 throw;
             } catch (Exception ex ) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -801,7 +801,7 @@ namespace Contensive.Processor.Controllers {
                     return pathExists_local(path);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -818,7 +818,7 @@ namespace Contensive.Processor.Controllers {
                 string absPath = convertToLocalAbsPath(path);
                 returnOk = Directory.Exists(absPath);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnOk;
@@ -835,8 +835,8 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- remote
                 path = normalizeDosPath(path);
-                string remoteUnixPathFilename = genericController.convertToUnixSlash("/" + joinPath(remotePathPrefix, path));
-                var url = genericController.splitUrl(remoteUnixPathFilename);
+                string remoteUnixPathFilename = GenericController.convertToUnixSlash("/" + joinPath(remotePathPrefix, path));
+                var url = GenericController.splitUrl(remoteUnixPathFilename);
                 var parentFolderInfo = new Amazon.S3.IO.S3DirectoryInfo(s3Client, core.serverConfig.awsBucketName, "");
                 string dosPathFromLeft = "";
                 foreach (string segment in url.pathSegments) {
@@ -849,7 +849,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 return true;
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -894,7 +894,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -922,7 +922,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnSize;
@@ -968,7 +968,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -1013,7 +1013,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -1039,7 +1039,7 @@ namespace Contensive.Processor.Controllers {
                     copyFolder_srcLocal(joinPath(localAbsRootPath, srcPath), dstPath, dstFileSystem);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -1086,8 +1086,8 @@ namespace Contensive.Processor.Controllers {
             try {
                 pathFilename = normalizeDosPathFilename(pathFilename);
                 if ((!string.IsNullOrEmpty(pathFilename)) & (!string.IsNullOrEmpty(Link))) {
-                    string URLLink = genericController.vbReplace(Link, " ", "%20");
-                    httpRequestController HTTP = new httpRequestController();
+                    string URLLink = GenericController.vbReplace(Link, " ", "%20");
+                    HttpRequestController HTTP = new HttpRequestController();
                     HTTP.timeout = 600;
                     HTTP.getUrlToFile(encodeText(URLLink), convertToLocalAbsPath(pathFilename));
                     //
@@ -1096,7 +1096,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -1144,7 +1144,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -1164,7 +1164,7 @@ namespace Contensive.Processor.Controllers {
                 bool recurse = true;
                 fastZip.CreateZip(convertToLocalAbsPath(archivePathFilename), convertToLocalAbsPath(addPathFilename), recurse, fileFilter);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -1189,7 +1189,7 @@ namespace Contensive.Processor.Controllers {
                     result = joinPath(localAbsRootPath, normalizedPathFilename);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -1293,7 +1293,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return success;
@@ -1374,7 +1374,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex ) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return fileSize;
         }
@@ -1394,9 +1394,9 @@ namespace Contensive.Processor.Controllers {
                     // not exception, can be used regardless of isLocal //throw new ApplicationException("copyLocalToRemote is not valid in a local File system [" + localAbsRootPath + "]");
                 } else {
                     if (fileExists_local(pathFilename)) {
-                        string localDosPathFilename = genericController.convertToDosSlash(pathFilename);
+                        string localDosPathFilename = GenericController.convertToDosSlash(pathFilename);
                         // no, cannot change the case here
-                        string remoteUnixPathFilenameLowercase = genericController.convertToUnixSlash(joinPath(remotePathPrefix, pathFilename));
+                        string remoteUnixPathFilenameLowercase = GenericController.convertToUnixSlash(joinPath(remotePathPrefix, pathFilename));
                         //string remoteUnixPathFilenameLowercase = genericController.convertToUnixSlash(joinPath(remotePathPrefix, pathFilename)).ToLower();
                         verifyPath_remote(getPath(pathFilename));
                         //
@@ -1412,7 +1412,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -1430,8 +1430,8 @@ namespace Contensive.Processor.Controllers {
                     //
                     // note: local call is not exception, can be used regardless of isLocal
                     verifyPath_remote(getPath(pathFilename));
-                    string remoteUnixAbsPathFilename = genericController.convertToUnixSlash(joinPath(remotePathPrefix, pathFilename));
-                    string localDosPathFilename = genericController.convertToDosSlash(pathFilename);
+                    string remoteUnixAbsPathFilename = GenericController.convertToUnixSlash(joinPath(remotePathPrefix, pathFilename));
+                    string localDosPathFilename = GenericController.convertToDosSlash(pathFilename);
                     //
                     // -- delete local file (for both cases, remote exists and remote does not)
                     deleteFile_local(localDosPathFilename);
@@ -1449,7 +1449,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -1465,7 +1465,7 @@ namespace Contensive.Processor.Controllers {
                     createPath_local(path);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
         }
         //
@@ -1476,9 +1476,9 @@ namespace Contensive.Processor.Controllers {
         private void verifyPath_remote(string path) {
             try {
                 path = normalizeDosPath(path);
-                string remoteUnixPathLowercase = genericController.convertToUnixSlash("/" + joinPath(remotePathPrefix, path));
+                string remoteUnixPathLowercase = GenericController.convertToUnixSlash("/" + joinPath(remotePathPrefix, path));
                 if ( !verifiedRemotePathList.Contains(remoteUnixPathLowercase)) {
-                    var urlLowercase = genericController.splitUrl(remoteUnixPathLowercase);
+                    var urlLowercase = GenericController.splitUrl(remoteUnixPathLowercase);
                     var parentFolderInfo = new Amazon.S3.IO.S3DirectoryInfo(s3Client, core.serverConfig.awsBucketName, "");
                     string bucketKeyLowercase = "";
                     foreach (string subPathLowercase in urlLowercase.pathSegments) {
@@ -1495,7 +1495,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
         }
         //
@@ -1515,7 +1515,7 @@ namespace Contensive.Processor.Controllers {
                     verifyPath_remote(path);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
         }
         //
@@ -1536,7 +1536,7 @@ namespace Contensive.Processor.Controllers {
                     filename = resultFile.Name;
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return filename;
         }

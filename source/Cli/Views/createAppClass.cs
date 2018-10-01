@@ -53,7 +53,7 @@ namespace Contensive.CLI {
                     bool routeOk = false;
                     do {
                         appConfig.adminRoute = cliController.promptForReply("Admin Route (non-blank, no leading or trailing slash)", "admin");
-                        appConfig.adminRoute = Contensive.Processor.Controllers.genericController.convertToUnixSlash(appConfig.adminRoute);
+                        appConfig.adminRoute = Contensive.Processor.Controllers.GenericController.convertToUnixSlash(appConfig.adminRoute);
                         if (!string.IsNullOrEmpty(appConfig.adminRoute)) {
                             if (!appConfig.adminRoute.Substring(0, 1).Equals("/")) {
                                 if (!appConfig.adminRoute.Substring(appConfig.adminRoute.Length - 1, 1).Equals("/")) {
@@ -68,7 +68,7 @@ namespace Contensive.CLI {
                     domainName = cliController.promptForReply("Primary Domain Name", "www." + appName + ".com");
                     appConfig.domainList.Add(domainName);
                     appConfig.enabled = true;
-                    appConfig.privateKey = Processor.Controllers.genericController.getGUIDString();
+                    appConfig.privateKey = Processor.Controllers.GenericController.getGUIDString();
                     //Console.Write("\n\rApplication Architecture");
                     //Console.Write("\n\r\t1 Local Mode, compatible with v4.1, cdn is virtual folder /" + appName + "/files/");
                     //Console.Write("\n\r\t2 Scale Mode, cdn as AWS S3 bucket, privateFiles as AWS S3 bucket");
@@ -139,7 +139,7 @@ namespace Contensive.CLI {
                             //    cdnDomainName = domainName;
                             //    break;
                     }
-                    Contensive.Processor.Controllers.logController.logInfo(cp.core, "Create local folders.");
+                    Contensive.Processor.Controllers.LogController.logInfo(cp.core, "Create local folders.");
                     setupDirectory(appConfig.localWwwPath);
                     setupDirectory(appConfig.localFilesPath);
                     setupDirectory(appConfig.localPrivatePath);
@@ -196,7 +196,7 @@ namespace Contensive.CLI {
 
                     //
                     // -- save the app configuration and reload the server using this app
-                    Contensive.Processor.Controllers.logController.logInfo(cp.core, "Save app configuration.");
+                    Contensive.Processor.Controllers.LogController.logInfo(cp.core, "Save app configuration.");
                     appConfig.appStatus = AppConfigModel.AppStatusEnum.maintenance;
                     cp.core.serverConfig.apps.Add(appName, appConfig);
                     cp.core.serverConfig.saveObject(cp.core);
@@ -206,7 +206,7 @@ namespace Contensive.CLI {
                     // update local host file
                     //
                     try {
-                        Contensive.Processor.Controllers.logController.logInfo(cp.core, "Update host file to add domain [127.0.0.1 " + appName + "].");
+                        Contensive.Processor.Controllers.LogController.logInfo(cp.core, "Update host file to add domain [127.0.0.1 " + appName + "].");
                         File.AppendAllText("c:\\windows\\system32\\drivers\\etc\\hosts", System.Environment.NewLine + "127.0.0.1\t" + appName);
                     } catch (Exception ex) {
                         Console.Write("Error attempting to update local host file:" + ex.ToString());
@@ -215,10 +215,10 @@ namespace Contensive.CLI {
                     //
                     // create the database on the server
                     //
-                    Contensive.Processor.Controllers.logController.logInfo(cp.core, "Create database.");
+                    Contensive.Processor.Controllers.LogController.logInfo(cp.core, "Create database.");
                     cp.core.dbServer.createCatalog(appName);
                     //
-                    Contensive.Processor.Controllers.logController.logInfo(cp.core, "When app creating is complete, use IIS Import Application to install either you web application, or the Contensive IISDefault.zip application.");
+                    Contensive.Processor.Controllers.LogController.logInfo(cp.core, "When app creating is complete, use IIS Import Application to install either you web application, or the Contensive IISDefault.zip application.");
                     //// copy in the pattern files 
                     ////  - the only pattern is aspx
                     ////  - this is cc running, so they are setting up new application which may or may not have a webrole here.
@@ -238,18 +238,18 @@ namespace Contensive.CLI {
                 // initialize the new app, use the save authentication that was used to authorize this object
                 //
                 using (CPClass cp = new CPClass(appName)) {
-                    Contensive.Processor.Controllers.logController.logInfo(cp.core, "Verify website.");
+                    Contensive.Processor.Controllers.LogController.logInfo(cp.core, "Verify website.");
                     Processor.Controllers.WebServerController.verifySite(cp.core, appName, domainName, cp.core.appConfig.localWwwPath, iisDefaultDoc);
                     //
-                    Contensive.Processor.Controllers.logController.logInfo(cp.core, "Run db upgrade.");
+                    Contensive.Processor.Controllers.LogController.logInfo(cp.core, "Run db upgrade.");
                     Processor.Controllers.AppBuilderController.upgrade(cp.core, true, true);
                     //
                     // -- set the application back to normal mode
                     cp.core.serverConfig.saveObject(cp.core);
                     cp.core.siteProperties.setProperty(constants.siteproperty_serverPageDefault_name, iisDefaultDoc);
                     //
-                    Contensive.Processor.Controllers.logController.logInfo(cp.core, "Upgrade complete.");
-                    Contensive.Processor.Controllers.logController.logInfo(cp.core, "Use IIS Import Application to install either you web application, or the Contensive IISDefault.zip application.");
+                    Contensive.Processor.Controllers.LogController.logInfo(cp.core, "Upgrade complete.");
+                    Contensive.Processor.Controllers.LogController.logInfo(cp.core, "Use IIS Import Application to install either you web application, or the Contensive IISDefault.zip application.");
                 }
                 //
             } catch (Exception ex) {

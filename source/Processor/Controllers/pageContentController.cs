@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 using Contensive.BaseClasses;
@@ -22,23 +22,23 @@ namespace Contensive.Processor.Controllers {
     /// <summary>
     /// build page content system. Persistence is the docController.
     /// </summary>
-    public class pageContentController : IDisposable {
+    public class PageContentController : IDisposable {
         /// <summary>
         /// Constructor
         /// </summary>
-        public pageContentController() {
-            page = new pageContentModel();
-            pageToRootList = new List<pageContentModel>();
-            template = new pageTemplateModel();
+        public PageContentController() {
+            page = new PageContentModel();
+            pageToRootList = new List<PageContentModel>();
+            template = new PageTemplateModel();
         }
         /// <summary>
         /// current page to it's root
         /// </summary>
-        public List<Models.Db.pageContentModel> pageToRootList { get; set; }
+        public List<Models.Db.PageContentModel> pageToRootList { get; set; }
         /// <summary>
         /// current template
         /// </summary>
-        public pageTemplateModel template { get; set; }
+        public PageTemplateModel template { get; set; }
         /// <summary>
         /// the reason the current template was selected, displayed only as comment for debug mode
         /// </summary>
@@ -46,7 +46,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// current page for website documents, blank for others
         /// </summary>
-        public pageContentModel page { get; set; }
+        public PageContentModel page { get; set; }
         //
         //========================================================================
         //
@@ -73,7 +73,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     returnBody = ""
                         + "\r<div class=\"ccLoginPageCon\">"
-                        + genericController.nop(PageContent) + "\r</div>"
+                        + GenericController.nop(PageContent) + "\r</div>"
                         + "";
                 } else if (!core.doc.continueProcessing) {
                     //
@@ -98,7 +98,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     //
                     if (returnBody.IndexOf(fpoContentBox)  != -1) {
-                        returnBody = genericController.vbReplace(returnBody, fpoContentBox, PageContent);
+                        returnBody = GenericController.vbReplace(returnBody, fpoContentBox, PageContent);
                     } else {
                         // If Content was not found, add it to the end
                         returnBody = returnBody + PageContent;
@@ -128,7 +128,7 @@ namespace Contensive.Processor.Controllers {
                     }
                }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnBody;
@@ -144,7 +144,7 @@ namespace Contensive.Processor.Controllers {
                 if (core.doc.domain == null) {
                     //
                     // -- domain not listed, this is now an error
-                    logController.logError(core, "Domain not recognized:" + core.webServer.requestUrlSource);
+                    LogController.logError(core, "Domain not recognized:" + core.webServer.requestUrlSource);
                     return "<div style=\"width:300px; margin: 100px auto auto auto;text-align:center;\">The domain name is not configured for this site.</div>";
                 }
                 //
@@ -152,17 +152,17 @@ namespace Contensive.Processor.Controllers {
                 if (core.doc.pageController.page.id == 0) {
                     //
                     // -- landing page is not valid -- display error
-                    logController.logInfo(core, "Requested page/document not found:" + core.webServer.requestUrlSource);
+                    LogController.logInfo(core, "Requested page/document not found:" + core.webServer.requestUrlSource);
                     core.doc.redirectBecausePageNotFound = true;
                     core.doc.redirectReason = "Redirecting because the page selected could not be found.";
-                    core.doc.redirectLink = pageContentController.main_ProcessPageNotFound_GetLink(core, core.doc.redirectReason, "", "", 0, 0);
+                    core.doc.redirectLink = PageContentController.main_ProcessPageNotFound_GetLink(core, core.doc.redirectReason, "", "", 0, 0);
                     return core.webServer.redirect(core.doc.redirectLink, core.doc.redirectReason, core.doc.redirectBecausePageNotFound);
                 }
                 //
                 // -- get contentbox
                 returnHtml = getContentBox(core, "", AllowChildPageList, AllowReturnLink, false, 0, core.siteProperties.useContentWatchLink, false);
                 if (core.doc.redirectLink == "" && (returnHtml.IndexOf(html_quickEdit_fpo)  != -1)) {
-                    int FieldRows = genericController.encodeInteger(core.userProperty.getText("Page Content.copyFilename.PixelHeight", "500"));
+                    int FieldRows = GenericController.encodeInteger(core.userProperty.getText("Page Content.copyFilename.PixelHeight", "500"));
                     if (FieldRows < 50) {
                         FieldRows = 50;
                         core.userProperty.setProperty("Page Content.copyFilename.PixelHeight", 50);
@@ -171,7 +171,7 @@ namespace Contensive.Processor.Controllers {
                     // -- if fpo_QuickEdit it there, replace it out
                     string addonListJSON = core.html.getWysiwygAddonList(contentTypeEnum.contentTypeWeb);
                     string Editor = core.html.getFormInputHTML("copyFilename", core.doc.quickEditCopy, FieldRows.ToString(), "100%", false, true, addonListJSON, "", "");
-                    returnHtml = genericController.vbReplace(returnHtml, html_quickEdit_fpo, Editor);
+                    returnHtml = GenericController.vbReplace(returnHtml, html_quickEdit_fpo, Editor);
                 }
                 //
                 // -- Add admin warning to the top of the content
@@ -195,7 +195,7 @@ namespace Contensive.Processor.Controllers {
                     returnHtml = AdminUIController.getEditWrapper( core, "Page Content", returnHtml);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return returnHtml;
         }
@@ -248,7 +248,7 @@ namespace Contensive.Processor.Controllers {
                     //core.db.csClose(ref CS);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -292,7 +292,7 @@ namespace Contensive.Processor.Controllers {
                 core.db.csClose(ref CS);
                 result = Copy;
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -319,17 +319,17 @@ namespace Contensive.Processor.Controllers {
                 if (domain == null) {
                     //
                     // -- domain is not valid
-                    logController.handleError( core,new ApplicationException("Page could not be determined because the domain was not recognized."));
+                    LogController.handleError( core,new ApplicationException("Page could not be determined because the domain was not recognized."));
                 } else {
                     //
                     // -- attempt requested page
-                    pageContentModel requestedPage = null;
+                    PageContentModel requestedPage = null;
                     if (!requestedPageId.Equals(0)) {
-                        requestedPage = pageContentModel.create(core, requestedPageId);
+                        requestedPage = PageContentModel.create(core, requestedPageId);
                         if (requestedPage == null) {
                             //
                             // -- requested page not found
-                            requestedPage = pageContentModel.create(core, getPageNotFoundPageId(core));
+                            requestedPage = PageContentModel.create(core, getPageNotFoundPageId(core));
                         }
                     }
                     if (requestedPage == null) {
@@ -341,13 +341,13 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- build parentpageList (first = current page, last = root)
                     // -- add a 0, then repeat until another 0 is found, or there is a repeat
-                    core.doc.pageController.pageToRootList = new List<Models.Db.pageContentModel>();
+                    core.doc.pageController.pageToRootList = new List<Models.Db.PageContentModel>();
                     List<int> usedPageIdList = new List<int>();
                     int targetPageId = requestedPage.id;
                     usedPageIdList.Add(0);
                     while (!usedPageIdList.Contains(targetPageId)) {
                         usedPageIdList.Add(targetPageId);
-                        pageContentModel targetpage = pageContentModel.create(core, targetPageId );
+                        PageContentModel targetpage = PageContentModel.create(core, targetPageId );
                         if (targetpage == null) {
                             break;
                         } else {
@@ -358,7 +358,7 @@ namespace Contensive.Processor.Controllers {
                     if (core.doc.pageController.pageToRootList.Count == 0) {
                         //
                         // -- attempt failed, create default page
-                        core.doc.pageController.page = pageContentModel.add(core);
+                        core.doc.pageController.page = PageContentModel.add(core);
                         core.doc.pageController.page.name = DefaultNewLandingPageName + ", " + domain.name;
                         core.doc.pageController.page.Copyfilename.content = landingPageDefaultHtml;
                         core.doc.pageController.page.save(core);
@@ -369,9 +369,9 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- get template from pages
                     core.doc.pageController.template = null;
-                    foreach (Models.Db.pageContentModel page in core.doc.pageController.pageToRootList) {
+                    foreach (Models.Db.PageContentModel page in core.doc.pageController.pageToRootList) {
                         if (page.TemplateID > 0) {
-                            core.doc.pageController.template = pageTemplateModel.create(core, page.TemplateID );
+                            core.doc.pageController.template = PageTemplateModel.create(core, page.TemplateID );
                             if (core.doc.pageController.template == null) {
                                 //
                                 // -- templateId is not valid
@@ -393,7 +393,7 @@ namespace Contensive.Processor.Controllers {
                         // -- get template from domain
                         if (domain != null) {
                             if (domain.defaultTemplateId > 0) {
-                                core.doc.pageController.template = pageTemplateModel.create(core, domain.defaultTemplateId );
+                                core.doc.pageController.template = PageTemplateModel.create(core, domain.defaultTemplateId );
                                 if (core.doc.pageController.template == null) {
                                     //
                                     // -- domain templateId is not valid
@@ -405,11 +405,11 @@ namespace Contensive.Processor.Controllers {
                         if (core.doc.pageController.template == null) {
                             //
                             // -- get template named Default
-                            core.doc.pageController.template = pageTemplateModel.createByName(core, defaultTemplateName);
+                            core.doc.pageController.template = PageTemplateModel.createByName(core, defaultTemplateName);
                             if (core.doc.pageController.template == null) {
                                 //
                                 // -- ceate new template named Default
-                                core.doc.pageController.template = pageTemplateModel.add(core );
+                                core.doc.pageController.template = PageTemplateModel.add(core );
                                 core.doc.pageController.template.name = defaultTemplateName;
                                 core.doc.pageController.template.bodyHTML = core.appRootFiles.readFileText(defaultTemplateHomeFilename);
                                 core.doc.pageController.template.save(core);
@@ -424,7 +424,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
         }
         //
@@ -440,18 +440,18 @@ namespace Contensive.Processor.Controllers {
         //
         //---------------------------------------------------------------------------
         //
-        public static pageContentModel getLandingPage(CoreController core, DomainModel domain) {
-            pageContentModel landingPage = null;
+        public static PageContentModel getLandingPage(CoreController core, DomainModel domain) {
+            PageContentModel landingPage = null;
             try {
                 if (domain == null) {
                     //
                     // -- domain not available
-                    logController.handleError( core,new ApplicationException("Landing page could not be determined because the domain was not recognized."));
+                    LogController.handleError( core,new ApplicationException("Landing page could not be determined because the domain was not recognized."));
                 } else {
                     //
                     // -- attempt domain landing page
                     if (!domain.rootPageId.Equals(0)) {
-                        landingPage = pageContentModel.create(core, domain.rootPageId);
+                        landingPage = PageContentModel.create(core, domain.rootPageId);
                         if (landingPage == null) {
                             domain.rootPageId = 0;
                             domain.save(core);
@@ -462,7 +462,7 @@ namespace Contensive.Processor.Controllers {
                         // -- attempt site landing page
                         int siteLandingPageID = core.siteProperties.getInteger("LandingPageID", 0);
                         if (!siteLandingPageID.Equals(0)) {
-                            landingPage = pageContentModel.create(core, siteLandingPageID);
+                            landingPage = PageContentModel.create(core, siteLandingPageID);
                             if (landingPage == null) {
                                 core.siteProperties.setProperty("LandingPageID", 0);
                                 domain.rootPageId = 0;
@@ -472,7 +472,7 @@ namespace Contensive.Processor.Controllers {
                         if (landingPage == null) {
                             //
                             // -- create detault landing page
-                            landingPage = pageContentModel.add(core);
+                            landingPage = PageContentModel.add(core);
                             landingPage.name = DefaultNewLandingPageName + ", " + domain.name;
                             landingPage.Copyfilename.content = landingPageDefaultHtml;
                             landingPage.save(core);
@@ -485,7 +485,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return landingPage;
@@ -497,10 +497,10 @@ namespace Contensive.Processor.Controllers {
             string result = null;
             result = linkSrc;
             if (!string.IsNullOrEmpty(result)) {
-                if (genericController.vbInstr(1, result, "://") != 0) {
+                if (GenericController.vbInstr(1, result, "://") != 0) {
                     //
                     // protocol provided, do not fixup
-                    result = genericController.encodeVirtualPath(result, core.appConfig.cdnFileUrl, appRootPath, core.webServer.requestDomain);
+                    result = GenericController.encodeVirtualPath(result, core.appConfig.cdnFileUrl, appRootPath, core.webServer.requestDomain);
                 } else {
                     //
                     // no protocol, convert to short link
@@ -509,8 +509,8 @@ namespace Contensive.Processor.Controllers {
                         // page entered without path, assume it is in root path
                         result = "/" + result;
                     }
-                    result = genericController.ConvertLinkToShortLink(result, core.webServer.requestDomain, core.appConfig.cdnFileUrl);
-                    result = genericController.encodeVirtualPath(result, core.appConfig.cdnFileUrl, appRootPath, core.webServer.requestDomain);
+                    result = GenericController.ConvertLinkToShortLink(result, core.webServer.requestDomain, core.appConfig.cdnFileUrl);
+                    result = GenericController.encodeVirtualPath(result, core.appConfig.cdnFileUrl, appRootPath, core.webServer.requestDomain);
                 }
             }
             return result;
@@ -555,15 +555,15 @@ namespace Contensive.Processor.Controllers {
                     //
                     // Add the Referrer to the Admin Msg
                     if (core.webServer.requestReferer != "") {
-                        int Pos = genericController.vbInstr(1, core.webServer.requestReferrer, "main_AdminWarningPageID=", 1);
+                        int Pos = GenericController.vbInstr(1, core.webServer.requestReferrer, "main_AdminWarningPageID=", 1);
                         if (Pos != 0) {
                             core.webServer.requestReferrer = core.webServer.requestReferrer.Left( Pos - 2);
                         }
-                        Pos = genericController.vbInstr(1, core.webServer.requestReferrer, "main_AdminWarningMsg=", 1);
+                        Pos = GenericController.vbInstr(1, core.webServer.requestReferrer, "main_AdminWarningMsg=", 1);
                         if (Pos != 0) {
                             core.webServer.requestReferrer = core.webServer.requestReferrer.Left( Pos - 2);
                         }
-                        Pos = genericController.vbInstr(1, core.webServer.requestReferrer, "blockcontenttracking=", 1);
+                        Pos = GenericController.vbInstr(1, core.webServer.requestReferrer, "blockcontenttracking=", 1);
                         if (Pos != 0) {
                             core.webServer.requestReferrer = core.webServer.requestReferrer.Left( Pos - 2);
                         }
@@ -573,20 +573,20 @@ namespace Contensive.Processor.Controllers {
                     adminMessage = adminMessage + "</p>";
                     //
                     if (EditPageID != 0) {
-                        Link = genericController.modifyLinkQuery(Link, "main_AdminWarningPageID", EditPageID.ToString(), true);
+                        Link = GenericController.modifyLinkQuery(Link, "main_AdminWarningPageID", EditPageID.ToString(), true);
                     }
                     //
                     if (EditSectionID != 0) {
-                        Link = genericController.modifyLinkQuery(Link, "main_AdminWarningSectionID", EditSectionID.ToString(), true);
+                        Link = GenericController.modifyLinkQuery(Link, "main_AdminWarningSectionID", EditSectionID.ToString(), true);
                     }
                     //
-                    Link = genericController.modifyLinkQuery(Link, RequestNameBlockContentTracking, "1", true);
-                    Link = genericController.modifyLinkQuery(Link, "main_AdminWarningMsg", "<p>" + adminMessage + "</p>", true);
+                    Link = GenericController.modifyLinkQuery(Link, RequestNameBlockContentTracking, "1", true);
+                    Link = GenericController.modifyLinkQuery(Link, "main_AdminWarningMsg", "<p>" + adminMessage + "</p>", true);
                 }
                 //
                 result = Link;
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -600,7 +600,7 @@ namespace Contensive.Processor.Controllers {
                 // -- set linkPathPath to linkAlias
                 string linkPathPage = null;
                 if (AllowLinkAliasIfEnabled && core.siteProperties.allowLinkAlias) {
-                    linkPathPage = linkAliasController.getLinkAlias(core, PageID, QueryStringSuffix, "");
+                    linkPathPage = LinkAliasController.getLinkAlias(core, PageID, QueryStringSuffix, "");
                 }
                 if (string.IsNullOrEmpty(linkPathPage)) {
                     //
@@ -609,7 +609,7 @@ namespace Contensive.Processor.Controllers {
                     if (string.IsNullOrEmpty(linkPathPage)) {
                         linkPathPage = "/" + getDefaultScript();
                     } else {
-                        int Pos = genericController.vbInstr(1, linkPathPage, "?");
+                        int Pos = GenericController.vbInstr(1, linkPathPage, "?");
                         if (Pos != 0) {
                             linkPathPage = linkPathPage.Left( Pos - 1);
                         }
@@ -673,7 +673,7 @@ namespace Contensive.Processor.Controllers {
                 // -- assemble
                 result = linkprotocol + linkDomain + linkPathPage;
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -702,12 +702,12 @@ namespace Contensive.Processor.Controllers {
                 result = (ChildRecordID == ParentRecordID);
                 if (!result) {
                     Models.Domain.CDefModel CDef = Models.Domain.CDefModel.getCdef(core, ContentName);
-                    if (genericController.isInDelimitedString(CDef.selectCommaList.ToUpper(), "PARENTID", ",")) {
+                    if (GenericController.isInDelimitedString(CDef.selectCommaList.ToUpper(), "PARENTID", ",")) {
                         result = main_IsChildRecord_Recurse(core, CDef.contentDataSourceName, CDef.contentTableName, ChildRecordID, ParentRecordID, "");
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -728,14 +728,14 @@ namespace Contensive.Processor.Controllers {
                     ChildRecordParentID = core.db.csGetInteger(CS, "ParentID");
                 }
                 core.db.csClose(ref CS);
-                if ((ChildRecordParentID != 0) & (!genericController.isInDelimitedString(History, ChildRecordID.ToString(), ","))) {
+                if ((ChildRecordParentID != 0) & (!GenericController.isInDelimitedString(History, ChildRecordID.ToString(), ","))) {
                     result = (ParentRecordID == ChildRecordParentID);
                     if (!result) {
                         result = main_IsChildRecord_Recurse(core, DataSourceName, TableName, ChildRecordParentID, ParentRecordID, History + "," + ChildRecordID.ToString());
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -777,7 +777,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     //
                     // -- load requested page/template
-                    pageContentController.loadPage(core, core.docProperties.getInteger(rnPageId), core.doc.domain);
+                    PageContentController.loadPage(core, core.docProperties.getInteger(rnPageId), core.doc.domain);
                     //
                     // -- execute context for included addons
                     CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
@@ -785,12 +785,12 @@ namespace Contensive.Processor.Controllers {
                         cssContainerClass = "",
                         cssContainerId = "",
                         hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
-                            contentName = pageContentModel.contentName,
+                            contentName = PageContentModel.contentName,
                             fieldName = "copyfilename",
                             recordId = core.doc.pageController.page.id
                         },
                         isIncludeAddon = false,
-                        personalizationAuthenticated = core.session.visit.VisitAuthenticated,
+                        personalizationAuthenticated = core.session.visit.visitAuthenticated,
                         personalizationPeopleId = core.session.user.id
                     };
 
@@ -822,7 +822,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // todo move cookie test to htmlDoc controller
                     // -- Add cookie test
-                    bool AllowCookieTest = core.siteProperties.allowVisitTracking && (core.session.visit.PageVisits == 1);
+                    bool AllowCookieTest = core.siteProperties.allowVisitTracking && (core.session.visit.pageVisits == 1);
                     if (AllowCookieTest) {
                         core.html.addScriptCode_onLoad("if (document.cookie && document.cookie != null){cj.ajax.qs('f92vo2a8d=" + SecurityController.encodeToken( core,core.session.visit.id, core.doc.profileStartTime) + "')};", "Cookie Test");
                     }
@@ -898,22 +898,22 @@ namespace Contensive.Processor.Controllers {
                         if (downloadId != 0) {
                             //
                             // -- lookup record and set clicks
-                            libraryFilesModel file = libraryFilesModel.create(core, downloadId);
+                            LibraryFilesModel file = LibraryFilesModel.create(core, downloadId);
                             if (file != null) {
                                 file.clicks += 1;
                                 file.save(core);
                                 if (file.filename != "") {
                                     //
                                     // -- create log entry
-                                    libraryFileLogModel log = libraryFileLogModel.add(core);
+                                    LibraryFileLogModel log = LibraryFileLogModel.add(core);
                                     if (log != null) {
-                                        log.FileID = file.id;
-                                        log.VisitID = core.session.visit.id;
-                                        log.MemberID = core.session.user.id;
+                                        log.fileID = file.id;
+                                        log.visitID = core.session.visit.id;
+                                        log.memberID = core.session.user.id;
                                     }
                                     //
                                     // -- and go
-                                    string link = genericController.getCdnFileLink(core, file.filename);
+                                    string link = GenericController.getCdnFileLink(core, file.filename);
                                     //string link = core.webServer.requestProtocol + core.webServer.requestDomain + genericController.getCdnFileLink(core, file.Filename);
                                     return core.webServer.redirect(link, "Redirecting because the active download request variable is set to a valid Library Files record. Library File Log has been appended.");
                                 }
@@ -932,7 +932,7 @@ namespace Contensive.Processor.Controllers {
                         // if a cut, load the clipboard
                         //
                         core.visitProperty.setProperty("Clipboard", Clip);
-                        genericController.modifyLinkQuery(core.doc.refreshQueryString, RequestNameCut, "");
+                        GenericController.modifyLinkQuery(core.doc.refreshQueryString, RequestNameCut, "");
                     }
                     int ClipParentContentID = core.docProperties.getInteger(RequestNamePasteParentContentID);
                     int ClipParentRecordID = core.docProperties.getInteger(RequestNamePasteParentRecordID);
@@ -943,8 +943,8 @@ namespace Contensive.Processor.Controllers {
                         //
                         string ClipBoard = core.visitProperty.getText("Clipboard", "");
                         core.visitProperty.setProperty("Clipboard", "");
-                        genericController.modifyQueryString(core.doc.refreshQueryString, RequestNamePasteParentContentID, "");
-                        genericController.modifyQueryString(core.doc.refreshQueryString, RequestNamePasteParentRecordID, "");
+                        GenericController.modifyQueryString(core.doc.refreshQueryString, RequestNamePasteParentContentID, "");
+                        GenericController.modifyQueryString(core.doc.refreshQueryString, RequestNamePasteParentRecordID, "");
                         string ClipParentContentName = Models.Domain.CDefModel.getContentNameByID(core, ClipParentContentID);
                         if (string.IsNullOrEmpty(ClipParentContentName)) {
                             // state not working...
@@ -952,35 +952,35 @@ namespace Contensive.Processor.Controllers {
                             // state not working...
                         } else {
                             if (!core.session.isAuthenticatedContentManager(core, ClipParentContentName)) {
-                                errorController.addUserError(core, "The paste operation failed because you are not a content manager of the Clip Parent");
+                                ErrorController.addUserError(core, "The paste operation failed because you are not a content manager of the Clip Parent");
                             } else {
                                 //
                                 // Current identity is a content manager for this content
                                 //
-                                int Position = genericController.vbInstr(1, ClipBoard, ".");
+                                int Position = GenericController.vbInstr(1, ClipBoard, ".");
                                 if (Position == 0) {
-                                    errorController.addUserError(core, "The paste operation failed because the clipboard data is configured incorrectly.");
+                                    ErrorController.addUserError(core, "The paste operation failed because the clipboard data is configured incorrectly.");
                                 } else {
                                     string[] ClipBoardArray = ClipBoard.Split('.');
                                     if (ClipBoardArray.GetUpperBound(0) == 0) {
-                                        errorController.addUserError(core, "The paste operation failed because the clipboard data is configured incorrectly.");
+                                        ErrorController.addUserError(core, "The paste operation failed because the clipboard data is configured incorrectly.");
                                     } else {
-                                        int ClipChildContentID = genericController.encodeInteger(ClipBoardArray[0]);
-                                        int ClipChildRecordID = genericController.encodeInteger(ClipBoardArray[1]);
+                                        int ClipChildContentID = GenericController.encodeInteger(ClipBoardArray[0]);
+                                        int ClipChildRecordID = GenericController.encodeInteger(ClipBoardArray[1]);
                                         if (!Models.Domain.CDefModel.isWithinContent(core, ClipChildContentID, ClipParentContentID)) {
-                                            errorController.addUserError(core, "The paste operation failed because the destination location is not compatible with the clipboard data.");
+                                            ErrorController.addUserError(core, "The paste operation failed because the destination location is not compatible with the clipboard data.");
                                         } else {
                                             //
                                             // the content definition relationship is OK between the child and parent record
                                             //
                                             string ClipChildContentName = Models.Domain.CDefModel.getContentNameByID(core, ClipChildContentID);
                                             if (!(!string.IsNullOrEmpty(ClipChildContentName))) {
-                                                errorController.addUserError(core, "The paste operation failed because the clipboard data content is undefined.");
+                                                ErrorController.addUserError(core, "The paste operation failed because the clipboard data content is undefined.");
                                             } else {
                                                 if (ClipParentRecordID == 0) {
-                                                    errorController.addUserError(core, "The paste operation failed because the clipboard data record is undefined.");
-                                                } else if (pageContentController.isChildRecord(core, ClipChildContentName, ClipParentRecordID, ClipChildRecordID)) {
-                                                    errorController.addUserError(core, "The paste operation failed because the destination location is a child of the clipboard data record.");
+                                                    ErrorController.addUserError(core, "The paste operation failed because the clipboard data record is undefined.");
+                                                } else if (PageContentController.isChildRecord(core, ClipChildContentName, ClipParentRecordID, ClipChildRecordID)) {
+                                                    ErrorController.addUserError(core, "The paste operation failed because the destination location is a child of the clipboard data record.");
                                                 } else {
                                                     //
                                                     // the parent record is not a child of the child record (circular check)
@@ -988,7 +988,7 @@ namespace Contensive.Processor.Controllers {
                                                     string ClipChildRecordName = "record " + ClipChildRecordID;
                                                     int CSClip = core.db.csOpen2(ClipChildContentName, ClipChildRecordID, true, true);
                                                     if (!core.db.csOk(CSClip)) {
-                                                        errorController.addUserError(core, "The paste operation failed because the data record referenced by the clipboard could not found.");
+                                                        ErrorController.addUserError(core, "The paste operation failed because the data record referenced by the clipboard could not found.");
                                                     } else {
                                                         //
                                                         // Paste the edit record record
@@ -999,7 +999,7 @@ namespace Contensive.Processor.Controllers {
                                                             // Legacy paste - go right to the parent id
                                                             //
                                                             if (!core.db.csIsFieldSupported(CSClip, "ParentID")) {
-                                                                errorController.addUserError(core, "The paste operation failed because the record you are pasting does not   support the necessary parenting feature.");
+                                                                ErrorController.addUserError(core, "The paste operation failed because the record you are pasting does not   support the necessary parenting feature.");
                                                             } else {
                                                                 core.db.csSet(CSClip, "ParentID", ClipParentRecordID);
                                                             }
@@ -1016,10 +1016,10 @@ namespace Contensive.Processor.Controllers {
                                                                 }
                                                                 string[] NameValues = Pair.Split('=');
                                                                 if (NameValues.GetUpperBound(0) == 0) {
-                                                                    errorController.addUserError(core, "The paste operation failed because the clipboard data Field List is not configured correctly.");
+                                                                    ErrorController.addUserError(core, "The paste operation failed because the clipboard data Field List is not configured correctly.");
                                                                 } else {
                                                                     if (!core.db.csIsFieldSupported(CSClip, encodeText(NameValues[0]))) {
-                                                                        errorController.addUserError(core, "The paste operation failed because the clipboard data Field [" + encodeText(NameValues[0]) + "] is not supported by the location data.");
+                                                                        ErrorController.addUserError(core, "The paste operation failed because the clipboard data Field [" + encodeText(NameValues[0]) + "] is not supported by the location data.");
                                                                     } else {
                                                                         core.db.csSet(CSClip, encodeText(NameValues[0]), encodeText(NameValues[1]));
                                                                     }
@@ -1044,10 +1044,9 @@ namespace Contensive.Processor.Controllers {
                                                     }
                                                     core.db.csClose(ref CSClip);
                                                     //
-                                                    // Live Editing
-                                                    //
-                                                    core.cache.invalidateAllInContent(ClipChildContentName);
-                                                    core.cache.invalidateAllInContent(ClipParentContentName);
+                                                    // clear cache
+                                                    PageContentModel.invalidateRecordCache(core, ClipParentRecordID);
+                                                    PageContentModel.invalidateRecordCache(core, ClipChildRecordID);
                                                 }
                                             }
                                         }
@@ -1063,7 +1062,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         core.visitProperty.setProperty("Clipboard", "");
                         Clip = core.visitProperty.getText("Clipboard", "");
-                        genericController.modifyLinkQuery(core.doc.refreshQueryString, RequestNameCutClear, "");
+                        GenericController.modifyLinkQuery(core.doc.refreshQueryString, RequestNameCutClear, "");
                     }
                     //
                     // link alias and link forward
@@ -1081,20 +1080,20 @@ namespace Contensive.Processor.Controllers {
                     if ((!IsPageNotFound) && (core.webServer.requestPathPage != "")) {
                         //
                         // build link variations needed later
-                        int Pos = genericController.vbInstr(1, core.webServer.requestPathPage, "://", 1);
+                        int Pos = GenericController.vbInstr(1, core.webServer.requestPathPage, "://", 1);
                         string LinkNoProtocol = "";
                         string LinkFullPath = "";
                         string LinkFullPathNoSlash = "";
                         if (Pos != 0) {
                             LinkNoProtocol = core.webServer.requestPathPage.Substring(Pos + 2);
-                            Pos = genericController.vbInstr(Pos + 3, core.webServer.requestPathPage, "/", 2);
+                            Pos = GenericController.vbInstr(Pos + 3, core.webServer.requestPathPage, "/", 2);
                             if (Pos != 0) {
                                 string linkDomain = core.webServer.requestPathPage.Left(Pos - 1);
                                 LinkFullPath = core.webServer.requestPathPage.Substring(Pos - 1);
                                 //
                                 // strip off leading or trailing slashes, and return only the string between the leading and secton slash
                                 //
-                                if (genericController.vbInstr(1, LinkFullPath, "/") != 0) {
+                                if (GenericController.vbInstr(1, LinkFullPath, "/") != 0) {
                                     string[] LinkSplit = LinkFullPath.Split('/');
                                     LinkFullPathNoSlash = LinkSplit[0];
                                     if (string.IsNullOrEmpty(LinkFullPathNoSlash)) {
@@ -1146,9 +1145,9 @@ namespace Contensive.Processor.Controllers {
                                 tmpLink = core.db.csGetText(CSPointer, "DestinationLink");
                                 GroupID = core.db.csGetInteger(CSPointer, "GroupID");
                                 if (GroupID != 0) {
-                                    groupName = groupController.group_GetGroupName(core, GroupID);
+                                    groupName = GroupController.group_GetGroupName(core, GroupID);
                                     if (!string.IsNullOrEmpty(groupName)) {
-                                        groupController.group_AddGroupMember(core, groupName);
+                                        GroupController.group_AddGroupMember(core, groupName);
                                     }
                                 }
                                 if (!string.IsNullOrEmpty(tmpLink)) {
@@ -1164,9 +1163,9 @@ namespace Contensive.Processor.Controllers {
                             //
                             if (!string.IsNullOrEmpty(linkAliasTest1 + linkAliasTest2)) {
                                 string sqlLinkAliasCriteria = "(name=" + core.db.encodeSQLText(linkAliasTest1) + ")or(name=" + core.db.encodeSQLText(linkAliasTest2) + ")";
-                                List<Models.Db.linkAliasModel> linkAliasList = linkAliasModel.createList(core, sqlLinkAliasCriteria, "id desc");
+                                List<Models.Db.LinkAliasModel> linkAliasList = LinkAliasModel.createList(core, sqlLinkAliasCriteria, "id desc");
                                 if (linkAliasList.Count > 0) {
-                                    linkAliasModel linkAlias = linkAliasList.First();
+                                    LinkAliasModel linkAlias = linkAliasList.First();
                                     string LinkQueryString = rnPageId + "=" + linkAlias.PageID + "&" + linkAlias.QueryStringSuffix;
                                     core.docProperties.setProperty(rnPageId, linkAlias.PageID.ToString(), false);
                                     string[] nameValuePairs = linkAlias.QueryStringSuffix.Split('&');
@@ -1201,11 +1200,11 @@ namespace Contensive.Processor.Controllers {
                     //
                     // ----- do anonymous access blocking
                     if (!core.session.isAuthenticated) {
-                        if ((core.webServer.requestPath != "/") & genericController.vbInstr(1, "/" + core.appConfig.adminRoute, core.webServer.requestPath, 1) != 0) {
+                        if ((core.webServer.requestPath != "/") & GenericController.vbInstr(1, "/" + core.appConfig.adminRoute, core.webServer.requestPath, 1) != 0) {
                             //
                             // admin page is excluded from custom blocking
                         } else {
-                            int AnonymousUserResponseID = genericController.encodeInteger(core.siteProperties.getText("AnonymousUserResponseID", "0"));
+                            int AnonymousUserResponseID = GenericController.encodeInteger(core.siteProperties.getText("AnonymousUserResponseID", "0"));
                             switch (AnonymousUserResponseID) {
                                 case 1:
                                     //
@@ -1232,7 +1231,7 @@ namespace Contensive.Processor.Controllers {
                     // -- check secure certificate required
                     bool SecureLink_Template_Required = core.doc.pageController.template.isSecure;
                     bool SecureLink_Page_Required = false;
-                    foreach (Models.Db.pageContentModel page in core.doc.pageController.pageToRootList) {
+                    foreach (Models.Db.PageContentModel page in core.doc.pageController.pageToRootList) {
                         if (core.doc.pageController.page.IsSecure) {
                             SecureLink_Page_Required = true;
                             break;
@@ -1243,7 +1242,7 @@ namespace Contensive.Processor.Controllers {
                     if (SecureLink_CurrentURL && (!SecureLink_Required)) {
                         //
                         // -- redirect to non-secure
-                        core.doc.redirectLink = genericController.vbReplace(core.webServer.requestUrl, "https://", "http://");
+                        core.doc.redirectLink = GenericController.vbReplace(core.webServer.requestUrl, "https://", "http://");
                         core.doc.redirectReason = "Redirecting because neither the page or the template requires a secure link.";
                         core.doc.redirectBecausePageNotFound = false;
                         return core.webServer.redirect(core.doc.redirectLink, core.doc.redirectReason, core.doc.redirectBecausePageNotFound);
@@ -1251,7 +1250,7 @@ namespace Contensive.Processor.Controllers {
                     } else if ((!SecureLink_CurrentURL) && SecureLink_Required) {
                         //
                         // -- redirect to secure
-                        core.doc.redirectLink = genericController.vbReplace(core.webServer.requestUrl, "http://", "https://");
+                        core.doc.redirectLink = GenericController.vbReplace(core.webServer.requestUrl, "http://", "https://");
                         if (SecureLink_Page_Required) {
                             core.doc.redirectReason = "Redirecting because this page [" + core.doc.pageController.pageToRootList[0].name + "] requires a secure link.";
                         } else {
@@ -1300,7 +1299,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // new way -- if a (real) 404 page is received, just convert this hit to the page-not-found page, do not redirect to it
                     //
-                    logController.addSiteWarning(core, "Page Not Found", "Page Not Found", "", 0, "Page Not Found from [" + core.webServer.requestUrlSource + "]", "Page Not Found", "Page Not Found");
+                    LogController.addSiteWarning(core, "Page Not Found", "Page Not Found", "", 0, "Page Not Found from [" + core.webServer.requestUrlSource + "]", "Page Not Found", "Page Not Found");
                     core.webServer.setResponseStatus(WebServerController.httpResponseStatus404);
                     core.docProperties.setProperty(rnPageId, getPageNotFoundPageId(core));
                     //Call main_mergeInStream(rnPageId & "=" & main_GetPageNotFoundPageId())
@@ -1314,10 +1313,10 @@ namespace Contensive.Processor.Controllers {
                 //
                 // add exception list header
                 if (core.session.user.Developer) {
-                    result = errorController.getDocExceptionHtmlList(core) + result;
+                    result = ErrorController.getDocExceptionHtmlList(core) + result;
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -1366,7 +1365,7 @@ namespace Contensive.Processor.Controllers {
                                 // People Record
                                 //
                                 FormValue = core.docProperties.getText(tempVar.PeopleField);
-                                if ((!string.IsNullOrEmpty(FormValue)) & genericController.encodeBoolean(Models.Domain.CDefModel.GetContentFieldProperty(core, "people", tempVar.PeopleField, "uniquename"))) {
+                                if ((!string.IsNullOrEmpty(FormValue)) & GenericController.encodeBoolean(Models.Domain.CDefModel.GetContentFieldProperty(core, "people", tempVar.PeopleField, "uniquename"))) {
                                     string SQL = "select count(*) from ccMembers where " + tempVar.PeopleField + "=" + core.db.encodeSQLText(FormValue);
                                     CS = core.db.csOpenSql(SQL);
                                     if (core.db.csOk(CS)) {
@@ -1374,12 +1373,12 @@ namespace Contensive.Processor.Controllers {
                                     }
                                     core.db.csClose(ref CS);
                                     if (!Success) {
-                                        errorController.addUserError(core, "The field [" + tempVar.Caption + "] must be unique, and the value [" + HtmlController.encodeHtml(FormValue) + "] has already been used.");
+                                        ErrorController.addUserError(core, "The field [" + tempVar.Caption + "] must be unique, and the value [" + HtmlController.encodeHtml(FormValue) + "] has already been used.");
                                     }
                                 }
-                                if ((tempVar.REquired | genericController.encodeBoolean(Models.Domain.CDefModel.GetContentFieldProperty(core, "people", tempVar.PeopleField, "required"))) && string.IsNullOrEmpty(FormValue)) {
+                                if ((tempVar.REquired | GenericController.encodeBoolean(Models.Domain.CDefModel.GetContentFieldProperty(core, "people", tempVar.PeopleField, "required"))) && string.IsNullOrEmpty(FormValue)) {
                                     Success = false;
-                                    errorController.addUserError(core, "The field [" + HtmlController.encodeHtml(tempVar.Caption) + "] is required.");
+                                    ErrorController.addUserError(core, "The field [" + HtmlController.encodeHtml(tempVar.Caption) + "] is required.");
                                 } else {
                                     if (!core.db.csOk(CSPeople)) {
                                         CSPeople = core.db.csOpenRecord("people", core.session.user.id);
@@ -1388,7 +1387,7 @@ namespace Contensive.Processor.Controllers {
                                         string PeopleUsername = null;
                                         string PeoplePassword = null;
                                         string PeopleEmail = "";
-                                        switch (genericController.vbUCase(tempVar.PeopleField)) {
+                                        switch (GenericController.vbUCase(tempVar.PeopleField)) {
                                             case "NAME":
                                                 PeopleName = FormValue;
                                                 core.db.csSet(CSPeople, tempVar.PeopleField, FormValue);
@@ -1427,9 +1426,9 @@ namespace Contensive.Processor.Controllers {
                                 IsInGroup = core.docProperties.getBoolean("Group" + tempVar.GroupName);
                                 WasInGroup = core.session.isMemberOfGroup(core, tempVar.GroupName);
                                 if (WasInGroup && !IsInGroup) {
-                                    groupController.group_DeleteGroupMember(core, tempVar.GroupName);
+                                    GroupController.group_DeleteGroupMember(core, tempVar.GroupName);
                                 } else if (IsInGroup && !WasInGroup) {
-                                    groupController.group_AddGroupMember(core, tempVar.GroupName);
+                                    GroupController.group_AddGroupMember(core, tempVar.GroupName);
                                 }
                                 break;
                         }
@@ -1461,7 +1460,7 @@ namespace Contensive.Processor.Controllers {
                         SecurityController.decodeToken(core, core.docProperties.getText("SuccessID"), ref GroupIDToJoinOnSuccess, ref tokenDate);
                         //GroupIDToJoinOnSuccess = main_DecodeKeyNumber(main_GetStreamText2("SuccessID"))
                         if (GroupIDToJoinOnSuccess != 0) {
-                            groupController.group_AddGroupMember(core, groupController.group_GetGroupName(core, GroupIDToJoinOnSuccess));
+                            GroupController.group_AddGroupMember(core, GroupController.group_GetGroupName(core, GroupIDToJoinOnSuccess));
                         }
                         //
                         // Join Groups requested by pageform
@@ -1471,14 +1470,14 @@ namespace Contensive.Processor.Controllers {
                             for (Ptr = 0; Ptr <= Groups.GetUpperBound(0); Ptr++) {
                                 string GroupName = Groups[Ptr].Trim(' ');
                                 if (!string.IsNullOrEmpty(GroupName)) {
-                                    groupController.group_AddGroupMember(core, GroupName);
+                                    GroupController.group_AddGroupMember(core, GroupName);
                                 }
                             }
                         }
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -1509,29 +1508,29 @@ namespace Contensive.Processor.Controllers {
             try {
                 //
                 if (true) {
-                    int PtrFront = genericController.vbInstr(1, Formhtml, "{{REPEATSTART", 1);
+                    int PtrFront = GenericController.vbInstr(1, Formhtml, "{{REPEATSTART", 1);
                     if (PtrFront > 0) {
-                        int PtrBack = genericController.vbInstr(PtrFront, Formhtml, "}}");
+                        int PtrBack = GenericController.vbInstr(PtrFront, Formhtml, "}}");
                         if (PtrBack > 0) {
                             result.PreRepeat = Formhtml.Left( PtrFront - 1);
-                            PtrFront = genericController.vbInstr(PtrBack, Formhtml, "{{REPEATEND", 1);
+                            PtrFront = GenericController.vbInstr(PtrBack, Formhtml, "{{REPEATEND", 1);
                             if (PtrFront > 0) {
                                 result.RepeatCell = Formhtml.Substring(PtrBack + 1, PtrFront - PtrBack - 2);
-                                PtrBack = genericController.vbInstr(PtrFront, Formhtml, "}}");
+                                PtrBack = GenericController.vbInstr(PtrFront, Formhtml, "}}");
                                 if (PtrBack > 0) {
                                     result.PostRepeat = Formhtml.Substring(PtrBack + 1);
                                     //
                                     // Decode instructions and build output
                                     //
-                                    string[] i = genericController.splitNewLine(FormInstructions);
+                                    string[] i = GenericController.splitNewLine(FormInstructions);
                                     if (i.GetUpperBound(0) > 0) {
                                         int IStart = 0;
                                         if (string.CompareOrdinal(i[0].Trim(' '), "1") >= 0) {
                                             //
                                             // decode Version 1 arguments, then start instructions line at line 1
                                             //
-                                            result.AddGroupNameList = genericController.encodeText(i[1]);
-                                            result.AuthenticateOnFormProcess = genericController.encodeBoolean(i[2]);
+                                            result.AddGroupNameList = GenericController.encodeText(i[1]);
+                                            result.AuthenticateOnFormProcess = GenericController.encodeBoolean(i[2]);
                                             IStart = 3;
                                         }
                                         //
@@ -1544,8 +1543,8 @@ namespace Contensive.Processor.Controllers {
                                             string[] IArgs = i[IPtr + IStart].Split(',');
                                             if (IArgs.GetUpperBound(0) >= main_IPosMax) {
                                                 tempVar.Caption = IArgs[main_IPosCaption];
-                                                tempVar.Type = genericController.encodeInteger(IArgs[main_IPosType]);
-                                                tempVar.REquired = genericController.encodeBoolean(IArgs[main_IPosRequired]);
+                                                tempVar.Type = GenericController.encodeInteger(IArgs[main_IPosType]);
+                                                tempVar.REquired = GenericController.encodeBoolean(IArgs[main_IPosRequired]);
                                                 switch (tempVar.Type) {
                                                     case 1:
                                                         //
@@ -1569,7 +1568,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -1618,13 +1617,13 @@ namespace Contensive.Processor.Controllers {
                                 CSPeople = core.db.csOpenRecord("people", core.session.user.id);
                             }
                             Caption = tempVar.Caption;
-                            if (tempVar.REquired | genericController.encodeBoolean(Models.Domain.CDefModel.GetContentFieldProperty(core, "People", tempVar.PeopleField, "Required"))) {
+                            if (tempVar.REquired | GenericController.encodeBoolean(Models.Domain.CDefModel.GetContentFieldProperty(core, "People", tempVar.PeopleField, "Required"))) {
                                 Caption = "*" + Caption;
                             }
                             if (core.db.csOk(CSPeople)) {
                                 Body = f.RepeatCell;
-                                Body = genericController.vbReplace(Body, "{{CAPTION}}", CaptionSpan + Caption + "</span>", 1, 99, 1);
-                                Body = genericController.vbReplace(Body, "{{FIELD}}", core.html.inputCs(CSPeople, "People", tempVar.PeopleField), 1, 99, 1);
+                                Body = GenericController.vbReplace(Body, "{{CAPTION}}", CaptionSpan + Caption + "</span>", 1, 99, 1);
+                                Body = GenericController.vbReplace(Body, "{{FIELD}}", core.html.inputCs(CSPeople, "People", tempVar.PeopleField), 1, 99, 1);
                                 RepeatBody = RepeatBody + Body;
                                 HasRequiredFields = HasRequiredFields || tempVar.REquired;
                             }
@@ -1635,8 +1634,8 @@ namespace Contensive.Processor.Controllers {
                             //
                             GroupValue = core.session.isMemberOfGroup(core, tempVar.GroupName);
                             Body = f.RepeatCell;
-                            Body = genericController.vbReplace(Body, "{{CAPTION}}", HtmlController.checkbox("Group" + tempVar.GroupName, GroupValue), 1, 99, 1);
-                            Body = genericController.vbReplace(Body, "{{FIELD}}", tempVar.Caption);
+                            Body = GenericController.vbReplace(Body, "{{CAPTION}}", HtmlController.checkbox("Group" + tempVar.GroupName, GroupValue), 1, 99, 1);
+                            Body = GenericController.vbReplace(Body, "{{FIELD}}", tempVar.Caption);
                             RepeatBody = RepeatBody + Body;
                             GroupRowPtr = GroupRowPtr + 1;
                             HasRequiredFields = HasRequiredFields || tempVar.REquired;
@@ -1646,8 +1645,8 @@ namespace Contensive.Processor.Controllers {
                 core.db.csClose(ref CSPeople);
                 if (HasRequiredFields) {
                     Body = f.RepeatCell;
-                    Body = genericController.vbReplace(Body, "{{CAPTION}}", "&nbsp;", 1, 99, 1);
-                    Body = genericController.vbReplace(Body, "{{FIELD}}", "*&nbsp;Required Fields");
+                    Body = GenericController.vbReplace(Body, "{{CAPTION}}", "&nbsp;", 1, 99, 1);
+                    Body = GenericController.vbReplace(Body, "{{FIELD}}", "*&nbsp;Required Fields");
                     RepeatBody = RepeatBody + Body;
                 }
                 //
@@ -1658,10 +1657,10 @@ namespace Contensive.Processor.Controllers {
                     + RepeatBody 
                     + f.PostRepeat;
                 result = ""
-                    + errorController.getUserError(core)
+                    + ErrorController.getUserError(core)
                     + HtmlController.formMultipart(core, innerHtml, core.doc.refreshQueryString, "", "ccForm");
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -1692,7 +1691,7 @@ namespace Contensive.Processor.Controllers {
                 // -- build list of blocked pages
                 string BlockedRecordIDList = "";
                 if ((!string.IsNullOrEmpty(returnHtml)) && (core.doc.redirectLink == "")) {
-                    foreach (pageContentModel testPage in core.doc.pageController.pageToRootList) {
+                    foreach (PageContentModel testPage in core.doc.pageController.pageToRootList) {
                         if (testPage.BlockContent | testPage.BlockPage) {
                             BlockedRecordIDList = BlockedRecordIDList + "," + testPage.id;
                         }
@@ -1732,7 +1731,7 @@ namespace Contensive.Processor.Controllers {
                         CS = core.db.csOpenSql(SQL);
                         BlockedRecordIDList = "," + BlockedRecordIDList;
                         while (core.db.csOk(CS)) {
-                            BlockedRecordIDList = genericController.vbReplace(BlockedRecordIDList, "," + core.db.csGetText(CS, "RecordID"), "");
+                            BlockedRecordIDList = GenericController.vbReplace(BlockedRecordIDList, "," + core.db.csGetText(CS, "RecordID"), "");
                             core.db.csGoNext(CS);
                         }
                         core.db.csClose(ref CS);
@@ -1755,7 +1754,7 @@ namespace Contensive.Processor.Controllers {
                                 + " AND ((ManagementMemberRules.MemberID)=" + core.session.user.id + " ));";
                             CS = core.db.csOpenSql(SQL);
                             while (core.db.csOk(CS)) {
-                                BlockedRecordIDList = genericController.vbReplace(BlockedRecordIDList, "," + core.db.csGetText(CS, "RecordID"), "");
+                                BlockedRecordIDList = GenericController.vbReplace(BlockedRecordIDList, "," + core.db.csGetText(CS, "RecordID"), "");
                                 core.db.csGoNext(CS);
                             }
                             core.db.csClose(ref CS);
@@ -1775,7 +1774,7 @@ namespace Contensive.Processor.Controllers {
                     int BlockSourceID = main_BlockSourceDefaultMessage;
                     int ContentPadding = 20;
                     string[] BlockedPages = BlockedRecordIDList.Split(',');
-                    int BlockedPageRecordID = genericController.encodeInteger(BlockedPages[BlockedPages.GetUpperBound(0)]);
+                    int BlockedPageRecordID = GenericController.encodeInteger(BlockedPages[BlockedPages.GetUpperBound(0)]);
                     int RegistrationGroupID = 0;
                     if (BlockedPageRecordID != 0) {
                         CS = core.db.csOpenRecord("Page Content", BlockedPageRecordID, false, false, "CustomBlockMessage,BlockSourceID,RegistrationGroupID,ContentPadding");
@@ -1836,7 +1835,7 @@ namespace Contensive.Processor.Controllers {
                                 }
                                 returnHtml = ""
                                     + "<div style=\"margin: 100px, auto, auto, auto;text-align:left;\">"
-                                    + errorController.getUserError(core) + BlockForm + "</div>";
+                                    + ErrorController.getUserError(core) + BlockForm + "</div>";
                                 break;
                             }
                         case main_BlockSourceRegistration: {
@@ -1883,7 +1882,7 @@ namespace Contensive.Processor.Controllers {
                                 }
                                 returnHtml = ""
                                     + "<div style=\"margin: 100px, auto, auto, auto;text-align:left;\">"
-                                    + errorController.getUserError(core) + BlockForm + "</div>";
+                                    + ErrorController.getUserError(core) + BlockForm + "</div>";
                                 break;
                             }
                         default: {
@@ -1904,9 +1903,9 @@ namespace Contensive.Processor.Controllers {
                     // Encode the copy
                     //
                     //returnHtml = contentCmdController.executeContentCommands(core, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, core.sessionContext.user.id, core.sessionContext.isAuthenticated, ref layoutError);
-                    returnHtml = ActiveContentController.renderHtmlForWeb(core, returnHtml, pageContentModel.contentName, PageRecordID, core.doc.pageController.page.ContactMemberID, "http://" + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
+                    returnHtml = ActiveContentController.renderHtmlForWeb(core, returnHtml, PageContentModel.contentName, PageRecordID, core.doc.pageController.page.ContactMemberID, "http://" + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
                     if (core.doc.refreshQueryString != "") {
-                        returnHtml = genericController.vbReplace(returnHtml, "?method=login", "?method=Login&" + core.doc.refreshQueryString, 1, 99, 1);
+                        returnHtml = GenericController.vbReplace(returnHtml, "?method=login", "?method=Login&" + core.doc.refreshQueryString, 1, 99, 1);
                     }
                     //
                     // Add in content padding required for integration with the template
@@ -1921,24 +1920,24 @@ namespace Contensive.Processor.Controllers {
                         //
                     } else {
                         int pageViewings = core.doc.pageController.page.Viewings;
-                        if (core.session.isEditing(pageContentModel.contentName) | core.visitProperty.getBoolean("AllowWorkflowRendering")) {
+                        if (core.session.isEditing(PageContentModel.contentName) | core.visitProperty.getBoolean("AllowWorkflowRendering")) {
                             //
                             // Link authoring, workflow rendering -> do encoding, but no tracking
                             //
                             //returnHtml = contentCmdController.executeContentCommands(core, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, core.sessionContext.user.id, core.sessionContext.isAuthenticated, ref layoutError);
-                            returnHtml = ActiveContentController.renderHtmlForWeb(core, returnHtml, pageContentModel.contentName, PageRecordID, core.doc.pageController.page.ContactMemberID, "http://" + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
+                            returnHtml = ActiveContentController.renderHtmlForWeb(core, returnHtml, PageContentModel.contentName, PageRecordID, core.doc.pageController.page.ContactMemberID, "http://" + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
                         } else {
                             //
                             // Live content
                             //returnHtml = contentCmdController.executeContentCommands(core, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, core.sessionContext.user.id, core.sessionContext.isAuthenticated, ref layoutError);
-                            returnHtml = ActiveContentController.renderHtmlForWeb(core, returnHtml, pageContentModel.contentName, PageRecordID, core.doc.pageController.page.ContactMemberID, "http://" + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
+                            returnHtml = ActiveContentController.renderHtmlForWeb(core, returnHtml, PageContentModel.contentName, PageRecordID, core.doc.pageController.page.ContactMemberID, "http://" + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
                             core.db.executeQuery("update ccpagecontent set viewings=" + (pageViewings + 1) + " where id=" + core.doc.pageController.page.id);
                         }
                         //
                         // Page Hit Notification
                         //
-                        if ((!core.session.visit.ExcludeFromAnalytics) & (core.doc.pageController.page.ContactMemberID != 0) && (core.webServer.requestBrowser.IndexOf("kmahttp", System.StringComparison.OrdinalIgnoreCase)  == -1)) {
-                            personModel person = personModel.create(core, core.doc.pageController.page.ContactMemberID);
+                        if ((!core.session.visit.excludeFromAnalytics) & (core.doc.pageController.page.ContactMemberID != 0) && (core.webServer.requestBrowser.IndexOf("kmahttp", System.StringComparison.OrdinalIgnoreCase)  == -1)) {
+                            PersonModel person = PersonModel.create(core, core.doc.pageController.page.ContactMemberID);
                             if ( person != null ) {
                                 if (core.doc.pageController.page.AllowHitNotification) {
                                     string PageName = core.doc.pageController.page.name;
@@ -1961,13 +1960,13 @@ namespace Contensive.Processor.Controllers {
                                     Body = Body + get2ColumnTableRow("Page Name", PageName, true);
                                     Body = Body + get2ColumnTableRow("Member Name", core.session.user.name, false);
                                     Body = Body + get2ColumnTableRow("Member #", encodeText(core.session.user.id), true);
-                                    Body = Body + get2ColumnTableRow("Visit Start Time", encodeText(core.session.visit.StartTime), false);
+                                    Body = Body + get2ColumnTableRow("Visit Start Time", encodeText(core.session.visit.startTime), false);
                                     Body = Body + get2ColumnTableRow("Visit #", encodeText(core.session.visit.id), true);
                                     Body = Body + get2ColumnTableRow("Visit IP", core.webServer.requestRemoteIP, false);
                                     Body = Body + get2ColumnTableRow("Browser ", core.webServer.requestBrowser, true);
                                     Body = Body + get2ColumnTableRow("Visitor #", encodeText(core.session.visitor.id), false);
-                                    Body = Body + get2ColumnTableRow("Visit Authenticated", encodeText(core.session.visit.VisitAuthenticated), true);
-                                    Body = Body + get2ColumnTableRow("Visit Referrer", core.session.visit.HTTP_REFERER, false);
+                                    Body = Body + get2ColumnTableRow("Visit Authenticated", encodeText(core.session.visit.visitAuthenticated), true);
+                                    Body = Body + get2ColumnTableRow("Visit Referrer", core.session.visit.http_referer, false);
                                     Body = Body + kmaEndTable;
                                     string queryStringForLinkAppend = "";
                                     string emailStatus = "";
@@ -1991,10 +1990,10 @@ namespace Contensive.Processor.Controllers {
                                     EmailController.queueSystemEmail(core, core.db.getRecordName("System Email", SystemEMailID), "", core.session.user.id);
                                 }
                                 if (main_AddGroupID != 0) {
-                                    groupController.group_AddGroupMember(core, groupController.group_GetGroupName(core, main_AddGroupID));
+                                    GroupController.group_AddGroupMember(core, GroupController.group_GetGroupName(core, main_AddGroupID));
                                 }
                                 if (RemoveGroupID != 0) {
-                                    groupController.group_DeleteGroupMember(core, groupController.group_GetGroupName(core, RemoveGroupID));
+                                    GroupController.group_DeleteGroupMember(core, GroupController.group_GetGroupName(core, RemoveGroupID));
                                 }
                                 break;
                             case 2:
@@ -2002,15 +2001,15 @@ namespace Contensive.Processor.Controllers {
                                 // If in Condition Group
                                 //
                                 if (ConditionGroupID != 0) {
-                                    if (core.session.isMemberOfGroup(core, groupController.group_GetGroupName(core, ConditionGroupID))) {
+                                    if (core.session.isMemberOfGroup(core, GroupController.group_GetGroupName(core, ConditionGroupID))) {
                                         if (SystemEMailID != 0) {
                                             EmailController.queueSystemEmail(core, core.db.getRecordName("System Email", SystemEMailID), "", core.session.user.id);
                                         }
                                         if (main_AddGroupID != 0) {
-                                            groupController.group_AddGroupMember(core, groupController.group_GetGroupName(core, main_AddGroupID));
+                                            GroupController.group_AddGroupMember(core, GroupController.group_GetGroupName(core, main_AddGroupID));
                                         }
                                         if (RemoveGroupID != 0) {
-                                            groupController.group_DeleteGroupMember(core, groupController.group_GetGroupName(core, RemoveGroupID));
+                                            GroupController.group_DeleteGroupMember(core, GroupController.group_GetGroupName(core, RemoveGroupID));
                                         }
                                     }
                                 }
@@ -2020,12 +2019,12 @@ namespace Contensive.Processor.Controllers {
                                 // If not in Condition Group
                                 //
                                 if (ConditionGroupID != 0) {
-                                    if (!core.session.isMemberOfGroup(core, groupController.group_GetGroupName(core, ConditionGroupID))) {
+                                    if (!core.session.isMemberOfGroup(core, GroupController.group_GetGroupName(core, ConditionGroupID))) {
                                         if (main_AddGroupID != 0) {
-                                            groupController.group_AddGroupMember(core, groupController.group_GetGroupName(core, main_AddGroupID));
+                                            GroupController.group_AddGroupMember(core, GroupController.group_GetGroupName(core, main_AddGroupID));
                                         }
                                         if (RemoveGroupID != 0) {
-                                            groupController.group_DeleteGroupMember(core, groupController.group_GetGroupName(core, RemoveGroupID));
+                                            GroupController.group_DeleteGroupMember(core, GroupController.group_GetGroupName(core, RemoveGroupID));
                                         }
                                         if (SystemEMailID != 0) {
                                             EmailController.queueSystemEmail(core, core.db.getRecordName("System Email", SystemEMailID), "", core.session.user.id);
@@ -2050,7 +2049,7 @@ namespace Contensive.Processor.Controllers {
                     //---------------------------------------------------------------------------------
                     //
                     if (DateModified != DateTime.MinValue) {
-                        core.webServer.addResponseHeader("LAST-MODIFIED", genericController.GetRFC1123PatternDateFormat(DateModified));
+                        core.webServer.addResponseHeader("LAST-MODIFIED", GenericController.GetRFC1123PatternDateFormat(DateModified));
                     }
                     //
                     //---------------------------------------------------------------------------------
@@ -2061,7 +2060,7 @@ namespace Contensive.Processor.Controllers {
                     core.html.addScriptCode_onLoad(core.doc.pageController.page.JSOnLoad, "page content");
                     core.html.addScriptCode(core.doc.pageController.page.JSHead, "page content");
                     if (core.doc.pageController.page.JSFilename != "") {
-                        core.html.addScriptLinkSrc(genericController.getCdnFileLink(core, core.doc.pageController.page.JSFilename), "page content");
+                        core.html.addScriptLinkSrc(GenericController.getCdnFileLink(core, core.doc.pageController.page.JSFilename), "page content");
                     }
                     core.html.addScriptCode(core.doc.pageController.page.JSEndBody, "page content");
                     //
@@ -2127,7 +2126,7 @@ namespace Contensive.Processor.Controllers {
                     core.doc.adminWarning = "";
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return returnHtml;
         }
@@ -2153,22 +2152,22 @@ namespace Contensive.Processor.Controllers {
             try {
                 if (core.doc.continueProcessing) {
                     if (core.doc.redirectLink == "") {
-                        bool isEditing = core.session.isEditing(pageContentModel.contentName);
+                        bool isEditing = core.session.isEditing(PageContentModel.contentName);
                         //
                         // ----- Render the Body
-                        string LiveBody = getContentBox_content_Body(core, OrderByClause, AllowChildPageList, false, core.doc.pageController.pageToRootList.Last().id, AllowReturnLink, pageContentModel.contentName, ArchivePages);
+                        string LiveBody = getContentBox_content_Body(core, OrderByClause, AllowChildPageList, false, core.doc.pageController.pageToRootList.Last().id, AllowReturnLink, PageContentModel.contentName, ArchivePages);
                         bool isRootPage = (core.doc.pageController.pageToRootList.Count == 1);
                         if (core.session.isAdvancedEditing(core, "")) {
-                            result += AdminUIController.getRecordEditLink(core, pageContentModel.contentName, core.doc.pageController.page.id, (!isRootPage)) + LiveBody;
+                            result += AdminUIController.getRecordEditLink(core, PageContentModel.contentName, core.doc.pageController.page.id, (!isRootPage)) + LiveBody;
                         } else if (isEditing) {
-                            result += AdminUIController.getEditWrapper( core, "", AdminUIController.getRecordEditLink(core, pageContentModel.contentName, core.doc.pageController.page.id, (!isRootPage)) + LiveBody);
+                            result += AdminUIController.getEditWrapper( core, "", AdminUIController.getRecordEditLink(core, PageContentModel.contentName, core.doc.pageController.page.id, (!isRootPage)) + LiveBody);
                         } else {
                             result += LiveBody;
                         }
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -2247,8 +2246,8 @@ namespace Contensive.Processor.Controllers {
                 // ----- Start Text Search
                 //
                 string Cell = "";
-                if (core.session.isQuickEditing(core, pageContentModel.contentName)) {
-                    Cell = Cell + quickEditController.getQuickEditing(core, rootPageId, OrderByClause, AllowChildList, AllowReturnLink, ArchivePage, core.doc.pageController.page.ContactMemberID, core.doc.pageController.page.ChildListSortMethodID, allowChildListComposite, ArchivePage);
+                if (core.session.isQuickEditing(core, PageContentModel.contentName)) {
+                    Cell = Cell + QuickEditController.getQuickEditing(core, rootPageId, OrderByClause, AllowChildList, AllowReturnLink, ArchivePage, core.doc.pageController.page.ContactMemberID, core.doc.pageController.page.ChildListSortMethodID, allowChildListComposite, ArchivePage);
                 } else {
                     //
                     // ----- Headline
@@ -2265,7 +2264,7 @@ namespace Contensive.Processor.Controllers {
                     if (string.IsNullOrEmpty(bodyCopy)) {
                         //
                         // Page copy is empty if  Links Enabled put in a blank line to separate edit from add tag
-                        if (core.session.isEditing(pageContentModel.contentName)) {
+                        if (core.session.isEditing(PageContentModel.contentName)) {
                             bodyCopy = "\r<p><!-- Empty Content Placeholder --></p>";
                         }
                     } else {
@@ -2274,7 +2273,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // ----- Wrap content body
                     Cell = Cell + "\r<!-- ContentBoxBodyStart -->"
-                        + genericController.nop(bodyCopy) + "\r<!-- ContentBoxBodyEnd -->";
+                        + GenericController.nop(bodyCopy) + "\r<!-- ContentBoxBodyEnd -->";
                     //
                     // ----- Child pages
                     if (allowChildListComposite || core.session.isEditingAnything()) {
@@ -2285,11 +2284,11 @@ namespace Contensive.Processor.Controllers {
                         CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
                             addonType = CPUtilsBaseClass.addonContext.ContextPage,
                             hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
-                                contentName = pageContentModel.contentName,
+                                contentName = PageContentModel.contentName,
                                 fieldName = "",
                                 recordId = core.doc.pageController.page.id
                             },
-                            instanceArguments = genericController.convertAddonArgumentstoDocPropertiesList(core, core.doc.pageController.page.ChildListInstanceOptions),
+                            instanceArguments = GenericController.convertAddonArgumentstoDocPropertiesList(core, core.doc.pageController.page.ChildListInstanceOptions),
                             instanceGuid = PageChildListInstanceID,
                             wrapperID = core.siteProperties.defaultWrapperID,
                             errorContextMessage = "executing child list addon for page [" + core.doc.pageController.page.id + "]"
@@ -2301,12 +2300,12 @@ namespace Contensive.Processor.Controllers {
                 //
                 // ----- End Text Search
                 result += "\r<!-- TextSearchStart -->"
-                    + genericController.nop(Cell) + "\r<!-- TextSearchEnd -->";
+                    + GenericController.nop(Cell) + "\r<!-- TextSearchEnd -->";
                 //
                 // ----- Page See Also
                 if (core.doc.pageController.page.AllowSeeAlso) {
                     result += "\r<div>"
-                        + genericController.nop(getSeeAlso(core, pageContentModel.contentName, core.doc.pageController.page.id)) + "\r</div>";
+                        + GenericController.nop(getSeeAlso(core, PageContentModel.contentName, core.doc.pageController.page.id)) + "\r</div>";
                 }
                 //
                 // ----- Allow More Info
@@ -2365,7 +2364,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 //Call core.db.cs_Close(CS)
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -2399,7 +2398,7 @@ namespace Contensive.Processor.Controllers {
                             string SeeAlsoLink = (core.db.csGetText(CS, "Link"));
                             if (!string.IsNullOrEmpty(SeeAlsoLink)) {
                                 result += "\r<li class=\"ccListItem\">";
-                                if (genericController.vbInstr(1, SeeAlsoLink, "://") == 0) {
+                                if (GenericController.vbInstr(1, SeeAlsoLink, "://") == 0) {
                                     SeeAlsoLink = core.webServer.requestProtocol + SeeAlsoLink;
                                 }
                                 if (IsEditingLocal) {
@@ -2426,11 +2425,11 @@ namespace Contensive.Processor.Controllers {
                     if (SeeAlsoCount == 0) {
                         result = "";
                     } else {
-                        result = "<p>See Also\r<ul class=\"ccList\">" + genericController.nop(result) + "\r</ul></p>";
+                        result = "<p>See Also\r<ul class=\"ccList\">" + GenericController.nop(result) + "\r</ul></p>";
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -2493,7 +2492,7 @@ namespace Contensive.Processor.Controllers {
                         NoteCopy = NoteCopy + Copy + BR;
                         core.db.csClose(ref CS);
                         //
-                        personModel person = personModel.create(core, ToMemberID);
+                        PersonModel person = PersonModel.create(core, ToMemberID);
                         if (person != null) {
                             string sendStatus = "";
                             string queryStringForLinkAppend = "";
@@ -2548,7 +2547,7 @@ namespace Contensive.Processor.Controllers {
                         break;
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -2573,28 +2572,28 @@ namespace Contensive.Processor.Controllers {
             string result = "";
             try {
                 if (string.IsNullOrEmpty(ContentName)) {
-                    ContentName = pageContentModel.contentName;
+                    ContentName = PageContentModel.contentName;
                 }
                 bool isAuthoring = core.session.isEditing(ContentName);
                 //
                 int ChildListCount = 0;
-                string UcaseRequestedListName = genericController.vbUCase(RequestedListName);
+                string UcaseRequestedListName = GenericController.vbUCase(RequestedListName);
                 if ((UcaseRequestedListName == "NONE") || (UcaseRequestedListName == "ORPHAN")) {
                     UcaseRequestedListName = "";
                 }
                 //
                 string archiveLink = core.webServer.requestPathPage;
-                archiveLink = genericController.ConvertLinkToShortLink(archiveLink, core.webServer.requestDomain, core.appConfig.cdnFileUrl);
-                archiveLink = genericController.encodeVirtualPath(archiveLink, core.appConfig.cdnFileUrl, appRootPath, core.webServer.requestDomain);
+                archiveLink = GenericController.ConvertLinkToShortLink(archiveLink, core.webServer.requestDomain, core.appConfig.cdnFileUrl);
+                archiveLink = GenericController.encodeVirtualPath(archiveLink, core.appConfig.cdnFileUrl, appRootPath, core.webServer.requestDomain);
                 //
                 //string sqlCriteria = "(parentId=" + parentPageID + ")";
                 //string sqlCriteria = "(parentId=" + core.doc.pageController.page.id + ")";
                 //string sqlOrderBy = "sortOrder";
-                List<pageContentModel> childPageList = pageContentModel.createList(core, "(parentId=" + parentPageID + ")", "sortOrder");
+                List<PageContentModel> childPageList = PageContentModel.createList(core, "(parentId=" + parentPageID + ")", "sortOrder");
                 string inactiveList = "";
                 string activeList = "";
-                foreach (pageContentModel childPage in childPageList) {
-                    string PageLink = pageContentController.getPageLink(core, childPage.id, "", true, false);
+                foreach (PageContentModel childPage in childPageList) {
+                    string PageLink = PageContentController.getPageLink(core, childPage.id, "", true, false);
                     string pageMenuHeadline = childPage.MenuHeadline;
                     if (string.IsNullOrEmpty(pageMenuHeadline)) {
                         pageMenuHeadline = childPage.name.Trim(' ');
@@ -2609,13 +2608,13 @@ namespace Contensive.Processor.Controllers {
                     //
                     string link = PageLink;
                     if (ArchivePages) {
-                        link = genericController.modifyLinkQuery(archiveLink, rnPageId, encodeText(childPage.id), true);
+                        link = GenericController.modifyLinkQuery(archiveLink, rnPageId, encodeText(childPage.id), true);
                     }
                     bool blockContentComposite = false;
                     if (childPage.BlockContent | childPage.BlockPage) {
                         blockContentComposite = !core.doc.bypassContentBlock(childPage.contentControlID, childPage.id);
                     }
-                    string LinkedText = genericController.csv_GetLinkedText("<a href=\"" + HtmlController.encodeHtml(link) + "\">", pageMenuHeadline);
+                    string LinkedText = GenericController.csv_GetLinkedText("<a href=\"" + HtmlController.encodeHtml(link) + "\">", pageMenuHeadline);
                     if ((string.IsNullOrEmpty(UcaseRequestedListName)) && (childPage.ParentListName != "") & (!isAuthoring)) {
                         //
                         // ----- Requested orphan list, and this record is in a named list, and not editing, do not display
@@ -2634,7 +2633,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // ----- Requested orphan List, Not AllowChildListDisplay, not Authoring, do not display
                         //
-                    } else if ((!string.IsNullOrEmpty(UcaseRequestedListName)) & (UcaseRequestedListName != genericController.vbUCase(childPage.ParentListName))) {
+                    } else if ((!string.IsNullOrEmpty(UcaseRequestedListName)) & (UcaseRequestedListName != GenericController.vbUCase(childPage.ParentListName))) {
                         //
                         // ----- requested named list and wrong RequestedListName, do not display
                         //
@@ -2727,10 +2726,10 @@ namespace Contensive.Processor.Controllers {
                 //
                 result = "";
                 if (!string.IsNullOrEmpty(activeList)) {
-                    result += "\r<ul id=\"childPageList_" + parentPageID + "_" + RequestedListName + "\" class=\"ccChildList\">" + genericController.nop(activeList) + "\r</ul>";
+                    result += "\r<ul id=\"childPageList_" + parentPageID + "_" + RequestedListName + "\" class=\"ccChildList\">" + GenericController.nop(activeList) + "\r</ul>";
                 }
                 if (!string.IsNullOrEmpty(inactiveList)) {
-                    result += "\r<ul id=\"childPageList_" + parentPageID + "_" + RequestedListName + "\" class=\"ccChildListInactive\">" + genericController.nop(inactiveList) + "\r</ul>";
+                    result += "\r<ul id=\"childPageList_" + parentPageID + "_" + RequestedListName + "\" class=\"ccChildListInactive\">" + GenericController.nop(inactiveList) + "\r</ul>";
                 }
                 //
                 // ----- if non-orphan list, authoring and none found, print none message
@@ -2739,7 +2738,7 @@ namespace Contensive.Processor.Controllers {
                     result = "[Child Page List with no pages]</p><p>" + result;
                 }
             } catch (Exception ex) {
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
             }
             return result;
         }
@@ -2761,7 +2760,7 @@ namespace Contensive.Processor.Controllers {
             GC.SuppressFinalize(this);
         }
         //
-        ~pageContentController() {
+        ~PageContentController() {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(false);
             //todo  NOTE: The base class Finalize method is automatically called from the destructor:

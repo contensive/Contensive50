@@ -11,12 +11,12 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 using Contensive.Processor.Models.Domain;
 //
 namespace Contensive.Processor.Controllers {
-    public class taskSchedulerController : IDisposable {
+    public class TaskSchedulerController : IDisposable {
         private System.Timers.Timer processTimer;
         private const int ProcessTimerMsecPerTick = 5000;
         private bool ProcessTimerInProcess;
@@ -51,11 +51,11 @@ namespace Contensive.Processor.Controllers {
             try {
                 processTimer.Enabled = false;
                 using (CPClass cp = new CPClass()) {
-                    logController.logTrace(cp.core,"stopTimerEvents");
+                    LogController.logTrace(cp.core,"stopTimerEvents");
                 }
             } catch (Exception ex) {
                 using (CPClass cp = new CPClass()) {
-                    logController.handleError(cp.core, ex);
+                    LogController.handleError(cp.core, ex);
                 }
             }
         }
@@ -81,11 +81,11 @@ namespace Contensive.Processor.Controllers {
                     StartServiceInProgress = false;
                 }
                 using (CPClass cp = new CPClass()) {
-                    logController.logTrace(cp.core, "stopTimerEvents");
+                    LogController.logTrace(cp.core, "stopTimerEvents");
                 }
             } catch (Exception ex) {
                 using (CPClass cp = new CPClass()) {
-                    logController.handleError(cp.core,ex);
+                    LogController.handleError(cp.core,ex);
                 }
             }
             return returnStartedOk;
@@ -108,7 +108,7 @@ namespace Contensive.Processor.Controllers {
                 }
             } catch (Exception ex) {
                 using (CPClass cp = new CPClass()) {
-                    logController.handleError(cp.core,ex);
+                    LogController.handleError(cp.core,ex);
                 }
             } finally {
                 ProcessTimerInProcess = false;
@@ -124,12 +124,12 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- run tasks for each app
                 foreach (KeyValuePair<string, Models.Domain.AppConfigModel> appKvp in coreServer.serverConfig.apps) {
-                    logController.logTrace(coreServer, "scheduleTasks, app=[" + appKvp.Value.name + "]");
+                    LogController.logTrace(coreServer, "scheduleTasks, app=[" + appKvp.Value.name + "]");
                     using (CPClass cpApp = new CPClass(appKvp.Value.name)) {
                         CoreController coreApp = cpApp.core;
                         if (!(coreApp.appConfig.appStatus == AppConfigModel.AppStatusEnum.ok)) {
                             //
-                            logController.logTrace(coreApp, "scheduleTasks, app status not ok");
+                            LogController.logTrace(coreApp, "scheduleTasks, app status not ok");
                         //} else if (!(coreApp.appConfig.appMode == appConfigModel.appModeEnum.normal)) {
                         //    //
                         //    logController.logTrace(coreApp, "scheduleTasks, app mode not normal");
@@ -159,7 +159,7 @@ namespace Contensive.Processor.Controllers {
                                     }
                                     if ((addonProcessNextRun < RightNow) || (addonProcessRunOnce)) {
                                         //
-                                        logController.logTrace(coreApp, "scheduleTasks, addon [" + addonName + "], add task, addonProcessRunOnce [" + addonProcessRunOnce + "], addonProcessNextRun [" + addonProcessNextRun + "]");
+                                        LogController.logTrace(coreApp, "scheduleTasks, addon [" + addonName + "], add task, addonProcessRunOnce [" + addonProcessRunOnce + "], addonProcessNextRun [" + addonProcessNextRun + "]");
                                         //
                                         // -- resolve triggering state
                                         coreApp.db.csSet(CS, "ProcessRunOnce", false);
@@ -172,11 +172,11 @@ namespace Contensive.Processor.Controllers {
                                         cmdDetailClass cmdDetail = new cmdDetailClass();
                                         cmdDetail.addonId = coreApp.db.csGetInteger(CS, "ID");
                                         cmdDetail.addonName = addonName;
-                                        cmdDetail.args = genericController.convertAddonArgumentstoDocPropertiesList(coreApp, coreApp.db.csGetText(CS, "argumentlist"));
+                                        cmdDetail.args = GenericController.convertAddonArgumentstoDocPropertiesList(coreApp, coreApp.db.csGetText(CS, "argumentlist"));
                                         addTaskToQueue(coreApp, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
                                     } else if (coreApp.db.csGetDate(CS, "ProcessNextRun") == DateTime.MinValue) {
                                         //
-                                        logController.logTrace(coreApp, "scheduleTasks, addon [" + addonName + "], setup next run, ProcessInterval set but no processNextRun, set processNextRun [" + nextRun + "]");
+                                        LogController.logTrace(coreApp, "scheduleTasks, addon [" + addonName + "], setup next run, ProcessInterval set but no processNextRun, set processNextRun [" + nextRun + "]");
                                         //
                                         // -- Interval is OK but NextRun is 0, just set next run
                                         coreApp.db.csSet(CS, "ProcessNextRun", nextRun);
@@ -186,15 +186,15 @@ namespace Contensive.Processor.Controllers {
                                 coreApp.db.csClose(ref CS);
                             } catch (Exception ex) {
                                 //
-                                logController.logTrace(coreApp, "scheduleTasks, exception [" + ex.ToString() + "]");
-                                logController.handleError(coreApp, ex);
+                                LogController.logTrace(coreApp, "scheduleTasks, exception [" + ex.ToString() + "]");
+                                LogController.handleError(coreApp, ex);
                             }
                         }
                     }
                 }
             } catch (Exception ex) {
-                logController.logTrace(coreServer, "scheduleTasks, exeception [" + ex.ToString() + "]");
-                logController.handleError(coreServer, ex);
+                LogController.logTrace(coreServer, "scheduleTasks, exeception [" + ex.ToString() + "]");
+                LogController.handleError(coreServer, ex);
             }
         }
         //
@@ -229,11 +229,11 @@ namespace Contensive.Processor.Controllers {
                         cpSiteCore.db.csSet(cs, "cmdDetail", cmdDetailJson);
                     }
                     cpSiteCore.db.csClose(ref cs);
-                    logController.logTrace(cpSiteCore, "addTaskToQueue, command [" + command + "], cmdDetailJson [" + cmdDetailJson + "]");
+                    LogController.logTrace(cpSiteCore, "addTaskToQueue, command [" + command + "], cmdDetailJson [" + cmdDetailJson + "]");
                 }
             } catch (Exception ex) {
-                logController.logTrace(cpSiteCore, "addTaskToQueue, exeception [" + ex.ToString() + "]");
-                logController.handleError(cpSiteCore, ex);
+                LogController.logTrace(cpSiteCore, "addTaskToQueue, exeception [" + ex.ToString() + "]");
+                LogController.handleError(cpSiteCore, ex);
             }
             return returnTaskAdded;
         }
@@ -247,7 +247,7 @@ namespace Contensive.Processor.Controllers {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        ~taskSchedulerController() {
+        ~TaskSchedulerController() {
             Dispose(false);
             //todo  NOTE: The base class Finalize method is automatically called from the destructor:
             //base.Finalize();

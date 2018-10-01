@@ -4,7 +4,7 @@ Option Strict On
 
 Imports Contensive.Processor
 Imports Contensive.Processor.Controllers
-Imports Contensive.Processor.Controllers.genericController
+Imports Contensive.Processor.Controllers.GenericController
 Imports System.Web.Routing
 Imports System.IO
 Imports Contensive.Processor.Models.Domain
@@ -43,8 +43,8 @@ Public Class configurationClass
             serverConfig.defaultDataSourceAddress = ConfigurationManager.AppSettings("ContensiveDefaultDataSourceAddress")
             serverConfig.defaultDataSourcePassword = ConfigurationManager.AppSettings("ContensiveDefaultDataSourcePassword")
             serverConfig.defaultDataSourceUsername = ConfigurationManager.AppSettings("ContensiveDefaultDataSourceUsername")
-            serverConfig.enableLocalMemoryCache = genericController.encodeBoolean(ConfigurationManager.AppSettings("ContensiveIsLocalCache"))
-            serverConfig.isLocalFileSystem = genericController.encodeBoolean(ConfigurationManager.AppSettings("ContensiveIsLocalFileSystem"))
+            serverConfig.enableLocalMemoryCache = GenericController.encodeBoolean(ConfigurationManager.AppSettings("ContensiveIsLocalCache"))
+            serverConfig.isLocalFileSystem = GenericController.encodeBoolean(ConfigurationManager.AppSettings("ContensiveIsLocalFileSystem"))
             serverConfig.localDataDriveLetter = ConfigurationManager.AppSettings("ContensiveLocalDataDriveLetter")
             serverConfig.name = ConfigurationManager.AppSettings("ContensiveServerGroupName")
             serverConfig.password = ConfigurationManager.AppSettings("ContensiveServerGroupPassword")
@@ -68,7 +68,7 @@ Public Class configurationClass
     End Function
     '
     Public Shared Sub loadRouteMap(cp As Contensive.BaseClasses.CPBaseClass)
-        logController.forceNLog("configurationClass, loadRouteMap, [" + cp.Site.Name + "]", logController.logLevel.Trace)
+        LogController.forceNLog("configurationClass, loadRouteMap, [" + cp.Site.Name + "]", LogController.logLevel.Trace)
         ' 20180307, added clear to resolve error 
         RouteTable.Routes.Clear()
         For Each kvp In cp.Site.getRouteDictionary()
@@ -76,7 +76,7 @@ Public Class configurationClass
                 Dim newRouteName As String = kvp.Key
                 Dim newRoute As Contensive.BaseClasses.CPSiteBaseClass.routeClass = kvp.Value
                 '
-                logController.forceNLog("configurationClass, loadRouteMap, [" + cp.Site.Name + "] [" + newRoute.virtualRoute + "], [" + newRoute.physicalRoute + "]", logController.logLevel.Trace)
+                LogController.forceNLog("configurationClass, loadRouteMap, [" + cp.Site.Name + "] [" + newRoute.virtualRoute + "], [" + newRoute.physicalRoute + "]", LogController.logLevel.Trace)
                 '
                 RouteTable.Routes.Remove(RouteTable.Routes(newRouteName))
                 RouteTable.Routes.MapPageRoute(newRoute.virtualRoute, newRoute.virtualRoute, newRoute.physicalRoute)

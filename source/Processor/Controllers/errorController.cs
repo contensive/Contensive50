@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 //
@@ -21,7 +21,7 @@ namespace Contensive.Processor.Controllers {
     /// <summary>
     /// static class controller
     /// </summary>
-    public class errorController : IDisposable {
+    public class ErrorController : IDisposable {
         //
         // ----- constants
         //
@@ -34,7 +34,7 @@ namespace Contensive.Processor.Controllers {
         public static void addUserError(CoreController core, string Message) {
             if (!string.IsNullOrEmpty(Message)) {
                 if (core.doc.debug_iUserError.IndexOf(Message, System.StringComparison.OrdinalIgnoreCase) == -1) {
-                    core.doc.debug_iUserError = core.doc.debug_iUserError + "\r<li class=\"ccError\">" + genericController.encodeText(Message) + "</LI>";
+                    core.doc.debug_iUserError = core.doc.debug_iUserError + "\r<li class=\"ccError\">" + GenericController.encodeText(Message) + "</LI>";
                 }
             }
         }
@@ -46,9 +46,9 @@ namespace Contensive.Processor.Controllers {
         //
         public static string getUserError(CoreController core) {
             string temperror_GetUserError = null;
-            temperror_GetUserError = genericController.encodeText(core.doc.debug_iUserError);
+            temperror_GetUserError = GenericController.encodeText(core.doc.debug_iUserError);
             if (!string.IsNullOrEmpty(temperror_GetUserError)) {
-                temperror_GetUserError = "<ul class=\"ccError\">" + genericController.nop(temperror_GetUserError) + "\r</ul>";
+                temperror_GetUserError = "<ul class=\"ccError\">" + GenericController.nop(temperror_GetUserError) + "\r</ul>";
                 temperror_GetUserError = UserErrorHeadline + "" + temperror_GetUserError;
                 core.doc.debug_iUserError = "";
             }
@@ -97,7 +97,7 @@ namespace Contensive.Processor.Controllers {
             GC.SuppressFinalize(this);
         }
         //
-        ~errorController() {
+        ~ErrorController() {
             Dispose(false);
             //todo  NOTE: The base class Finalize method is automatically called from the destructor:
             //base.Finalize();

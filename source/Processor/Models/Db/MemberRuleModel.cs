@@ -11,17 +11,17 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Models.Db {
-    public class memberRuleModel : BaseModel {
+    public class MemberRuleModel : BaseModel {
         //
         //====================================================================================================
         //-- const
         public const string contentName = "member rules";
         public const string contentTableName = "ccmemberrules";
-        private const string contentDataSource = "default";
+        public const string contentDataSource = "default";
         //
         //====================================================================================================
         // -- instance properties
@@ -30,43 +30,43 @@ namespace Contensive.Processor.Models.Db {
         public int MemberID { get; set; }
         //
         //====================================================================================================
-        public static memberRuleModel add(CoreController core) {
-            return add<memberRuleModel>(core);
+        public static MemberRuleModel add(CoreController core) {
+            return add<MemberRuleModel>(core);
         }
         //
         //====================================================================================================
-        public static memberRuleModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<memberRuleModel>(core, ref callersCacheNameList);
+        public static MemberRuleModel add(CoreController core, ref List<string> callersCacheNameList) {
+            return add<MemberRuleModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static memberRuleModel create(CoreController core, int recordId) {
-            return create<memberRuleModel>(core, recordId);
+        public static MemberRuleModel create(CoreController core, int recordId) {
+            return create<MemberRuleModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static memberRuleModel create(CoreController core, int recordId, ref List<string> callersCacheNameList) {
-            return create<memberRuleModel>(core, recordId, ref callersCacheNameList);
+        public static MemberRuleModel create(CoreController core, int recordId, ref List<string> callersCacheNameList) {
+            return create<MemberRuleModel>(core, recordId, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static memberRuleModel create(CoreController core, string recordGuid) {
-            return create<memberRuleModel>(core, recordGuid);
+        public static MemberRuleModel create(CoreController core, string recordGuid) {
+            return create<MemberRuleModel>(core, recordGuid);
         }
         //
         //====================================================================================================
-        public static memberRuleModel create(CoreController core, string recordGuid, ref List<string> callersCacheNameList) {
-            return create<memberRuleModel>(core, recordGuid, ref callersCacheNameList);
+        public static MemberRuleModel create(CoreController core, string recordGuid, ref List<string> callersCacheNameList) {
+            return create<MemberRuleModel>(core, recordGuid, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static memberRuleModel createByName(CoreController core, string recordName) {
-            return createByName<memberRuleModel>(core, recordName);
+        public static MemberRuleModel createByName(CoreController core, string recordName) {
+            return createByName<MemberRuleModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static memberRuleModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<memberRuleModel>(core, recordName, ref callersCacheNameList);
+        public static MemberRuleModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByName<MemberRuleModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================
@@ -76,52 +76,62 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static void delete(CoreController core, int recordId) {
-            delete<memberRuleModel>(core, recordId);
+            delete<MemberRuleModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static void delete(CoreController core, string ccGuid) {
-            delete<memberRuleModel>(core, ccGuid);
+            delete<MemberRuleModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static List<memberRuleModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
-            return createList<memberRuleModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
+        public static List<MemberRuleModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
+            return createList<MemberRuleModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static List<memberRuleModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy) {
-            return createList<memberRuleModel>(core, sqlCriteria, sqlOrderBy);
+        public static List<MemberRuleModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy) {
+            return createList<MemberRuleModel>(core, sqlCriteria, sqlOrderBy);
         }
         //
         //====================================================================================================
-        public static List<memberRuleModel> createList(CoreController core, string sqlCriteria) {
-            return createList<memberRuleModel>(core, sqlCriteria);
+        public static List<MemberRuleModel> createList(CoreController core, string sqlCriteria) {
+            return createList<MemberRuleModel>(core, sqlCriteria);
         }
         //
         //====================================================================================================
-        public void invalidatePrimaryCache(CoreController core, int recordId) {
-            invalidateCache<memberRuleModel>(core, recordId);
+        public static void invalidateRecordCache(CoreController core, int recordId) {
+            invalidateRecordCache<MemberRuleModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return BaseModel.getRecordName<memberRuleModel>(core, recordId);
+            return BaseModel.getRecordName<MemberRuleModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return BaseModel.getRecordName<memberRuleModel>(core, ccGuid);
+            return BaseModel.getRecordName<MemberRuleModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return BaseModel.getRecordId<memberRuleModel>(core, ccGuid);
+            return BaseModel.getRecordId<MemberRuleModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static memberRuleModel createDefault(CoreController core) {
-            return createDefault<memberRuleModel>(core);
+        public static MemberRuleModel createDefault(CoreController core) {
+            return createDefault<MemberRuleModel>(core);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Return a cache key used to represent the table. ONLY used for invalidation. Add this as a dependent key if you want that key cleared when ANY record in the table is changed.
+        /// </summary>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        public static string getTableInvalidationKey(CoreController core) {
+            return getTableCacheKey<MemberRuleModel>(core);
         }
     }
 }

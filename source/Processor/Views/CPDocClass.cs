@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 
@@ -299,16 +299,16 @@ namespace Contensive.Processor {
             tempdecodeLegacyOptionStringArgument = "";
             if (!string.IsNullOrEmpty(EncodedArg)) {
                 a = EncodedArg;
-                a = genericController.vbReplace(a, "#0058#", ":");
-                a = genericController.vbReplace(a, "#0093#", "]");
-                a = genericController.vbReplace(a, "#0091#", "[");
-                a = genericController.vbReplace(a, "#0124#", "|");
-                a = genericController.vbReplace(a, "#0039#", "'");
-                a = genericController.vbReplace(a, "#0034#", "\"");
-                a = genericController.vbReplace(a, "#0044#", ",");
-                a = genericController.vbReplace(a, "#0061#", "=");
-                a = genericController.vbReplace(a, "#0038#", "&");
-                a = genericController.vbReplace(a, "#0013#", "\r\n");
+                a = GenericController.vbReplace(a, "#0058#", ":");
+                a = GenericController.vbReplace(a, "#0093#", "]");
+                a = GenericController.vbReplace(a, "#0091#", "[");
+                a = GenericController.vbReplace(a, "#0124#", "|");
+                a = GenericController.vbReplace(a, "#0039#", "'");
+                a = GenericController.vbReplace(a, "#0034#", "\"");
+                a = GenericController.vbReplace(a, "#0044#", ",");
+                a = GenericController.vbReplace(a, "#0061#", "=");
+                a = GenericController.vbReplace(a, "#0038#", "&");
+                a = GenericController.vbReplace(a, "#0013#", "\r\n");
                 tempdecodeLegacyOptionStringArgument = a;
             }
             return tempdecodeLegacyOptionStringArgument;
@@ -327,13 +327,13 @@ namespace Contensive.Processor {
         //=======================================================================================================
         //
         public override bool GetBoolean(string PropertyName, string DefaultValue = "") {
-            return genericController.encodeBoolean(GetProperty(PropertyName, DefaultValue));
+            return GenericController.encodeBoolean(GetProperty(PropertyName, DefaultValue));
         }
         //
         //=======================================================================================================
         //
         public override DateTime GetDate(string PropertyName, string DefaultValue = "") {
-            return genericController.encodeDate(GetProperty(PropertyName, DefaultValue));
+            return GenericController.encodeDate(GetProperty(PropertyName, DefaultValue));
         }
         //
         //=======================================================================================================
@@ -416,7 +416,7 @@ namespace Contensive.Processor {
                 try {
                     returnIsAdmin = (cp.Request.PathPage.IndexOf(cp.Site.GetText("adminUrl"), System.StringComparison.OrdinalIgnoreCase)  != -1);
                 } catch (Exception ex) {
-                    logController.handleError( core,ex); 
+                    LogController.handleError( core,ex); 
                     throw;
                 }
                 return returnIsAdmin;

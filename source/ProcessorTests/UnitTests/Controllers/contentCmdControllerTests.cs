@@ -21,7 +21,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
                 AddonModel addon = AddonModel.add(cp.core);
-                addon.name = "testaddon" + genericController.GetRandomInteger(cp.core).ToString() ;
+                addon.name = "testaddon" + GenericController.GetRandomInteger(cp.core).ToString() ;
                 addon.copyText = "foo";
                 addon.save(cp.core);
                 string cmd = "<div>{% \"" + addon.name + "\" %}</div>";
@@ -42,12 +42,12 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
                 AddonModel addonFoo = AddonModel.add(cp.core);
-                addonFoo.name = "addonFoo" + genericController.GetRandomInteger(cp.core).ToString();
+                addonFoo.name = "addonFoo" + GenericController.GetRandomInteger(cp.core).ToString();
                 addonFoo.copyText = "foo";
                 addonFoo.save(cp.core);
                 //
                 AddonModel addonBar = AddonModel.add(cp.core);
-                addonBar.name = "addonBar" + genericController.GetRandomInteger(cp.core).ToString();
+                addonBar.name = "addonBar" + GenericController.GetRandomInteger(cp.core).ToString();
                 addonBar.copyText = "Bar";
                 addonBar.save(cp.core);
                 string cmd = "<div>{% \"" + addonFoo.name + "\" %}{% \"" + addonBar.name + "\" %}+{% \"" + addonFoo.name + "\" %}\n{% \"" + addonBar.name + "\" %}</div>";
@@ -67,12 +67,12 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
                 AddonModel addonFoo = AddonModel.add(cp.core);
-                addonFoo.name = "addonFoo" + genericController.GetRandomInteger(cp.core).ToString();
+                addonFoo.name = "addonFoo" + GenericController.GetRandomInteger(cp.core).ToString();
                 addonFoo.copyText = "foo";
                 addonFoo.save(cp.core);
                 //
                 AddonModel addonBar = AddonModel.add(cp.core);
-                addonBar.name = "addonBar" + genericController.GetRandomInteger(cp.core).ToString();
+                addonBar.name = "addonBar" + GenericController.GetRandomInteger(cp.core).ToString();
                 addonBar.copyText = "Bar";
                 addonBar.save(cp.core);
                 string cmd = "<div>{%[{\"" + addonFoo.name + "\":\"commandArgument\"}]%}</div>";
@@ -93,12 +93,12 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
                 AddonModel addonFoo = AddonModel.add(cp.core);
-                addonFoo.name = "addonFoo" + genericController.GetRandomInteger(cp.core).ToString();
+                addonFoo.name = "addonFoo" + GenericController.GetRandomInteger(cp.core).ToString();
                 addonFoo.copyText = "foo";
                 addonFoo.save(cp.core);
                 //
                 AddonModel addonBar = AddonModel.add(cp.core);
-                addonBar.name = "addonBar" + genericController.GetRandomInteger(cp.core).ToString();
+                addonBar.name = "addonBar" + GenericController.GetRandomInteger(cp.core).ToString();
                 addonBar.copyText = "$cmdAccumulator$Bar";
                 addonBar.save(cp.core);
                 string cmd = "<div>{%[{\"" + addonFoo.name + "\":\"commandArgument\"},{\"" + addonBar.name + "\":\"commandArgument\"}]%}</div>";
@@ -118,7 +118,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
                 AddonModel addonFoo = AddonModel.add(cp.core);
-                addonFoo.name = "addonFoo" + genericController.GetRandomInteger(cp.core).ToString();
+                addonFoo.name = "addonFoo" + GenericController.GetRandomInteger(cp.core).ToString();
                 addonFoo.copyText = "foo";
                 addonFoo.save(cp.core);
                 string cmd = "<div class=\"sample\">{% {\"addon\":{\"addon\":\"" + addonFoo.name + "\"}} %}</div>";
@@ -138,7 +138,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
                 AddonModel addonFoo = AddonModel.add(cp.core);
-                addonFoo.name = "addonFoo" + genericController.GetRandomInteger(cp.core).ToString();
+                addonFoo.name = "addonFoo" + GenericController.GetRandomInteger(cp.core).ToString();
                 addonFoo.copyText = "foo$ReplaceMe$";
                 addonFoo.save(cp.core);
                 string cmd = "<div class=\"sample\">{% {\"addon\":{\"addon\":\"" + addonFoo.name + "\",\"ReplaceMe\":\"BAR\"}} %}</div>";
@@ -158,7 +158,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
                 AddonModel addon = AddonModel.add(cp.core);
-                addon.name = "testaddon" + genericController.GetRandomInteger(cp.core).ToString();
+                addon.name = "testaddon" + GenericController.GetRandomInteger(cp.core).ToString();
                 addon.copyText = "foo$insert$";
                 addon.save(cp.core);
                 string cmd = "<div class=\"sample\">{% {\"addon\":{\"addon\":\"" + addon.name + "\",\"insert\":\"bar\"}} %}</div>";

@@ -11,61 +11,61 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Models.Db {
-    public class layoutModel : BaseModel {
+    public class LayoutModel : BaseModel {
         //
         //====================================================================================================
         //-- const
         public const string contentName = "layouts";
         public const string contentTableName = "ccLayouts";
-        private const string contentDataSource = "default";
+        public const string contentDataSource = "default";
         //
         //====================================================================================================
         // -- instance properties
-        public string Layout { get; set; }
-        public string StylesFilename { get; set; }
+        public string layout { get; set; }
+        public string stylesFilename { get; set; }
         //
         //====================================================================================================
-        public static layoutModel add(CoreController core) {
-            return add<layoutModel>(core);
+        public static LayoutModel add(CoreController core) {
+            return add<LayoutModel>(core);
         }
         //
         //====================================================================================================
-        public static layoutModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<layoutModel>(core, ref callersCacheNameList);
+        public static LayoutModel add(CoreController core, ref List<string> callersCacheNameList) {
+            return add<LayoutModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static layoutModel create(CoreController core, int recordId) {
-            return create<layoutModel>(core, recordId);
+        public static LayoutModel create(CoreController core, int recordId) {
+            return create<LayoutModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static layoutModel create(CoreController core, int recordId, ref List<string> callersCacheNameList) {
-            return create<layoutModel>(core, recordId, ref callersCacheNameList);
+        public static LayoutModel create(CoreController core, int recordId, ref List<string> callersCacheNameList) {
+            return create<LayoutModel>(core, recordId, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static layoutModel create(CoreController core, string recordGuid) {
-            return create<layoutModel>(core, recordGuid);
+        public static LayoutModel create(CoreController core, string recordGuid) {
+            return create<LayoutModel>(core, recordGuid);
         }
         //
         //====================================================================================================
-        public static layoutModel create(CoreController core, string recordGuid, ref List<string> callersCacheNameList) {
-            return create<layoutModel>(core, recordGuid, ref callersCacheNameList);
+        public static LayoutModel create(CoreController core, string recordGuid, ref List<string> callersCacheNameList) {
+            return create<LayoutModel>(core, recordGuid, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static layoutModel createByName(CoreController core, string recordName) {
-            return createByName<layoutModel>(core, recordName);
+        public static LayoutModel createByName(CoreController core, string recordName) {
+            return createByName<LayoutModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static layoutModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<layoutModel>(core, recordName, ref callersCacheNameList);
+        public static LayoutModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByName<LayoutModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================
@@ -75,52 +75,62 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static void delete(CoreController core, int recordId) {
-            delete<layoutModel>(core, recordId);
+            delete<LayoutModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static void delete(CoreController core, string ccGuid) {
-            delete<layoutModel>(core, ccGuid);
+            delete<LayoutModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static List<layoutModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
-            return createList<layoutModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
+        public static List<LayoutModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
+            return createList<LayoutModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static List<layoutModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy) {
-            return createList<layoutModel>(core, sqlCriteria, sqlOrderBy);
+        public static List<LayoutModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy) {
+            return createList<LayoutModel>(core, sqlCriteria, sqlOrderBy);
         }
         //
         //====================================================================================================
-        public static List<layoutModel> createList(CoreController core, string sqlCriteria) {
-            return createList<layoutModel>(core, sqlCriteria);
+        public static List<LayoutModel> createList(CoreController core, string sqlCriteria) {
+            return createList<LayoutModel>(core, sqlCriteria);
         }
         //
         //====================================================================================================
-        public void invalidatePrimaryCache(CoreController core, int recordId) {
-            invalidateCache<layoutModel>(core, recordId);
+        public static void invalidateRecordCache(CoreController core, int recordId) {
+            invalidateRecordCache<LayoutModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return BaseModel.getRecordName<layoutModel>(core, recordId);
+            return BaseModel.getRecordName<LayoutModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return BaseModel.getRecordName<layoutModel>(core, ccGuid);
+            return BaseModel.getRecordName<LayoutModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return BaseModel.getRecordId<layoutModel>(core, ccGuid);
+            return BaseModel.getRecordId<LayoutModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static layoutModel createDefault(CoreController core) {
-            return createDefault<layoutModel>(core);
+        public static LayoutModel createDefault(CoreController core) {
+            return createDefault<LayoutModel>(core);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Return a cache key used to represent the table. ONLY used for invalidation. Add this as a dependent key if you want that key cleared when ANY record in the table is changed.
+        /// </summary>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        public static string getTableInvalidationKey(CoreController core) {
+            return getTableCacheKey<LayoutModel>(core);
         }
     }
 }

@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 using Contensive.BaseClasses;
 using System.IO;
@@ -61,7 +61,7 @@ namespace Contensive.Processor.Controllers {
             if (addon == null) {
                 //
                 // -- addon not found
-                logController.handleError(core, new ArgumentException("AddonExecute called without valid guid [" + addonGuid + "] from context [" + executeContext.errorContextMessage + "]."));
+                LogController.handleError(core, new ArgumentException("AddonExecute called without valid guid [" + addonGuid + "] from context [" + executeContext.errorContextMessage + "]."));
                 return "";
             } else {
                 return execute(addon, executeContext);
@@ -74,7 +74,7 @@ namespace Contensive.Processor.Controllers {
             if (addon == null) {
                 //
                 // -- addon not found
-                logController.handleError(core, new ArgumentException("AddonExecute called without valid id [" + addonId + "] from context [" + executeContext.errorContextMessage + "]."));
+                LogController.handleError(core, new ArgumentException("AddonExecute called without valid id [" + addonId + "] from context [" + executeContext.errorContextMessage + "]."));
                 return "";
             } else {
                 return execute(addon, executeContext);
@@ -98,7 +98,7 @@ namespace Contensive.Processor.Controllers {
             if (addon == null) {
                 //
                 // -- addon not found
-                logController.handleError(core, new ArgumentException("AddonExecute called without valid addon [" + executeContext.errorContextMessage + "]."));
+                LogController.handleError(core, new ArgumentException("AddonExecute called without valid addon [" + executeContext.errorContextMessage + "]."));
             } else {
                 try {
                     //
@@ -107,7 +107,7 @@ namespace Contensive.Processor.Controllers {
                     if (executeContext == null) {
                         //
                         // -- context not configured 
-                        logController.handleError(core, new ArgumentException("The Add-on executeContext was not configured for addon [#" + addon.id + ", " + addon.name + "]."));
+                        LogController.handleError(core, new ArgumentException("The Add-on executeContext was not configured for addon [#" + addon.id + ", " + addon.name + "]."));
                     } else if (!string.IsNullOrEmpty(addon.objectProgramID)) {
                         //
                         // -- addons with activeX components are deprecated
@@ -145,7 +145,7 @@ namespace Contensive.Processor.Controllers {
                                     if (addonRule.includedAddonID > 0) {
                                         AddonModel dependentAddon = AddonModel.create(core, addonRule.includedAddonID);
                                         if (dependentAddon == null) {
-                                            logController.handleError(core, new ApplicationException("Addon not found. An included addon of [" + addon.name + "] was not found. The included addon may have been deleted. Recreate or reinstall the missing addon, then reinstall [" + addon.name + "] or manually correct the included addon selection."));
+                                            LogController.handleError(core, new ApplicationException("Addon not found. An included addon of [" + addon.name + "] was not found. The included addon may have been deleted. Recreate or reinstall the missing addon, then reinstall [" + addon.name + "] or manually correct the included addon selection."));
                                         } else {
                                             executeContext.errorContextMessage = "adding dependent addon [" + dependentAddon.name + "] for addon [" + addon.name + "] called within context [" + addonContextMessage + "]";
                                             result += executeDependency(dependentAddon, executeContext);
@@ -183,10 +183,10 @@ namespace Contensive.Processor.Controllers {
                             foreach (var kvp in executeContext.instanceArguments) {
                                 switch (kvp.Key.ToLower()) {
                                     case "wrapper":
-                                        executeContext.wrapperID = genericController.encodeInteger(kvp.Value);
+                                        executeContext.wrapperID = GenericController.encodeInteger(kvp.Value);
                                         break;
                                     case "as ajax":
-                                        addon.asAjax = genericController.encodeBoolean(kvp.Value);
+                                        addon.asAjax = GenericController.encodeBoolean(kvp.Value);
                                         break;
                                     case "css container id":
                                         ContainerCssID = kvp.Value;
@@ -447,7 +447,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // -- DotNet
                                 if (addon.dotNetClass != "") {
-                                    result += execute_assembly(executeContext, addon, AddonCollectionModel.create(core, addon.collectionID));
+                                    result += execute_assembly(executeContext, addon, AddonCollection.create(core, addon.collectionID));
                                 }
                                 //
                                 // -- RemoteAssetLink
@@ -465,14 +465,14 @@ namespace Contensive.Processor.Controllers {
                                         }
                                     }
                                     int PosStart = 0;
-                                    httpRequestController kmaHTTP = new httpRequestController();
+                                    HttpRequestController kmaHTTP = new HttpRequestController();
                                     string RemoteAssetContent = kmaHTTP.getURL(ref RemoteAssetLink);
-                                    int Pos = genericController.vbInstr(1, RemoteAssetContent, "<body", 1);
+                                    int Pos = GenericController.vbInstr(1, RemoteAssetContent, "<body", 1);
                                     if (Pos > 0) {
-                                        Pos = genericController.vbInstr(Pos, RemoteAssetContent, ">");
+                                        Pos = GenericController.vbInstr(Pos, RemoteAssetContent, ">");
                                         if (Pos > 0) {
                                             PosStart = Pos + 1;
-                                            Pos = genericController.vbInstr(Pos, RemoteAssetContent, "</body", 1);
+                                            Pos = GenericController.vbInstr(Pos, RemoteAssetContent, "</body", 1);
                                             if (Pos > 0) {
                                                 RemoteAssetContent = RemoteAssetContent.Substring(PosStart - 1, Pos - PosStart);
                                             }
@@ -510,7 +510,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // -- js head code
                                 if (addon.jsFilename.filename != "") {
-                                    string scriptFilename = genericController.getCdnFileLink(core, addon.jsFilename.filename);
+                                    string scriptFilename = GenericController.getCdnFileLink(core, addon.jsFilename.filename);
                                     //string scriptFilename = core.webServer.requestProtocol + core.webServer.requestDomain + genericController.getCdnFileLink(core, addon.JSFilename.filename);
                                     core.html.addScriptLinkSrc(scriptFilename, AddedByName + " Javascript Head Code", (executeContext.forceJavascriptToHead || addon.javascriptForceHead), addon.id);
                                 }
@@ -533,7 +533,7 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     // -- styles
                                     if (addon.stylesFilename.filename != "") {
-                                        core.html.addStyleLink(genericController.getCdnFileLink(core, addon.stylesFilename.filename), addon.name + " Stylesheet");
+                                        core.html.addStyleLink(GenericController.getCdnFileLink(core, addon.stylesFilename.filename), addon.name + " Stylesheet");
                                     }
                                     //
                                     // -- link to stylesheet
@@ -597,7 +597,7 @@ namespace Contensive.Processor.Controllers {
                                             string HTMLViewerEditIcon = getHTMLViewerBubble(addon.id, "editWrapper" + core.doc.editWrapperCnt, ref DialogList);
                                             string SiteStylesEditIcon = ""; // ?????
                                             string ToolBar = InstanceSettingsEditIcon + AddonEditIcon + getAddonStylesBubble(addon.id, ref DialogList) + SiteStylesEditIcon + HTMLViewerEditIcon + HelpIcon;
-                                            ToolBar = genericController.vbReplace(ToolBar, "&nbsp;", "", 1, 99, 1);
+                                            ToolBar = GenericController.vbReplace(ToolBar, "&nbsp;", "", 1, 99, 1);
                                             result = AdminUIController.getEditWrapper(core, "<div class=\"ccAddonEditTools\">" + ToolBar + "&nbsp;" + addon.name + DialogList + "</div>", result);
                                         } else if (core.visitProperty.getBoolean("AllowEditing")) {
                                             result = AdminUIController.getEditWrapper(core, "<div class=\"ccAddonEditCaption\">" + addon.name + "&nbsp;" + HelpIcon + "</div>", result);
@@ -608,7 +608,7 @@ namespace Contensive.Processor.Controllers {
                                 // -- Add Comment wrapper, to help debugging except email, remote methods and admin (empty is used to detect no result)
                                 if (true && (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextAdmin) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextEmail) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextSimple)) {
                                     if (core.visitProperty.getBoolean("AllowDebugging")) {
-                                        string AddonCommentName = genericController.vbReplace(addon.name, "-->", "..>");
+                                        string AddonCommentName = GenericController.vbReplace(addon.name, "-->", "..>");
                                         if (addon.isInline) {
                                             result = "<!-- Add-on " + AddonCommentName + " -->" + result + "<!-- /Add-on " + AddonCommentName + " -->";
                                         } else {
@@ -634,7 +634,7 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                 } catch (Exception ex) {
-                    logController.handleError(core, ex);
+                    LogController.handleError(core, ex);
                 } finally {
                     //
                     // -- this completes the execute of this core.addon. remove it from the 'running' list
@@ -645,7 +645,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- if root level addon, and the addon is an html document, create the html document around it and uglify if not debugging
                     if ((executeContext.forceHtmlDocument) || ((rootLevelAddon) && (addon.htmlDocument))) {
-                        debugController.testPoint(core, "root level addon is html, build document around result");
+                        DebugController.testPoint(core, "root level addon is html, build document around result");
                         result = core.html.getHtmlDoc(result, "<body>");
                         if (!core.doc.visitPropertyAllowDebugging) {
                             result = NUglify.Uglify.Html(result).Code;
@@ -654,7 +654,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- pop modelstack and test point message
                     core.doc.addonModelStack.Pop();
-                    debugController.testPoint(core, "execute exit (" + (core.doc.appStopWatch.ElapsedMilliseconds - addonStart) + "ms) [#" + addon.id + ", " + addon.name + ", guid " + addon.ccguid + "]");
+                    DebugController.testPoint(core, "execute exit (" + (core.doc.appStopWatch.ElapsedMilliseconds - addonStart) + "ms) [#" + addon.id + ", " + addon.name + ", guid " + addon.ccguid + "]");
                 }
             }
             return result;
@@ -674,7 +674,7 @@ namespace Contensive.Processor.Controllers {
                 string fieldfilename = null;
                 string FieldDataSource = null;
                 string FieldSQL = null;
-                stringBuilderLegacyController Content = new stringBuilderLegacyController();
+                StringBuilderLegacyController Content = new StringBuilderLegacyController();
                 string Copy = null;
                 string Button = null;
                 string ButtonList = "";
@@ -686,7 +686,7 @@ namespace Contensive.Processor.Controllers {
                 string TabDescription = null;
                 string TabHeading = null;
                 int TabCnt = 0;
-                stringBuilderLegacyController TabCell = null;
+                StringBuilderLegacyController TabCell = null;
                 bool loadOK = true;
                 string FieldValue = "";
                 string FieldDescription = null;
@@ -736,7 +736,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // data is OK
                             //
-                            if (genericController.vbLCase(Doc.DocumentElement.Name) != "form") {
+                            if (GenericController.vbLCase(Doc.DocumentElement.Name) != "form") {
                                 //
                                 // error - Need a way to reach the user that submitted the file
                                 //
@@ -748,27 +748,27 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 if ((Button == ButtonSave) || (Button == ButtonOK)) {
                                     foreach (XmlNode SettingNode in Doc.DocumentElement.ChildNodes) {
-                                        switch (genericController.vbLCase(SettingNode.Name)) {
+                                        switch (GenericController.vbLCase(SettingNode.Name)) {
                                             case "tab":
                                                 foreach (XmlNode TabNode in SettingNode.ChildNodes) {
-                                                    switch (genericController.vbLCase(TabNode.Name)) {
+                                                    switch (GenericController.vbLCase(TabNode.Name)) {
                                                         case "siteproperty":
                                                             //
                                                             FieldName = xml_GetAttribute(IsFound, TabNode, "name", "");
                                                             FieldValue = core.docProperties.getText(FieldName);
                                                             fieldType = xml_GetAttribute(IsFound, TabNode, "type", "");
-                                                            switch (genericController.vbLCase(fieldType)) {
+                                                            switch (GenericController.vbLCase(fieldType)) {
                                                                 case "integer":
                                                                     //
                                                                     if (!string.IsNullOrEmpty(FieldValue)) {
-                                                                        FieldValue = genericController.encodeInteger(FieldValue).ToString();
+                                                                        FieldValue = GenericController.encodeInteger(FieldValue).ToString();
                                                                     }
                                                                     core.siteProperties.setProperty(FieldName, FieldValue);
                                                                     break;
                                                                 case "boolean":
                                                                     //
                                                                     if (!string.IsNullOrEmpty(FieldValue)) {
-                                                                        FieldValue = genericController.encodeBoolean(FieldValue).ToString();
+                                                                        FieldValue = GenericController.encodeBoolean(FieldValue).ToString();
                                                                     }
                                                                     core.siteProperties.setProperty(FieldName, FieldValue);
                                                                     break;
@@ -782,7 +782,7 @@ namespace Contensive.Processor.Controllers {
                                                                 case "date":
                                                                     //
                                                                     if (!string.IsNullOrEmpty(FieldValue)) {
-                                                                        FieldValue = genericController.encodeDate(FieldValue).ToString();
+                                                                        FieldValue = GenericController.encodeDate(FieldValue).ToString();
                                                                     }
                                                                     core.siteProperties.setProperty(FieldName, FieldValue);
                                                                     break;
@@ -849,10 +849,10 @@ namespace Contensive.Processor.Controllers {
                                                             //
                                                             // A Copy Content block
                                                             //
-                                                            FieldReadOnly = genericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
+                                                            FieldReadOnly = GenericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
                                                             if (!FieldReadOnly) {
                                                                 FieldName = xml_GetAttribute(IsFound, TabNode, "name", "");
-                                                                FieldHTML = genericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", "false"));
+                                                                FieldHTML = GenericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", "false"));
                                                                 if (FieldHTML) {
                                                                     //
                                                                     // treat html as active content for now.
@@ -890,7 +890,7 @@ namespace Contensive.Processor.Controllers {
                                                             //
                                                             // A File Content block
                                                             //
-                                                            FieldReadOnly = genericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
+                                                            FieldReadOnly = GenericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
                                                             if (!FieldReadOnly) {
                                                                 FieldName = xml_GetAttribute(IsFound, TabNode, "name", "");
                                                                 fieldfilename = xml_GetAttribute(IsFound, TabNode, "filename", "");
@@ -924,7 +924,7 @@ namespace Contensive.Processor.Controllers {
                                 Content.Add(AdminUIController.editTableOpen);
                                 Name = xml_GetAttribute(IsFound, Doc.DocumentElement, "name", "");
                                 foreach (XmlNode SettingNode in Doc.DocumentElement.ChildNodes) {
-                                    switch (genericController.vbLCase(SettingNode.Name)) {
+                                    switch (GenericController.vbLCase(SettingNode.Name)) {
                                         case "description":
                                             Description = SettingNode.InnerText;
                                             break;
@@ -936,11 +936,11 @@ namespace Contensive.Processor.Controllers {
                                             if (TabHeading == "Debug and Trace Settings") {
                                                 //TabHeading = TabHeading;
                                             }
-                                            TabCell = new stringBuilderLegacyController();
+                                            TabCell = new StringBuilderLegacyController();
                                             foreach (XmlNode TabNode in SettingNode.ChildNodes) {
                                                 int SQLPageSize = 0;
                                                 int ErrorNumber = 0;
-                                                switch (genericController.vbLCase(TabNode.Name)) {
+                                                switch (GenericController.vbLCase(TabNode.Name)) {
                                                     case "heading":
                                                         //
                                                         // Heading
@@ -958,8 +958,8 @@ namespace Contensive.Processor.Controllers {
                                                             if (string.IsNullOrEmpty(FieldCaption)) {
                                                                 FieldCaption = FieldName;
                                                             }
-                                                            FieldReadOnly = genericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
-                                                            FieldHTML = genericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", ""));
+                                                            FieldReadOnly = GenericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
+                                                            FieldHTML = GenericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", ""));
                                                             fieldType = xml_GetAttribute(IsFound, TabNode, "type", "");
                                                             FieldSelector = xml_GetAttribute(IsFound, TabNode, "selector", "");
                                                             FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "");
@@ -991,7 +991,7 @@ namespace Contensive.Processor.Controllers {
                                                                 //
                                                                 // Use default editor for each field type
                                                                 //
-                                                                switch (genericController.vbLCase(fieldType)) {
+                                                                switch (GenericController.vbLCase(fieldType)) {
                                                                     case "integer":
                                                                         //
                                                                         Copy = AdminUIController.getDefaultEditor_Text(core, FieldName, FieldValue, FieldReadOnly);
@@ -1002,7 +1002,7 @@ namespace Contensive.Processor.Controllers {
                                                                         //}
                                                                         break;
                                                                     case "boolean":
-                                                                        Copy = AdminUIController.getDefaultEditor_Bool(core, FieldName, genericController.encodeBoolean(FieldValue), FieldReadOnly);
+                                                                        Copy = AdminUIController.getDefaultEditor_Bool(core, FieldName, GenericController.encodeBoolean(FieldValue), FieldReadOnly);
                                                                         //if (FieldReadOnly) {
                                                                         //    Copy = core.html.inputCheckbox(FieldName, genericController.encodeBoolean(FieldValue));
                                                                         //    Copy = genericController.vbReplace(Copy, ">", " disabled>");
@@ -1037,7 +1037,7 @@ namespace Contensive.Processor.Controllers {
                                                                             if (string.IsNullOrEmpty(FieldValue)) {
                                                                                 Copy = core.html.inputFile(FieldName);
                                                                             } else {
-                                                                                NonEncodedLink = genericController.getCdnFileLink(core, FieldValue);
+                                                                                NonEncodedLink = GenericController.getCdnFileLink(core, FieldValue);
                                                                                 //NonEncodedLink = core.webServer.requestDomain + genericController.getCdnFileLink(core, FieldValue);
                                                                                 EncodedLink = encodeURL(NonEncodedLink);
                                                                                 string FieldValuefilename = "";
@@ -1143,9 +1143,9 @@ namespace Contensive.Processor.Controllers {
                                                             if (string.IsNullOrEmpty(FieldCaption)) {
                                                                 FieldCaption = FieldName;
                                                             }
-                                                            FieldReadOnly = genericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
+                                                            FieldReadOnly = GenericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
                                                             FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "");
-                                                            FieldHTML = genericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", ""));
+                                                            FieldHTML = GenericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", ""));
                                                             //
                                                             CS = core.db.csOpen("Copy Content", "Name=" + core.db.encodeSQLText(FieldName), "ID", false, 0, false, false, "id,name,Copy");
                                                             if (!core.db.csOk(CS)) {
@@ -1154,7 +1154,7 @@ namespace Contensive.Processor.Controllers {
                                                                 if (core.db.csOk(CS)) {
                                                                     int RecordID = core.db.csGetInteger(CS, "ID");
                                                                     core.db.csSet(CS, "name", FieldName);
-                                                                    core.db.csSet(CS, "copy", genericController.encodeText(TabNode.InnerText));
+                                                                    core.db.csSet(CS, "copy", GenericController.encodeText(TabNode.InnerText));
                                                                     core.db.csSave(CS);
                                                                     // Call core.workflow.publishEdit("Copy Content", RecordID)
                                                                 }
@@ -1196,11 +1196,11 @@ namespace Contensive.Processor.Controllers {
                                                         FieldName = xml_GetAttribute(IsFound, TabNode, "name", "");
                                                         FieldCaption = xml_GetAttribute(IsFound, TabNode, "caption", "");
                                                         fieldfilename = xml_GetAttribute(IsFound, TabNode, "filename", "");
-                                                        FieldReadOnly = genericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
+                                                        FieldReadOnly = GenericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
                                                         FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "");
                                                         FieldDefaultValue = TabNode.InnerText;
                                                         FieldValue = TabNode.InnerText;
-                                                        FieldHTML = genericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", ""));
+                                                        FieldHTML = GenericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", ""));
                                                         if (!string.IsNullOrEmpty(fieldfilename)) {
                                                             if (core.appRootFiles.fileExists(fieldfilename)) {
                                                                 FieldValue = core.cdnFiles.readFileText(fieldfilename);
@@ -1227,7 +1227,7 @@ namespace Contensive.Processor.Controllers {
                                                         FieldSQL = TabNode.InnerText;
                                                         FieldCaption = xml_GetAttribute(IsFound, TabNode, "caption", "");
                                                         FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "");
-                                                        SQLPageSize = genericController.encodeInteger(xml_GetAttribute(IsFound, TabNode, "rowmax", ""));
+                                                        SQLPageSize = GenericController.encodeInteger(xml_GetAttribute(IsFound, TabNode, "rowmax", ""));
                                                         if (SQLPageSize == 0) {
                                                             SQLPageSize = 100;
                                                         }
@@ -1274,7 +1274,7 @@ namespace Contensive.Processor.Controllers {
                                                                 if (dt.Rows.Count > 0) {
                                                                     object[,] something = { { } };
                                                                     if (dt.Rows.Count == 1 && dt.Columns.Count == 1) {
-                                                                        Copy = HtmlController.inputText(core, "result", genericController.encodeText(something[0, 0]), 0, 0, "", false, true);
+                                                                        Copy = HtmlController.inputText(core, "result", GenericController.encodeText(something[0, 0]), 0, 0, "", false, true);
                                                                     } else {
                                                                         foreach (DataRow dr in dt.Rows) {
                                                                             //
@@ -1323,10 +1323,10 @@ namespace Contensive.Processor.Controllers {
                                                                                         //    Copy = Copy & ("<br>(" & Ptr & ")&nbsp;[" & CellData[Ptr] & "]")
                                                                                         //Next
                                                                                         //Copy = Copy & (ColumnEnd)
-                                                                                    } else if (genericController.encodeText(CellData) == "") {
+                                                                                    } else if (GenericController.encodeText(CellData) == "") {
                                                                                         Copy += (ColumnStart + "[empty]" + ColumnEnd);
                                                                                     } else {
-                                                                                        Copy += (ColumnStart + HtmlController.encodeHtml(genericController.encodeText(CellData)) + ColumnEnd);
+                                                                                        Copy += (ColumnStart + HtmlController.encodeHtml(GenericController.encodeText(CellData)) + ColumnEnd);
                                                                                     }
                                                                                 }
                                                                                 Copy += (RowEnd);
@@ -1376,7 +1376,7 @@ namespace Contensive.Processor.Controllers {
                 Content = null;
 
             } catch (Exception ex) {
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
             }
             return result;
         }
@@ -1636,7 +1636,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
                 throw;
             }
             return returnText;
@@ -1644,9 +1644,10 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        private string execute_assembly(CPUtilsBaseClass.addonExecuteContext executeContext, Models.Db.AddonModel addon, AddonCollectionModel addonCollection) {
+        private string execute_assembly(CPUtilsBaseClass.addonExecuteContext executeContext, Models.Db.AddonModel addon, AddonCollection addonCollection) {
             string result = "";
             try {
+                LogController.logTrace(core, "execute_assembly dotNetClass [" + addon.dotNetClass + "], enter");
                 bool AddonFound = false;
                 string warningMessage = "The addon [" + addon.name + "] dotnet code could not be executed because no assembly was found with namespace [" + addon.dotNetClass + "].";
                 //
@@ -1656,7 +1657,7 @@ namespace Contensive.Processor.Controllers {
                 if (!Directory.Exists(commonAssemblyPath)) {
                     Directory.CreateDirectory(commonAssemblyPath);
                 } else {
-                    result = execute_assembly_byFilePath(addon.id, addon.name, commonAssemblyPath, addon.dotNetClass, true, ref AddonFound);
+                    result = execute_assembly_byFilePath(addon, commonAssemblyPath, true, ref AddonFound);
                 }
                 if (!AddonFound) {
                     //
@@ -1680,7 +1681,7 @@ namespace Contensive.Processor.Controllers {
                     appPath = Path.GetDirectoryName(path);
 
 
-                    result = execute_assembly_byFilePath(addon.id, addon.name, appPath, addon.dotNetClass, true, ref AddonFound);
+                    result = execute_assembly_byFilePath(addon, appPath, true, ref AddonFound);
                     if (!AddonFound) {
                         //
                         // -- try addon folder
@@ -1699,7 +1700,7 @@ namespace Contensive.Processor.Controllers {
                             } else {
                                 string AddonPath = core.privateFiles.joinPath(getPrivateFilesAddonPath(), AddonVersionPath);
                                 string appAddonPath = core.privateFiles.joinPath(core.privateFiles.localAbsRootPath, AddonPath);
-                                result = execute_assembly_byFilePath(addon.id, addon.name, appAddonPath, addon.dotNetClass, false, ref AddonFound);
+                                result = execute_assembly_byFilePath(addon, appAddonPath, false, ref AddonFound);
                                 if (!AddonFound) {
                                     throw new ApplicationException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "] or collection path [" + appAddonPath + "].");
                                 }
@@ -1708,8 +1709,10 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
                 throw;
+            } finally {
+                LogController.logTrace(core, "execute_assembly dotNetClass [" + addon.dotNetClass + "], exit");
             }
             return result;
         }
@@ -1719,7 +1722,7 @@ namespace Contensive.Processor.Controllers {
         //   This is not in the CP BaseClass, because it is used by addons to call back into CP for
         //   services, and they should never call this.
         //
-        private string execute_assembly_byFilePath(int AddonID, string AddonDisplayName, string fullPath, string typeFullName, bool IsDevAssembliesFolder, ref bool AddonFound) {
+        private string execute_assembly_byFilePath(Models.Db.AddonModel addon, string fullPath, bool IsDevAssembliesFolder, ref bool AddonFound) {
             string returnValue = "";
             try {
                 AddonFound = false;
@@ -1735,7 +1738,7 @@ namespace Contensive.Processor.Controllers {
                                 testAssembly = System.Reflection.Assembly.LoadFrom(TestFilePathname);
                                 //testAssemblyName = testAssembly.FullName
                             } catch (Exception ex) {
-                                logController.logWarn(core, "Assembley.LoadFrom failure, adding DLL [" + TestFilePathname + "] to assemblySkipList, ex [" + ex.ToString() + "]");
+                                LogController.logWarn(core, "Assembly.LoadFrom failure, adding DLL [" + TestFilePathname + "] to assemblySkipList, ex [" + ex.Message + "]");
                                 core.assemblySkipList.Add(TestFilePathname);
                                 testFileIsValidAddonAssembly = false;
                             }
@@ -1747,7 +1750,7 @@ namespace Contensive.Processor.Controllers {
                                     try {
                                         bool isAddonAssembly = false;
                                         var typeMap = testAssembly.GetTypes().ToDictionary(t => t.FullName, t => t, StringComparer.OrdinalIgnoreCase);
-                                        if (typeMap.TryGetValue(typeFullName, out Type addonType)) {
+                                        if (typeMap.TryGetValue(addon.dotNetClass, out Type addonType)) {
                                             if ((addonType.IsPublic) && (!((addonType.Attributes & TypeAttributes.Abstract) == TypeAttributes.Abstract)) && (addonType.BaseType != null)) {
                                                 //
                                                 // -- assembly is public, not abstract, based on a base type
@@ -1763,52 +1766,6 @@ namespace Contensive.Processor.Controllers {
                                                 }
                                             }
                                         }
-                                        ////
-                                        //// -- find type in collection directly
-                                        //addonType = testAssembly.GetType(typeFullName);
-                                        //if (addonType != null) {
-                                        //    if ((addonType.IsPublic) && (!((addonType.Attributes & TypeAttributes.Abstract) == TypeAttributes.Abstract)) && (addonType.BaseType != null)) {
-                                        //        //
-                                        //        // -- assembly is public, not abstract, based on a base type
-                                        //        if (addonType.BaseType.FullName != null) {
-                                        //            //
-                                        //            // -- assembly has a baseType fullname
-                                        //            if ((addonType.BaseType.FullName.ToLower() == "addonbaseclass") || (addonType.BaseType.FullName.ToLower() == "contensive.baseclasses.addonbaseclass")) {
-                                        //                //
-                                        //                // -- valid addon assembly
-                                        //                isAddonAssembly = true;
-                                        //                AddonFound = true;
-                                        //            }
-                                        //        }
-                                        //    }
-                                        //} else {
-                                        //    //
-                                        //    // -- not found, interate through types to eliminate non-assemblies
-                                        //    // -- consider removing all this, just go with test1
-                                        //    foreach (var testType in testAssembly.GetTypes()) {
-                                        //        //
-                                        //        // Loop through each type in the Assembly looking for our typename, public, and non-abstract
-                                        //        //
-                                        //        if ((testType.IsPublic) & (!((testType.Attributes & TypeAttributes.Abstract) == TypeAttributes.Abstract)) && (testType.BaseType != null)) {
-                                        //            //
-                                        //            // -- assembly is public, not abstract, based on a base type
-                                        //            if (testType.BaseType.FullName != null) {
-                                        //                //
-                                        //                // -- assembly has a baseType fullname
-                                        //                if ((testType.BaseType.FullName.ToLower() == "addonbaseclass") || (testType.BaseType.FullName.ToLower() == "contensive.baseclasses.addonbaseclass")) {
-                                        //                    //
-                                        //                    // -- valid addon assembly
-                                        //                    isAddonAssembly = true;
-                                        //                    if ((testType.FullName.Trim().ToLower() == typeFullName.Trim().ToLower())) {
-                                        //                        addonType = testType;
-                                        //                        AddonFound = true;
-                                        //                        break;
-                                        //                    }
-                                        //                }
-                                        //            }
-                                        //        }
-                                        //    }
-                                        //}
                                         if (AddonFound) {
                                             try {
                                                 //
@@ -1845,12 +1802,12 @@ namespace Contensive.Processor.Controllers {
                                                     //
                                                     // Error in the addon
                                                     //
-                                                    string detailedErrorMessage = "There was an error in the addon [" + AddonDisplayName + "]. It could not be executed because there was an error in the addon assembly [" + TestFilePathname + "], in class [" + addonType.FullName.Trim().ToLower() + "]. The error was [" + Ex.ToString() + "]";
-                                                    logController.handleError(core, Ex, detailedErrorMessage);
+                                                    string detailedErrorMessage = "There was an error in the addon [" + addon.name + "]. It could not be executed because there was an error in the addon assembly [" + TestFilePathname + "], in class [" + addonType.FullName.Trim().ToLower() + "]. The error was [" + Ex.ToString() + "]";
+                                                    LogController.handleError(core, Ex, detailedErrorMessage);
                                                     //Throw New ApplicationException(detailedErrorMessage)
                                                 }
                                             } catch (Exception Ex) {
-                                                string detailedErrorMessage = AddonDisplayName + " could not be executed because there was an error creating an object from the assembly, DLL [" + addonType.FullName + "]. The error was [" + Ex.ToString() + "]";
+                                                string detailedErrorMessage = addon.name + " could not be executed because there was an error creating an object from the assembly, DLL [" + addonType.FullName + "]. The error was [" + Ex.ToString() + "]";
                                                 throw new ApplicationException(detailedErrorMessage);
                                             }
                                             //
@@ -1866,22 +1823,22 @@ namespace Contensive.Processor.Controllers {
                                         //
                                         // exceptin thrown out of application bin folder when xunit library included -- ignore
                                         //
-                                        logController.logWarn(core, "Assembley ReflectionTypeLoadException, [" + TestFilePathname + "], adding to assemblySkipList, ex [" + ex.ToString() + "]");
+                                        LogController.logDebug(core, "Assembly ReflectionTypeLoadException, [" + TestFilePathname + "], adding to assemblySkipList, ex [" + ex.Message + "]");
                                         core.assemblySkipList.Add(TestFilePathname);
                                     } catch (Exception ex) {
                                         //
                                         // problem loading types
                                         //
-                                        logController.logWarn(core, "Assembley exception, [" + TestFilePathname + "], adding to assemblySkipList, ex [" + ex.ToString() + "]");
+                                        LogController.logDebug(core, "Assembly exception, [" + TestFilePathname + "], adding to assemblySkipList, ex [" + ex.Message + "]");
                                         core.assemblySkipList.Add(TestFilePathname);
-                                        string detailedErrorMessage = "While locating assembly for addon [" + AddonDisplayName + "], there was an error loading types for assembly [" + TestFilePathname + "]. This assembly was skipped and should be removed from the folder [" + fullPath + "]";
+                                        string detailedErrorMessage = "While locating assembly for addon [" + addon.name + "], there was an error loading types for assembly [" + TestFilePathname + "]. This assembly was skipped and should be removed from the folder [" + fullPath + "]";
                                         throw new ApplicationException(detailedErrorMessage);
                                     }
                                 }
                             } catch (System.Reflection.ReflectionTypeLoadException ex) {
-                                logController.logWarn(core, "Assembley ReflectionTypeLoadException-2, [" + TestFilePathname + "], adding to assemblySkipList, ex [" + ex.ToString() + "]");
+                                LogController.logDebug(core, "Assembly ReflectionTypeLoadException-2, [" + TestFilePathname + "], adding to assemblySkipList, ex [" + ex.ToString() + "]");
                                 core.assemblySkipList.Add(TestFilePathname);
-                                string detailedErrorMessage = "A load exception occured for addon [" + AddonDisplayName + "], DLL [" + TestFilePathname + "]. The error was [" + ex.ToString() + "] Any internal exception follow:";
+                                string detailedErrorMessage = "A load exception occured for addon [" + addon.name + "], DLL [" + TestFilePathname + "]. The error was [" + ex.ToString() + "] Any internal exception follow:";
                                 foreach (Exception exLoader in ex.LoaderExceptions) {
                                     detailedErrorMessage += "\r\n--LoaderExceptions: " + exLoader.Message;
                                 }
@@ -1890,10 +1847,10 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // ignore these errors
                                 //
-                                logController.logWarn(core, "Assembley Exception-2, [" + TestFilePathname + "], adding to assemblySkipList, ex [" + ex.ToString() + "]");
+                                LogController.logDebug(core, "Assembly Exception-2, [" + TestFilePathname + "], adding to assemblySkipList, ex [" + ex.Message + "]");
                                 core.assemblySkipList.Add(TestFilePathname);
-                                string detailedErrorMessage = "A non-load exception occured while loading the addon [" + AddonDisplayName + "], DLL [" + TestFilePathname + "]. The error was [" + ex.ToString() + "].";
-                                logController.handleError(core, new ApplicationException(detailedErrorMessage));
+                                string detailedErrorMessage = "A non-load exception occured while loading the addon [" + addon.name + "], DLL [" + TestFilePathname + "]. The error was [" + ex.ToString() + "].";
+                                LogController.handleError(core, new ApplicationException(detailedErrorMessage));
                             }
                         }
                     }
@@ -1901,7 +1858,7 @@ namespace Contensive.Processor.Controllers {
             } catch (Exception ex) {
                 //
                 // -- this exception should interrupt the caller
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
                 throw;
             }
             return returnValue;
@@ -1928,7 +1885,7 @@ namespace Contensive.Processor.Controllers {
                 AddonModel addon = null;
                 if (encodeInteger(AddonIDGuidOrName) > 0) {
                     addon = core.addonCache.getAddonById(encodeInteger(AddonIDGuidOrName));
-                } else if (genericController.isGuid(AddonIDGuidOrName)) {
+                } else if (GenericController.isGuid(AddonIDGuidOrName)) {
                     addon = core.addonCache.getAddonByGuid(AddonIDGuidOrName);
                 } else {
                     addon = core.addonCache.getAddonByName(AddonIDGuidOrName);
@@ -1936,21 +1893,21 @@ namespace Contensive.Processor.Controllers {
                 if (addon != null) {
                     //
                     // -- addon found
-                    logController.logTrace(core, "start: add process to background cmd queue, addon [" + addon.name + "/" + addon.id + "], optionstring [" + OptionString + "]");
+                    LogController.logTrace(core, "start: add process to background cmd queue, addon [" + addon.name + "/" + addon.id + "], optionstring [" + OptionString + "]");
                     //
                     string cmdQueryString = ""
                         + "appname=" + encodeNvaArgument(encodeRequestVariable(core.appConfig.name)) + "&AddonID=" + encodeText(addon.id) + "&OptionString=" + encodeNvaArgument(encodeRequestVariable(OptionString));
                     cmdDetailClass cmdDetail = new cmdDetailClass {
                         addonId = addon.id,
                         addonName = addon.name,
-                        args = genericController.convertAddonArgumentstoDocPropertiesList(core, cmdQueryString)
+                        args = GenericController.convertAddonArgumentstoDocPropertiesList(core, cmdQueryString)
                     };
-                    taskSchedulerController.addTaskToQueue(core, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
+                    TaskSchedulerController.addTaskToQueue(core, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
                     //
-                    logController.logTrace(core, "end: add process to background cmd queue, addon [" + addon.name + "/" + addon.id + "], optionstring [" + OptionString + "]");
+                    LogController.logTrace(core, "end: add process to background cmd queue, addon [" + addon.name + "/" + addon.id + "], optionstring [" + OptionString + "]");
                 }
             } catch (Exception ex) {
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
             }
             return result;
         }
@@ -2026,7 +1983,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             CopyContent = CopyContent + "<table border=0 cellpadding=5 cellspacing=0 width=\"100%\">"
                                 + "";
-                            OptionSplit = genericController.stringSplit(Option_String, "\r\n");
+                            OptionSplit = GenericController.stringSplit(Option_String, "\r\n");
                             for (Ptr = 0; Ptr <= OptionSplit.GetUpperBound(0); Ptr++) {
                                 //
                                 // Process each option row
@@ -2036,29 +1993,29 @@ namespace Contensive.Processor.Controllers {
                                 OptionDefault = "";
                                 LCaseOptionDefault = "";
                                 OptionSelector = "";
-                                Pos = genericController.vbInstr(1, OptionName, "=");
+                                Pos = GenericController.vbInstr(1, OptionName, "=");
                                 if (Pos != 0) {
                                     if (Pos < OptionName.Length) {
                                         OptionSelector = (OptionName.Substring(Pos)).Trim(' ');
                                     }
                                     OptionName = (OptionName.Left(Pos - 1)).Trim(' ');
                                 }
-                                OptionName = genericController.decodeNvaArgument(OptionName);
-                                Pos = genericController.vbInstr(1, OptionSelector, "[");
+                                OptionName = GenericController.decodeNvaArgument(OptionName);
+                                Pos = GenericController.vbInstr(1, OptionSelector, "[");
                                 if (Pos != 0) {
                                     //
                                     // List of Options, might be select, radio, checkbox, resourcelink
                                     //
                                     OptionDefault = OptionSelector.Left(Pos - 1);
-                                    OptionDefault = genericController.decodeNvaArgument(OptionDefault);
-                                    LCaseOptionDefault = genericController.vbLCase(OptionDefault);
+                                    OptionDefault = GenericController.decodeNvaArgument(OptionDefault);
+                                    LCaseOptionDefault = GenericController.vbLCase(OptionDefault);
                                     //LCaseOptionDefault = genericController.decodeNvaArgument(LCaseOptionDefault)
 
                                     OptionSelector = OptionSelector.Substring(Pos);
-                                    Pos = genericController.vbInstr(1, OptionSelector, "]");
+                                    Pos = GenericController.vbInstr(1, OptionSelector, "]");
                                     if (Pos > 0) {
                                         if (Pos < OptionSelector.Length) {
-                                            OptionSuffix = genericController.vbLCase((OptionSelector.Substring(Pos)).Trim(' '));
+                                            OptionSuffix = GenericController.vbLCase((OptionSelector.Substring(Pos)).Trim(' '));
                                         }
                                         OptionSelector = OptionSelector.Left(Pos - 1);
                                     }
@@ -2068,20 +2025,20 @@ namespace Contensive.Processor.Controllers {
                                     for (OptionPtr = 0; OptionPtr < OptionCnt; OptionPtr++) {
                                         OptionValue_AddonEncoded = OptionValues[OptionPtr].Trim(' ');
                                         if (!string.IsNullOrEmpty(OptionValue_AddonEncoded)) {
-                                            Pos = genericController.vbInstr(1, OptionValue_AddonEncoded, ":");
+                                            Pos = GenericController.vbInstr(1, OptionValue_AddonEncoded, ":");
                                             if (Pos == 0) {
-                                                OptionValue = genericController.decodeNvaArgument(OptionValue_AddonEncoded);
+                                                OptionValue = GenericController.decodeNvaArgument(OptionValue_AddonEncoded);
                                                 OptionCaption = OptionValue;
                                             } else {
-                                                OptionCaption = genericController.decodeNvaArgument(OptionValue_AddonEncoded.Left(Pos - 1));
-                                                OptionValue = genericController.decodeNvaArgument(OptionValue_AddonEncoded.Substring(Pos));
+                                                OptionCaption = GenericController.decodeNvaArgument(OptionValue_AddonEncoded.Left(Pos - 1));
+                                                OptionValue = GenericController.decodeNvaArgument(OptionValue_AddonEncoded.Substring(Pos));
                                             }
                                             switch (OptionSuffix) {
                                                 case "checkbox":
                                                     //
                                                     // Create checkbox FormInput
                                                     //
-                                                    if (genericController.vbInstr(1, "," + LCaseOptionDefault + ",", "," + genericController.vbLCase(OptionValue) + ",") != 0) {
+                                                    if (GenericController.vbInstr(1, "," + LCaseOptionDefault + ",", "," + GenericController.vbLCase(OptionValue) + ",") != 0) {
                                                         FormInput = FormInput + "<div style=\"white-space:nowrap\"><input type=\"checkbox\" name=\"" + OptionName + OptionPtr + "\" value=\"" + OptionValue + "\" checked=\"checked\">" + OptionCaption + "</div>";
                                                     } else {
                                                         FormInput = FormInput + "<div style=\"white-space:nowrap\"><input type=\"checkbox\" name=\"" + OptionName + OptionPtr + "\" value=\"" + OptionValue + "\" >" + OptionCaption + "</div>";
@@ -2091,7 +2048,7 @@ namespace Contensive.Processor.Controllers {
                                                     //
                                                     // Create Radio FormInput
                                                     //
-                                                    if (genericController.vbLCase(OptionValue) == LCaseOptionDefault) {
+                                                    if (GenericController.vbLCase(OptionValue) == LCaseOptionDefault) {
                                                         FormInput = FormInput + "<div style=\"white-space:nowrap\"><input type=\"radio\" name=\"" + OptionName + "\" value=\"" + OptionValue + "\" checked=\"checked\" >" + OptionCaption + "</div>";
                                                     } else {
                                                         FormInput = FormInput + "<div style=\"white-space:nowrap\"><input type=\"radio\" name=\"" + OptionName + "\" value=\"" + OptionValue + "\" >" + OptionCaption + "</div>";
@@ -2101,10 +2058,10 @@ namespace Contensive.Processor.Controllers {
                                                     //
                                                     // Create select FormInput
                                                     //
-                                                    if (genericController.vbLCase(OptionValue) == LCaseOptionDefault) {
+                                                    if (GenericController.vbLCase(OptionValue) == LCaseOptionDefault) {
                                                         FormInput = FormInput + "<option value=\"" + OptionValue + "\" selected>" + OptionCaption + "</option>";
                                                     } else {
-                                                        OptionCaption = genericController.vbReplace(OptionCaption, "\r\n", " ");
+                                                        OptionCaption = GenericController.vbReplace(OptionCaption, "\r\n", " ");
                                                         FormInput = FormInput + "<option value=\"" + OptionValue + "\">" + OptionCaption + "</option>";
                                                     }
                                                     break;
@@ -2138,7 +2095,7 @@ namespace Contensive.Processor.Controllers {
                                             //
                                             // Create text box linked to resource library
                                             //
-                                            OptionDefault = genericController.decodeNvaArgument(OptionDefault);
+                                            OptionDefault = GenericController.decodeNvaArgument(OptionDefault);
                                             FormInput = ""
                                                 + HtmlController.inputText(core, OptionName, OptionDefault, 1, 20) + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + OptionName + "' ) ;return false;\"><img src=\"/ccLib/images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>";
                                             //EditorString = core.main_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, 80)
@@ -2165,7 +2122,7 @@ namespace Contensive.Processor.Controllers {
                                     // Create Text FormInput
                                     //
 
-                                    OptionSelector = genericController.decodeNvaArgument(OptionSelector);
+                                    OptionSelector = GenericController.decodeNvaArgument(OptionSelector);
                                     FormInput = HtmlController.inputText(core, OptionName, OptionSelector, 1, 20);
                                 }
                                 CopyContent = CopyContent + "<tr>"
@@ -2180,7 +2137,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         BubbleJS = " onClick=\"HelpBubbleOn( 'HelpBubble" + core.doc.helpCodes.Count + "',this);return false;\"";
                         QueryString = core.doc.refreshQueryString;
-                        QueryString = genericController.modifyQueryString(QueryString, RequestNameHardCodedPage, "", false);
+                        QueryString = GenericController.modifyQueryString(QueryString, RequestNameHardCodedPage, "", false);
                         //QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
                         return_DialogList = return_DialogList 
                             + "<div class=\"ccCon helpDialogCon\">"
@@ -2210,7 +2167,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 return tempgetInstanceBubble;
             } catch (Exception ex) {
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
             }
             //ErrorTrap:
             //throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError18("addon_execute_GetInstanceBubble")
@@ -2260,7 +2217,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         BubbleJS = " onClick=\"HelpBubbleOn( 'HelpBubble" + core.doc.helpCodes.Count + "',this);return false;\"";
                         QueryString = core.doc.refreshQueryString;
-                        QueryString = genericController.modifyQueryString(QueryString, RequestNameHardCodedPage, "", false);
+                        QueryString = GenericController.modifyQueryString(QueryString, RequestNameHardCodedPage, "", false);
                         //QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
                         string Dialog = "";
 
@@ -2285,7 +2242,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
             }
             return result;
         }
@@ -2306,7 +2263,7 @@ namespace Contensive.Processor.Controllers {
             //
             if (core.session.isAuthenticated) {
                 if (core.session.isEditingAnything()) {
-                    StyleSN = genericController.encodeInteger(core.siteProperties.getText("StylesheetSerialNumber", "0"));
+                    StyleSN = GenericController.encodeInteger(core.siteProperties.getText("StylesheetSerialNumber", "0"));
                     //core.html.html_HelpViewerButtonID = "HelpBubble" & doccontroller.htmlDoc_HelpCodeCount
                     InnerCopy = helpCopy;
                     if (string.IsNullOrEmpty(InnerCopy)) {
@@ -2342,7 +2299,7 @@ namespace Contensive.Processor.Controllers {
                         + "";
                     //
                     QueryString = core.doc.refreshQueryString;
-                    QueryString = genericController.modifyQueryString(QueryString, RequestNameHardCodedPage, "", false);
+                    QueryString = GenericController.modifyQueryString(QueryString, RequestNameHardCodedPage, "", false);
                     //QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
                     return_DialogList = return_DialogList + "<div class=\"ccCon helpDialogCon\">"
                         + "<table border=0 cellpadding=0 cellspacing=0 class=\"ccBubbleCon\" id=\"HelpBubble" + core.doc.helpCodes.Count + "\" style=\"display:none;visibility:hidden;\">"
@@ -2386,7 +2343,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 if (core.session.isAuthenticated) {
                     if (core.session.isEditingAnything()) {
-                        StyleSN = genericController.encodeInteger(core.siteProperties.getText("StylesheetSerialNumber", "0"));
+                        StyleSN = GenericController.encodeInteger(core.siteProperties.getText("StylesheetSerialNumber", "0"));
                         HTMLViewerBubbleID = "HelpBubble" + core.doc.helpCodes.Count;
                         //
                         CopyHeader = CopyHeader + "<div class=\"ccHeaderCon\">"
@@ -2406,7 +2363,7 @@ namespace Contensive.Processor.Controllers {
                             + "";
                         //
                         QueryString = core.doc.refreshQueryString;
-                        QueryString = genericController.modifyQueryString(QueryString, RequestNameHardCodedPage, "", false);
+                        QueryString = GenericController.modifyQueryString(QueryString, RequestNameHardCodedPage, "", false);
                         //QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
                         return_DialogList = return_DialogList + "<div class=\"ccCon helpDialogCon\">"
                             + "<table border=0 cellpadding=0 cellspacing=0 class=\"ccBubbleCon\" id=\"" + HTMLViewerBubbleID + "\" style=\"display:none;visibility:hidden;\">"
@@ -2432,7 +2389,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 return tempgetHTMLViewerBubble;
             } catch (Exception ex) {
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
             }
             //ErrorTrap:
             //throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError18("addon_execute_GetHTMLViewerBubble")
@@ -3289,7 +3246,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // Initially Build Constructor from AddonOptions
                     //
-                    ConstructorNameValues = genericController.stringSplit(addonArgumentListFromRecord, "\r\n");
+                    ConstructorNameValues = GenericController.stringSplit(addonArgumentListFromRecord, "\r\n");
                     ConstructorCnt = ConstructorNameValues.GetUpperBound(0) + 1;
                     ConstructorNames = new string[ConstructorCnt + 1];
                     ConstructorSelectors = new string[ConstructorCnt + 1];
@@ -3300,11 +3257,11 @@ namespace Contensive.Processor.Controllers {
                         ConstructorName = ConstructorNameValues[ConstructorPtr];
                         ConstructorSelector = "";
                         ConstructorValue = "";
-                        Pos = genericController.vbInstr(1, ConstructorName, "=");
+                        Pos = GenericController.vbInstr(1, ConstructorName, "=");
                         if (Pos > 1) {
                             ConstructorValue = ConstructorName.Substring(Pos);
                             ConstructorName = (ConstructorName.Left(Pos - 1)).Trim(' ');
-                            Pos = genericController.vbInstr(1, ConstructorValue, "[");
+                            Pos = GenericController.vbInstr(1, ConstructorValue, "[");
                             if (Pos > 0) {
                                 ConstructorSelector = ConstructorValue.Substring(Pos - 1);
                                 ConstructorValue = ConstructorValue.Left(Pos - 1);
@@ -3335,7 +3292,7 @@ namespace Contensive.Processor.Controllers {
                         // if the name is not in the Constructor, add it
                         if (ConstructorCnt > 0) {
                             for (ConstructorPtr = 0; ConstructorPtr < ConstructorCnt; ConstructorPtr++) {
-                                if (genericController.vbLCase(InstanceName) == genericController.vbLCase(ConstructorNames[ConstructorPtr])) {
+                                if (GenericController.vbLCase(InstanceName) == GenericController.vbLCase(ConstructorNames[ConstructorPtr])) {
                                     break;
                                 }
                             }
@@ -3383,7 +3340,7 @@ namespace Contensive.Processor.Controllers {
                     addonArgumentListPassToBubbleEditor = addonArgumentListPassToBubbleEditor.Substring(2);
                 }
             } catch (Exception ex) {
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
             }
         }
         //
@@ -3450,23 +3407,23 @@ namespace Contensive.Processor.Controllers {
                     //
                     JSFilename = core.db.csGetText(CS, "jsfilename");
                     if (!string.IsNullOrEmpty(JSFilename)) {
-                        JSFilename = genericController.getCdnFileLink(core, JSFilename);
+                        JSFilename = GenericController.getCdnFileLink(core, JSFilename);
                         core.html.addScriptLinkSrc(JSFilename, SourceComment);
                     }
                     Copy = core.db.csGetText(CS, "stylesfilename");
                     if (!string.IsNullOrEmpty(Copy)) {
-                        if (genericController.vbInstr(1, Copy, "://") != 0) {
+                        if (GenericController.vbInstr(1, Copy, "://") != 0) {
                         } else if (Copy.Left(1) == "/") {
                         } else {
-                            Copy = genericController.getCdnFileLink(core, Copy);
+                            Copy = GenericController.getCdnFileLink(core, Copy);
                         }
                         core.html.addStyleLink(Copy, SourceComment);
                     }
                     //
                     if (!string.IsNullOrEmpty(Wrapper)) {
-                        Pos = genericController.vbInstr(1, Wrapper, TargetString, 1);
+                        Pos = GenericController.vbInstr(1, Wrapper, TargetString, 1);
                         if (Pos != 0) {
-                            s = genericController.vbReplace(Wrapper, TargetString, s, 1, 99, 1);
+                            s = GenericController.vbReplace(Wrapper, TargetString, s, 1, 99, 1);
                         } else {
                             s = ""
                                 + "<!-- the selected wrapper does not include the Target String marker to locate the position of the content. -->"
@@ -3476,7 +3433,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 core.db.csClose(ref CS);
             } catch (Exception ex) {
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
             }
             return s;
         }
@@ -3496,9 +3453,9 @@ namespace Contensive.Processor.Controllers {
                 Found = false;
                 ResultNode = Node.Attributes.GetNamedItem(Name);
                 if (ResultNode == null) {
-                    UcaseName = genericController.vbUCase(Name);
+                    UcaseName = GenericController.vbUCase(Name);
                     foreach (XmlAttribute NodeAttribute in Node.Attributes) {
-                        if (genericController.vbUCase(NodeAttribute.Name) == UcaseName) {
+                        if (GenericController.vbUCase(NodeAttribute.Name) == UcaseName) {
                             result = NodeAttribute.Value;
                             Found = true;
                             break;
@@ -3512,7 +3469,7 @@ namespace Contensive.Processor.Controllers {
                     result = DefaultIfNotFound;
                 }
             } catch (Exception ex) {
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
             }
             return result;
         }
@@ -3538,9 +3495,9 @@ namespace Contensive.Processor.Controllers {
             string NameValue = null;
             int Ptr = 0;
             //
-            ArgumentList = genericController.vbReplace(ArgumentList, "\r\n", "\r");
-            ArgumentList = genericController.vbReplace(ArgumentList, "\n", "\r");
-            ArgumentList = genericController.vbReplace(ArgumentList, "\r", "\r\n");
+            ArgumentList = GenericController.vbReplace(ArgumentList, "\r\n", "\r");
+            ArgumentList = GenericController.vbReplace(ArgumentList, "\n", "\r");
+            ArgumentList = GenericController.vbReplace(ArgumentList, "\r", "\r\n");
             if (ArgumentList.IndexOf("wrapper", System.StringComparison.OrdinalIgnoreCase) == -1) {
                 //
                 // Add in default constructors, like wrapper
@@ -3548,7 +3505,7 @@ namespace Contensive.Processor.Controllers {
                 if (!string.IsNullOrEmpty(ArgumentList)) {
                     ArgumentList = ArgumentList + "\r\n";
                 }
-                if (genericController.vbLCase(AddonGuid) == genericController.vbLCase(addonGuidContentBox)) {
+                if (GenericController.vbLCase(AddonGuid) == GenericController.vbLCase(addonGuidContentBox)) {
                     ArgumentList = ArgumentList + AddonOptionConstructor_BlockNoAjax;
                 } else if (IsInline) {
                     ArgumentList = ArgumentList + AddonOptionConstructor_Inline;
@@ -3560,7 +3517,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // Argument list is present, translate from AddonConstructor to AddonOption format (see main_executeAddon for details)
                 //
-                QuerySplit = genericController.splitNewLine(ArgumentList);
+                QuerySplit = GenericController.splitNewLine(ArgumentList);
                 result = "";
                 for (Ptr = 0; Ptr <= QuerySplit.GetUpperBound(0); Ptr++) {
                     NameValue = QuerySplit[Ptr];
@@ -3574,45 +3531,45 @@ namespace Contensive.Processor.Controllers {
                         //
                         // split on equal
                         //
-                        NameValue = genericController.vbReplace(NameValue, "\\=", "\r\n");
-                        Pos = genericController.vbInstr(1, NameValue, "=");
+                        NameValue = GenericController.vbReplace(NameValue, "\\=", "\r\n");
+                        Pos = GenericController.vbInstr(1, NameValue, "=");
                         if (Pos == 0) {
                             OptionName = NameValue;
                         } else {
                             OptionName = NameValue.Left(Pos - 1);
                             OptionValue = NameValue.Substring(Pos);
                         }
-                        OptionName = genericController.vbReplace(OptionName, "\r\n", "\\=");
-                        OptionValue = genericController.vbReplace(OptionValue, "\r\n", "\\=");
+                        OptionName = GenericController.vbReplace(OptionName, "\r\n", "\\=");
+                        OptionValue = GenericController.vbReplace(OptionValue, "\r\n", "\\=");
                         //
                         // split optionvalue on [
                         //
-                        OptionValue = genericController.vbReplace(OptionValue, "\\[", "\r\n");
-                        Pos = genericController.vbInstr(1, OptionValue, "[");
+                        OptionValue = GenericController.vbReplace(OptionValue, "\\[", "\r\n");
+                        Pos = GenericController.vbInstr(1, OptionValue, "[");
                         if (Pos != 0) {
                             OptionSelector = OptionValue.Substring(Pos - 1);
                             OptionValue = OptionValue.Left(Pos - 1);
                         }
-                        OptionValue = genericController.vbReplace(OptionValue, "\r\n", "\\[");
-                        OptionSelector = genericController.vbReplace(OptionSelector, "\r\n", "\\[");
+                        OptionValue = GenericController.vbReplace(OptionValue, "\r\n", "\\[");
+                        OptionSelector = GenericController.vbReplace(OptionSelector, "\r\n", "\\[");
                         //
                         // Decode AddonConstructor format
                         //
-                        OptionName = genericController.DecodeAddonConstructorArgument(OptionName);
-                        OptionValue = genericController.DecodeAddonConstructorArgument(OptionValue);
+                        OptionName = GenericController.DecodeAddonConstructorArgument(OptionName);
+                        OptionValue = GenericController.DecodeAddonConstructorArgument(OptionValue);
                         //
                         // Encode AddonOption format
                         //
                         //main_GetAddonSelector expects value to be encoded, but not name
                         //OptionName = encodeNvaArgument(OptionName)
-                        OptionValue = genericController.encodeNvaArgument(OptionValue);
+                        OptionValue = GenericController.encodeNvaArgument(OptionValue);
                         //
                         // rejoin
                         //
                         NameValuePair = core.html.getAddonSelector(OptionName, OptionValue, OptionSelector);
-                        NameValuePair = genericController.EncodeJavascriptStringSingleQuote(NameValuePair);
+                        NameValuePair = GenericController.EncodeJavascriptStringSingleQuote(NameValuePair);
                         result += "&" + NameValuePair;
-                        if (genericController.vbInstr(1, NameValuePair, "=") == 0) {
+                        if (GenericController.vbInstr(1, NameValuePair, "=") == 0) {
                             result += "=";
                         }
                     }
@@ -3651,12 +3608,12 @@ namespace Contensive.Processor.Controllers {
             WorkingString = OptionString;
             result = "";
             if (!string.IsNullOrEmpty(WorkingString)) {
-                TargetName = genericController.vbLCase(OptionName);
+                TargetName = GenericController.vbLCase(OptionName);
                 Options = OptionString.Split('&');
                 for (Ptr = 0; Ptr <= Options.GetUpperBound(0); Ptr++) {
-                    Pos = genericController.vbInstr(1, Options[Ptr], "=");
+                    Pos = GenericController.vbInstr(1, Options[Ptr], "=");
                     if (Pos > 0) {
-                        TestName = genericController.vbLCase((Options[Ptr].Left(Pos - 1)).Trim(' '));
+                        TestName = GenericController.vbLCase((Options[Ptr].Left(Pos - 1)).Trim(' '));
                         while ((!string.IsNullOrEmpty(TestName)) && (TestName.Left(1) == "\t")) {
                             TestName = TestName.Substring(1).Trim(' ');
                         }
@@ -3664,7 +3621,7 @@ namespace Contensive.Processor.Controllers {
                             TestName = (TestName.Left(TestName.Length - 1)).Trim(' ');
                         }
                         if (TestName == TargetName) {
-                            result = genericController.decodeNvaArgument((Options[Ptr].Substring(Pos)).Trim(' '));
+                            result = GenericController.decodeNvaArgument((Options[Ptr].Substring(Pos)).Trim(' '));
                             break;
                         }
                     }
@@ -3679,7 +3636,7 @@ namespace Contensive.Processor.Controllers {
             string addonDescription = "[invalid addon]";
             if (addon != null) {
                 string collectionName = "invalid collection or collection not set";
-                AddonCollectionModel collection = AddonCollectionModel.create(core, addon.collectionID);
+                AddonCollection collection = AddonCollection.create(core, addon.collectionID);
                 if (collection != null) {
                     collectionName = collection.name;
                 }
@@ -3706,11 +3663,11 @@ namespace Contensive.Processor.Controllers {
                         });
                     }
                 } catch (Exception ex) {
-                    logController.handleError(core, new Exception("Error calling ExecuteAddon with AddonManagerGuid, will attempt Safe Mode Addon Manager. Exception=[" + ex.ToString() + "]"));
+                    LogController.handleError(core, new Exception("Error calling ExecuteAddon with AddonManagerGuid, will attempt Safe Mode Addon Manager. Exception=[" + ex.ToString() + "]"));
                     AddonStatusOK = false;
                 }
                 if (string.IsNullOrEmpty(result)) {
-                    logController.handleError(core, new Exception("AddonManager returned blank, calling Safe Mode Addon Manager."));
+                    LogController.handleError(core, new Exception("AddonManager returned blank, calling Safe Mode Addon Manager."));
                     AddonStatusOK = false;
                 }
                 if (!AddonStatusOK) {
@@ -3718,7 +3675,7 @@ namespace Contensive.Processor.Controllers {
                     result = AddonMan.GetForm_SafeModeAddonManager();
                 }
             } catch (Exception ex) {
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
                 throw;
             }
             return result;
@@ -3734,7 +3691,7 @@ namespace Contensive.Processor.Controllers {
             string returnString = "";
             try {
                 string sql = null;
-                var cs = new csController(core);
+                var cs = new CsController(core);
                 int addonid = 0;
                 //
                 sql = "select e.id,c.addonId"
@@ -3743,7 +3700,7 @@ namespace Contensive.Processor.Controllers {
                     + " where ";
                 if (eventNameIdOrGuid.IsNumeric()) {
                     sql += "e.id=" + core.db.encodeSQLNumber(double.Parse(eventNameIdOrGuid));
-                } else if (genericController.isGuid(eventNameIdOrGuid)) {
+                } else if (GenericController.isGuid(eventNameIdOrGuid)) {
                     sql += "e.ccGuid=" + core.db.encodeSQLText(eventNameIdOrGuid);
                 } else {
                     sql += "e.name=" + core.db.encodeSQLText(eventNameIdOrGuid);
@@ -3756,7 +3713,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // can not create an id
                         //
-                    } else if (genericController.isGuid(eventNameIdOrGuid)) {
+                    } else if (GenericController.isGuid(eventNameIdOrGuid)) {
                         //
                         // create event with Guid and id for name
                         //
@@ -3788,7 +3745,7 @@ namespace Contensive.Processor.Controllers {
                 cs.close();
                 //
             } catch (Exception ex) {
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
             }
             return returnString;
         }

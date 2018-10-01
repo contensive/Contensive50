@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 //using Microsoft.Web.Administration;
@@ -140,17 +140,17 @@ namespace Contensive.Processor.Controllers {
                 string LogFilename = null;
                 string Copy = null;
                 //
-                LogFilename = "Temp\\" + genericController.encodeText(genericController.GetRandomInteger(core)) + ".Log";
+                LogFilename = "Temp\\" + GenericController.encodeText(GenericController.GetRandomInteger(core)) + ".Log";
                 Cmd = "IISReset.exe";
                 arg = "/restart >> \"" + LogFilename + "\"";
                 runProcess(core, Cmd, arg, true);
                 Copy = core.privateFiles.readFileText(LogFilename);
                 core.privateFiles.deleteFile(LogFilename);
-                Copy = genericController.vbReplace(Copy, "\r\n", "\\n");
-                Copy = genericController.vbReplace(Copy, "\r", "\\n");
-                Copy = genericController.vbReplace(Copy, "\n", "\\n");
+                Copy = GenericController.vbReplace(Copy, "\r\n", "\\n");
+                Copy = GenericController.vbReplace(Copy, "\r", "\\n");
+                Copy = GenericController.vbReplace(Copy, "\n", "\\n");
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -167,16 +167,16 @@ namespace Contensive.Processor.Controllers {
                 string LogFilename = null;
                 string Copy = null;
                 //
-                LogFilename = "Temp\\" + genericController.encodeText(genericController.GetRandomInteger(core)) + ".Log";
+                LogFilename = "Temp\\" + GenericController.encodeText(GenericController.GetRandomInteger(core)) + ".Log";
                 Cmd = "%comspec% /c IISReset /stop >> \"" + LogFilename + "\"";
                 runProcess(core, Cmd, "", true);
                 Copy = core.privateFiles.readFileText(LogFilename);
                 core.privateFiles.deleteFile(LogFilename);
-                Copy = genericController.vbReplace(Copy, "\r\n", "\\n");
-                Copy = genericController.vbReplace(Copy, "\r", "\\n");
-                Copy = genericController.vbReplace(Copy, "\n", "\\n");
+                Copy = GenericController.vbReplace(Copy, "\r\n", "\\n");
+                Copy = GenericController.vbReplace(Copy, "\r", "\\n");
+                Copy = GenericController.vbReplace(Copy, "\n", "\\n");
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -198,11 +198,11 @@ namespace Contensive.Processor.Controllers {
                 runProcess(core, Cmd, "", true);
                 Copy = core.privateFiles.readFileText(LogFilename);
                 core.privateFiles.deleteFile(LogFilename);
-                Copy = genericController.vbReplace(Copy, "\r\n", "\\n");
-                Copy = genericController.vbReplace(Copy, "\r", "\\n");
-                Copy = genericController.vbReplace(Copy, "\n", "\\n");
+                Copy = GenericController.vbReplace(Copy, "\r\n", "\\n");
+                Copy = GenericController.vbReplace(Copy, "\r", "\\n");
+                Copy = GenericController.vbReplace(Copy, "\n", "\\n");
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -225,7 +225,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -263,7 +263,7 @@ namespace Contensive.Processor.Controllers {
                     foreach (string key in iisContext.Request.QueryString) {
                         string keyValue = iisContext.Request.QueryString[key];
                         core.docProperties.setProperty(key, keyValue);
-                        requestQueryString = genericController.modifyQueryString(requestQueryString, key, keyValue);
+                        requestQueryString = GenericController.modifyQueryString(requestQueryString, key, keyValue);
                     }
                 }
                 //
@@ -280,7 +280,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- handle files
                 int filePtr = 0;
-                string instanceId = genericController.getGUIDString();
+                string instanceId = GenericController.getGUIDString();
                 string[] formNames = iisContext.Request.Files.AllKeys;
                 foreach (string formName in formNames) {
                     System.Web.HttpPostedFile file = iisContext.Request.Files[formName];
@@ -399,7 +399,7 @@ namespace Contensive.Processor.Controllers {
                     // verify app config domainlist is in the domainlist cache
                     foreach (string domain in core.appConfig.domainList) {
                         if (!core.domainDictionary.ContainsKey(domain.ToLower())) {
-                            logController.logTrace(core, "adding domain record because configList domain not found [" + domain.ToLower() + "]");
+                            LogController.logTrace(core, "adding domain record because configList domain not found [" + domain.ToLower() + "]");
                             var newDomain = DomainModel.add(core);
                             newDomain.name = domain;
                             newDomain.rootPageId = 0;
@@ -418,7 +418,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- verify request domain
                     if (!core.domainDictionary.ContainsKey(requestDomain.ToLower())) {
-                        logController.logTrace(core, "adding domain record because requestDomain [" + requestDomain.ToLower() + "] not found");
+                        LogController.logTrace(core, "adding domain record because requestDomain [" + requestDomain.ToLower() + "] not found");
                         var newDomain = DomainModel.add( core );
                         newDomain.name = requestDomain;
                         newDomain.rootPageId = 0;
@@ -437,7 +437,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // if there was a change, update the cache
                         //
-                        core.cache.setObject("domainContentList", core.domainDictionary, "domains");
+                        core.cache.setObject("domainContentList", core.domainDictionary, new List<string> { DomainModel.getTableInvalidationKey(core) });
                     }
                     //
                     // domain found
@@ -469,7 +469,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // normal domain, leave it
                         //
-                    } else if (genericController.vbInstr(1, requestPathPage, "/" + core.appConfig.adminRoute, 1) != 0) {
+                    } else if (GenericController.vbInstr(1, requestPathPage, "/" + core.appConfig.adminRoute, 1) != 0) {
                         //
                         // forwarding does not work in the admin site
                         //
@@ -480,7 +480,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         //Call AppendLog("main_init(), 1710 - exit for domain forward")
                         //
-                        if (genericController.vbInstr(1, core.domain.forwardUrl, "://") == 0) {
+                        if (GenericController.vbInstr(1, core.domain.forwardUrl, "://") == 0) {
                             core.domain.forwardUrl = "http://" + core.domain.forwardUrl;
                         }
                         redirect(core.domain.forwardUrl, "Forwarding to [" + core.domain.forwardUrl + "] because the current domain [" + requestDomain + "] is in the domain content set to forward to this URL", false, false);
@@ -551,7 +551,7 @@ namespace Contensive.Processor.Controllers {
                         requestUrl = requestUrl + "?" + requestQueryString;
                     }
                     //
-                    if (requestDomain.ToLower() != genericController.vbLCase(requestDomain)) {
+                    if (requestDomain.ToLower() != GenericController.vbLCase(requestDomain)) {
                         string Copy = "Redirecting to domain [" + requestDomain + "] because this site is configured to run on the current domain [" + requestDomain + "]";
                         if (requestQueryString != "") {
                             redirect(requestProtocol + requestDomain + requestPath + requestPage + "?" + requestQueryString, Copy, false, false);
@@ -570,7 +570,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- done at last
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return core.doc.continueProcessing;
@@ -666,7 +666,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -677,7 +677,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="status">A string starting with the response number (like 200 or 404) followed by the response message</param>
         public void setResponseStatus(string status) {
             if (core.doc.continueProcessing) {
-                logController.logTrace(core, "setResponseStatus [" + status + "]");
+                LogController.logTrace(core, "setResponseStatus [" + status + "]");
                 if (iisContext != null) {
                     // add header to response
                     iisContext.Response.Status = status;
@@ -710,10 +710,10 @@ namespace Contensive.Processor.Controllers {
                     if (bufferResponseHeader != "") {
                         bufferResponseHeader = bufferResponseHeader + "\r\n";
                     }
-                    bufferResponseHeader = bufferResponseHeader + genericController.vbReplace(HeaderName, "\r\n", "") + "\r\n" + genericController.vbReplace(genericController.encodeText(HeaderValue), "\r\n", "");
+                    bufferResponseHeader = bufferResponseHeader + GenericController.vbReplace(HeaderName, "\r\n", "") + "\r\n" + GenericController.vbReplace(GenericController.encodeText(HeaderValue), "\r\n", "");
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }  
         }
         //
@@ -754,8 +754,8 @@ namespace Contensive.Processor.Controllers {
                             NonEncodedLink = requestPath + NonEncodedLink;
                         }
                         ShortLink = NonEncodedLink;
-                        ShortLink = genericController.ConvertLinkToShortLink(ShortLink, requestDomain, core.appConfig.cdnFileUrl);
-                        ShortLink = genericController.encodeVirtualPath(ShortLink, core.appConfig.cdnFileUrl, appRootPath, requestDomain);
+                        ShortLink = GenericController.ConvertLinkToShortLink(ShortLink, requestDomain, core.appConfig.cdnFileUrl);
+                        ShortLink = GenericController.encodeVirtualPath(ShortLink, core.appConfig.cdnFileUrl, appRootPath, requestDomain);
                         FullLink = requestProtocol + requestDomain + ShortLink;
                     }
 
@@ -763,7 +763,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // Link is not valid
                         //
-                        logController.handleError( core,new ApplicationException("Redirect was called with a blank Link. Redirect Reason [" + RedirectReason + "]"));
+                        LogController.handleError( core,new ApplicationException("Redirect was called with a blank Link. Redirect Reason [" + RedirectReason + "]"));
                         return string.Empty;
                         //
                         // changed to main_ServerLinksource because if a redirect is caused by a link forward, and the host page for the iis 404 is
@@ -774,13 +774,13 @@ namespace Contensive.Processor.Controllers {
                         //
                         // Loop redirect error, throw trap and block redirect to prevent loop
                         //
-                        logController.handleError( core,new ApplicationException("Redirect was called to the same URL, main_ServerLink is [" + requestUrl + "], main_ServerLinkSource is [" + requestUrlSource + "]. This redirect is only allowed if either the form or querystring has change to prevent cyclic redirects. Redirect Reason [" + RedirectReason + "]"));
+                        LogController.handleError( core,new ApplicationException("Redirect was called to the same URL, main_ServerLink is [" + requestUrl + "], main_ServerLinkSource is [" + requestUrlSource + "]. This redirect is only allowed if either the form or querystring has change to prevent cyclic redirects. Redirect Reason [" + RedirectReason + "]"));
                         return string.Empty;
                     } else if (IsPageNotFound) {
                         //
                         // Do a PageNotFound then redirect
                         //
-                        logController.addSiteWarning(core, "Page Not Found Redirect", "Page Not Found Redirect", "", 0, "Page Not Found Redirect [" + requestUrlSource + "]", "Page Not Found Redirect", "Page Not Found Redirect");
+                        LogController.addSiteWarning(core, "Page Not Found Redirect", "Page Not Found Redirect", "", 0, "Page Not Found Redirect [" + requestUrlSource + "]", "Page Not Found Redirect", "Page Not Found Redirect");
                         if (!string.IsNullOrEmpty(ShortLink)) {
                             core.db.executeQuery("Update ccContentWatch set link=null where link=" + core.db.encodeSQLText(ShortLink));
                         }
@@ -821,7 +821,7 @@ namespace Contensive.Processor.Controllers {
                     core.doc.continueProcessing = false;
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -856,7 +856,7 @@ namespace Contensive.Processor.Controllers {
                 verifyAppPool(core, appName);
                 verifyWebsite(core, appName, DomainName, rootPublicFilesPath, appName);
             } catch (Exception ex) {
-                logController.handleError( core,ex, "verifySite");
+                LogController.handleError( core,ex, "verifySite");
             }
         }
         //
@@ -889,7 +889,7 @@ namespace Contensive.Processor.Controllers {
                     serverManager.CommitChanges();
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex, "verifyAppPool");
+                LogController.handleError( core,ex, "verifyAppPool");
             }
         }
         //
@@ -942,7 +942,7 @@ namespace Contensive.Processor.Controllers {
                     iisManager.CommitChanges();
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex, "verifyWebsite");
+                LogController.handleError( core,ex, "verifyWebsite");
             }
         }
         //
@@ -976,7 +976,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex, "verifyWebsite_Binding");
+                LogController.handleError( core,ex, "verifyWebsite_Binding");
             }
         }
         //
@@ -1019,7 +1019,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex, "verifyWebsite_VirtualDirectory");
+                LogController.handleError( core,ex, "verifyWebsite_VirtualDirectory");
             }
         }
         //========================================================================
@@ -1045,11 +1045,11 @@ namespace Contensive.Processor.Controllers {
             string EncodedLink = null;
             string NonEncodedLink = "";
             //
-            iContentName = genericController.encodeText(ContentName);
-            iRecordID = genericController.encodeInteger(RecordID);
-            iFieldName = genericController.encodeEmpty(FieldName, "link");
+            iContentName = GenericController.encodeText(ContentName);
+            iRecordID = GenericController.encodeInteger(RecordID);
+            iFieldName = GenericController.encodeEmpty(FieldName, "link");
             //
-            MethodName = "main_RedirectByRecord_ReturnStatus( " + iContentName + ", " + iRecordID + ", " + genericController.encodeEmpty(FieldName, "(fieldname empty)") + ")";
+            MethodName = "main_RedirectByRecord_ReturnStatus( " + iContentName + ", " + iRecordID + ", " + GenericController.encodeEmpty(FieldName, "(fieldname empty)") + ")";
             //
             tempmain_RedirectByRecord_ReturnStatus = false;
             BlockRedirect = false;
@@ -1066,8 +1066,8 @@ namespace Contensive.Processor.Controllers {
                     //
                     // ----- handle content special cases (prevent redirect to deleted records)
                     //
-                    NonEncodedLink = genericController.decodeResponseVariable(EncodedLink);
-                    switch (genericController.vbUCase(iContentName)) {
+                    NonEncodedLink = GenericController.decodeResponseVariable(EncodedLink);
+                    switch (GenericController.vbUCase(iContentName)) {
                         case "CONTENT WATCH":
                             //
                             // ----- special case
@@ -1116,7 +1116,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // If link incorrectly includes the LinkPrefix, take it off first, then add it back
                     //
-                    NonEncodedLink = genericController.removeUrlPrefix(NonEncodedLink, LinkPrefix);
+                    NonEncodedLink = GenericController.removeUrlPrefix(NonEncodedLink, LinkPrefix);
                     if (core.db.csIsFieldSupported(CSPointer, "Clicks")) {
                         core.db.csSet(CSPointer, "Clicks", (core.db.csGetNumber(CSPointer, "Clicks")) + 1);
                     }
@@ -1132,25 +1132,25 @@ namespace Contensive.Processor.Controllers {
         //
         public static string getBrowserAcceptLanguage(CoreController core) {
             try {
-                string AcceptLanguageString = genericController.encodeText(core.webServer.requestLanguage) + ",";
-                int CommaPosition = genericController.vbInstr(1, AcceptLanguageString, ",");
+                string AcceptLanguageString = GenericController.encodeText(core.webServer.requestLanguage) + ",";
+                int CommaPosition = GenericController.vbInstr(1, AcceptLanguageString, ",");
                 while (CommaPosition != 0) {
                     string AcceptLanguage = (AcceptLanguageString.Left( CommaPosition - 1)).Trim(' ');
                     AcceptLanguageString = AcceptLanguageString.Substring(CommaPosition);
                     if (AcceptLanguage.Length > 0) {
-                        int DashPosition = genericController.vbInstr(1, AcceptLanguage, "-");
+                        int DashPosition = GenericController.vbInstr(1, AcceptLanguage, "-");
                         if (DashPosition > 1) {
                             AcceptLanguage = AcceptLanguage.Left( DashPosition - 1);
                         }
-                        DashPosition = genericController.vbInstr(1, AcceptLanguage, ";");
+                        DashPosition = GenericController.vbInstr(1, AcceptLanguage, ";");
                         if (DashPosition > 1) {
                             return AcceptLanguage.Left( DashPosition - 1);
                         }
                     }
-                    CommaPosition = genericController.vbInstr(1, AcceptLanguageString, ",");
+                    CommaPosition = GenericController.vbInstr(1, AcceptLanguageString, ",");
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return "";
         }

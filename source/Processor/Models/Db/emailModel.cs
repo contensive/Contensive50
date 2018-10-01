@@ -10,7 +10,7 @@ namespace Contensive.Processor.Models.Db {
         //-- const
         public const string contentName = "email";
         public const string contentTableName = "ccemail";
-        private const string contentDataSource = "default";
+        public const string contentDataSource = "default";
         //
         //====================================================================================================
         // -- instance properties
@@ -20,7 +20,7 @@ namespace Contensive.Processor.Models.Db {
         public DateTime conditionExpireDate { get; set; }
         public int conditionID { get; set; }
         public int conditionPeriod { get; set; }
-        public BaseModel.fieldTypeTextFile copyFilename { get; set; }
+        public BaseModel.FieldTypeTextFile copyFilename { get; set; }
         public int emailTemplateID { get; set; }
         public int emailWizardID { get; set; }
         public string fromAddress { get; set; }
@@ -28,7 +28,7 @@ namespace Contensive.Processor.Models.Db {
         public DateTime lastSendTestDate { get; set; }
         public DateTime scheduleDate { get; set; }
         public bool sent { get; set; }
-        public BaseModel.fieldTypeCSSFile stylesFilename { get; set; }
+        public BaseModel.FieldTypeCSSFile stylesFilename { get; set; }
         public string subject { get; set; }
         public bool submitted { get; set; }
         public int testMemberID { get; set; }
@@ -105,8 +105,8 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public void invalidatePrimaryCache(CoreController core, int recordId) {
-            invalidateCache<EmailModel>(core, recordId);
+        public static void invalidateRecordCache(CoreController core, int recordId) {
+            invalidateRecordCache<EmailModel>(core, recordId);
         }
         //
         //====================================================================================================
@@ -127,6 +127,16 @@ namespace Contensive.Processor.Models.Db {
         //====================================================================================================
         public static EmailModel createDefault(CoreController core) {
             return createDefault<EmailModel>(core);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Return a cache key used to represent the table. ONLY used for invalidation. Add this as a dependent key if you want that key cleared when ANY record in the table is changed.
+        /// </summary>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        public static string getTableInvalidationKey(CoreController core) {
+            return getTableCacheKey<EmailModel>(core);
         }
     }
 }

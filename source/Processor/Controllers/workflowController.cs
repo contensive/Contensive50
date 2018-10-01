@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Controllers {
@@ -69,7 +69,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 this.core = core;
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
                 throw (ex);
             }
@@ -90,13 +90,13 @@ namespace Contensive.Processor.Controllers {
                 int ReturnMemberID = 0;
                 DateTime ReturnDateExpires = default(DateTime);
                 //
-                main_EditLockContentRecordKey_Local = (ContentName + genericController.encodeText(RecordID));
+                main_EditLockContentRecordKey_Local = (ContentName + GenericController.encodeText(RecordID));
                 main_EditLockDateExpires_Local = DateTime.MinValue;
                 main_EditLockMemberID_Local = 0;
                 main_EditLockMemberName_Local = "";
                 main_EditLockStatus_Local = false;
                 //
-                main_EditLockStatus_Local = getEditLock(genericController.encodeText(ContentName), genericController.encodeInteger(RecordID), ref ReturnMemberID, ref ReturnDateExpires);
+                main_EditLockStatus_Local = getEditLock(GenericController.encodeText(ContentName), GenericController.encodeInteger(RecordID), ref ReturnMemberID, ref ReturnDateExpires);
                 if (main_EditLockStatus_Local && (ReturnMemberID != core.session.user.id)) {
                     main_EditLockStatus_Local = true;
                     main_EditLockDateExpires_Local = ReturnDateExpires;
@@ -104,7 +104,7 @@ namespace Contensive.Processor.Controllers {
                     main_EditLockMemberName_Local = "";
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return main_EditLockStatus_Local;
@@ -119,7 +119,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 int CS = 0;
                 //
-                if (main_EditLockContentRecordKey_Local != (ContentName + genericController.encodeText(RecordID))) {
+                if (main_EditLockContentRecordKey_Local != (ContentName + GenericController.encodeText(RecordID))) {
                     GetEditLockStatus(ContentName, RecordID);
                 }
                 if (main_EditLockStatus_Local) {
@@ -138,7 +138,7 @@ namespace Contensive.Processor.Controllers {
                     tempGetEditLockMemberName = main_EditLockMemberName_Local;
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return main_EditLockMemberName_Local;
@@ -151,14 +151,14 @@ namespace Contensive.Processor.Controllers {
         public DateTime GetEditLockDateExpires(string ContentName, int RecordID) {
             DateTime returnDate = DateTime.MinValue;
             try {
-                if (main_EditLockContentRecordKey_Local != (ContentName + genericController.encodeText(RecordID))) {
+                if (main_EditLockContentRecordKey_Local != (ContentName + GenericController.encodeText(RecordID))) {
                     GetEditLockStatus(ContentName, RecordID);
                 }
                 if (main_EditLockStatus_Local) {
                     returnDate = main_EditLockDateExpires_Local;
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnDate;
@@ -169,7 +169,7 @@ namespace Contensive.Processor.Controllers {
         //========================================================================
         //
         public void SetEditLock(string ContentName, int RecordID) {
-            setEditLock(genericController.encodeText(ContentName), genericController.encodeInteger(RecordID), core.session.user.id);
+            setEditLock(GenericController.encodeText(ContentName), GenericController.encodeInteger(RecordID), core.session.user.id);
         }
         //
         //========================================================================
@@ -177,7 +177,7 @@ namespace Contensive.Processor.Controllers {
         //========================================================================
         //
         public void ClearEditLock(string ContentName, int RecordID) {
-            clearEditLock(genericController.encodeText(ContentName), genericController.encodeInteger(RecordID), core.session.user.id);
+            clearEditLock(GenericController.encodeText(ContentName), GenericController.encodeInteger(RecordID), core.session.user.id);
         }
         //
         //========================================================================
@@ -740,7 +740,7 @@ namespace Contensive.Processor.Controllers {
                 result = core.db.csOk(CS);
                 core.db.csClose(ref CS);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -788,7 +788,7 @@ namespace Contensive.Processor.Controllers {
                     result = "(ContentID In (" + Criteria.Substring(1) + "))And(RecordID=" + core.db.encodeSQLNumber(RecordID) + ")And((DateExpires>" + core.db.encodeSQLDate(DateTime.Now) + ")Or(DateExpires Is null))";
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -814,7 +814,7 @@ namespace Contensive.Processor.Controllers {
                         break;
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -858,7 +858,7 @@ namespace Contensive.Processor.Controllers {
                                         core.db.csSet(CSNewLock, "RecordID", RecordID);
                                         core.db.csSet(CSNewLock, "DateExpires", (DateTime.Now.AddDays(EditLockTimeoutDays)));
                                         core.db.csSet(CSNewLock, "ControlType", AuthoringControlsEditing);
-                                        core.db.csSet(CSNewLock, "ContentRecordKey", genericController.encodeText(ContentID + "." + RecordID));
+                                        core.db.csSet(CSNewLock, "ContentRecordKey", GenericController.encodeText(ContentID + "." + RecordID));
                                         core.db.csSet(CSNewLock, "ContentID", ContentID);
                                     }
                                     core.db.csClose(ref CSNewLock);
@@ -876,7 +876,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -959,7 +959,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -973,7 +973,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 setEditLock2(ContentName, RecordID, MemberID, false);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -987,7 +987,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 setEditLock2(ContentName, RecordID, MemberID, true);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -1018,7 +1018,7 @@ namespace Contensive.Processor.Controllers {
                 string EditLockKey2 = null;
                 //
                 if ((!string.IsNullOrEmpty(ContentName)) & (RecordID != 0)) {
-                    EditLockKey2 = genericController.vbUCase(ContentName + "," + RecordID.ToString());
+                    EditLockKey2 = GenericController.vbUCase(ContentName + "," + RecordID.ToString());
                     StringBuffer = core.siteProperties.getText("EditLockTimeout", "5");
                     EditLockTimeoutMinutes = encodeNumber(StringBuffer);
                     EditLockDateExpires = DateTime.Now.AddMinutes(EditLockTimeoutMinutes);
@@ -1083,7 +1083,7 @@ namespace Contensive.Processor.Controllers {
                     EditLockCount = DestinationPointer;
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -1102,7 +1102,7 @@ namespace Contensive.Processor.Controllers {
                 DateTime DateNow = default(DateTime);
                 //
                 if ((!string.IsNullOrEmpty(ContentName)) & (RecordID != 0) && (EditLockCount > 0)) {
-                    EditLockKey2 = genericController.vbUCase(ContentName + "," + RecordID.ToString());
+                    EditLockKey2 = GenericController.vbUCase(ContentName + "," + RecordID.ToString());
                     DateNow = DateTime.Now;
                     for (SourcePointer = 0; SourcePointer < EditLockCount; SourcePointer++) {
                         if (EditLockArray[SourcePointer].Key == EditLockKey2) {
@@ -1116,7 +1116,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return EditLock2;

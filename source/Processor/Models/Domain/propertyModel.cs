@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Models.Domain {
@@ -23,7 +23,7 @@ namespace Contensive.Processor.Models.Domain {
         private CoreController core;
         //
         private string[,] propertyCache;
-        private keyPtrController propertyCache_nameIndex;
+        private KeyPtrController propertyCache_nameIndex;
         private bool propertyCacheLoaded = false;
         private int propertyCacheCnt;
         private int propertyTypeId;
@@ -156,7 +156,7 @@ namespace Contensive.Processor.Models.Domain {
                     db.csClose(ref CS);
                 } else if (propertyCache[1, Ptr] != PropertyValue) {
                     propertyCache[1, Ptr] = PropertyValue;
-                    RecordID = genericController.encodeInteger(propertyCache[2, Ptr]);
+                    RecordID = GenericController.encodeInteger(propertyCache[2, Ptr]);
                     SQLNow = db.encodeSQLDate(DateTime.Now);
                     //
                     // save the value in the property that was found
@@ -171,10 +171,10 @@ namespace Contensive.Processor.Models.Domain {
                 // ----- Error Trap
                 //
             } catch( Exception ex ) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             //ErrorTrap:
-            logController.handleError( core,new Exception("Unexpected exception"));
+            LogController.handleError( core,new Exception("Unexpected exception"));
         }
         //
         //====================================================================================================
@@ -218,7 +218,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="keyId"></param>
         /// <returns></returns>
         public DateTime getDate(string propertyName, DateTime defaultValue, int keyId) {
-            return genericController.encodeDate(getText(propertyName, genericController.encodeText(defaultValue), keyId));
+            return GenericController.encodeDate(getText(propertyName, GenericController.encodeText(defaultValue), keyId));
         }
         //
         //====================================================================================================
@@ -262,7 +262,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="keyId"></param>
         /// <returns></returns>
         public double getNumber(string propertyName, double defaultValue, int keyId) {
-            return encodeNumber(getText(propertyName, genericController.encodeText(defaultValue), keyId));
+            return encodeNumber(getText(propertyName, GenericController.encodeText(defaultValue), keyId));
         }
         //
         //====================================================================================================
@@ -306,7 +306,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="keyId"></param>
         /// <returns></returns>
         public bool getBoolean(string propertyName, bool defaultValue, int keyId) {
-            return genericController.encodeBoolean(getText(propertyName, genericController.encodeText(defaultValue), keyId));
+            return GenericController.encodeBoolean(getText(propertyName, GenericController.encodeText(defaultValue), keyId));
         }
         //
         //====================================================================================================
@@ -350,7 +350,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="keyId"></param>
         /// <returns></returns>
         public int getInteger(string propertyName, int defaultValue, int keyId) {
-            return genericController.encodeInteger(getText(propertyName, genericController.encodeText(defaultValue), keyId));
+            return GenericController.encodeInteger(getText(propertyName, GenericController.encodeText(defaultValue), keyId));
         }
         //
         //====================================================================================================
@@ -407,7 +407,7 @@ namespace Contensive.Processor.Models.Domain {
                 if (propertyCacheCnt > 0) {
                     Ptr = propertyCache_nameIndex.getPtr(propertyName);
                     if (Ptr >= 0) {
-                        returnString = genericController.encodeText(propertyCache[1, Ptr]);
+                        returnString = GenericController.encodeText(propertyCache[1, Ptr]);
                         Found = true;
                     }
                 }
@@ -417,7 +417,7 @@ namespace Contensive.Processor.Models.Domain {
                     setProperty(propertyName, defaultValue, keyId);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnString;
@@ -431,7 +431,7 @@ namespace Contensive.Processor.Models.Domain {
                 string Name = null;
                 DbController db = core.db;
                 //
-                propertyCache_nameIndex = new keyPtrController();
+                propertyCache_nameIndex = new KeyPtrController();
                 propertyCacheCnt = 0;
                 //
                 using (DataTable dt = db.executeQuery("select Name,FieldValue,ID from ccProperties where (active<>0)and(TypeID=" + propertyTypeId + ")and(KeyID=" + keyId + ")")) {
@@ -439,10 +439,10 @@ namespace Contensive.Processor.Models.Domain {
                         propertyCacheCnt = 0;
                         propertyCache = new string[3, dt.Rows.Count];
                         foreach (DataRow dr in dt.Rows) {
-                            Name = genericController.encodeText(dr[0]);
+                            Name = GenericController.encodeText(dr[0]);
                             propertyCache[0, propertyCacheCnt] = Name;
-                            propertyCache[1, propertyCacheCnt] = genericController.encodeText(dr[1]);
-                            propertyCache[2, propertyCacheCnt] = genericController.encodeInteger(dr[2]).ToString();
+                            propertyCache[1, propertyCacheCnt] = GenericController.encodeText(dr[1]);
+                            propertyCache[2, propertyCacheCnt] = GenericController.encodeInteger(dr[2]).ToString();
                             propertyCache_nameIndex.setPtr(Name.ToLower(), propertyCacheCnt);
                             propertyCacheCnt += 1;
                         }
@@ -457,10 +457,10 @@ namespace Contensive.Processor.Models.Domain {
                 // ----- Error Trap
                 //
             } catch( Exception ex ) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             //ErrorTrap:
-            logController.handleError( core,new Exception("Unexpected exception"));
+            LogController.handleError( core,new Exception("Unexpected exception"));
         }
     }
 }

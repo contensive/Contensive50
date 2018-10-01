@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 // todo -- should not be here
@@ -20,7 +20,7 @@ using System.Xml.Linq;
 //
 namespace Contensive.Processor.Controllers {
     //
-    public class loginController {
+    public class LoginController {
         //
         //========================================================================
         /// <summary>
@@ -47,7 +47,7 @@ namespace Contensive.Processor.Controllers {
                 //    + nop(result)
                 //    + "</div>";
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -93,13 +93,13 @@ namespace Contensive.Processor.Controllers {
                     }
                     //
                     // -- add user errors
-                    loginForm = loginForm.Replace("{message}", errorController.getUserError(core));
+                    loginForm = loginForm.Replace("{message}", ErrorController.getUserError(core));
                     if (!core.doc.errorCount.Equals(0)) {
                     }
                     //
                     // -- create the action query
-                    string QueryString = genericController.modifyQueryString(core.webServer.requestQueryString, RequestNameHardCodedPage, "", false);
-                    QueryString = genericController.modifyQueryString(QueryString, "requestbinary", "", false);
+                    string QueryString = GenericController.modifyQueryString(core.webServer.requestQueryString, RequestNameHardCodedPage, "", false);
+                    QueryString = GenericController.modifyQueryString(QueryString, "requestbinary", "", false);
                     loginForm += HtmlController.inputHidden("Type", FormTypeLogin);
                     loginForm += HtmlController.inputHidden("email", core.session.user.Email);
                     result = HtmlController.form(core, loginForm, QueryString);
@@ -113,7 +113,7 @@ namespace Contensive.Processor.Controllers {
                     result = HtmlController.div(result, "ccLoginFormCon"); 
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -144,8 +144,8 @@ namespace Contensive.Processor.Controllers {
                             //
                             // -- login successful, redirect back to this page (without a method)
                             string QS = core.doc.refreshQueryString;
-                            QS = genericController.modifyQueryString(QS, "method", "");
-                            QS = genericController.modifyQueryString(QS, "RequestBinary", "");
+                            QS = GenericController.modifyQueryString(QS, "method", "");
+                            QS = GenericController.modifyQueryString(QS, "RequestBinary", "");
                             //
                             return core.webServer.redirect("?" + QS, "Login form success");
                         }
@@ -158,7 +158,7 @@ namespace Contensive.Processor.Controllers {
                     returnHtml = getLoginForm_Default(core);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnHtml;
@@ -183,7 +183,7 @@ namespace Contensive.Processor.Controllers {
                     foreach (string key in core.docProperties.getKeyList()) {
                         var tempVar = core.docProperties.getProperty(key);
                         if (tempVar.IsForm) {
-                            switch (genericController.vbUCase(tempVar.Name)) {
+                            switch (GenericController.vbUCase(tempVar.Name)) {
                                 case "S":
                                 case "MA":
                                 case "MB":
@@ -198,12 +198,12 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                     QueryString = core.doc.refreshQueryString;
-                    QueryString = genericController.modifyQueryString(QueryString, "S", "");
-                    QueryString = genericController.modifyQueryString(QueryString, "ccIPage", "");
+                    QueryString = GenericController.modifyQueryString(QueryString, "S", "");
+                    QueryString = GenericController.modifyQueryString(QueryString, "ccIPage", "");
                     returnResult = HtmlController.form( core,returnResult,QueryString);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnResult;
@@ -226,23 +226,23 @@ namespace Contensive.Processor.Controllers {
                 loginForm_Password = core.docProperties.getText("password");
                 loginForm_AutoLogin = core.docProperties.getBoolean("autologin");
                 //
-                if ((core.session.visit.LoginAttempts < core.siteProperties.maxVisitLoginAttempts) && core.session.visit.CookieSupport) {
+                if ((core.session.visit.loginAttempts < core.siteProperties.maxVisitLoginAttempts) && core.session.visit.cookieSupport) {
                     LocalMemberID = core.session.getUserIdForCredentials(core, loginForm_Username, loginForm_Password);
                     if (LocalMemberID == 0) {
-                        core.session.visit.LoginAttempts = core.session.visit.LoginAttempts + 1;
+                        core.session.visit.loginAttempts = core.session.visit.loginAttempts + 1;
                         core.session.visit.save(core);
                     } else {
                         returnREsult = SessionController.authenticateById(core, LocalMemberID, core.session);
                         if (returnREsult) {
-                            logController.addSiteActivity(core, "successful username/password login", core.session.user.id, core.session.user.OrganizationID);
+                            LogController.addSiteActivity(core, "successful username/password login", core.session.user.id, core.session.user.OrganizationID);
                         } else {
-                            logController.addSiteActivity(core, "bad username/password login", core.session.user.id, core.session.user.OrganizationID);
+                            LogController.addSiteActivity(core, "bad username/password login", core.session.user.id, core.session.user.OrganizationID);
                         }
                     }
                 }
 
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnREsult;
@@ -256,7 +256,7 @@ namespace Contensive.Processor.Controllers {
                 string returnUserMessage = "";
                 sendPassword(core, core.docProperties.getText("email"), ref returnUserMessage);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -291,26 +291,26 @@ namespace Contensive.Processor.Controllers {
                 const string passwordChrs = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345678999999";
                 const int passwordChrsLength = 62;
                 //
-                workingEmail = genericController.encodeText(Email);
+                workingEmail = GenericController.encodeText(Email);
                 //
                 result = false;
                 if (string.IsNullOrEmpty(workingEmail)) {
                     //hint = "110"
-                    errorController.addUserError(core, "Please enter your email address before requesting your username and password.");
+                    ErrorController.addUserError(core, "Please enter your email address before requesting your username and password.");
                 } else {
                     //hint = "120"
-                    atPtr = genericController.vbInstr(1, workingEmail, "@");
+                    atPtr = GenericController.vbInstr(1, workingEmail, "@");
                     if (atPtr < 2) {
                         //
                         // email not valid
                         //
                         //hint = "130"
-                        errorController.addUserError(core, "Please enter a valid email address before requesting your username and password.");
+                        ErrorController.addUserError(core, "Please enter a valid email address before requesting your username and password.");
                     } else {
                         //hint = "140"
                         EMailName = vbMid(workingEmail, 1, atPtr - 1);
                         //
-                        logController.addSiteActivity(core, "password request for email " + workingEmail, core.session.user.id, core.session.user.OrganizationID);
+                        LogController.addSiteActivity(core, "password request for email " + workingEmail, core.session.user.id, core.session.user.OrganizationID);
                         //
                         allowEmailLogin = core.siteProperties.getBoolean("allowEmailLogin", false);
                         recordCnt = 0;
@@ -353,7 +353,7 @@ namespace Contensive.Processor.Controllers {
                                 core.db.csSave(CS);
                             } else {
                                 //hint = "155"
-                                errorController.addUserError(core, "No current user was found matching this email address. Please try again. ");
+                                ErrorController.addUserError(core, "No current user was found matching this email address. Please try again. ");
                             }
                         }
                         if (core.db.csOk(CS)) {
@@ -449,7 +449,7 @@ namespace Contensive.Processor.Controllers {
                     EmailController.queueAdHocEmail(core, workingEmail, FromAddress, subject, Message, "", "", "", true, false, 0, ref sendStatus);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return result;
@@ -474,16 +474,16 @@ namespace Contensive.Processor.Controllers {
                 loginForm_Username = core.docProperties.getText("username");
                 loginForm_Password = core.docProperties.getText("password");
                 //
-                if (!genericController.encodeBoolean(core.siteProperties.getBoolean("AllowMemberJoin", false))) {
-                    errorController.addUserError(core, "This site does not accept public main_MemberShip.");
+                if (!GenericController.encodeBoolean(core.siteProperties.getBoolean("AllowMemberJoin", false))) {
+                    ErrorController.addUserError(core, "This site does not accept public main_MemberShip.");
                 } else {
                     if (!core.session.isNewCredentialOK(core, loginForm_Username, loginForm_Password, ref ErrorMessage, ref errorCode)) {
-                        errorController.addUserError(core, ErrorMessage);
+                        ErrorController.addUserError(core, ErrorMessage);
                     } else {
                         if (!(core.doc.debug_iUserError != "")) {
                             CS = core.db.csOpen("people", "ID=" + core.db.encodeSQLNumber(core.session.user.id));
                             if (!core.db.csOk(CS)) {
-                                logController.handleError( core,new Exception("Could not open the current members account to set the username and password."));
+                                LogController.handleError( core,new Exception("Could not open the current members account to set the username and password."));
                             } else {
                                 if ((core.db.csGetText(CS, "username") != "") | (core.db.csGetText(CS, "password") != "") | (core.db.csGetBoolean(CS, "admin")) | (core.db.csGetBoolean(CS, "developer"))) {
                                     //
@@ -506,9 +506,9 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                 }
-                core.cache.invalidateAllInContent("People");
+                PersonModel.invalidateRecordCache(core, core.session.user.id);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }

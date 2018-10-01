@@ -15,32 +15,32 @@ namespace Contensive.WindowsServices {
         public taskService() {
             InitializeComponent();
         }
-        private taskSchedulerController taskScheduler = null;
-        private taskRunnerController taskRunner = null;
+        private TaskSchedulerController taskScheduler = null;
+        private TaskRunnerController taskRunner = null;
         //
         protected override void OnStart(string[] args) {
             CPClass cp = new CPClass();
             try {
                 //
-                logController.logTrace(cp.core, "Services.OnStart enter");
+                LogController.logTrace(cp.core, "Services.OnStart enter");
                 //
                 if (true) {
                     //
                     // -- start scheduler
-                    logController.logTrace(cp.core, "Services.OnStart, call taskScheduler.startTimerEvents");
-                    taskScheduler = new taskSchedulerController();
+                    LogController.logTrace(cp.core, "Services.OnStart, call taskScheduler.startTimerEvents");
+                    taskScheduler = new TaskSchedulerController();
                     taskScheduler.startTimerEvents();
                 }
                 if (true) {
                     //
                     // -- start runner
-                    logController.logTrace(cp.core, "Services.OnStart, call taskRunner.startTimerEvents");
-                    taskRunner = new taskRunnerController();
+                    LogController.logTrace(cp.core, "Services.OnStart, call taskRunner.startTimerEvents");
+                    taskRunner = new TaskRunnerController();
                     taskRunner.startTimerEvents();
                 }
-                logController.logTrace(cp.core, "Services.OnStart exit");
+                LogController.logTrace(cp.core, "Services.OnStart exit");
             } catch (Exception ex) {
-                logController.handleError(cp.core, ex, "taskService.OnStart Exception");
+                LogController.handleError(cp.core, ex, "taskService.OnStart Exception");
             }
         }
 
@@ -48,13 +48,13 @@ namespace Contensive.WindowsServices {
             CPClass cp = new CPClass();
             try {
                 //
-                logController.logTrace(cp.core, "Services.OnStop enter");
+                LogController.logTrace(cp.core, "Services.OnStop enter");
                 //
                 if (taskScheduler != null) {
                     //
                     // stop taskscheduler
                     //
-                    logController.logTrace(cp.core, "Services.OnStop, call taskScheduler.stopTimerEvents");
+                    LogController.logTrace(cp.core, "Services.OnStop, call taskScheduler.stopTimerEvents");
                     taskScheduler.stopTimerEvents();
                     taskScheduler.Dispose();
                 }
@@ -62,13 +62,13 @@ namespace Contensive.WindowsServices {
                     //
                     // stop taskrunner
                     //
-                    logController.logTrace(cp.core, "Services.OnStop, call taskRunner.stopTimerEvents");
+                    LogController.logTrace(cp.core, "Services.OnStop, call taskRunner.stopTimerEvents");
                     taskRunner.stopTimerEvents();
                     taskRunner.Dispose();
                 }
-                logController.logTrace(cp.core, "Services.OnStop exit");
+                LogController.logTrace(cp.core, "Services.OnStop exit");
             } catch (Exception ex) {
-                logController.handleError(cp.core, ex, "taskService.OnStop Exception");
+                LogController.handleError(cp.core, ex, "taskService.OnStop Exception");
             }
         }
     }

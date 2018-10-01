@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 namespace Contensive.Processor {
     public class CPUserErrorClass : BaseClasses.CPUserErrorBaseClass, IDisposable {
@@ -51,13 +51,13 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override void Add(string Message) {
-            errorController.addUserError(core, Message);
+            ErrorController.addUserError(core, Message);
         }
         //
         //====================================================================================================
         //
         public override string GetList()  {
-            return errorController.getUserError(core);
+            return ErrorController.getUserError(core);
         }
         //
         //====================================================================================================

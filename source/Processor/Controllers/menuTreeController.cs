@@ -11,12 +11,12 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 //
 namespace Contensive.Processor.Controllers {
-    public class menuTreeController {
+    public class MenuTreeController {
         //
         //==============================================================================
         //
@@ -82,7 +82,7 @@ namespace Contensive.Processor.Controllers {
         private MenuEntryType[] iEntry;
         //
         private string UsedEntries; // String of EntryNames that have been used (for unique test)
-        private keyPtrController EntryIndexName;
+        private KeyPtrController EntryIndexName;
         private string MenuFlyoutNamePrefix;
         private const bool newmode = true;
         //
@@ -92,9 +92,9 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="core"></param>
         /// <remarks></remarks>
-        public menuTreeController(CoreController core) : base() {
+        public MenuTreeController(CoreController core) : base() {
             this.core = core;
-            EntryIndexName = new keyPtrController();
+            EntryIndexName = new KeyPtrController();
             Microsoft.VisualBasic.VBMath.Randomize();
             MenuFlyoutNamePrefix = "id" + encodeText(encodeInteger(Math.Floor(encodeNumber(9999 * Microsoft.VisualBasic.VBMath.Rnd()))));
         }
@@ -109,8 +109,8 @@ namespace Contensive.Processor.Controllers {
                 string iEntryName = null;
                 string UcaseEntryName = null;
                 //
-                iEntryName = genericController.vbReplace(encodeEmpty(EntryName, ""), ",", " ");
-                UcaseEntryName = genericController.vbUCase(iEntryName);
+                iEntryName = GenericController.vbReplace(encodeEmpty(EntryName, ""), ",", " ");
+                UcaseEntryName = GenericController.vbUCase(iEntryName);
                 //
                 if ((!string.IsNullOrEmpty(iEntryName)) && ((UsedEntries + ",").IndexOf("," + UcaseEntryName + ",")  == -1)) {
                     UsedEntries = UsedEntries + "," + UcaseEntryName;
@@ -133,7 +133,7 @@ namespace Contensive.Processor.Controllers {
                         iEntry[iEntryCount].Caption = encodeEmpty(Caption, "");
                     }
                     iEntry[iEntryCount].Name = UcaseEntryName;
-                    iEntry[iEntryCount].ParentName = genericController.vbUCase(encodeEmpty(ParentiEntryName, ""));
+                    iEntry[iEntryCount].ParentName = GenericController.vbUCase(encodeEmpty(ParentiEntryName, ""));
                     iEntry[iEntryCount].ImageOver = encodeEmpty(ImageOverLink, "");
                     iEntry[iEntryCount].ImageOpen = encodeEmpty(ImageOpenLink, "");
                     iEntry[iEntryCount].NewWindow = NewWindow;
@@ -144,7 +144,7 @@ namespace Contensive.Processor.Controllers {
                 return;
                 //
             } catch( Exception ex ) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             //ErrorTrap:
             throw (new Exception("Unexpected exception")); // Call HandleClassError("AddEntry", Err.Number, Err.Source, Err.Description)
@@ -253,7 +253,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -261,7 +261,7 @@ namespace Contensive.Processor.Controllers {
         // Temp log file solution
         //
         private void AppendLog(string Message) {
-            logController.logInfo(core, "menuTreeController: " + Message);
+            LogController.logInfo(core, "menuTreeController: " + Message);
         }
         //
         //===============================================================================
@@ -281,14 +281,14 @@ namespace Contensive.Processor.Controllers {
                 // ----- Get the menu pointer
                 //
                 if (iEntryCount > 0) {
-                    UcaseMenuName = genericController.vbUCase(MenuName);
+                    UcaseMenuName = GenericController.vbUCase(MenuName);
                     EntryPointer = EntryIndexName.getPtr(UcaseMenuName);
                     return GetMenuTreeListBranch2(EntryPointer, "", OpenNodesList);
                 }
                 return null;
                 //
             } catch( Exception ex ) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             //ErrorTrap:
             throw (new Exception("Unexpected exception")); // Call HandleClassError("GetMenuTreeList", Err.Number, Err.Source, Err.Description)
@@ -312,7 +312,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // Output this node
                     //
-                    if (genericController.vbInstr(1, "," + NodePointer.ToString() + ",", "," + UsedEntriesList + ",") == 0) {
+                    if (GenericController.vbInstr(1, "," + NodePointer.ToString() + ",", "," + UsedEntriesList + ",") == 0) {
                         result += "<ul Style=\"list-style-type: none; margin-left: 20px\">";
                         //
                         // The Node has not already been used in this branch
@@ -323,7 +323,7 @@ namespace Contensive.Processor.Controllers {
                             Caption = "<A TARGET=\"_blank\" HREF=\"" + Link + "\">" + Caption + "</A>";
                         }
                         //
-                        if (genericController.vbInstr(1, "," + OpenNodesList + ",", "," + NodePointer.ToString() + ",") == 0) {
+                        if (GenericController.vbInstr(1, "," + OpenNodesList + ",", "," + NodePointer.ToString() + ",") == 0) {
                             //
                             // The branch is closed
                             //
@@ -344,7 +344,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // Now output any child branches of this node
                             //
-                            UcaseNodeName = genericController.vbUCase(iEntry[NodePointer].Name);
+                            UcaseNodeName = GenericController.vbUCase(iEntry[NodePointer].Name);
                             for (EntryPointer = 0; EntryPointer < iEntryCount; EntryPointer++) {
                                 if (iEntry[EntryPointer].ParentName == UcaseNodeName) {
                                     result += GetMenuTreeListBranch2(EntryPointer, UsedEntriesList + "," + NodePointer, OpenNodesList);
@@ -355,7 +355,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }

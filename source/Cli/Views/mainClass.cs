@@ -251,7 +251,7 @@ namespace Contensive.CLI {
                                             //
                                             // run the taskscheduler in the console
                                             Console.WriteLine("Beginning command line taskScheduler. Hit any key to exit");
-                                            taskSchedulerController taskScheduler = new taskSchedulerController();
+                                            TaskSchedulerController taskScheduler = new TaskSchedulerController();
                                             taskScheduler.startTimerEvents();
                                             object keyStroke = Console.ReadKey();
                                             taskScheduler.stopTimerEvents();
@@ -259,7 +259,7 @@ namespace Contensive.CLI {
                                         } else {
                                             //
                                             // turn the windows service scheduler on/off
-                                            cpServer.core.serverConfig.allowTaskSchedulerService = Contensive.Processor.Controllers.genericController.encodeBoolean(args[argPtr]);
+                                            cpServer.core.serverConfig.allowTaskSchedulerService = Contensive.Processor.Controllers.GenericController.encodeBoolean(args[argPtr]);
                                             cpServer.core.serverConfig.saveObject(cpServer.core);
                                             Console.WriteLine("allowtaskscheduler set " + cpServer.core.serverConfig.allowTaskSchedulerService.ToString());
                                         }
@@ -274,7 +274,7 @@ namespace Contensive.CLI {
                                             //
                                             // -- run the taskrunner in the console
                                             Console.WriteLine("Beginning command line taskRunner. Hit any key to exit");
-                                            using (taskRunnerController taskRunner = new taskRunnerController()) {
+                                            using (TaskRunnerController taskRunner = new TaskRunnerController()) {
                                                 taskRunner.startTimerEvents();
                                                 object keyStroke = Console.ReadKey();
                                                 taskRunner.stopTimerEvents();
@@ -283,7 +283,7 @@ namespace Contensive.CLI {
                                         } else {
                                             //
                                             // -- turn the windows service scheduler on/off
-                                            cpServer.core.serverConfig.allowTaskRunnerService = Contensive.Processor.Controllers.genericController.encodeBoolean(args[argPtr]);
+                                            cpServer.core.serverConfig.allowTaskRunnerService = Contensive.Processor.Controllers.GenericController.encodeBoolean(args[argPtr]);
                                             cpServer.core.serverConfig.saveObject(cpServer.core);
                                             Console.WriteLine("allowtaskrunner set " + cpServer.core.serverConfig.allowTaskRunnerService.ToString());
                                         }
@@ -300,10 +300,10 @@ namespace Contensive.CLI {
                                             //
                                             Console.WriteLine("Beginning command line taskScheduler and taskRunner. Hit any key to exit");
                                             //
-                                            taskSchedulerController taskScheduler = new taskSchedulerController();
+                                            TaskSchedulerController taskScheduler = new TaskSchedulerController();
                                             taskScheduler.startTimerEvents();
                                             //
-                                            using (taskRunnerController taskRunner = new taskRunnerController()) {
+                                            using (TaskRunnerController taskRunner = new TaskRunnerController()) {
                                                 taskRunner.startTimerEvents();
                                                 object keyStroke = Console.ReadKey();
                                                 taskRunner.stopTimerEvents();
@@ -313,8 +313,8 @@ namespace Contensive.CLI {
                                             //
                                             // turn the windows service scheduler on/off
                                             //
-                                            cpServer.core.serverConfig.allowTaskSchedulerService = Contensive.Processor.Controllers.genericController.encodeBoolean(args[argPtr]);
-                                            cpServer.core.serverConfig.allowTaskRunnerService = Contensive.Processor.Controllers.genericController.encodeBoolean(args[argPtr]);
+                                            cpServer.core.serverConfig.allowTaskSchedulerService = Contensive.Processor.Controllers.GenericController.encodeBoolean(args[argPtr]);
+                                            cpServer.core.serverConfig.allowTaskRunnerService = Contensive.Processor.Controllers.GenericController.encodeBoolean(args[argPtr]);
                                             cpServer.core.serverConfig.saveObject(cpServer.core);
                                             Console.WriteLine("allowTaskScheduler set " + cpServer.core.serverConfig.allowTaskSchedulerService.ToString());
                                             Console.WriteLine("allowTaskRunner set " + cpServer.core.serverConfig.allowTaskRunnerService.ToString());
@@ -326,7 +326,7 @@ namespace Contensive.CLI {
                                     // -- logging
                                     if (argPtr != (args.Length + 1)) {
                                         argPtr++;
-                                        cpServer.core.serverConfig.enableLogging = genericController.encodeBoolean(args[argPtr].ToLower());
+                                        cpServer.core.serverConfig.enableLogging = GenericController.encodeBoolean(args[argPtr].ToLower());
                                         cpServer.core.serverConfig.saveObject(cpServer.core);
                                         Console.WriteLine("enableLogging set " + cpServer.core.serverConfig.enableLogging.ToString());
                                     }
@@ -343,7 +343,7 @@ namespace Contensive.CLI {
                                             runnerGuid = args[argPtr];
                                         }
                                         Console.WriteLine("runTask, appName [" + appName + "], runnerGuid [" + runnerGuid + "]");
-                                        taskRunnerController.runTask(appName, runnerGuid);
+                                        TaskRunnerController.runTask(appName, runnerGuid);
                                     }
                                     break;
                                 case "--installservice":

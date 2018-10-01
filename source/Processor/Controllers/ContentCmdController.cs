@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 using System.Linq;
 using System.Data;
@@ -216,7 +216,7 @@ namespace Contensive.Processor.Controllers {
                 ptrLast = 1;
                 do {
                     Cmd = "";
-                    posOpen = genericController.vbInstr(ptrLast, src, contentReplaceEscapeStart);
+                    posOpen = GenericController.vbInstr(ptrLast, src, contentReplaceEscapeStart);
                     Ptr = posOpen;
                     if (Ptr == 0) {
                         //
@@ -228,7 +228,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         notFound = true;
                         do {
-                            posClose = genericController.vbInstr(Ptr, src, contentReplaceEscapeEnd);
+                            posClose = GenericController.vbInstr(Ptr, src, contentReplaceEscapeEnd);
                             if (posClose == 0) {
                                 //
                                 // brace opened but no close, forget the open and exit
@@ -238,7 +238,7 @@ namespace Contensive.Processor.Controllers {
                             } else {
                                 posDq = Ptr;
                                 do {
-                                    posDq = genericController.vbInstr(posDq + 1, src, "\"");
+                                    posDq = GenericController.vbInstr(posDq + 1, src, "\"");
                                     escape = "";
                                     if (posDq > 0) {
                                         escape = src.Substring(posDq - 2, 1);
@@ -246,7 +246,7 @@ namespace Contensive.Processor.Controllers {
                                 } while (escape == "\\");
                                 posSq = Ptr;
                                 do {
-                                    posSq = genericController.vbInstr(posSq + 1, src, "'");
+                                    posSq = GenericController.vbInstr(posSq + 1, src, "'");
                                     escape = "";
                                     if (posSq > 0) {
                                         escape = src.Substring(posSq - 2, 1);
@@ -270,7 +270,7 @@ namespace Contensive.Processor.Controllers {
                                             // skip forward to the next non-escaped sq
                                             //
                                             do {
-                                                posSq = genericController.vbInstr(posSq + 1, src, "'");
+                                                posSq = GenericController.vbInstr(posSq + 1, src, "'");
                                                 escape = "";
                                                 if (posSq > 0) {
                                                     escape = src.Substring(posSq - 2, 1);
@@ -292,7 +292,7 @@ namespace Contensive.Processor.Controllers {
                                             //
                                             do {
                                                 //Ptr = posDq + 1
-                                                posDq = genericController.vbInstr(posDq + 1, src, "\"");
+                                                posDq = GenericController.vbInstr(posDq + 1, src, "\"");
                                                 escape = "";
                                                 if (posDq > 0) {
                                                     escape = src.Substring(posDq - 2, 1);
@@ -332,7 +332,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 returnValue = dst;
             } catch (Exception ex) {
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
                 throw;
             }
             return returnValue;
@@ -362,11 +362,11 @@ namespace Contensive.Processor.Controllers {
                     if (trimLen > 0) {
                         string leftChr = cmdSrc.Left(1);
                         string rightChr = cmdSrc.Substring(cmdSrc.Length - 1);
-                        if (genericController.vbInstr(1, whiteChrs, leftChr) != 0) {
+                        if (GenericController.vbInstr(1, whiteChrs, leftChr) != 0) {
                             cmdSrc = cmdSrc.Substring(1);
                             trimming = true;
                         }
-                        if (genericController.vbInstr(1, whiteChrs, rightChr) != 0) {
+                        if (GenericController.vbInstr(1, whiteChrs, rightChr) != 0) {
                             cmdSrc = cmdSrc.Left(cmdSrc.Length - 1);
                             trimming = true;
                         }
@@ -406,7 +406,7 @@ namespace Contensive.Processor.Controllers {
                         try {
                             cmdDictionary = core.json.Deserialize<Dictionary<string, object>>(cmdSrc);
                         } catch (Exception ex) {
-                            logController.handleError(core, ex);
+                            LogController.handleError(core, ex);
                             throw;
                         }
                         //
@@ -462,7 +462,7 @@ namespace Contensive.Processor.Controllers {
                             //   "Open" file
                             //   "Open" "file"
                             //
-                            int Pos = genericController.vbInstr(2, cmdText, "\"");
+                            int Pos = GenericController.vbInstr(2, cmdText, "\"");
                             if (Pos <= 1) {
                                 throw new ApplicationException("Error parsing content command [" + cmdSrc + "], expected a close quote around position " + Pos);
                             } else {
@@ -489,7 +489,7 @@ namespace Contensive.Processor.Controllers {
                             //   open
                             //   open file
                             //
-                            int Pos = genericController.vbInstr(1, cmdText, " ");
+                            int Pos = GenericController.vbInstr(1, cmdText, " ");
                             if (Pos > 0) {
                                 cmdArg = cmdSrc.Substring(Pos);
                                 cmdText = (cmdSrc.Left(Pos - 1)).Trim(' ');
@@ -499,7 +499,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             //cmdarg is quoted
                             //
-                            int Pos = genericController.vbInstr(2, cmdArg, "\"");
+                            int Pos = GenericController.vbInstr(2, cmdArg, "\"");
                             if (Pos <= 1) {
                                 throw new ApplicationException("Error parsing JSON command list, expected a quoted command argument, command list [" + cmdSrc + "]");
                             } else {
@@ -605,7 +605,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // execute the cmd with cmdArgDef dictionary
                         //
-                        switch (genericController.vbLCase(cmdText)) {
+                        switch (GenericController.vbLCase(cmdText)) {
                             case "textbox": {
                                     //
                                     // Opens a textbox addon (patch for text box name being "text name" so it requies json)copy content record
@@ -677,7 +677,7 @@ namespace Contensive.Processor.Controllers {
                                         //CmdAccumulator = core.main_GetContentCopy(ArgName, "copy content")
                                         DataTable dt = core.db.executeQuery("select layout from ccLayouts where name=" + core.db.encodeSQLText(ArgName));
                                         if (dt != null) {
-                                            CmdAccumulator = genericController.encodeText(dt.Rows[0]["layout"]);
+                                            CmdAccumulator = GenericController.encodeText(dt.Rows[0]["layout"]);
                                         }
                                         dt.Dispose();
                                     }
@@ -896,7 +896,7 @@ namespace Contensive.Processor.Controllers {
                                         errorContextMessage = "calling Addon [" + addonName + "] during content cmd execution"
                                     };
                                     if (addon == null) {
-                                        logController.handleError(core, new ApplicationException("Add-on [" + addonName + "] could not be found executing command in content [" + cmdSrc + "]"));
+                                        LogController.handleError(core, new ApplicationException("Add-on [" + addonName + "] could not be found executing command in content [" + cmdSrc + "]"));
                                     } else {
                                         CmdAccumulator = core.addon.execute(addon, executeContext);
                                     }
@@ -985,7 +985,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 returnValue = CmdAccumulator;
             } catch (Exception ex) {
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
                 throw;
             }
             return returnValue;

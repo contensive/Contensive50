@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 using Contensive.Processor.Models.Domain;
 using Contensive.Addons.Tools;
@@ -42,18 +42,18 @@ namespace Contensive.Addons.AdminSite {
                     //   Process reset
                     core.userProperty.setProperty(adminContextClass.IndexConfigPrefix + adminContent.id.ToString(), "");
                 }
-                IndexConfigClass IndexConfig = getHtmlBodyClass.LoadIndexConfig(core, adminContext);
+                IndexConfigClass IndexConfig = GetHtmlBodyClass.loadIndexConfig(core, adminContext);
                 int ToolsAction = core.docProperties.getInteger("dta");
                 int TargetFieldID = core.docProperties.getInteger("fi");
                 string TargetFieldName = core.docProperties.getText("FieldName");
                 int ColumnPointer = core.docProperties.getInteger("dtcn");
                 const string RequestNameAddField = "addfield";
-                string FieldNameToAdd = genericController.vbUCase(core.docProperties.getText(RequestNameAddField));
+                string FieldNameToAdd = GenericController.vbUCase(core.docProperties.getText(RequestNameAddField));
                 const string RequestNameAddFieldID = "addfieldID";
                 int FieldIDToAdd = core.docProperties.getInteger(RequestNameAddFieldID);
                 bool normalizeSaveLoad = core.docProperties.getBoolean("NeedToReloadConfig");
                 bool AllowContentAutoLoad = false;
-                stringBuilderLegacyController Stream = new stringBuilderLegacyController();
+                StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 string Title = "Set Columns: " + adminContent.name;
                 string Description = "Use the icons to add, remove and modify your personal column prefernces for this content (" + adminContent.name + "). Hit OK when complete. Hit Reset to restore your column preferences for this content to the site's default column preferences.";
                 Stream.Add(AdminUIController.getToolFormTitle(Title, Description));
@@ -245,8 +245,8 @@ namespace Contensive.Addons.AdminSite {
                             foreach (var column in IndexConfig.columns) {
                                 column.Width = encodeInteger((1000 * column.Width) / (double)ColumnWidthTotal);
                             }
-                            getHtmlBodyClass.SetIndexSQL_SaveIndexConfig(core, IndexConfig);
-                            IndexConfig = getHtmlBodyClass.LoadIndexConfig(core, adminContext);
+                            GetHtmlBodyClass.setIndexSQL_SaveIndexConfig(core, IndexConfig);
+                            IndexConfig = GetHtmlBodyClass.loadIndexConfig(core, adminContext);
                         }
                     }
                     //
@@ -431,7 +431,7 @@ namespace Contensive.Addons.AdminSite {
                 //FormPanel = FormPanel & core.htmldoc.main_GetFormInputSelect2("ContentID", ContentID, "Content")
                 //Call Stream.Add(core.htmldoc.main_GetPanel(FormPanel))
                 //
-                core.siteProperties.setProperty("AllowContentAutoLoad", genericController.encodeText(AllowContentAutoLoad));
+                core.siteProperties.setProperty("AllowContentAutoLoad", GenericController.encodeText(AllowContentAutoLoad));
                 //Stream.Add( core.main_GetFormInputHidden("NeedToReloadConfig", NeedToReloadConfig))
                 string Content = ""
                     + Stream.Text
@@ -473,7 +473,7 @@ namespace Contensive.Addons.AdminSite {
                 //    GetForm_Index_SetColumns = Stream.Text
                 core.html.addTitle(Title);
             } catch (Exception ex) {
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
             }
             return result;
         }

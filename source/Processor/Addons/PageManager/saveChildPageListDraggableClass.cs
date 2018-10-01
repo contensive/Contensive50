@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Addons.PageManager {
@@ -53,7 +53,7 @@ namespace Contensive.Addons.PageManager {
                                 }
                             }
                             //
-                           pageContentModel parentPage = pageContentModel.create(core, parentPageId );
+                           PageContentModel parentPage = PageContentModel.create(core, parentPageId );
                             if (parentPage == null) {
                                 //
                                 // -- parent page is not valid
@@ -61,14 +61,14 @@ namespace Contensive.Addons.PageManager {
                             } else {
                                 //
                                 // -- verify page set to required sort method Id
-                                sortMethodModel sortMethod = sortMethodModel.createByName(core, "By Alpha Sort Order Field");
+                                SortMethodModel sortMethod = SortMethodModel.createByName(core, "By Alpha Sort Order Field");
                                 if (sortMethod == null) {
-                                    sortMethod = sortMethodModel.createByName(core, "Alpha Sort Order Field");
+                                    sortMethod = SortMethodModel.createByName(core, "Alpha Sort Order Field");
                                 }
                                 if (sortMethod == null) {
                                     //
                                     // -- create the required sortMethod
-                                    sortMethod = sortMethodModel.add(core);
+                                    sortMethod = SortMethodModel.add(core);
                                     sortMethod.name = "By Alpha Sort Order Field";
                                     sortMethod.OrderByClause = "sortOrder";
                                     sortMethod.save(core);
@@ -87,7 +87,7 @@ namespace Contensive.Addons.PageManager {
                                         cp.Site.ErrorReport(new ApplicationException("child page id is invalid from remote request [" + pageCommaList + "]"));
                                     } else {
                                         string SortOrder = (100000 + (pagePtr * 10)).ToString();
-                                       pageContentModel childPage = pageContentModel.create(core, childPageId);
+                                       PageContentModel childPage = PageContentModel.create(core, childPageId);
                                         if (childPage.sortOrder != SortOrder) {
                                             childPage.sortOrder = SortOrder;
                                             childPage.save(core);

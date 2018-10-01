@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Addons.Primitives {
@@ -33,7 +33,7 @@ namespace Contensive.Addons.Primitives {
                     // -- Email open detected. Log it and redirect to a 1x1 spacer
                     EmailDropModel emailDrop = EmailDropModel.create(core, emailDropId);
                     if (emailDrop != null) {
-                        personModel recipient = personModel.create(core, core.docProperties.getInteger(rnEmailMemberID));
+                        PersonModel recipient = PersonModel.create(core, core.docProperties.getInteger(rnEmailMemberID));
                         if (recipient != null) {
                            EmailLogModel log = new EmailLogModel() {
                                 name = "User " + recipient.name + " opened email drop " + emailDrop.name + " at " + core.doc.profileStartTime.ToString(),

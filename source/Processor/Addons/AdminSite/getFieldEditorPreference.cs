@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Addons.AdminSite {
@@ -49,8 +49,8 @@ namespace Contensive.Addons.AdminSite {
                 DataTable dt = core.db.executeQuery(Sql);
                 if (dt.Rows.Count > 0) {
                     foreach (DataRow rsDr in dt.Rows) {
-                        addonDefaultEditorName = "&nbsp;(" + genericController.encodeText(rsDr["name"]) + ")";
-                        addonDefaultEditorId = genericController.encodeInteger(rsDr["id"]);
+                        addonDefaultEditorName = "&nbsp;(" + GenericController.encodeText(rsDr["name"]) + ")";
+                        addonDefaultEditorId = GenericController.encodeInteger(rsDr["id"]);
                     }
                 }
                 //
@@ -67,9 +67,9 @@ namespace Contensive.Addons.AdminSite {
                 dt = core.db.executeQuery(Sql);
                 if (dt.Rows.Count > 0) {
                     foreach (DataRow rsDr in dt.Rows) {
-                        int addonId = genericController.encodeInteger(rsDr["addonid"]);
+                        int addonId = GenericController.encodeInteger(rsDr["addonid"]);
                         if ((addonId != 0) & (addonId != addonDefaultEditorId)) {
-                            result += "\r\n\t<div class=\"radioCon\">" + core.html.inputRadio(radioGroupName, genericController.encodeText(addonId), currentEditorAddonId.ToString()) + "&nbsp;Use " + genericController.encodeText(rsDr["addonName"]) + "</div>";
+                            result += "\r\n\t<div class=\"radioCon\">" + core.html.inputRadio(radioGroupName, GenericController.encodeText(addonId), currentEditorAddonId.ToString()) + "&nbsp;Use " + GenericController.encodeText(rsDr["addonName"]) + "</div>";
                         }
 
                     }

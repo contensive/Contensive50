@@ -14,8 +14,8 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 cp.core.mockSmtp = true;
                 // arrange
-                string test1 = genericController.GetRandomInteger(cp.core).ToString() + "@kma.net";
-                string test2 = genericController.GetRandomInteger(cp.core).ToString() + "@kma.net";
+                string test1 = GenericController.GetRandomInteger(cp.core).ToString() + "@kma.net";
+                string test2 = GenericController.GetRandomInteger(cp.core).ToString() + "@kma.net";
                 // act
                 EmailController.addToBlockList(cp.core, test1);
                 string blockList = Contensive.Processor.Controllers.EmailController.getBlockList(cp.core);
@@ -45,7 +45,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 cp.core.mockSmtp = true;
                 // arrange
-                string body = genericController.GetRandomInteger(cp.core).ToString() ;
+                string body = GenericController.GetRandomInteger(cp.core).ToString() ;
                 string sendStatus = "";
                 string ResultLogFilename = "";
                 // act
@@ -70,12 +70,12 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 cp.core.mockSmtp = true;
                 // arrange
-                string body = genericController.GetRandomInteger(cp.core).ToString();
-                var toPerson = Processor.Models.Db.personModel.add(cp.core);
+                string body = GenericController.GetRandomInteger(cp.core).ToString();
+                var toPerson = Processor.Models.Db.PersonModel.add(cp.core);
                 Assert.IsNotNull(toPerson);
-                toPerson.Email = genericController.GetRandomInteger(cp.core).ToString() + "@kma.net";
-                toPerson.FirstName = genericController.GetRandomInteger(cp.core).ToString();
-                toPerson.LastName = genericController.GetRandomInteger(cp.core).ToString();
+                toPerson.Email = GenericController.GetRandomInteger(cp.core).ToString() + "@kma.net";
+                toPerson.FirstName = GenericController.GetRandomInteger(cp.core).ToString();
+                toPerson.LastName = GenericController.GetRandomInteger(cp.core).ToString();
                 toPerson.save(cp.core);
                 string sendStatus = "";
                 // act

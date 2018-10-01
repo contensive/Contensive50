@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 using System.Net;
 using System.Text;
@@ -24,7 +24,7 @@ namespace Contensive.Processor.Controllers {
     /// <summary>
     /// controller for shared non-specific tasks
     /// </summary>
-    public class genericController {
+    public class GenericController {
         //
         //====================================================================================================
         //
@@ -772,9 +772,9 @@ namespace Contensive.Processor.Controllers {
             try {
                 if (!string.IsNullOrEmpty(GMTDate)) {
                     double HourPart = encodeNumber(GMTDate.Substring(5, 11));
-                    if (dateController.IsDate(HourPart)) {
+                    if (DateController.IsDate(HourPart)) {
                         double YearPart = encodeNumber(GMTDate.Substring(17, 8));
-                        if (dateController.IsDate(YearPart)) {
+                        if (DateController.IsDate(YearPart)) {
                             result = DateTime.FromOADate(YearPart + (HourPart + 4) / 24);
                         }
                     }
@@ -1509,7 +1509,7 @@ namespace Contensive.Processor.Controllers {
         public static DateTime encodeDate(object Expression) {
             DateTime tempEncodeDate = default(DateTime);
             tempEncodeDate = DateTime.MinValue;
-            if (dateController.IsDate(Expression)) {
+            if (DateController.IsDate(Expression)) {
                 tempEncodeDate = Convert.ToDateTime(Expression);
                 //If EncodeDate < #1/1/1990# Then
                 //    EncodeDate = Date.MinValue
@@ -1571,7 +1571,7 @@ namespace Contensive.Processor.Controllers {
             string returnResult = "";
             Process p = new Process();
             //
-            logController.logInfo(core, "ccCommonModule.runProcess, cmd=[" + Cmd + "], Arguments=[" + Arguments + "], WaitForReturn=[" + WaitForReturn + "]");
+            LogController.logInfo(core, "ccCommonModule.runProcess, cmd=[" + Cmd + "], Arguments=[" + Arguments + "], WaitForReturn=[" + WaitForReturn + "]");
             //
             p.StartInfo.FileName = Cmd;
             p.StartInfo.Arguments = Arguments;
@@ -1837,7 +1837,7 @@ namespace Contensive.Processor.Controllers {
                 if (string.IsNullOrEmpty(normalizedRoute)) {
                     normalizedRoute = "";
                 } else {
-                    normalizedRoute = genericController.convertToUnixSlash(normalizedRoute);
+                    normalizedRoute = GenericController.convertToUnixSlash(normalizedRoute);
                     while (normalizedRoute.IndexOf("//") >= 0) {
                         normalizedRoute = normalizedRoute.Replace("//", "/");
                     }
@@ -2062,7 +2062,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="srcDate"></param>
         /// <returns></returns>
         public static int convertDateToDayPtr(DateTime srcDate) {
-            return encodeInteger(dateController.DateDiff(dateController.DateInterval.Day, srcDate, DateTime.MinValue));
+            return encodeInteger(DateController.DateDiff(DateController.DateInterval.Day, srcDate, DateTime.MinValue));
         }
         //
         //====================================================================================================
@@ -2079,18 +2079,18 @@ namespace Contensive.Processor.Controllers {
             string a = "";
             if (!string.IsNullOrEmpty(Arg)) {
                 a = Arg;
-                a = genericController.vbReplace(a, "\r\n", "#0013#");
-                a = genericController.vbReplace(a, "\n", "#0013#");
-                a = genericController.vbReplace(a, "\r", "#0013#");
-                a = genericController.vbReplace(a, "&", "#0038#");
-                a = genericController.vbReplace(a, "=", "#0061#");
-                a = genericController.vbReplace(a, ",", "#0044#");
-                a = genericController.vbReplace(a, "\"", "#0034#");
-                a = genericController.vbReplace(a, "'", "#0039#");
-                a = genericController.vbReplace(a, "|", "#0124#");
-                a = genericController.vbReplace(a, "[", "#0091#");
-                a = genericController.vbReplace(a, "]", "#0093#");
-                a = genericController.vbReplace(a, ":", "#0058#");
+                a = GenericController.vbReplace(a, "\r\n", "#0013#");
+                a = GenericController.vbReplace(a, "\n", "#0013#");
+                a = GenericController.vbReplace(a, "\r", "#0013#");
+                a = GenericController.vbReplace(a, "&", "#0038#");
+                a = GenericController.vbReplace(a, "=", "#0061#");
+                a = GenericController.vbReplace(a, ",", "#0044#");
+                a = GenericController.vbReplace(a, "\"", "#0034#");
+                a = GenericController.vbReplace(a, "'", "#0039#");
+                a = GenericController.vbReplace(a, "|", "#0124#");
+                a = GenericController.vbReplace(a, "[", "#0091#");
+                a = GenericController.vbReplace(a, "]", "#0093#");
+                a = GenericController.vbReplace(a, ":", "#0058#");
             }
             return a;
         }
@@ -2146,20 +2146,20 @@ namespace Contensive.Processor.Controllers {
             string[] PairSplit = null;
             //
             if ((!string.IsNullOrEmpty(NameValueString)) & (!string.IsNullOrEmpty(Name))) {
-                while (genericController.vbInstr(1, NameValueStringWorking, " =") != 0) {
-                    NameValueStringWorking = genericController.vbReplace(NameValueStringWorking, " =", "=");
+                while (GenericController.vbInstr(1, NameValueStringWorking, " =") != 0) {
+                    NameValueStringWorking = GenericController.vbReplace(NameValueStringWorking, " =", "=");
                 }
-                while (genericController.vbInstr(1, NameValueStringWorking, "= ") != 0) {
-                    NameValueStringWorking = genericController.vbReplace(NameValueStringWorking, "= ", "=");
+                while (GenericController.vbInstr(1, NameValueStringWorking, "= ") != 0) {
+                    NameValueStringWorking = GenericController.vbReplace(NameValueStringWorking, "= ", "=");
                 }
-                while (genericController.vbInstr(1, NameValueStringWorking, "& ") != 0) {
-                    NameValueStringWorking = genericController.vbReplace(NameValueStringWorking, "& ", "&");
+                while (GenericController.vbInstr(1, NameValueStringWorking, "& ") != 0) {
+                    NameValueStringWorking = GenericController.vbReplace(NameValueStringWorking, "& ", "&");
                 }
-                while (genericController.vbInstr(1, NameValueStringWorking, " &") != 0) {
-                    NameValueStringWorking = genericController.vbReplace(NameValueStringWorking, " &", "&");
+                while (GenericController.vbInstr(1, NameValueStringWorking, " &") != 0) {
+                    NameValueStringWorking = GenericController.vbReplace(NameValueStringWorking, " &", "&");
                 }
                 NameValueStringWorking = NameValueString + "&";
-                UcaseNameValueStringWorking = genericController.vbUCase(NameValueStringWorking);
+                UcaseNameValueStringWorking = GenericController.vbUCase(NameValueStringWorking);
                 //
                 result = "";
                 if (!string.IsNullOrEmpty(NameValueStringWorking)) {
@@ -2167,7 +2167,7 @@ namespace Contensive.Processor.Controllers {
                     PairCount = pairs.GetUpperBound(0) + 1;
                     for (PairPointer = 0; PairPointer < PairCount; PairPointer++) {
                         PairSplit = pairs[PairPointer].Split('=');
-                        if (genericController.vbUCase(PairSplit[0]) == genericController.vbUCase(Name)) {
+                        if (GenericController.vbUCase(PairSplit[0]) == GenericController.vbUCase(Name)) {
                             if (PairSplit.GetUpperBound(0) > 0) {
                                 result = PairSplit[1];
                             }
@@ -2188,8 +2188,8 @@ namespace Contensive.Processor.Controllers {
         //
         public static string getCdnFileLink(CoreController core, string virtualFile) {
             string returnLink = virtualFile;
-            returnLink = genericController.vbReplace(returnLink, "\\", "/");
-            if (genericController.vbInstr(1, returnLink, "://") != 0) {
+            returnLink = GenericController.vbReplace(returnLink, "\\", "/");
+            if (GenericController.vbInstr(1, returnLink, "://") != 0) {
                 //
                 // icon is an Absolute URL - leave it
                 //
@@ -2216,9 +2216,9 @@ namespace Contensive.Processor.Controllers {
             string iAnchorTag = null;
             string iAnchorText = null;
             //
-            iAnchorTag = genericController.encodeText(AnchorTag);
-            iAnchorText = genericController.encodeText(AnchorText);
-            UcaseAnchorText = genericController.vbUCase(iAnchorText);
+            iAnchorTag = GenericController.encodeText(AnchorTag);
+            iAnchorText = GenericController.encodeText(AnchorText);
+            UcaseAnchorText = GenericController.vbUCase(iAnchorText);
             if ((!string.IsNullOrEmpty(iAnchorTag)) & (!string.IsNullOrEmpty(iAnchorText))) {
                 LinkPosition = UcaseAnchorText.LastIndexOf("<LINK>") + 1;
                 if (LinkPosition == 0) {
@@ -2330,12 +2330,12 @@ namespace Contensive.Processor.Controllers {
                 int Pos = 0;
                 //
                 if (!string.IsNullOrEmpty(SrcOptionList)) {
-                    SrcOptions = genericController.stringSplit(SrcOptionList.Replace("\r\n", "\r").Replace("\n", "\r"), "\r");
+                    SrcOptions = GenericController.stringSplit(SrcOptionList.Replace("\r\n", "\r").Replace("\n", "\r"), "\r");
                     for (var Ptr = 0; Ptr <= SrcOptions.GetUpperBound(0); Ptr++) {
                         key = SrcOptions[Ptr].Replace("\t", "");
                         if (!string.IsNullOrEmpty(key)) {
                             value = "";
-                            Pos = genericController.vbInstr(1, key, "=");
+                            Pos = GenericController.vbInstr(1, key, "=");
                             if (Pos > 0) {
                                 value = key.Substring(Pos);
                                 key = key.Left(Pos - 1);
@@ -2345,7 +2345,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnList;
@@ -2422,7 +2422,7 @@ namespace Contensive.Processor.Controllers {
                             }
                         }
                     } catch (Exception ex) {
-                        logController.handleError( core,ex);
+                        LogController.handleError( core,ex);
                         throw;
                     }
                 }
@@ -2444,11 +2444,11 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static string removeScriptTag(string source) {
             string result = source;
-            int StartPos = genericController.vbInstr(1, result, "<script", 1);
+            int StartPos = GenericController.vbInstr(1, result, "<script", 1);
             if (StartPos != 0) {
-                int EndPos = genericController.vbInstr(StartPos, result, "</script", 1);
+                int EndPos = GenericController.vbInstr(StartPos, result, "</script", 1);
                 if (EndPos != 0) {
-                    EndPos = genericController.vbInstr(EndPos, result, ">", 1);
+                    EndPos = GenericController.vbInstr(EndPos, result, ">", 1);
                     if (EndPos != 0) {
                         result = result.Left(StartPos - 1) + result.Substring(EndPos);
                     }

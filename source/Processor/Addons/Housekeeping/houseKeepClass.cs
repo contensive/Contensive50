@@ -12,7 +12,7 @@ using Contensive.BaseClasses;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 using System.IO;
@@ -64,7 +64,7 @@ namespace Contensive.Addons.Housekeeping {
                     //
                     // it is the next day, remove old log files
                     //
-                    logController.housekeepLogs(core);
+                    LogController.housekeepLogs(core);
                     //
                     // Download Updates
                     DownloadUpdates(core);
@@ -90,7 +90,7 @@ namespace Contensive.Addons.Housekeeping {
                     //CollectionController.installCollectionFromRemoteRepo(core, CoreCollectionGuid, ref ErrorMessage, "", false, false, ref nonCriticalErrorList);
                     //
                     string DomainNamePrimary = core.appConfig.domainList[0];
-                    int Pos = genericController.vbInstr(1, DomainNamePrimary, ",");
+                    int Pos = GenericController.vbInstr(1, DomainNamePrimary, ",");
                     if (Pos > 1) {
                         DomainNamePrimary = DomainNamePrimary.Left(Pos - 1);
                     }
@@ -107,7 +107,7 @@ namespace Contensive.Addons.Housekeeping {
                     //
                     // Get ArchiveAgeDays - use this as the oldest data they care about
                     //
-                    int VisitArchiveAgeDays = genericController.encodeInteger(core.siteProperties.getText("ArchiveRecordAgeDays", "365"));
+                    int VisitArchiveAgeDays = GenericController.encodeInteger(core.siteProperties.getText("ArchiveRecordAgeDays", "365"));
                     if (VisitArchiveAgeDays < 2) {
                         VisitArchiveAgeDays = 2;
                         core.siteProperties.setProperty("ArchiveRecordAgeDays", "2");
@@ -121,7 +121,7 @@ namespace Contensive.Addons.Housekeeping {
                     //
                     // Get GuestArchiveAgeDays
                     //
-                    int GuestArchiveAgeDays = genericController.encodeInteger(core.siteProperties.getText("ArchivePeopleAgeDays", "2"));
+                    int GuestArchiveAgeDays = GenericController.encodeInteger(core.siteProperties.getText("ArchivePeopleAgeDays", "2"));
                     if (GuestArchiveAgeDays < 2) {
                         GuestArchiveAgeDays = 2;
                         core.siteProperties.setProperty("ArchivePeopleAgeDays", GuestArchiveAgeDays.ToString());
@@ -129,7 +129,7 @@ namespace Contensive.Addons.Housekeeping {
                     //
                     // Get EmailDropArchiveAgeDays
                     //
-                    int EmailDropArchiveAgeDays = genericController.encodeInteger(core.siteProperties.getText("ArchiveEmailDropAgeDays", "90"));
+                    int EmailDropArchiveAgeDays = GenericController.encodeInteger(core.siteProperties.getText("ArchiveEmailDropAgeDays", "90"));
                     if (EmailDropArchiveAgeDays < 2) {
                         EmailDropArchiveAgeDays = 2;
                         core.siteProperties.setProperty("ArchiveEmailDropAgeDays", EmailDropArchiveAgeDays.ToString());
@@ -354,7 +354,7 @@ namespace Contensive.Addons.Housekeeping {
                             AlarmTimeString = "12:00:00 AM";
                             core.siteProperties.setProperty("ArchiveTimeOfDate", AlarmTimeString);
                         }
-                        if (!dateController.IsDate(AlarmTimeString)) {
+                        if (!DateController.IsDate(AlarmTimeString)) {
                             AlarmTimeString = "12:00:00 AM";
                             core.siteProperties.setProperty("ArchiveTimeOfDate", AlarmTimeString);
                         }
@@ -423,7 +423,7 @@ namespace Contensive.Addons.Housekeeping {
                 MidnightTwoDaysAgo = rightNow.AddDays(-2).Date;
                 thirtyDaysAgo = rightNow.AddDays(-30).Date;
                 appName = core.appConfig.name;
-                ArchiveDeleteNoCookie = genericController.encodeBoolean(core.siteProperties.getText("ArchiveDeleteNoCookie", "1"));
+                ArchiveDeleteNoCookie = GenericController.encodeBoolean(core.siteProperties.getText("ArchiveDeleteNoCookie", "1"));
                 DataSourceType = core.db.getDataSourceType("default");
                 TimeoutSave = core.db.sqlCommandTimeout;
                 core.db.sqlCommandTimeout = 1800;
@@ -1114,7 +1114,7 @@ namespace Contensive.Addons.Housekeeping {
                 //
                 // Content TextFile types with no controlling record
                 //
-                if (genericController.encodeBoolean(core.siteProperties.getText("ArchiveAllowFileClean", "false"))) {
+                if (GenericController.encodeBoolean(core.siteProperties.getText("ArchiveAllowFileClean", "false"))) {
                     //
                     int DSType = core.db.getDataSourceType("");
                     logHousekeeping(core, "Content TextFile types with no controlling record.");
@@ -1136,7 +1136,7 @@ namespace Contensive.Addons.Housekeeping {
                             foreach (CPFileSystemBaseClass.FileDetail file in FileList) {
                                 Filename = file.Name;
                                 VirtualFileName = PathName + "\\" + Filename;
-                                VirtualLink = genericController.vbReplace(VirtualFileName, "\\", "/");
+                                VirtualLink = GenericController.vbReplace(VirtualFileName, "\\", "/");
                                 FileSize = file.Size;
                                 if (FileSize == 0) {
                                     SQL = "update " + TableName + " set " + FieldName + "=null where (" + FieldName + "=" + core.db.encodeSQLText(VirtualFileName) + ")or(" + FieldName + "=" + core.db.encodeSQLText(VirtualLink) + ")";
@@ -1259,7 +1259,7 @@ namespace Contensive.Addons.Housekeeping {
                 return;
                 //
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
         }
         //
@@ -1324,7 +1324,7 @@ namespace Contensive.Addons.Housekeeping {
                 return;
                 //
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
         }
         //
@@ -1349,7 +1349,7 @@ namespace Contensive.Addons.Housekeeping {
                     + " and(email is null)";
                 core.db.deleteTableRecordChunks("default", "" + SQLTablePeople + "", SQLCriteria, 1000, 10000);
             } catch (Exception ex) {
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
             }  finally { 
                 //
                 // restore sved timeout
@@ -1623,7 +1623,7 @@ namespace Contensive.Addons.Housekeeping {
                 //
                 return;
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             //ErrorTrap:
             //throw new ApplicationException("Unexpected exception");
@@ -1632,7 +1632,7 @@ namespace Contensive.Addons.Housekeeping {
         //====================================================================================================
         //
         public void logHousekeeping(CoreController core, string LogCopy) {
-            logController.logInfo(core, "housekeeping: " + LogCopy);
+            LogController.logInfo(core, "housekeeping: " + LogCopy);
         }
         //
         //====================================================================================================
@@ -1649,7 +1649,7 @@ namespace Contensive.Addons.Housekeeping {
                 return;
                 //
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
         }
         //
@@ -1666,10 +1666,10 @@ namespace Contensive.Addons.Housekeeping {
                 URL = "http://support.contensive.com/GetUpdates?iv=" + core.codeVersion();
                 loadOK = true;
                 Doc.Load(URL);
-                if ((Doc.DocumentElement.Name.ToLower() == genericController.vbLCase("ContensiveUpdate")) && (Doc.DocumentElement.ChildNodes.Count != 0)) {
+                if ((Doc.DocumentElement.Name.ToLower() == GenericController.vbLCase("ContensiveUpdate")) && (Doc.DocumentElement.ChildNodes.Count != 0)) {
                     foreach (XmlNode CDefSection in Doc.DocumentElement.ChildNodes) {
                         Copy = CDefSection.InnerText;
-                        switch (genericController.vbLCase(CDefSection.Name)) {
+                        switch (GenericController.vbLCase(CDefSection.Name)) {
                             case "mastervisitnamelist":
                                 //
                                 // Read in the interfaces and save to Add-ons
@@ -1694,7 +1694,7 @@ namespace Contensive.Addons.Housekeeping {
                     }
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return loadOK;
         }
@@ -1739,7 +1739,7 @@ namespace Contensive.Addons.Housekeeping {
                 int BotPageViews = 0;
                 string SQL = null;
                 if (string.CompareOrdinal(BuildVersion, core.codeVersion()) < 0) {
-                    logController.handleError( core,new ApplicationException("Can not summarize analytics until this site's data needs been upgraded."));
+                    LogController.handleError( core,new ApplicationException("Can not summarize analytics until this site's data needs been upgraded."));
                 } else {
                     hint = 1;
                     PeriodStart = StartTimeDate;
@@ -1942,7 +1942,7 @@ namespace Contensive.Addons.Housekeeping {
                 //
                 return;
             } catch (Exception ex) {
-                logController.handleError( core,ex, "hint [" + hint + "]");
+                LogController.handleError( core,ex, "hint [" + hint + "]");
             }
         }
         //
@@ -1984,7 +1984,7 @@ namespace Contensive.Addons.Housekeeping {
                     //
                     logHousekeeping(core, "Collection.xml loaded ok");
                     //
-                    if (genericController.vbLCase(Doc.DocumentElement.Name) != genericController.vbLCase(CollectionListRootNode)) {
+                    if (GenericController.vbLCase(Doc.DocumentElement.Name) != GenericController.vbLCase(CollectionListRootNode)) {
                         logHousekeeping(core, "RegisterAddonFolder, Hint=[" + hint + "], The Collections.xml file has an invalid root node, [" + Doc.DocumentElement.Name + "] was received and [" + CollectionListRootNode + "] was expected.");
                     } else {
                         //
@@ -2003,25 +2003,25 @@ namespace Contensive.Addons.Housekeeping {
                                 CollectionPath = "";
                                 LocalGuid = "";
                                 LocalName = "no name found";
-                                switch (genericController.vbLCase(LocalListNode.Name)) {
+                                switch (GenericController.vbLCase(LocalListNode.Name)) {
                                     case "collection":
                                         LocalGuid = "";
                                         foreach (XmlNode CollectionNode in LocalListNode.ChildNodes) {
-                                            switch (genericController.vbLCase(CollectionNode.Name)) {
+                                            switch (GenericController.vbLCase(CollectionNode.Name)) {
                                                 case "name":
                                                     //
-                                                    LocalName = genericController.vbLCase(CollectionNode.InnerText);
+                                                    LocalName = GenericController.vbLCase(CollectionNode.InnerText);
                                                     break;
                                                 case "guid":
                                                     //
-                                                    LocalGuid = genericController.vbLCase(CollectionNode.InnerText);
+                                                    LocalGuid = GenericController.vbLCase(CollectionNode.InnerText);
                                                     break;
                                                 case "path":
                                                     //
-                                                    CollectionPath = genericController.vbLCase(CollectionNode.InnerText);
+                                                    CollectionPath = GenericController.vbLCase(CollectionNode.InnerText);
                                                     break;
                                                 case "lastchangedate":
-                                                    LastChangeDate = genericController.encodeDate(CollectionNode.InnerText);
+                                                    LastChangeDate = GenericController.encodeDate(CollectionNode.InnerText);
                                                     break;
                                             }
                                         }
@@ -2038,7 +2038,7 @@ namespace Contensive.Addons.Housekeeping {
                                     logHousekeeping(core, "no collection path, skipping");
                                     //
                                 } else {
-                                    CollectionPath = genericController.vbLCase(CollectionPath);
+                                    CollectionPath = GenericController.vbLCase(CollectionPath);
                                     CollectionRootPath = CollectionPath;
                                     Pos = CollectionRootPath.LastIndexOf("\\") + 1;
                                     if (Pos <= 0) {
@@ -2115,7 +2115,7 @@ namespace Contensive.Addons.Housekeeping {
                                             // register files found in the active folder last
                                             //
                                             if (!string.IsNullOrEmpty(RegisterPathList)) {
-                                                RegisterPaths = genericController.stringSplit(RegisterPathList, "\r\n");
+                                                RegisterPaths = GenericController.stringSplit(RegisterPathList, "\r\n");
                                                 for (Ptr = 0; Ptr <= RegisterPaths.GetUpperBound(0); Ptr++) {
                                                     RegisterPath = RegisterPaths[Ptr].Trim(' ');
                                                     if (!string.IsNullOrEmpty(RegisterPath)) {

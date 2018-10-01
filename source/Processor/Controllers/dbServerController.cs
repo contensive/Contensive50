@@ -10,7 +10,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 
@@ -40,7 +40,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 this.core = core;
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -74,7 +74,7 @@ namespace Contensive.Processor.Controllers {
                     + "Password=" + core.serverConfig.defaultDataSourcePassword + ";"
                     + "";
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnConnString;
@@ -89,7 +89,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 executeSql("create database " + catalogName);
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
@@ -111,7 +111,7 @@ namespace Contensive.Processor.Controllers {
                 returnOk = (dt.Rows.Count > 0);
                 dt.Dispose();
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return returnOk;
@@ -145,7 +145,7 @@ namespace Contensive.Processor.Controllers {
                 }
             } catch (Exception ex) {
                 ApplicationException newEx = new ApplicationException("Exception [" + ex.Message + "] executing master sql [" + sql + "]", ex);
-                logController.handleError( core,newEx);
+                LogController.handleError( core,newEx);
             }
             return returnData;
         }

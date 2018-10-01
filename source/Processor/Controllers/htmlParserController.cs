@@ -11,11 +11,11 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Controllers {
-    public class htmlParserController {
+    public class HtmlParserController {
         //
         //====================================================================================================
         // open source html parser to try
@@ -76,7 +76,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public htmlParserController(CoreController core) {
+        public HtmlParserController(CoreController core) {
             this.core = core;
         }
         //
@@ -99,14 +99,14 @@ namespace Contensive.Processor.Controllers {
                 WorkingSrc = HTMLSource;
                 LocalElementCount = 0;
                 LocalElementSize = 0;
-                LocalElements = new Contensive.Processor.Controllers.htmlParserController.Element[LocalElementSize + 1];
+                LocalElements = new Contensive.Processor.Controllers.HtmlParserController.Element[LocalElementSize + 1];
                 tempLoad = true;
                 Ptr = 0;
                 //
                 // get a unique signature
                 //
                 do {
-                    BlobSN = "/blob" + encodeText(genericController.GetRandomInteger(core)) + ":";
+                    BlobSN = "/blob" + encodeText(GenericController.GetRandomInteger(core)) + ":";
                     Ptr = Ptr + 1;
                 } while ((WorkingSrc.IndexOf(BlobSN, System.StringComparison.OrdinalIgnoreCase) != -1) && (Ptr < 10));
                 //
@@ -117,9 +117,9 @@ namespace Contensive.Processor.Controllers {
                 Cnt = splittest.GetUpperBound(0) + 1;
                 if (Cnt > 1) {
                     for (Ptr = 1; Ptr < Cnt; Ptr++) {
-                        PosScriptEnd = genericController.vbInstr(1, splittest[Ptr], ">");
+                        PosScriptEnd = GenericController.vbInstr(1, splittest[Ptr], ">");
                         if (PosScriptEnd > 0) {
-                            PosEndScript = genericController.vbInstr(PosScriptEnd, splittest[Ptr], "</script");
+                            PosEndScript = GenericController.vbInstr(PosScriptEnd, splittest[Ptr], "</script");
                             if (PosEndScript > 0) {
                                 Array.Resize(ref Blobs, BlobCnt + 1);
                                 Blobs[BlobCnt] = splittest[Ptr].Substring(PosScriptEnd, (PosEndScript - 1) - (PosScriptEnd + 1) + 1);
@@ -133,13 +133,13 @@ namespace Contensive.Processor.Controllers {
                 //
                 // remove all styles
                 //
-                splittest = genericController.stringSplit(WorkingSrc, "<style");
+                splittest = GenericController.stringSplit(WorkingSrc, "<style");
                 Cnt = splittest.GetUpperBound(0) + 1;
                 if (Cnt > 1) {
                     for (Ptr = 1; Ptr < Cnt; Ptr++) {
-                        PosScriptEnd = genericController.vbInstr(1, splittest[Ptr], ">");
+                        PosScriptEnd = GenericController.vbInstr(1, splittest[Ptr], ">");
                         if (PosScriptEnd > 0) {
-                            PosEndScript = genericController.vbInstr(PosScriptEnd, splittest[Ptr], "</style", 1);
+                            PosEndScript = GenericController.vbInstr(PosScriptEnd, splittest[Ptr], "</style", 1);
                             if (PosEndScript > 0) {
                                 Array.Resize(ref Blobs, BlobCnt + 1);
                                 Blobs[BlobCnt] = splittest[Ptr].Substring(PosScriptEnd, (PosEndScript - 1) - (PosScriptEnd + 1) + 1);
@@ -153,11 +153,11 @@ namespace Contensive.Processor.Controllers {
                 //
                 // remove comments
                 //
-                splittest = genericController.stringSplit(WorkingSrc, "<!--");
+                splittest = GenericController.stringSplit(WorkingSrc, "<!--");
                 Cnt = splittest.GetUpperBound(0) + 1;
                 if (Cnt > 1) {
                     for (Ptr = 1; Ptr < Cnt; Ptr++) {
-                        PosScriptEnd = genericController.vbInstr(1, splittest[Ptr], "-->");
+                        PosScriptEnd = GenericController.vbInstr(1, splittest[Ptr], "-->");
                         if (PosScriptEnd > 0) {
                             Array.Resize(ref Blobs, BlobCnt + 1);
                             Blobs[BlobCnt] = splittest[Ptr].Left(PosScriptEnd - 1);
@@ -173,13 +173,13 @@ namespace Contensive.Processor.Controllers {
                 SplitStore = WorkingSrc.Split('<');
                 SplitStoreCnt = SplitStore.GetUpperBound(0) + 1;
                 LocalElementCount = (SplitStoreCnt * 2);
-                LocalElements = new Contensive.Processor.Controllers.htmlParserController.Element[LocalElementCount + 1];
+                LocalElements = new Contensive.Processor.Controllers.HtmlParserController.Element[LocalElementCount + 1];
                 return tempLoad;
             } catch( Exception ex ) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             //ErrorTrap:
-            logController.handleError( core,new Exception("unexpected exception"));
+            LogController.handleError( core,new Exception("unexpected exception"));
             return tempLoad;
         }
         //
@@ -203,7 +203,7 @@ namespace Contensive.Processor.Controllers {
                     result = LocalElements[ElementPointer].IsTag;
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             return result;
         }
@@ -223,10 +223,10 @@ namespace Contensive.Processor.Controllers {
                 //
                 return tempText;
             } catch( Exception ex ) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             //ErrorTrap:
-            logController.handleError( core,new Exception("unexpected exception"));
+            LogController.handleError( core,new Exception("unexpected exception"));
             return tempText;
         }
         //
@@ -245,10 +245,10 @@ namespace Contensive.Processor.Controllers {
                 //
                 return tempTagName;
             } catch( Exception ex ) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             //ErrorTrap:
-            logController.handleError( core,new Exception("unexpected exception"));
+            LogController.handleError( core,new Exception("unexpected exception"));
             return tempTagName;
         }
         //
@@ -267,10 +267,10 @@ namespace Contensive.Processor.Controllers {
                 //
                 return tempPosition;
             } catch( Exception ex ) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             //ErrorTrap:
-            logController.handleError( core,new Exception("unexpected exception"));
+            LogController.handleError( core,new Exception("unexpected exception"));
             return tempPosition;
         }
         //
@@ -289,10 +289,10 @@ namespace Contensive.Processor.Controllers {
                 //
                 return tempElementAttributeCount;
             } catch( Exception ex ) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             //ErrorTrap:
-            logController.handleError( core,new Exception("unexpected exception"));
+            LogController.handleError( core,new Exception("unexpected exception"));
             return tempElementAttributeCount;
         }
         //
@@ -313,10 +313,10 @@ namespace Contensive.Processor.Controllers {
                 //
                 return tempElementAttributeName;
             } catch( Exception ex ) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             //ErrorTrap:
-            logController.handleError( core,new Exception("unexpected exception"));
+            LogController.handleError( core,new Exception("unexpected exception"));
             return tempElementAttributeName;
         }
         //
@@ -337,10 +337,10 @@ namespace Contensive.Processor.Controllers {
                 //
                 return tempElementAttributeValue;
             } catch( Exception ex ) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             //ErrorTrap:
-            logController.handleError( core,new Exception("unexpected exception"));
+            LogController.handleError( core,new Exception("unexpected exception"));
             return tempElementAttributeValue;
         }
         //
@@ -358,7 +358,7 @@ namespace Contensive.Processor.Controllers {
                 LoadElement(ElementPointer);
                 if (ElementPointer < LocalElementCount) {
                     if (LocalElements[ElementPointer].AttributeCount > 0) {
-                        UcaseName = genericController.vbUCase(Name);
+                        UcaseName = GenericController.vbUCase(Name);
                         //todo  NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of LocalElements(ElementPointer).AttributeCount for every iteration:
                         int tempVar = LocalElements[ElementPointer].AttributeCount;
                         for (AttributePointer = 0; AttributePointer < tempVar; AttributePointer++) {
@@ -372,10 +372,10 @@ namespace Contensive.Processor.Controllers {
                 //
                 return tempElementAttribute;
             } catch( Exception ex ) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             //ErrorTrap:
-            logController.handleError( core,new Exception("unexpected exception"));
+            LogController.handleError( core,new Exception("unexpected exception"));
             return tempElementAttribute;
         }
         //
@@ -397,15 +397,15 @@ namespace Contensive.Processor.Controllers {
                     TagString = TagString.Left( TagString.Length - 1);
                 }
                 //TagString = genericController.vbReplace(TagString, ">", " ") & " "
-                TagString = genericController.vbReplace(TagString, "\r", " ");
-                TagString = genericController.vbReplace(TagString, "\n", " ");
-                TagString = genericController.vbReplace(TagString, "  ", " ");
+                TagString = GenericController.vbReplace(TagString, "\r", " ");
+                TagString = GenericController.vbReplace(TagString, "\n", " ");
+                TagString = GenericController.vbReplace(TagString, "  ", " ");
                 //TagString = genericController.vbReplace(TagString, " =", "=")
                 //TagString = genericController.vbReplace(TagString, "= ", "=")
                 //TagString = genericController.vbReplace(TagString, "'", """")
                 LocalElements[ElementPointer].AttributeCount = 0;
                 LocalElements[ElementPointer].AttributeSize = 1;
-                LocalElements[ElementPointer].Attributes = new Contensive.Processor.Controllers.htmlParserController.ElementAttributeStructure[1]; // allocates the first
+                LocalElements[ElementPointer].Attributes = new Contensive.Processor.Controllers.HtmlParserController.ElementAttributeStructure[1]; // allocates the first
                                                                                                                                               //ClosePosition = Len(TagString)
                                                                                                                                               //If ClosePosition <= 2 Then
                                                                                                                                               //    '
@@ -436,10 +436,10 @@ namespace Contensive.Processor.Controllers {
                                             LocalElements[ElementPointer].AttributeSize = LocalElements[ElementPointer].AttributeSize + 5;
                                             Array.Resize(ref LocalElements[ElementPointer].Attributes, (LocalElements[ElementPointer].AttributeSize) + 1);
                                         }
-                                        int EqualPosition = genericController.vbInstr(1, AttrName, "=");
+                                        int EqualPosition = GenericController.vbInstr(1, AttrName, "=");
                                         if (EqualPosition == 0) {
                                             LocalElements[ElementPointer].Attributes[LocalElements[ElementPointer].AttributeCount].Name = AttrName;
-                                            LocalElements[ElementPointer].Attributes[LocalElements[ElementPointer].AttributeCount].UcaseName = genericController.vbUCase(AttrName);
+                                            LocalElements[ElementPointer].Attributes[LocalElements[ElementPointer].AttributeCount].UcaseName = GenericController.vbUCase(AttrName);
                                             LocalElements[ElementPointer].Attributes[LocalElements[ElementPointer].AttributeCount].Value = AttrName;
                                         } else {
                                             AttrValue = AttrName.Substring(EqualPosition);
@@ -451,7 +451,7 @@ namespace Contensive.Processor.Controllers {
                                             }
                                             AttrName = AttrName.Left( EqualPosition - 1);
                                             LocalElements[ElementPointer].Attributes[LocalElements[ElementPointer].AttributeCount].Name = AttrName;
-                                            LocalElements[ElementPointer].Attributes[LocalElements[ElementPointer].AttributeCount].UcaseName = genericController.vbUCase(AttrName);
+                                            LocalElements[ElementPointer].Attributes[LocalElements[ElementPointer].AttributeCount].UcaseName = GenericController.vbUCase(AttrName);
                                             LocalElements[ElementPointer].Attributes[LocalElements[ElementPointer].AttributeCount].Value = AttrValue;
                                         }
                                         LocalElements[ElementPointer].AttributeCount = LocalElements[ElementPointer].AttributeCount + 1;
@@ -513,10 +513,10 @@ namespace Contensive.Processor.Controllers {
                 //
                 return;
             } catch( Exception ex ) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             //ErrorTrap:
-            logController.handleError( core,new Exception("unexpected exception"));
+            LogController.handleError( core,new Exception("unexpected exception"));
         }
         //
         //====================================================================================================
@@ -541,10 +541,10 @@ namespace Contensive.Processor.Controllers {
                 //
                 return tempGetLesserNonZero;
             } catch( Exception ex ) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             //ErrorTrap:
-            logController.handleError( core,new Exception("unexpected exception"));
+            LogController.handleError( core,new Exception("unexpected exception"));
             return tempGetLesserNonZero;
         }
         //
@@ -562,10 +562,10 @@ namespace Contensive.Processor.Controllers {
                 //
                 return tempPassWhiteSpace;
             } catch( Exception ex ) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
             }
             //ErrorTrap:
-            logController.handleError( core,new Exception("unexpected exception"));
+            LogController.handleError( core,new Exception("unexpected exception"));
             return tempPassWhiteSpace;
         }
         //
@@ -584,7 +584,7 @@ namespace Contensive.Processor.Controllers {
                     SplitPtr = encodeInteger(ElementPtr / 2.0);
                     ElementBasePtr = SplitPtr * 2;
                     SplitSrc = SplitStore[SplitPtr];
-                    Ptr = genericController.vbInstr(1, SplitSrc, ">");
+                    Ptr = GenericController.vbInstr(1, SplitSrc, ">");
                     //
                     // replace blobs
                     //
@@ -658,11 +658,11 @@ namespace Contensive.Processor.Controllers {
             string Blob = "";
             //
             tempReplaceBlob = Src;
-            Pos = genericController.vbInstr(1, Src, BlobSN);
+            Pos = GenericController.vbInstr(1, Src, BlobSN);
             if (Pos != 0) {
-                PosEnd = genericController.vbInstr(Pos + 1, Src, "/");
+                PosEnd = GenericController.vbInstr(Pos + 1, Src, "/");
                 if (PosEnd > 0) {
-                    PosNum = genericController.vbInstr(Pos + 1, Src, ":");
+                    PosNum = GenericController.vbInstr(Pos + 1, Src, ":");
                     if (PosNum > 0) {
                         PtrText = Src.Substring(PosNum, PosEnd - PosNum - 1);
                         if (PtrText.IsNumeric()) {

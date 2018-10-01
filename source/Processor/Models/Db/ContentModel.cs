@@ -10,7 +10,7 @@ namespace Contensive.Processor.Models.Db {
         //-- const
         public const string contentName = "content";
         public const string contentTableName = "cccontent";
-        private const string contentDataSource = "default";
+        public const string contentDataSource = "default";
         //
         //====================================================================================================
         // -- instance properties
@@ -106,8 +106,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public void invalidatePrimaryCache(CoreController core, int recordId) {
-            invalidateCache<ContentModel>(core, recordId);
+        public static void invalidateRecordCache(CoreController core, int recordId) {
+            invalidateRecordCache<ContentModel>(core, recordId);
+        }
+        //
+        //====================================================================================================
+        public static void invalidateTableCache(CoreController core) {
+            invalidateTableCache<ContentModel>(core);
         }
         //
         //====================================================================================================
@@ -144,10 +149,20 @@ namespace Contensive.Processor.Models.Db {
                     result.Add(content.id, content);
                 }
             } catch (Exception ex) {
-                logController.handleError( core,ex);
+                LogController.handleError( core,ex);
                 throw;
             }
             return result;
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Return a cache key used to represent the table. ONLY used for invalidation. Add this as a dependent key if you want that key cleared when ANY record in the table is changed.
+        /// </summary>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        public static string getTableInvalidationKey(CoreController core) {
+            return getTableCacheKey<ContentModel>(core);
         }
     }
 }

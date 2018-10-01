@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 using System.Net.Mail;
@@ -19,7 +19,7 @@ using System.Net.Mime;
 using System.IO;
 //
 namespace Contensive.Processor.Controllers {
-    public class smtpController {
+    public class SmtpController {
         //
         //====================================================================================================
         /// <summary>
@@ -86,16 +86,16 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- send email
                     try {
-                        logController.logInfo(core, "sendSmtp, to [" + email.toAddress + "], from [" + email.fromAddress + "], subject [" + email.subject + "], BounceAddress [" + email.BounceAddress + "], replyTo [" + email.replyToAddress + "]");
+                        LogController.logInfo(core, "sendSmtp, to [" + email.toAddress + "], from [" + email.fromAddress + "], subject [" + email.subject + "], BounceAddress [" + email.BounceAddress + "], replyTo [" + email.replyToAddress + "]");
                         client.Send(mailMessage);
                         status = true;
                     } catch (Exception ex) {
                         returnErrorMessage = "There was an error sending email [" + ex.ToString() + "]";
-                        logController.logError(core, returnErrorMessage);
+                        LogController.logError(core, returnErrorMessage);
                     }
                 }
             } catch (Exception ex) {
-                logController.logError(core, "There was an error configuring smtp server ex [" + ex.ToString() + "]");
+                LogController.logError(core, "There was an error configuring smtp server ex [" + ex.ToString() + "]");
                 throw;
             }
             return status;

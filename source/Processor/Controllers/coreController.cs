@@ -314,13 +314,13 @@ namespace Contensive.Processor.Controllers {
         public AddonModel.AddonCacheClass addonCache {
             get {
                 if (_addonCache == null) {
-                    _addonCache = cache.getObject<AddonModel.AddonCacheClass>("addonCache");
+                    _addonCache = cache.getObject<AddonModel.AddonCacheClass>(cacheObject_addonCache);
                     if (_addonCache == null) {
                         _addonCache = new AddonModel.AddonCacheClass();
                         foreach (AddonModel addon in AddonModel.createList(this, "")) {
                             _addonCache.add(this, addon);
                         }
-                        cache.setObject("addonCache", _addonCache);
+                        cache.setObject(cacheObject_addonCache, _addonCache);
                     }
                 }
                 return _addonCache;
@@ -422,6 +422,7 @@ namespace Contensive.Processor.Controllers {
         /// <remarks></remarks>
         public CoreController(CPClass cp) : base() {
             cp_forAddonExecutionOnly = cp;
+            LogController.forceNLog( "CoreController constructor-0, enter", LogController.logLevel.Trace);
             //
             // -- create default auth objects for non-user methods, or until auth is available
             session = new SessionController(this);
@@ -430,6 +431,7 @@ namespace Contensive.Processor.Controllers {
             this.serverConfig.defaultDataSourceType = DataSourceModel.DataSourceTypeEnum.sqlServerNative;
             webServer.iisContext = null;
             constructorInitialize(false);
+            LogController.forceNLog( "CoreController constructor-0, exit", LogController.logLevel.Trace);
         }
         //
         //====================================================================================================
@@ -440,6 +442,7 @@ namespace Contensive.Processor.Controllers {
         /// <remarks></remarks>
         public CoreController(CPClass cp, string applicationName) : base() {
             this.cp_forAddonExecutionOnly = cp;
+            LogController.forceNLog( "CoreController constructor-1, enter", LogController.logLevel.Trace);
             //
             // -- create default auth objects for non-user methods, or until auth is available
             session = new SessionController(this);
@@ -451,6 +454,7 @@ namespace Contensive.Processor.Controllers {
                 webServer.iisContext = null;
                 constructorInitialize(false);
             }
+            LogController.forceNLog( "CoreController constructor-1, exit", LogController.logLevel.Trace);
         }
         //
         //====================================================================================================
@@ -461,6 +465,7 @@ namespace Contensive.Processor.Controllers {
         /// <remarks></remarks>
         public CoreController(CPClass cp, string applicationName, ServerConfigModel serverConfig) : base() {
             cp_forAddonExecutionOnly = cp;
+            LogController.forceNLog( "CoreController constructor-2, enter", LogController.logLevel.Trace);
             //
             // -- create default auth objects for non-user methods, or until auth is available
             session = new SessionController(this);
@@ -471,6 +476,7 @@ namespace Contensive.Processor.Controllers {
             appConfig.appStatus = AppConfigModel.AppStatusEnum.ok;
             webServer.iisContext = null;
             constructorInitialize(false);
+            LogController.forceNLog( "CoreController constructor-2, exit", LogController.logLevel.Trace);
         }
         //
         //====================================================================================================
@@ -481,6 +487,7 @@ namespace Contensive.Processor.Controllers {
         /// <remarks></remarks>
         public CoreController(CPClass cp, string applicationName, ServerConfigModel serverConfig, System.Web.HttpContext httpContext) : base() {
             this.cp_forAddonExecutionOnly = cp;
+            LogController.forceNLog( "CoreController constructor-3, enter", LogController.logLevel.Trace);
             //
             // -- create default auth objects for non-user methods, or until auth is available
             session = new SessionController(this);
@@ -491,6 +498,7 @@ namespace Contensive.Processor.Controllers {
             this.appConfig.appStatus = AppConfigModel.AppStatusEnum.ok;
             webServer.initWebContext(httpContext);
             constructorInitialize(true);
+            LogController.forceNLog( "CoreController constructor-3, exit", LogController.logLevel.Trace);
         }
         //====================================================================================================
         /// <summary>
@@ -498,6 +506,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public CoreController(CPClass cp, string applicationName, System.Web.HttpContext httpContext) : base() {
             this.cp_forAddonExecutionOnly = cp;
+            LogController.forceNLog( "CoreController constructor-4, enter", LogController.logLevel.Trace);
             //
             // -- create default auth objects for non-user methods, or until auth is available
             session = new SessionController(this);
@@ -509,6 +518,7 @@ namespace Contensive.Processor.Controllers {
                 webServer.initWebContext(httpContext);
                 constructorInitialize(true);
             }
+            LogController.forceNLog( "CoreController constructor-4, exit", LogController.logLevel.Trace);
         }
         //=============================================================================
         /// <summary>
@@ -525,10 +535,11 @@ namespace Contensive.Processor.Controllers {
             string result = "";
             var sw = new Stopwatch();
             sw.Start();
+            LogController.forceNLog("CoreController executeRoute, enter", LogController.logLevel.Trace);
             try {
                 //
                 // -- test point message
-                debugController.testPoint(this, "executeRoute enter");
+                DebugController.testPoint(this, "executeRoute enter");
                 if (appConfig != null) {
                     //
                     // -- test fix for 404 response during routing - could it be a response left over from processing before we are called
@@ -538,15 +549,15 @@ namespace Contensive.Processor.Controllers {
                     // -- intercept routes should be addons alos
                     //
                     // -- determine the route: try routeOverride
-                    string normalizedRoute = genericController.normalizeRoute(routeOverride);
+                    string normalizedRoute = GenericController.normalizeRoute(routeOverride);
                     if (string.IsNullOrEmpty(normalizedRoute)) {
                         //
                         // -- no override, try argument route (remoteMethodAddon=)
-                        normalizedRoute = genericController.normalizeRoute(docProperties.getText(RequestNameRemoteMethodAddon));
+                        normalizedRoute = GenericController.normalizeRoute(docProperties.getText(RequestNameRemoteMethodAddon));
                         if (string.IsNullOrEmpty(normalizedRoute)) {
                             //
                             // -- no override or argument, use the url as the route
-                            normalizedRoute = genericController.normalizeRoute(webServer.requestPathPage.ToLower());
+                            normalizedRoute = GenericController.normalizeRoute(webServer.requestPathPage.ToLower());
                         }
                     }
                     //
@@ -687,7 +698,7 @@ namespace Contensive.Processor.Controllers {
                     // -- legacy methods=
                     string HardCodedPage = docProperties.getText(RequestNameHardCodedPage);
                     if (!string.IsNullOrEmpty(HardCodedPage)) {
-                        switch (genericController.vbLCase(HardCodedPage)) {
+                        switch (GenericController.vbLCase(HardCodedPage)) {
                             case HardCodedPageLogout:
                                 //
                                 // -- logout intercept -- after logout continue
@@ -752,7 +763,7 @@ namespace Contensive.Processor.Controllers {
                                     // -- admin site
                                     AddonModel addon = AddonModel.create(this, addonGuidAdminSite);
                                     if (addon == null) {
-                                        logController.handleError( this,new ApplicationException("The admin site addon could not be found by guid [" + addonGuidAdminSite + "]."));
+                                        LogController.handleError( this,new ApplicationException("The admin site addon could not be found by guid [" + addonGuidAdminSite + "]."));
                                         return "The default admin site addon could not be found. Please run an upgrade on this application to restore default services (command line> cc -a appName -u )";
                                     } else {
                                         return this.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() {
@@ -766,7 +777,7 @@ namespace Contensive.Processor.Controllers {
                                     // -- remote method
                                     AddonModel addon = addonCache.getAddonById(route.remoteMethodAddonId);
                                     if (addon == null) {
-                                        logController.handleError( this,new ApplicationException("The addon for remoteMethodAddonId [" + route.remoteMethodAddonId + "] could not be opened."));
+                                        LogController.handleError( this,new ApplicationException("The addon for remoteMethodAddonId [" + route.remoteMethodAddonId + "] could not be opened."));
                                         return "";
                                     } else { 
                                         CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
@@ -788,7 +799,7 @@ namespace Contensive.Processor.Controllers {
                             case CPSiteBaseClass.routeTypeEnum.linkAlias:
                                 //
                                 // - link alias
-                                linkAliasModel linkAlias = linkAliasModel.create(this, route.linkAliasId);
+                                LinkAliasModel linkAlias = LinkAliasModel.create(this, route.linkAliasId);
                                 if (linkAlias != null) {
                                     docProperties.setProperty("bid", linkAlias.PageID);
                                     if (!string.IsNullOrEmpty(linkAlias.QueryStringSuffix)) {
@@ -810,7 +821,7 @@ namespace Contensive.Processor.Controllers {
                             case CPSiteBaseClass.routeTypeEnum.linkForward:
                                 //
                                 // -- link forward
-                                linkForwardModel linkForward = linkForwardModel.create(this, route.linkForwardId);
+                                LinkForwardModel linkForward = LinkForwardModel.create(this, route.linkForwardId);
                                 return webServer.redirect(linkForward.DestinationLink, "Link Forward #" + linkForward.id + ", " + linkForward.name);
                         }
                     }
@@ -847,7 +858,7 @@ namespace Contensive.Processor.Controllers {
                                 fieldName = "",
                                 recordId = 0
                             },
-                            personalizationAuthenticated = session.visit.VisitAuthenticated,
+                            personalizationAuthenticated = session.visit.visitAuthenticated,
                             personalizationPeopleId = session.user.id,
                             errorContextMessage = "calling default route addon [" + defaultAddonId + "] during execute route method"
                         };
@@ -858,9 +869,10 @@ namespace Contensive.Processor.Controllers {
                     result = "<p>This site is not configured for website traffic. Please set the default route.</p>";
                 }
             } catch (Exception ex) {
-                logController.handleError( this,ex);
+                LogController.handleError( this,ex);
             } finally {
                 // if (doc.routeDictionaryChanges) { DefaultSite.configurationClass.loadRouteMap(cp))}
+                LogController.forceNLog("CoreController executeRoute, exit", LogController.logLevel.Trace);
             }
             return result;
         }
@@ -875,7 +887,7 @@ namespace Contensive.Processor.Controllers {
         public string executeRoute_ProcessAjaxData() {
             string result = "";
             try {
-                logController.handleError( this,new ApplicationException("executeRoute_ProcessAjaxData deprecated"));
+                LogController.handleError( this,new ApplicationException("executeRoute_ProcessAjaxData deprecated"));
                 //string RemoteKey = docProperties.getText("key");
                 //string EncodedArgs = docProperties.getText("args");
                 //int PageSize = docProperties.getInteger("pagesize");
@@ -1076,7 +1088,7 @@ namespace Contensive.Processor.Controllers {
         private void constructorInitialize(bool allowVisit) {
             try {
                 //
-                doc.docGuid = genericController.getGUID();
+                doc.docGuid = GenericController.getGUID();
                 doc.allowDebugLog = true;
                 doc.profileStartTime = DateTime.Now;
                 doc.visitPropertyAllowDebugging = true;
@@ -1165,6 +1177,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing) {
+            LogController.forceNLog("CoreController dispose, enter", LogController.logLevel.Trace);
             if (!this.disposed) {
                 this.disposed = true;
                 if (disposing) {
@@ -1176,9 +1189,10 @@ namespace Contensive.Processor.Controllers {
                     doc.blockExceptionReporting = true;
                     doc.continueProcessing = false;
                     //
-                    // -- save addoncache
+                    // -- save assemblySkipList
                     if (_assemblySkipList != null) {
                         if (_assemblySkipList.Count > _assemblySkipList_CountWhenLoaded) {
+                            LogController.forceNLog("CoreController dispose, save assemblySkipList to cache, _assemblySkipList.Count [" + _assemblySkipList.Count + "], _assemblySkipList_CountWhenLoaded [" + _assemblySkipList_CountWhenLoaded + "]", LogController.logLevel.Trace);
                             cache.setObject(cacheNameAssemblySkipList, _assemblySkipList);
                         }
                     }
@@ -1193,7 +1207,7 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     // If visit tracking, save the viewing record
                                     //
-                                    string ViewingName = ((string)(session.visit.id + "." + session.visit.PageVisits)).Left(10);
+                                    string ViewingName = ((string)(session.visit.id + "." + session.visit.pageVisits)).Left(10);
                                     int PageID = 0;
                                     if (_doc != null) {
                                         if (doc.pageController.page != null) {
@@ -1202,7 +1216,7 @@ namespace Contensive.Processor.Controllers {
                                     }
                                     //
                                     // -- convert requestFormDict to a name=value string for Db storage
-                                    string requestFormSerialized = genericController.convertNameValueDictToREquestString(webServer.requestFormDict);
+                                    string requestFormSerialized = GenericController.convertNameValueDictToREquestString(webServer.requestFormDict);
                                     string pagetitle = "";
                                     if (!doc.htmlMetaContent_TitleList.Count.Equals(0)) {
                                         pagetitle = doc.htmlMetaContent_TitleList[0].content;
@@ -1319,6 +1333,7 @@ namespace Contensive.Processor.Controllers {
                 // cleanup non-managed objects
                 //
             }
+            LogController.forceNLog("CoreController dispose, exit", LogController.logLevel.Trace);
         }
         #endregion
     }

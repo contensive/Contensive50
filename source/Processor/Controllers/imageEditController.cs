@@ -11,13 +11,13 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 using System.Drawing;
 //
 namespace Contensive.Processor.Controllers {
-    public class imageEditController : IDisposable {
+    public class ImageEditController : IDisposable {
         private bool loaded = false;
         private string src = "";
         private System.Drawing.Image srcImage;
@@ -123,7 +123,7 @@ namespace Contensive.Processor.Controllers {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        ~imageEditController() {
+        ~ImageEditController() {
             Dispose(false);
             //todo  NOTE: The base class Finalize method is automatically called from the destructor:
             //base.Finalize();

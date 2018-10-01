@@ -9,7 +9,7 @@ namespace Contensive.Processor.Models.Db {
         //-- const
         public const string contentName = "tables";             //<------ set content name
         public const string contentTableName = "ccTables";      //<------ set to tablename for the primary content (used for cache names)
-        private const string contentDataSource = "default";     //<------ set to datasource if not default
+        public const string contentDataSource = "default";     //<------ set to datasource if not default
         //
         //====================================================================================================
         // -- instance properties
@@ -86,8 +86,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public void invalidatePrimaryCache(CoreController core, int recordId) {
-            invalidateCache<_BlankModel>(core, recordId);
+        public static void invalidateRecordCache(CoreController core, int recordId) {
+            invalidateRecordCache<_BlankModel>(core, recordId);
+        }
+        //
+        //====================================================================================================
+        public static void invalidateTableCache(CoreController core) {
+            invalidateTableCache<_BlankModel>(core);
         }
         //
         //====================================================================================================
@@ -108,6 +113,16 @@ namespace Contensive.Processor.Models.Db {
         //====================================================================================================
         public static _BlankModel createDefault(CoreController core) {
             return createDefault<_BlankModel>(core);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Return a cache key used to represent the table. ONLY used for invalidation. Add this as a dependent key if you want that key cleared when ANY record in the table is changed.
+        /// </summary>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        public static string getTableInvalidationKey(CoreController core) {
+            return getTableCacheKey<_BlankModel>(core);
         }
     }
 }

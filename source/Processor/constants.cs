@@ -9,6 +9,9 @@ namespace Contensive.Processor {
         //
         public const int codeVersion = 0;
         //
+        // -- cache names
+        public const string cacheObject_addonCache = "addonCache";
+        //
         // -- symbols 
         public const string iconNotAvailable = "<i alt=\"not available\" title=\"not available\" class=\"fa fa-ban\"></i>";
         public const string iconExpand = "<i alt=\"expand\" title=\"expand\" class=\"fa fa-chevron-circle-up\"></i>";

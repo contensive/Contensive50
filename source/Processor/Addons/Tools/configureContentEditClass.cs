@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Addons.Tools {
@@ -36,7 +36,7 @@ namespace Contensive.Addons.Tools {
             string result = "";
             CoreController core = cp.core;
             try {
-                keyPtrController Index = new keyPtrController();
+                KeyPtrController Index = new KeyPtrController();
                 string ButtonList = ButtonCancel + "," + ButtonSelect;
                 string ToolButton = cp.Doc.GetText("Button");
                 bool ReloadCDef = cp.Doc.GetBoolean("ReloadCDef");
@@ -71,14 +71,14 @@ namespace Contensive.Addons.Tools {
                             //
                             // ----- Save the input
                             //
-                            RecordCount = genericController.encodeInteger(cp.Doc.GetInteger("dtfaRecordCount"));
+                            RecordCount = GenericController.encodeInteger(cp.Doc.GetInteger("dtfaRecordCount"));
                             if (RecordCount > 0) {
                                 int RecordPointer = 0;
                                 for (RecordPointer = 0; RecordPointer < RecordCount; RecordPointer++) {
                                     //
                                     string formFieldName = cp.Doc.GetText("dtfaName." + RecordPointer);
                                     int formFieldTypeId = cp.Doc.GetInteger("dtfaType." + RecordPointer);
-                                    formFieldId = genericController.encodeInteger(cp.Doc.GetInteger("dtfaID." + RecordPointer));
+                                    formFieldId = GenericController.encodeInteger(cp.Doc.GetInteger("dtfaID." + RecordPointer));
                                     bool formFieldInherited = cp.Doc.GetBoolean("dtfaInherited." + RecordPointer);
                                     //
                                     // problem - looking for the name in the Db using the form's name, but it could have changed.
@@ -121,8 +121,8 @@ namespace Contensive.Addons.Tools {
                                                         //
                                                         // remoave spaces from new name
                                                         //
-                                                        StatusMessage = StatusMessage + "<LI>Field [" + formFieldName + "] was renamed [" + genericController.vbReplace(formFieldName, " ", "") + "] because the field name can not include spaces.</LI>";
-                                                        formFieldName = genericController.vbReplace(formFieldName, " ", "");
+                                                        StatusMessage = StatusMessage + "<LI>Field [" + formFieldName + "] was renamed [" + GenericController.vbReplace(formFieldName, " ", "") + "] because the field name can not include spaces.</LI>";
+                                                        formFieldName = GenericController.vbReplace(formFieldName, " ", "");
                                                     }
                                                     //
                                                     string SQL = null;
@@ -161,7 +161,7 @@ namespace Contensive.Addons.Tools {
                                                         core.db.executeQuery(SQL, DataSourceName);
                                                     }
                                                     SQL = "Update ccFields"
-                                                + " Set name=" + core.db.encodeSQLText(formFieldName) + ",type=" + formFieldTypeId + ",caption=" + core.db.encodeSQLText(cp.Doc.GetText("dtfaCaption." + RecordPointer)) + ",DefaultValue=" + core.db.encodeSQLText(cp.Doc.GetText("dtfaDefaultValue." + RecordPointer)) + ",EditSortPriority=" + core.db.encodeSQLText(genericController.encodeText(cp.Doc.GetInteger("dtfaEditSortPriority." + RecordPointer))) + ",Active=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaActive." + RecordPointer)) + ",ReadOnly=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaReadOnly." + RecordPointer)) + ",Authorable=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaAuthorable." + RecordPointer)) + ",Required=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaRequired." + RecordPointer)) + ",UniqueName=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaUniqueName." + RecordPointer)) + ",TextBuffered=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaTextBuffered." + RecordPointer)) + ",Password=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaPassword." + RecordPointer)) + ",HTMLContent=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaHTMLContent." + RecordPointer)) + ",EditTab=" + core.db.encodeSQLText(cp.Doc.GetText("dtfaEditTab." + RecordPointer)) + ",Scramble=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaScramble." + RecordPointer)) + "";
+                                                + " Set name=" + core.db.encodeSQLText(formFieldName) + ",type=" + formFieldTypeId + ",caption=" + core.db.encodeSQLText(cp.Doc.GetText("dtfaCaption." + RecordPointer)) + ",DefaultValue=" + core.db.encodeSQLText(cp.Doc.GetText("dtfaDefaultValue." + RecordPointer)) + ",EditSortPriority=" + core.db.encodeSQLText(GenericController.encodeText(cp.Doc.GetInteger("dtfaEditSortPriority." + RecordPointer))) + ",Active=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaActive." + RecordPointer)) + ",ReadOnly=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaReadOnly." + RecordPointer)) + ",Authorable=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaAuthorable." + RecordPointer)) + ",Required=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaRequired." + RecordPointer)) + ",UniqueName=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaUniqueName." + RecordPointer)) + ",TextBuffered=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaTextBuffered." + RecordPointer)) + ",Password=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaPassword." + RecordPointer)) + ",HTMLContent=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaHTMLContent." + RecordPointer)) + ",EditTab=" + core.db.encodeSQLText(cp.Doc.GetText("dtfaEditTab." + RecordPointer)) + ",Scramble=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaScramble." + RecordPointer)) + "";
                                                     if (core.session.isAuthenticatedAdmin(core)) {
                                                         SQL += ",adminonly=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaAdminOnly." + RecordPointer));
                                                     }
@@ -220,7 +220,7 @@ namespace Contensive.Addons.Tools {
                 }
                 //
                 //   Print Output
-                stringBuilderLegacyController Stream = new stringBuilderLegacyController();
+                StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 Stream.Add(AdminUIController.getToolFormTitle("Manage Admin Edit Fields", "Use this tool to add or modify content definition fields. Contensive uses a caching system for content definitions that is not automatically reloaded. Change you make will not take effect until the next time the system is reloaded. When you create a new field, the database field is created automatically when you have saved both a name and a field type. If you change the field type, you may have to manually change the database field."));
                 //
                 // -- status of last operation
@@ -325,10 +325,10 @@ Stream.Add(core.html.getPanelTop());
                             fieldList.Add(fieldSort);
                         }
                         fieldList.Sort((p1, p2) => p1.sort.CompareTo(p2.sort));
-                        stringBuilderLegacyController StreamValidRows = new stringBuilderLegacyController();
+                        StringBuilderLegacyController StreamValidRows = new StringBuilderLegacyController();
                         var contentFieldsCdef = Processor.Models.Domain.CDefModel.getCdef(core, "content fields");
                         foreach (fieldSortClass fieldsort in fieldList) {
-                            stringBuilderLegacyController streamRow = new stringBuilderLegacyController();
+                            StringBuilderLegacyController streamRow = new StringBuilderLegacyController();
                             bool rowValid = true;
                             //
                             // If Field has name and type, it is locked and can not be changed
@@ -416,9 +416,9 @@ Stream.Add(core.html.getPanelTop());
                             //
                             streamRow.Add("<td class=\"ccPanelInput\" align=\"left\"><nobr>");
                             if (fieldsort.field.inherited) {
-                                streamRow.Add(SpanClassAdminSmall + genericController.encodeText(fieldsort.field.defaultValue) + "</SPAN>");
+                                streamRow.Add(SpanClassAdminSmall + GenericController.encodeText(fieldsort.field.defaultValue) + "</SPAN>");
                             } else {
-                                streamRow.Add(HtmlController.inputText(core, "dtfaDefaultValue." + RecordCount, genericController.encodeText(fieldsort.field.defaultValue), 1, 10));
+                                streamRow.Add(HtmlController.inputText(core, "dtfaDefaultValue." + RecordCount, GenericController.encodeText(fieldsort.field.defaultValue), 1, 10));
                             }
                             streamRow.Add("</nobr></td>");
                             //
@@ -438,8 +438,8 @@ Stream.Add(core.html.getPanelTop());
                                 streamRow.Add(core.db.getRecordName("content field types", fieldsort.field.fieldTypeId) + HtmlController.inputHidden("dtfaType." + RecordCount, fieldsort.field.fieldTypeId));
                             } else {
                                 string TypeSelect = TypeSelectTemplate;
-                                TypeSelect = genericController.vbReplace(TypeSelect, "menuname", "dtfaType." + RecordCount, 1, 99, 1);
-                                TypeSelect = genericController.vbReplace(TypeSelect, "=\"" + fieldsort.field.fieldTypeId + "\"", "=\"" + fieldsort.field.fieldTypeId + "\" selected", 1, 99, 1);
+                                TypeSelect = GenericController.vbReplace(TypeSelect, "menuname", "dtfaType." + RecordCount, 1, 99, 1);
+                                TypeSelect = GenericController.vbReplace(TypeSelect, "=\"" + fieldsort.field.fieldTypeId + "\"", "=\"" + fieldsort.field.fieldTypeId + "\" selected", 1, 99, 1);
                                 streamRow.Add(TypeSelect);
                             }
                             streamRow.Add("</nobr></td>");
@@ -533,7 +533,7 @@ Stream.Add(core.html.getPanelTop());
                 // -- assemble form
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
             } catch (Exception ex) {
-                logController.handleError(core, ex);
+                LogController.handleError(core, ex);
             }
             return result;
         }

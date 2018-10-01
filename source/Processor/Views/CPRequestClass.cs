@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Models.Domain;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor {
@@ -72,7 +72,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         public override bool BrowserIsMobile {
             get {
-                return core.session.visit.Mobile;
+                return core.session.visit.mobile;
             }
         }
         //
@@ -118,7 +118,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         public override string Form {
             get {
-                return Controllers.genericController.convertNameValueDictToREquestString(core.webServer.requestFormDict);
+                return Controllers.GenericController.convertNameValueDictToREquestString(core.webServer.requestFormDict);
             }
         }
         //
@@ -195,7 +195,7 @@ namespace Contensive.Processor {
                 if (core.session.userLanguage == null) {
                     return "";
                 }
-                languageModel userLanguage = languageModel.create(core, core.session.user.LanguageID);
+                LanguageModel userLanguage = LanguageModel.create(core, core.session.user.LanguageID);
                 if (userLanguage != null) {
                     return userLanguage.name;
                 }

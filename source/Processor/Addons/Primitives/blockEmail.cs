@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.genericController;
+using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Addons.Primitives {
@@ -33,7 +33,7 @@ namespace Contensive.Addons.Primitives {
                     //
                     string recipientEmailToBlock = core.docProperties.getText(rnEmailBlockRecipientEmail);
                     if (string.IsNullOrEmpty(recipientEmailToBlock)) {
-                        List<personModel> recipientList = personModel.createList(core, "(email=" + core.db.encodeSQLText(recipientEmailToBlock) + ")");
+                        List<PersonModel> recipientList = PersonModel.createList(core, "(email=" + core.db.encodeSQLText(recipientEmailToBlock) + ")");
                         foreach (var recipient in recipientList) {
                             recipient.AllowBulkEmail = false;
                             recipient.save(core);
