@@ -352,7 +352,7 @@ namespace Contensive.Processor.Controllers {
                             break;
                         } else {
                             core.doc.pageController.pageToRootList.Add(targetpage);
-                            targetPageId = targetpage.ParentID;
+                            targetPageId = targetpage.parentID;
                         }
                     }
                     if (core.doc.pageController.pageToRootList.Count == 0) {
@@ -360,7 +360,7 @@ namespace Contensive.Processor.Controllers {
                         // -- attempt failed, create default page
                         core.doc.pageController.page = PageContentModel.add(core);
                         core.doc.pageController.page.name = DefaultNewLandingPageName + ", " + domain.name;
-                        core.doc.pageController.page.Copyfilename.content = landingPageDefaultHtml;
+                        core.doc.pageController.page.copyfilename.content = landingPageDefaultHtml;
                         core.doc.pageController.page.save(core);
                         core.doc.pageController.pageToRootList.Add(core.doc.pageController.page);
                     } else {
@@ -474,7 +474,7 @@ namespace Contensive.Processor.Controllers {
                             // -- create detault landing page
                             landingPage = PageContentModel.add(core);
                             landingPage.name = DefaultNewLandingPageName + ", " + domain.name;
-                            landingPage.Copyfilename.content = landingPageDefaultHtml;
+                            landingPage.copyfilename.content = landingPageDefaultHtml;
                             landingPage.save(core);
                             core.doc.landingPageID = landingPage.id;
                         }
@@ -664,7 +664,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- protocol
                 string linkprotocol = "";
-                if (core.doc.pageController.page.IsSecure | core.doc.pageController.template.isSecure) {
+                if (core.doc.pageController.page.isSecure | core.doc.pageController.template.isSecure) {
                     linkprotocol = "https://";
                 } else {
                     linkprotocol = "http://";
@@ -1166,9 +1166,9 @@ namespace Contensive.Processor.Controllers {
                                 List<Models.Db.LinkAliasModel> linkAliasList = LinkAliasModel.createList(core, sqlLinkAliasCriteria, "id desc");
                                 if (linkAliasList.Count > 0) {
                                     LinkAliasModel linkAlias = linkAliasList.First();
-                                    string LinkQueryString = rnPageId + "=" + linkAlias.PageID + "&" + linkAlias.QueryStringSuffix;
-                                    core.docProperties.setProperty(rnPageId, linkAlias.PageID.ToString(), false);
-                                    string[] nameValuePairs = linkAlias.QueryStringSuffix.Split('&');
+                                    string LinkQueryString = rnPageId + "=" + linkAlias.pageID + "&" + linkAlias.queryStringSuffix;
+                                    core.docProperties.setProperty(rnPageId, linkAlias.pageID.ToString(), false);
+                                    string[] nameValuePairs = linkAlias.queryStringSuffix.Split('&');
                                     //Dim nameValuePairs As String() = Split(core.cache_linkAlias(linkAliasCache_queryStringSuffix, Ptr), "&")
                                     foreach (string nameValuePair in nameValuePairs) {
                                         string[] nameValueThing = nameValuePair.Split('=');
@@ -1232,7 +1232,7 @@ namespace Contensive.Processor.Controllers {
                     bool SecureLink_Template_Required = core.doc.pageController.template.isSecure;
                     bool SecureLink_Page_Required = false;
                     foreach (Models.Db.PageContentModel page in core.doc.pageController.pageToRootList) {
-                        if (core.doc.pageController.page.IsSecure) {
+                        if (core.doc.pageController.page.isSecure) {
                             SecureLink_Page_Required = true;
                             break;
                         }
@@ -1679,11 +1679,11 @@ namespace Contensive.Processor.Controllers {
                 returnHtml = getContentBox_content(core, OrderByClause, AllowChildPageList, AllowReturnLink, ArchivePages, ignoreme, UseContentWatchLink, allowPageWithoutSectionDisplay);
                 //
                 // ----- If Link field populated, do redirect
-                if (core.doc.pageController.page.PageLink != "") {
-                    core.doc.pageController.page.Clicks += 1;
+                if (core.doc.pageController.page.pageLink != "") {
+                    core.doc.pageController.page.clicks += 1;
                     core.doc.pageController.page.save(core);
-                    core.doc.redirectLink = core.doc.pageController.page.PageLink;
-                    core.doc.redirectReason = "Redirect required because this page (PageRecordID=" + core.doc.pageController.page.id + ") has a Link Override [" + core.doc.pageController.page.PageLink + "].";
+                    core.doc.redirectLink = core.doc.pageController.page.pageLink;
+                    core.doc.redirectReason = "Redirect required because this page (PageRecordID=" + core.doc.pageController.page.id + ") has a Link Override [" + core.doc.pageController.page.pageLink + "].";
                     core.doc.redirectBecausePageNotFound = false;
                     return core.webServer.redirect(core.doc.redirectLink, core.doc.redirectReason, core.doc.redirectBecausePageNotFound);
                 }
@@ -1692,7 +1692,7 @@ namespace Contensive.Processor.Controllers {
                 string BlockedRecordIDList = "";
                 if ((!string.IsNullOrEmpty(returnHtml)) && (core.doc.redirectLink == "")) {
                     foreach (PageContentModel testPage in core.doc.pageController.pageToRootList) {
-                        if (testPage.BlockContent | testPage.BlockPage) {
+                        if (testPage.blockContent | testPage.blockPage) {
                             BlockedRecordIDList = BlockedRecordIDList + "," + testPage.id;
                         }
                     }
@@ -1903,7 +1903,7 @@ namespace Contensive.Processor.Controllers {
                     // Encode the copy
                     //
                     //returnHtml = contentCmdController.executeContentCommands(core, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, core.sessionContext.user.id, core.sessionContext.isAuthenticated, ref layoutError);
-                    returnHtml = ActiveContentController.renderHtmlForWeb(core, returnHtml, PageContentModel.contentName, PageRecordID, core.doc.pageController.page.ContactMemberID, "http://" + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
+                    returnHtml = ActiveContentController.renderHtmlForWeb(core, returnHtml, PageContentModel.contentName, PageRecordID, core.doc.pageController.page.contactMemberID, "http://" + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
                     if (core.doc.refreshQueryString != "") {
                         returnHtml = GenericController.vbReplace(returnHtml, "?method=login", "?method=Login&" + core.doc.refreshQueryString, 1, 99, 1);
                     }
@@ -1925,26 +1925,26 @@ namespace Contensive.Processor.Controllers {
                             // Link authoring, workflow rendering -> do encoding, but no tracking
                             //
                             //returnHtml = contentCmdController.executeContentCommands(core, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, core.sessionContext.user.id, core.sessionContext.isAuthenticated, ref layoutError);
-                            returnHtml = ActiveContentController.renderHtmlForWeb(core, returnHtml, PageContentModel.contentName, PageRecordID, core.doc.pageController.page.ContactMemberID, "http://" + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
+                            returnHtml = ActiveContentController.renderHtmlForWeb(core, returnHtml, PageContentModel.contentName, PageRecordID, core.doc.pageController.page.contactMemberID, "http://" + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
                         } else {
                             //
                             // Live content
                             //returnHtml = contentCmdController.executeContentCommands(core, returnHtml, CPUtilsBaseClass.addonContext.ContextPage, core.sessionContext.user.id, core.sessionContext.isAuthenticated, ref layoutError);
-                            returnHtml = ActiveContentController.renderHtmlForWeb(core, returnHtml, PageContentModel.contentName, PageRecordID, core.doc.pageController.page.ContactMemberID, "http://" + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
+                            returnHtml = ActiveContentController.renderHtmlForWeb(core, returnHtml, PageContentModel.contentName, PageRecordID, core.doc.pageController.page.contactMemberID, "http://" + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
                             core.db.executeQuery("update ccpagecontent set viewings=" + (pageViewings + 1) + " where id=" + core.doc.pageController.page.id);
                         }
                         //
                         // Page Hit Notification
                         //
-                        if ((!core.session.visit.excludeFromAnalytics) & (core.doc.pageController.page.ContactMemberID != 0) && (core.webServer.requestBrowser.IndexOf("kmahttp", System.StringComparison.OrdinalIgnoreCase)  == -1)) {
-                            PersonModel person = PersonModel.create(core, core.doc.pageController.page.ContactMemberID);
+                        if ((!core.session.visit.excludeFromAnalytics) & (core.doc.pageController.page.contactMemberID != 0) && (core.webServer.requestBrowser.IndexOf("kmahttp", System.StringComparison.OrdinalIgnoreCase)  == -1)) {
+                            PersonModel person = PersonModel.create(core, core.doc.pageController.page.contactMemberID);
                             if ( person != null ) {
-                                if (core.doc.pageController.page.AllowHitNotification) {
+                                if (core.doc.pageController.page.allowHitNotification) {
                                     string PageName = core.doc.pageController.page.name;
                                     if (string.IsNullOrEmpty(PageName)) {
-                                        PageName = core.doc.pageController.page.MenuHeadline;
+                                        PageName = core.doc.pageController.page.menuHeadline;
                                         if (string.IsNullOrEmpty(PageName)) {
-                                            PageName = core.doc.pageController.page.Headline;
+                                            PageName = core.doc.pageController.page.headline;
                                             if (string.IsNullOrEmpty(PageName)) {
                                                 PageName = "[no name]";
                                             }
@@ -2041,7 +2041,7 @@ namespace Contensive.Processor.Controllers {
                     // ----- Add in ContentPadding (a table around content with the appropriate padding added)
                     //---------------------------------------------------------------------------------
                     //
-                    returnHtml = getContentBoxWrapper(core, returnHtml, core.doc.pageController.page.ContentPadding);
+                    returnHtml = getContentBoxWrapper(core, returnHtml, core.doc.pageController.page.contentPadding);
                     DateTime DateModified = default(DateTime);
                     //
                     //---------------------------------------------------------------------------------
@@ -2057,12 +2057,12 @@ namespace Contensive.Processor.Controllers {
                     //---------------------------------------------------------------------------------
                     // todo -- assets should all come from addons !!!
                     //
-                    core.html.addScriptCode_onLoad(core.doc.pageController.page.JSOnLoad, "page content");
-                    core.html.addScriptCode(core.doc.pageController.page.JSHead, "page content");
-                    if (core.doc.pageController.page.JSFilename != "") {
-                        core.html.addScriptLinkSrc(GenericController.getCdnFileLink(core, core.doc.pageController.page.JSFilename), "page content");
+                    core.html.addScriptCode_onLoad(core.doc.pageController.page.jSOnLoad, "page content");
+                    core.html.addScriptCode(core.doc.pageController.page.jSHead, "page content");
+                    if (core.doc.pageController.page.jSFilename != "") {
+                        core.html.addScriptLinkSrc(GenericController.getCdnFileLink(core, core.doc.pageController.page.jSFilename), "page content");
                     }
-                    core.html.addScriptCode(core.doc.pageController.page.JSEndBody, "page content");
+                    core.html.addScriptCode(core.doc.pageController.page.jSEndBody, "page content");
                     //
                     //---------------------------------------------------------------------------------
                     // Set the Meta Content flag
@@ -2070,8 +2070,8 @@ namespace Contensive.Processor.Controllers {
                     //
                     core.html.addTitle(HtmlController.encodeHtml(core.doc.pageController.page.pageTitle), "page content");
                     core.html.addMetaDescription(HtmlController.encodeHtml(core.doc.pageController.page.metaDescription), "page content");
-                    core.html.addHeadTag(core.doc.pageController.page.OtherHeadTags, "page content");
-                    core.html.addMetaKeywordList(core.doc.pageController.page.MetaKeywordList, "page content");
+                    core.html.addHeadTag(core.doc.pageController.page.otherHeadTags, "page content");
+                    core.html.addMetaKeywordList(core.doc.pageController.page.metaKeywordList, "page content");
                     //
                     Dictionary<string, string> instanceArguments = new Dictionary<string, string> {
                         { "CSPage", "-1" }
@@ -2190,9 +2190,9 @@ namespace Contensive.Processor.Controllers {
         internal static string getContentBox_content_Body(CoreController core, string OrderByClause, bool AllowChildList, bool Authoring, int rootPageId, bool AllowReturnLink, string RootPageContentName, bool ArchivePage) {
             string result = "";
             try {
-                bool allowChildListComposite = AllowChildList && core.doc.pageController.page.AllowChildListDisplay;
-                bool allowReturnLinkComposite = AllowReturnLink && core.doc.pageController.page.AllowReturnLinkDisplay;
-                string bodyCopy = core.doc.pageController.page.Copyfilename.content;
+                bool allowChildListComposite = AllowChildList && core.doc.pageController.page.allowChildListDisplay;
+                bool allowReturnLinkComposite = AllowReturnLink && core.doc.pageController.page.allowReturnLinkDisplay;
+                string bodyCopy = core.doc.pageController.page.copyfilename.content;
                 string breadCrumb = "";
                 string BreadCrumbDelimiter = null;
                 string BreadCrumbPrefix = null;
@@ -2204,7 +2204,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     BreadCrumbPrefix = core.siteProperties.getText("BreadCrumbPrefix", "Return to");
                     BreadCrumbDelimiter = core.siteProperties.getText("BreadCrumbDelimiter", " &gt; ");
-                    breadCrumb = core.doc.getReturnBreadcrumb(RootPageContentName, core.doc.pageController.page.ParentID, rootPageId, "", ArchivePage, BreadCrumbDelimiter);
+                    breadCrumb = core.doc.getReturnBreadcrumb(RootPageContentName, core.doc.pageController.page.parentID, rootPageId, "", ArchivePage, BreadCrumbDelimiter);
                     if (!string.IsNullOrEmpty(breadCrumb)) {
                         breadCrumb = "\r<p class=\"ccPageListNavigation\">" + BreadCrumbPrefix + " " + breadCrumb + "</p>";
                     }
@@ -2247,13 +2247,13 @@ namespace Contensive.Processor.Controllers {
                 //
                 string Cell = "";
                 if (core.session.isQuickEditing(core, PageContentModel.contentName)) {
-                    Cell = Cell + QuickEditController.getQuickEditing(core, rootPageId, OrderByClause, AllowChildList, AllowReturnLink, ArchivePage, core.doc.pageController.page.ContactMemberID, core.doc.pageController.page.ChildListSortMethodID, allowChildListComposite, ArchivePage);
+                    Cell = Cell + QuickEditController.getQuickEditing(core, rootPageId, OrderByClause, AllowChildList, AllowReturnLink, ArchivePage, core.doc.pageController.page.contactMemberID, core.doc.pageController.page.childListSortMethodID, allowChildListComposite, ArchivePage);
                 } else {
                     //
                     // ----- Headline
                     //
-                    if (core.doc.pageController.page.Headline != "") {
-                        string headline = HtmlController.encodeHtml(core.doc.pageController.page.Headline);
+                    if (core.doc.pageController.page.headline != "") {
+                        string headline = HtmlController.encodeHtml(core.doc.pageController.page.headline);
                         Cell = Cell + "\r<h1>" + headline + "</h1>";
                         //
                         // Add AC end here to force the end of any left over AC tags (like language)
@@ -2288,7 +2288,7 @@ namespace Contensive.Processor.Controllers {
                                 fieldName = "",
                                 recordId = core.doc.pageController.page.id
                             },
-                            instanceArguments = GenericController.convertAddonArgumentstoDocPropertiesList(core, core.doc.pageController.page.ChildListInstanceOptions),
+                            instanceArguments = GenericController.convertAddonArgumentstoDocPropertiesList(core, core.doc.pageController.page.childListInstanceOptions),
                             instanceGuid = PageChildListInstanceID,
                             wrapperID = core.siteProperties.defaultWrapperID,
                             errorContextMessage = "executing child list addon for page [" + core.doc.pageController.page.id + "]"
@@ -2303,14 +2303,14 @@ namespace Contensive.Processor.Controllers {
                     + GenericController.nop(Cell) + "\r<!-- TextSearchEnd -->";
                 //
                 // ----- Page See Also
-                if (core.doc.pageController.page.AllowSeeAlso) {
+                if (core.doc.pageController.page.allowSeeAlso) {
                     result += "\r<div>"
                         + GenericController.nop(getSeeAlso(core, PageContentModel.contentName, core.doc.pageController.page.id)) + "\r</div>";
                 }
                 //
                 // ----- Allow More Info
-                if ((core.doc.pageController.page.ContactMemberID != 0) & core.doc.pageController.page.AllowMoreInfo) {
-                    result += getMoreInfoHtml(core, core.doc.pageController.page.ContactMemberID);
+                if ((core.doc.pageController.page.contactMemberID != 0) & core.doc.pageController.page.allowMoreInfo) {
+                    result += getMoreInfoHtml(core, core.doc.pageController.page.contactMemberID);
                     //result += "\r<ac TYPE=\"" + ACTypeContact + "\">";
                 }
                 ////
@@ -2320,7 +2320,7 @@ namespace Contensive.Processor.Controllers {
                 //}
                 //
                 // ----- Last Modified line
-                if ((core.doc.pageController.page.modifiedDate != DateTime.MinValue) & core.doc.pageController.page.AllowLastModifiedFooter) {
+                if ((core.doc.pageController.page.modifiedDate != DateTime.MinValue) & core.doc.pageController.page.allowLastModifiedFooter) {
                     result += "\r<p>This page was last modified " + core.doc.pageController.page.modifiedDate.ToString("G");
                     if (core.session.isAuthenticatedAdmin(core)) {
                         if (core.doc.pageController.page.modifiedBy == 0) {
@@ -2338,8 +2338,8 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 // ----- Last Reviewed line
-                if ((core.doc.pageController.page.DateReviewed != DateTime.MinValue) & core.doc.pageController.page.AllowReviewedFooter) {
-                    result += "\r<p>This page was last reviewed " + core.doc.pageController.page.DateReviewed.ToString("");
+                if ((core.doc.pageController.page.dateReviewed != DateTime.MinValue) & core.doc.pageController.page.allowReviewedFooter) {
+                    result += "\r<p>This page was last reviewed " + core.doc.pageController.page.dateReviewed.ToString("");
                     if (core.session.isAuthenticatedAdmin(core)) {
                         if (core.doc.pageController.page.ReviewedBy == 0) {
                             result += " (by unknown)";
@@ -2356,7 +2356,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 // ----- Page Content Message Footer
-                if (core.doc.pageController.page.AllowMessageFooter) {
+                if (core.doc.pageController.page.allowMessageFooter) {
                     string pageContentMessageFooter = core.siteProperties.getText("PageContentMessageFooter", "");
                     if (!string.IsNullOrEmpty(pageContentMessageFooter)) {
                         result += "\r<p>" + pageContentMessageFooter + "</p>";
@@ -2594,7 +2594,7 @@ namespace Contensive.Processor.Controllers {
                 string activeList = "";
                 foreach (PageContentModel childPage in childPageList) {
                     string PageLink = PageContentController.getPageLink(core, childPage.id, "", true, false);
-                    string pageMenuHeadline = childPage.MenuHeadline;
+                    string pageMenuHeadline = childPage.menuHeadline;
                     if (string.IsNullOrEmpty(pageMenuHeadline)) {
                         pageMenuHeadline = childPage.name.Trim(' ');
                         if (string.IsNullOrEmpty(pageMenuHeadline)) {
@@ -2611,33 +2611,33 @@ namespace Contensive.Processor.Controllers {
                         link = GenericController.modifyLinkQuery(archiveLink, rnPageId, encodeText(childPage.id), true);
                     }
                     bool blockContentComposite = false;
-                    if (childPage.BlockContent | childPage.BlockPage) {
+                    if (childPage.blockContent | childPage.blockPage) {
                         blockContentComposite = !core.doc.bypassContentBlock(childPage.contentControlID, childPage.id);
                     }
                     string LinkedText = GenericController.csv_GetLinkedText("<a href=\"" + HtmlController.encodeHtml(link) + "\">", pageMenuHeadline);
-                    if ((string.IsNullOrEmpty(UcaseRequestedListName)) && (childPage.ParentListName != "") & (!isAuthoring)) {
+                    if ((string.IsNullOrEmpty(UcaseRequestedListName)) && (childPage.parentListName != "") & (!isAuthoring)) {
                         //
                         // ----- Requested orphan list, and this record is in a named list, and not editing, do not display
                         //
-                    } else if ((string.IsNullOrEmpty(UcaseRequestedListName)) && (childPage.ParentListName != "")) {
+                    } else if ((string.IsNullOrEmpty(UcaseRequestedListName)) && (childPage.parentListName != "")) {
                         //
                         // ----- Requested orphan list, and this record is in a named list, but authoring, list it
                         //
                         if (isAuthoring) {
                             inactiveList = inactiveList + "\r<li name=\"page" + childPage.id + "\" name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItem\">";
                             inactiveList = inactiveList + pageEditLink;
-                            inactiveList = inactiveList + "[from Child Page List '" + childPage.ParentListName + "': " + LinkedText + "]";
+                            inactiveList = inactiveList + "[from Child Page List '" + childPage.parentListName + "': " + LinkedText + "]";
                             inactiveList = inactiveList + "</li>";
                         }
                     } else if ((string.IsNullOrEmpty(UcaseRequestedListName)) && (!allowChildListDisplay) && (!isAuthoring)) {
                         //
                         // ----- Requested orphan List, Not AllowChildListDisplay, not Authoring, do not display
                         //
-                    } else if ((!string.IsNullOrEmpty(UcaseRequestedListName)) & (UcaseRequestedListName != GenericController.vbUCase(childPage.ParentListName))) {
+                    } else if ((!string.IsNullOrEmpty(UcaseRequestedListName)) & (UcaseRequestedListName != GenericController.vbUCase(childPage.parentListName))) {
                         //
                         // ----- requested named list and wrong RequestedListName, do not display
                         //
-                    } else if (!childPage.AllowInChildLists) {
+                    } else if (!childPage.allowInChildLists) {
                         //
                         // ----- Allow in Child Page Lists is false, display hint to authors
                         //
@@ -2657,24 +2657,24 @@ namespace Contensive.Processor.Controllers {
                             inactiveList = inactiveList + "[Hidden (Inactive): " + LinkedText + "]";
                             inactiveList = inactiveList + "</li>";
                         }
-                    } else if ((childPage.PubDate != DateTime.MinValue) && (childPage.PubDate > core.doc.profileStartTime)) {
+                    } else if ((childPage.pubDate != DateTime.MinValue) && (childPage.pubDate > core.doc.profileStartTime)) {
                         //
                         // ----- Child page has not been published
                         //
                         if (isAuthoring) {
                             inactiveList = inactiveList + "\r<li name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItem\">";
                             inactiveList = inactiveList + pageEditLink;
-                            inactiveList = inactiveList + "[Hidden (To be published " + childPage.PubDate + "): " + LinkedText + "]";
+                            inactiveList = inactiveList + "[Hidden (To be published " + childPage.pubDate + "): " + LinkedText + "]";
                             inactiveList = inactiveList + "</li>";
                         }
-                    } else if ((childPage.DateExpires != DateTime.MinValue) && (childPage.DateExpires < core.doc.profileStartTime)) {
+                    } else if ((childPage.dateExpires != DateTime.MinValue) && (childPage.dateExpires < core.doc.profileStartTime)) {
                         //
                         // ----- Child page has expired
                         //
                         if (isAuthoring) {
                             inactiveList = inactiveList + "\r<li name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItem\">";
                             inactiveList = inactiveList + pageEditLink;
-                            inactiveList = inactiveList + "[Hidden (Expired " + childPage.DateExpires + "): " + LinkedText + "]";
+                            inactiveList = inactiveList + "[Hidden (Expired " + childPage.dateExpires + "): " + LinkedText + "]";
                             inactiveList = inactiveList + "</li>";
                         }
                     } else {
@@ -2690,10 +2690,10 @@ namespace Contensive.Processor.Controllers {
                         // include authoring mark for content block
                         //
                         if (isAuthoring) {
-                            if (childPage.BlockContent) {
+                            if (childPage.blockContent) {
                                 activeList = activeList + "&nbsp;[Content Blocked]";
                             }
-                            if (childPage.BlockPage) {
+                            if (childPage.blockPage) {
                                 activeList = activeList + "&nbsp;[Page Blocked]";
                             }
                         }
@@ -2701,8 +2701,8 @@ namespace Contensive.Processor.Controllers {
                         // include overview
                         // if AllowBrief is false, BriefFilename is not loaded
                         //
-                        if ((childPage.BriefFilename != "") & (childPage.AllowBrief)) {
-                            string Brief = encodeText(core.cdnFiles.readFileText(childPage.BriefFilename)).Trim(' ');
+                        if ((childPage.briefFilename != "") & (childPage.allowBrief)) {
+                            string Brief = encodeText(core.cdnFiles.readFileText(childPage.briefFilename)).Trim(' ');
                             if (!string.IsNullOrEmpty(Brief)) {
                                 activeList = activeList + "<div class=\"ccListCopy\">" + Brief + "</div>";
                             }

@@ -123,9 +123,7 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public new void save(CoreController core) {
-            base.save(core);
-        }
+        public new void save(CoreController core, bool asyncSave = false) { base.save(core, asyncSave); }
         //
         //====================================================================================================
         public static void delete(CoreController core, int recordId) {

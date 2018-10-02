@@ -73,10 +73,10 @@ namespace Contensive.Addons.PageManager {
                                     sortMethod.OrderByClause = "sortOrder";
                                     sortMethod.save(core);
                                 }
-                                if (parentPage.ChildListSortMethodID != sortMethod.id) {
+                                if (parentPage.childListSortMethodID != sortMethod.id) {
                                     //
                                     // -- update page if not set correctly
-                                    parentPage.ChildListSortMethodID = sortMethod.id;
+                                    parentPage.childListSortMethodID = sortMethod.id;
                                     parentPage.save(core);
                                 }
                                 int pagePtr = 0;

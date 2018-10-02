@@ -259,12 +259,12 @@ namespace Contensive.Processor.Controllers {
                         domain.name = primaryDomain;
                         domain.pageNotFoundPageId = landingPage.id;
                         domain.rootPageId = landingPage.id;
-                        domain.typeId = (int) DomainModel.domainTypeEnum.Normal;
+                        domain.typeId = (int) DomainModel.DomainTypeEnum.Normal;
                         domain.visited = false;
                         domain.save(core);
                         //
                         landingPage.TemplateID = defaultTemplate.id;
-                        landingPage.Copyfilename.content = constants.defaultLandingPageHtml;
+                        landingPage.copyfilename.content = constants.defaultLandingPageHtml;
                         landingPage.save(core);
                         //
                         if (core.siteProperties.getInteger("LandingPageID", landingPage.id) == 0) {

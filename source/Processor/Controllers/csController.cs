@@ -101,10 +101,10 @@ namespace Contensive.Processor {
         }
         //
         //====================================================================================================
-        public void close() {
+        public void close(bool asyncSave = false) {
             try {
                 if (csPtr != -1) {
-                    core.db.csClose(ref csPtr);
+                    core.db.csClose(ref csPtr, asyncSave);
                     csPtr = -1;
                 }
             } catch (Exception ex) {

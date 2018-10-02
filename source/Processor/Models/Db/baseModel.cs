@@ -588,7 +588,7 @@ namespace Contensive.Processor.Models.Db {
         /// </summary>
         /// <param name="core"></param>
         /// <returns></returns>
-        protected int save(CoreController core) {
+        protected int save(CoreController core, bool asyncSave = false) {
             try {
                 if (core.serverConfig == null) {
                     //
@@ -786,7 +786,7 @@ namespace Contensive.Processor.Models.Db {
                                 break;
                         }
                     }
-                    cs.close();
+                    cs.close(asyncSave);
                     //
                     // -- object is here, but the cache was invalidated, setting
                     core.cache.setObject(CacheController.getCacheKey_forDbRecord(id, tableName, datasourceName), this);

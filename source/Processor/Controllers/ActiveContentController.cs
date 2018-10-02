@@ -1594,48 +1594,54 @@ namespace Contensive.Processor.Controllers {
                                 string addonOptionString = "";
                                 string ACInstanceID = "";
                                 string AddonGuid = "";
-                                Copy = result.Substring(LineStart + 10, LineEnd - LineStart - 11);
-                                string[] ArgSplit = GenericController.SplitDelimited(Copy, ",");
-                                int ArgCnt = ArgSplit.GetUpperBound(0) + 1;
-                                if (!string.IsNullOrEmpty(ArgSplit[0])) {
-                                    AddonName = ArgSplit[0].Substring(1, ArgSplit[0].Length - 2);
-                                    if (ArgCnt > 1) {
-                                        if (!string.IsNullOrEmpty(ArgSplit[1])) {
-                                            addonOptionString = ArgSplit[1].Substring(1, ArgSplit[1].Length - 2);
-                                            addonOptionString = HtmlController.decodeHtml(addonOptionString.Trim(' '));
-                                        }
-                                        if (ArgCnt > 2) {
-                                            if (!string.IsNullOrEmpty(ArgSplit[2])) {
-                                                ACInstanceID = ArgSplit[2].Substring(1, ArgSplit[2].Length - 2);
+                                int copyLength = LineEnd - LineStart - 11;
+                                if(copyLength<=0) {
+                                    //
+                                    // -- nothing between start and end, someone added a comment <!-- ADDON -->
+                                } else {
+                                    Copy = result.Substring(LineStart + 10, copyLength);
+                                    string[] ArgSplit = GenericController.SplitDelimited(Copy, ",");
+                                    int ArgCnt = ArgSplit.GetUpperBound(0) + 1;
+                                    if (!string.IsNullOrEmpty(ArgSplit[0])) {
+                                        AddonName = ArgSplit[0].Substring(1, ArgSplit[0].Length - 2);
+                                        if (ArgCnt > 1) {
+                                            if (!string.IsNullOrEmpty(ArgSplit[1])) {
+                                                addonOptionString = ArgSplit[1].Substring(1, ArgSplit[1].Length - 2);
+                                                addonOptionString = HtmlController.decodeHtml(addonOptionString.Trim(' '));
                                             }
-                                            if (ArgCnt > 3) {
-                                                if (!string.IsNullOrEmpty(ArgSplit[3])) {
-                                                    AddonGuid = ArgSplit[3].Substring(1, ArgSplit[3].Length - 2);
+                                            if (ArgCnt > 2) {
+                                                if (!string.IsNullOrEmpty(ArgSplit[2])) {
+                                                    ACInstanceID = ArgSplit[2].Substring(1, ArgSplit[2].Length - 2);
+                                                }
+                                                if (ArgCnt > 3) {
+                                                    if (!string.IsNullOrEmpty(ArgSplit[3])) {
+                                                        AddonGuid = ArgSplit[3].Substring(1, ArgSplit[3].Length - 2);
+                                                    }
                                                 }
                                             }
                                         }
-                                    }
-                                    // dont have any way of getting fieldname yet
+                                        // dont have any way of getting fieldname yet
 
-                                    CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
-                                        addonType = CPUtilsBaseClass.addonContext.ContextPage,
-                                        cssContainerClass = "",
-                                        cssContainerId = "",
-                                        hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
-                                            contentName = ContextContentName,
-                                            fieldName = "",
-                                            recordId = ContextRecordID
-                                        },
-                                        personalizationAuthenticated = personalizationIsAuthenticated,
-                                        personalizationPeopleId = personalizationPeopleId,
-                                        instanceGuid = ACInstanceID,
-                                        instanceArguments = GenericController.convertAddonArgumentstoDocPropertiesList(core, addonOptionString),
-                                        errorContextMessage = "rendering active content with guid [" + AddonGuid + "] or name [" + AddonName + "]"
-                                    };
-                                    if (!string.IsNullOrEmpty(AddonGuid)) {
-                                        Copy = core.addon.execute(AddonModel.create(core, AddonGuid), executeContext);
-                                    } else {
-                                        Copy = core.addon.execute(AddonModel.createByName(core, AddonName), executeContext);
+                                        CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
+                                            addonType = CPUtilsBaseClass.addonContext.ContextPage,
+                                            cssContainerClass = "",
+                                            cssContainerId = "",
+                                            hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
+                                                contentName = ContextContentName,
+                                                fieldName = "",
+                                                recordId = ContextRecordID
+                                            },
+                                            personalizationAuthenticated = personalizationIsAuthenticated,
+                                            personalizationPeopleId = personalizationPeopleId,
+                                            instanceGuid = ACInstanceID,
+                                            instanceArguments = GenericController.convertAddonArgumentstoDocPropertiesList(core, addonOptionString),
+                                            errorContextMessage = "rendering active content with guid [" + AddonGuid + "] or name [" + AddonName + "]"
+                                        };
+                                        if (!string.IsNullOrEmpty(AddonGuid)) {
+                                            Copy = core.addon.execute(AddonModel.create(core, AddonGuid), executeContext);
+                                        } else {
+                                            Copy = core.addon.execute(AddonModel.createByName(core, AddonName), executeContext);
+                                        }
                                     }
                                 }
                             }

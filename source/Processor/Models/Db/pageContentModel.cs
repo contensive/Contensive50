@@ -25,57 +25,57 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         // -- instance properties
-        public bool AllowBrief { get; set; }
-        public bool AllowChildListDisplay { get; set; }
-        public bool AllowFeedback { get; set; }
-        public bool AllowHitNotification { get; set; }
-        public bool AllowInChildLists { get; set; }
-        public bool AllowInMenus { get; set; }
-        public bool AllowLastModifiedFooter { get; set; }
-        public bool AllowMessageFooter { get; set; }
-        public bool AllowMetaContentNoFollow { get; set; }
-        public bool AllowMoreInfo { get; set; }
+        public bool allowBrief { get; set; }
+        public bool allowChildListDisplay { get; set; }
+        public bool allowFeedback { get; set; }
+        public bool allowHitNotification { get; set; }
+        public bool allowInChildLists { get; set; }
+        public bool allowInMenus { get; set; }
+        public bool allowLastModifiedFooter { get; set; }
+        public bool allowMessageFooter { get; set; }
+        public bool allowMetaContentNoFollow { get; set; }
+        public bool allowMoreInfo { get; set; }
         //// deprecated 20180701
         //public bool AllowPrinterVersion { get; set; }
-        public bool AllowReturnLinkDisplay { get; set; }
-        public bool AllowReviewedFooter { get; set; }
-        public bool AllowSeeAlso { get; set; }
-        public int ArchiveParentID { get; set; }
-        public bool BlockContent { get; set; }
-        public bool BlockPage { get; set; }
-        public int BlockSourceID { get; set; }
-        public string BriefFilename { get; set; }
-        public string ChildListInstanceOptions { get; set; }
-        public int ChildListSortMethodID { get; set; }
-        public bool ChildPagesFound { get; set; }
-        public int Clicks { get; set; }
-        public int ContactMemberID { get; set; }
-        public int ContentPadding { get; set; }
-        public FieldTypeHTMLFile Copyfilename { get; set; } = new FieldTypeHTMLFile();
-        public string CustomBlockMessage { get; set; }
-        public DateTime DateArchive { get; set; }
-        public DateTime DateExpires { get; set; }
-        public DateTime DateReviewed { get; set; }
+        public bool allowReturnLinkDisplay { get; set; }
+        public bool allowReviewedFooter { get; set; }
+        public bool allowSeeAlso { get; set; }
+        public int archiveParentID { get; set; }
+        public bool blockContent { get; set; }
+        public bool blockPage { get; set; }
+        public int blockSourceID { get; set; }
+        public string briefFilename { get; set; }
+        public string childListInstanceOptions { get; set; }
+        public int childListSortMethodID { get; set; }
+        public bool childPagesFound { get; set; }
+        public int clicks { get; set; }
+        public int contactMemberID { get; set; }
+        public int contentPadding { get; set; }
+        public FieldTypeHTMLFile copyfilename { get; set; } = new FieldTypeHTMLFile();
+        public string customBlockMessage { get; set; }
+        public DateTime dateArchive { get; set; }
+        public DateTime dateExpires { get; set; }
+        public DateTime dateReviewed { get; set; }
 
 
 
-        public string Headline { get; set; }
+        public string headline { get; set; }
         public string imageFilename { get; set; }
-        public bool IsSecure { get; set; }
-        public string JSEndBody { get; set; }
-        public string JSFilename { get; set; }
-        public string JSHead { get; set; }
-        public string JSOnLoad { get; set; }
-        public string LinkAlias { get; set; }
-        public string MenuHeadline { get; set; }
+        public bool isSecure { get; set; }
+        public string jSEndBody { get; set; }
+        public string jSFilename { get; set; }
+        public string jSHead { get; set; }
+        public string jSOnLoad { get; set; }
+        public string linkAlias { get; set; }
+        public string menuHeadline { get; set; }
         public string metaDescription { get; set; }
-        public string MetaKeywordList { get; set; }
-        public string OtherHeadTags { get; set; }
-        public string PageLink { get; set; }
+        public string metaKeywordList { get; set; }
+        public string otherHeadTags { get; set; }
+        public string pageLink { get; set; }
         public string pageTitle { get; set; }
-        public int ParentID { get; set; }
-        public string ParentListName { get; set; }
-        public DateTime PubDate { get; set; }
+        public int parentID { get; set; }
+        public string parentListName { get; set; }
+        public DateTime pubDate { get; set; }
         public int RegistrationGroupID { get; set; }
         public int ReviewedBy { get; set; }
         public int TemplateID { get; set; }
@@ -127,9 +127,7 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public new void save(CoreController core) {
-            base.save(core);
-        }
+        public new void save(CoreController core, bool asyncSave = false) { base.save(core, asyncSave); }
         //
         //====================================================================================================
         public static void delete(CoreController core, int recordId) {

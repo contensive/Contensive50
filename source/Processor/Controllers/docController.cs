@@ -504,7 +504,7 @@ namespace Contensive.Processor.Controllers {
             string returnHtml = "";
             //
             foreach (PageContentModel testpage in pageController.pageToRootList) {
-                string pageCaption = testpage.MenuHeadline;
+                string pageCaption = testpage.menuHeadline;
                 if (string.IsNullOrEmpty(pageCaption)) {
                     pageCaption = GenericController.encodeText(testpage.name);
                 }
@@ -591,8 +591,8 @@ namespace Contensive.Processor.Controllers {
                     if (page != null) {
                         Copy = core.docProperties.getText("copyFilename");
                         Copy = ActiveContentController.processWysiwygResponseForSave(core, Copy);
-                        if (Copy != page.Copyfilename.content) {
-                            page.Copyfilename.content = Copy;
+                        if (Copy != page.copyfilename.content) {
+                            page.copyfilename.content = Copy;
                             SaveButNoChanges = false;
                         }
                         RecordName = core.docProperties.getText("name");
@@ -601,13 +601,13 @@ namespace Contensive.Processor.Controllers {
                             LinkAliasController.addLinkAlias(core, RecordName, RecordID, "");
                             SaveButNoChanges = false;
                         }
-                        RecordParentID = page.ParentID;
+                        RecordParentID = page.parentID;
                         page.save(core);
                         //
                         core.workflow.SetEditLock(PageContentModel.contentName, page.id);
                         //
                         if (!SaveButNoChanges) {
-                            core.doc.processAfterSave(false, PageContentModel.contentName, page.id, page.name, page.ParentID, false);
+                            core.doc.processAfterSave(false, PageContentModel.contentName, page.id, page.name, page.parentID, false);
                             PageContentModel.invalidateRecordCache(core, page.id);
                         }
                     }
@@ -1115,13 +1115,13 @@ namespace Contensive.Processor.Controllers {
             try {
                 PageContentModel page = PageContentModel.create(core, PageID);
                 if (page != null) {
-                    if ((page.ParentID == 0) && (!UsedIDList.Contains(page.ParentID))) {
-                        UsedIDList.Add(page.ParentID);
-                        if (siteSectionRootPageIndex.ContainsKey(page.ParentID)) {
-                            sectionId = siteSectionRootPageIndex[page.ParentID];
+                    if ((page.parentID == 0) && (!UsedIDList.Contains(page.parentID))) {
+                        UsedIDList.Add(page.parentID);
+                        if (siteSectionRootPageIndex.ContainsKey(page.parentID)) {
+                            sectionId = siteSectionRootPageIndex[page.parentID];
                         }
                     } else {
-                        sectionId = getPageSectionId(page.ParentID, ref UsedIDList, siteSectionRootPageIndex);
+                        sectionId = getPageSectionId(page.parentID, ref UsedIDList, siteSectionRootPageIndex);
                     }
                 }
             } catch (Exception ex) {

@@ -26,8 +26,8 @@ namespace Contensive.Processor.Models.Db {
         //====================================================================================================
         // -- instance properties
         //Public Property Link As String
-        public int PageID { get; set; }
-        public string QueryStringSuffix { get; set; }
+        public int pageID { get; set; }
+        public string queryStringSuffix { get; set; }
         //
         //====================================================================================================
         public static LinkAliasModel add(CoreController core) {
@@ -70,9 +70,7 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public new void save(CoreController core) {
-            base.save(core);
-        }
+        public new void save(CoreController core, bool asyncSave = false) { base.save(core, asyncSave); }
         //
         //====================================================================================================
         public static void delete(CoreController core, int recordId) {

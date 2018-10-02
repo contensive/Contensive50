@@ -25,25 +25,25 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         // -- instance properties
-        public string Address1 { get; set; }
-        public string Address2 { get; set; }
-        public string BriefFilename { get; set; }
-        public string City { get; set; }
-        public int Clicks { get; set; }
-        public int ContactMemberID { get; set; }
+        public string address1 { get; set; }
+        public string address2 { get; set; }
+        public string briefFilename { get; set; }
+        public string city { get; set; }
+        public int clicks { get; set; }
+        public int contactMemberID { get; set; }
         
-        public string CopyFilename { get; set; }
-        public string Country { get; set; }
-        public string Email { get; set; }
-        public string Fax { get; set; }
-        public string ImageFilename { get; set; }
-        public string Link { get; set; }
-        public string Phone { get; set; }
-        public string State { get; set; }
-        public string ThumbNailFilename { get; set; }
-        public int Viewings { get; set; }
-        public string Web { get; set; }
-        public string Zip { get; set; }
+        public string copyFilename { get; set; }
+        public string country { get; set; }
+        public string email { get; set; }
+        public string fax { get; set; }
+        public string imageFilename { get; set; }
+        public string link { get; set; }
+        public string phone { get; set; }
+        public string state { get; set; }
+        public string thumbNailFilename { get; set; }
+        public int viewings { get; set; }
+        public string web { get; set; }
+        public string zip { get; set; }
         //
         //====================================================================================================
         public static OrganizationModel add(CoreController core) {
@@ -86,9 +86,7 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public new void save(CoreController core) {
-            base.save(core);
-        }
+        public new void save(CoreController core, bool asyncSave = false) { base.save(core, asyncSave); }
         //
         //====================================================================================================
         public static void delete(CoreController core, int recordId) {

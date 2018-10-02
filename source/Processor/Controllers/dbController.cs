@@ -51,8 +51,6 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public int sqlSlowThreshholdMsec { get; set; } = 1000;
         //
-        private bool saveTransactionLog_InProcess { get; set; } = false;
-        //
         public int sqlCommandTimeout { get; set; } = 30;
         //
         private ContentSetClass[] contentSetStore = new ContentSetClass[] { };
@@ -362,7 +360,7 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                     dbVerified = true;
-                    saveTransactionLog(sql, sw.ElapsedMilliseconds);
+                    saveTransactionLog(sql, sw.ElapsedMilliseconds, "query");
                 }
             } catch (Exception ex) {
                 ApplicationException newEx = new ApplicationException("Exception [" + ex.Message + "] executing sql [" + sql + "], datasource [" + dataSourceName + "], startRecord [" + startRecord + "], maxRecords [" + maxRecords + "]", ex);
@@ -426,6 +424,7 @@ namespace Contensive.Processor.Controllers {
         public void executeNonQuery(string sql, string dataSourceName, ref int recordsAffected) {
             try {
                 if (dbEnabled) {
+                    Stopwatch sw = Stopwatch.StartNew();
                     string connString = getConnectionStringADONET(core.appConfig.name, dataSourceName);
                     using (SqlConnection connSQL = new SqlConnection(connString)) {
                         connSQL.Open();
@@ -437,6 +436,7 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                     dbVerified = true;
+                    saveTransactionLog(sql, sw.ElapsedMilliseconds, "non-query");
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -453,6 +453,7 @@ namespace Contensive.Processor.Controllers {
         public void executeNonQueryAsync(string sql, string dataSourceName = "") {
             try {
                 if (dbEnabled) {
+                    Stopwatch sw = Stopwatch.StartNew();
                     string connString = getConnectionStringADONET(core.appConfig.name, dataSourceName);
                     using (SqlConnection connSQL = new SqlConnection(connString)) {
                         connSQL.Open();
@@ -464,6 +465,7 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                     dbVerified = true;
+                    saveTransactionLog(sql, sw.ElapsedMilliseconds, "non-query-async");
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -611,12 +613,12 @@ namespace Contensive.Processor.Controllers {
         /// update the transaction log
         /// </summary>
         /// <param name="LogEntry"></param>
-        private void saveTransactionLog(string sql, long ElapsedMilliseconds) {
-            string logMsg = ("duration [" + ElapsedMilliseconds + "ms], sql [" + sql + "]").Replace("\r", "").Replace("\n", "");
+        private void saveTransactionLog(string sql, long ElapsedMilliseconds, string sqlMethodType) {
+            string logMsg = "type [" + sqlMethodType + "], duration [" + ElapsedMilliseconds + "ms], sql [" + sql.Replace("\r", "").Replace("\n", "") + "]";
             if (ElapsedMilliseconds > sqlSlowThreshholdMsec) {
-                LogController.logWarn(core, "dbController: Slow Query " + logMsg);
+                LogController.logWarn(core, "Slow Query " + logMsg);
             } else {
-                LogController.logDebug(core, "dbController: " + logMsg);
+                LogController.logDebug(core, logMsg);
             }
         }
         //
@@ -1597,13 +1599,13 @@ namespace Contensive.Processor.Controllers {
         /// sets CSPointer to -1
         /// </summary>
         /// <param name="CSPointer"></param>
-        /// <param name="AsyncSave"></param>
-        public void csClose(ref int CSPointer, bool AsyncSave = false) {
+        /// <param name="asyncSave"></param>
+        public void csClose(ref int CSPointer, bool asyncSave = false) {
             try {
                 if ((CSPointer > 0) && (CSPointer <= contentSetStoreCount)) {
                     ContentSetClass tmp = contentSetStore[CSPointer];
                     if (tmp.IsOpen) {
-                        csSave(CSPointer, AsyncSave);
+                        csSave(CSPointer, asyncSave);
                         tmp.readCache = new string[,] { { }, { } };
                         tmp.writeCache = new Dictionary<string, string>();
                         tmp.resultColumnCount = 0;
@@ -3017,23 +3019,23 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Save the current CS Cache back to the database
         /// </summary>
-        /// <param name="CSPointer"></param>
-        /// <param name="AsyncSave"></param>
+        /// <param name="csPtr"></param>
+        /// <param name="asyncSave"></param>
         /// <param name="Blockcsv_ClearBake"></param>
-        public void csSave(int CSPointer, bool AsyncSave = false, bool Blockcsv_ClearBake = false) {
+        public void csSave(int csPtr, bool asyncSave = false, bool Blockcsv_ClearBake = false) {
             try {
-                if (!csOk(CSPointer)) {
+                if (!csOk(csPtr)) {
                     //
                     // -- already closed or not opened or not on a current row. No error so you can always call save(), it skips if nothing to save
-                } else if (contentSetStore[CSPointer].writeCache.Count == 0) {
+                } else if (contentSetStore[csPtr].writeCache.Count == 0) {
                     //
                     // -- nothing to write, just exit
-                } else if (!(contentSetStore[CSPointer].Updateable)) {
+                } else if (!(contentSetStore[csPtr].Updateable)) {
                     //
                     // -- dataset not updatable
                     throw new ArgumentException("The dataset cannot be updated because it was created with a query and not a content table.");
                 } else {
-                    var contentSet = contentSetStore[CSPointer];
+                    var contentSet = contentSetStore[csPtr];
                     if (contentSet.CDef == null) {
                         //
                         // -- dataset not updatable
@@ -3044,10 +3046,10 @@ namespace Contensive.Processor.Controllers {
                         string LiveDataSourceName = contentSet.CDef.contentDataSourceName;
                         string ContentName = contentSet.CDef.name;
                         int ContentID = contentSet.CDef.id;
-                        int LiveRecordID = csGetInteger(CSPointer, "ID");
-                        int LiveRecordContentControlID = csGetInteger(CSPointer, "CONTENTCONTROLID");
+                        int LiveRecordID = csGetInteger(csPtr, "ID");
+                        int LiveRecordContentControlID = csGetInteger(csPtr, "CONTENTCONTROLID");
                         string LiveRecordContentName = Models.Domain.CDefModel.getContentNameByID(core, LiveRecordContentControlID);
-                        bool LiveRecordInactive = !csGetBoolean(CSPointer, "ACTIVE");
+                        bool LiveRecordInactive = !csGetBoolean(csPtr, "ACTIVE");
                         string SQLLiveDelimiter = "";
                         string SQLLiveUpdate = "";
                         DateTime sqlModifiedDate = DateTime.Now;
@@ -3144,7 +3146,7 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     // ----- Set the new value in the 
                                     //
-                                    var tempVar2 = contentSetStore[CSPointer];
+                                    var tempVar2 = contentSetStore[csPtr];
                                     if (tempVar2.resultColumnCount > 0) {
                                         for (int ColumnPtr = 0; ColumnPtr < tempVar2.resultColumnCount; ColumnPtr++) {
                                             if (tempVar2.fieldNames[ColumnPtr] == UcaseFieldName) {
@@ -3231,7 +3233,11 @@ namespace Contensive.Processor.Controllers {
                             //
                             if (!string.IsNullOrEmpty(SQLLiveUpdate)) {
                                 string SQLUpdate = "UPDATE " + LiveTableName + " SET " + SQLLiveUpdate + " WHERE ID=" + LiveRecordID + ";";
-                                executeQuery(SQLUpdate, LiveDataSourceName);
+                                if (asyncSave) {
+                                    executeNonQueryAsync(SQLUpdate, LiveDataSourceName);
+                                } else {
+                                    executeNonQuery(SQLUpdate, LiveDataSourceName);
+                                }
                             }
                             //
                             // ----- Live record has changed

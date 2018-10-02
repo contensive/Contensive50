@@ -22,7 +22,7 @@ namespace Contensive.Addons.Housekeeping {
     /// <summary>
     /// support for housekeeping functions
     /// </summary>
-    public class houseKeepClass : Contensive.BaseClasses.AddonBaseClass {
+    public class HouseKeepClass : Contensive.BaseClasses.AddonBaseClass {
         //
         //====================================================================================================
         /// <summary>
@@ -37,7 +37,7 @@ namespace Contensive.Addons.Housekeeping {
                 // -- ok to cast cpbase to cp because they build from the same solution
                 //this.cp = (CPClass)cp;
                 CoreController core = ((CPClass)cp).core;
-                HouseKeep(core, core.docProperties.getBoolean("force"));
+                houseKeep(core, core.docProperties.getBoolean("force"));
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }
@@ -46,7 +46,7 @@ namespace Contensive.Addons.Housekeeping {
         //
         //====================================================================================================
         //
-        public void HouseKeep(CoreController core, bool force) {
+        public void houseKeep(CoreController core, bool force) {
             try {
                 DateTime LastCheckDateTime = core.siteProperties.getDate("housekeep, last check", default(DateTime));
                 int ServerHousekeepHour = core.siteProperties.getInteger("housekeep, run time hour", 2);
@@ -193,7 +193,7 @@ namespace Contensive.Addons.Housekeeping {
                                     //
                                     // Out of data, start with this DatePtr
                                     //
-                                    HouseKeep_VisitSummary(core, datePtr, datePtr, 24, core.siteProperties.dataBuildVersion, OldestVisitSummaryWeCareAbout);
+                                    houseKeep_VisitSummary(core, datePtr, datePtr, 24, core.siteProperties.dataBuildVersion, OldestVisitSummaryWeCareAbout);
                                     //Exit For
                                 } else {
                                     DateTime workingDate = DateTime.MinValue.AddDays(core.db.csGetInteger(CS, "DateNumber"));
@@ -201,7 +201,7 @@ namespace Contensive.Addons.Housekeeping {
                                         //
                                         // There are missing dates, update them
                                         //
-                                        HouseKeep_VisitSummary(core, datePtr, workingDate.AddDays(-1), 24, core.siteProperties.dataBuildVersion, OldestVisitSummaryWeCareAbout);
+                                        houseKeep_VisitSummary(core, datePtr, workingDate.AddDays(-1), 24, core.siteProperties.dataBuildVersion, OldestVisitSummaryWeCareAbout);
                                     }
                                 }
                                 if (core.db.csOk(CS)) {
@@ -255,7 +255,7 @@ namespace Contensive.Addons.Housekeeping {
                             if (datePtr < OldestVisitSummaryWeCareAbout) {
                                 datePtr = OldestVisitSummaryWeCareAbout;
                             }
-                            HouseKeep_PageViewSummary(core, datePtr, Yesterday, 24, core.siteProperties.dataBuildVersion, OldestVisitSummaryWeCareAbout);
+                            houseKeep_PageViewSummary(core, datePtr, Yesterday, 24, core.siteProperties.dataBuildVersion, OldestVisitSummaryWeCareAbout);
                         }
                         //
                         // -- Properties
@@ -333,7 +333,7 @@ namespace Contensive.Addons.Housekeeping {
                         logHousekeeping(core, "Summaryize visits hourly, starting [" + NextSummaryStartDate + "]");
                         PeriodStep = (double)1 / (double)24;
                         //PeriodStart = (Int(OldestDateAdded * 24) / 24)
-                        HouseKeep_VisitSummary(core, NextSummaryStartDate, rightNow, 1, core.siteProperties.dataBuildVersion, OldestVisitSummaryWeCareAbout);
+                        houseKeep_VisitSummary(core, NextSummaryStartDate, rightNow, 1, core.siteProperties.dataBuildVersion, OldestVisitSummaryWeCareAbout);
                     }
                     //
                     // OK to run archive
@@ -1393,7 +1393,7 @@ namespace Contensive.Addons.Housekeeping {
         //
         //=========================================================================================
         //
-        public void HouseKeep_VisitSummary(CoreController core, DateTime StartTimeDate, DateTime EndTimeDate, int HourDuration, string BuildVersion, DateTime OldestVisitSummaryWeCareAbout) {
+        public void houseKeep_VisitSummary(CoreController core, DateTime StartTimeDate, DateTime EndTimeDate, int HourDuration, string BuildVersion, DateTime OldestVisitSummaryWeCareAbout) {
             try {
                 double StartTimeHoursSinceMidnight = 0;
                 DateTime PeriodStart = default(DateTime);
@@ -1710,7 +1710,7 @@ namespace Contensive.Addons.Housekeeping {
         /// <param name="BuildVersion"></param>
         /// <param name="OldestVisitSummaryWeCareAbout"></param>
         //
-        public void HouseKeep_PageViewSummary(CoreController core, DateTime StartTimeDate, DateTime EndTimeDate, int HourDuration, string BuildVersion, DateTime OldestVisitSummaryWeCareAbout) {
+        public void houseKeep_PageViewSummary(CoreController core, DateTime StartTimeDate, DateTime EndTimeDate, int HourDuration, string BuildVersion, DateTime OldestVisitSummaryWeCareAbout) {
             int hint = 0;
             string hinttxt = "";
             try {

@@ -146,7 +146,7 @@ namespace Contensive.Processor.Controllers {
                         if (string.IsNullOrEmpty(Link)) {
                             Link = "no name #" + GenericController.encodeText(testPage.id);
                         }
-                        Link = "<a href=\"" + testPage.PageLink + "\">" + Link + "</a>";
+                        Link = "<a href=\"" + testPage.pageLink + "\">" + Link + "</a>";
                         PageList = "<ul class=\"qeListUL\"><li class=\"qeListLI\">" + Link + PageList + "</li></ul>";
                     }
                 }
@@ -166,7 +166,7 @@ namespace Contensive.Processor.Controllers {
                         fieldName = "",
                         recordId = core.doc.pageController.page.id
                     },
-                    instanceArguments = GenericController.convertAddonArgumentstoDocPropertiesList(core, core.doc.pageController.page.ChildListInstanceOptions),
+                    instanceArguments = GenericController.convertAddonArgumentstoDocPropertiesList(core, core.doc.pageController.page.childListInstanceOptions),
                     instanceGuid = PageChildListInstanceID,
                     errorContextMessage = "calling child page addon in quick editing editor"
                 };
@@ -205,7 +205,7 @@ namespace Contensive.Processor.Controllers {
         //========================================================================
         //
         internal static string getQuickEditingBody(CoreController core, string ContentName, string OrderByClause, bool AllowChildList, bool Authoring, int rootPageId, bool readOnlyField, bool AllowReturnLink, string RootPageContentName, bool ArchivePage, int contactMemberID) {
-            string pageCopy = core.doc.pageController.page.Copyfilename.content;
+            string pageCopy = core.doc.pageController.page.copyfilename.content;
             //
             // ----- Page Copy
             //

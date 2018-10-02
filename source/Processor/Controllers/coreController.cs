@@ -85,10 +85,11 @@ namespace Contensive.Processor.Controllers {
                 if (_assemblySkipList == null) {
                     _assemblySkipList = cache.getObject<List<string>>(cacheNameAssemblySkipList);
                     if (_assemblySkipList == null) {
-                        _assemblySkipList = new List<string>();
-                        _assemblySkipList.Add(programFiles.localAbsRootPath + "v8-base-ia32.dll");
-                        _assemblySkipList.Add(programFiles.localAbsRootPath + "v8-ia32.dll");
-                        _assemblySkipList.Add(programFiles.localAbsRootPath + "ClearScriptV8-32.dll");
+                        _assemblySkipList = new List<string> {
+                            programFiles.localAbsRootPath + "v8-base-ia32.dll",
+                            programFiles.localAbsRootPath + "v8-ia32.dll",
+                            programFiles.localAbsRootPath + "ClearScriptV8-32.dll"
+                        };
                     }
                     _assemblySkipList_CountWhenLoaded = _assemblySkipList.Count;
                 }
@@ -801,9 +802,9 @@ namespace Contensive.Processor.Controllers {
                                 // - link alias
                                 LinkAliasModel linkAlias = LinkAliasModel.create(this, route.linkAliasId);
                                 if (linkAlias != null) {
-                                    docProperties.setProperty("bid", linkAlias.PageID);
-                                    if (!string.IsNullOrEmpty(linkAlias.QueryStringSuffix)) {
-                                        string[] nvp = linkAlias.QueryStringSuffix.Split('&');
+                                    docProperties.setProperty("bid", linkAlias.pageID);
+                                    if (!string.IsNullOrEmpty(linkAlias.queryStringSuffix)) {
+                                        string[] nvp = linkAlias.queryStringSuffix.Split('&');
                                         foreach (var nv in nvp) {
                                             string[] keyValue = nv.Split('=');
                                             if (!string.IsNullOrEmpty(keyValue[0])) {
@@ -1229,7 +1230,7 @@ namespace Contensive.Processor.Controllers {
                                     SQL += "," + db.encodeSQLBoolean(webServer.pageExcludeFromAnalytics);
                                     SQL += "," + db.encodeSQLText(pagetitle);
                                     SQL += ");";
-                                    db.executeQuery(SQL);
+                                    db.executeNonQueryAsync(SQL);
                                 }
                             }
                         }
