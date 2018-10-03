@@ -280,7 +280,7 @@ namespace Contensive.Processor {
                         addonName = ExportCSVAddon.name,
                         args = docProperties
                     };
-                    TaskSchedulerController.addTaskToQueue(core, taskCommandBuildCsv, cmdDetail, false);
+                    TaskSchedulerControllerx.addTaskToQueue(core, taskCommandBuildCsv, cmdDetail, false);
                 }
             } catch (Exception) {
                 throw;

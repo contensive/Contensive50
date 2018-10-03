@@ -15,7 +15,7 @@ namespace Contensive.WindowsServices {
         public taskService() {
             InitializeComponent();
         }
-        private TaskSchedulerController taskScheduler = null;
+        private TaskSchedulerControllerx taskScheduler = null;
         private TaskRunnerController taskRunner = null;
         //
         protected override void OnStart(string[] args) {
@@ -28,7 +28,7 @@ namespace Contensive.WindowsServices {
                     //
                     // -- start scheduler
                     LogController.logTrace(cp.core, "Services.OnStart, call taskScheduler.startTimerEvents");
-                    taskScheduler = new TaskSchedulerController();
+                    taskScheduler = new TaskSchedulerControllerx();
                     taskScheduler.startTimerEvents();
                 }
                 if (true) {

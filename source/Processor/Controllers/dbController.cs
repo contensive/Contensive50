@@ -3170,9 +3170,10 @@ namespace Contensive.Processor.Controllers {
                         // -- dataset not updatable
                         throw new ArgumentException("The dataset cannot be updated because it was not created from a valid content table.");
                     } else {
+                        //
+                        // -- get id from read cache or write cache. if id=0 save is insert, else save is update
                         int id = csGetInteger(csPtr, "ID");
-                        int contentControlID = csGetInteger(csPtr, "CONTENTCONTROLID");
-                        bool recordInactive = !csGetBoolean(csPtr, "ACTIVE");
+                        //bool recordInactive = !csGetBoolean(csPtr, "ACTIVE");
                         string sqlDelimiter = "";
                         string sqlUpdate = "";
                         DateTime sqlModifiedDate = DateTime.Now;
@@ -3204,7 +3205,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // let these field be added to the sql
                                 //
-                                recordInactive = (ucaseFieldName == "ACTIVE" && (!GenericController.encodeBoolean(writeCacheValue)));
+                                //recordInactive = (ucaseFieldName == "ACTIVE" && (!GenericController.encodeBoolean(writeCacheValue)));
                                 FieldFoundCount += 1;
                                 Models.Domain.CDefFieldModel field = contentSet.CDef.fields[fieldName.ToLower()];
                                 string SQLSetPair = "";
@@ -3305,7 +3306,7 @@ namespace Contensive.Processor.Controllers {
                                         }
                                     }
                                     //
-                                    // ----- Live mode: update live record
+                                    // ----- update live record
                                     //
                                     sqlUpdate = sqlUpdate + sqlDelimiter + SQLSetPair;
                                     sqlDelimiter = ",";
@@ -3331,16 +3332,6 @@ namespace Contensive.Processor.Controllers {
                             }
                         }
                         //
-                        // not sure why, but this section was commented out.
-                        // Modified was not being set, so I un-commented it
-                        //
-                        //If (SQLEditUpdate <> "") And (AuthorableFieldUpdate) Then
-                        //    '
-                        //    ' ----- set the csv_ContentSet Modified
-                        //    '
-                        //    Call core.workflow.setRecordLocking(ContentName, LiveRecordID, AuthoringControlsModified, .OwnerMemberID)
-                        //End If
-                        //
                         // ----- Do the unique check on the content table, if necessary
                         //
                         if (!string.IsNullOrEmpty(SQLCriteriaUnique)) {
@@ -3365,28 +3356,11 @@ namespace Contensive.Processor.Controllers {
                                     executeNonQuery(SQLUpdate, contentSet.CDef.dataSourceName);
                                 }
                             }
-                            //
-                            // ----- Live record has changed
-                            //
-                            if (AuthorableFieldUpdate) {
-                                //
-                                // ----- reset the ContentTimeStamp to csv_ClearBake
-                                //
-                                core.cache.invalidate(CacheController.getCacheKey_forDbRecord(id, contentSet.CDef.tableName, contentSet.CDef.dataSourceName));
-                                //
-                                // ----- mark the record NOT UpToDate for SpiderDocs
-                                //
-                                if ((contentSet.CDef.tableName.ToLower() == "ccpagecontent") && (id != 0)) {
-                                    if (isSQLTableField("default", "ccSpiderDocs", "PageID")) {
-                                        executeQuery("UPDATE ccspiderdocs SET UpToDate = 0 WHERE PageID=" + id);
-                                    }
-                                }
-                            }
                         }
                         contentSet.LastUsed = DateTime.Now;
                         //
                         // -- invalidate the special cache name used to detect a change in any record
-                        core.cache.invalidateDbRecord(id, contentSet.CDef.tableName);
+                        core.cache.invalidateDbRecord(id, contentSet.CDef.tableName, contentSet.CDef.dataSourceName);
                     }
                 }
             } catch (Exception ex) {

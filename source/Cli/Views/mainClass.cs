@@ -251,7 +251,7 @@ namespace Contensive.CLI {
                                             //
                                             // run the taskscheduler in the console
                                             Console.WriteLine("Beginning command line taskScheduler. Hit any key to exit");
-                                            TaskSchedulerController taskScheduler = new TaskSchedulerController();
+                                            TaskSchedulerControllerx taskScheduler = new TaskSchedulerControllerx();
                                             taskScheduler.startTimerEvents();
                                             object keyStroke = Console.ReadKey();
                                             taskScheduler.stopTimerEvents();
@@ -300,7 +300,7 @@ namespace Contensive.CLI {
                                             //
                                             Console.WriteLine("Beginning command line taskScheduler and taskRunner. Hit any key to exit");
                                             //
-                                            TaskSchedulerController taskScheduler = new TaskSchedulerController();
+                                            TaskSchedulerControllerx taskScheduler = new TaskSchedulerControllerx();
                                             taskScheduler.startTimerEvents();
                                             //
                                             using (TaskRunnerController taskRunner = new TaskRunnerController()) {

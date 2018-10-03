@@ -16,7 +16,7 @@ using static Contensive.Processor.constants;
 using Contensive.Processor.Models.Domain;
 //
 namespace Contensive.Processor.Controllers {
-    public class TaskSchedulerController : IDisposable {
+    public class TaskSchedulerControllerx : IDisposable {
         private System.Timers.Timer processTimer;
         private const int ProcessTimerMsecPerTick = 5000;
         private bool ProcessTimerInProcess;
@@ -247,7 +247,7 @@ namespace Contensive.Processor.Controllers {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        ~TaskSchedulerController() {
+        ~TaskSchedulerControllerx() {
             Dispose(false);
             //todo  NOTE: The base class Finalize method is automatically called from the destructor:
             //base.Finalize();

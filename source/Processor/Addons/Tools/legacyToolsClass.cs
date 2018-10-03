@@ -2893,7 +2893,7 @@ namespace Contensive.Addons.Tools {
                     core.webServer.redirect("/ccLib/Popup/WaitForIISReset.htm");
                     Thread.Sleep(2000);
                     //
-                    TaskSchedulerController.addTaskToQueue(core, taskQueueCommandEnumModule.runAddon, new cmdDetailClass() {
+                    TaskSchedulerControllerx.addTaskToQueue(core, taskQueueCommandEnumModule.runAddon, new cmdDetailClass() {
                         addonId = 0,
                         addonName = "commandRestart",
                         args = GenericController.convertAddonArgumentstoDocPropertiesList(core, "")
@@ -3374,7 +3374,7 @@ namespace Contensive.Addons.Tools {
                         cmdDetail.addonId = 0;
                         cmdDetail.addonName = "GetForm_FindAndReplace";
                         cmdDetail.args = GenericController.convertAddonArgumentstoDocPropertiesList(core, QS);
-                        TaskSchedulerController.addTaskToQueue(core, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
+                        TaskSchedulerControllerx.addTaskToQueue(core, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
                         Stream.Add("Find and Replace has been requested for content definitions [" + CDefList + "], finding [" + FindText + "] and replacing with [" + ReplaceText + "]");
                     }
                 } else {
@@ -3459,7 +3459,7 @@ namespace Contensive.Addons.Tools {
                     cmdDetail.addonId = 0;
                     cmdDetail.addonName = "GetForm_IISReset";
                     cmdDetail.args = GenericController.convertAddonArgumentstoDocPropertiesList(core, "");
-                    TaskSchedulerController.addTaskToQueue(core, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
+                    TaskSchedulerControllerx.addTaskToQueue(core, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
                 }
                 //
                 // Display form

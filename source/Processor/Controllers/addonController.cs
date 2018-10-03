@@ -1902,7 +1902,7 @@ namespace Contensive.Processor.Controllers {
                         addonName = addon.name,
                         args = GenericController.convertAddonArgumentstoDocPropertiesList(core, cmdQueryString)
                     };
-                    TaskSchedulerController.addTaskToQueue(core, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
+                    TaskSchedulerControllerx.addTaskToQueue(core, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
                     //
                     LogController.logTrace(core, "end: add process to background cmd queue, addon [" + addon.name + "/" + addon.id + "], optionstring [" + OptionString + "]");
                 }

@@ -11001,7 +11001,7 @@ namespace Contensive.Addons.AdminSite {
                                                 addonName = ExportCSVAddon.name,
                                                 args = docProperties
                                             };
-                                            TaskSchedulerController.addTaskToQueue(core, taskCommandBuildCsv, cmdDetail, false);
+                                            TaskSchedulerControllerx.addTaskToQueue(core, taskCommandBuildCsv, cmdDetail, false);
                                         }
                                         break;
                                     default:
@@ -11019,7 +11019,7 @@ namespace Contensive.Addons.AdminSite {
                                                 addonName = ExportXMLAddon.name,
                                                 args = docProperties
                                             };
-                                            TaskSchedulerController.addTaskToQueue(core, taskCommandBuildXml, cmdDetail, false);
+                                            TaskSchedulerControllerx.addTaskToQueue(core, taskCommandBuildXml, cmdDetail, false);
                                         }
                                         break;
                                 }
