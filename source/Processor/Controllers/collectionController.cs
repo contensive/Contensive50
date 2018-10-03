@@ -116,8 +116,8 @@ namespace Contensive.Processor.Controllers {
                             updateDst |= (dstCdef.allowContentTracking != srcCdef.allowContentTracking);
                             updateDst |= (dstCdef.allowDelete != srcCdef.allowDelete);
                             updateDst |= (dstCdef.allowTopicRules != srcCdef.allowTopicRules);
-                            updateDst |= !textMatch(dstCdef.contentDataSourceName, srcCdef.contentDataSourceName);
-                            updateDst |= !textMatch(dstCdef.contentTableName, srcCdef.contentTableName);
+                            updateDst |= !textMatch(dstCdef.dataSourceName, srcCdef.dataSourceName);
+                            updateDst |= !textMatch(dstCdef.tableName, srcCdef.tableName);
                             updateDst |= !textMatch(dstCdef.defaultSortMethod, srcCdef.defaultSortMethod);
                             updateDst |= !textMatch(dstCdef.dropDownFieldList, srcCdef.dropDownFieldList);
                             updateDst |= !textMatch(dstCdef.editorGroupName, srcCdef.editorGroupName);
@@ -150,8 +150,8 @@ namespace Contensive.Processor.Controllers {
                         dstCdef.allowTopicRules = srcCdef.allowTopicRules;
                         dstCdef.guid = srcCdef.guid;
                         dstCdef.contentControlCriteria = srcCdef.contentControlCriteria;
-                        dstCdef.contentDataSourceName = srcCdef.contentDataSourceName;
-                        dstCdef.contentTableName = srcCdef.contentTableName;
+                        dstCdef.dataSourceName = srcCdef.dataSourceName;
+                        dstCdef.tableName = srcCdef.tableName;
                         dstCdef.dataSourceId = srcCdef.dataSourceId;
                         dstCdef.defaultSortMethod = srcCdef.defaultSortMethod;
                         dstCdef.developerOnly = srcCdef.developerOnly;
@@ -3600,7 +3600,7 @@ namespace Contensive.Processor.Controllers {
                                                     ReturnUpgradeOK = false;
                                                     ReturnErrorMessage = ReturnErrorMessage + "<P>The collection was not installed because the add-on [" + AOName + "] requires an included add-on [" + IncludeAddonName + "] which could not be found. If it is in the collection being installed, it must appear before any add-ons that include it.</P>";
                                                 } else {
-                                                    CS2 = core.db.csOpenSql_rev("default", "select ID from ccAddonIncludeRules where Addonid=" + addonId + " and IncludedAddonID=" + IncludeAddonID);
+                                                    CS2 = core.db.csOpenSql( "select ID from ccAddonIncludeRules where Addonid=" + addonId + " and IncludedAddonID=" + IncludeAddonID);
                                                     AddRule = !core.db.csOk(CS2);
                                                     core.db.csClose(ref CS2);
                                                 }
@@ -3792,12 +3792,12 @@ namespace Contensive.Processor.Controllers {
                                             DefaultCDef = new Models.Domain.CDefModel();
                                         }
                                         //
-                                        ContentTableName =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "ContentTableName", DefaultCDef.contentTableName);
+                                        ContentTableName =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "ContentTableName", DefaultCDef.tableName);
                                         if (!string.IsNullOrEmpty(ContentTableName)) {
                                             //
                                             // These two fields are needed to import the row
                                             //
-                                            DataSourceName =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "dataSource", DefaultCDef.contentDataSourceName);
+                                            DataSourceName =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "dataSource", DefaultCDef.dataSourceName);
                                             if (string.IsNullOrEmpty(DataSourceName)) {
                                                 DataSourceName = "Default";
                                             }
@@ -3835,8 +3835,8 @@ namespace Contensive.Processor.Controllers {
                                             tempVar.dataChanged = setAllDataChanged;
                                             tempVar.set_childIdList(core, new List<int>());
                                             tempVar.contentControlCriteria = "";
-                                            tempVar.contentDataSourceName =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "ContentDataSourceName", DefaultCDef.contentDataSourceName);
-                                            tempVar.contentTableName =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "ContentTableName", DefaultCDef.contentTableName);
+                                            tempVar.dataSourceName =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "ContentDataSourceName", DefaultCDef.dataSourceName);
+                                            tempVar.tableName =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "ContentTableName", DefaultCDef.tableName);
                                             tempVar.dataSourceId = 0;
                                             tempVar.defaultSortMethod =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "DefaultSortMethod", DefaultCDef.defaultSortMethod);
                                             if ((tempVar.defaultSortMethod == "") || (tempVar.defaultSortMethod.ToLower() == "name")) {
@@ -4201,14 +4201,14 @@ namespace Contensive.Processor.Controllers {
                         Models.Domain.CDefModel workingCdef = keypairvalue.Value;
                         ContentName = workingCdef.name;
                         if (workingCdef.dataChanged) {
-                            LogController.logInfo(core, "creating sql table [" + workingCdef.contentTableName + "], datasource [" + workingCdef.contentDataSourceName + "]");
-                            if (GenericController.vbLCase(workingCdef.contentDataSourceName) == "default" || workingCdef.contentDataSourceName == "") {
-                                string TableName = workingCdef.contentTableName;
+                            LogController.logInfo(core, "creating sql table [" + workingCdef.tableName + "], datasource [" + workingCdef.dataSourceName + "]");
+                            if (GenericController.vbLCase(workingCdef.dataSourceName) == "default" || workingCdef.dataSourceName == "") {
+                                string TableName = workingCdef.tableName;
                                 if (GenericController.vbInstr(1, "," + UsedTables + ",", "," + TableName + ",", 1) != 0) {
                                     //TableName = TableName;
                                 } else {
                                     UsedTables = UsedTables + "," + TableName;
-                                    core.db.createSQLTable(workingCdef.contentDataSourceName, TableName);
+                                    core.db.createSQLTable(workingCdef.dataSourceName, TableName);
                                 }
                             }
                         }
@@ -4470,7 +4470,7 @@ namespace Contensive.Processor.Controllers {
                 bool ContentIsBaseContent = false;
                 int FieldHelpCID = Models.Domain.CDefModel.getContentId(core, "Content Field Help");
                 var tmpList = new List<string> { };
-                var datasource = DataSourceModel.createByName(core, cdef.contentDataSourceName, ref tmpList);
+                var datasource = DataSourceModel.createByName(core, cdef.dataSourceName, ref tmpList);
                 {
                     //
                     // -- get contentid and protect content with IsBaseContent true
@@ -4499,7 +4499,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     //
                     // -- update definition (use SingleRecord as an update flag)
-                    Models.Domain.CDefModel.addContent(core, true, datasource, cdef.contentTableName, cdef.name, cdef.adminOnly, cdef.developerOnly, cdef.allowAdd, cdef.allowDelete, cdef.parentName, cdef.defaultSortMethod, cdef.dropDownFieldList, false, cdef.allowCalendarEvents, cdef.allowContentTracking, cdef.allowTopicRules, cdef.allowContentChildTool, false, cdef.iconLink, cdef.iconWidth, cdef.iconHeight, cdef.iconSprites, cdef.guid, cdef.isBaseContent, cdef.installedByCollectionGuid);
+                    Models.Domain.CDefModel.addContent(core, true, datasource, cdef.tableName, cdef.name, cdef.adminOnly, cdef.developerOnly, cdef.allowAdd, cdef.allowDelete, cdef.parentName, cdef.defaultSortMethod, cdef.dropDownFieldList, false, cdef.allowCalendarEvents, cdef.allowContentTracking, cdef.allowTopicRules, cdef.allowContentChildTool, false, cdef.iconLink, cdef.iconWidth, cdef.iconHeight, cdef.iconSprites, cdef.guid, cdef.isBaseContent, cdef.installedByCollectionGuid);
                     if (ContentID == 0) {
                         LogController.logInfo(core, "Could not determine contentid after createcontent3 for [" + cdef.name + "], upgrade for this cdef aborted.");
                     } else {

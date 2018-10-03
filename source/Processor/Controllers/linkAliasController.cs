@@ -171,7 +171,7 @@ namespace Contensive.Processor.Controllers {
                                     //   remove it and add this one
                                     //
                                     CurrentLinkAliasID = core.db.csGetInteger(CS, "id");
-                                    CS2 = core.db.csOpenSql_rev("default", "select top 1 id from ccLinkAliases where pageid=" + LinkAliasPageID + " order by id desc");
+                                    CS2 = core.db.csOpenSql("select top 1 id from ccLinkAliases where pageid=" + LinkAliasPageID + " order by id desc");
                                     if (core.db.csOk(CS2)) {
                                         resaveLinkAlias = (CurrentLinkAliasID != core.db.csGetInteger(CS2, "id"));
                                     }

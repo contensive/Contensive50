@@ -605,7 +605,14 @@ namespace Contensive.Processor.Models.Db {
                     string tableName = derivedTableName(instanceType);
                     string datasourceName = derivedDataSourceName(instanceType);
                     if (id > 0) {
-                        if (!cs.open(contentName, "id=" + id)) {
+
+                        //
+                        // need a new cs method here... openForUpdate( optional id )
+                        //  creates a cs with no read data and an empty write buffer
+                        //  read buffer get() is blocked, but you can setField()
+                        //  cs.save() writes values, if id=0 it does insert, else just update
+                        //
+                        if (!cs.openForUpdate(contentName, id)) {
                             string message = "Unable to open record in content [" + contentName + "], with id [" + id + "]";
                             cs.close();
                             id = 0;
@@ -618,11 +625,11 @@ namespace Contensive.Processor.Models.Db {
                             throw new ApplicationException("Unable to insert record in content [" + contentName + "]");
                         }
                     }
-                    int recordId = cs.getInteger("id");
+                    //int recordId = cs.getInteger("id");
                     foreach (PropertyInfo instanceProperty in this.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
                         switch (instanceProperty.Name.ToLower()) {
                             case "id":
-                                id = cs.getInteger("id");
+                                //id = cs.getInteger("id");
                                 break;
                             case "ccguid":
                                 if (string.IsNullOrEmpty(ccguid)) {
@@ -717,7 +724,7 @@ namespace Contensive.Processor.Models.Db {
                                                 //
                                                 // -- save content
                                                 if (string.IsNullOrEmpty(filename)) {
-                                                    filename = FileController.getVirtualRecordUnixPathFilename(tableName, instanceProperty.Name.ToLower(), recordId, fieldTypeId);
+                                                    filename = FileController.getVirtualRecordUnixPathFilename(tableName, instanceProperty.Name.ToLower(), id, fieldTypeId);
                                                 }
                                                 core.cdnFiles.saveFile(filename, content);
                                                 cs.setFieldFilename(instanceProperty.Name, filename);

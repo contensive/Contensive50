@@ -328,7 +328,7 @@ namespace Contensive.Addons.AdminSite {
                         } else if (adminContext.AdminForm == AdminFormQuickStats) {
                             adminBody = (GetForm_QuickStats());
                         } else if (adminContext.AdminForm == AdminFormIndex) {
-                            adminBody = (GetForm_Index(adminContext, (adminContext.adminContent.contentTableName.ToLower() == "ccemail")));
+                            adminBody = (GetForm_Index(adminContext, (adminContext.adminContent.tableName.ToLower() == "ccemail")));
                         } else if (adminContext.AdminForm == AdminFormEdit) {
                             adminBody = GetForm_Edit(adminContext);
                         } else if (adminContext.AdminForm == AdminFormClose) {
@@ -654,11 +654,11 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // ----- Workflow Fields
                 //
-                return_sqlFieldList = return_sqlFieldList + adminContext.adminContent.contentTableName + ".ID";
+                return_sqlFieldList = return_sqlFieldList + adminContext.adminContent.tableName + ".ID";
                 //
                 // ----- From Clause - build joins for Lookup fields in columns, in the findwords, and in sorts
                 //
-                return_sqlFrom = adminContext.adminContent.contentTableName;
+                return_sqlFrom = adminContext.adminContent.tableName;
                 foreach (KeyValuePair<string, CDefFieldModel> keyValuePair in adminContext.adminContent.fields) {
                     CDefFieldModel field = keyValuePair.Value;
                     FieldPtr = field.id; // quick fix for a replacement for the old fieldPtr (so multiple for loops will always use the same "table"+ptr string
@@ -733,7 +733,7 @@ namespace Contensive.Addons.AdminSite {
                             if (!string.IsNullOrEmpty(JoinTablename)) {
                                 IsLookupFieldValid[field.nameLc] = true;
                                 return_sqlFieldList = return_sqlFieldList + ", LookupTable" + FieldPtr + ".Name AS LookupTable" + FieldPtr + "Name";
-                                return_sqlFrom = "(" + return_sqlFrom + " LEFT JOIN " + JoinTablename + " AS LookupTable" + FieldPtr + " ON " + adminContext.adminContent.contentTableName + "." + field.nameLc + " = LookupTable" + FieldPtr + ".ID)";
+                                return_sqlFrom = "(" + return_sqlFrom + " LEFT JOIN " + JoinTablename + " AS LookupTable" + FieldPtr + " ON " + adminContext.adminContent.tableName + "." + field.nameLc + " = LookupTable" + FieldPtr + ".ID)";
                             }
                             //End If
                         }
@@ -742,7 +742,7 @@ namespace Contensive.Addons.AdminSite {
                         //
                         // This field is included in the columns, so include it in the select
                         //
-                        return_sqlFieldList = return_sqlFieldList + " ," + adminContext.adminContent.contentTableName + "." + field.nameLc;
+                        return_sqlFieldList = return_sqlFieldList + " ," + adminContext.adminContent.tableName + "." + field.nameLc;
                         FieldUsedInColumns[field.nameLc] = true;
                     }
                 }
@@ -758,7 +758,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 DateTime rightNow = DateTime.Now;
                 string sqlRightNow = core.db.encodeSQLDate(rightNow);
-                if (adminContext.adminContent.contentTableName.ToLower() == "ccmembers") {
+                if (adminContext.adminContent.tableName.ToLower() == "ccmembers") {
                     if (IndexConfig.GroupListCnt > 0) {
                         for (Ptr = 0; Ptr < IndexConfig.GroupListCnt; Ptr++) {
                             GroupName = IndexConfig.GroupList[Ptr];
@@ -780,7 +780,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 //If Not SQLSelectIncludesName Then
                 // SQLSelectIncludesName is declared, but not initialized
-                return_sqlFieldList = return_sqlFieldList + " ," + adminContext.adminContent.contentTableName + ".Name";
+                return_sqlFieldList = return_sqlFieldList + " ," + adminContext.adminContent.tableName + ".Name";
                 //End If
                 //
                 // paste sections together and do where clause
@@ -811,7 +811,7 @@ namespace Contensive.Addons.AdminSite {
                                 if (Pos > 0) {
                                     ContentID = GenericController.encodeInteger(ListSplit[Ptr].Left(Pos - 1));
                                     if (ContentID > 0 && (ContentID != adminContext.adminContent.id) & adminContextClass.userHasContentAccess(core, ContentID)) {
-                                        SubQuery = SubQuery + "OR(" + adminContext.adminContent.contentTableName + ".ContentControlID=" + ContentID + ")";
+                                        SubQuery = SubQuery + "OR(" + adminContext.adminContent.tableName + ".ContentControlID=" + ContentID + ")";
                                         return_ContentAccessLimitMessage = return_ContentAccessLimitMessage + ", '<a href=\"?cid=" + ContentID + "\">" + CDefModel.getContentNameByID(core, ContentID) + "</a>'";
                                         SubContactList += "," + ContentID;
                                         SubContentCnt = SubContentCnt + 1;
@@ -835,31 +835,31 @@ namespace Contensive.Addons.AdminSite {
                 // Where Clause: Active Only
                 //
                 if (IndexConfig.ActiveOnly) {
-                    return_SQLWhere += "AND(" + adminContext.adminContent.contentTableName + ".active<>0)";
+                    return_SQLWhere += "AND(" + adminContext.adminContent.tableName + ".active<>0)";
                 }
                 //
                 // Where Clause: edited by me
                 //
                 if (IndexConfig.LastEditedByMe) {
-                    return_SQLWhere += "AND(" + adminContext.adminContent.contentTableName + ".ModifiedBy=" + core.session.user.id + ")";
+                    return_SQLWhere += "AND(" + adminContext.adminContent.tableName + ".ModifiedBy=" + core.session.user.id + ")";
                 }
                 //
                 // Where Clause: edited today
                 //
                 if (IndexConfig.LastEditedToday) {
-                    return_SQLWhere += "AND(" + adminContext.adminContent.contentTableName + ".ModifiedDate>=" + core.db.encodeSQLDate(core.doc.profileStartTime.Date) + ")";
+                    return_SQLWhere += "AND(" + adminContext.adminContent.tableName + ".ModifiedDate>=" + core.db.encodeSQLDate(core.doc.profileStartTime.Date) + ")";
                 }
                 //
                 // Where Clause: edited past week
                 //
                 if (IndexConfig.LastEditedPast7Days) {
-                    return_SQLWhere += "AND(" + adminContext.adminContent.contentTableName + ".ModifiedDate>=" + core.db.encodeSQLDate(core.doc.profileStartTime.Date.AddDays(-7)) + ")";
+                    return_SQLWhere += "AND(" + adminContext.adminContent.tableName + ".ModifiedDate>=" + core.db.encodeSQLDate(core.doc.profileStartTime.Date.AddDays(-7)) + ")";
                 }
                 //
                 // Where Clause: edited past month
                 //
                 if (IndexConfig.LastEditedPast30Days) {
-                    return_SQLWhere += "AND(" + adminContext.adminContent.contentTableName + ".ModifiedDate>=" + core.db.encodeSQLDate(core.doc.profileStartTime.Date.AddDays(-30)) + ")";
+                    return_SQLWhere += "AND(" + adminContext.adminContent.tableName + ".ModifiedDate>=" + core.db.encodeSQLDate(core.doc.profileStartTime.Date.AddDays(-30)) + ")";
                 }
                 //
                 // Where Clause: Where Pairs
@@ -876,7 +876,7 @@ namespace Contensive.Addons.AdminSite {
                                     //
                                     // found it, add it in the sql
                                     //
-                                    return_SQLWhere += "AND(" + adminContext.adminContent.contentTableName + "." + adminContext.WherePair[0, WCount] + "=";
+                                    return_SQLWhere += "AND(" + adminContext.adminContent.tableName + "." + adminContext.WherePair[0, WCount] + "=";
                                     if (adminContext.WherePair[1, WCount].IsNumeric()) {
                                         return_SQLWhere += adminContext.WherePair[1, WCount] + ")";
                                     } else {
@@ -916,20 +916,20 @@ namespace Contensive.Addons.AdminSite {
                                                 int FindWordValueInteger = GenericController.encodeInteger(FindWordValue);
                                                 switch (FindMatchOption) {
                                                     case (int)FindWordMatchEnum.MatchEmpty:
-                                                        return_SQLWhere += "AND(" + adminContext.adminContent.contentTableName + "." + FindWordName + " is null)";
+                                                        return_SQLWhere += "AND(" + adminContext.adminContent.tableName + "." + FindWordName + " is null)";
                                                         break;
                                                     case (int)FindWordMatchEnum.MatchNotEmpty:
-                                                        return_SQLWhere += "AND(" + adminContext.adminContent.contentTableName + "." + FindWordName + " is not null)";
+                                                        return_SQLWhere += "AND(" + adminContext.adminContent.tableName + "." + FindWordName + " is not null)";
                                                         break;
                                                     case (int)FindWordMatchEnum.MatchEquals:
                                                     case (int)FindWordMatchEnum.matchincludes:
-                                                        return_SQLWhere += "AND(" + adminContext.adminContent.contentTableName + "." + FindWordName + "=" + core.db.encodeSQLNumber(FindWordValueInteger) + ")";
+                                                        return_SQLWhere += "AND(" + adminContext.adminContent.tableName + "." + FindWordName + "=" + core.db.encodeSQLNumber(FindWordValueInteger) + ")";
                                                         break;
                                                     case (int)FindWordMatchEnum.MatchGreaterThan:
-                                                        return_SQLWhere += "AND(" + adminContext.adminContent.contentTableName + "." + FindWordName + ">" + core.db.encodeSQLNumber(FindWordValueInteger) + ")";
+                                                        return_SQLWhere += "AND(" + adminContext.adminContent.tableName + "." + FindWordName + ">" + core.db.encodeSQLNumber(FindWordValueInteger) + ")";
                                                         break;
                                                     case (int)FindWordMatchEnum.MatchLessThan:
-                                                        return_SQLWhere += "AND(" + adminContext.adminContent.contentTableName + "." + FindWordName + "<" + core.db.encodeSQLNumber(FindWordValueInteger) + ")";
+                                                        return_SQLWhere += "AND(" + adminContext.adminContent.tableName + "." + FindWordName + "<" + core.db.encodeSQLNumber(FindWordValueInteger) + ")";
                                                         break;
                                                 }
                                                 //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
@@ -944,20 +944,20 @@ namespace Contensive.Addons.AdminSite {
                                                 double FindWordValueDouble = GenericController.encodeNumber(FindWordValue);
                                                 switch (FindMatchOption) {
                                                     case (int)FindWordMatchEnum.MatchEmpty:
-                                                        return_SQLWhere += "AND(" + adminContext.adminContent.contentTableName + "." + FindWordName + " is null)";
+                                                        return_SQLWhere += "AND(" + adminContext.adminContent.tableName + "." + FindWordName + " is null)";
                                                         break;
                                                     case (int)FindWordMatchEnum.MatchNotEmpty:
-                                                        return_SQLWhere += "AND(" + adminContext.adminContent.contentTableName + "." + FindWordName + " is not null)";
+                                                        return_SQLWhere += "AND(" + adminContext.adminContent.tableName + "." + FindWordName + " is not null)";
                                                         break;
                                                     case (int)FindWordMatchEnum.MatchEquals:
                                                     case (int)FindWordMatchEnum.matchincludes:
-                                                        return_SQLWhere += "AND(" + adminContext.adminContent.contentTableName + "." + FindWordName + "=" + core.db.encodeSQLNumber(FindWordValueDouble) + ")";
+                                                        return_SQLWhere += "AND(" + adminContext.adminContent.tableName + "." + FindWordName + "=" + core.db.encodeSQLNumber(FindWordValueDouble) + ")";
                                                         break;
                                                     case (int)FindWordMatchEnum.MatchGreaterThan:
-                                                        return_SQLWhere += "AND(" + adminContext.adminContent.contentTableName + "." + FindWordName + ">" + core.db.encodeSQLNumber(FindWordValueDouble) + ")";
+                                                        return_SQLWhere += "AND(" + adminContext.adminContent.tableName + "." + FindWordName + ">" + core.db.encodeSQLNumber(FindWordValueDouble) + ")";
                                                         break;
                                                     case (int)FindWordMatchEnum.MatchLessThan:
-                                                        return_SQLWhere += "AND(" + adminContext.adminContent.contentTableName + "." + FindWordName + "<" + core.db.encodeSQLNumber(FindWordValueDouble) + ")";
+                                                        return_SQLWhere += "AND(" + adminContext.adminContent.tableName + "." + FindWordName + "<" + core.db.encodeSQLNumber(FindWordValueDouble) + ")";
                                                         break;
                                                 }
                                                 //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
@@ -970,10 +970,10 @@ namespace Contensive.Addons.AdminSite {
                                                 //
                                                 switch (FindMatchOption) {
                                                     case (int)FindWordMatchEnum.MatchEmpty:
-                                                        return_SQLWhere += "AND(" + adminContext.adminContent.contentTableName + "." + FindWordName + " is null)";
+                                                        return_SQLWhere += "AND(" + adminContext.adminContent.tableName + "." + FindWordName + " is null)";
                                                         break;
                                                     case (int)FindWordMatchEnum.MatchNotEmpty:
-                                                        return_SQLWhere += "AND(" + adminContext.adminContent.contentTableName + "." + FindWordName + " is not null)";
+                                                        return_SQLWhere += "AND(" + adminContext.adminContent.tableName + "." + FindWordName + " is not null)";
                                                         break;
                                                 }
                                                 //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
@@ -989,20 +989,20 @@ namespace Contensive.Addons.AdminSite {
                                                 }
                                                 switch (FindMatchOption) {
                                                     case (int)FindWordMatchEnum.MatchEmpty:
-                                                        return_SQLWhere += "AND(" + adminContext.adminContent.contentTableName + "." + FindWordName + " is null)";
+                                                        return_SQLWhere += "AND(" + adminContext.adminContent.tableName + "." + FindWordName + " is null)";
                                                         break;
                                                     case (int)FindWordMatchEnum.MatchNotEmpty:
-                                                        return_SQLWhere += "AND(" + adminContext.adminContent.contentTableName + "." + FindWordName + " is not null)";
+                                                        return_SQLWhere += "AND(" + adminContext.adminContent.tableName + "." + FindWordName + " is not null)";
                                                         break;
                                                     case (int)FindWordMatchEnum.MatchEquals:
                                                     case (int)FindWordMatchEnum.matchincludes:
-                                                        return_SQLWhere += "AND(" + adminContext.adminContent.contentTableName + "." + FindWordName + "=" + core.db.encodeSQLDate(findDate) + ")";
+                                                        return_SQLWhere += "AND(" + adminContext.adminContent.tableName + "." + FindWordName + "=" + core.db.encodeSQLDate(findDate) + ")";
                                                         break;
                                                     case (int)FindWordMatchEnum.MatchGreaterThan:
-                                                        return_SQLWhere += "AND(" + adminContext.adminContent.contentTableName + "." + FindWordName + ">" + core.db.encodeSQLDate(findDate) + ")";
+                                                        return_SQLWhere += "AND(" + adminContext.adminContent.tableName + "." + FindWordName + ">" + core.db.encodeSQLDate(findDate) + ")";
                                                         break;
                                                     case (int)FindWordMatchEnum.MatchLessThan:
-                                                        return_SQLWhere += "AND(" + adminContext.adminContent.contentTableName + "." + FindWordName + "<" + core.db.encodeSQLDate(findDate) + ")";
+                                                        return_SQLWhere += "AND(" + adminContext.adminContent.tableName + "." + FindWordName + "<" + core.db.encodeSQLDate(findDate) + ")";
                                                         break;
                                                 }
                                                 //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
@@ -1037,10 +1037,10 @@ namespace Contensive.Addons.AdminSite {
                                                     //
                                                     switch (FindMatchOption) {
                                                         case (int)FindWordMatchEnum.MatchEmpty:
-                                                            return_SQLWhere += "AND(" + adminContext.adminContent.contentTableName + "." + FindWordName + " is null)";
+                                                            return_SQLWhere += "AND(" + adminContext.adminContent.tableName + "." + FindWordName + " is null)";
                                                             break;
                                                         case (int)FindWordMatchEnum.MatchNotEmpty:
-                                                            return_SQLWhere += "AND(" + adminContext.adminContent.contentTableName + "." + FindWordName + " is not null)";
+                                                            return_SQLWhere += "AND(" + adminContext.adminContent.tableName + "." + FindWordName + " is not null)";
                                                             break;
                                                         case (int)FindWordMatchEnum.MatchEquals:
                                                         case (int)FindWordMatchEnum.matchincludes:
@@ -1048,7 +1048,7 @@ namespace Contensive.Addons.AdminSite {
                                                             LookupQuery = "";
                                                             for (LookupPtr = 0; LookupPtr <= lookups.GetUpperBound(0); LookupPtr++) {
                                                                 if (!lookups[LookupPtr].Contains(FindWordValue)) {
-                                                                    LookupQuery = LookupQuery + "OR(" + adminContext.adminContent.contentTableName + "." + FindWordName + "=" + core.db.encodeSQLNumber(LookupPtr + 1) + ")";
+                                                                    LookupQuery = LookupQuery + "OR(" + adminContext.adminContent.tableName + "." + FindWordName + "=" + core.db.encodeSQLNumber(LookupPtr + 1) + ")";
                                                                 }
                                                                 //if (genericController.vbInstr(1, lookups[LookupPtr], FindWordValue, 1) != 0) {
                                                                 //    LookupQuery = LookupQuery + "OR(" + adminContext.adminContext.content.ContentTableName + "." + FindWordName + "=" + core.db.encodeSQLNumber(LookupPtr + 1) + ")";
@@ -1070,16 +1070,16 @@ namespace Contensive.Addons.AdminSite {
                                                 switch (FindMatchOption) {
                                                     case (int)FindWordMatchEnum.matchincludes:
                                                         if (GenericController.encodeBoolean(FindWordValue)) {
-                                                            return_SQLWhere += "AND(" + adminContext.adminContent.contentTableName + "." + FindWordName + "<>0)";
+                                                            return_SQLWhere += "AND(" + adminContext.adminContent.tableName + "." + FindWordName + "<>0)";
                                                         } else {
-                                                            return_SQLWhere += "AND((" + adminContext.adminContent.contentTableName + "." + FindWordName + "=0)or(" + adminContext.adminContent.contentTableName + "." + FindWordName + " is null))";
+                                                            return_SQLWhere += "AND((" + adminContext.adminContent.tableName + "." + FindWordName + "=0)or(" + adminContext.adminContent.tableName + "." + FindWordName + " is null))";
                                                         }
                                                         break;
                                                     case (int)FindWordMatchEnum.MatchTrue:
-                                                        return_SQLWhere += "AND(" + adminContext.adminContent.contentTableName + "." + FindWordName + "<>0)";
+                                                        return_SQLWhere += "AND(" + adminContext.adminContent.tableName + "." + FindWordName + "<>0)";
                                                         break;
                                                     case (int)FindWordMatchEnum.MatchFalse:
-                                                        return_SQLWhere += "AND((" + adminContext.adminContent.contentTableName + "." + FindWordName + "=0)or(" + adminContext.adminContent.contentTableName + "." + FindWordName + " is null))";
+                                                        return_SQLWhere += "AND((" + adminContext.adminContent.tableName + "." + FindWordName + "=0)or(" + adminContext.adminContent.tableName + "." + FindWordName + " is null))";
                                                         break;
                                                 }
                                                 //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
@@ -1091,18 +1091,18 @@ namespace Contensive.Addons.AdminSite {
                                                 //
                                                 switch (FindMatchOption) {
                                                     case (int)FindWordMatchEnum.MatchEmpty:
-                                                        return_SQLWhere += "AND(" + adminContext.adminContent.contentTableName + "." + FindWordName + " is null)";
+                                                        return_SQLWhere += "AND(" + adminContext.adminContent.tableName + "." + FindWordName + " is null)";
                                                         break;
                                                     case (int)FindWordMatchEnum.MatchNotEmpty:
-                                                        return_SQLWhere += "AND(" + adminContext.adminContent.contentTableName + "." + FindWordName + " is not null)";
+                                                        return_SQLWhere += "AND(" + adminContext.adminContent.tableName + "." + FindWordName + " is not null)";
                                                         break;
                                                     case (int)FindWordMatchEnum.matchincludes:
                                                         FindWordValue = core.db.encodeSQLText(FindWordValue);
                                                         FindWordValue = FindWordValue.Substring(1, FindWordValue.Length - 2);
-                                                        return_SQLWhere += "AND(" + adminContext.adminContent.contentTableName + "." + FindWordName + " LIKE '%" + FindWordValue + "%')";
+                                                        return_SQLWhere += "AND(" + adminContext.adminContent.tableName + "." + FindWordName + " LIKE '%" + FindWordValue + "%')";
                                                         break;
                                                     case (int)FindWordMatchEnum.MatchEquals:
-                                                        return_SQLWhere += "AND(" + adminContext.adminContent.contentTableName + "." + FindWordName + "=" + core.db.encodeSQLText(FindWordValue) + ")";
+                                                        return_SQLWhere += "AND(" + adminContext.adminContent.tableName + "." + FindWordName + "=" + core.db.encodeSQLText(FindWordValue) + ")";
                                                         break;
                                                 }
                                                 //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
@@ -1135,7 +1135,7 @@ namespace Contensive.Addons.AdminSite {
                         if ((tempVar.fieldTypeId == FieldTypeIdLookup) && IsLookupFieldValid[sort.fieldName]) {
                             return_SQLOrderBy += orderByDelim + "LookupTable" + FieldPtr + ".Name";
                         } else {
-                            return_SQLOrderBy += orderByDelim + adminContext.adminContent.contentTableName + "." + SortFieldName;
+                            return_SQLOrderBy += orderByDelim + adminContext.adminContent.tableName + "." + SortFieldName;
                         }
                     }
                     if (sort.direction > 1) {
@@ -1283,7 +1283,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // Bad content name
                     Stream.Add(GetForm_Error("No content definition could be found for ContentID [" + adminContext.adminContent.id + "]. This could be a menu error. Please contact your application developer for more assistance.", "No content definition for ContentID [" + adminContext.adminContent.id + "] could be found."));
-                } else if (adminContext.adminContent.contentTableName == "") {
+                } else if (adminContext.adminContent.tableName == "") {
                     //
                     // No tablename
                     Stream.Add(GetForm_Error("The content definition [" + adminContext.adminContent.name + "] is not associated with a valid database table. Please contact your application developer for more assistance.", "Content [" + adminContext.adminContent.name + "] ContentTablename is empty."));
@@ -1351,12 +1351,12 @@ namespace Contensive.Addons.AdminSite {
                         } else {
                             //
                             // Get the total record count
-                            string SQL = "select count(" + adminContext.adminContent.contentTableName + ".ID) as cnt from " + sqlFrom;
+                            string SQL = "select count(" + adminContext.adminContent.tableName + ".ID) as cnt from " + sqlFrom;
                             if (!string.IsNullOrEmpty(sqlWhere)) {
                                 SQL += " where " + sqlWhere;
                             }
                             int recordCnt = 0;
-                            int CS = core.db.csOpenSql_rev(datasource.name, SQL);
+                            int CS = core.db.csOpenSql(SQL, datasource.name);
                             if (core.db.csOk(CS)) {
                                 recordCnt = core.db.csGetInteger(CS, "cnt");
                             }
@@ -1597,7 +1597,7 @@ namespace Contensive.Addons.AdminSite {
                                         if (FieldUsedInColumns.ContainsKey(columnNameLc)) {
                                             if (FieldUsedInColumns[columnNameLc]) {
                                                 DataTable_DataRows += ("\r\n<td valign=\"middle\" " + RowColor + " align=\"left\">" + SpanClassAdminNormal);
-                                                DataTable_DataRows += GetForm_Index_GetCell(adminContext, column.Name, CS, IsLookupFieldValid[columnNameLc], GenericController.vbLCase(adminContext.adminContent.contentTableName) == "ccemail");
+                                                DataTable_DataRows += GetForm_Index_GetCell(adminContext, column.Name, CS, IsLookupFieldValid[columnNameLc], GenericController.vbLCase(adminContext.adminContent.tableName) == "ccemail");
                                                 DataTable_DataRows += ("&nbsp;</span></td>");
                                             }
                                         }
@@ -2415,7 +2415,7 @@ namespace Contensive.Addons.AdminSite {
                                     ErrorController.addUserError(core, "Your request was blocked because the record you specified is now locked by another authcontext.user.");
                                 } else {
                                     LoadEditRecord(adminContext);
-                                    core.db.deprecate_argsreversed_deleteTableRecord(adminContext.adminContent.contentTableName, adminContext.editRecord.id, adminContext.adminContent.contentDataSourceName);
+                                    core.db.deprecate_argsreversed_deleteTableRecord(adminContext.adminContent.tableName, adminContext.editRecord.id, adminContext.adminContent.dataSourceName);
                                     core.doc.processAfterSave(true, adminContext.editRecord.contentControlId_Name, adminContext.editRecord.id, adminContext.editRecord.nameLc, adminContext.editRecord.parentID, UseContentWatchLink);
                                 }
                                 adminContext.Admin_Action = adminContextClass.AdminActionNop;
@@ -2600,13 +2600,13 @@ namespace Contensive.Addons.AdminSite {
                                                     // non-Workflow Delete
                                                     //
                                                     ContentName = CDefModel.getContentNameByID(core, core.db.csGetInteger(CSEditRecord, "ContentControlID"));
-                                                    core.cache.invalidateDbRecord(RecordID, adminContext.adminContent.contentTableName);
+                                                    core.cache.invalidateDbRecord(RecordID, adminContext.adminContent.tableName);
                                                     core.doc.processAfterSave(true, ContentName, RecordID, "", 0, UseContentWatchLink);
                                                 }
                                                 //
                                                 // Page Content special cases
                                                 //
-                                                if (GenericController.vbLCase(adminContext.adminContent.contentTableName) == "ccpagecontent") {
+                                                if (GenericController.vbLCase(adminContext.adminContent.tableName) == "ccpagecontent") {
                                                     //Call core.pages.cache_pageContent_removeRow(RecordID, False, False)
                                                     if (RecordID == (core.siteProperties.getInteger("PageNotFoundPageID", 0))) {
                                                         core.siteProperties.getText("PageNotFoundPageID", "0");
@@ -2990,7 +2990,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // ----- Set Read Only: if non-developer tries to edit a developer record
                     //
-                    if (GenericController.vbUCase(adminContext.adminContent.contentTableName) == GenericController.vbUCase("ccMembers")) {
+                    if (GenericController.vbUCase(adminContext.adminContent.tableName) == GenericController.vbUCase("ccMembers")) {
                         if (!core.session.isAuthenticatedDeveloper(core)) {
                             if (editRecord.fieldsLc.ContainsKey("developer")) {
                                 if (GenericController.encodeBoolean(editRecord.fieldsLc["developer"].value)) {
@@ -3223,7 +3223,7 @@ namespace Contensive.Addons.AdminSite {
                     adminContext.BlockEditForm = true;
                     ErrorController.addUserError(core, "No content definition could be found For ContentID [" + adminContent.id + "]. This could be a menu Error. Please contact your application developer For more assistance.");
                     handleLegacyClassError("AdminClass.LoadEditRecord_Dbase", "No content definition For ContentID [" + adminContent.id + "] could be found.");
-                } else if (adminContent.contentTableName == "") {
+                } else if (adminContent.tableName == "") {
                     //
                     // ----- Error: no content table
                     //
@@ -3883,7 +3883,7 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 // special case - people records without Allowduplicateusername require username to be unique
                                 //
-                                if (GenericController.vbLCase(adminContext.adminContent.contentTableName) == "ccmembers") {
+                                if (GenericController.vbLCase(adminContext.adminContent.tableName) == "ccmembers") {
                                     if (GenericController.vbLCase(field.nameLc) == "username") {
                                         blockDuplicateUsername = !(core.siteProperties.getBoolean("allowduplicateusername", false));
                                     }
@@ -3895,13 +3895,13 @@ namespace Contensive.Addons.AdminSite {
                                     //
                                     // ----- Do the unique check for this field
                                     //
-                                    string SQLUnique = "select id from " + adminContext.adminContent.contentTableName + " where (" + field.nameLc + "=" + core.db.encodeSQL(ResponseFieldValueText, field.fieldTypeId) + ")and(" + CDefModel.getContentControlCriteria(core, adminContext.adminContent.name) + ")";
+                                    string SQLUnique = "select id from " + adminContext.adminContent.tableName + " where (" + field.nameLc + "=" + core.db.encodeSQL(ResponseFieldValueText, field.fieldTypeId) + ")and(" + CDefModel.getContentControlCriteria(core, adminContext.adminContent.name) + ")";
                                     if (editRecord.id > 0) {
                                         //
                                         // --editing record
                                         SQLUnique = SQLUnique + "and(id<>" + editRecord.id + ")";
                                     }
-                                    CSPointer = core.db.csOpenSql_rev(adminContext.adminContent.contentDataSourceName, SQLUnique);
+                                    CSPointer = core.db.csOpenSql(SQLUnique,adminContext.adminContent.dataSourceName);
                                     if (core.db.csOk(CSPointer)) {
                                         //
                                         // field is not unique, skip it and flag error
@@ -4092,7 +4092,7 @@ namespace Contensive.Addons.AdminSite {
                     }
                     if (!string.IsNullOrEmpty(linkAlias)) {
                         if (OverRideDuplicate) {
-                            core.db.executeQuery("update " + adminContext.adminContent.contentTableName + " set linkalias=null where ( linkalias=" + core.db.encodeSQLText(linkAlias) + ") and (id<>" + editRecord.id + ")");
+                            core.db.executeQuery("update " + adminContext.adminContent.tableName + " set linkalias=null where ( linkalias=" + core.db.encodeSQLText(linkAlias) + ") and (id<>" + editRecord.id + ")");
                         } else {
                             int CS = core.db.csOpen(adminContext.adminContent.name, "( linkalias=" + core.db.encodeSQLText(linkAlias) + ")and(id<>" + editRecord.id + ")");
                             if (core.db.csOk(CS)) {
@@ -4304,7 +4304,7 @@ namespace Contensive.Addons.AdminSite {
                             //
                             // ----- Put the field in the SQL to be saved
                             //
-                            if (IsVisibleUserField(field.adminOnly, field.developerOnly, field.active, field.authorable, field.nameLc, adminContext.adminContent.contentTableName) & (NewRecord || (!field.readOnly)) & (NewRecord || (!field.notEditable))) {
+                            if (IsVisibleUserField(field.adminOnly, field.developerOnly, field.active, field.authorable, field.nameLc, adminContext.adminContent.tableName) & (NewRecord || (!field.readOnly)) & (NewRecord || (!field.notEditable))) {
                                 //
                                 // ----- save the value by field type
                                 //
@@ -4440,7 +4440,7 @@ namespace Contensive.Addons.AdminSite {
                             //
                             // -- Log Activity for changes to people and organizattions
                             if (fieldChanged) {
-                                switch (GenericController.vbLCase(adminContext.adminContent.contentTableName)) {
+                                switch (GenericController.vbLCase(adminContext.adminContent.tableName)) {
                                     case "cclibraryfiles":
                                         //
                                         if (core.docProperties.getText("filename") != "") {
@@ -4449,7 +4449,7 @@ namespace Contensive.Addons.AdminSite {
                                         break;
                                 }
                                 if (!NewRecord) {
-                                    switch (GenericController.vbLCase(adminContext.adminContent.contentTableName)) {
+                                    switch (GenericController.vbLCase(adminContext.adminContent.tableName)) {
                                         case "ccmembers":
                                             //
                                             if (ActivityLogOrganizationID < 0) {
@@ -4757,10 +4757,10 @@ namespace Contensive.Addons.AdminSite {
                 Stream.Add(GetForm_EditFormStart(adminContext, AdminFormEdit));
                 bool IsLandingPageParent = false;
                 int TemplateIDForStyles = 0;
-                bool IsTemplateTable = (adminContext.adminContent.contentTableName.ToLower() == Processor.Models.Db.PageTemplateModel.contentTableName);
-                bool IsPageContentTable = (adminContext.adminContent.contentTableName.ToLower() == Processor.Models.Db.PageContentModel.contentTableName);
-                bool IsSectionTable = (adminContext.adminContent.contentTableName.ToLower() == Processor.Models.Db.SiteSectionModel.contentTableName);
-                bool IsEmailTable = (adminContext.adminContent.contentTableName.ToLower() == Processor.Models.Db.EmailModel.contentTableName);
+                bool IsTemplateTable = (adminContext.adminContent.tableName.ToLower() == Processor.Models.Db.PageTemplateModel.contentTableName);
+                bool IsPageContentTable = (adminContext.adminContent.tableName.ToLower() == Processor.Models.Db.PageContentModel.contentTableName);
+                bool IsSectionTable = (adminContext.adminContent.tableName.ToLower() == Processor.Models.Db.SiteSectionModel.contentTableName);
+                bool IsEmailTable = (adminContext.adminContent.tableName.ToLower() == Processor.Models.Db.EmailModel.contentTableName);
                 int emailIdForStyles = IsEmailTable ? editRecord.id : 0;
                 bool IsLandingPage = false;
                 bool IsRootPage = false;
@@ -4883,9 +4883,9 @@ namespace Contensive.Addons.AdminSite {
                 contentTypeEnum ContentType;
                 if (GenericController.vbLCase(adminContext.adminContent.name) == "email templates") {
                     ContentType = contentTypeEnum.contentTypeEmailTemplate;
-                } else if (GenericController.vbLCase(adminContext.adminContent.contentTableName) == "cctemplates") {
+                } else if (GenericController.vbLCase(adminContext.adminContent.tableName) == "cctemplates") {
                     ContentType = contentTypeEnum.contentTypeWebTemplate;
-                } else if (GenericController.vbLCase(adminContext.adminContent.contentTableName) == "ccemail") {
+                } else if (GenericController.vbLCase(adminContext.adminContent.tableName) == "ccemail") {
                     ContentType = contentTypeEnum.contentTypeEmail;
                 } else {
                     ContentType = contentTypeEnum.contentTypeWeb;
@@ -4895,7 +4895,7 @@ namespace Contensive.Addons.AdminSite {
                 string styleOptionList = "";
                 string editorAddonListJSON = core.html.getWysiwygAddonList(ContentType);
                 string styleList = "";
-                string adminContentTableNameLower = adminContext.adminContent.contentTableName.ToLower();
+                string adminContentTableNameLower = adminContext.adminContent.tableName.ToLower();
                 if (adminContentTableNameLower == PersonModel.contentTableName.ToLower()) {
                     //
                     // -- people
@@ -5036,7 +5036,7 @@ namespace Contensive.Addons.AdminSite {
                         if (adminContext.allowAdminTabs) Stream.Add(core.doc.menuComboTab.GetTabs(core));
                         Stream.Add(EditSectionButtonBar);
                     }
-                } else if (adminContext.adminContent.contentTableName.ToLower() == ContentModel.contentTableName.ToLower()) {
+                } else if (adminContext.adminContent.tableName.ToLower() == ContentModel.contentTableName.ToLower()) {
                     if (!(core.session.isAuthenticatedAdmin(core))) {
                         //
                         // Must be admin
@@ -5208,7 +5208,7 @@ namespace Contensive.Addons.AdminSite {
                     // All other tables (User definined)
                     bool IsPageContent = CDefModel.isWithinContent(core, adminContext.adminContent.id, CDefModel.getContentId(core, "Page Content"));
                     bool HasChildRecords = CDefModel.isContentFieldSupported(core, adminContext.adminContent.name, "parentid");
-                    bool AllowMarkReviewed = core.db.isSQLTableField("default", adminContext.adminContent.contentTableName, "DateReviewed");
+                    bool AllowMarkReviewed = core.db.isSQLTableField("default", adminContext.adminContent.tableName, "DateReviewed");
                     string EditSectionButtonBar = AdminUIController.getButtonBarForEdit(core, new EditButtonBarInfoClass() {
                         allowActivate = false,
                         allowAdd = (allowAdd && adminContext.adminContent.allowAdd & editRecord.AllowInsert),
@@ -5664,7 +5664,7 @@ namespace Contensive.Addons.AdminSite {
                     foreach (var keyValuePair in adminContext.adminContent.fields) {
                         CDefFieldModel field = keyValuePair.Value;
                         if (field.editTabName.ToLower() == EditTab.ToLower()) {
-                            if (IsVisibleUserField(field.adminOnly, field.developerOnly, field.active, field.authorable, field.nameLc, adminContext.adminContent.contentTableName)) {
+                            if (IsVisibleUserField(field.adminOnly, field.developerOnly, field.active, field.authorable, field.nameLc, adminContext.adminContent.tableName)) {
                                 AlphaSort = GenericController.getIntegerString(field.editSortPriority, 10) + "-" + GenericController.getIntegerString(field.id, 10);
                                 sortingFields.Add(AlphaSort, field);
                             }
@@ -5689,7 +5689,7 @@ namespace Contensive.Addons.AdminSite {
                             fieldCaption = "&nbsp;**" + fieldCaption;
                         } else {
                             if (field.nameLc.ToLower() == "email") {
-                                if ((adminContext.adminContent.contentTableName.ToLower() == "ccmembers") && ((core.siteProperties.getBoolean("allowemaillogin", false)))) {
+                                if ((adminContext.adminContent.tableName.ToLower() == "ccmembers") && ((core.siteProperties.getBoolean("allowemaillogin", false)))) {
                                     fieldCaption = "&nbsp;***" + fieldCaption;
                                     needUniqueEmailMessage = true;
                                 }
@@ -5750,7 +5750,7 @@ namespace Contensive.Addons.AdminSite {
                         //
                         // Special Case - ccemail table Alloweid should be disabled if siteproperty AllowLinkLogin is false
                         //
-                        if (GenericController.vbLCase(adminContext.adminContent.contentTableName) == "ccemail" && GenericController.vbLCase(field.nameLc) == "allowlinkeid") {
+                        if (GenericController.vbLCase(adminContext.adminContent.tableName) == "ccemail" && GenericController.vbLCase(field.nameLc) == "allowlinkeid") {
                             if (!(core.siteProperties.getBoolean("AllowLinkLogin", true))) {
                                 //.ValueVariant = "0"
                                 fieldValue_object = "0";
@@ -6723,7 +6723,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // ----- EID (Encoded ID)
                 {
-                    if (GenericController.vbUCase(adminContext.adminContent.contentTableName) == GenericController.vbUCase("ccMembers")) {
+                    if (GenericController.vbUCase(adminContext.adminContent.tableName) == GenericController.vbUCase("ccMembers")) {
                         bool AllowEID = (core.siteProperties.getBoolean("AllowLinkLogin", true)) | (core.siteProperties.getBoolean("AllowLinkRecognize", true));
                         string fieldHelp = "";
                         string fieldEditor = "";
@@ -8412,7 +8412,7 @@ namespace Contensive.Addons.AdminSite {
             if (!string.IsNullOrEmpty(iParentCriteria)) {
                 iParentCriteria = "(" + iParentCriteria + ")";
             }
-            return core.db.csOpenSql_rev("default", GetMenuSQL(iParentCriteria, cnNavigatorEntries));
+            return core.db.csOpenSql( GetMenuSQL(iParentCriteria, cnNavigatorEntries));
         }
         //
         //========================================================================
@@ -8662,7 +8662,7 @@ namespace Contensive.Addons.AdminSite {
                                     EditorStyleRulesFilename = GenericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", "0", 1, 99, 1);
                                     core.cdnFiles.deleteFile(EditorStyleRulesFilename);
                                     //
-                                    CS = core.db.csOpenSql_rev("default", "select id from cctemplates");
+                                    CS = core.db.csOpenSql( "select id from cctemplates");
                                     while (core.db.csOk(0)) {
                                         EditorStyleRulesFilename = GenericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", core.db.csGet(0, "ID"), 1, 99, 1);
                                         core.cdnFiles.deleteFile(EditorStyleRulesFilename);
@@ -8818,7 +8818,7 @@ namespace Contensive.Addons.AdminSite {
             bool tempIsFieldEditable = false;
             try {
                 //
-                tempIsFieldEditable = IsVisibleUserField(Field.adminOnly, Field.developerOnly, Field.active, Field.authorable, Field.nameLc, adminContext.adminContent.contentTableName) && (!Field.readOnly) & (!Field.notEditable);
+                tempIsFieldEditable = IsVisibleUserField(Field.adminOnly, Field.developerOnly, Field.active, Field.authorable, Field.nameLc, adminContext.adminContent.tableName) && (!Field.readOnly) & (!Field.notEditable);
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
             }
@@ -8863,7 +8863,7 @@ namespace Contensive.Addons.AdminSite {
                         //todo  NOTE: The following VB 'Select Case' included either a non-ordinal switch expression or non-ordinal, range-type, or non-constant 'Case' expressions and was converted to C# 'if-else' logic:
                         //						Select Case genericController.vbUCase(adminContext.content.ContentTableName)
                         //ORIGINAL LINE: Case genericController.vbUCase("ccMembers")
-                        if (GenericController.vbUCase(adminContext.adminContent.contentTableName) == GenericController.vbUCase("ccMembers")) {
+                        if (GenericController.vbUCase(adminContext.adminContent.tableName) == GenericController.vbUCase("ccMembers")) {
                             //
                             //
                             //
@@ -8873,7 +8873,7 @@ namespace Contensive.Addons.AdminSite {
                             //Call SaveTopicRules
                         }
                         //ORIGINAL LINE: Case "CCEMAIL"
-                        else if (GenericController.vbUCase(adminContext.adminContent.contentTableName) == "CCEMAIL") {
+                        else if (GenericController.vbUCase(adminContext.adminContent.tableName) == "CCEMAIL") {
                             //
                             //
                             //
@@ -8886,7 +8886,7 @@ namespace Contensive.Addons.AdminSite {
                             core.html.processCheckList("EmailTopics", "Group Email", GenericController.encodeText(editRecord.id), "Topics", "Email Topics", "EmailID", "TopicID");
                         }
                         //ORIGINAL LINE: Case "CCCONTENT"
-                        else if (GenericController.vbUCase(adminContext.adminContent.contentTableName) == "CCCONTENT") {
+                        else if (GenericController.vbUCase(adminContext.adminContent.tableName) == "CCCONTENT") {
                             //
                             //
                             //
@@ -8894,7 +8894,7 @@ namespace Contensive.Addons.AdminSite {
                             LoadAndSaveGroupRules(editRecord);
                         }
                         //ORIGINAL LINE: Case "CCPAGECONTENT"
-                        else if (GenericController.vbUCase(adminContext.adminContent.contentTableName) == "CCPAGECONTENT") {
+                        else if (GenericController.vbUCase(adminContext.adminContent.tableName) == "CCPAGECONTENT") {
                             //
                             //
                             //
@@ -8907,7 +8907,7 @@ namespace Contensive.Addons.AdminSite {
                             SaveContentTracking(adminContext);
                         }
                         //ORIGINAL LINE: Case "CCLIBRARYFOLDERS"
-                        else if (GenericController.vbUCase(adminContext.adminContent.contentTableName) == "CCLIBRARYFOLDERS") {
+                        else if (GenericController.vbUCase(adminContext.adminContent.tableName) == "CCLIBRARYFOLDERS") {
                             //
                             //
                             //
@@ -8921,7 +8921,7 @@ namespace Contensive.Addons.AdminSite {
                             SaveContentTracking(adminContext);
                         }
                         //ORIGINAL LINE: Case "CCSETUP"
-                        else if (GenericController.vbUCase(adminContext.adminContent.contentTableName) == "CCSETUP") {
+                        else if (GenericController.vbUCase(adminContext.adminContent.tableName) == "CCSETUP") {
                             //
                             // Site Properties
                             //
@@ -8933,7 +8933,7 @@ namespace Contensive.Addons.AdminSite {
                             }
                         }
                         //ORIGINAL LINE: Case genericController.vbUCase("ccGroups")
-                        else if (GenericController.vbUCase(adminContext.adminContent.contentTableName) == GenericController.vbUCase("ccGroups")) {
+                        else if (GenericController.vbUCase(adminContext.adminContent.tableName) == GenericController.vbUCase("ccGroups")) {
                             //Case "CCGROUPS"
                             //
                             //
@@ -8949,7 +8949,7 @@ namespace Contensive.Addons.AdminSite {
                             //Dim EditorStyleRulesFilename As String
                         }
                         //ORIGINAL LINE: Case "CCTEMPLATES"
-                        else if (GenericController.vbUCase(adminContext.adminContent.contentTableName) == "CCTEMPLATES") {
+                        else if (GenericController.vbUCase(adminContext.adminContent.tableName) == "CCTEMPLATES") {
                             //
                             // save and clear editorstylerules for this template
                             //
@@ -9935,7 +9935,7 @@ namespace Contensive.Addons.AdminSite {
                 // converted array to dictionary - Dim FieldPointer As Integer
                 //
                 if (!(core.doc.debug_iUserError != "")) {
-                    switch (GenericController.vbUCase(adminContext.adminContent.contentTableName)) {
+                    switch (GenericController.vbUCase(adminContext.adminContent.tableName)) {
                         case "CCEMAIL":
                             //
                             // --- preload array with values that may not come back in response
@@ -9997,7 +9997,7 @@ namespace Contensive.Addons.AdminSite {
                                 foreach (KeyValuePair<string, Contensive.Processor.Models.Domain.CDefFieldModel> keyValuePair in adminContext.adminContent.fields) {
                                     CDefFieldModel field = keyValuePair.Value;
                                     if (GenericController.vbLCase(field.nameLc) == "email") {
-                                        if ((adminContext.adminContent.contentTableName.ToLower() == "ccmembers") && (GenericController.encodeBoolean(core.siteProperties.getBoolean("allowemaillogin", false)))) {
+                                        if ((adminContext.adminContent.tableName.ToLower() == "ccmembers") && (GenericController.encodeBoolean(core.siteProperties.getBoolean("allowemaillogin", false)))) {
                                             editRecord.fieldsLc[field.nameLc].value = "";
                                         }
                                     }
@@ -10950,8 +10950,8 @@ namespace Contensive.Addons.AdminSite {
                             //
                             // Get the total record count
                             //
-                            SQL = "select count(" + adminContext.adminContent.contentTableName + ".ID) as cnt from " + SQLFrom + " where " + SQLWhere;
-                            CS = core.db.csOpenSql_rev(datasource.name, SQL);
+                            SQL = "select count(" + adminContext.adminContent.tableName + ".ID) as cnt from " + SQLFrom + " where " + SQLWhere;
+                            CS = core.db.csOpenSql(SQL,datasource.name);
                             if (core.db.csOk(CS)) {
                                 recordCnt = core.db.csGetInteger(CS, "cnt");
                             }
@@ -10963,7 +10963,7 @@ namespace Contensive.Addons.AdminSite {
                             if (IsRecordLimitSet && (datasource.type != DataSourceTypeODBCMySQL)) {
                                 SQL += " Top " + RecordLimit;
                             }
-                            SQL += " " + adminContext.adminContent.contentTableName + ".* From " + SQLFrom + " WHERE " + SQLWhere;
+                            SQL += " " + adminContext.adminContent.tableName + ".* From " + SQLFrom + " WHERE " + SQLWhere;
                             if (!string.IsNullOrEmpty(SQLOrderBy)) {
                                 SQL += " Order By" + SQLOrderBy;
                             }
@@ -11233,7 +11233,7 @@ namespace Contensive.Addons.AdminSite {
                             EditorStyleRulesFilename = GenericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", "0", 1, 99, 1);
                             core.privateFiles.deleteFile(EditorStyleRulesFilename);
                             //
-                            CS = core.db.csOpenSql_rev("default", "select id from cctemplates");
+                            CS = core.db.csOpenSql( "select id from cctemplates");
                             while (core.db.csOk(CS)) {
                                 EditorStyleRulesFilename = GenericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", core.db.csGet(CS, "ID"), 1, 99, 1);
                                 core.privateFiles.deleteFile(EditorStyleRulesFilename);

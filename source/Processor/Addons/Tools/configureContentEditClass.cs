@@ -132,7 +132,7 @@ namespace Contensive.Addons.Tools {
                                                         // Create Db field, Field is good but was not before
                                                         //
                                                         core.db.createSQLTableField(DataSourceName, TableName, formFieldName, formFieldTypeId);
-                                                        StatusMessage = StatusMessage + "<LI>Field [" + formFieldName + "] was saved to this content definition and a database field was created in [" + CDef.contentTableName + "].</LI>";
+                                                        StatusMessage = StatusMessage + "<LI>Field [" + formFieldName + "] was saved to this content definition and a database field was created in [" + CDef.tableName + "].</LI>";
                                                     } else if ((string.IsNullOrEmpty(formFieldName)) || (formFieldTypeId == 0)) {
                                                         //
                                                         // name blank or type=0 - do nothing but tell them
@@ -152,10 +152,10 @@ namespace Contensive.Addons.Tools {
                                                         int DataSourceTypeID = core.db.getDataSourceType(DataSourceName);
                                                         switch (DataSourceTypeID) {
                                                             case DataSourceTypeODBCMySQL:
-                                                                SQL = "alter table " + CDef.contentTableName + " change " + cdefFieldKvp.Value.nameLc + " " + cdefFieldKvp.Value.nameLc + " " + core.db.getSQLAlterColumnType(DataSourceName, formFieldTypeId) + ";";
+                                                                SQL = "alter table " + CDef.tableName + " change " + cdefFieldKvp.Value.nameLc + " " + cdefFieldKvp.Value.nameLc + " " + core.db.getSQLAlterColumnType(DataSourceName, formFieldTypeId) + ";";
                                                                 break;
                                                             default:
-                                                                SQL = "alter table " + CDef.contentTableName + " alter column " + cdefFieldKvp.Value.nameLc + " " + core.db.getSQLAlterColumnType(DataSourceName, formFieldTypeId) + ";";
+                                                                SQL = "alter table " + CDef.tableName + " alter column " + cdefFieldKvp.Value.nameLc + " " + core.db.getSQLAlterColumnType(DataSourceName, formFieldTypeId) + ";";
                                                                 break;
                                                         }
                                                         core.db.executeQuery(SQL, DataSourceName);

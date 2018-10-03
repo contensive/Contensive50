@@ -505,7 +505,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 Active = !InActive;
                 Models.Domain.CDefModel cdef = Models.Domain.CDefModel.getCdef(core, ContentName);
-                string tableName = cdef.contentTableName;
+                string tableName = cdef.tableName;
                 int cid = cdef.id;
                 //
                 dt = core.db.executeQuery("SELECT ID FROM " + tableName + " WHERE NAME=" + core.db.encodeSQLText(Name) + ";");

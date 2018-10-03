@@ -31,12 +31,12 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// the name of the content table
         /// </summary>
-        public string contentTableName { get; set; } 
+        public string tableName { get; set; } 
         //
         /// <summary>
         /// The name of the datasource that stores this content (the name of the database connection)
         /// </summary>
-        public string contentDataSourceName { get; set; }
+        public string dataSourceName { get; set; }
         //
         /// <summary>
         /// Allow adding records
@@ -334,8 +334,8 @@ namespace Contensive.Processor.Models.Domain {
                         result.allowDelete = GenericController.encodeBoolean(row[6]);
                         result.parentID = GenericController.encodeInteger(row[7]);
                         result.dropDownFieldList = GenericController.vbUCase(GenericController.encodeText(row[9]));
-                        result.contentTableName = GenericController.encodeText(contentTablename);
-                        result.contentDataSourceName = "default";
+                        result.tableName = GenericController.encodeText(contentTablename);
+                        result.dataSourceName = "default";
                         result.allowCalendarEvents = GenericController.encodeBoolean(row[15]);
                         result.defaultSortMethod = GenericController.encodeText(row[17]);
                         if (string.IsNullOrEmpty(result.defaultSortMethod)) {
@@ -564,7 +564,7 @@ namespace Contensive.Processor.Models.Domain {
                         //
                         // ----- Create the ContentControlCriteria
                         //
-                        result.contentControlCriteria = Models.Domain.CDefModel.getContentControlCriteria(core, result.id, result.contentTableName, result.contentDataSourceName, new List<int>());
+                        result.contentControlCriteria = Models.Domain.CDefModel.getContentControlCriteria(core, result.id, result.tableName, result.dataSourceName, new List<int>());
                         //
                         getCdef_SetAdminColumns(core, result);
                     }
@@ -955,7 +955,7 @@ namespace Contensive.Processor.Models.Domain {
                 //
                 CDef = Models.Domain.CDefModel.getCdef(core, ContentName);
                 if (CDef != null) {
-                    returnTableName = CDef.contentTableName;
+                    returnTableName = CDef.tableName;
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -976,7 +976,7 @@ namespace Contensive.Processor.Models.Domain {
                 if (CDef == null) {
                     //
                 } else {
-                    returnDataSource = CDef.contentDataSourceName;
+                    returnDataSource = CDef.dataSourceName;
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -1810,7 +1810,7 @@ namespace Contensive.Processor.Models.Domain {
                     core.db.executeQuery(SQL, DataSourceName);
                     if (HasParentID) {
                         SQL = "select contentcontrolid,ID from " + RecordTableName + " where ParentID=" + RecordID;
-                        CS = core.db.csOpenSql_rev(DataSourceName, SQL);
+                        CS = core.db.csOpenSql(SQL, DataSourceName);
                         while (core.db.csOk(CS)) {
                             setContentControlId(core, core.db.csGetInteger(CS, "contentcontrolid"), core.db.csGetInteger(CS, "ID"), NewContentControlID, UsedIDString + "," + RecordID);
                             core.db.csGoNext(CS);
@@ -1952,10 +1952,10 @@ namespace Contensive.Processor.Models.Domain {
                     //    main_result = Contentdefinition.SingleRecord
                     break;
                 case "CONTENTTABLENAME":
-                    result = Contentdefinition.contentTableName;
+                    result = Contentdefinition.tableName;
                     break;
                 case "CONTENTDATASOURCENAME":
-                    result = Contentdefinition.contentDataSourceName;
+                    result = Contentdefinition.dataSourceName;
                     //Case "AUTHORINGTABLENAME"
                     //    result = Contentdefinition.AuthoringTableName
                     //Case "AUTHORINGDATASOURCENAME"

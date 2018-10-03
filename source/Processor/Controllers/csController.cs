@@ -75,7 +75,29 @@ namespace Contensive.Processor {
                 if (csPtr != -1) {
                     core.db.csClose(ref csPtr);
                 }
-                csPtr = core.db.csOpen(ContentName, SQLCriteria, SortFieldList, ActiveOnly,0,false,false,SelectFieldList, pageSize, PageNumber);
+                csPtr = core.db.csOpen(ContentName, SQLCriteria, SortFieldList, ActiveOnly, 0, false, false, SelectFieldList, pageSize, PageNumber);
+                success = core.db.csOk(csPtr);
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+                throw;
+            }
+            return success;
+        }
+        //
+        //====================================================================================================
+        //
+        // need a new cs method here... openForUpdate( optional id )
+        //  creates a cs with no read data and an empty write buffer
+        //  read buffer get() is blocked, but you can setField()
+        //  cs.save() writes values, if id=0 it does insert, else just update
+        //
+        public bool openForUpdate(string ContentName, int recordId ) {
+            bool success = false;
+            try {
+                if (csPtr != -1) {
+                    core.db.csClose(ref csPtr);
+                }
+                csPtr = core.db.csOpenForUpdate(ContentName, recordId);
                 success = core.db.csOk(csPtr);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);

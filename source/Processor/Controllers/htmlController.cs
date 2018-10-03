@@ -177,8 +177,8 @@ namespace Contensive.Processor.Controllers {
                     // This was commented out -- I really do not know why -- seems like the best way
                     //
                     CDef = Models.Domain.CDefModel.getCdef(core, ContentName);
-                    TableName = CDef.contentTableName;
-                    DataSource = CDef.contentDataSourceName;
+                    TableName = CDef.tableName;
+                    DataSource = CDef.dataSourceName;
                     ContentControlCriteria = CDef.contentControlCriteria;
                     //
                     // This is what was there
@@ -2406,7 +2406,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     int PrimaryContentID = Models.Domain.CDefModel.getContentId(core, PrimaryContentName);
                     SecondaryCDef = Models.Domain.CDefModel.getCdef(core, SecondaryContentName);
-                    string SecondaryTablename = SecondaryCDef.contentTableName;
+                    string SecondaryTablename = SecondaryCDef.tableName;
                     int SecondaryContentID = SecondaryCDef.id;
                     ContentIDList.Add(SecondaryContentID);
                     ContentIDList.AddRange(SecondaryCDef.get_childIdList(core));

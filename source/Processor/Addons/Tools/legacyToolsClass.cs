@@ -1283,7 +1283,7 @@ namespace Contensive.Addons.Tools {
                                     }
                                     if ((!string.IsNullOrEmpty(FieldName)) & (fieldType != FieldTypeIdRedirect) & (fieldType != FieldTypeIdManyToMany)) {
                                         SQL = "SELECT " + FieldName + " FROM " + TableName + " WHERE ID=0;";
-                                        CSTest = core.db.csOpenSql_rev(DataSourceName, SQL);
+                                        CSTest = core.db.csOpenSql( SQL, DataSourceName);
                                         if (CSTest == -1) {
                                             DiagProblem = "PROBLEM: Field [" + FieldName + "] in Content Definition [" + ContentName + "] could not be read from database table [" + TableName + "] on datasource [" + DataSourceName + "].";
                                             DiagActions = new DiagActionType[2];
@@ -1766,14 +1766,14 @@ namespace Contensive.Addons.Tools {
                     if (core.db.csOk(CSContent)) {
                         do {
                             CD = Processor.Models.Domain.CDefModel.getCdef(core, core.db.csGetInteger(CSContent, "id"));
-                            TableName = CD.contentTableName;
+                            TableName = CD.tableName;
                             Stream.Add("Synchronizing Content " + CD.name + " to table " + TableName + "<br>");
-                            core.db.createSQLTable(CD.contentDataSourceName, TableName);
+                            core.db.createSQLTable(CD.dataSourceName, TableName);
                             if (CD.fields.Count > 0) {
                                 foreach (var keyValuePair in CD.fields) {
                                     Processor.Models.Domain.CDefFieldModel field = keyValuePair.Value;
                                     Stream.Add("...Field " + field.nameLc + "<br>");
-                                    core.db.createSQLTableField(CD.contentDataSourceName, TableName, field.nameLc, field.fieldTypeId);
+                                    core.db.createSQLTableField(CD.dataSourceName, TableName, field.nameLc, field.fieldTypeId);
                                 }
                             }
                             core.db.csGoNext(CSContent);

@@ -957,7 +957,7 @@ namespace Contensive.Processor {
                     //
                     string CreatedBy = "the system";
                     if ( editRecord.createdBy.id != 0) {
-                        int CS = core.db.csOpenSql_rev("default", "select Name,Active from ccMembers where id=" + editRecord.createdBy.id);
+                        int CS = core.db.csOpenSql( "select Name,Active from ccMembers where id=" + editRecord.createdBy.id);
                         if (core.db.csOk(CS)) {
                             string Name = core.db.csGetText(CS, "name");
                             bool Active = core.db.csGetBoolean(CS, "active");
@@ -988,7 +988,7 @@ namespace Contensive.Processor {
                         ModifiedCopy = ModifiedCopy + " " + editRecord.modifiedDate;
                         CreatedBy = "the system";
                         if ( editRecord.modifiedBy.id != 0) {
-                            int CS = core.db.csOpenSql_rev("default", "select Name,Active from ccMembers where id=" + editRecord.modifiedBy.id);
+                            int CS = core.db.csOpenSql( "select Name,Active from ccMembers where id=" + editRecord.modifiedBy.id);
                             if (core.db.csOk(CS)) {
                                 string Name = core.db.csGetText(CS, "name");
                                 bool Active = core.db.csGetBoolean(CS, "active");
@@ -1561,7 +1561,7 @@ namespace Contensive.Processor {
             //
             // add groups to caption
             //
-            if ((content.contentTableName.ToLower() == "ccmembers") && (IndexConfig.GroupListCnt > 0)) {
+            if ((content.tableName.ToLower() == "ccmembers") && (IndexConfig.GroupListCnt > 0)) {
                 string GroupList = "";
                 for (int Ptr = 0; Ptr < IndexConfig.GroupListCnt; Ptr++) {
                     if (IndexConfig.GroupList[Ptr] != "") {

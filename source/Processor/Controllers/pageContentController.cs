@@ -703,7 +703,7 @@ namespace Contensive.Processor.Controllers {
                 if (!result) {
                     Models.Domain.CDefModel CDef = Models.Domain.CDefModel.getCdef(core, ContentName);
                     if (GenericController.isInDelimitedString(CDef.selectCommaList.ToUpper(), "PARENTID", ",")) {
-                        result = main_IsChildRecord_Recurse(core, CDef.contentDataSourceName, CDef.contentTableName, ChildRecordID, ParentRecordID, "");
+                        result = main_IsChildRecord_Recurse(core, CDef.dataSourceName, CDef.tableName, ChildRecordID, ParentRecordID, "");
                     }
                 }
             } catch (Exception ex) {
