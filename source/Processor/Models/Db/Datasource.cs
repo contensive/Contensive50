@@ -202,7 +202,8 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static DataSourceModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<DataSourceModel>(core, recordName, ref callersCacheNameList);
+            return (string.IsNullOrWhiteSpace(recordName) | (recordName.ToLower() == "default")) ? getDefaultDatasource(core) : createByName<DataSourceModel>(core, recordName, ref callersCacheNameList);
+            //return createByName<DataSourceModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================
