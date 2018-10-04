@@ -519,7 +519,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="dataSourceName"></param>
         /// <returns></returns>
         public static string getCachePtr_forDbRecord(string guid, string tableName, string dataSourceName = "") {
-            string key = "dbrecord/" + dataSourceName + "/" + tableName + "/guid/" + guid + "/";
+            string key = "dbptr/" + dataSourceName + "/" + tableName + "/ccguid/" + guid + "/";
             key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
             return key;
         }
@@ -641,12 +641,14 @@ namespace Contensive.Processor.Controllers {
         private void setWrappedObject(string key, CacheWrapperClass wrappedObject) {
             try {
                 //
-                //logController.appendCacheLog(core,"setWrappedContent(" + key + ")");
-                //
                 if (string.IsNullOrEmpty(key)) {
                     throw new ArgumentException("cache key cannot be blank");
                 } else {
                     string serverKey = convertKeyToServerKey(key);
+                    //
+                    //LogController.logTrace(core, "setWrappedObject(" + serverKey + ")");
+                    LogController.logTrace(core, "setWrappedObject(" + serverKey + "), expires [" + wrappedObject.invalidationDate.ToString() + "], depends on [" + string.Join(",", wrappedObject.dependentKeyList) + "], points to [" + string.Join(",", wrappedObject.keyPtr) + "]");
+                    //
                     if (core.serverConfig.enableLocalMemoryCache) {
                         //
                         // -- save local memory cache

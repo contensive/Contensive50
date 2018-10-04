@@ -30,6 +30,12 @@ namespace Contensive.Processor.Controllers {
         //
         private CoreController core;
         //
+
+        public enum ScriptLanguages {
+            VBScript = 1,
+            Javascript = 2
+        }
+        //
         // ====================================================================================================
         /// <summary>
         /// constructor
@@ -138,22 +144,32 @@ namespace Contensive.Processor.Controllers {
                             executeContext.forceJavascriptToHead = executeContext.forceJavascriptToHead || addon.javascriptForceHead;
                             //
                             // -- run included add-ons before their parent
-                            List<Models.Db.AddonIncludeRuleModel> addonIncludeRules = AddonIncludeRuleModel.createList(core, "(addonid=" + addon.id + ")");
-                            if (addonIncludeRules.Count > 0) {
-                                string addonContextMessage = executeContext.errorContextMessage;
-                                foreach (Models.Db.AddonIncludeRuleModel addonRule in addonIncludeRules) {
-                                    if (addonRule.includedAddonID > 0) {
-                                        AddonModel dependentAddon = AddonModel.create(core, addonRule.includedAddonID);
-                                        if (dependentAddon == null) {
-                                            LogController.handleError(core, new ApplicationException("Addon not found. An included addon of [" + addon.name + "] was not found. The included addon may have been deleted. Recreate or reinstall the missing addon, then reinstall [" + addon.name + "] or manually correct the included addon selection."));
-                                        } else {
-                                            executeContext.errorContextMessage = "adding dependent addon [" + dependentAddon.name + "] for addon [" + addon.name + "] called within context [" + addonContextMessage + "]";
-                                            result += executeDependency(dependentAddon, executeContext);
-                                        }
-                                    }
+                            List<int> dependentAddonList = core.doc.getDependentAddonList(addon.id);
+                            foreach ( int includedAddonID in dependentAddonList) {
+                                AddonModel dependentAddon = AddonModel.create(core, includedAddonID);
+                                if (dependentAddon == null) {
+                                    LogController.handleError(core, new ApplicationException("Addon not found. An included addon of [" + addon.name + "] was not found. The included addon may have been deleted. Recreate or reinstall the missing addon, then reinstall [" + addon.name + "] or manually correct the included addon selection."));
+                                } else {
+                                    executeContext.errorContextMessage = "adding dependent addon [" + dependentAddon.name + "] for addon [" + addon.name + "] called within context [" + executeContext.errorContextMessage + "]";
+                                    result += executeDependency(dependentAddon, executeContext);
                                 }
-                                executeContext.errorContextMessage = addonContextMessage;
                             }
+                            //List<Models.Db.AddonIncludeRuleModel> addonIncludeRules = AddonIncludeRuleModel.createList(core, "(addonid=" + addon.id + ")");
+                            //if (addonIncludeRules.Count > 0) {
+                            //    string addonContextMessage = executeContext.errorContextMessage;
+                            //    foreach (Models.Db.AddonIncludeRuleModel addonRule in addonIncludeRules) {
+                            //        if (addonRule.includedAddonID > 0) {
+                            //            AddonModel dependentAddon = AddonModel.create(core, addonRule.includedAddonID);
+                            //            if (dependentAddon == null) {
+                            //                LogController.handleError(core, new ApplicationException("Addon not found. An included addon of [" + addon.name + "] was not found. The included addon may have been deleted. Recreate or reinstall the missing addon, then reinstall [" + addon.name + "] or manually correct the included addon selection."));
+                            //            } else {
+                            //                executeContext.errorContextMessage = "adding dependent addon [" + dependentAddon.name + "] for addon [" + addon.name + "] called within context [" + addonContextMessage + "]";
+                            //                result += executeDependency(dependentAddon, executeContext);
+                            //            }
+                            //        }
+                            //    }
+                            //    executeContext.errorContextMessage = addonContextMessage;
+                            //}
                             //
                             // -- properties referenced multiple time 
                             bool allowAdvanceEditor = core.visitProperty.getBoolean("AllowAdvancedEditor");
@@ -428,17 +444,12 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // -- Scripting code
                                 if (addon.scriptingCode != "") {
-                                    //
-                                    // Get Language
-                                    string ScriptingLanguage = "";
-                                    if (addon.scriptingLanguageID != 0) {
-                                        ScriptingLanguage = core.db.getRecordName("Scripting Languages", addon.scriptingLanguageID);
-                                    }
-                                    if (string.IsNullOrEmpty(ScriptingLanguage)) {
-                                        ScriptingLanguage = "VBScript";
-                                    }
                                     try {
-                                        result += execute_Script(ref addon, ScriptingLanguage, addon.scriptingCode, addon.scriptingEntryPoint, encodeInteger(addon.scriptingTimeout), "Addon [" + addon.name + "]");
+                                        if (addon.scriptingLanguageID == (int)ScriptLanguages.Javascript ) {
+                                            result += execute_Script_JScript(ref addon);
+                                        } else {
+                                            result += execute_Script_VBScript(ref addon);
+                                        }
                                     } catch (Exception ex) {
                                         string addonDescription = getAddonDescription(core, addon);
                                         throw new ApplicationException("There was an error executing the script component of Add-on " + addonDescription + ". The details of this error follow.</p><p>" + ex.InnerException.Message + "");
@@ -1512,128 +1523,152 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// execute the script section of addons. Must be 32-bit. 
+        /// 
         /// </summary>
-        /// <param name="Language"></param>
+        /// <param name="addon"></param>
         /// <param name="Code"></param>
         /// <param name="EntryPoint"></param>
-        /// <param name="ignore"></param>
         /// <param name="ScriptingTimeout"></param>
         /// <param name="ScriptName"></param>
-        /// <param name="ReplaceCnt"></param>
-        /// <param name="ReplaceNames"></param>
-        /// <param name="ReplaceValues"></param>
         /// <returns></returns>
-        /// <remarks>long run, use either csscript.net, or use .net tools to build compile/run funtion</remarks>
-        private string execute_Script(ref AddonModel addon, string Language, string Code, string EntryPoint, int ScriptingTimeout, string ScriptName) {
+        private string execute_Script_VBScript(ref AddonModel addon) {
             string returnText = "";
             try {
+                //var engine = new Microsoft.ClearScript.Windows.JScriptEngine();
                 var engine = new Microsoft.ClearScript.Windows.VBScriptEngine();
                 string[] Args = { };
-                string WorkingCode = Code;
+                string WorkingCode = addon.scriptingCode;
                 //
-                if (string.IsNullOrEmpty(EntryPoint)) {
+                string entryPoint = addon.scriptingEntryPoint;
+                if (string.IsNullOrEmpty(entryPoint)) {
                     //
                     // -- compatibility mode, if no entry point given, if the code starts with "function myFuncton()" and add "call myFunction()"
                     int pos = WorkingCode.IndexOf("function", StringComparison.CurrentCultureIgnoreCase);
                     if (pos >= 0) {
-                        EntryPoint = WorkingCode.Substring(pos + 9);
-                        pos = EntryPoint.IndexOf("\r");
+                        entryPoint = WorkingCode.Substring(pos + 9);
+                        pos = entryPoint.IndexOf("\r");
                         if (pos > 0) {
-                            EntryPoint = EntryPoint.Substring(0, pos);
+                            entryPoint = entryPoint.Substring(0, pos);
                         }
-                        pos = EntryPoint.IndexOf("\n");
+                        pos = entryPoint.IndexOf("\n");
                         if (pos > 0) {
-                            EntryPoint = EntryPoint.Substring(0, pos);
+                            entryPoint = entryPoint.Substring(0, pos);
                         }
-                        pos = EntryPoint.IndexOf("(");
+                        pos = entryPoint.IndexOf("(");
                         if (pos > 0) {
-                            EntryPoint = EntryPoint.Substring(0, pos);
+                            entryPoint = entryPoint.Substring(0, pos);
                         }
-                        // normal behavior, if no entry it provided, go to the first function main()
-                        //logController.logWarn(core, "Addon code script [" + ScriptName + "] does not include an entry point, but starts with a function. For compatibility, will call first function [" + EntryPoint + "].");
-                        //WorkingCode = EntryPoint + "\n" + WorkingCode;
                     }
                 } else {
                     //
                     // -- etnry point provided, remove "()" if included and add to code
-                    //string EntryPoint = EntryPoint;
-                    int pos = EntryPoint.IndexOf("(");
+                    int pos = entryPoint.IndexOf("(");
                     if (pos > 0) {
-                        EntryPoint = EntryPoint.Substring(0, pos);
+                        entryPoint = entryPoint.Substring(0, pos);
                     }
-                    //string entryCode = "\r\n" + EntryPoint;
-                    //WorkingCode += entryCode;
                 }
-                //int Pos = genericController.vbInstr(1, EntryPoint, "(");
-                //if (Pos == 0) {
-                //    Pos = genericController.vbInstr(1, EntryPoint, " ");
-                //}
-                //if (Pos > 1) {
-                //    EntryPointArgs = EntryPoint.Substring(Pos - 1).Trim(' ');
-                //    EntryPoint = (EntryPoint.Left(Pos - 1)).Trim(' ');
-                //    if ((EntryPointArgs.Left(1) == "(") && (EntryPointArgs.Substring(EntryPointArgs.Length - 1, 1) == ")")) {
-                //        EntryPointArgs = EntryPointArgs.Substring(1, EntryPointArgs.Length - 2);
-                //    }
-                //    Args = SplitDelimited(EntryPointArgs, ",");
-                //}
+                try {
+                    mainCsvScriptCompatibilityClass mainCsv = new mainCsvScriptCompatibilityClass(core);
+                    engine.AddHostObject("ccLib", mainCsv);
+                } catch (Exception) {
+                    throw;
+                }
+                try {
+                    engine.AddHostObject("cp", core.cp_forAddonExecutionOnly);
+                } catch (Exception) {
+                    throw;
+                }
+                try {
+                    engine.Execute(WorkingCode);
+                    object returnObj = engine.Evaluate(entryPoint);
+                    if (returnObj != null) {
+                        if (returnObj.GetType() == typeof(String)) {
+                            returnText = (String)returnObj;
+                        }
+                    }
+                } catch (Exception ex) {
+                    string addonDescription = getAddonDescription(core, addon);
+                    string errorMessage = "Error executing addon script, " + addonDescription;
+                    throw new ApplicationException(errorMessage, ex);
+                }
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+                throw;
+            }
+            return returnText;
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="addon"></param>
+        /// <param name="Code"></param>
+        /// <param name="EntryPoint"></param>
+        /// <param name="ScriptingTimeout"></param>
+        /// <param name="ScriptName"></param>
+        /// <returns></returns>
+        private string execute_Script_JScript(ref AddonModel addon) {
+            string returnText = "";
+            try {
+                var engine = new Microsoft.ClearScript.Windows.JScriptEngine();
+                //var engine = new Microsoft.ClearScript.Windows.VBScriptEngine();
+                string[] Args = { };
+                string WorkingCode = addon.scriptingCode;
                 //
-                //MSScriptControl.ScriptControl sc = new MSScriptControl.ScriptControl();
-                //try {
-                //    //sc.AllowUI = false;
-                //    //sc.Timeout = ScriptingTimeout;
-                //    //if (!string.IsNullOrEmpty(Language)) {
-                //    //    sc.Language = Language;
-                //    //} else {
-                //    //    sc.Language = "VBScript";
-                //    //}
-                //    //sc.AddCode(WorkingCode);
-                //} catch (Exception ex) {
-                //    string errorMessage = "Error configuring scripting system";
-                //    if (sc.Error.Number != 0) {
-                //        errorMessage += ", #" + sc.Error.Number + ", " + sc.Error.Description + ", line " + sc.Error.Line + ", character " + sc.Error.Column;
-                //        if (sc.Error.Line != 0) {
-                //            Lines = genericController.customSplit(WorkingCode, "\r\n");
-                //            if (Lines.GetUpperBound(0) >= sc.Error.Line) {
-                //                errorMessage += ", code [" + Lines[sc.Error.Line - 1] + "]";
-                //            }
-                //        }
-                //    } else {
-                //        errorMessage += ", no scripting error";
-                //    }
-                //    throw new ApplicationException(errorMessage, ex);
-                //}
-                if (true) {
-                    try {
-                        mainCsvScriptCompatibilityClass mainCsv = new mainCsvScriptCompatibilityClass(core);
-                        //sc.AddObject("ccLib", mainCsv);
-                        engine.AddHostObject("ccLib", mainCsv);
-                    } catch (Exception) {
-                        throw;
-                    }
-                    if (true) {
-                        try {
-                            //sc.AddObject("cp", core.cp_forAddonExecutionOnly);
-                            engine.AddHostObject("cp", core.cp_forAddonExecutionOnly);
-                        } catch (Exception) {
-                            throw;
+                string entryPoint = addon.scriptingEntryPoint;
+                if (string.IsNullOrEmpty(entryPoint)) {
+                    //
+                    // -- compatibility mode, if no entry point given, if the code starts with "function myFuncton()" and add "call myFunction()"
+                    int pos = WorkingCode.IndexOf("function", StringComparison.CurrentCultureIgnoreCase);
+                    if (pos >= 0) {
+                        entryPoint = WorkingCode.Substring(pos + 9);
+                        pos = entryPoint.IndexOf("\r");
+                        if (pos > 0) {
+                            entryPoint = entryPoint.Substring(0, pos);
                         }
-                        if (true) {
-                            try {
-                                engine.Execute(WorkingCode);
-                                object returnObj = engine.Evaluate(EntryPoint);
-                                if (returnObj != null) {
-                                    if (returnObj.GetType() == typeof(String)) {
-                                        returnText = (String)returnObj;
-                                    }
-                                }
-                            } catch (Exception ex) {
-                                string addonDescription = getAddonDescription(core, addon);
-                                string errorMessage = "Error executing script [" + ScriptName + "], " + addonDescription;
-                                throw new ApplicationException(errorMessage, ex);
-                            }
+                        pos = entryPoint.IndexOf("\n");
+                        if (pos > 0) {
+                            entryPoint = entryPoint.Substring(0, pos);
+                        }
+                        pos = entryPoint.IndexOf("(");
+                        if (pos > 0) {
+                            entryPoint = entryPoint.Substring(0, pos);
                         }
                     }
+                } else {
+                    //
+                    // -- etnry point provided, remove "()" if included and add to code
+                    int pos = entryPoint.IndexOf("(");
+                    if (pos > 0) {
+                        entryPoint = entryPoint.Substring(0, pos);
+                    }
+                }
+                try {
+                    mainCsvScriptCompatibilityClass mainCsv = new mainCsvScriptCompatibilityClass(core);
+                    engine.AddHostObject("ccLib", mainCsv);
+                } catch (Exception) {
+                    throw;
+                }
+                try {
+                    engine.AddHostObject("cp", core.cp_forAddonExecutionOnly);
+                } catch (Exception) {
+                    throw;
+                }
+                try {
+                    engine.Execute(WorkingCode);
+                    object returnObj = engine.Evaluate(entryPoint);
+                    //object returnObj = engine.Evaluate(entryPoint);
+                    if (returnObj != null) {
+                        returnText = returnObj.ToString();
+                        //if (returnObj.GetType() == typeof(String)) {
+                        //    returnText = (String)returnObj;
+                        //}
+                    }
+                } catch (Exception ex) {
+                    string addonDescription = getAddonDescription(core, addon);
+                    string errorMessage = "Error executing addon script, " + addonDescription;
+                    throw new ApplicationException(errorMessage, ex);
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);

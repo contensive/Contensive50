@@ -17,6 +17,14 @@ namespace Contensive.Processor.Controllers {
         /// parent object
         /// </summary>
         private CoreController core;
+        //
+        public List<int> getDependentAddonList(int addonId) {
+            if (_includeRuleDict==null) {
+                _includeRuleDict = Models.Db.AddonIncludeRuleModel.getIncludeRuleDict(core);
+            }
+            return (_includeRuleDict.ContainsKey(addonId)) ? _includeRuleDict[addonId] : new List<int> { };
+        }
+        private Dictionary<int, List<int>> _includeRuleDict;
         /// <summary>
         /// this documents unique guid (created on the fly)
         /// </summary>

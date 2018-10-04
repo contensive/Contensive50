@@ -148,7 +148,6 @@ namespace Contensive.Processor.Controllers {
                     VerifyLibraryFolders(core);
                     VerifyLibraryFileTypes(core);
                     verifyDefaultGroups(core);
-                    verifyScriptingRecords(core);
                     //
                     //---------------------------------------------------------------------
                     // ----- Set Default SitePropertyDefaults
@@ -600,22 +599,6 @@ namespace Contensive.Processor.Controllers {
                 // -- Reload
                 core.cache.invalidateAll();
                 core.doc.clearMetaData();
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-                throw;
-            }
-        }
-        //
-        //=========================================================================================
-        //
-        //
-        public static void verifyScriptingRecords(CoreController core) {
-            try {
-                //
-                appendUpgradeLogAddStep(core, core.appConfig.name, "VerifyScriptingRecords", "Verify Scripting Records.");
-                //
-                VerifyRecord(core, "Scripting Languages", "VBScript", "", "");
-                VerifyRecord(core, "Scripting Languages", "JScript", "", "");
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
