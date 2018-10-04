@@ -405,7 +405,7 @@ namespace Contensive.Processor.Models.Db {
                     if (!string.IsNullOrEmpty(recordGuid)) {
                         Type instanceType = typeof(T);
                         string contentName = derivedContentName(instanceType);
-                        //result = readModelCache<T>(core, "ccguid", recordGuid);
+                        result = readRecordCache<T>(core, recordGuid);
                         if (result == null) {
                             using (CsController cs = new CsController(core)) {
                                 if (cs.open(contentName, "(ccGuid=" + core.db.encodeSQLText(recordGuid) + ")")) {
@@ -796,7 +796,9 @@ namespace Contensive.Processor.Models.Db {
                     cs.close(asyncSave);
                     //
                     // -- object is here, but the cache was invalidated, setting
-                    core.cache.setObject(CacheController.getCacheKey_forDbRecord(id, tableName, datasourceName), this);
+                    string cacheKey = CacheController.getCacheKey_forDbRecord(id, tableName, datasourceName);
+                    core.cache.setObject(cacheKey, this);
+                    core.cache.setPtr(CacheController.getCachePtr_forDbRecord(ccguid, tableName, datasourceName), cacheKey);
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -1158,6 +1160,13 @@ namespace Contensive.Processor.Models.Db {
         private static T readRecordCache<T>(CoreController core, int recordId) where T : BaseModel {
             Type instanceType = typeof(T);
             return core.cache.getObject<T>(CacheController.getCacheKey_forDbRecord(recordId, derivedTableName(instanceType), derivedDataSourceName(instanceType)));
+        }
+        //
+        //====================================================================================================
+        //
+        private static T readRecordCache<T>(CoreController core, string ccGuid) where T : BaseModel {
+            Type instanceType = typeof(T);
+            return core.cache.getObject<T>(CacheController.getCachePtr_forDbRecord(ccGuid, derivedTableName(instanceType), derivedDataSourceName(instanceType)));
         }
         //
         //====================================================================================================
