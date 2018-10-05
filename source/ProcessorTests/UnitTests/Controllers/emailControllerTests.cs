@@ -50,7 +50,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 string ResultLogFilename = "";
                 // act
                 EmailController.queueAdHocEmail(cp.core, "to@kma.net", "from@kma.net", "subject", body,"bounce@kma.net","replyTo@kma.net", ResultLogFilename, true, true, 0, ref sendStatus);
-                Contensive.BaseClasses.AddonBaseClass addon = new Contensive.Addons.Email.processEmailClass();
+                Contensive.BaseClasses.AddonBaseClass addon = new Contensive.Addons.Email.ProcessEmailClass();
                 addon.Execute(cp);
                 // assert
                 Assert.AreEqual(1, cp.core.mockSmtpList.Count);
@@ -80,7 +80,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 string sendStatus = "";
                 // act
                 Assert.IsTrue( EmailController.queuePersonEmail(cp.core, toPerson, "from@kma.net", "subject", body, "bounce@kma.net", "replyTo@kma.net", true, true, 0, "", true, ref sendStatus, ""));
-                Contensive.BaseClasses.AddonBaseClass addon = new Contensive.Addons.Email.processEmailClass();
+                Contensive.BaseClasses.AddonBaseClass addon = new Contensive.Addons.Email.ProcessEmailClass();
                 addon.Execute(cp);
                 // assert
                 Assert.AreEqual(1, cp.core.mockSmtpList.Count);

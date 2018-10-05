@@ -1,13 +1,5 @@
 ﻿
 using System;
-using System.Reflection;
-using System.Xml;
-using System.Diagnostics;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
@@ -17,7 +9,7 @@ using Contensive.Processor.Models.Domain;
 using Contensive.BaseClasses;
 //
 namespace Contensive.Addons.Email {
-    public class processEmailClass  : Contensive.BaseClasses.AddonBaseClass{
+    public class ProcessEmailClass  : AddonBaseClass{
         //
         //====================================================================================================
         /// <summary>
@@ -36,14 +28,12 @@ namespace Contensive.Addons.Email {
                 ProcessGroupEmail(core);
                 //
                 // Send Conditional Email - Offset days after Joining
-                DateTime EmailServiceLastCheck = core.siteProperties.getDate("EmailServiceLastCheck");
-                core.siteProperties.setProperty("EmailServiceLastCheck", encodeText(DateTime.Now));
-                bool IsNewHour = (DateTime.Now - EmailServiceLastCheck).TotalHours > 1;
-                bool IsNewDay = EmailServiceLastCheck.Date != DateTime.Now.Date;
-                ProcessConditionalEmail(core, IsNewHour, IsNewDay);
+                ProcessConditionalEmail(core);
                 //
                 // -- send queue
                 EmailController.sendEmailInQueue(core);
+                //
+                core.siteProperties.setProperty("EmailServiceLastCheck", encodeText(DateTime.Now));
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }
@@ -167,7 +157,7 @@ namespace Contensive.Addons.Email {
         /// <param name="core"></param>
         /// <param name="IsNewHour"></param>
         /// <param name="IsNewDay"></param>
-        private void ProcessConditionalEmail(CoreController core, bool IsNewHour, bool IsNewDay) {
+        private void ProcessConditionalEmail(CoreController core) {
             try {
                 int dataSourceType = core.db.getDataSourceType("default");
                 string BounceAddress = core.siteProperties.getText("EmailBounceAddress", "");
@@ -181,7 +171,7 @@ namespace Contensive.Addons.Email {
                 //   To keep them from only getting one, the log is used for the one day.
                 //   Housekeep logs far > 1 day
                 //
-                if (IsNewDay) {
+                if (true) {
                     string FieldList = "ccEmail.TestMemberID AS TestMemberID,ccEmail.ID as EmailID,ccMembers.ID AS MemberID, ccMemberRules.DateExpires AS DateExpires,ccEmail.BlockSiteStyles,ccEmail.stylesFilename";
                     string SQL = "SELECT Distinct " + FieldList + " FROM ((((ccEmail"
                         + " LEFT JOIN ccEmailGroups ON ccEmail.ID = ccEmailGroups.EmailID)"
@@ -227,7 +217,7 @@ namespace Contensive.Addons.Email {
                 //
                 // Send Conditional Email - Offset days Before Expiration
                 //
-                if (IsNewDay) {
+                if (true) {
                     string FieldList = "ccEmail.TestMemberID AS TestMemberID,ccEmail.ID AS EmailID, ccMembers.ID AS MemberID, ccMemberRules.DateExpires AS DateExpires,ccEmail.BlockSiteStyles,ccEmail.stylesFilename";
                     string sqlDateTest = "";
                     if (dataSourceType == DataSourceTypeODBCSQLServer) {
@@ -285,7 +275,7 @@ namespace Contensive.Addons.Email {
                 //
                 // Send Conditional Email - Birthday
                 //
-                if (IsNewDay) {
+                if (true) {
                     string FieldList = "ccEmail.TestMemberID AS TestMemberID,ccEmail.ID AS EmailID, ccMembers.ID AS MemberID, ccMemberRules.DateExpires AS DateExpires,ccEmail.BlockSiteStyles,ccEmail.stylesFilename";
                     string SQL = "SELECT DISTINCT " + FieldList + " FROM ((((ccEmail"
                         + " LEFT JOIN ccEmailGroups ON ccEmail.ID = ccEmailGroups.EmailID)"
