@@ -171,7 +171,7 @@ namespace Contensive.Processor {
         //Public Const ignoreInteger = KmaObjectError + 1
         //Public Const KmaccErrorServiceStopped = KmaObjectError + 2
         //
-        public const string UserErrorHeadline = "<p class=\"ccError\">There was a problem with this page.</p>";
+        public const string UserErrorHeadline = "<h3 class=\"ccError\">There was an issue.</h3>";
         //
         // ----- Errors connecting to server
         //

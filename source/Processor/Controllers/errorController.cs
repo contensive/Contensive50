@@ -34,7 +34,7 @@ namespace Contensive.Processor.Controllers {
         public static void addUserError(CoreController core, string Message) {
             if (!string.IsNullOrEmpty(Message)) {
                 if (core.doc.debug_iUserError.IndexOf(Message, System.StringComparison.OrdinalIgnoreCase) == -1) {
-                    core.doc.debug_iUserError = core.doc.debug_iUserError + "\r<li class=\"ccError\">" + GenericController.encodeText(Message) + "</LI>";
+                    core.doc.debug_iUserError = core.doc.debug_iUserError + "\r<li class=\"ccExceptionListRow\">" + GenericController.encodeText(Message) + "</LI>";
                 }
             }
         }
@@ -45,14 +45,12 @@ namespace Contensive.Processor.Controllers {
         //==========================================================================
         //
         public static string getUserError(CoreController core) {
-            string temperror_GetUserError = null;
-            temperror_GetUserError = GenericController.encodeText(core.doc.debug_iUserError);
-            if (!string.IsNullOrEmpty(temperror_GetUserError)) {
-                temperror_GetUserError = "<ul class=\"ccError\">" + GenericController.nop(temperror_GetUserError) + "\r</ul>";
-                temperror_GetUserError = UserErrorHeadline + "" + temperror_GetUserError;
+            string result = "";
+            if (!string.IsNullOrEmpty(core.doc.debug_iUserError)) {
+                result = UserErrorHeadline + "<ul class=\"ccExceptionList\">" + core.doc.debug_iUserError + "\r</ul>";
                 core.doc.debug_iUserError = "";
             }
-            return temperror_GetUserError;
+            return result;
         }
 
         //

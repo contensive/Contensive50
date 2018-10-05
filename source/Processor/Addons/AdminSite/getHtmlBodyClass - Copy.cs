@@ -143,7 +143,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // check for member login, if logged in and no admin, lock out, Do CheckMember here because we need to know who is there to create proper blocked menu
                 if (core.doc.continueProcessing) {
-                    var adminContext = new adminInfoDomainModel(core);
+                    var adminContext = new adminContextClass(core);
                     core.db.sqlCommandTimeout = 300;
                     adminContext.ButtonObjectCount = 0;
                     adminContext.JavaScriptString = "";
@@ -242,7 +242,7 @@ namespace Contensive.Addons.AdminSite {
                     if (adminContext.RecordTop != 0) {
                         core.doc.addRefreshQueryString("rt", GenericController.encodeText(adminContext.RecordTop));
                     }
-                    if (adminContext.RecordsPerPage != adminInfoDomainModel.RecordsPerPageDefault) {
+                    if (adminContext.RecordsPerPage != adminContextClass.RecordsPerPageDefault) {
                         core.doc.addRefreshQueryString("rs", GenericController.encodeText(adminContext.RecordsPerPage));
                     }
                     if (adminContext.AdminForm != 0) {
@@ -618,7 +618,7 @@ namespace Contensive.Addons.AdminSite {
         //
         //
         //
-        private void SetIndexSQL(adminInfoDomainModel adminContext, IndexConfigClass IndexConfig, ref bool Return_AllowAccess, ref string return_sqlFieldList, ref string return_sqlFrom, ref string return_SQLWhere, ref string return_SQLOrderBy, ref bool return_IsLimitedToSubContent, ref string return_ContentAccessLimitMessage, ref Dictionary<string, bool> FieldUsedInColumns, Dictionary<string, bool> IsLookupFieldValid) {
+        private void SetIndexSQL(adminContextClass adminContext, IndexConfigClass IndexConfig, ref bool Return_AllowAccess, ref string return_sqlFieldList, ref string return_sqlFrom, ref string return_SQLWhere, ref string return_SQLOrderBy, ref bool return_IsLimitedToSubContent, ref string return_ContentAccessLimitMessage, ref Dictionary<string, bool> FieldUsedInColumns, Dictionary<string, bool> IsLookupFieldValid) {
             try {
                 string LookupQuery = null;
                 string ContentName = null;
@@ -785,7 +785,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // paste sections together and do where clause
                 //
-                if (adminInfoDomainModel.userHasContentAccess(core, adminContext.adminContent.id)) {
+                if (adminContextClass.userHasContentAccess(core, adminContext.adminContent.id)) {
                     //
                     // This person can see all the records
                     //
@@ -810,7 +810,7 @@ namespace Contensive.Addons.AdminSite {
                                 Pos = GenericController.vbInstr(1, ListSplit[Ptr], ")");
                                 if (Pos > 0) {
                                     ContentID = GenericController.encodeInteger(ListSplit[Ptr].Left(Pos - 1));
-                                    if (ContentID > 0 && (ContentID != adminContext.adminContent.id) & adminInfoDomainModel.userHasContentAccess(core, ContentID)) {
+                                    if (ContentID > 0 && (ContentID != adminContext.adminContent.id) & adminContextClass.userHasContentAccess(core, ContentID)) {
                                         SubQuery = SubQuery + "OR(" + adminContext.adminContent.tableName + ".ContentControlID=" + ContentID + ")";
                                         return_ContentAccessLimitMessage = return_ContentAccessLimitMessage + ", '<a href=\"?cid=" + ContentID + "\">" + CDefModel.getContentNameByID(core, ContentID) + "</a>'";
                                         SubContactList += "," + ContentID;
@@ -1269,7 +1269,7 @@ namespace Contensive.Addons.AdminSite {
         /// <param name="editRecord"></param>
         /// <param name="IsEmailContent"></param>
         /// <returns></returns>
-        private string GetForm_Index(adminInfoDomainModel adminContext, bool IsEmailContent) {
+        private string GetForm_Index(adminContextClass adminContext, bool IsEmailContent) {
             string result = "";
             try {
                 //
@@ -1572,7 +1572,7 @@ namespace Contensive.Addons.AdminSite {
                                     //
                                     // --- Edit button column
                                     DataTable_DataRows += "<td align=center " + RowColor + ">";
-                                    string URI = "\\" + core.appConfig.adminRoute + "?" + rnAdminAction + "=" + adminInfoDomainModel.AdminActionNop + "&cid=" + adminContext.adminContent.id + "&id=" + RecordID + "&" + RequestNameTitleExtension + "=" + GenericController.encodeRequestVariable(adminContext.TitleExtension) + "&ad=" + adminContext.ignore_legacyMenuDepth + "&" + rnAdminSourceForm + "=" + adminContext.AdminForm + "&" + rnAdminForm + "=" + AdminFormEdit;
+                                    string URI = "\\" + core.appConfig.adminRoute + "?" + rnAdminAction + "=" + adminContextClass.AdminActionNop + "&cid=" + adminContext.adminContent.id + "&id=" + RecordID + "&" + RequestNameTitleExtension + "=" + GenericController.encodeRequestVariable(adminContext.TitleExtension) + "&ad=" + adminContext.ignore_legacyMenuDepth + "&" + rnAdminSourceForm + "=" + adminContext.AdminForm + "&" + rnAdminForm + "=" + AdminFormEdit;
                                     if (adminContext.WherePairCount > 0) {
                                         for (int WhereCount = 0; WhereCount < adminContext.WherePairCount; WhereCount++) {
                                             URI = URI + "&wl" + WhereCount + "=" + GenericController.encodeRequestVariable(adminContext.WherePair[0, WhereCount]) + "&wr" + WhereCount + "=" + GenericController.encodeRequestVariable(adminContext.WherePair[1, WhereCount]);
@@ -1782,7 +1782,7 @@ namespace Contensive.Addons.AdminSite {
         /// </summary>
         /// <param name="adminContext.content"></param>
         /// <returns></returns>
-        public string getForm_IndexFilterContent(adminInfoDomainModel adminContext) {
+        public string getForm_IndexFilterContent(adminContextClass adminContext) {
             string returnContent = "";
             try {
                 string TableName = null;
@@ -2116,8 +2116,8 @@ namespace Contensive.Addons.AdminSite {
         //       the upl collection
         //========================================================================
         //
-        private void contextConstructor(ref adminInfoDomainModel adminContext) {
-            adminContext = new adminInfoDomainModel(core);
+        private void contextConstructor(ref adminContextClass adminContext) {
+            adminContext = new adminContextClass(core);
             //try {
             //    if (adminContext == null) {
             //        adminContext = new adminContextClass();
@@ -2377,7 +2377,7 @@ namespace Contensive.Addons.AdminSite {
         //       Email - (not done) Sends "body" field to "email" field in adminContext.content.id
         //========================================================================
         //
-        private void ProcessActions(adminInfoDomainModel adminContext, bool UseContentWatchLink) {
+        private void ProcessActions(adminContextClass adminContext, bool UseContentWatchLink) {
             try {
                 int CS = 0;
                 int RecordID = 0;
@@ -2387,7 +2387,7 @@ namespace Contensive.Addons.AdminSite {
                 int RowCnt = 0;
                 int RowPtr = 0;
                 //
-                if (adminContext.Admin_Action != adminInfoDomainModel.AdminActionNop) {
+                if (adminContext.Admin_Action != adminContextClass.AdminActionNop) {
                     if (!adminContext.UserAllowContentEdit) {
                         //
                         // Action blocked by BlockCurrentRecord
@@ -2397,20 +2397,20 @@ namespace Contensive.Addons.AdminSite {
                         // Process actions
                         //
                         switch (adminContext.Admin_Action) {
-                            case adminInfoDomainModel.AdminActionEditRefresh:
+                            case adminContextClass.AdminActionEditRefresh:
                                 //
                                 // Load the record as if it will be saved, but skip the save
                                 //
                                 LoadEditRecord(adminContext);
                                 LoadEditRecord_Request(adminContext);
                                 break;
-                            case adminInfoDomainModel.AdminActionMarkReviewed:
+                            case adminContextClass.AdminActionMarkReviewed:
                                 //
                                 // Mark the record reviewed without making any changes
                                 //
                                 core.doc.markRecordReviewed(adminContext.adminContent.name, adminContext.editRecord.id);
                                 break;
-                            case adminInfoDomainModel.AdminActionDelete:
+                            case adminContextClass.AdminActionDelete:
                                 if (adminContext.editRecord.Read_Only) {
                                     ErrorController.addUserError(core, "Your request was blocked because the record you specified is now locked by another authcontext.user.");
                                 } else {
@@ -2418,9 +2418,9 @@ namespace Contensive.Addons.AdminSite {
                                     core.db.deprecate_argsreversed_deleteTableRecord(adminContext.adminContent.tableName, adminContext.editRecord.id, adminContext.adminContent.dataSourceName);
                                     core.doc.processAfterSave(true, adminContext.editRecord.contentControlId_Name, adminContext.editRecord.id, adminContext.editRecord.nameLc, adminContext.editRecord.parentID, UseContentWatchLink);
                                 }
-                                adminContext.Admin_Action = adminInfoDomainModel.AdminActionNop;
+                                adminContext.Admin_Action = adminContextClass.AdminActionNop;
                                 break;
-                            case adminInfoDomainModel.AdminActionSave:
+                            case adminContextClass.AdminActionSave:
                                 //
                                 // ----- Save Record
                                 //
@@ -2432,10 +2432,10 @@ namespace Contensive.Addons.AdminSite {
                                     ProcessActionSave(adminContext, UseContentWatchLink);
                                     core.doc.processAfterSave(false, adminContext.adminContent.name, adminContext.editRecord.id, adminContext.editRecord.nameLc, adminContext.editRecord.parentID, UseContentWatchLink);
                                 }
-                                adminContext.Admin_Action = adminInfoDomainModel.AdminActionNop; // convert so action can be used in as a refresh
+                                adminContext.Admin_Action = adminContextClass.AdminActionNop; // convert so action can be used in as a refresh
                                                                                               //
                                 break;
-                            case adminInfoDomainModel.AdminActionSaveAddNew:
+                            case adminContextClass.AdminActionSaveAddNew:
                                 //
                                 // ----- Save and add a new record
                                 //
@@ -2453,17 +2453,17 @@ namespace Contensive.Addons.AdminSite {
                                     //    ReDim EditRecordDbValues(adminContext.content.fields.Count)
                                     //End If
                                 }
-                                adminContext.Admin_Action = adminInfoDomainModel.AdminActionNop; // convert so action can be used in as a refresh
+                                adminContext.Admin_Action = adminContextClass.AdminActionNop; // convert so action can be used in as a refresh
                                                                                               //
                                 break;
-                            case adminInfoDomainModel.AdminActionDuplicate:
+                            case adminContextClass.AdminActionDuplicate:
                                 //
                                 // ----- Save Record
                                 //
                                 ProcessActionDuplicate(adminContext);
-                                adminContext.Admin_Action = adminInfoDomainModel.AdminActionNop;
+                                adminContext.Admin_Action = adminContextClass.AdminActionNop;
                                 break;
-                            case adminInfoDomainModel.AdminActionSendEmail:
+                            case adminContextClass.AdminActionSendEmail:
                                 //
                                 // ----- Send (Group Email Only)
                                 //
@@ -2496,10 +2496,10 @@ namespace Contensive.Addons.AdminSite {
                                         }
                                     }
                                 }
-                                adminContext.Admin_Action = adminInfoDomainModel.AdminActionNop; // convert so action can be used in as a refresh
+                                adminContext.Admin_Action = adminContextClass.AdminActionNop; // convert so action can be used in as a refresh
                                                                                               //
                                 break;
-                            case adminInfoDomainModel.AdminActionDeactivateEmail:
+                            case adminContextClass.AdminActionDeactivateEmail:
                                 //
                                 // ----- Deactivate (Conditional Email Only)
                                 //
@@ -2522,9 +2522,9 @@ namespace Contensive.Addons.AdminSite {
                                         }
                                     }
                                 }
-                                adminContext.Admin_Action = adminInfoDomainModel.AdminActionNop; // convert so action can be used in as a refresh
+                                adminContext.Admin_Action = adminContextClass.AdminActionNop; // convert so action can be used in as a refresh
                                 break;
-                            case adminInfoDomainModel.AdminActionActivateEmail:
+                            case adminContextClass.AdminActionActivateEmail:
                                 //
                                 // ----- Activate (Conditional Email Only)
                                 //
@@ -2554,9 +2554,9 @@ namespace Contensive.Addons.AdminSite {
                                         }
                                     }
                                 }
-                                adminContext.Admin_Action = adminInfoDomainModel.AdminActionNop; // convert so action can be used in as a refresh
+                                adminContext.Admin_Action = adminContextClass.AdminActionNop; // convert so action can be used in as a refresh
                                 break;
-                            case adminInfoDomainModel.AdminActionSendEmailTest:
+                            case adminContextClass.AdminActionSendEmailTest:
                                 if (adminContext.editRecord.Read_Only) {
                                     ErrorController.addUserError(core, "Your request was blocked because the record you specified is now locked by another authcontext.user.");
                                 } else {
@@ -2580,10 +2580,10 @@ namespace Contensive.Addons.AdminSite {
                                         }
                                     }
                                 }
-                                adminContext.Admin_Action = adminInfoDomainModel.AdminActionNop; // convert so action can be used in as a refresh
+                                adminContext.Admin_Action = adminContextClass.AdminActionNop; // convert so action can be used in as a refresh
                                                                                               // end case
                                 break;
-                            case adminInfoDomainModel.AdminActionDeleteRows:
+                            case adminContextClass.AdminActionDeleteRows:
                                 //
                                 // Delete Multiple Rows
                                 //
@@ -2621,7 +2621,7 @@ namespace Contensive.Addons.AdminSite {
                                     }
                                 }
                                 break;
-                            case adminInfoDomainModel.AdminActionReloadCDef:
+                            case adminContextClass.AdminActionReloadCDef:
                                 //
                                 // ccContent - save changes and reload content definitions
                                 //
@@ -2634,7 +2634,7 @@ namespace Contensive.Addons.AdminSite {
                                     core.cache.invalidateAll();
                                     core.doc.clearMetaData();
                                 }
-                                adminContext.Admin_Action = adminInfoDomainModel.AdminActionNop; // convert so action can be used in as a refresh
+                                adminContext.Admin_Action = adminContextClass.AdminActionNop; // convert so action can be used in as a refresh
                                 break;
                             default:
                                 //
@@ -2895,7 +2895,7 @@ namespace Contensive.Addons.AdminSite {
         //   Then load in any response elements
         //========================================================================
         //
-        private void LoadEditRecord(adminInfoDomainModel adminContext, bool CheckUserErrors = false) {
+        private void LoadEditRecord(adminContextClass adminContext, bool CheckUserErrors = false) {
             try {
                 // todo refactor out
                 AdminUIController.EditRecordClass editRecord = adminContext.editRecord;
@@ -3018,7 +3018,7 @@ namespace Contensive.Addons.AdminSite {
         //   Load both Live and Edit Record values from definition defaults
         //========================================================================
         //
-        private void LoadEditRecord_Default(adminInfoDomainModel adminContext) {
+        private void LoadEditRecord_Default(adminContextClass adminContext) {
             try {
                 // todo
                 AdminUIController.EditRecordClass editrecord = adminContext.editRecord;
@@ -3137,7 +3137,7 @@ namespace Contensive.Addons.AdminSite {
         //   Load both Live and Edit Record values from definition defaults
         //========================================================================
         //
-        private void LoadEditRecord_WherePairs(adminInfoDomainModel adminContext) {
+        private void LoadEditRecord_WherePairs(adminContextClass adminContext) {
             try {
                 // todo refactor out
                 AdminUIController.EditRecordClass editRecord = adminContext.editRecord;
@@ -3188,7 +3188,7 @@ namespace Contensive.Addons.AdminSite {
         //   Load Records from the database
         //========================================================================
         //
-        private void LoadEditRecord_Dbase(adminInfoDomainModel adminContext, bool CheckUserErrors = false) {
+        private void LoadEditRecord_Dbase(adminContextClass adminContext, bool CheckUserErrors = false) {
             try {
                 // todo
                 AdminUIController.EditRecordClass editrecord = adminContext.editRecord;
@@ -3414,7 +3414,7 @@ namespace Contensive.Addons.AdminSite {
         //   Read the Form into the fields array
         //========================================================================
         //
-        private void LoadEditRecord_Request(adminInfoDomainModel adminContext) {
+        private void LoadEditRecord_Request(adminContextClass adminContext) {
             try {
                 // todo
                 AdminUIController.EditRecordClass editRecord = adminContext.editRecord;
@@ -3550,7 +3550,7 @@ namespace Contensive.Addons.AdminSite {
         //   Read the Form into the fields array
         //========================================================================
         //
-        private void LoadEditRecord_RequestField(adminInfoDomainModel adminContext, CDefFieldModel field, string ignore, List<string> FormFieldLcListToBeLoaded, List<string> FormEmptyFieldLcList) {
+        private void LoadEditRecord_RequestField(adminContextClass adminContext, CDefFieldModel field, string ignore, List<string> FormFieldLcListToBeLoaded, List<string> FormEmptyFieldLcList) {
             try {
                 // todo
                 AdminUIController.EditRecordClass editRecord = adminContext.editRecord;
@@ -3951,7 +3951,7 @@ namespace Contensive.Addons.AdminSite {
         //   does NOT check AuthoringLocked -- you must check before calling
         //========================================================================
         //
-        private void SaveContentTracking(adminInfoDomainModel adminContext) {
+        private void SaveContentTracking(adminContextClass adminContext) {
             try {
                 // todo
                 AdminUIController.EditRecordClass editRecord = adminContext.editRecord;
@@ -4030,7 +4030,7 @@ namespace Contensive.Addons.AdminSite {
         //   Read in Whats New values if present
         //========================================================================
         //
-        private void LoadContentTrackingResponse(adminInfoDomainModel adminContext) {
+        private void LoadContentTrackingResponse(adminContextClass adminContext) {
             try {
                 //
                 int CSContentWatchList = 0;
@@ -4072,7 +4072,7 @@ namespace Contensive.Addons.AdminSite {
         //   if not, it appears in the LinkAlias tab, and must be saved here
         //========================================================================
         //
-        private void SaveLinkAlias(adminInfoDomainModel adminContext) {
+        private void SaveLinkAlias(adminContextClass adminContext) {
             try {
                 // todo
                 AdminUIController.EditRecordClass editRecord = adminContext.editRecord;
@@ -4125,7 +4125,7 @@ namespace Contensive.Addons.AdminSite {
         //   Field values must be loaded
         //========================================================================
         //
-        private void LoadContentTrackingDataBase(adminInfoDomainModel adminContext) {
+        private void LoadContentTrackingDataBase(adminContextClass adminContext) {
             try {
                 // todo
                 AdminUIController.EditRecordClass editRecord = adminContext.editRecord;
@@ -4159,7 +4159,7 @@ namespace Contensive.Addons.AdminSite {
         //
         //========================================================================
         //
-        private void SaveEditRecord(adminInfoDomainModel adminContext) {
+        private void SaveEditRecord(adminContextClass adminContext) {
             try {
                 // todo
                 AdminUIController.EditRecordClass editRecord = adminContext.editRecord;
@@ -4169,7 +4169,7 @@ namespace Contensive.Addons.AdminSite {
                 if (core.doc.debug_iUserError != "") {
                     //
                     // -- If There is an error, block the save
-                    adminContext.Admin_Action = adminInfoDomainModel.AdminActionNop;
+                    adminContext.Admin_Action = adminContextClass.AdminActionNop;
                 } else if (!core.session.isAuthenticatedContentManager(core, adminContext.adminContent.name)) {
                     //
                     // -- must be content manager
@@ -4558,7 +4558,7 @@ namespace Contensive.Addons.AdminSite {
         //   Display a field in the admin index form
         //========================================================================
         //
-        private string GetForm_Index_GetCell(adminInfoDomainModel adminContext, string fieldName, int CS, bool IsLookupFieldValid, bool IsEmailContent) {
+        private string GetForm_Index_GetCell(adminContextClass adminContext, string fieldName, int CS, bool IsLookupFieldValid, bool IsEmailContent) {
             string return_formIndexCell = "";
             try {
                 string FieldText = null;
@@ -4672,24 +4672,21 @@ namespace Contensive.Addons.AdminSite {
         /// <summary>
         ///edit record
         /// </summary>
-        /// <param name="adminInfo.content"></param>
+        /// <param name="adminContext.content"></param>
         /// <param name="editRecord"></param>
         /// <returns></returns>
-        private string GetForm_Edit(adminInfoDomainModel adminInfo) {
+        private string GetForm_Edit(adminContextClass adminContext) {
             string returnHtml = "";
             try {
-                //
-                cp.Utils.AppendLogFile("GetForm_Edit, enter");
-                //
                 // todo
-                AdminUIController.EditRecordClass editRecord = adminInfo.editRecord;
+                AdminUIController.EditRecordClass editRecord = adminContext.editRecord;
                 //
                 bool AllowajaxTabs = (core.siteProperties.getBoolean("AllowAjaxEditTabBeta", false));
                 //
                 if ((core.doc.debug_iUserError != "") & editRecord.Loaded) {
                     //
                     // block load if there was a user error and it is already loaded (assume error was from response )
-                } else if (adminInfo.adminContent.id <= 0) {
+                } else if (adminContext.adminContent.id <= 0) {
                     //
                     // Invalid Content
                     ErrorController.addUserError(core, "There was a problem identifying the content you requested. Please return to the previous form and verify your selection.");
@@ -4705,7 +4702,7 @@ namespace Contensive.Addons.AdminSite {
                     // xx This was added to bypass the load for the editrefresh case (reload the response so the editor preference can change)
                     // xx  I do not know why the following section says "reload even if it is loaded", but lets try this
                     //
-                    foreach (var keyValuePair in adminInfo.adminContent.fields) {
+                    foreach (var keyValuePair in adminContext.adminContent.fields) {
                         CDefFieldModel field = keyValuePair.Value;
                         switch (field.fieldTypeId) {
                             case FieldTypeIdFile:
@@ -4717,7 +4714,7 @@ namespace Contensive.Addons.AdminSite {
                 } else {
                     //
                     // otherwise, load the record, even if it was loaded during a previous form process
-                    LoadEditRecord(adminInfo, true);
+                    LoadEditRecord(adminContext, true);
                     if (editRecord.contentControlId == 0) {
                         if (core.doc.debug_iUserError != "") {
                             //
@@ -4732,7 +4729,7 @@ namespace Contensive.Addons.AdminSite {
                 }
                 //
                 // Test if this editors has access to this record
-                if (!adminInfoDomainModel.userHasContentAccess(core, editRecord.contentControlId)) {
+                if (!adminContextClass.userHasContentAccess(core, editRecord.contentControlId)) {
                     ErrorController.addUserError(core, "Your account on this system does not have access rights to edit this content.");
                     return "";
                 }
@@ -4757,13 +4754,13 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // Print common form elements
                 StringBuilderLegacyController Stream = new StringBuilderLegacyController();
-                Stream.Add(GetForm_EditFormStart(adminInfo, AdminFormEdit));
+                Stream.Add(GetForm_EditFormStart(adminContext, AdminFormEdit));
                 bool IsLandingPageParent = false;
                 int TemplateIDForStyles = 0;
-                bool IsTemplateTable = (adminInfo.adminContent.tableName.ToLower() == Processor.Models.Db.PageTemplateModel.contentTableName);
-                bool IsPageContentTable = (adminInfo.adminContent.tableName.ToLower() == Processor.Models.Db.PageContentModel.contentTableName);
-                bool IsSectionTable = (adminInfo.adminContent.tableName.ToLower() == Processor.Models.Db.SiteSectionModel.contentTableName);
-                bool IsEmailTable = (adminInfo.adminContent.tableName.ToLower() == Processor.Models.Db.EmailModel.contentTableName);
+                bool IsTemplateTable = (adminContext.adminContent.tableName.ToLower() == Processor.Models.Db.PageTemplateModel.contentTableName);
+                bool IsPageContentTable = (adminContext.adminContent.tableName.ToLower() == Processor.Models.Db.PageContentModel.contentTableName);
+                bool IsSectionTable = (adminContext.adminContent.tableName.ToLower() == Processor.Models.Db.SiteSectionModel.contentTableName);
+                bool IsEmailTable = (adminContext.adminContent.tableName.ToLower() == Processor.Models.Db.EmailModel.contentTableName);
                 int emailIdForStyles = IsEmailTable ? editRecord.id : 0;
                 bool IsLandingPage = false;
                 bool IsRootPage = false;
@@ -4817,9 +4814,9 @@ namespace Contensive.Addons.AdminSite {
                 bool allowCMEdit = false;
                 bool allowCMAdd = false;
                 bool allowCMDelete = false;
-                core.session.getContentAccessRights(core, adminInfo.adminContent.name, ref allowCMEdit, ref allowCMAdd, ref allowCMDelete);
-                bool allowAdd = adminInfo.adminContent.allowAdd && allowCMAdd;
-                bool AllowDelete = adminInfo.adminContent.allowDelete & allowCMDelete & (editRecord.id != 0);
+                core.session.getContentAccessRights(core, adminContext.adminContent.name, ref allowCMEdit, ref allowCMAdd, ref allowCMDelete);
+                bool allowAdd = adminContext.adminContent.allowAdd && allowCMAdd;
+                bool AllowDelete = adminContext.adminContent.allowDelete & allowCMDelete & (editRecord.id != 0);
                 bool allowSave = allowCMEdit;
                 bool AllowRefresh = true;
                 //
@@ -4843,7 +4840,7 @@ namespace Contensive.Addons.AdminSite {
                 //   with custom FancyBox form in edit window with button "set editor preference"
                 //   this button causes a 'refresh' action, reloads fields with stream without save
                 //
-                string fieldEditorPreferencesList = core.userProperty.getText("editorPreferencesForContent:" + adminInfo.adminContent.id, "");
+                string fieldEditorPreferencesList = core.userProperty.getText("editorPreferencesForContent:" + adminContext.adminContent.id, "");
                 //
                 // add the addon editors assigned to each field
                 // !!!!! this should be added to metaData load
@@ -4852,7 +4849,7 @@ namespace Contensive.Addons.AdminSite {
                     + " f.id,f.editorAddonID"
                     + " from ccfields f"
                     + " where"
-                    + " f.ContentID=" + adminInfo.adminContent.id + " and f.editorAddonId is not null";
+                    + " f.ContentID=" + adminContext.adminContent.id + " and f.editorAddonId is not null";
                 DataTable dt = core.db.executeQuery(SQL);
 
                 string[,] Cells = core.db.convertDataTabletoArray(dt);
@@ -4884,11 +4881,11 @@ namespace Contensive.Addons.AdminSite {
                 // ----- determine contentType for editor
                 //
                 contentTypeEnum ContentType;
-                if (GenericController.vbLCase(adminInfo.adminContent.name) == "email templates") {
+                if (GenericController.vbLCase(adminContext.adminContent.name) == "email templates") {
                     ContentType = contentTypeEnum.contentTypeEmailTemplate;
-                } else if (GenericController.vbLCase(adminInfo.adminContent.tableName) == "cctemplates") {
+                } else if (GenericController.vbLCase(adminContext.adminContent.tableName) == "cctemplates") {
                     ContentType = contentTypeEnum.contentTypeWebTemplate;
-                } else if (GenericController.vbLCase(adminInfo.adminContent.tableName) == "ccemail") {
+                } else if (GenericController.vbLCase(adminContext.adminContent.tableName) == "ccemail") {
                     ContentType = contentTypeEnum.contentTypeEmail;
                 } else {
                     ContentType = contentTypeEnum.contentTypeWeb;
@@ -4898,7 +4895,7 @@ namespace Contensive.Addons.AdminSite {
                 string styleOptionList = "";
                 string editorAddonListJSON = core.html.getWysiwygAddonList(ContentType);
                 string styleList = "";
-                string adminContentTableNameLower = adminInfo.adminContent.tableName.ToLower();
+                string adminContentTableNameLower = adminContext.adminContent.tableName.ToLower();
                 if (adminContentTableNameLower == PersonModel.contentTableName.ToLower()) {
                     //
                     // -- people
@@ -4909,7 +4906,7 @@ namespace Contensive.Addons.AdminSite {
                     } else {
                         string EditSectionButtonBar = AdminUIController.getButtonBarForEdit(core, new EditButtonBarInfoClass() {
                             allowActivate = false,
-                            allowAdd = (allowAdd && adminInfo.adminContent.allowAdd & editRecord.AllowInsert),
+                            allowAdd = (allowAdd && adminContext.adminContent.allowAdd & editRecord.AllowInsert),
                             allowCancel = editRecord.AllowCancel,
                             allowCreateDuplicate = (allowSave && editRecord.AllowSave & (editRecord.id != 0)),
                             allowDelete = AllowDelete && editRecord.AllowDelete,
@@ -4922,11 +4919,11 @@ namespace Contensive.Addons.AdminSite {
                             isPageContent = false
                         });
                         Stream.Add(EditSectionButtonBar);
-                        Stream.Add(AdminUIController.getTitleBar(core, GetForm_EditTitle(adminInfo), titleBarDetails));
-                        Stream.Add(GetForm_Edit_Tabs(adminInfo, editRecord.Read_Only, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
-                        Stream.Add(GetForm_Edit_AddTab("Groups", GetForm_Edit_MemberGroups(adminInfo), adminInfo.allowAdminTabs));
-                        Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminInfo), adminInfo.allowAdminTabs));
-                        if (adminInfo.allowAdminTabs) Stream.Add(core.doc.menuComboTab.GetTabs(core));
+                        Stream.Add(AdminUIController.getTitleBar(core, GetForm_EditTitle(adminContext), titleBarDetails));
+                        Stream.Add(GetForm_Edit_Tabs(adminContext, editRecord.Read_Only, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
+                        Stream.Add(GetForm_Edit_AddTab("Groups", GetForm_Edit_MemberGroups(adminContext), adminContext.allowAdminTabs));
+                        Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminContext), adminContext.allowAdminTabs));
+                        if (adminContext.allowAdminTabs) Stream.Add(core.doc.menuComboTab.GetTabs(core));
                         Stream.Add(EditSectionButtonBar);
                     }
                 } else if (adminContentTableNameLower == EmailModel.contentTableName.ToLower()) {
@@ -4956,7 +4953,7 @@ namespace Contensive.Addons.AdminSite {
                         }
                         string EditSectionButtonBar = AdminUIController.getButtonBarForEdit(core, new EditButtonBarInfoClass() {
                             allowActivate = false,
-                            allowAdd = (allowAdd && adminInfo.adminContent.allowAdd & editRecord.AllowInsert),
+                            allowAdd = (allowAdd && adminContext.adminContent.allowAdd & editRecord.AllowInsert),
                             allowCancel = editRecord.AllowCancel,
                             allowCreateDuplicate = (allowSave && editRecord.AllowSave & (editRecord.id != 0)),
                             allowDelete = AllowDelete && editRecord.AllowDelete && core.session.isAuthenticatedDeveloper(core),
@@ -4969,17 +4966,15 @@ namespace Contensive.Addons.AdminSite {
                             isPageContent = false
                         });
                         Stream.Add(EditSectionButtonBar);
-                        Stream.Add(AdminUIController.getTitleBar(core, GetForm_EditTitle(adminInfo), titleBarDetails));
-                        Stream.Add(GetForm_Edit_Tabs(adminInfo, editRecord.Read_Only, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
-                        Stream.Add(GetForm_Edit_AddTab("Send&nbsp;To&nbsp;Groups", GetForm_Edit_EmailRules(adminInfo, editRecord.Read_Only & (!core.session.isAuthenticatedDeveloper(core))), adminInfo.allowAdminTabs));
-                        Stream.Add(GetForm_Edit_AddTab("Send&nbsp;To&nbsp;Topics", GetForm_Edit_EmailTopics(adminInfo, editRecord.Read_Only & (!core.session.isAuthenticatedDeveloper(core))), adminInfo.allowAdminTabs));
-                        Stream.Add(GetForm_Edit_AddTab("Bounce&nbsp;Control", GetForm_Edit_EmailBounceStatus(adminInfo), adminInfo.allowAdminTabs));
-                        Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminInfo), adminInfo.allowAdminTabs));
-                        if (adminInfo.allowAdminTabs) Stream.Add(core.doc.menuComboTab.GetTabs(core));
+                        Stream.Add(AdminUIController.getTitleBar(core, GetForm_EditTitle(adminContext), titleBarDetails));
+                        Stream.Add(GetForm_Edit_Tabs(adminContext, editRecord.Read_Only, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
+                        Stream.Add(GetForm_Edit_AddTab("Send&nbsp;To&nbsp;Groups", GetForm_Edit_EmailRules(adminContext, editRecord.Read_Only & (!core.session.isAuthenticatedDeveloper(core))), adminContext.allowAdminTabs));
+                        Stream.Add(GetForm_Edit_AddTab("Send&nbsp;To&nbsp;Topics", GetForm_Edit_EmailTopics(adminContext, editRecord.Read_Only & (!core.session.isAuthenticatedDeveloper(core))), adminContext.allowAdminTabs));
+                        Stream.Add(GetForm_Edit_AddTab("Bounce&nbsp;Control", GetForm_Edit_EmailBounceStatus(adminContext), adminContext.allowAdminTabs));
+                        Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminContext), adminContext.allowAdminTabs));
+                        if (adminContext.allowAdminTabs) Stream.Add(core.doc.menuComboTab.GetTabs(core));
                         Stream.Add(EditSectionButtonBar);
                     } else if (CDefModel.isWithinContent(core, editRecord.contentControlId, ConditionalEmailCID)) {
-                        //
-                        cp.Utils.AppendLog("GetForm_Edit, Conditional Email");
                         //
                         // Conditional Email
                         EmailSubmitted = false;
@@ -4989,7 +4984,7 @@ namespace Contensive.Addons.AdminSite {
                         string EditSectionButtonBar = AdminUIController.getButtonBarForEdit(core, new EditButtonBarInfoClass() {
                             allowActivate = !EmailSubmitted & (LastSendTestDate == DateTime.MinValue) && (!AllowEmailSendWithoutTest),
                             allowDeactivate = EmailSubmitted,
-                            allowAdd = allowAdd && adminInfo.adminContent.allowAdd & editRecord.AllowInsert,
+                            allowAdd = allowAdd && adminContext.adminContent.allowAdd & editRecord.AllowInsert,
                             allowCancel = editRecord.AllowCancel,
                             allowCreateDuplicate = allowAdd && (editRecord.id != 0),
                             allowDelete = AllowDelete && editRecord.AllowDelete && core.session.isAuthenticatedDeveloper(core),
@@ -5002,12 +4997,12 @@ namespace Contensive.Addons.AdminSite {
                             isPageContent = false
                         });
                         Stream.Add(EditSectionButtonBar);
-                        Stream.Add(AdminUIController.getTitleBar(core, GetForm_EditTitle(adminInfo), titleBarDetails));
-                        Stream.Add(GetForm_Edit_Tabs(adminInfo, editRecord.Read_Only || EmailSubmitted, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
-                        Stream.Add(GetForm_Edit_AddTab("Condition&nbsp;Groups", GetForm_Edit_EmailRules(adminInfo, editRecord.Read_Only || EmailSubmitted), adminInfo.allowAdminTabs));
-                        Stream.Add(GetForm_Edit_AddTab("Bounce&nbsp;Control", GetForm_Edit_EmailBounceStatus(adminInfo), adminInfo.allowAdminTabs));
-                        Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminInfo), adminInfo.allowAdminTabs));
-                        if (adminInfo.allowAdminTabs) Stream.Add(core.doc.menuComboTab.GetTabs(core));
+                        Stream.Add(AdminUIController.getTitleBar(core, GetForm_EditTitle(adminContext), titleBarDetails));
+                        Stream.Add(GetForm_Edit_Tabs(adminContext, editRecord.Read_Only || EmailSubmitted, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
+                        Stream.Add(GetForm_Edit_AddTab("Condition&nbsp;Groups", GetForm_Edit_EmailRules(adminContext, editRecord.Read_Only || EmailSubmitted), adminContext.allowAdminTabs));
+                        Stream.Add(GetForm_Edit_AddTab("Bounce&nbsp;Control", GetForm_Edit_EmailBounceStatus(adminContext), adminContext.allowAdminTabs));
+                        Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminContext), adminContext.allowAdminTabs));
+                        if (adminContext.allowAdminTabs) Stream.Add(core.doc.menuComboTab.GetTabs(core));
                         Stream.Add(EditSectionButtonBar);
                     } else {
                         //
@@ -5019,7 +5014,7 @@ namespace Contensive.Addons.AdminSite {
                         string EditSectionButtonBar = AdminUIController.getButtonBarForEdit(core, new EditButtonBarInfoClass() {
                             allowActivate = !EmailSubmitted & (LastSendTestDate == DateTime.MinValue) && (!AllowEmailSendWithoutTest),
                             allowDeactivate = EmailSubmitted,
-                            allowAdd = allowAdd && adminInfo.adminContent.allowAdd & editRecord.AllowInsert,
+                            allowAdd = allowAdd && adminContext.adminContent.allowAdd & editRecord.AllowInsert,
                             allowCancel = editRecord.AllowCancel,
                             allowCreateDuplicate = allowAdd && (editRecord.id != 0),
                             allowDelete = AllowDelete && editRecord.AllowDelete && core.session.isAuthenticatedDeveloper(core),
@@ -5032,16 +5027,16 @@ namespace Contensive.Addons.AdminSite {
                             isPageContent = false
                         });
                         Stream.Add(EditSectionButtonBar);
-                        Stream.Add(AdminUIController.getTitleBar(core, GetForm_EditTitle(adminInfo), titleBarDetails));
-                        Stream.Add(GetForm_Edit_Tabs(adminInfo, editRecord.Read_Only | EmailSubmitted || EmailSent, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
-                        Stream.Add(GetForm_Edit_AddTab("Send&nbsp;To&nbsp;Groups", GetForm_Edit_EmailRules(adminInfo, editRecord.Read_Only | EmailSubmitted || EmailSent), adminInfo.allowAdminTabs));
-                        Stream.Add(GetForm_Edit_AddTab("Send&nbsp;To&nbsp;Topics", GetForm_Edit_EmailTopics(adminInfo, editRecord.Read_Only | EmailSubmitted || EmailSent), adminInfo.allowAdminTabs));
-                        Stream.Add(GetForm_Edit_AddTab("Bounce&nbsp;Control", GetForm_Edit_EmailBounceStatus(adminInfo), adminInfo.allowAdminTabs));
-                        Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminInfo), adminInfo.allowAdminTabs));
-                        if (adminInfo.allowAdminTabs) Stream.Add(core.doc.menuComboTab.GetTabs(core));
+                        Stream.Add(AdminUIController.getTitleBar(core, GetForm_EditTitle(adminContext), titleBarDetails));
+                        Stream.Add(GetForm_Edit_Tabs(adminContext, editRecord.Read_Only | EmailSubmitted || EmailSent, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
+                        Stream.Add(GetForm_Edit_AddTab("Send&nbsp;To&nbsp;Groups", GetForm_Edit_EmailRules(adminContext, editRecord.Read_Only | EmailSubmitted || EmailSent), adminContext.allowAdminTabs));
+                        Stream.Add(GetForm_Edit_AddTab("Send&nbsp;To&nbsp;Topics", GetForm_Edit_EmailTopics(adminContext, editRecord.Read_Only | EmailSubmitted || EmailSent), adminContext.allowAdminTabs));
+                        Stream.Add(GetForm_Edit_AddTab("Bounce&nbsp;Control", GetForm_Edit_EmailBounceStatus(adminContext), adminContext.allowAdminTabs));
+                        Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminContext), adminContext.allowAdminTabs));
+                        if (adminContext.allowAdminTabs) Stream.Add(core.doc.menuComboTab.GetTabs(core));
                         Stream.Add(EditSectionButtonBar);
                     }
-                } else if (adminInfo.adminContent.tableName.ToLower() == ContentModel.contentTableName.ToLower()) {
+                } else if (adminContext.adminContent.tableName.ToLower() == ContentModel.contentTableName.ToLower()) {
                     if (!(core.session.isAuthenticatedAdmin(core))) {
                         //
                         // Must be admin
@@ -5050,7 +5045,7 @@ namespace Contensive.Addons.AdminSite {
                     } else {
                         string EditSectionButtonBar = AdminUIController.getButtonBarForEdit(core, new EditButtonBarInfoClass() {
                             allowActivate = false,
-                            allowAdd = (allowAdd && adminInfo.adminContent.allowAdd & editRecord.AllowInsert),
+                            allowAdd = (allowAdd && adminContext.adminContent.allowAdd & editRecord.AllowInsert),
                             allowCancel = editRecord.AllowCancel,
                             allowCreateDuplicate = (allowSave && editRecord.AllowSave & (editRecord.id != 0)),
                             allowDelete = AllowDelete && editRecord.AllowDelete,
@@ -5063,11 +5058,11 @@ namespace Contensive.Addons.AdminSite {
                             isPageContent = false
                         });
                         Stream.Add(EditSectionButtonBar);
-                        Stream.Add(AdminUIController.getTitleBar(core, GetForm_EditTitle(adminInfo), titleBarDetails));
-                        Stream.Add(GetForm_Edit_Tabs(adminInfo, editRecord.Read_Only, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
-                        Stream.Add(GetForm_Edit_AddTab("Authoring Permissions", GetForm_Edit_GroupRules(adminInfo), adminInfo.allowAdminTabs));
-                        Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminInfo), adminInfo.allowAdminTabs));
-                        if (adminInfo.allowAdminTabs) {
+                        Stream.Add(AdminUIController.getTitleBar(core, GetForm_EditTitle(adminContext), titleBarDetails));
+                        Stream.Add(GetForm_Edit_Tabs(adminContext, editRecord.Read_Only, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
+                        Stream.Add(GetForm_Edit_AddTab("Authoring Permissions", GetForm_Edit_GroupRules(adminContext), adminContext.allowAdminTabs));
+                        Stream.Add(GetForm_Edit_AddTab("Control&nbsp;Info", GetForm_Edit_Control(adminContext), adminContext.allowAdminTabs));
+                        if (adminContext.allowAdminTabs) {
                             Stream.Add(core.doc.menuComboTab.GetTabs(core));
                             //Call Stream.Add("<div class=""ccPanelBackground"">" & core.main_GetComboTabs() & "</div>")
                         }
@@ -5081,7 +5076,7 @@ namespace Contensive.Addons.AdminSite {
                     int TableID = core.db.getRecordID("Tables", "ccPageContent");
                     string EditSectionButtonBar = AdminUIController.getButtonBarForEdit(core, new EditButtonBarInfoClass() {
                         allowActivate = false,
-                        allowAdd = (allowAdd && adminInfo.adminContent.allowAdd & editRecord.AllowInsert),
+                        allowAdd = (allowAdd && adminContext.adminContent.allowAdd & editRecord.AllowInsert),
                         allowCancel = editRecord.AllowCancel,
                         allowCreateDuplicate = (allowSave && editRecord.AllowSave & (editRecord.id != 0)),
                         allowDelete = AllowDelete && editRecord.AllowDelete,
@@ -5094,12 +5089,12 @@ namespace Contensive.Addons.AdminSite {
                         isPageContent = false
                     });
                     Stream.Add(EditSectionButtonBar);
-                    Stream.Add(AdminUIController.getTitleBar(core, GetForm_EditTitle(adminInfo), titleBarDetails));
-                    Stream.Add(GetForm_Edit_Tabs(adminInfo, editRecord.Read_Only, IsLandingPage || IsLandingPageParent, IsRootPage, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
-                    Stream.Add(GetForm_Edit_AddTab("Link Aliases", GetForm_Edit_LinkAliases(adminInfo, editRecord.Read_Only), adminInfo.allowAdminTabs));
-                    Stream.Add(GetForm_Edit_AddTab("Content Watch", GetForm_Edit_ContentTracking(adminInfo), adminInfo.allowAdminTabs));
-                    Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminInfo), adminInfo.allowAdminTabs));
-                    if (adminInfo.allowAdminTabs) {
+                    Stream.Add(AdminUIController.getTitleBar(core, GetForm_EditTitle(adminContext), titleBarDetails));
+                    Stream.Add(GetForm_Edit_Tabs(adminContext, editRecord.Read_Only, IsLandingPage || IsLandingPageParent, IsRootPage, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
+                    Stream.Add(GetForm_Edit_AddTab("Link Aliases", GetForm_Edit_LinkAliases(adminContext, editRecord.Read_Only), adminContext.allowAdminTabs));
+                    Stream.Add(GetForm_Edit_AddTab("Content Watch", GetForm_Edit_ContentTracking(adminContext), adminContext.allowAdminTabs));
+                    Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContext), adminContext.allowAdminTabs));
+                    if (adminContext.allowAdminTabs) {
                         Stream.Add(core.doc.menuComboTab.GetTabs(core));
                     }
                     Stream.Add(EditSectionButtonBar);
@@ -5211,12 +5206,12 @@ namespace Contensive.Addons.AdminSite {
                 } else {
                     //
                     // All other tables (User definined)
-                    bool IsPageContent = CDefModel.isWithinContent(core, adminInfo.adminContent.id, CDefModel.getContentId(core, "Page Content"));
-                    bool HasChildRecords = CDefModel.isContentFieldSupported(core, adminInfo.adminContent.name, "parentid");
-                    bool AllowMarkReviewed = core.db.isSQLTableField("default", adminInfo.adminContent.tableName, "DateReviewed");
+                    bool IsPageContent = CDefModel.isWithinContent(core, adminContext.adminContent.id, CDefModel.getContentId(core, "Page Content"));
+                    bool HasChildRecords = CDefModel.isContentFieldSupported(core, adminContext.adminContent.name, "parentid");
+                    bool AllowMarkReviewed = core.db.isSQLTableField("default", adminContext.adminContent.tableName, "DateReviewed");
                     string EditSectionButtonBar = AdminUIController.getButtonBarForEdit(core, new EditButtonBarInfoClass() {
                         allowActivate = false,
-                        allowAdd = (allowAdd && adminInfo.adminContent.allowAdd & editRecord.AllowInsert),
+                        allowAdd = (allowAdd && adminContext.adminContent.allowAdd & editRecord.AllowInsert),
                         allowCancel = editRecord.AllowCancel,
                         allowCreateDuplicate = (allowSave && editRecord.AllowSave & (editRecord.id != 0)),
                         allowDelete = AllowDelete && editRecord.AllowDelete,
@@ -5229,25 +5224,22 @@ namespace Contensive.Addons.AdminSite {
                         isPageContent = IsPageContent
                     });
                     Stream.Add(EditSectionButtonBar);
-                    Stream.Add(AdminUIController.getTitleBar(core, GetForm_EditTitle(adminInfo), titleBarDetails));
-                    Stream.Add(GetForm_Edit_Tabs(adminInfo, editRecord.Read_Only, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
-                    Stream.Add(GetForm_Edit_AddTab("Content Watch", GetForm_Edit_ContentTracking(adminInfo), adminInfo.allowAdminTabs));
-                    Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminInfo), adminInfo.allowAdminTabs));
-                    if (adminInfo.allowAdminTabs) Stream.Add(core.doc.menuComboTab.GetTabs(core));
+                    Stream.Add(AdminUIController.getTitleBar(core, GetForm_EditTitle(adminContext), titleBarDetails));
+                    Stream.Add(GetForm_Edit_Tabs(adminContext, editRecord.Read_Only, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
+                    Stream.Add(GetForm_Edit_AddTab("Content Watch", GetForm_Edit_ContentTracking(adminContext), adminContext.allowAdminTabs));
+                    Stream.Add(GetForm_Edit_AddTab("Control Info", GetForm_Edit_Control(adminContext), adminContext.allowAdminTabs));
+                    if (adminContext.allowAdminTabs) Stream.Add(core.doc.menuComboTab.GetTabs(core));
                     Stream.Add(EditSectionButtonBar);
                 }
                 Stream.Add("</form>");
                 returnHtml = Stream.Text;
                 if (editRecord.id == 0) {
-                    core.html.addTitle("Add " + adminInfo.adminContent.name);
+                    core.html.addTitle("Add " + adminContext.adminContent.name);
                 } else if (editRecord.nameLc == "") {
                     core.html.addTitle("Edit #" + editRecord.id + " in " + editRecord.contentControlId_Name);
                 } else {
                     core.html.addTitle("Edit " + editRecord.nameLc + " in " + editRecord.contentControlId_Name);
                 }
-                //
-                cp.Utils.AppendLog("GetForm_Edit, exit");
-                //
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
                 throw;
@@ -5597,7 +5589,7 @@ namespace Contensive.Addons.AdminSite {
         //   Generate the content of a tab in the Edit Screen
         //========================================================================
         //
-        private string GetForm_Edit_Tab(adminInfoDomainModel adminContext, int RecordID, int ContentID, bool record_readOnly, bool IsLandingPage, bool IsRootPage, string EditTab, contentTypeEnum EditorContext, ref string return_NewFieldList, int TemplateIDForStyles, int HelpCnt, int[] HelpIDCache, string[] helpDefaultCache, string[] HelpCustomCache, bool AllowHelpMsgCustom, KeyPtrController helpIdIndex, string[] fieldTypeDefaultEditors, string fieldEditorPreferenceList, string styleList, string styleOptionList, int emailIdForStyles, bool IsTemplateTable, string editorAddonListJSON) {
+        private string GetForm_Edit_Tab(adminContextClass adminContext, int RecordID, int ContentID, bool record_readOnly, bool IsLandingPage, bool IsRootPage, string EditTab, contentTypeEnum EditorContext, ref string return_NewFieldList, int TemplateIDForStyles, int HelpCnt, int[] HelpIDCache, string[] helpDefaultCache, string[] HelpCustomCache, bool AllowHelpMsgCustom, KeyPtrController helpIdIndex, string[] fieldTypeDefaultEditors, string fieldEditorPreferenceList, string styleList, string styleOptionList, int emailIdForStyles, bool IsTemplateTable, string editorAddonListJSON) {
             string returnHtml = "";
             try {
                 // todo
@@ -6517,7 +6509,7 @@ namespace Contensive.Addons.AdminSite {
         //   Display field in the admin/edit
         //========================================================================
         //
-        private string GetForm_Edit_ContentTracking(adminInfoDomainModel adminContext) {
+        private string GetForm_Edit_ContentTracking(adminContextClass adminContext) {
             string tempGetForm_Edit_ContentTracking = null;
             try {
                 // todo
@@ -6641,7 +6633,7 @@ namespace Contensive.Addons.AdminSite {
         //
         //========================================================================
         //
-        private string GetForm_Edit_Control(adminInfoDomainModel adminContext) {
+        private string GetForm_Edit_Control(adminContextClass adminContext) {
             string result = null;
             try {
                 // todo
@@ -6947,7 +6939,7 @@ namespace Contensive.Addons.AdminSite {
         //   Display field in the admin/edit
         //========================================================================
         //
-        private string GetForm_Edit_SiteProperties(adminInfoDomainModel adminContext) {
+        private string GetForm_Edit_SiteProperties(adminContextClass adminContext) {
             string tempGetForm_Edit_SiteProperties = null;
             try {
                 // todo
@@ -7492,7 +7484,7 @@ namespace Contensive.Addons.AdminSite {
         //   Print the Topic Rules section of any edit form
         //========================================================================
         //
-        private string GetForm_Edit_LinkAliases(adminInfoDomainModel adminContext, bool readOnlyField) {
+        private string GetForm_Edit_LinkAliases(adminContextClass adminContext, bool readOnlyField) {
             string tempGetForm_Edit_LinkAliases = null;
             try {
                 // todo
@@ -7580,7 +7572,7 @@ namespace Contensive.Addons.AdminSite {
         //   Content must conform to ccMember fields
         //========================================================================
         //
-        private string GetForm_Edit_EmailRules(adminInfoDomainModel adminContext, bool readOnlyField) {
+        private string GetForm_Edit_EmailRules(adminContextClass adminContext, bool readOnlyField) {
             string s = "";
             try {
                 // todo
@@ -7612,7 +7604,7 @@ namespace Contensive.Addons.AdminSite {
         //   Content must conform to ccMember fields
         //========================================================================
         //
-        private string GetForm_Edit_EmailTopics(adminInfoDomainModel adminContext, bool readOnlyField) {
+        private string GetForm_Edit_EmailTopics(adminContextClass adminContext, bool readOnlyField) {
             string s = "";
             try {
                 // todo
@@ -7642,7 +7634,7 @@ namespace Contensive.Addons.AdminSite {
         //
         //========================================================================
         //
-        private string GetForm_Edit_EmailBounceStatus(adminInfoDomainModel adminContext) {
+        private string GetForm_Edit_EmailBounceStatus(adminContextClass adminContext) {
             string tempGetForm_Edit_EmailBounceStatus = null;
             try {
                 //
@@ -7684,7 +7676,7 @@ namespace Contensive.Addons.AdminSite {
         //   Content must conform to ccMember fields
         //========================================================================
         //
-        private string GetForm_Edit_MemberGroups(adminInfoDomainModel adminContext) {
+        private string GetForm_Edit_MemberGroups(adminContextClass adminContext) {
             string result = null;
             try {
                 // todo
@@ -7811,7 +7803,7 @@ namespace Contensive.Addons.AdminSite {
         //   Special case tab for Layout records
         //========================================================================
         //
-        private string GetForm_Edit_LayoutReports(adminInfoDomainModel adminContext) {
+        private string GetForm_Edit_LayoutReports(adminContextClass adminContext) {
             string tempGetForm_Edit_LayoutReports = null;
             try {
                 // todo
@@ -7842,7 +7834,7 @@ namespace Contensive.Addons.AdminSite {
         //   Special case tab for People records
         //========================================================================
         //
-        private string GetForm_Edit_MemberReports(adminInfoDomainModel adminContext) {
+        private string GetForm_Edit_MemberReports(adminContextClass adminContext) {
             string tempGetForm_Edit_MemberReports = null;
             try {
                 // todo
@@ -7874,7 +7866,7 @@ namespace Contensive.Addons.AdminSite {
         //   Print the path Rules section of the path edit form
         //========================================================================
         //
-        private string GetForm_Edit_PageContentBlockRules(adminInfoDomainModel adminContext) {
+        private string GetForm_Edit_PageContentBlockRules(adminContextClass adminContext) {
             string tempGetForm_Edit_PageContentBlockRules = null;
             try {
                 // todo
@@ -7921,7 +7913,7 @@ namespace Contensive.Addons.AdminSite {
         //   Print the path Rules section of the path edit form
         //========================================================================
         //
-        private string GetForm_Edit_LibraryFolderRules(adminInfoDomainModel adminContext) {
+        private string GetForm_Edit_LibraryFolderRules(adminContextClass adminContext) {
             string tempGetForm_Edit_LibraryFolderRules = null;
             try {
                 // todo
@@ -7974,7 +7966,7 @@ namespace Contensive.Addons.AdminSite {
         //   EditRecord.ContentID is the ContentControlID of the Edit Record
         //========================================================================
         //
-        private string GetForm_Edit_GroupRules(adminInfoDomainModel adminContext) {
+        private string GetForm_Edit_GroupRules(adminContextClass adminContext) {
             string tempGetForm_Edit_GroupRules = null;
             try {
                 // todo
@@ -7990,7 +7982,7 @@ namespace Contensive.Addons.AdminSite {
                 string GroupName = null;
                 int GroupCount = 0;
                 bool GroupFound = false;
-                adminInfoDomainModel.GroupRuleType[] GroupRules = { };
+                adminContextClass.GroupRuleType[] GroupRules = { };
                 StringBuilderLegacyController FastString = null;
                 //adminUIController Adminui = new adminUIController(core);
                 //
@@ -8013,7 +8005,7 @@ namespace Contensive.Addons.AdminSite {
                     if (core.db.csOk(CS)) {
                         if (true) {
                             GroupRulesSize = 100;
-                            GroupRules = new adminInfoDomainModel.GroupRuleType[GroupRulesSize + 1];
+                            GroupRules = new adminContextClass.GroupRuleType[GroupRulesSize + 1];
                             while (core.db.csOk(CS)) {
                                 if (GroupRulesCount >= GroupRulesSize) {
                                     GroupRulesSize = GroupRulesSize + 100;
@@ -8110,7 +8102,7 @@ namespace Contensive.Addons.AdminSite {
         //   Get all content authorable by the current group
         //========================================================================
         //
-        private string GetForm_Edit_ContentGroupRules(adminInfoDomainModel adminContext) {
+        private string GetForm_Edit_ContentGroupRules(adminContextClass adminContext) {
             string tempGetForm_Edit_ContentGroupRules = null;
             try {
                 // todo
@@ -8125,7 +8117,7 @@ namespace Contensive.Addons.AdminSite {
                 string ContentName = null;
                 int ContentCount = 0;
                 bool ContentFound = false;
-                adminInfoDomainModel.ContentGroupRuleType[] ContentGroupRules = { };
+                adminContextClass.ContentGroupRuleType[] ContentGroupRules = { };
                 StringBuilderLegacyController FastString = null;
                 //adminUIController Adminui = new adminUIController(core);
                 //
@@ -8149,7 +8141,7 @@ namespace Contensive.Addons.AdminSite {
                         CS = core.db.csOpenSql(SQL, "Default");
                         if (core.db.csOk(CS)) {
                             ContentGroupRulesSize = 100;
-                            ContentGroupRules = new adminInfoDomainModel.ContentGroupRuleType[ContentGroupRulesSize + 1];
+                            ContentGroupRules = new adminContextClass.ContentGroupRuleType[ContentGroupRulesSize + 1];
                             while (core.db.csOk(CS)) {
                                 if (ContentGroupRulesCount >= ContentGroupRulesSize) {
                                     ContentGroupRulesSize = ContentGroupRulesSize + 100;
@@ -8294,7 +8286,7 @@ namespace Contensive.Addons.AdminSite {
         //   After this, print the content window, then PrintFormBottom()
         //========================================================================
         //
-        private string getAdminHeader(adminInfoDomainModel adminContext, string BackgroundColor = "") {
+        private string getAdminHeader(adminContextClass adminContext, string BackgroundColor = "") {
             string result = "";
             try {
                 string LeftSide = core.siteProperties.getText("AdminHeaderHTML", "Contensive Administration Site");
@@ -8466,7 +8458,7 @@ namespace Contensive.Addons.AdminSite {
         /// <param name="adminContext.content"></param>
         /// <param name="editRecord"></param>
         //
-        private void ProcessForms(adminInfoDomainModel adminContext) {
+        private void ProcessForms(adminContextClass adminContext) {
             try {
                 // todo
                 AdminUIController.EditRecordClass editRecord = adminContext.editRecord;
@@ -8482,7 +8474,7 @@ namespace Contensive.Addons.AdminSite {
                             //
                             switch (adminContext.requestButton) {
                                 case ButtonCancel:
-                                    adminContext.Admin_Action = adminInfoDomainModel.AdminActionNop;
+                                    adminContext.Admin_Action = adminContextClass.AdminActionNop;
                                     adminContext.AdminForm = AdminFormRoot;
                                     break;
                             }
@@ -8490,7 +8482,7 @@ namespace Contensive.Addons.AdminSite {
                         case AdminFormQuickStats:
                             switch (adminContext.requestButton) {
                                 case ButtonCancel:
-                                    adminContext.Admin_Action = adminInfoDomainModel.AdminActionNop;
+                                    adminContext.Admin_Action = adminContextClass.AdminActionNop;
                                     adminContext.AdminForm = AdminFormRoot;
                                     break;
                             }
@@ -8501,7 +8493,7 @@ namespace Contensive.Addons.AdminSite {
                             //
                             switch (adminContext.requestButton) {
                                 case ButtonCancel:
-                                    adminContext.Admin_Action = adminInfoDomainModel.AdminActionNop;
+                                    adminContext.Admin_Action = adminContextClass.AdminActionNop;
                                     adminContext.AdminForm = AdminFormRoot;
                                     break;
                             }
@@ -8509,21 +8501,21 @@ namespace Contensive.Addons.AdminSite {
                         case AdminFormIndex:
                             switch (adminContext.requestButton) {
                                 case ButtonCancel:
-                                    adminContext.Admin_Action = adminInfoDomainModel.AdminActionNop;
+                                    adminContext.Admin_Action = adminContextClass.AdminActionNop;
                                     adminContext.AdminForm = AdminFormRoot;
                                     adminContext.adminContent = new CDefModel();
                                     break;
                                 case ButtonClose:
-                                    adminContext.Admin_Action = adminInfoDomainModel.AdminActionNop;
+                                    adminContext.Admin_Action = adminContextClass.AdminActionNop;
                                     adminContext.AdminForm = AdminFormRoot;
                                     adminContext.adminContent = new CDefModel();
                                     break;
                                 case ButtonAdd:
-                                    adminContext.Admin_Action = adminInfoDomainModel.AdminActionNop;
+                                    adminContext.Admin_Action = adminContextClass.AdminActionNop;
                                     adminContext.AdminForm = AdminFormEdit;
                                     break;
                                 case ButtonFind:
-                                    adminContext.Admin_Action = adminInfoDomainModel.AdminActionFind;
+                                    adminContext.Admin_Action = adminContextClass.AdminActionFind;
                                     adminContext.AdminForm = adminContext.AdminSourceForm;
                                     break;
                                 case ButtonFirst:
@@ -8535,15 +8527,15 @@ namespace Contensive.Addons.AdminSite {
                                     if (adminContext.RecordTop < 0) {
                                         adminContext.RecordTop = 0;
                                     }
-                                    adminContext.Admin_Action = adminInfoDomainModel.AdminActionNop;
+                                    adminContext.Admin_Action = adminContextClass.AdminActionNop;
                                     adminContext.AdminForm = adminContext.AdminSourceForm;
                                     break;
                                 case ButtonNext:
-                                    adminContext.Admin_Action = adminInfoDomainModel.AdminActionNext;
+                                    adminContext.Admin_Action = adminContextClass.AdminActionNext;
                                     adminContext.AdminForm = adminContext.AdminSourceForm;
                                     break;
                                 case ButtonDelete:
-                                    adminContext.Admin_Action = adminInfoDomainModel.AdminActionDeleteRows;
+                                    adminContext.Admin_Action = adminContextClass.AdminActionDeleteRows;
                                     adminContext.AdminForm = adminContext.AdminSourceForm;
                                     break;
                             }
@@ -8559,63 +8551,63 @@ namespace Contensive.Addons.AdminSite {
                                     // this is a test operation. need this so the user can set editor preferences without saving the record
                                     //   during refresh, the edit page is redrawn just was it was, but no save
                                     //
-                                    adminContext.Admin_Action = adminInfoDomainModel.AdminActionEditRefresh;
+                                    adminContext.Admin_Action = adminContextClass.AdminActionEditRefresh;
                                     adminContext.AdminForm = AdminFormEdit;
                                     break;
                                 case ButtonMarkReviewed:
-                                    adminContext.Admin_Action = adminInfoDomainModel.AdminActionMarkReviewed;
+                                    adminContext.Admin_Action = adminContextClass.AdminActionMarkReviewed;
                                     adminContext.AdminForm = GetForm_Close(adminContext.ignore_legacyMenuDepth, adminContext.adminContent.name, editRecord.id);
                                     break;
                                 case ButtonSaveandInvalidateCache:
-                                    adminContext.Admin_Action = adminInfoDomainModel.AdminActionReloadCDef;
+                                    adminContext.Admin_Action = adminContextClass.AdminActionReloadCDef;
                                     adminContext.AdminForm = AdminFormEdit;
                                     break;
                                 case ButtonDelete:
-                                    adminContext.Admin_Action = adminInfoDomainModel.AdminActionDelete;
+                                    adminContext.Admin_Action = adminContextClass.AdminActionDelete;
                                     adminContext.AdminForm = GetForm_Close(adminContext.ignore_legacyMenuDepth, adminContext.adminContent.name, editRecord.id);
                                     break;
                                 case ButtonSave:
-                                    adminContext.Admin_Action = adminInfoDomainModel.AdminActionSave;
+                                    adminContext.Admin_Action = adminContextClass.AdminActionSave;
                                     adminContext.AdminForm = AdminFormEdit;
                                     break;
                                 case ButtonSaveAddNew:
-                                    adminContext.Admin_Action = adminInfoDomainModel.AdminActionSaveAddNew;
+                                    adminContext.Admin_Action = adminContextClass.AdminActionSaveAddNew;
                                     adminContext.AdminForm = AdminFormEdit;
                                     break;
                                 case ButtonOK:
-                                    adminContext.Admin_Action = adminInfoDomainModel.AdminActionSave;
+                                    adminContext.Admin_Action = adminContextClass.AdminActionSave;
                                     adminContext.AdminForm = GetForm_Close(adminContext.ignore_legacyMenuDepth, adminContext.adminContent.name, editRecord.id);
                                     break;
                                 case ButtonCancel:
-                                    adminContext.Admin_Action = adminInfoDomainModel.AdminActionNop;
+                                    adminContext.Admin_Action = adminContextClass.AdminActionNop;
                                     adminContext.AdminForm = GetForm_Close(adminContext.ignore_legacyMenuDepth, adminContext.adminContent.name, editRecord.id);
                                     break;
                                 case ButtonSend:
                                     //
                                     // Send a Group Email
                                     //
-                                    adminContext.Admin_Action = adminInfoDomainModel.AdminActionSendEmail;
+                                    adminContext.Admin_Action = adminContextClass.AdminActionSendEmail;
                                     adminContext.AdminForm = AdminFormEdit;
                                     break;
                                 case ButtonActivate:
                                     //
                                     // Activate (submit) a conditional Email
                                     //
-                                    adminContext.Admin_Action = adminInfoDomainModel.AdminActionActivateEmail;
+                                    adminContext.Admin_Action = adminContextClass.AdminActionActivateEmail;
                                     adminContext.AdminForm = AdminFormEdit;
                                     break;
                                 case ButtonDeactivate:
                                     //
                                     // Deactivate (clear submit) a conditional Email
                                     //
-                                    adminContext.Admin_Action = adminInfoDomainModel.AdminActionDeactivateEmail;
+                                    adminContext.Admin_Action = adminContextClass.AdminActionDeactivateEmail;
                                     adminContext.AdminForm = AdminFormEdit;
                                     break;
                                 case ButtonSendTest:
                                     //
                                     // Test an Email (Group, System, or Conditional)
                                     //
-                                    adminContext.Admin_Action = adminInfoDomainModel.AdminActionSendEmailTest;
+                                    adminContext.Admin_Action = adminContextClass.AdminActionSendEmailTest;
                                     adminContext.AdminForm = AdminFormEdit;
                                     //                Case ButtonSpellCheck
                                     //                    SpellCheckRequest = True
@@ -8626,7 +8618,7 @@ namespace Contensive.Addons.AdminSite {
                                     //
                                     // Create a Duplicate record (for email)
                                     //
-                                    adminContext.Admin_Action = adminInfoDomainModel.AdminActionDuplicate;
+                                    adminContext.Admin_Action = adminContextClass.AdminActionDuplicate;
                                     adminContext.AdminForm = AdminFormEdit;
                                     break;
                             }
@@ -8703,7 +8695,7 @@ namespace Contensive.Addons.AdminSite {
         //
         //========================================================================
         //
-        private string GetForm_EditTitle(adminInfoDomainModel adminContext) {
+        private string GetForm_EditTitle(adminContextClass adminContext) {
             return "";
             // this info moved to description block
             //string tempGetForm_EditTitle = "";
@@ -8724,7 +8716,7 @@ namespace Contensive.Addons.AdminSite {
         //
         //========================================================================
         //
-        private string GetForm_EditTitleBar(adminInfoDomainModel adminContext) {
+        private string GetForm_EditTitleBar(adminContextClass adminContext) {
             // todo
             AdminUIController.EditRecordClass editRecord = adminContext.editRecord;
             //
@@ -8736,7 +8728,7 @@ namespace Contensive.Addons.AdminSite {
         //
         //========================================================================
         //
-        private string GetForm_EditFormStart(adminInfoDomainModel adminContext, int AdminFormID) {
+        private string GetForm_EditFormStart(adminContextClass adminContext, int AdminFormID) {
             string s = "";
             try {
                 core.html.addScriptCode("var docLoaded=false", "Form loader");
@@ -8822,7 +8814,7 @@ namespace Contensive.Addons.AdminSite {
         // true if the field is an editable user field (can edit on edit form and save to database)
         //=============================================================================================
         //
-        private bool IsFieldEditable(adminInfoDomainModel adminContext, CDefFieldModel Field) {
+        private bool IsFieldEditable(adminContextClass adminContext, CDefFieldModel Field) {
             bool tempIsFieldEditable = false;
             try {
                 //
@@ -8856,7 +8848,7 @@ namespace Contensive.Addons.AdminSite {
         //
         //=============================================================================================
         //
-        private void ProcessActionSave(adminInfoDomainModel adminContext, bool UseContentWatchLink) {
+        private void ProcessActionSave(adminContextClass adminContext, bool UseContentWatchLink) {
             try {
                 // todo
                 AdminUIController.EditRecordClass editRecord = adminContext.editRecord;
@@ -9017,7 +9009,7 @@ namespace Contensive.Addons.AdminSite {
                 if (core.doc.debug_iUserError != "") {
                     adminContext.AdminForm = adminContext.AdminSourceForm;
                 }
-                adminContext.Admin_Action = adminInfoDomainModel.AdminActionNop; // convert so action can be used in as a refresh
+                adminContext.Admin_Action = adminContextClass.AdminActionNop; // convert so action can be used in as a refresh
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
             }
@@ -9578,7 +9570,7 @@ namespace Contensive.Addons.AdminSite {
         //
         //
         //
-        private string GetForm_Edit_Tabs(adminInfoDomainModel adminContext, bool readOnlyField, bool IsLandingPage, bool IsRootPage, contentTypeEnum EditorContext, bool allowAjaxTabs, int TemplateIDForStyles, string[] fieldTypeDefaultEditors, string fieldEditorPreferenceList, string styleList, string styleOptionList, int emailIdForStyles, bool IsTemplateTable, string editorAddonListJSON) {
+        private string GetForm_Edit_Tabs(adminContextClass adminContext, bool readOnlyField, bool IsLandingPage, bool IsRootPage, contentTypeEnum EditorContext, bool allowAjaxTabs, int TemplateIDForStyles, string[] fieldTypeDefaultEditors, string fieldEditorPreferenceList, string styleList, string styleOptionList, int emailIdForStyles, bool IsTemplateTable, string editorAddonListJSON) {
             string returnHtml = "";
             try {
                 // todo
@@ -9935,7 +9927,7 @@ namespace Contensive.Addons.AdminSite {
         //   Create a duplicate record
         //=============================================================================================
         //
-        private void ProcessActionDuplicate(adminInfoDomainModel adminContext) {
+        private void ProcessActionDuplicate(adminContextClass adminContext) {
             try {
                 // todo
                 AdminUIController.EditRecordClass editRecord = adminContext.editRecord;
@@ -10020,7 +10012,7 @@ namespace Contensive.Addons.AdminSite {
                             break;
                     }
                     adminContext.AdminForm = adminContext.AdminSourceForm;
-                    adminContext.Admin_Action = adminInfoDomainModel.AdminActionNop; // convert so action can be used in as a refresh
+                    adminContext.Admin_Action = adminContextClass.AdminActionNop; // convert so action can be used in as a refresh
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
@@ -10032,7 +10024,7 @@ namespace Contensive.Addons.AdminSite {
         //   Prints the menu section of the admin page
         //========================================================================
         //
-        private string GetMenuTopMode(adminInfoDomainModel adminContext) {
+        private string GetMenuTopMode(adminContextClass adminContext) {
             string tempGetMenuTopMode = null;
             try {
                 //
@@ -10288,7 +10280,7 @@ namespace Contensive.Addons.AdminSite {
                 }
                 if (!string.IsNullOrEmpty(UserError)) {
                     ErrorController.addUserError(core, UserError);
-                    tempGetForm_Error = adminInfoDomainModel.AdminFormErrorOpen + ErrorController.getUserError(core) + adminInfoDomainModel.AdminFormErrorClose;
+                    tempGetForm_Error = adminContextClass.AdminFormErrorOpen + ErrorController.getUserError(core) + adminContextClass.AdminFormErrorClose;
                 }
                 //
             } catch (Exception ex) {
@@ -10859,7 +10851,7 @@ namespace Contensive.Addons.AdminSite {
         //   Export the Admin List form results
         //=============================================================================
         //
-        private string GetForm_Index_Export(adminInfoDomainModel adminContext) {
+        private string GetForm_Index_Export(adminContextClass adminContext) {
             string tempGetForm_Index_Export = null;
             try {
                 //
@@ -11414,7 +11406,7 @@ namespace Contensive.Addons.AdminSite {
         //       if it is empty, setup defaults
         //=================================================================================
         //
-        public static IndexConfigClass loadIndexConfig(CoreController core, adminInfoDomainModel adminContext) {
+        public static IndexConfigClass loadIndexConfig(CoreController core, adminContextClass adminContext) {
             IndexConfigClass returnIndexConfig = new IndexConfigClass();
             try {
                 // refactor this out
@@ -11430,12 +11422,12 @@ namespace Contensive.Addons.AdminSite {
                 returnIndexConfig.Loaded = true;
                 returnIndexConfig.Open = false;
                 returnIndexConfig.PageNumber = 1;
-                returnIndexConfig.RecordsPerPage = adminInfoDomainModel.RecordsPerPageDefault;
+                returnIndexConfig.RecordsPerPage = adminContextClass.RecordsPerPageDefault;
                 returnIndexConfig.RecordTop = 0;
                 //
                 // Setup Member Properties
                 //
-                string ConfigList = core.userProperty.getText(adminInfoDomainModel.IndexConfigPrefix + encodeText(adminContext.adminContent.id), "");
+                string ConfigList = core.userProperty.getText(adminContextClass.IndexConfigPrefix + encodeText(adminContext.adminContent.id), "");
                 if (!string.IsNullOrEmpty(ConfigList)) {
                     //
                     // load values
@@ -11499,14 +11491,14 @@ namespace Contensive.Addons.AdminSite {
                         Ptr = Ptr + 1;
                     }
                     if (returnIndexConfig.RecordsPerPage <= 0) {
-                        returnIndexConfig.RecordsPerPage = adminInfoDomainModel.RecordsPerPageDefault;
+                        returnIndexConfig.RecordsPerPage = adminContextClass.RecordsPerPageDefault;
                     }
                     //.PageNumber = 1 + Int(.RecordTop / .RecordsPerPage)
                 }
                 //
                 // Setup Visit Properties
                 //
-                ConfigList = core.visitProperty.getText(adminInfoDomainModel.IndexConfigPrefix + encodeText(adminContext.adminContent.id), "");
+                ConfigList = core.visitProperty.getText(adminContextClass.IndexConfigPrefix + encodeText(adminContext.adminContent.id), "");
                 if (!string.IsNullOrEmpty(ConfigList)) {
                     //
                     // load values
@@ -11594,7 +11586,7 @@ namespace Contensive.Addons.AdminSite {
                         Ptr = Ptr + 1;
                     }
                     if (returnIndexConfig.RecordsPerPage <= 0) {
-                        returnIndexConfig.RecordsPerPage = adminInfoDomainModel.RecordsPerPageDefault;
+                        returnIndexConfig.RecordsPerPage = adminContextClass.RecordsPerPageDefault;
                     }
                     //.PageNumber = 1 + Int(.RecordTop / .RecordsPerPage)
                 }
@@ -11678,7 +11670,7 @@ namespace Contensive.Addons.AdminSite {
         //   Process request input on the IndexConfig
         //========================================================================================
         //
-        private void SetIndexSQL_ProcessIndexConfigRequests(adminInfoDomainModel adminContext, ref IndexConfigClass IndexConfig) {
+        private void SetIndexSQL_ProcessIndexConfigRequests(adminContextClass adminContext, ref IndexConfigClass IndexConfig) {
             try {
                 //
                 int TestInteger = 0;
@@ -11705,7 +11697,7 @@ namespace Contensive.Addons.AdminSite {
                     IndexConfig.RecordsPerPage = GenericController.encodeInteger(VarText);
                 }
                 if (IndexConfig.RecordsPerPage <= 0) {
-                    IndexConfig.RecordsPerPage = adminInfoDomainModel.RecordsPerPageDefault;
+                    IndexConfig.RecordsPerPage = adminContextClass.RecordsPerPageDefault;
                 }
                 IndexConfig.PageNumber = encodeInteger(1 + Math.Floor(IndexConfig.RecordTop / (double)IndexConfig.RecordsPerPage));
                 //
@@ -12078,7 +12070,7 @@ namespace Contensive.Addons.AdminSite {
                     + "\r\nIndexFilterOpen";
             }
             //
-            core.visitProperty.setProperty(adminInfoDomainModel.IndexConfigPrefix + encodeText(IndexConfig.ContentID), FilterText);
+            core.visitProperty.setProperty(adminContextClass.IndexConfigPrefix + encodeText(IndexConfig.ContentID), FilterText);
             //
             //   Member Properties (persistant)
             //
@@ -12106,7 +12098,7 @@ namespace Contensive.Addons.AdminSite {
             if (!string.IsNullOrEmpty(SubList)) {
                 FilterText += "\r\nSorts" + SubList + "\r\n";
             }
-            core.userProperty.setProperty(adminInfoDomainModel.IndexConfigPrefix + encodeText(IndexConfig.ContentID), FilterText);
+            core.userProperty.setProperty(adminContextClass.IndexConfigPrefix + encodeText(IndexConfig.ContentID), FilterText);
             //
 
         }
@@ -12129,7 +12121,7 @@ namespace Contensive.Addons.AdminSite {
         //
         //=================================================================================
         //
-        private string GetForm_Index_AdvancedSearch(adminInfoDomainModel adminContext) {
+        private string GetForm_Index_AdvancedSearch(adminContextClass adminContext) {
             string returnForm = "";
             try {
                 //

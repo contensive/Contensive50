@@ -24,7 +24,7 @@ namespace Contensive.Addons.AdminSite {
         //   Print the Configure Index Form
         //=============================================================================
         //
-        public static string GetForm_Index_SetColumns(CoreController core, adminContextClass adminContext) {
+        public static string GetForm_Index_SetColumns(CoreController core, adminInfoDomainModel adminContext) {
             string result = "";
             try {
                 // todo refactor out
@@ -40,7 +40,7 @@ namespace Contensive.Addons.AdminSite {
                 if (Button == ButtonReset) {
                     //
                     //   Process reset
-                    core.userProperty.setProperty(adminContextClass.IndexConfigPrefix + adminContent.id.ToString(), "");
+                    core.userProperty.setProperty(adminInfoDomainModel.IndexConfigPrefix + adminContent.id.ToString(), "");
                 }
                 IndexConfigClass IndexConfig = GetHtmlBodyClass.loadIndexConfig(core, adminContext);
                 int ToolsAction = core.docProperties.getInteger("dta");

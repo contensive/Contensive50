@@ -37,7 +37,7 @@ namespace Contensive.Addons.AdminSite {
                     result = "No filter is available";
                 } else {
                     //cdefModel cdef = cdefModel.getCdef(core, ContentID);
-                    var adminContext = new adminContextClass(core);
+                    var adminContext = new adminInfoDomainModel(core);
                     result = adminSite.getForm_IndexFilterContent(adminContext);
                 }
             } catch (Exception ex) {
