@@ -242,6 +242,9 @@ namespace Contensive.Processor {
         /// Get the Normal Edit Button Bar String, used on Normal Edit and others
         /// </summary>
         public static string getButtonBarForEdit(CoreController core, EditButtonBarInfoClass info) {
+            //
+            LogController.logTrace(core, "getButtonBarForEdit, enter, info.allowActivate [" + info.allowActivate + "]");
+            //
             string buttonsLeft = "";
             string buttonsRight = "";
             try {
@@ -268,6 +271,9 @@ namespace Contensive.Processor {
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
             }
+            //
+            LogController.logTrace(core, "getButtonBarForEdit, exit");
+            //
             return getButtonBar(core, buttonsLeft, buttonsRight);
         }
         //
