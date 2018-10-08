@@ -22,6 +22,7 @@ namespace Contensive.Processor.Models.Db {
         public const string contentName = "link aliases";
         public const string contentTableName = "cclinkaliases";
         public const string contentDataSource = "default";
+        public const bool nameFieldIsUnique = true;
         //
         //====================================================================================================
         // -- instance properties
@@ -60,13 +61,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static LinkAliasModel createByName(CoreController core, string recordName) {
-            return createByName<LinkAliasModel>(core, recordName);
+        public static LinkAliasModel createByUniqueName(CoreController core, string recordName) {
+            return createByUniqueName<LinkAliasModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static LinkAliasModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<LinkAliasModel>(core, recordName, ref callersCacheNameList);
+        public static LinkAliasModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByUniqueName<LinkAliasModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================

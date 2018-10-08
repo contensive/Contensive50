@@ -420,7 +420,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="tableName"></param>
         /// <param name="recordId"></param>
-        public void invalidateDbRecord(int recordId, string tableName, string dataSourceName = "") {
+        public void invalidateDbRecord(int recordId, string tableName, string dataSourceName = "default") {
             invalidate(getCacheKey_forDbRecord(recordId, tableName, dataSourceName));
         }
         ////
@@ -500,26 +500,45 @@ namespace Contensive.Processor.Controllers {
             return key;
         }
         /// <summary>
-        /// return the standard name used as a key for Db records
+        /// return the standard key for Db records. 
+        /// setObject for this key should only be the object model for this id
+        /// getObject for this key should return null or an object of the model.
         /// </summary>
         /// <param name="recordId"></param>
         /// <param name="tableName"></param>
         /// <param name="dataSourceName"></param>
         /// <returns></returns>
-        public static string getCacheKey_forDbRecord(int recordId, string tableName, string dataSourceName = "") {
+        public static string getCacheKey_forDbRecord(int recordId, string tableName, string dataSourceName = "default") {
             string key = "dbrecord/" + dataSourceName + "/" + tableName + "/id/" + recordId.ToString() + "/";
             key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
             return key;
         }
         /// <summary>
-        /// return the standard name used as a key for cache ptr objects for Db records
+        /// return the standard key for cache ptr by Guid for Db records.  
+        /// Only use this Ptr in setPtr. NEVER setObject for a ptr.
+        /// getObject for this key should return null or an object of the model
         /// </summary>
         /// <param name="guid"></param>
         /// <param name="tableName"></param>
         /// <param name="dataSourceName"></param>
         /// <returns></returns>
-        public static string getCachePtr_forDbRecord(string guid, string tableName, string dataSourceName = "") {
+        public static string getCachePtr_forDbRecord_guid(string guid, string tableName, string dataSourceName = "default") {
             string key = "dbptr/" + dataSourceName + "/" + tableName + "/ccguid/" + guid + "/";
+            key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
+            return key;
+        }
+        /// <summary>
+        /// return the standard key for cache ptr by name for Db records. 
+        /// ONLY use this for tables where the name is unique.
+        /// Only use this Ptr in setPtr. NEVER setObject for a ptr.
+        /// getObject for this key should return a list of models that match the name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="tableName"></param>
+        /// <param name="dataSourceName"></param>
+        /// <returns></returns>
+        public static string getCachePtr_forDbRecord_uniqueName(string name, string tableName, string dataSourceName = "default") {
+            string key = "dbptr/" + dataSourceName + "/" + tableName + "/name/" + name + "/";
             key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
             return key;
         }

@@ -22,6 +22,7 @@ namespace Contensive.Processor.Models.Db {
         public const string contentName = "tasks";
         public const string contentTableName = "ccTasks";
         public const string contentDataSource = "default";
+        public const bool nameFieldIsUnique = false;
         //
         //====================================================================================================
         //
@@ -67,13 +68,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static TaskModel createByName(CoreController core, string recordName) {
-            return createByName<TaskModel>(core, recordName);
+        public static TaskModel createByUniqueName(CoreController core, string recordName) {
+            return createByUniqueName<TaskModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static TaskModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<TaskModel>(core, recordName, ref callersCacheNameList);
+        public static TaskModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByUniqueName<TaskModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================

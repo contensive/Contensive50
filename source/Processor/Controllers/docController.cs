@@ -18,11 +18,18 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         private CoreController core;
         //
-        public List<int> getDependentAddonList(int addonId) {
+        public List<int> getAddonIncludeRuleList(int addonId) {
             if (_includeRuleDict==null) {
-                _includeRuleDict = Models.Db.AddonIncludeRuleModel.getIncludeRuleDict(core);
+                _includeRuleDict = new Dictionary<int, List<int>>();
             }
-            return (_includeRuleDict.ContainsKey(addonId)) ? _includeRuleDict[addonId] : new List<int> { };
+            if (!_includeRuleDict.ContainsKey(addonId)) {
+                var includeRuleList = new List<int>();
+                foreach (var rule in AddonIncludeRuleModel.createList(core, "(addonId=" + addonId + ")")) {
+                    includeRuleList.Add(rule.includedAddonID);
+                }
+                _includeRuleDict.Add(addonId, includeRuleList);
+            }
+            return _includeRuleDict[addonId];
         }
         private Dictionary<int, List<int>> _includeRuleDict;
         /// <summary>
@@ -264,34 +271,44 @@ namespace Contensive.Processor.Controllers {
         // -- lookup contentId by contentName
         internal Dictionary<string, int> contentNameIdDictionary {
             get {
+                //
+                // -- method 2 - populate this dictionary on demand with just the record (or record cache) needed
                 if (_contentNameIdDictionary == null) {
                     _contentNameIdDictionary = new Dictionary<string, int>();
-                    foreach (KeyValuePair<int, ContentModel> kvp in contentIdDict) {
-                        string key = kvp.Value.name.Trim().ToLower();
-                        if (!string.IsNullOrEmpty(key)) {
-                            if (!_contentNameIdDictionary.ContainsKey(key)) {
-                                _contentNameIdDictionary.Add(key, kvp.Value.id);
-                            }
-                        }
-                    }
                 }
+                // -- method-1, on first request, call contentIdDict, which on first request loads all content records
+                //if (_contentNameIdDictionary == null) {
+                //    _contentNameIdDictionary = new Dictionary<string, int>();
+                //    foreach (KeyValuePair<int, ContentModel> kvp in contentIdDict) {
+                //        string key = kvp.Value.name.Trim().ToLower();
+                //        if (!string.IsNullOrEmpty(key)) {
+                //            if (!_contentNameIdDictionary.ContainsKey(key)) {
+                //                _contentNameIdDictionary.Add(key, kvp.Value.id);
+                //            }
+                //        }
+                //    }
+                //}
                 return _contentNameIdDictionary;
             }
         }
         internal void contentNameIdDictionaryClear() {
             _contentNameIdDictionary = null;
         } private Dictionary<string, int> _contentNameIdDictionary = null;
-        //
-        //====================================================================================================
-        // -- lookup contentModel by contentId
-        internal Dictionary<int, ContentModel> contentIdDict {
-            get {
-                if (_contentIdDict == null) {
-                    _contentIdDict = ContentModel.createDict(core, new List<string>());
-                }
-                return _contentIdDict;
-            }
-        }
+        ////
+        ////====================================================================================================
+        //// -- lookup contentModel by contentId
+        //internal Dictionary<int, ContentModel> contentIdDict {
+        //    get {
+        //        //
+        //        // -- method 2 - if id not found, load the one you need
+        //        //
+        //        // -- method-1, on first request, load all content records
+        //        if (_contentIdDict == null) {
+        //            _contentIdDict = ContentModel.createDict(core, new List<string>());
+        //        }
+        //        return _contentIdDict;
+        //    }
+        //}
         internal string landingLink {
             get {
                 if (_landingLink == "") {

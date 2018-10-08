@@ -61,9 +61,9 @@ namespace Contensive.Addons.PageManager {
                             } else {
                                 //
                                 // -- verify page set to required sort method Id
-                                SortMethodModel sortMethod = SortMethodModel.createByName(core, "By Alpha Sort Order Field");
+                                SortMethodModel sortMethod = SortMethodModel.createByUniqueName(core, "By Alpha Sort Order Field");
                                 if (sortMethod == null) {
-                                    sortMethod = SortMethodModel.createByName(core, "Alpha Sort Order Field");
+                                    sortMethod = SortMethodModel.createByUniqueName(core, "Alpha Sort Order Field");
                                 }
                                 if (sortMethod == null) {
                                     //

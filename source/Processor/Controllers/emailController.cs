@@ -317,7 +317,7 @@ namespace Contensive.Processor.Controllers {
                 returnString = "";
                 iAdditionalMemberID = AdditionalMemberIDOrZero;
                 //
-                SystemEmailModel email = SystemEmailModel.createByName(core, emailName);
+                SystemEmailModel email = SystemEmailModel.createByUniqueName(core, emailName );
                 if (email == null) {
                     email = SystemEmailModel.add(core);
                     email.name = emailName;

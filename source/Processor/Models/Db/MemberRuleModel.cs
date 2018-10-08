@@ -22,6 +22,7 @@ namespace Contensive.Processor.Models.Db {
         public const string contentName = "member rules";
         public const string contentTableName = "ccmemberrules";
         public const string contentDataSource = "default";
+        public const bool nameFieldIsUnique = false;
         //
         //====================================================================================================
         // -- instance properties
@@ -60,13 +61,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static MemberRuleModel createByName(CoreController core, string recordName) {
-            return createByName<MemberRuleModel>(core, recordName);
+        public static MemberRuleModel createByUniqueName(CoreController core, string recordName) {
+            return createByUniqueName<MemberRuleModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static MemberRuleModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<MemberRuleModel>(core, recordName, ref callersCacheNameList);
+        public static MemberRuleModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByUniqueName<MemberRuleModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================

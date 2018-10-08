@@ -7,9 +7,10 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         //-- const
-        public const string contentName = "tables";             //<------ set content name
-        public const string contentTableName = "ccTables";      //<------ set to tablename for the primary content (used for cache names)
+        public const string contentName = "tables";            //<------ set content name
+        public const string contentTableName = "ccTables";     //<------ set to tablename for the primary content (used for cache names)
         public const string contentDataSource = "default";     //<------ set to datasource if not default
+        public const bool nameFieldIsUnique = false;           //<----- set true if the name field's value for all records must be unique (no duplicates). Used for cache ptr generation
         //
         //====================================================================================================
         // -- instance properties
@@ -46,13 +47,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static _BlankModel createByName(CoreController core, string recordName) {
-            return createByName<_BlankModel>(core, recordName);
+        public static _BlankModel createByUniqueName(CoreController core, string recordName) {
+            return createByUniqueName<_BlankModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static _BlankModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<_BlankModel>(core, recordName, ref callersCacheNameList);
+        public static _BlankModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByUniqueName<_BlankModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================

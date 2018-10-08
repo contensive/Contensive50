@@ -22,6 +22,7 @@ namespace Contensive.Processor.Models.Db {
         public const string contentName = "Template Domain Rules";
         public const string contentTableName = "ccDomainTemplateRules";
         public const string contentDataSource = "default";
+        public const bool nameFieldIsUnique = false;
         //
         //====================================================================================================
         // -- instance properties
@@ -59,13 +60,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static TemplateDomainRuleModel createByName(CoreController core, string recordName) {
-            return createByName<TemplateDomainRuleModel>(core, recordName);
+        public static TemplateDomainRuleModel createByUniqueName(CoreController core, string recordName) {
+            return createByUniqueName<TemplateDomainRuleModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static TemplateDomainRuleModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<TemplateDomainRuleModel>(core, recordName, ref callersCacheNameList);
+        public static TemplateDomainRuleModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByUniqueName<TemplateDomainRuleModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================

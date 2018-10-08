@@ -11,6 +11,7 @@ namespace Contensive.Processor.Models.Db {
         public const string contentName = "content";
         public const string contentTableName = "cccontent";
         public const string contentDataSource = "default";
+        public const bool nameFieldIsUnique = true;
         //
         //====================================================================================================
         // -- instance properties
@@ -34,6 +35,7 @@ namespace Contensive.Processor.Models.Db {
         public int installedByCollectionID { get; set; }
         public bool isBaseContent { get; set; }
         public int parentID { get; set; }
+        public bool supportLegacyContentControl { get; set; }
         //
         //====================================================================================================
         public static ContentModel add(CoreController core) {
@@ -66,13 +68,19 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static ContentModel createByName(CoreController core, string recordName) {
-            return createByName<ContentModel>(core, recordName);
+        /// <summary>
+        /// name is a unique field, so this is treated similar to guid
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="recordName"></param>
+        /// <returns></returns>
+        public static ContentModel createByUniqueName(CoreController core, string recordName) {
+            return createByUniqueName<ContentModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static ContentModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<ContentModel>(core, recordName, ref callersCacheNameList);
+        public static ContentModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByUniqueName<ContentModel>(core, recordName, ref callersCacheNameList );
         }
         //
         //====================================================================================================
@@ -132,26 +140,35 @@ namespace Contensive.Processor.Models.Db {
         public static ContentModel createDefault(CoreController core) {
             return createDefault<ContentModel>(core);
         }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// pattern get a list of objects from this model
-        /// </summary>
-        /// <param name="cp"></param>
-        /// <param name="someCriteria"></param>
-        /// <returns></returns>
-        public static Dictionary<int, ContentModel> createDict(CoreController core, List<string> callersCacheNameList) {
-            Dictionary<int, ContentModel> result = new Dictionary<int, ContentModel>();
-            try {
-                foreach (ContentModel content in createList(core, "")) {
-                    result.Add(content.id, content);
-                }
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-                throw;
-            }
-            return result;
-        }
+        ////
+        ////====================================================================================================
+        ///// <summary>
+        ///// pattern get a list of objects from this model
+        ///// </summary>
+        ///// <param name="cp"></param>
+        ///// <param name="someCriteria"></param>
+        ///// <returns></returns>
+        //public static Dictionary<int, ContentModel> createDict(CoreController core, List<string> callersCacheNameList) {
+        //    Dictionary<int, ContentModel> result = new Dictionary<int, ContentModel>();
+        //    try {
+        //        using ( var cs = new CsController(core) ) {
+        //            if ( cs.openSQL( "select id from " + contentTableName + " where active>0")) {
+        //                do {
+        //                    int id = cs.getInteger("id");
+        //                    result.Add(id, create(core, id));
+        //                    cs.goNext();
+        //                } while (cs.ok());
+        //            }
+        //        }
+        //        //foreach (ContentModel content in createList(core, "")) {
+        //        //    result.Add(content.id, content);
+        //        //}
+        //    } catch (Exception ex) {
+        //        LogController.handleError( core,ex);
+        //        throw;
+        //    }
+        //    return result;
+        //}
         //
         //====================================================================================================
         /// <summary>

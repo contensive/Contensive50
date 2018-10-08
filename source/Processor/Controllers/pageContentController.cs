@@ -221,7 +221,7 @@ namespace Contensive.Processor.Controllers {
         internal static string getDefaultBlockMessage(CoreController core, bool UseContentWatchLink) {
             string result = "";
             try {
-                var copyRecord = CopyContentModel.createByName(core, ContentBlockCopyName);  
+                var copyRecord = CopyContentModel.createByUniqueName(core, ContentBlockCopyName);  
                 if (copyRecord!=null) {
                     result = copyRecord.copy;
                 }
@@ -405,7 +405,7 @@ namespace Contensive.Processor.Controllers {
                         if (core.doc.pageController.template == null) {
                             //
                             // -- get template named Default
-                            core.doc.pageController.template = PageTemplateModel.createByName(core, defaultTemplateName);
+                            core.doc.pageController.template = PageTemplateModel.createByUniqueName(core, defaultTemplateName);
                             if (core.doc.pageController.template == null) {
                                 //
                                 // -- ceate new template named Default
@@ -762,7 +762,7 @@ namespace Contensive.Processor.Controllers {
                         int posDot = 0;
                         int loopCnt = 10;
                         do {
-                            core.doc.domain = DomainModel.createByName(core, domainTest);
+                            core.doc.domain = DomainModel.createByUniqueName(core, domainTest);
                             posDot = domainTest.IndexOf('.');
                             if ((posDot >= 0) && (domainTest.Length > 1)) {
                                 domainTest = domainTest.Substring(posDot + 1);

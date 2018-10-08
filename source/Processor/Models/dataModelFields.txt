@@ -123,7 +123,7 @@ public bool Authorable { get; set; }
 public string Caption { get; set; }
 
 public int ContentID { get; set; }
-public bool createResourceFilesOnRoot { get; set; }
+
 public string DefaultValue { get; set; }
 public bool DeveloperOnly { get; set; }
 public int editorAddonID { get; set; }
@@ -145,7 +145,7 @@ public string ManyToManyRuleSecondaryField { get; set; }
 public int MemberSelectGroupID { get; set; }
 public bool NotEditable { get; set; }
 public bool Password { get; set; }
-public string prefixForRootResourceFiles { get; set; }
+
 public bool ReadOnly { get; set; }
 public int RedirectContentID { get; set; }
 public string RedirectID { get; set; }

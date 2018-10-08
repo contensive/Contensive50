@@ -22,6 +22,7 @@ namespace Contensive.Processor.Models.Db {
         public const string contentName = "library Files";
         public const string contentTableName = "cclibraryFiles";
         public const string contentDataSource = "default";
+        public const bool nameFieldIsUnique = false;
         //
         //====================================================================================================
         // -- instance properties
@@ -67,13 +68,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static LibraryFilesModel createByName(CoreController core, string recordName) {
-            return createByName<LibraryFilesModel>(core, recordName);
+        public static LibraryFilesModel createByUniqueName(CoreController core, string recordName) {
+            return createByUniqueName<LibraryFilesModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static LibraryFilesModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<LibraryFilesModel>(core, recordName, ref callersCacheNameList);
+        public static LibraryFilesModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByUniqueName<LibraryFilesModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================

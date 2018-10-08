@@ -41,7 +41,7 @@ namespace Contensive.Addons.Tools {
                 string ToolButton = cp.Doc.GetText("Button");
                 bool ReloadCDef = cp.Doc.GetBoolean("ReloadCDef");
                 int ContentID = cp.Doc.GetInteger("" + RequestNameToolContentID + "");
-                string DataSourceName = "";
+                string dataSourceName = "default";
                 string ContentName = "";
                 Processor.Models.Domain.CDefModel CDef = null;
                 string TableName = "";
@@ -49,7 +49,7 @@ namespace Contensive.Addons.Tools {
                     ContentName = cp.Content.GetRecordName("content", ContentID);
                     if (!string.IsNullOrEmpty(ContentName)) {
                         TableName = cp.Content.GetTable(ContentName);
-                        DataSourceName = cp.Content.GetDataSource(ContentName);
+                        dataSourceName = cp.Content.GetDataSource(ContentName);
                         CDef = Processor.Models.Domain.CDefModel.getCdef(core, ContentID, true, true);
                     }
                 }
@@ -131,7 +131,7 @@ namespace Contensive.Addons.Tools {
                                                         //
                                                         // Create Db field, Field is good but was not before
                                                         //
-                                                        core.db.createSQLTableField(DataSourceName, TableName, formFieldName, formFieldTypeId);
+                                                        core.db.createSQLTableField(dataSourceName, TableName, formFieldName, formFieldTypeId);
                                                         StatusMessage = StatusMessage + "<LI>Field [" + formFieldName + "] was saved to this content definition and a database field was created in [" + CDef.tableName + "].</LI>";
                                                     } else if ((string.IsNullOrEmpty(formFieldName)) || (formFieldTypeId == 0)) {
                                                         //
@@ -149,16 +149,16 @@ namespace Contensive.Addons.Tools {
                                                         // Field Type changed, must be done manually
                                                         //
                                                         ErrorMessage += "<LI>Field [" + formFieldName + "] changed type from [" + core.db.getRecordName("content Field Types", cdefFieldKvp.Value.fieldTypeId) + "] to [" + core.db.getRecordName("content Field Types", formFieldTypeId) + "]. This may have caused a problem converting content.</LI>";
-                                                        int DataSourceTypeID = core.db.getDataSourceType(DataSourceName);
+                                                        int DataSourceTypeID = core.db.getDataSourceType(dataSourceName);
                                                         switch (DataSourceTypeID) {
                                                             case DataSourceTypeODBCMySQL:
-                                                                SQL = "alter table " + CDef.tableName + " change " + cdefFieldKvp.Value.nameLc + " " + cdefFieldKvp.Value.nameLc + " " + core.db.getSQLAlterColumnType(DataSourceName, formFieldTypeId) + ";";
+                                                                SQL = "alter table " + CDef.tableName + " change " + cdefFieldKvp.Value.nameLc + " " + cdefFieldKvp.Value.nameLc + " " + core.db.getSQLAlterColumnType(dataSourceName, formFieldTypeId) + ";";
                                                                 break;
                                                             default:
-                                                                SQL = "alter table " + CDef.tableName + " alter column " + cdefFieldKvp.Value.nameLc + " " + core.db.getSQLAlterColumnType(DataSourceName, formFieldTypeId) + ";";
+                                                                SQL = "alter table " + CDef.tableName + " alter column " + cdefFieldKvp.Value.nameLc + " " + core.db.getSQLAlterColumnType(dataSourceName, formFieldTypeId) + ";";
                                                                 break;
                                                         }
-                                                        core.db.executeQuery(SQL, DataSourceName);
+                                                        core.db.executeQuery(SQL, dataSourceName);
                                                     }
                                                     SQL = "Update ccFields"
                                                 + " Set name=" + core.db.encodeSQLText(formFieldName) + ",type=" + formFieldTypeId + ",caption=" + core.db.encodeSQLText(cp.Doc.GetText("dtfaCaption." + RecordPointer)) + ",DefaultValue=" + core.db.encodeSQLText(cp.Doc.GetText("dtfaDefaultValue." + RecordPointer)) + ",EditSortPriority=" + core.db.encodeSQLText(GenericController.encodeText(cp.Doc.GetInteger("dtfaEditSortPriority." + RecordPointer))) + ",Active=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaActive." + RecordPointer)) + ",ReadOnly=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaReadOnly." + RecordPointer)) + ",Authorable=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaAuthorable." + RecordPointer)) + ",Required=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaRequired." + RecordPointer)) + ",UniqueName=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaUniqueName." + RecordPointer)) + ",TextBuffered=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaTextBuffered." + RecordPointer)) + ",Password=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaPassword." + RecordPointer)) + ",HTMLContent=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaHTMLContent." + RecordPointer)) + ",EditTab=" + core.db.encodeSQLText(cp.Doc.GetText("dtfaEditTab." + RecordPointer)) + ",Scramble=" + core.db.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaScramble." + RecordPointer)) + "";

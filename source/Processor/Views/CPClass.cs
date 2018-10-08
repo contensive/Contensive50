@@ -174,7 +174,7 @@ namespace Contensive.Processor {
                         });
                     }
                 } else {
-                    AddonModel addon = Models.Db.AddonModel.createByName(core, addonNameOrGuid);
+                    AddonModel addon = Models.Db.AddonModel.createByUniqueName(core, addonNameOrGuid);
                     if ( addon != null ) {
                         //
                         // -- call by name

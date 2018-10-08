@@ -11,6 +11,7 @@ namespace Contensive.Processor.Models.Db {
         public const string contentName = "Add-on Collections";
         public const string contentTableName = "ccAddonCollections";
         public const string contentDataSource = "default";
+        public const bool nameFieldIsUnique = true;
         //
         //====================================================================================================
         // -- instance properties
@@ -57,13 +58,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static AddonCollection createByName(CoreController core, string recordName) {
-            return createByName<AddonCollection>(core, recordName);
+        public static AddonCollection createByUniqueName(CoreController core, string recordName) {
+            return createByUniqueName<AddonCollection>(core, recordName);
         }
         //
         //====================================================================================================
-        public static AddonCollection createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<AddonCollection>(core, recordName, ref callersCacheNameList);
+        public static AddonCollection createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByUniqueName<AddonCollection>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================

@@ -10,6 +10,7 @@ namespace Contensive.Processor.Models.Db {
         public const string contentName = "copy content";
         public const string contentTableName = "cccopy";
         public const string contentDataSource = "default";
+        public const bool nameFieldIsUnique = true;
         //
         //====================================================================================================
         // -- instance properties
@@ -46,13 +47,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static CopyContentModel createByName(CoreController core, string recordName) {
-            return createByName<CopyContentModel>(core, recordName);
+        public static CopyContentModel createByUniqueName(CoreController core, string recordName) {
+            return createByUniqueName<CopyContentModel>(core, recordName );
         }
         //
         //====================================================================================================
-        public static CopyContentModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<CopyContentModel>(core, recordName, ref callersCacheNameList);
+        public static CopyContentModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByUniqueName<CopyContentModel>(core, recordName, ref callersCacheNameList );
         }
         //
         //====================================================================================================

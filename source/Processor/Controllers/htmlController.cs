@@ -179,7 +179,7 @@ namespace Contensive.Processor.Controllers {
                     CDef = Models.Domain.CDefModel.getCdef(core, ContentName);
                     TableName = CDef.tableName;
                     DataSource = CDef.dataSourceName;
-                    ContentControlCriteria = CDef.contentControlCriteria;
+                    ContentControlCriteria = CDef.legacyContentControlCriteria;
                     //
                     // This is what was there
                     //

@@ -10,6 +10,7 @@ namespace Contensive.Processor.Models.Db {
         public const string contentName = "Add-on Include Rules";
         public const string contentTableName = "ccAddonIncludeRules";
         public const string contentDataSource = "default";
+        public const bool nameFieldIsUnique = false;
         //
         //====================================================================================================
         // -- instance properties
@@ -47,13 +48,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static AddonIncludeRuleModel createByName(CoreController core, string recordName) {
-            return createByName<AddonIncludeRuleModel>(core, recordName);
+        public static AddonIncludeRuleModel createByUniqueName(CoreController core, string recordName) {
+            return createByUniqueName<AddonIncludeRuleModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static AddonIncludeRuleModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<AddonIncludeRuleModel>(core, recordName, ref callersCacheNameList);
+        public static AddonIncludeRuleModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByUniqueName<AddonIncludeRuleModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================
@@ -118,23 +119,23 @@ namespace Contensive.Processor.Models.Db {
         public static string getTableInvalidationKey(CoreController core) {
             return getTableCacheKey<AddonIncludeRuleModel>(core);
         }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// return a dictionary of addonId each with a list of included addon Ids
-        /// </summary>
-        /// <param name="core"></param>
-        /// <returns></returns>
-        public static  Dictionary<int, List<int>> getIncludeRuleDict( CoreController core) {
-            var result = new Dictionary<int, List<int>>();
-            foreach ( AddonIncludeRuleModel addonRule  in createList( core , "" )) {
-                if (!result.ContainsKey(addonRule.addonID)) {
-                    result.Add(addonRule.addonID, new List<int>() { addonRule.includedAddonID });
-                } else {
-                    result[addonRule.addonID].Add(addonRule.includedAddonID);
-                }
-            }
-            return result;
-        }
+        ////
+        ////====================================================================================================
+        ///// <summary>
+        ///// return a dictionary of addonId each with a list of included addon Ids
+        ///// </summary>
+        ///// <param name="core"></param>
+        ///// <returns></returns>
+        //public static  Dictionary<int, List<int>> getIncludeRuleDict( CoreController core) {
+        //    var result = new Dictionary<int, List<int>>();
+        //    foreach ( AddonIncludeRuleModel addonRule  in createList( core , "" )) {
+        //        if (!result.ContainsKey(addonRule.addonID)) {
+        //            result.Add(addonRule.addonID, new List<int>() { addonRule.includedAddonID });
+        //        } else {
+        //            result[addonRule.addonID].Add(addonRule.includedAddonID);
+        //        }
+        //    }
+        //    return result;
+        //}
     }
 }

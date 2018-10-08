@@ -10,6 +10,7 @@ namespace Contensive.Processor.Models.Db {
         public const string contentName = "domains";
         public const string contentTableName = "ccdomains";
         public const string contentDataSource = "default";
+        public const bool nameFieldIsUnique = true;
         //
         //====================================================================================================
         /// <summary>
@@ -84,13 +85,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static DomainModel createByName(CoreController core, string recordName) {
-            return createByName<DomainModel>(core, recordName);
+        public static DomainModel createByUniqueName(CoreController core, string recordName) {
+            return createByUniqueName<DomainModel>(core, recordName );
         }
         //
         //====================================================================================================
-        public static DomainModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<DomainModel>(core, recordName, ref callersCacheNameList);
+        public static DomainModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByUniqueName<DomainModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================

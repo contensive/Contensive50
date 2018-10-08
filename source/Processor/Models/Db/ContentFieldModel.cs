@@ -10,6 +10,7 @@ namespace Contensive.Processor.Models.Db {
         public const string contentName = "content fields";
         public const string contentTableName = "ccfields";
         public const string contentDataSource = "default";
+        public const bool nameFieldIsUnique = false;
         //
         //====================================================================================================
         // -- instance properties
@@ -17,7 +18,7 @@ namespace Contensive.Processor.Models.Db {
         public bool authorable { get; set; }
         public string caption { get; set; }
         public int contentID { get; set; }
-        public bool createResourceFilesOnRoot { get; set; }
+        //public bool createResourceFilesOnRoot { get; set; }
         public string defaultValue { get; set; }
         public bool developerOnly { get; set; }
         public int editorAddonID { get; set; }
@@ -38,7 +39,7 @@ namespace Contensive.Processor.Models.Db {
         public int memberSelectGroupID { get; set; }
         public bool notEditable { get; set; }
         public bool password { get; set; }
-        public string prefixForRootResourceFiles { get; set; }
+        //public string prefixForRootResourceFiles { get; set; }
         public bool readOnly { get; set; }
         public int redirectContentID { get; set; }
         public string redirectID { get; set; }
@@ -50,6 +51,7 @@ namespace Contensive.Processor.Models.Db {
         public bool textBuffered { get; set; }
         public int type { get; set; }
         public bool uniqueName { get; set; }
+        public bool isBaseField { get; set; }
         //
         //====================================================================================================
         public static ContentFieldModel add(CoreController core) {
@@ -82,13 +84,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static ContentFieldModel createByName(CoreController core, string recordName) {
-            return createByName<ContentFieldModel>(core, recordName);
+        public static ContentFieldModel createByUniqueName(CoreController core, string recordName) {
+            return createByUniqueName<ContentFieldModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static ContentFieldModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<ContentFieldModel>(core, recordName, ref callersCacheNameList);
+        public static ContentFieldModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByUniqueName<ContentFieldModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================

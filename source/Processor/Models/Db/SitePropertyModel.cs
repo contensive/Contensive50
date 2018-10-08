@@ -12,6 +12,7 @@ namespace Contensive.Processor.Models.Db {
         public const string contentName = "Site Property";
         public const string contentTableName = "ccsetup";
         public const string contentDataSource = "default";
+        public const bool nameFieldIsUnique = true;
         //
         //====================================================================================================
         // -- instance properties
@@ -48,13 +49,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static SitePropertyModel createByName(CoreController core, string recordName) {
-            return createByName<SitePropertyModel>(core, recordName);
+        public static SitePropertyModel createByUniqueName(CoreController core, string recordName) {
+            return createByUniqueName<SitePropertyModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static SitePropertyModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<SitePropertyModel>(core, recordName, ref callersCacheNameList);
+        public static SitePropertyModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByUniqueName<SitePropertyModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================

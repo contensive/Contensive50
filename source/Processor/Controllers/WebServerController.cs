@@ -372,7 +372,7 @@ namespace Contensive.Processor.Controllers {
                         int CookieDetectVisitId = 0;
                         SecurityController.decodeToken(core,CookieDetectKey, ref CookieDetectVisitId, ref  cookieDetectDate);
                         if (CookieDetectVisitId != 0) {
-                            core.db.executeQuery("update ccvisits set CookieSupport=1 where id=" + CookieDetectVisitId);
+                            core.db.executeNonQueryAsync("update ccvisits set CookieSupport=1 where id=" + CookieDetectVisitId);
                             core.doc.continueProcessing = false; //--- should be disposed by caller --- Call dispose
                             return core.doc.continueProcessing;
                         }
@@ -782,7 +782,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         LogController.addSiteWarning(core, "Page Not Found Redirect", "Page Not Found Redirect", "", 0, "Page Not Found Redirect [" + requestUrlSource + "]", "Page Not Found Redirect", "Page Not Found Redirect");
                         if (!string.IsNullOrEmpty(ShortLink)) {
-                            core.db.executeQuery("Update ccContentWatch set link=null where link=" + core.db.encodeSQLText(ShortLink));
+                            core.db.executeNonQueryAsync("Update ccContentWatch set link=null where link=" + core.db.encodeSQLText(ShortLink));
                         }
                         //
                         if (allowDebugMessage && core.doc.visitPropertyAllowDebugging) {

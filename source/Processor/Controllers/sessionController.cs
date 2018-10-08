@@ -61,12 +61,12 @@ namespace Contensive.Processor.Controllers {
                         //
                         // -- try default language
                         string defaultLanguageName = core.siteProperties.getText("Language", "English");
-                        _language = LanguageModel.createByName(core, defaultLanguageName);
+                        _language = LanguageModel.createByUniqueName(core, defaultLanguageName);
                     }
                     if (_language == null) {
                         //
                         // -- try english
-                        _language = LanguageModel.createByName(core, "English");
+                        _language = LanguageModel.createByUniqueName(core, "English");
                     }
                     if (_language == null) {
                         //

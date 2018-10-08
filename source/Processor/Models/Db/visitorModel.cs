@@ -22,6 +22,7 @@ namespace Contensive.Processor.Models.Db {
         public const string contentName = "visitors";
         public const string contentTableName = "ccvisitors";
         public const string contentDataSource = "default";
+        public const bool nameFieldIsUnique = false;
         //
         //====================================================================================================
         // -- instance properties
@@ -59,13 +60,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static VisitorModel createByName(CoreController core, string recordName) {
-            return createByName<VisitorModel>(core, recordName);
+        public static VisitorModel createByUniqueName(CoreController core, string recordName) {
+            return createByUniqueName<VisitorModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static VisitorModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<VisitorModel>(core, recordName, ref callersCacheNameList);
+        public static VisitorModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByUniqueName<VisitorModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================

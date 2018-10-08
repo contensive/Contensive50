@@ -10,6 +10,7 @@ namespace Contensive.Processor.Models.Db {
         public const string contentName = "add-on page rules";
         public const string contentTableName = "ccAddonPageRules";
         public const string contentDataSource = "default";
+        public const bool nameFieldIsUnique = false;
         //
         //====================================================================================================
         // -- instance properties
@@ -47,13 +48,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static AddonPageRuleModel createByName(CoreController core, string recordName) {
-            return createByName<AddonPageRuleModel>(core, recordName);
+        public static AddonPageRuleModel createByUniqueName(CoreController core, string recordName) {
+            return createByUniqueName<AddonPageRuleModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static AddonPageRuleModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<AddonPageRuleModel>(core, recordName, ref callersCacheNameList);
+        public static AddonPageRuleModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByUniqueName<AddonPageRuleModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================

@@ -22,6 +22,7 @@ namespace Contensive.Processor.Models.Db {
         public const string contentName = "link forwards";
         public const string contentTableName = "cclinkforwards";
         public const string contentDataSource = "default";
+        public const bool nameFieldIsUnique = true;
         //
         //====================================================================================================
         // -- instance properties
@@ -61,13 +62,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static LinkForwardModel createByName(CoreController core, string recordName) {
-            return createByName<LinkForwardModel>(core, recordName);
+        public static LinkForwardModel createByUniqueName(CoreController core, string recordName) {
+            return createByUniqueName<LinkForwardModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static LinkForwardModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<LinkForwardModel>(core, recordName, ref callersCacheNameList);
+        public static LinkForwardModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByUniqueName<LinkForwardModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================

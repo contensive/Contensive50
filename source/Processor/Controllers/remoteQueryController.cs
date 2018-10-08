@@ -25,7 +25,7 @@ namespace Contensive.Processor.Controllers {
         //
         //
         //
-        public static string main_GetRemoteQueryKey(CoreController core, string SQL, string DataSourceName = "", int maxRows = 1000) {
+        public static string main_GetRemoteQueryKey(CoreController core, string SQL, string dataSourceName = "default", int maxRows = 1000) {
             //
             int CS = 0;
             string RemoteKey = "";
@@ -37,7 +37,7 @@ namespace Contensive.Processor.Controllers {
             CS = core.db.csInsertRecord("Remote Queries");
             if (core.db.csOk(CS)) {
                 RemoteKey = GenericController.getGUIDString();
-                DataSourceID = core.db.getRecordID("Data Sources", DataSourceName);
+                DataSourceID = core.db.getRecordID("Data Sources", dataSourceName);
                 core.db.csSet(CS, "remotekey", RemoteKey);
                 core.db.csSet(CS, "datasourceid", DataSourceID);
                 core.db.csSet(CS, "sqlquery", SQL);

@@ -11,6 +11,7 @@ namespace Contensive.Processor.Models.Db {
         public const string contentName = "content field help";
         public const string contentTableName = "ccFieldHelp";
         public const string contentDataSource = "default";
+        public const bool nameFieldIsUnique = false;
         //
         //====================================================================================================
         // -- instance properties
@@ -49,13 +50,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static ContentFieldHelpModel createByName(CoreController core, string recordName) {
-            return createByName<ContentFieldHelpModel>(core, recordName);
+        public static ContentFieldHelpModel createByUniqueName(CoreController core, string recordName) {
+            return createByUniqueName<ContentFieldHelpModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static ContentFieldHelpModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<ContentFieldHelpModel>(core, recordName, ref callersCacheNameList);
+        public static ContentFieldHelpModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByUniqueName<ContentFieldHelpModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================

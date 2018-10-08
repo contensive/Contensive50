@@ -10,6 +10,7 @@ namespace Contensive.Processor.Models.Db {
         public const string contentName = "add-on template rules";
         public const string contentTableName = "ccAddonTemplateRules";
         public const string contentDataSource = "default";
+        public const bool nameFieldIsUnique = false;
         //
         //====================================================================================================
         // -- instance properties
@@ -47,13 +48,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static AddonTemplateRuleModel createByName(CoreController core, string recordName) {
-            return createByName<AddonTemplateRuleModel>(core, recordName);
+        public static AddonTemplateRuleModel createByUniqueName(CoreController core, string recordName) {
+            return createByUniqueName<AddonTemplateRuleModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static AddonTemplateRuleModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<AddonTemplateRuleModel>(core, recordName, ref callersCacheNameList);
+        public static AddonTemplateRuleModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByUniqueName<AddonTemplateRuleModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================

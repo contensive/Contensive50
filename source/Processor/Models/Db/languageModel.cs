@@ -22,6 +22,7 @@ namespace Contensive.Processor.Models.Db {
         public const string contentName = "languages";
         public const string contentTableName = "cclanguages";
         public const string contentDataSource = "default";
+        public const bool nameFieldIsUnique = true;
         //
         //====================================================================================================
         // -- instance properties
@@ -58,13 +59,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static LanguageModel createByName(CoreController core, string recordName) {
-            return createByName<LanguageModel>(core, recordName);
+        public static LanguageModel createByUniqueName(CoreController core, string recordName) {
+            return createByUniqueName<LanguageModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static LanguageModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<LanguageModel>(core, recordName, ref callersCacheNameList);
+        public static LanguageModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByUniqueName<LanguageModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================

@@ -22,6 +22,7 @@ namespace Contensive.Processor.Models.Db {
         public const string contentName = "library File log";
         public const string contentTableName = "cclibraryFileLog";
         public const string contentDataSource = "default";
+        public const bool nameFieldIsUnique = false;
         //
         //====================================================================================================
         // -- instance properties
@@ -60,13 +61,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static LibraryFileLogModel createByName(CoreController core, string recordName) {
-            return createByName<LibraryFileLogModel>(core, recordName);
+        public static LibraryFileLogModel createByUniqueName(CoreController core, string recordName) {
+            return createByUniqueName<LibraryFileLogModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static LibraryFileLogModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<LibraryFileLogModel>(core, recordName, ref callersCacheNameList);
+        public static LibraryFileLogModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByUniqueName<LibraryFileLogModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================

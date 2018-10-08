@@ -22,6 +22,7 @@ namespace Contensive.Processor.Models.Db {
         public const string contentName = "sort methods";
         public const string contentTableName = "ccSortMethods";
         public const string contentDataSource = "default";
+        public const bool nameFieldIsUnique = true;
         //
         //====================================================================================================
         // -- instance properties
@@ -58,13 +59,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static SortMethodModel createByName(CoreController core, string recordName) {
-            return createByName<SortMethodModel>(core, recordName);
+        public static SortMethodModel createByUniqueName(CoreController core, string recordName) {
+            return createByUniqueName<SortMethodModel>(core, recordName );
         }
         //
         //====================================================================================================
-        public static SortMethodModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<SortMethodModel>(core, recordName, ref callersCacheNameList);
+        public static SortMethodModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByUniqueName<SortMethodModel>(core, recordName, ref callersCacheNameList );
         }
         //
         //====================================================================================================
@@ -96,7 +97,7 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public void invalidateCacheSingleRecord(CoreController core, int recordId) {
+        public static void invalidateRecordCache(CoreController core, int recordId) {
             invalidateRecordCache<SortMethodModel>(core, recordId);
         }
         //

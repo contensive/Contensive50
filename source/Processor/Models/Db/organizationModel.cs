@@ -22,6 +22,7 @@ namespace Contensive.Processor.Models.Db {
         public const string contentName = "organizations";
         public const string contentTableName = "organizations";
         public const string contentDataSource = "default";
+        public const bool nameFieldIsUnique = false;
         //
         //====================================================================================================
         // -- instance properties
@@ -76,13 +77,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static OrganizationModel createByName(CoreController core, string recordName) {
-            return createByName<OrganizationModel>(core, recordName);
+        public static OrganizationModel createByUniqueName(CoreController core, string recordName) {
+            return createByUniqueName<OrganizationModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static OrganizationModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<OrganizationModel>(core, recordName, ref callersCacheNameList);
+        public static OrganizationModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByUniqueName<OrganizationModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================

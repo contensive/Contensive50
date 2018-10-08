@@ -323,7 +323,7 @@ namespace Contensive.Processor {
         //
         public override int AddContent(string ContentName, string sqlTableName, string dataSourceName) {
             var tmpList = new List<string> { };
-            DataSourceModel dataSource = DataSourceModel.createByName(core, dataSourceName, ref tmpList);
+            DataSourceModel dataSource = DataSourceModel.createByUniqueName(core, dataSourceName, ref tmpList);
             return Models.Domain.CDefModel.addContent(core, true, dataSource, sqlTableName, ContentName, false, false, true, false, "", "sort order", "name", false, false, false, false, false, false, "", 0, 0, 0, "", false, "", true);
         }
         //

@@ -19,9 +19,10 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         //-- const
-        public const string contentName = "tables"; //<------ set content name
-        public const string contentTableName = "ccTables"; //<------ set to tablename for the primary content (used for cache names)
-        public const string contentDataSource = "default"; //<----- set to datasource if not default
+        public const string contentName = "tables";
+        public const string contentTableName = "ccTables";
+        public const string contentDataSource = "default";
+        public const bool nameFieldIsUnique = true;
         //
         //====================================================================================================
         // -- instance properties
@@ -58,13 +59,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static TableModel createByName(CoreController core, string recordName) {
-            return createByName<TableModel>(core, recordName);
+        public static TableModel createByUniqueName(CoreController core, string recordName) {
+            return createByUniqueName<TableModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static TableModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<TableModel>(core, recordName, ref callersCacheNameList);
+        public static TableModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByUniqueName<TableModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================

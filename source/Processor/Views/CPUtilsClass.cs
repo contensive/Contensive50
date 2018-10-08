@@ -185,7 +185,7 @@ namespace Contensive.Processor {
                 return CP.core.addon.execute(Models.Db.AddonModel.create(CP.core, IdGuidOrName), executeContext);
             } else {
                 executeContext.errorContextMessage += "addon " + IdGuidOrName;
-                return CP.core.addon.execute(Models.Db.AddonModel.createByName(CP.core, IdGuidOrName), executeContext);
+                return CP.core.addon.execute(Models.Db.AddonModel.createByUniqueName(CP.core, IdGuidOrName), executeContext);
             }
         }
         //

@@ -11,6 +11,7 @@ namespace Contensive.Processor.Models.Db {
         public const string contentName = "conditional email";
         public const string contentTableName = "ccemail";
         public const string contentDataSource = "default";
+        public const bool nameFieldIsUnique = false;
         //
         //====================================================================================================
         //
@@ -51,13 +52,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static ConditionalEmailModel createByName(CoreController core, string recordName) {
-            return createByName<ConditionalEmailModel>(core, recordName);
+        public static ConditionalEmailModel createByUniqueName(CoreController core, string recordName) {
+            return createByUniqueName<ConditionalEmailModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static ConditionalEmailModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<ConditionalEmailModel>(core, recordName, ref callersCacheNameList);
+        public static ConditionalEmailModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByUniqueName<ConditionalEmailModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================

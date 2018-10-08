@@ -319,7 +319,7 @@ namespace Contensive.Addons.AdminSite {
                         } else if (adminContext.AdminForm == AdminFormClearCache) {
                             adminBody = adminClearCacheToolAddon.GetForm_ClearCache(core);
                         } else if (adminContext.AdminForm == AdminFormSpiderControl) {
-                            adminBody = core.addon.execute(AddonModel.createByName(core, "Content Spider Control"), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
+                            adminBody = core.addon.execute(AddonModel.createByUniqueName(core, "Content Spider Control"), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                 addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
                                 errorContextMessage = "get Content Spider Control for Admin"
                             });
@@ -391,7 +391,7 @@ namespace Contensive.Addons.AdminSite {
                             } else if (!string.IsNullOrEmpty(AddonName)) {
                                 executeContextErrorCaption = "addon name:" + AddonName + " for Admin";
                                 core.doc.addRefreshQueryString("addonname", AddonName);
-                                addon = AddonModel.createByName(core, AddonName);
+                                addon = AddonModel.createByUniqueName(core, AddonName);
                             }
                             if (addon != null) {
                                 addonId = addon.id;
@@ -796,7 +796,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     return_IsLimitedToSubContent = true;
                     SubQuery = "";
-                    list = adminContext.adminContent.contentControlCriteria;
+                    list = adminContext.adminContent.legacyContentControlCriteria;
                     adminContext.adminContent.id = adminContext.adminContent.id;
                     SubContentCnt = 0;
                     if (!string.IsNullOrEmpty(list)) {
@@ -3380,6 +3380,9 @@ namespace Contensive.Addons.AdminSite {
                                     break;
                                 case "CONTENTCONTROLID":
                                     editrecord.contentControlId = core.db.csGetInteger(CSEditRecord, adminContentcontent.nameLc);
+                                    if (editrecord.contentControlId.Equals(0)) {
+                                        editrecord.contentControlId = adminContent.id;
+                                    }
                                     editrecord.contentControlId_Name = CDefModel.getContentNameByID(core, editrecord.contentControlId);
                                     break;
                                 case "ID":
@@ -3977,7 +3980,7 @@ namespace Contensive.Addons.AdminSite {
                     }
                     // ----- update/create the content watch record for this content record
                     //
-                    ContentID = editRecord.contentControlId;
+                    ContentID = (editRecord.contentControlId.Equals(0)) ? adminContext.adminContent.id : editRecord.contentControlId;
                     CSContentWatch = core.db.csOpen("Content Watch", "(ContentID=" + core.db.encodeSQLNumber(ContentID) + ")And(RecordID=" + core.db.encodeSQLNumber(editRecord.id) + ")");
                     if (!core.db.csOk(CSContentWatch)) {
                         core.db.csClose(ref CSContentWatch);
@@ -4125,10 +4128,10 @@ namespace Contensive.Addons.AdminSite {
         //   Field values must be loaded
         //========================================================================
         //
-        private void LoadContentTrackingDataBase(adminInfoDomainModel adminContext) {
+        private void LoadContentTrackingDataBase(adminInfoDomainModel adminInfo) {
             try {
                 // todo
-                AdminUIController.EditRecordClass editRecord = adminContext.editRecord;
+                AdminUIController.EditRecordClass editRecord = adminInfo.editRecord;
                 //
                 int ContentID = 0;
                 int CSPointer = 0;
@@ -4136,19 +4139,19 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // ----- check if admin record is present
                 //
-                if ((editRecord.id != 0) & (adminContext.adminContent.allowContentTracking)) {
+                if ((editRecord.id != 0) & (adminInfo.adminContent.allowContentTracking)) {
                     //
                     // ----- Open the content watch record for this content record
                     //
-                    ContentID = editRecord.contentControlId;
+                    ContentID = ((adminInfo.editRecord.contentControlId.Equals(0)) ? adminInfo.adminContent.id : adminInfo.editRecord.contentControlId);
                     CSPointer = core.db.csOpen("Content Watch", "(ContentID=" + core.db.encodeSQLNumber(ContentID) + ")AND(RecordID=" + core.db.encodeSQLNumber(editRecord.id) + ")");
                     if (core.db.csOk(CSPointer)) {
-                        adminContext.ContentWatchLoaded = true;
-                        adminContext.ContentWatchRecordID = (core.db.csGetInteger(CSPointer, "ID"));
-                        adminContext.ContentWatchLink = (core.db.csGet(CSPointer, "Link"));
-                        adminContext.ContentWatchClicks = (core.db.csGetInteger(CSPointer, "Clicks"));
-                        adminContext.ContentWatchLinkLabel = (core.db.csGet(CSPointer, "LinkLabel"));
-                        adminContext.ContentWatchExpires = (core.db.csGetDate(CSPointer, "WhatsNewDateExpires"));
+                        adminInfo.ContentWatchLoaded = true;
+                        adminInfo.ContentWatchRecordID = (core.db.csGetInteger(CSPointer, "ID"));
+                        adminInfo.ContentWatchLink = (core.db.csGet(CSPointer, "Link"));
+                        adminInfo.ContentWatchClicks = (core.db.csGetInteger(CSPointer, "Clicks"));
+                        adminInfo.ContentWatchLinkLabel = (core.db.csGet(CSPointer, "LinkLabel"));
+                        adminInfo.ContentWatchExpires = (core.db.csGetDate(CSPointer, "WhatsNewDateExpires"));
                         core.db.csClose(ref CSPointer);
                     }
                 }
@@ -4159,18 +4162,18 @@ namespace Contensive.Addons.AdminSite {
         //
         //========================================================================
         //
-        private void SaveEditRecord(adminInfoDomainModel adminContext) {
+        private void SaveEditRecord(adminInfoDomainModel adminInfo) {
             try {
                 // todo
-                AdminUIController.EditRecordClass editRecord = adminContext.editRecord;
+                AdminUIController.EditRecordClass editRecord = adminInfo.editRecord;
                 //
                 int SaveCCIDValue = 0;
                 int ActivityLogOrganizationID = -1;
                 if (core.doc.debug_iUserError != "") {
                     //
                     // -- If There is an error, block the save
-                    adminContext.Admin_Action = adminInfoDomainModel.AdminActionNop;
-                } else if (!core.session.isAuthenticatedContentManager(core, adminContext.adminContent.name)) {
+                    adminInfo.Admin_Action = adminInfoDomainModel.AdminActionNop;
+                } else if (!core.session.isAuthenticatedContentManager(core, adminInfo.adminContent.name)) {
                     //
                     // -- must be content manager
                 } else if (editRecord.Read_Only) {
@@ -4185,10 +4188,10 @@ namespace Contensive.Addons.AdminSite {
                     if (editRecord.id == 0) {
                         NewRecord = true;
                         recordChanged = true;
-                        csEditRecord = core.db.csInsertRecord(adminContext.adminContent.name);
+                        csEditRecord = core.db.csInsertRecord(adminInfo.adminContent.name);
                     } else {
                         NewRecord = false;
-                        csEditRecord = core.db.csOpen2(adminContext.adminContent.name, editRecord.id, true, true);
+                        csEditRecord = core.db.csOpen2(adminInfo.adminContent.name, editRecord.id, true, true);
                     }
                     if (!core.db.csOk(csEditRecord)) {
                         //
@@ -4198,12 +4201,12 @@ namespace Contensive.Addons.AdminSite {
                             //
                             // Could not insert record
                             //
-                            LogController.handleError(core, new ApplicationException("A new record could not be inserted for content [" + adminContext.adminContent.name + "]. Verify the Database table and field DateAdded, CreateKey, and ID."));
+                            LogController.handleError(core, new ApplicationException("A new record could not be inserted for content [" + adminInfo.adminContent.name + "]. Verify the Database table and field DateAdded, CreateKey, and ID."));
                         } else {
                             //
                             // Could not locate record you requested
                             //
-                            LogController.handleError(core, new ApplicationException("The record you requested (ID=" + editRecord.id + ") could not be found for content [" + adminContext.adminContent.name + "]"));
+                            LogController.handleError(core, new ApplicationException("The record you requested (ID=" + editRecord.id + ") could not be found for content [" + adminInfo.adminContent.name + "]"));
                         }
                     } else {
                         //
@@ -4214,7 +4217,7 @@ namespace Contensive.Addons.AdminSite {
                         // ----- Create the update sql
                         //
                         bool fieldChanged = false;
-                        foreach (var keyValuePair in adminContext.adminContent.fields) {
+                        foreach (var keyValuePair in adminInfo.adminContent.fields) {
                             CDefFieldModel field = keyValuePair.Value;
                             EditRecordFieldClass editRecordField = editRecord.fieldsLc[field.nameLc];
                             object fieldValueObject = editRecordField.value;
@@ -4274,10 +4277,10 @@ namespace Contensive.Addons.AdminSite {
                                         if (!GenericController.IsNull(fieldValueObject)) {
                                             if (DateController.IsDate(fieldValueObject)) {
                                                 DateTime saveValue = GenericController.encodeDate(fieldValueObject);
-                                                if (adminContext.ContentWatchExpires <= DateTime.MinValue) {
-                                                    adminContext.ContentWatchExpires = saveValue;
-                                                } else if (adminContext.ContentWatchExpires > saveValue) {
-                                                    adminContext.ContentWatchExpires = saveValue;
+                                                if (adminInfo.ContentWatchExpires <= DateTime.MinValue) {
+                                                    adminInfo.ContentWatchExpires = saveValue;
+                                                } else if (adminInfo.ContentWatchExpires > saveValue) {
+                                                    adminInfo.ContentWatchExpires = saveValue;
                                                 }
                                             }
                                         }
@@ -4291,10 +4294,10 @@ namespace Contensive.Addons.AdminSite {
                                         if (!GenericController.IsNull(fieldValueObject)) {
                                             if (DateController.IsDate(fieldValueObject)) {
                                                 DateTime saveValue = GenericController.encodeDate(fieldValueObject);
-                                                if ((adminContext.ContentWatchExpires) <= DateTime.MinValue) {
-                                                    adminContext.ContentWatchExpires = saveValue;
-                                                } else if (adminContext.ContentWatchExpires > saveValue) {
-                                                    adminContext.ContentWatchExpires = saveValue;
+                                                if ((adminInfo.ContentWatchExpires) <= DateTime.MinValue) {
+                                                    adminInfo.ContentWatchExpires = saveValue;
+                                                } else if (adminInfo.ContentWatchExpires > saveValue) {
+                                                    adminInfo.ContentWatchExpires = saveValue;
                                                 }
                                             }
                                         }
@@ -4304,7 +4307,7 @@ namespace Contensive.Addons.AdminSite {
                             //
                             // ----- Put the field in the SQL to be saved
                             //
-                            if (IsVisibleUserField(field.adminOnly, field.developerOnly, field.active, field.authorable, field.nameLc, adminContext.adminContent.tableName) & (NewRecord || (!field.readOnly)) & (NewRecord || (!field.notEditable))) {
+                            if (IsVisibleUserField(field.adminOnly, field.developerOnly, field.active, field.authorable, field.nameLc, adminInfo.adminContent.tableName) & (NewRecord || (!field.readOnly)) & (NewRecord || (!field.notEditable))) {
                                 //
                                 // ----- save the value by field type
                                 //
@@ -4329,7 +4332,7 @@ namespace Contensive.Addons.AdminSite {
                                             string filename = GenericController.encodeText(fieldValueObject);
                                             if (!string.IsNullOrWhiteSpace(filename)) {
                                                 filename = FileController.encodeDosFilename(filename);
-                                                string unixPathFilename = core.db.csGetFieldFilename(csEditRecord, fieldName, filename, adminContext.adminContent.name);
+                                                string unixPathFilename = core.db.csGetFieldFilename(csEditRecord, fieldName, filename, adminInfo.adminContent.name);
                                                 string dosPathFilename = GenericController.convertToDosSlash(unixPathFilename);
                                                 string dosPath = GenericController.getPath(dosPathFilename);
                                                 core.cdnFiles.upload(fieldName, dosPath, ref filename);
@@ -4440,7 +4443,7 @@ namespace Contensive.Addons.AdminSite {
                             //
                             // -- Log Activity for changes to people and organizattions
                             if (fieldChanged) {
-                                switch (GenericController.vbLCase(adminContext.adminContent.tableName)) {
+                                switch (GenericController.vbLCase(adminInfo.adminContent.tableName)) {
                                     case "cclibraryfiles":
                                         //
                                         if (core.docProperties.getText("filename") != "") {
@@ -4449,7 +4452,7 @@ namespace Contensive.Addons.AdminSite {
                                         break;
                                 }
                                 if (!NewRecord) {
-                                    switch (GenericController.vbLCase(adminContext.adminContent.tableName)) {
+                                    switch (GenericController.vbLCase(adminInfo.adminContent.tableName)) {
                                         case "ccmembers":
                                             //
                                             if (ActivityLogOrganizationID < 0) {
@@ -4475,7 +4478,7 @@ namespace Contensive.Addons.AdminSite {
                             // -- clear cache
                             string tableName = "";
                             if (editRecord.contentControlId == 0) {
-                                tableName = CDefModel.getContentTablename(core, adminContext.adminContent.name);
+                                tableName = CDefModel.getContentTablename(core, adminInfo.adminContent.name);
                             } else {
                                 tableName = CDefModel.getContentTablename(core, editRecord.contentControlId_Name);
                             }
@@ -4515,17 +4518,16 @@ namespace Contensive.Addons.AdminSite {
                         //
                         // ----- clear/set authoring controls
                         //
-                        core.workflow.ClearEditLock(adminContext.adminContent.name, editRecord.id);
+                        core.workflow.ClearEditLock(adminInfo.adminContent.name, editRecord.id);
                         //
                         // ----- if admin content is changed, reload the adminContext.content data in case this is a save, and not an OK
                         //
                         if (recordChanged && SaveCCIDValue != 0) {
-                            CDefModel.setContentControlId(core, editRecord.contentControlId, editRecord.id, SaveCCIDValue);
+                            CDefModel.setContentControlId(core, (editRecord.contentControlId.Equals(0)) ? adminInfo.adminContent.id : editRecord.contentControlId, editRecord.id, SaveCCIDValue);
                             editRecord.contentControlId_Name = CDefModel.getContentNameByID(core, SaveCCIDValue);
-                            adminContext.adminContent = CDefModel.getCdef(core, editRecord.contentControlId_Name);
-                            adminContext.adminContent.id = adminContext.adminContent.id;
-                            adminContext.adminContent.name = adminContext.adminContent.name;
-                            // false = core.siteProperties.allowWorkflowAuthoring And adminContext.content.AllowWorkflowAuthoring
+                            adminInfo.adminContent = CDefModel.getCdef(core, editRecord.contentControlId_Name);
+                            adminInfo.adminContent.id = adminInfo.adminContent.id;
+                            adminInfo.adminContent.name = adminInfo.adminContent.name;
                         }
                     }
                     editRecord.Saved = true;
@@ -4715,21 +4717,23 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // otherwise, load the record, even if it was loaded during a previous form process
                     LoadEditRecord(adminInfo, true);
-                    if (adminInfo.editRecord.contentControlId == 0) {
-                        if (core.doc.debug_iUserError != "") {
-                            //
-                            // known user error, just return
-                        } else {
-                            //
-                            // unknown error, set userError and return
-                            ErrorController.addUserError(core, "There was an unknown error in your request for data. Please let the site administrator know.");
-                        }
-                        return "";
-                    }
+                    // -- allow for record to have no content control id
+                    //if (adminInfo.editRecord.contentControlId == 0) {
+                    //    if (core.doc.debug_iUserError != "") {
+                    //        //
+                    //        // known user error, just return
+                    //    } else {
+                    //        //
+                    //        // unknown error, set userError and return
+                    //        ErrorController.addUserError(core, "There was an unknown error in your request for data. Please let the site administrator know.");
+                    //    }
+                    //    return "";
+                    //}
                 }
                 //
                 // Test if this editors has access to this record
-                if (!adminInfoDomainModel.userHasContentAccess(core, adminInfo.editRecord.contentControlId)) {
+                
+                if (!adminInfoDomainModel.userHasContentAccess(core, ((adminInfo.editRecord.contentControlId.Equals(0)) ? adminInfo.adminContent.id : adminInfo.editRecord.contentControlId))) {
                     ErrorController.addUserError(core, "Your account on this system does not have access rights to edit this content.");
                     return "";
                 }
@@ -4759,7 +4763,6 @@ namespace Contensive.Addons.AdminSite {
                 int TemplateIDForStyles = 0;
                 bool IsTemplateTable = (adminInfo.adminContent.tableName.ToLower() == Processor.Models.Db.PageTemplateModel.contentTableName);
                 bool IsPageContentTable = (adminInfo.adminContent.tableName.ToLower() == Processor.Models.Db.PageContentModel.contentTableName);
-                bool IsSectionTable = (adminInfo.adminContent.tableName.ToLower() == Processor.Models.Db.SiteSectionModel.contentTableName);
                 bool IsEmailTable = (adminInfo.adminContent.tableName.ToLower() == Processor.Models.Db.EmailModel.contentTableName);
                 int emailIdForStyles = IsEmailTable ? adminInfo.editRecord.id : 0;
                 bool IsLandingPage = false;
@@ -5876,7 +5879,7 @@ namespace Contensive.Addons.AdminSite {
                                 if (field.redirectContentID != 0) {
                                     RedirectPath = RedirectPath + "&cid=" + field.redirectContentID;
                                 } else {
-                                    RedirectPath = RedirectPath + "&cid=" + editRecord.contentControlId;
+                                    RedirectPath = RedirectPath + "&cid=" + ((editRecord.contentControlId.Equals(0)) ? adminContext.adminContent.id : editRecord.contentControlId);
                                 }
                                 if (editRecord.id == 0) {
                                     EditorString += ("[available after save]");
@@ -6773,7 +6776,7 @@ namespace Contensive.Addons.AdminSite {
                         // if this record has a parent id, only include CDefs compatible with the parent record - otherwise get all for the table
                         FieldHelp = GenericController.encodeText(field.helpMessage);
                         FieldRequired = GenericController.encodeBoolean(field.required);
-                        int FieldValueInteger = editRecord.contentControlId;
+                        int FieldValueInteger = (editRecord.contentControlId.Equals(0)) ? adminContext.adminContent.id : editRecord.contentControlId;
                         if (!core.session.isAuthenticatedAdmin(core)) {
                             HTMLFieldString = HTMLFieldString + HtmlController.inputHidden("ContentControlID", FieldValueInteger);
                         } else {

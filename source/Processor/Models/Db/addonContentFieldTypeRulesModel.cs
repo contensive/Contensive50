@@ -10,6 +10,7 @@ namespace Contensive.Processor.Models.Db {
         public const string contentName = "add-on Content Field Type Rules";
         public const string contentTableName = "ccAddonContentFieldTypeRules";
         public const string contentDataSource = "default";
+        public const bool nameFieldIsUnique = false;
         //
         //====================================================================================================
         // -- instance properties
@@ -47,13 +48,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static AddonContentFieldTypeRulesModel createByName(CoreController core, string recordName) {
-            return createByName<AddonContentFieldTypeRulesModel>(core, recordName);
+        public static AddonContentFieldTypeRulesModel createByUniqueName(CoreController core, string recordName) {
+            return createByUniqueName<AddonContentFieldTypeRulesModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static AddonContentFieldTypeRulesModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<AddonContentFieldTypeRulesModel>(core, recordName, ref callersCacheNameList);
+        public static AddonContentFieldTypeRulesModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByUniqueName<AddonContentFieldTypeRulesModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================

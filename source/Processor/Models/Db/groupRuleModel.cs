@@ -9,7 +9,8 @@ namespace Contensive.Processor.Models.Db {
         //-- const
         public const string contentName = "group rules";
         public const string contentTableName = "ccgrouprules";
-        public const string contentDataSource = "default"; 
+        public const string contentDataSource = "default";
+        public const bool nameFieldIsUnique = false;
         //
         //====================================================================================================
         // -- instance properties
@@ -49,13 +50,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static GroupRuleModel createByName(CoreController core, string recordName) {
-            return createByName<GroupRuleModel>(core, recordName);
+        public static GroupRuleModel createByUniqueName(CoreController core, string recordName) {
+            return createByUniqueName<GroupRuleModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static GroupRuleModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<GroupRuleModel>(core, recordName, ref callersCacheNameList);
+        public static GroupRuleModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByUniqueName<GroupRuleModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================

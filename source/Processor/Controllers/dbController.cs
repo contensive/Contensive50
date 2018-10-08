@@ -186,7 +186,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <returns>
         /// </returns>
-        public string getConnectionStringADONET(string catalogName, string dataSourceName = "") {
+        public string getConnectionStringADONET(string catalogName, string dataSourceName = "default") {
             //
             // (OLEDB) OLE DB Provider for SQL Server > "Provider=sqloledb;Data Source=MyServerName;Initial Catalog=MyDatabaseName;User Id=MyUsername;Password=MyPassword;"
             //     https://www.codeproject.com/Articles/2304/ADO-Connection-Strings#OLE%20DB%20SqlServer
@@ -382,7 +382,7 @@ namespace Contensive.Processor.Controllers {
         ///// <param name="startRecord"></param>
         ///// <param name="maxRecords"></param>
         ///// <returns>You must close the recordset after use.</returns>
-        //public ADODB.Recordset executeSql_getRecordSet(string sql, string dataSourceName = "", int startRecord = 0, int maxRecords = 9999) {
+        //public ADODB.Recordset executeSql_getRecordSet(string sql, string dataSourceName = "default", int startRecord = 0, int maxRecords = 9999) {
         //    //
         //    // from - https://support.microsoft.com/en-us/kb/308611
         //    //
@@ -454,7 +454,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="sql"></param>
         /// <param name="dataSourceName"></param>
-        public void executeNonQueryAsync(string sql, string dataSourceName = "") {
+        public void executeNonQueryAsync(string sql, string dataSourceName = "default") {
             try {
                 if (dbEnabled) {
                     Stopwatch sw = Stopwatch.StartNew();
@@ -793,6 +793,7 @@ namespace Contensive.Processor.Controllers {
                         }
                         executeQuery(SQL, DataSourceName).Dispose();
                         //
+                        TableSchemaModel.tableSchemaListClear(core);
                         if (clearMetaCache) {
                             core.cache.invalidateAll();
                             core.doc.clearMetaData();
@@ -1311,7 +1312,7 @@ namespace Contensive.Processor.Controllers {
                         }
                         //
                         // ----- fixup the criteria to include the ContentControlID(s) / EditSourceID
-                        string sqlContentCriteria = CDef.contentControlCriteria;
+                        string sqlContentCriteria = CDef.legacyContentControlCriteria;
                         if (string.IsNullOrEmpty(sqlContentCriteria)) {
                             sqlContentCriteria = "(1=1)";
                         } else {
@@ -1621,7 +1622,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="pageSize"></param>
         /// <param name="pageNumber"></param>
         /// <returns></returns>
-        public int csOpenSql(string sql, string dataSourceName = "", int pageSize = 9999, int pageNumber = 1) {
+        public int csOpenSql(string sql, string dataSourceName = "default", int pageSize = 9999, int pageNumber = 1) {
             int returnCs = -1;
             try {
                 returnCs = csInit(core.session.user.id);
@@ -3335,12 +3336,13 @@ namespace Contensive.Processor.Controllers {
                         // ----- Do the unique check on the content table, if necessary
                         //
                         if (!string.IsNullOrEmpty(SQLCriteriaUnique)) {
-                            string sqlUnique = "SELECT ID FROM " + contentSet.CDef.tableName + " WHERE (ID<>" + id + ")AND(" + SQLCriteriaUnique + ")and(" + contentSet.CDef.contentControlCriteria + ");";
+                            string sqlUnique = "SELECT ID FROM " + contentSet.CDef.tableName + " WHERE (ID<>" + id + ")AND(" + SQLCriteriaUnique + ")and(" + contentSet.CDef.legacyContentControlCriteria + ");";
                             using (DataTable dt = executeQuery(sqlUnique, contentSet.CDef.dataSourceName)) {
                                 //
                                 // -- unique violation
                                 if (dt.Rows.Count > 0) {
-                                    throw new ApplicationException(("Can not save record to content [" + contentSet.CDef.name + "] because it would create a non-unique record for one or more of the following field(s) [" + UniqueViolationFieldList + "]"));
+                                    LogController.handleError(core, new ApplicationException(("Can not save record to content [" + contentSet.CDef.name + "] because it would create a non-unique record for one or more of the following field(s) [" + UniqueViolationFieldList + "]")));
+                                    return;
                                 }
                             }
                         }
@@ -3355,6 +3357,7 @@ namespace Contensive.Processor.Controllers {
                                 } else {
                                     executeNonQuery(SQLUpdate, contentSet.CDef.dataSourceName);
                                 }
+                                core.cache.invalidateDbRecord(id, contentSet.CDef.tableName, contentSet.CDef.dataSourceName);
                             }
                         }
                         contentSet.LastUsed = DateTime.Now;
@@ -3734,14 +3737,14 @@ namespace Contensive.Processor.Controllers {
         /// <param name="TableName"></param>
         /// <param name="RecordID"></param>
         //
-        public void deleteTableRecord(int RecordID, string TableName, string DataSourceName = "") {
+        public void deleteTableRecord(int RecordID, string TableName, string dataSourceName = "default") {
             try {
                 if (string.IsNullOrEmpty(TableName.Trim())) {
                     throw new ApplicationException("tablename cannot be blank");
                 } else if (RecordID <= 0) {
                     throw new ApplicationException("record id is not valid [" + RecordID + "]");
                 } else {
-                    deleteTableRecords(TableName, "ID=" + RecordID, DataSourceName);
+                    deleteTableRecords(TableName, "ID=" + RecordID, dataSourceName);
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -3749,8 +3752,8 @@ namespace Contensive.Processor.Controllers {
             }
         }
         // todo deprecate
-        public void deprecate_argsreversed_deleteTableRecord(string TableName, int RecordID, string DataSourceName = "") {
-            deleteTableRecord(RecordID, TableName, DataSourceName);
+        public void deprecate_argsreversed_deleteTableRecord(string TableName, int RecordID, string dataSourceName = "default") {
+            deleteTableRecord(RecordID, TableName, dataSourceName);
         }
             //
             //==================================================================================================

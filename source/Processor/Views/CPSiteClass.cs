@@ -299,7 +299,7 @@ namespace Contensive.Processor {
             if ( string.IsNullOrWhiteSpace(DomainName)) {
                 return GetInteger("LandingPageID", 0);
             } else {
-                var domain = DomainModel.createByName(CP.core, DomainName);
+                var domain = DomainModel.createByUniqueName(CP.core, DomainName);
                 if ( domain == null) {
                     return GetInteger("LandingPageID", 0);
                 } else {

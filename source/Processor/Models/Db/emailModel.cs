@@ -11,6 +11,7 @@ namespace Contensive.Processor.Models.Db {
         public const string contentName = "email";
         public const string contentTableName = "ccemail";
         public const string contentDataSource = "default";
+        public const bool nameFieldIsUnique = true;
         //
         //====================================================================================================
         // -- instance properties
@@ -65,13 +66,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static EmailModel createByName(CoreController core, string recordName) {
-            return createByName<EmailModel>(core, recordName);
+        public static EmailModel createByUniqueName(CoreController core, string recordName) {
+            return createByUniqueName<EmailModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static EmailModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<EmailModel>(core, recordName, ref callersCacheNameList);
+        public static EmailModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByUniqueName<EmailModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================

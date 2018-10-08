@@ -150,8 +150,6 @@
     <Content Include="ccLib\ClientSide\tdpopup.htm" />
     <Content Include="ccLib\Config\aoSample.xml" />
     <Content Include="ccLib\Config\ccCountries.xml" />
-    <Content Include="ccLib\Config\CDefCompatibility21.xml" />
-    <Content Include="ccLib\Config\CDefMemberSmart.xml" />
     <Content Include="ccLib\Config\CDefRef.xml" />
     <Content Include="ccLib\Config\config.xml" />
     <Content Include="ccLib\Config\ContensiveStyles.txt" />

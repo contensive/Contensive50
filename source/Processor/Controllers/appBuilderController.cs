@@ -231,7 +231,7 @@ namespace Contensive.Processor.Controllers {
                     if (isNewBuild) {
                         //
                         // -- primary domain
-                        DomainModel domain = DomainModel.createByName(core, primaryDomain);
+                        DomainModel domain = DomainModel.createByUniqueName(core, primaryDomain);
                         if (domain == null) {
                             domain = DomainModel.add(core);
                             domain.name = primaryDomain;
@@ -246,7 +246,7 @@ namespace Contensive.Processor.Controllers {
                         }
                         //
                         // -- default template
-                        PageTemplateModel defaultTemplate = PageTemplateModel.createByName(core, "Default");
+                        PageTemplateModel defaultTemplate = PageTemplateModel.createByUniqueName(core, "Default");
                         if (defaultTemplate == null) {
                             defaultTemplate = PageTemplateModel.add(core);
                             defaultTemplate.name = "Default";
@@ -966,15 +966,13 @@ namespace Contensive.Processor.Controllers {
                     core.db.createSQLTableField("Default", "ccContent", "AllowContentTracking", FieldTypeIdBoolean);
                     core.db.createSQLTableField("Default", "ccContent", "AllowTopicRules", FieldTypeIdBoolean);
                     core.db.createSQLTableField("Default", "ccContent", "AllowContentChildTool", FieldTypeIdBoolean);
-                    //Call core.db.createSQLTableField("Default", "ccContent", "AllowMetaContent", FieldTypeIdBoolean)
                     core.db.createSQLTableField("Default", "ccContent", "IconLink", FieldTypeIdLink);
                     core.db.createSQLTableField("Default", "ccContent", "IconHeight", FieldTypeIdInteger);
                     core.db.createSQLTableField("Default", "ccContent", "IconWidth", FieldTypeIdInteger);
                     core.db.createSQLTableField("Default", "ccContent", "IconSprites", FieldTypeIdInteger);
                     core.db.createSQLTableField("Default", "ccContent", "installedByCollectionId", FieldTypeIdInteger);
-                    //Call core.app.csv_CreateSQLTableField("Default", "ccContent", "ccGuid", FieldTypeText)
                     core.db.createSQLTableField("Default", "ccContent", "IsBaseContent", FieldTypeIdBoolean);
-                    //Call core.app.csv_CreateSQLTableField("Default", "ccContent", "WhereClause", FieldTypeText)
+                    core.db.createSQLTableField("Default", "ccContent", "SupportLegacyContentControl", FieldTypeIdBoolean);
                     //
                     core.db.createSQLTable("Default", "ccFields");
                     core.db.createSQLTableField("Default", "ccFields", "ContentID", FieldTypeIdInteger);

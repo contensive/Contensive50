@@ -22,6 +22,7 @@ namespace Contensive.Processor.Models.Db {
         public const string contentName = "layouts";
         public const string contentTableName = "ccLayouts";
         public const string contentDataSource = "default";
+        public const bool nameFieldIsUnique = true;
         //
         //====================================================================================================
         // -- instance properties
@@ -59,13 +60,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static LayoutModel createByName(CoreController core, string recordName) {
-            return createByName<LayoutModel>(core, recordName);
+        public static LayoutModel createByUniqueName(CoreController core, string recordName) {
+            return createByUniqueName<LayoutModel>(core, recordName );
         }
         //
         //====================================================================================================
-        public static LayoutModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<LayoutModel>(core, recordName, ref callersCacheNameList);
+        public static LayoutModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByUniqueName<LayoutModel>(core, recordName, ref callersCacheNameList );
         }
         //
         //====================================================================================================

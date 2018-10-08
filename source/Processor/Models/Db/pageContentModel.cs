@@ -22,6 +22,7 @@ namespace Contensive.Processor.Models.Db {
         public const string contentName = "page content";
         public const string contentTableName = "ccpagecontent";
         public const string contentDataSource = "default";
+        public const bool nameFieldIsUnique = true;
         //
         //====================================================================================================
         // -- instance properties
@@ -117,13 +118,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static PageContentModel createByName(CoreController core, string recordName) {
-            return createByName<PageContentModel>(core, recordName);
+        public static PageContentModel createByUniqueName(CoreController core, string recordName) {
+            return createByUniqueName<PageContentModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static PageContentModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<PageContentModel>(core, recordName, ref callersCacheNameList);
+        public static PageContentModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByUniqueName<PageContentModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================

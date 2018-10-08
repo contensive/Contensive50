@@ -11,6 +11,7 @@ namespace Contensive.Processor.Models.Db {
         public const string contentName = "add-ons";
         public const string contentTableName = "ccaggregatefunctions";
         public const string contentDataSource = "default";
+        public const bool nameFieldIsUnique = true;
         //
         //====================================================================================================
         // -- instance properties
@@ -111,13 +112,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static AddonModel createByName(CoreController core, string recordName) {
-            return createByName<AddonModel>(core, recordName);
+        public static AddonModel createByUniqueName(CoreController core, string recordName ) {
+            return createByUniqueName<AddonModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static AddonModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<AddonModel>(core, recordName, ref callersCacheNameList);
+        public static AddonModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByUniqueName<AddonModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================

@@ -11,6 +11,7 @@ namespace Contensive.Processor.Models.Db {
         public const string contentName = "group email";
         public const string contentTableName = "ccemail";
         public const string contentDataSource = "default";
+        public const bool nameFieldIsUnique = true;
         //
         //====================================================================================================
         // -- instance properties
@@ -60,13 +61,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static GroupEmailModel createByName(CoreController core, string recordName) {
-            return createByName<GroupEmailModel>(core, recordName);
+        public static GroupEmailModel createByUniqueName(CoreController core, string recordName) {
+            return createByUniqueName<GroupEmailModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static GroupEmailModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<GroupEmailModel>(core, recordName, ref callersCacheNameList);
+        public static GroupEmailModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByUniqueName<GroupEmailModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================

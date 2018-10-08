@@ -6,6 +6,7 @@ using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
+using System.Linq;
 //
 namespace Contensive.Processor.Models.Domain {
     //
@@ -94,9 +95,9 @@ namespace Contensive.Processor.Models.Domain {
         private string _dataSourceName { get; set; } = "";
         //
         /// <summary>
-        /// if true, all records in the source are in this content
+        /// if false, all records in the table are in this content
         /// </summary>
-        public bool ignoreContentControl { get; set; }
+        public bool supportLegacyContentControl { get; set; }
         //
         /// <summary>
         /// deprecate - Field Name of the required "name" field
@@ -184,7 +185,7 @@ namespace Contensive.Processor.Models.Domain {
         public string installedByCollectionGuid { get; set; }
         //
         /// <summary>
-        /// consider deprecation - read from Db, if not IgnoreContentControl, the ID of the parent content
+        /// deprecate one day - domain model cdef calculates hasChild from this. If hasChild is false, contentcontrolid is ignored and queries are from the whole table
         /// </summary>
         public int parentID { get; set; }
         //
@@ -211,7 +212,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// consider deprection - string created from ParentIDs used to select records. If we eliminate parentId, then the whole table belongs to the content. This will speed queries and simplify concepts
         /// </summary>
-        public string contentControlCriteria { get; set; }
+        public string legacyContentControlCriteria { get; set; }
         //
         /// <summary>
         /// 
@@ -296,8 +297,10 @@ namespace Contensive.Processor.Models.Domain {
                         + ", ccSortMethods.OrderByClause as DefaultSortMethod"
                         + ", ccGroups.Name as EditorGroupName"
                         + ", c.AllowContentTracking as AllowContentTracking"
-                        + ", c.AllowTopicRules as AllowTopicRules"
-                        + ", c.AllowContentTracking as AllowContentTracking"
+                        + ", c.AllowTopicRules as AllowTopicRules";
+                    sql += ", c.supportLegacyContentControl";
+                    //
+                    sql += ""
                         + " from (((((ccContent c"
                         + " left join ccTables AS ContentTable ON c.ContentTableID = ContentTable.ID)"
                         + " left join ccTables AS AuthoringTable ON c.AuthoringTableID = AuthoringTable.ID)"
@@ -349,7 +352,10 @@ namespace Contensive.Processor.Models.Domain {
                         result.activeOnly = true;
                         result.aliasID = "ID";
                         result.aliasName = "NAME";
-                        result.ignoreContentControl = false;
+                        //
+                        // -- figure out later how to deprecate it. Test adding Db field read, but make sure system loads without field, or -u correctly adds field
+                        result.supportLegacyContentControl = GenericController.encodeBoolean(row[21]);
+                        //result.supportLegacyContentControl = true;
                         //
                         // load parent cdef fields first so we can overlay the current cdef field
                         //
@@ -562,9 +568,8 @@ namespace Contensive.Processor.Models.Domain {
                         }
                                     dt.Dispose();
                         //
-                        // ----- Create the ContentControlCriteria
-                        //
-                        result.contentControlCriteria = Models.Domain.CDefModel.getContentControlCriteria(core, result.id, result.tableName, result.dataSourceName, new List<int>());
+                        // ----- Create the LegacyContentControlCriteria. For compatibility, if support=false, return (1=1)
+                        result.legacyContentControlCriteria = getLegacyContentControlCriteria(core, result.supportLegacyContentControl, result.id, result.tableName, result.dataSourceName, new List<int>());
                         //
                         getCdef_SetAdminColumns(core, result);
                     }
@@ -647,9 +652,22 @@ namespace Contensive.Processor.Models.Domain {
         public static int getContentId(CoreController core, string contentName) {
             int returnId = 0;
             try {
+                //
+                // -- method 2 - if name/id dictionary doesnt have it, load the one record
                 if (core.doc.contentNameIdDictionary.ContainsKey(contentName.ToLower())) {
                     returnId = core.doc.contentNameIdDictionary[contentName.ToLower()];
+                } else { 
+                    ContentModel content = ContentModel.createByUniqueName(core, contentName);
+                    if ( content != null ) {
+                        core.doc.contentNameIdDictionary.Add(contentName.ToLower(), content.id);
+                        returnId = content.id;
+                    }
                 }
+                //
+                // -- method-1, on first request, load all content records
+                //if (core.doc.contentNameIdDictionary.ContainsKey(contentName.ToLower())) {
+                //    returnId = core.doc.contentNameIdDictionary[contentName.ToLower()];
+                //}
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
@@ -663,7 +681,7 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         /// <param name="contentName"></param>
         /// <returns></returns>
-        public static Models.Domain.CDefModel getCdef(CoreController core, string contentName) {
+        public static CDefModel getCdef(CoreController core, string contentName) {
             Models.Domain.CDefModel returnCdef = null;
             try {
                 int ContentId = getContentId(core, contentName);
@@ -683,8 +701,8 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         /// <param name="contentId"></param>
         /// <returns></returns>
-        public static Models.Domain.CDefModel getCdef(CoreController core, int contentId, bool forceDbLoad = false, bool loadInvalidFields = false) {
-            Models.Domain.CDefModel returnCdef = null;
+        public static CDefModel getCdef(CoreController core, int contentId, bool forceDbLoad = false, bool loadInvalidFields = false) {
+            CDefModel returnCdef = null;
             try {
                 if (contentId <= 0) {
                     //
@@ -699,7 +717,7 @@ namespace Contensive.Processor.Models.Domain {
                         // -- key is already there, remove it first                        
                         core.doc.cdefDictionary.Remove(contentId.ToString());
                     }
-                    returnCdef = Models.Domain.CDefModel.create(core, contentId, loadInvalidFields, forceDbLoad);
+                    returnCdef = create(core, contentId, loadInvalidFields, forceDbLoad);
                     core.doc.cdefDictionary.Add(contentId.ToString(), returnCdef);
                 }
             } catch (Exception ex) {
@@ -726,22 +744,32 @@ namespace Contensive.Processor.Models.Domain {
         // will include both the content, and its child contents.
         //========================================================================
         //
-        internal static string getContentControlCriteria(CoreController core, int contentId, string contentTableName, string contentDAtaSourceName, List<int> parentIdList) {
+        internal static string getLegacyContentControlCriteria(CoreController core, bool supportLegacyContentControl, int contentId, string contentTableName, string contentDAtaSourceName, List<int> parentIdList) {
             string returnCriteria = "";
             try {
                 //
-                returnCriteria = "(1=0)";
-                if (contentId >= 0) {
-                    if (!parentIdList.Contains(contentId)) {
-                        parentIdList.Add(contentId);
-                        returnCriteria = "(" + contentTableName + ".contentcontrolId=" + contentId + ")";
-                        foreach (KeyValuePair<int, ContentModel> kvp in core.doc.contentIdDict) {
-                            if (kvp.Value.parentID == contentId) {
-                                returnCriteria += "OR" + getContentControlCriteria(core, kvp.Value.id, contentTableName, contentDAtaSourceName, parentIdList);
+                if (!supportLegacyContentControl) {
+                    returnCriteria = "(1=1)";
+                } else {
+                    returnCriteria = "(1=0)";
+                    if (contentId >= 0) {
+                        if (!parentIdList.Contains(contentId)) {
+                            parentIdList.Add(contentId);
+                            returnCriteria = "(" + contentTableName + ".contentcontrolId=" + contentId + ")";
+                            //
+                            // TODO -- only works if contentIdDist is fully loaded, but this is the only requirement to preload Dict, so removing this removes negative-performance requirements
+                            //
+                            foreach (var childContent in ContentModel.createList(core, "(parentid=" + contentId + ")")) {
+                                returnCriteria += "OR" + getLegacyContentControlCriteria(core, childContent.supportLegacyContentControl, childContent.id, contentTableName, contentDAtaSourceName, parentIdList);
                             }
+                            //foreach (KeyValuePair<int, ContentModel> kvp in core.doc.contentIdDict) {
+                            //    if (kvp.Value.parentID == contentId) {
+                            //        returnCriteria += "OR" + getLegacyContentControlCriteria(core, kvp.Value.supportLegacyContentControl, kvp.Value.id, contentTableName, contentDAtaSourceName, parentIdList);
+                            //    }
+                            //}
+                            parentIdList.Remove(contentId);
+                            returnCriteria = "(" + returnCriteria + ")";
                         }
-                        parentIdList.Remove(contentId);
-                        returnCriteria = "(" + returnCriteria + ")";
                     }
                 }
             } catch (Exception ex) {
@@ -836,7 +864,7 @@ namespace Contensive.Processor.Models.Domain {
         //
         public static void createContentChild(CoreController core, string ChildContentName, string ParentContentName, int MemberID) {
             try {
-                string DataSourceName = "";
+                string dataSourceName = "default";
                 string SQL = null;
                 DataTable rs = null;
                 int ChildContentID = 0;
@@ -864,7 +892,7 @@ namespace Contensive.Processor.Models.Domain {
                     // Get ContentID of parent
                     //
                     SQL = "select ID from ccContent where name=" + core.db.encodeSQLText(ParentContentName) + ";";
-                    rs = core.db.executeQuery(SQL, DataSourceName);
+                    rs = core.db.executeQuery(SQL, dataSourceName);
                     if (DbController.isDataTableOk(rs)) {
                         ParentContentID = GenericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "ID"));
                         //
@@ -880,7 +908,7 @@ namespace Contensive.Processor.Models.Domain {
                         //
                         // ----- create child content record, let the csv_ExecuteSQL reload CDef
                         //
-                        DataSourceName = "Default";
+                        dataSourceName = "Default";
                         CSContent = core.db.csOpenContentRecord("Content", ParentContentID);
                         if (!core.db.csOk(CSContent)) {
                             throw (new ApplicationException("Can not create Child Content [" + ChildContentName + "] because the Parent Content [" + ParentContentName + "] was not found."));
@@ -1143,6 +1171,7 @@ namespace Contensive.Processor.Models.Domain {
                                 sqlList.add("CONTENTCONTROLID", core.db.encodeSQLNumber(Models.Domain.CDefModel.getContentId(core, "Tables")));
                                 //
                                 core.db.updateTableRecord("Default", "ccTables", "ID=" + TableID, sqlList);
+                                TableModel.invalidateRecordCache(core, TableID);
                             } else {
                                 TableID = GenericController.encodeInteger(dt.Rows[0]["ID"]);
                             }
@@ -1218,6 +1247,7 @@ namespace Contensive.Processor.Models.Domain {
                                 LogController.handleError( core,new ApplicationException("createContent call, content.name match found but content.ccGuid did not, name [" + contentName + "], newGuid [" + NewGuid + "], installedGuid [" + LcContentGuid + "] "));
                             }
                             core.db.updateTableRecord("Default", "ccContent", "ID=" + returnContentId, sqlList);
+                            ContentModel.invalidateRecordCache(core, returnContentId);
                             //
                             //-----------------------------------------------------------------------------------------------
                             // Verify Core Content Definition Fields
@@ -1411,120 +1441,84 @@ namespace Contensive.Processor.Models.Domain {
         {
             int returnId = 0;
             try {
-                //
-                bool RecordIsBaseField = false;
-                bool IsBaseField = false;
-                string SQL = null;
-                int ContentID = 0;
                 string[] SQLName = new string[101];
                 string[] SQLValue = new string[101];
-                string MethodName = null;
-                int LookupContentID = 0;
-                int RecordID = 0;
-                int TableID = 0;
-                string TableName = null;
-                int DataSourceID = 0;
-                string DataSourceName = null;
-                bool FieldReadOnly = false;
-                bool FieldActive = false;
-                int fieldTypeId = 0;
-                string FieldCaption = null;
-                bool FieldAuthorable = false;
-                string LookupContentName = null;
-                string DefaultValue = null;
-                bool NotEditable = false;
-                string AdminIndexWidth = null;
-                int AdminIndexSort = 0;
-                string RedirectContentName = null;
-                string RedirectIDField = null;
-                string RedirectPath = null;
-                bool HTMLContent = false;
-                bool UniqueName = false;
-                bool Password = false;
-                int RedirectContentID = 0;
-                bool FieldRequired = false;
-                bool RSSTitle = false;
-                bool RSSDescription = false;
-                bool FieldDeveloperOnly = false;
-                int MemberSelectGroupID = 0;
-                string installedByCollectionGuid = null;
-                int InstalledByCollectionID = 0;
-                string EditTab = null;
-                bool Scramble = false;
-                string LookupList = null;
-                DataTable rs = null;
-                bool isNewFieldRecord = true;
                 //
-                MethodName = "csv_VerifyCDefField_ReturnID(" + ContentName + "," + field.nameLc + ")";
-                //
-                if ((ContentName.ToUpper() == "PAGE CONTENT") && (field.nameLc.ToUpper() == "ACTIVE")) {
-                    field.nameLc = field.nameLc;
-                }
-                //
-                // Prevent load during the changes
-                //
-                //StateOfAllowContentAutoLoad = AllowContentAutoLoad
-                //AllowContentAutoLoad = False
                 //
                 // determine contentid and tableid
-                //
-                ContentID = -1;
-                TableID = 0;
-                SQL = "select ID,ContentTableID from ccContent where name=" + core.db.encodeSQLText(ContentName) + ";";
-                rs = core.db.executeQuery(SQL);
-                if (DbController.isDataTableOk(rs)) {
-                    ContentID = GenericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "ID"));
-                    TableID = GenericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "ContentTableID"));
+                int ContentID = -1;
+                int TableID = 0;
+                {
+                    var content = ContentModel.createByUniqueName(core, ContentName);
+                    if ( content != null ) {
+                        ContentID = content.id;
+                        TableID = content.contentTableID;
+                    }
                 }
+                //SQL = "select ID,ContentTableID from ccContent where name=" + core.db.encodeSQLText(ContentName) + ";";
+                //rs = core.db.executeQuery(SQL);
+                //if (DbController.isDataTableOk(rs)) {
+                //    ContentID = GenericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "ID"));
+                //    TableID = GenericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "ContentTableID"));
+                //}
                 //
                 // test if field definition found or not
                 //
-                RecordID = 0;
-                RecordIsBaseField = false;
-                SQL = "select ID,IsBaseField from ccFields where (ContentID=" + core.db.encodeSQLNumber(ContentID) + ")and(name=" + core.db.encodeSQLText(field.nameLc) + ");";
-                rs = core.db.executeQuery(SQL);
-                if (DbController.isDataTableOk(rs)) {
-                    isNewFieldRecord = false;
-                    RecordID = GenericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "ID"));
-                    RecordIsBaseField = GenericController.encodeBoolean(core.db.getDataRowColumnName(rs.Rows[0], "IsBaseField"));
+                int RecordID = 0;
+                //
+                bool RecordIsBaseField = false;
+                bool isNewFieldRecord = true;
+                {
+                    var contentFieldList = ContentFieldModel.createList(core, "(ContentID=" + core.db.encodeSQLNumber(ContentID) + ")and(name=" + core.db.encodeSQLText(field.nameLc) + ")");
+                    if (contentFieldList.Count > 0) {
+                        isNewFieldRecord = false;
+                        RecordID = contentFieldList.First().id;
+                        RecordIsBaseField = contentFieldList.First().isBaseField;
+                    }
                 }
+                //SQL = "select ID,IsBaseField from ccFields where (ContentID=" + core.db.encodeSQLNumber(ContentID) + ")and(name=" + core.db.encodeSQLText(field.nameLc) + ");";
+                //rs = core.db.executeQuery(SQL);
+                //if (DbController.isDataTableOk(rs)) {
+                //    isNewFieldRecord = false;
+                //    RecordID = GenericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "ID"));
+                //    RecordIsBaseField = GenericController.encodeBoolean(core.db.getDataRowColumnName(rs.Rows[0], "IsBaseField"));
+                //}
                 //
                 // check if this is a non-base field updating a base field
                 //
-                IsBaseField = field.isBaseField;
+                bool IsBaseField = field.isBaseField;
                 if ((!IsBaseField) && (RecordIsBaseField)) {
                     //
                     // This update is not allowed
                     //
                     LogController.handleWarn( core,new ApplicationException("Warning, updating non-base field with base field, content [" + ContentName + "], field [" + field.nameLc + "]"));
                 }
-                if (true) {
+                {
                     //FieldAdminOnly = field.adminOnly
-                    FieldDeveloperOnly = field.developerOnly;
-                    FieldActive = field.active;
-                    FieldCaption = field.caption;
-                    FieldReadOnly = field.readOnly;
-                    fieldTypeId = field.fieldTypeId;
-                    FieldAuthorable = field.authorable;
-                    DefaultValue = GenericController.encodeText(field.defaultValue);
-                    NotEditable = field.notEditable;
-                    LookupContentName = field.get_lookupContentName(core);
-                    AdminIndexWidth = field.indexWidth;
-                    AdminIndexSort = field.indexSortOrder;
-                    RedirectContentName = field.get_redirectContentName(core);
-                    RedirectIDField = field.redirectID;
-                    RedirectPath = field.redirectPath;
-                    HTMLContent = field.htmlContent;
-                    UniqueName = field.uniqueName;
-                    Password = field.password;
-                    FieldRequired = field.required;
-                    RSSTitle = field.RSSTitleField;
-                    RSSDescription = field.RSSDescriptionField;
-                    MemberSelectGroupID = field.memberSelectGroupId_get( core );
-                    installedByCollectionGuid = field.installedByCollectionGuid;
-                    EditTab = field.editTabName;
-                    Scramble = field.Scramble;
-                    LookupList = field.lookupList;
+                    bool FieldDeveloperOnly = field.developerOnly;
+                    bool FieldActive = field.active;
+                    string FieldCaption = field.caption;
+                    bool FieldReadOnly = field.readOnly;
+                    int fieldTypeId = field.fieldTypeId;
+                    bool FieldAuthorable = field.authorable;
+                    string DefaultValue = GenericController.encodeText(field.defaultValue);
+                    bool NotEditable = field.notEditable;
+                    string LookupContentName = field.get_lookupContentName(core);
+                    string AdminIndexWidth = field.indexWidth;
+                    int AdminIndexSort = field.indexSortOrder;
+                    string RedirectContentName = field.get_redirectContentName(core);
+                    string RedirectIDField = field.redirectID;
+                    string RedirectPath = field.redirectPath;
+                    bool HTMLContent = field.htmlContent;
+                    bool UniqueName = field.uniqueName;
+                    bool Password = field.password;
+                    bool FieldRequired = field.required;
+                    bool RSSTitle = field.RSSTitleField;
+                    bool RSSDescription = field.RSSDescriptionField;
+                    int MemberSelectGroupID = field.memberSelectGroupId_get(core);
+                    string installedByCollectionGuid = field.installedByCollectionGuid;
+                    string EditTab = field.editTabName;
+                    string LookupList = field.lookupList;
                     //
                     // ----- Check error conditions before starting
                     //
@@ -1547,45 +1541,58 @@ namespace Contensive.Processor.Models.Domain {
                         //
                         // Get the TableName and DataSourceID
                         //
-                        TableName = "";
-                        rs = core.db.executeQuery("Select Name, DataSourceID from ccTables where ID=" + core.db.encodeSQLNumber(TableID) + ";");
-                        if (!DbController.isDataTableOk(rs)) {
-                            throw (new ApplicationException("Could Not create Field [" + field.nameLc + "] because table For tableID [" + TableID + "] was not found."));
-                        } else {
-                            DataSourceID = GenericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "DataSourceID"));
-                            TableName = GenericController.encodeText(core.db.getDataRowColumnName(rs.Rows[0], "Name"));
+                        string TableName = "";
+                        int DataSourceID = 0;
+                        {
+                            var table = TableModel.create(core, TableID);
+                            if (table != null) {
+                                DataSourceID = table.dataSourceID;
+                                TableName = table.name;
+                            }
                         }
-                        rs.Dispose();
+                        //rs = core.db.executeQuery("Select Name, DataSourceID from ccTables where ID=" + core.db.encodeSQLNumber(TableID) + ";");
+                        //if (!DbController.isDataTableOk(rs)) {
+                        //    throw (new ApplicationException("Could Not create Field [" + field.nameLc + "] because table For tableID [" + TableID + "] was not found."));
+                        //} else {
+                        //    DataSourceID = GenericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "DataSourceID"));
+                        //    TableName = GenericController.encodeText(core.db.getDataRowColumnName(rs.Rows[0], "Name"));
+                        //}
+                        //rs.Dispose();
                         if (!string.IsNullOrEmpty(TableName)) {
                             //
-                            // Get the DataSourceName
-                            //
-                            if (DataSourceID < 1) {
-                                DataSourceName = "Default";
-                            } else {
-                                rs = core.db.executeQuery("Select Name from ccDataSources where ID=" + core.db.encodeSQLNumber(DataSourceID) + ";");
-                                if (!DbController.isDataTableOk(rs)) {
+                            // Get the DataSourceName - special case model, returns default object if input not valid
+                            var dataSource = DataSourceModel.create(core, DataSourceID);
+                            string DataSourceName = dataSource.name;
+                            //if (DataSourceID < 1) {
+                            //    DataSourceName = "Default";
+                            //} else {
+                            //    rs = core.db.executeQuery("Select Name from ccDataSources where ID=" + core.db.encodeSQLNumber(DataSourceID) + ";");
+                            //    if (!DbController.isDataTableOk(rs)) {
 
-                                    DataSourceName = "Default";
-                                    // change condition to successful -- the goal is 1) deliver pages 2) report problems
-                                    // this problem, if translated to default, is really no longer a problem, unless the
-                                    // resulting datasource does not have this data, then other errors will be generated anyway.
-                                    //Call csv_HandleClassInternalError(MethodName, "Could Not create Field [" & field.name & "] because datasource For ID [" & DataSourceID & "] was not found.")
-                                } else {
-                                    DataSourceName = GenericController.encodeText(core.db.getDataRowColumnName(rs.Rows[0], "Name"));
-                                }
-                                rs.Dispose();
-                            }
+                            //        DataSourceName = "Default";
+                            //        // change condition to successful -- the goal is 1) deliver pages 2) report problems
+                            //        // this problem, if translated to default, is really no longer a problem, unless the
+                            //        // resulting datasource does not have this data, then other errors will be generated anyway.
+                            //        //Call csv_HandleClassInternalError(MethodName, "Could Not create Field [" & field.name & "] because datasource For ID [" & DataSourceID & "] was not found.")
+                            //    } else {
+                            //        DataSourceName = GenericController.encodeText(core.db.getDataRowColumnName(rs.Rows[0], "Name"));
+                            //    }
+                            //    rs.Dispose();
+                            //}
                             //
                             // Get the installedByCollectionId
                             //
-                            InstalledByCollectionID = 0;
+                            int InstalledByCollectionID = 0;
                             if (!string.IsNullOrEmpty(installedByCollectionGuid)) {
-                                rs = core.db.executeQuery("Select id from ccAddonCollections where ccguid=" + core.db.encodeSQLText(installedByCollectionGuid) + ";");
-                                if (DbController.isDataTableOk(rs)) {
-                                    InstalledByCollectionID = GenericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "Id"));
+                                var addonCollection = AddonCollection.create(core, installedByCollectionGuid);
+                                if ( addonCollection != null ) {
+                                    InstalledByCollectionID = addonCollection.id;
                                 }
-                                rs.Dispose();
+                                //rs = core.db.executeQuery("Select id from ccAddonCollections where ccguid=" + core.db.encodeSQLText(installedByCollectionGuid) + ";");
+                                //if (DbController.isDataTableOk(rs)) {
+                                //    InstalledByCollectionID = GenericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "Id"));
+                                //}
+                                //rs.Dispose();
                             }
                             //
                             // Create or update the Table Field
@@ -1608,37 +1615,39 @@ namespace Contensive.Processor.Models.Domain {
                             // create or update the field
                             //
                             SqlFieldListClass sqlList = new SqlFieldListClass();
-                            sqlList.add("ACTIVE", core.db.encodeSQLBoolean(field.active)); // Pointer)
-                            sqlList.add("MODIFIEDBY", core.db.encodeSQLNumber(SystemMemberID)); // Pointer)
-                            sqlList.add("MODIFIEDDATE", core.db.encodeSQLDate(DateTime.Now)); // Pointer)
-                            sqlList.add("TYPE", core.db.encodeSQLNumber(fieldTypeId)); // Pointer)
-                            sqlList.add("CAPTION", core.db.encodeSQLText(FieldCaption)); // Pointer)
-                            sqlList.add("ReadOnly", core.db.encodeSQLBoolean(FieldReadOnly)); // Pointer)
-                            sqlList.add("REQUIRED", core.db.encodeSQLBoolean(FieldRequired)); // Pointer)
-                            sqlList.add("TEXTBUFFERED", SQLFalse); // Pointer)
-                            sqlList.add("PASSWORD", core.db.encodeSQLBoolean(Password)); // Pointer)
-                            sqlList.add("EDITSORTPRIORITY", core.db.encodeSQLNumber(field.editSortPriority)); // Pointer)
-                            sqlList.add("ADMINONLY", core.db.encodeSQLBoolean(field.adminOnly)); // Pointer)
-                            sqlList.add("DEVELOPERONLY", core.db.encodeSQLBoolean(FieldDeveloperOnly)); // Pointer)
-                            sqlList.add("CONTENTCONTROLID", core.db.encodeSQLNumber(Models.Domain.CDefModel.getContentId(core, "Content Fields"))); // Pointer)
-                            sqlList.add("DefaultValue", core.db.encodeSQLText(DefaultValue)); // Pointer)
-                            sqlList.add("HTMLCONTENT", core.db.encodeSQLBoolean(HTMLContent)); // Pointer)
-                            sqlList.add("NOTEDITABLE", core.db.encodeSQLBoolean(NotEditable)); // Pointer)
-                            sqlList.add("AUTHORABLE", core.db.encodeSQLBoolean(FieldAuthorable)); // Pointer)
-                            sqlList.add("INDEXCOLUMN", core.db.encodeSQLNumber(field.indexColumn)); // Pointer)
-                            sqlList.add("INDEXWIDTH", core.db.encodeSQLText(AdminIndexWidth)); // Pointer)
-                            sqlList.add("INDEXSORTPRIORITY", core.db.encodeSQLNumber(AdminIndexSort)); // Pointer)
-                            sqlList.add("REDIRECTID", core.db.encodeSQLText(RedirectIDField)); // Pointer)
-                            sqlList.add("REDIRECTPATH", core.db.encodeSQLText(RedirectPath)); // Pointer)
-                            sqlList.add("UNIQUENAME", core.db.encodeSQLBoolean(UniqueName)); // Pointer)
-                            sqlList.add("RSSTITLEFIELD", core.db.encodeSQLBoolean(RSSTitle)); // Pointer)
-                            sqlList.add("RSSDESCRIPTIONFIELD", core.db.encodeSQLBoolean(RSSDescription)); // Pointer)
-                            sqlList.add("MEMBERSELECTGROUPID", core.db.encodeSQLNumber(MemberSelectGroupID)); // Pointer)
-                            sqlList.add("installedByCollectionId", core.db.encodeSQLNumber(InstalledByCollectionID)); // Pointer)
-                            sqlList.add("EDITTAB", core.db.encodeSQLText(EditTab)); // Pointer)
-                            sqlList.add("SCRAMBLE", core.db.encodeSQLBoolean(Scramble)); // Pointer)
-                            sqlList.add("ISBASEFIELD", core.db.encodeSQLBoolean(IsBaseField)); // Pointer)
+                            sqlList.add("ACTIVE", core.db.encodeSQLBoolean(field.active));
+                            sqlList.add("MODIFIEDBY", core.db.encodeSQLNumber(SystemMemberID));
+                            sqlList.add("MODIFIEDDATE", core.db.encodeSQLDate(DateTime.Now));
+                            sqlList.add("TYPE", core.db.encodeSQLNumber(fieldTypeId));
+                            sqlList.add("CAPTION", core.db.encodeSQLText(FieldCaption));
+                            sqlList.add("ReadOnly", core.db.encodeSQLBoolean(FieldReadOnly));
+                            sqlList.add("REQUIRED", core.db.encodeSQLBoolean(FieldRequired));
+                            sqlList.add("TEXTBUFFERED", SQLFalse);
+                            sqlList.add("PASSWORD", core.db.encodeSQLBoolean(Password));
+                            sqlList.add("EDITSORTPRIORITY", core.db.encodeSQLNumber(field.editSortPriority));
+                            sqlList.add("ADMINONLY", core.db.encodeSQLBoolean(field.adminOnly));
+                            sqlList.add("DEVELOPERONLY", core.db.encodeSQLBoolean(FieldDeveloperOnly));
+                            sqlList.add("CONTENTCONTROLID", core.db.encodeSQLNumber(Models.Domain.CDefModel.getContentId(core, "Content Fields")));
+                            sqlList.add("DefaultValue", core.db.encodeSQLText(DefaultValue));
+                            sqlList.add("HTMLCONTENT", core.db.encodeSQLBoolean(HTMLContent));
+                            sqlList.add("NOTEDITABLE", core.db.encodeSQLBoolean(NotEditable));
+                            sqlList.add("AUTHORABLE", core.db.encodeSQLBoolean(FieldAuthorable));
+                            sqlList.add("INDEXCOLUMN", core.db.encodeSQLNumber(field.indexColumn));
+                            sqlList.add("INDEXWIDTH", core.db.encodeSQLText(AdminIndexWidth));
+                            sqlList.add("INDEXSORTPRIORITY", core.db.encodeSQLNumber(AdminIndexSort));
+                            sqlList.add("REDIRECTID", core.db.encodeSQLText(RedirectIDField));
+                            sqlList.add("REDIRECTPATH", core.db.encodeSQLText(RedirectPath));
+                            sqlList.add("UNIQUENAME", core.db.encodeSQLBoolean(UniqueName));
+                            sqlList.add("RSSTITLEFIELD", core.db.encodeSQLBoolean(RSSTitle));
+                            sqlList.add("RSSDESCRIPTIONFIELD", core.db.encodeSQLBoolean(RSSDescription));
+                            sqlList.add("MEMBERSELECTGROUPID", core.db.encodeSQLNumber(MemberSelectGroupID));
+                            sqlList.add("installedByCollectionId", core.db.encodeSQLNumber(InstalledByCollectionID));
+                            sqlList.add("EDITTAB", core.db.encodeSQLText(EditTab));
+                            sqlList.add("SCRAMBLE", core.db.encodeSQLBoolean(false));
+                            sqlList.add("ISBASEFIELD", core.db.encodeSQLBoolean(IsBaseField));
                             sqlList.add("LOOKUPLIST", core.db.encodeSQLText(LookupList));
+                            int RedirectContentID = 0;
+                            int LookupContentID = 0;
                             //
                             // -- conditional fields
                             switch (fieldTypeId) {
@@ -1652,7 +1661,7 @@ namespace Contensive.Processor.Models.Domain {
                                             LogController.logError(core, "Could not create lookup field [" + field.nameLc + "] for content definition [" + ContentName + "] because no content definition was found For lookup-content [" + LookupContentName + "].");
                                         }
                                     }
-                                    sqlList.add("LOOKUPCONTENTID", core.db.encodeSQLNumber(LookupContentID)); // Pointer)
+                                    sqlList.add("LOOKUPCONTENTID", core.db.encodeSQLNumber(LookupContentID));
                                     break;
                                 case FieldTypeIdManyToMany:
                                     //
@@ -1687,33 +1696,34 @@ namespace Contensive.Processor.Models.Domain {
                                             LogController.logError(core, "Could not create redirect field [" + field.nameLc + "] for Content Definition [" + ContentName + "] because no content definition was found For redirect-content [" + RedirectContentName + "].");
                                         }
                                     }
-                                    sqlList.add("REDIRECTCONTENTID", core.db.encodeSQLNumber(RedirectContentID)); // Pointer)
+                                    sqlList.add("REDIRECTCONTENTID", core.db.encodeSQLNumber(RedirectContentID));
                                     break;
                             }
                             //
                             if (RecordID == 0) {
-                                sqlList.add("NAME", core.db.encodeSQLText(field.nameLc)); // Pointer)
-                                sqlList.add("CONTENTID", core.db.encodeSQLNumber(ContentID)); // Pointer)
-                                sqlList.add("CREATEKEY", "0"); // Pointer)
-                                sqlList.add("DATEADDED", core.db.encodeSQLDate(DateTime.Now)); // Pointer)
-                                sqlList.add("CREATEDBY", core.db.encodeSQLNumber(SystemMemberID)); // Pointer)
-                                                                                                     //
+                                sqlList.add("NAME", core.db.encodeSQLText(field.nameLc));
+                                sqlList.add("CONTENTID", core.db.encodeSQLNumber(ContentID));
+                                sqlList.add("CREATEKEY", "0");
+                                sqlList.add("DATEADDED", core.db.encodeSQLDate(DateTime.Now));
+                                sqlList.add("CREATEDBY", core.db.encodeSQLNumber(SystemMemberID));
                                 RecordID = core.db.insertTableRecordGetId("Default", "ccFields");
                             }
                             if (RecordID == 0) {
                                 throw (new ApplicationException("Could Not create Field [" + field.nameLc + "] because insert into ccfields failed."));
                             } else {
                                 core.db.updateTableRecord("Default", "ccFields", "ID=" + RecordID, sqlList);
+                                ContentFieldModel.invalidateRecordCache(core, RecordID);
                             }
                             //
                         }
                     }
                 }
                 //
-                if (!isNewFieldRecord) {
-                    core.cache.invalidateAll();
-                    core.doc.clearMetaData();
-                }
+                // 20181007 - what if we didnt
+                //if (!isNewFieldRecord) {
+                //    core.cache.invalidateAll();
+                //    core.doc.clearMetaData();
+                //}
                 //
                 returnId = RecordID;
             } catch (Exception ex) {
@@ -1768,7 +1778,7 @@ namespace Contensive.Processor.Models.Domain {
         //========================================================================
         //
         public static string getContentControlCriteria(CoreController core, string ContentName) {
-            return Models.Domain.CDefModel.getCdef(core, ContentName).contentControlCriteria;
+            return Models.Domain.CDefModel.getCdef(core, ContentName).legacyContentControlCriteria;
         }
         //
         //============================================================================================================
@@ -1901,7 +1911,7 @@ namespace Contensive.Processor.Models.Domain {
             Contentdefinition = Models.Domain.CDefModel.getCdef(core, GenericController.encodeText(ContentName));
             switch (GenericController.vbUCase(GenericController.encodeText(PropertyName))) {
                 case "CONTENTCONTROLCRITERIA":
-                    result = Contentdefinition.contentControlCriteria;
+                    result = Contentdefinition.legacyContentControlCriteria;
                     break;
                 case "ACTIVEONLY":
                     result = Contentdefinition.activeOnly.ToString();
@@ -1940,8 +1950,8 @@ namespace Contensive.Processor.Models.Domain {
                 case "ID":
                     result = Contentdefinition.id.ToString();
                     break;
-                case "IGNORECONTENTCONTROL":
-                    result = Contentdefinition.ignoreContentControl.ToString();
+                case "SUPPORTLEGACYCONTENTCONTROL":
+                    result = Contentdefinition.supportLegacyContentControl.ToString();
                     break;
                 case "NAME":
                     result = Contentdefinition.name;

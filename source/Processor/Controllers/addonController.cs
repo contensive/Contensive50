@@ -144,8 +144,8 @@ namespace Contensive.Processor.Controllers {
                             executeContext.forceJavascriptToHead = executeContext.forceJavascriptToHead || addon.javascriptForceHead;
                             //
                             // -- run included add-ons before their parent
-                            List<int> dependentAddonList = core.doc.getDependentAddonList(addon.id);
-                            foreach ( int includedAddonID in dependentAddonList) {
+                            List<int> addonIncludeRuleList = core.doc.getAddonIncludeRuleList(addon.id);
+                            foreach ( int includedAddonID in addonIncludeRuleList) {
                                 AddonModel dependentAddon = AddonModel.create(core, includedAddonID);
                                 if (dependentAddon == null) {
                                     LogController.handleError(core, new ApplicationException("Addon not found. An included addon of [" + addon.name + "] was not found. The included addon may have been deleted. Recreate or reinstall the missing addon, then reinstall [" + addon.name + "] or manually correct the included addon selection."));
@@ -986,7 +986,7 @@ namespace Contensive.Processor.Controllers {
                                                                     { "FieldValue", core.siteProperties.getText(FieldName, FieldDefaultValue) }
                                                                 };
                                                                 //OptionString = "FieldName=" & FieldName & "&FieldValue=" & encodeNvaArgument(core.siteProperties.getText(FieldName, FieldDefaultValue))
-                                                                AddonModel addon = AddonModel.createByName(core, FieldAddon);
+                                                                AddonModel addon = AddonModel.createByUniqueName(core, FieldAddon);
                                                                 Copy = core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() {
                                                                     addonType = CPUtilsBaseClass.addonContext.ContextAdmin,
                                                                     instanceArguments = arguments,

@@ -165,7 +165,7 @@ namespace Contensive.Processor {
                 } else {
                     //
                     // -- record name
-                    copy = CopyContentModel.createByName(core, copyRecordNameOrGuid);
+                    copy = CopyContentModel.createByUniqueName(core, copyRecordNameOrGuid);
                 }
                 if (copy != null ) {
                     accum = copy.copy;
@@ -207,7 +207,7 @@ namespace Contensive.Processor {
                 } else {
                     //
                     // -- record name
-                    copy = LayoutModel.createByName(core, layoutRecordNameOrGuid);
+                    copy = LayoutModel.createByUniqueName(core, layoutRecordNameOrGuid);
                 }
                 if (copy != null) {
                     accum = copy.layout;

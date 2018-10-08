@@ -352,14 +352,17 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         public int lookupContentID { get; set; }
         public string get_lookupContentName(CoreController core) {
-            if (_lookupContentName == null) {
-                if (lookupContentID > 0) {
-                    _lookupContentName = "";
-                    DataTable dt = core.db.executeQuery("select name from cccontent where id=" + lookupContentID.ToString());
-                    if (dt.Rows.Count > 0) {
-                        _lookupContentName = GenericController.encodeText(dt.Rows[0][0]);
-                    }
-                }
+            if ((_lookupContentName == null)&(lookupContentID>0)) {
+                _lookupContentName = CDefModel.getContentNameByID(core, lookupContentID);
+                //if (lookupContentID > 0) {
+                //    _lookupContentName = "";
+                //    var content = ContentModel.create(core, lookupContentID);
+                //    if (content != null) _lookupContentName = content.name;
+                //    //DataTable dt = core.db.executeQuery("select name from cccontent where id=" + lookupContentID.ToString());
+                //    //if (dt.Rows.Count > 0) {
+                //    //    _lookupContentName = GenericController.encodeText(dt.Rows[0][0]);
+                //    //}
+                //}
             }
             return _lookupContentName;
         }

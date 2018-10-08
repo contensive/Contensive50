@@ -10,6 +10,7 @@ namespace Contensive.Processor.Models.Db {
         public const string contentName = "email queue";
         public const string contentTableName = "ccEmailQueue";
         public const string contentDataSource = "default";
+        public const bool nameFieldIsUnique = false;
         //
         //====================================================================================================
         //
@@ -50,13 +51,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static EmailQueueModel createByName(CoreController core, string recordName) {
-            return createByName<EmailQueueModel>(core, recordName);
+        public static EmailQueueModel createByUniqueName(CoreController core, string recordName) {
+            return createByUniqueName<EmailQueueModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static EmailQueueModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<EmailQueueModel>(core, recordName, ref callersCacheNameList);
+        public static EmailQueueModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByUniqueName<EmailQueueModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================

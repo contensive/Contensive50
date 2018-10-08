@@ -22,6 +22,7 @@ namespace Contensive.Processor.Models.Db {
         public const string contentName = "Navigator Entries";
         public const string contentTableName = "ccMenuEntries";
         public const string contentDataSource = "default";
+        public const bool nameFieldIsUnique = false;
         //
         //====================================================================================================
         // -- instance properties
@@ -72,13 +73,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static NavigatorEntryModel createByName(CoreController core, string recordName) {
-            return createByName<NavigatorEntryModel>(core, recordName);
+        public static NavigatorEntryModel createByUniqueName(CoreController core, string recordName) {
+            return createByUniqueName<NavigatorEntryModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static NavigatorEntryModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<NavigatorEntryModel>(core, recordName, ref callersCacheNameList);
+        public static NavigatorEntryModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByUniqueName<NavigatorEntryModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================

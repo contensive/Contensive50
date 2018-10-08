@@ -11,6 +11,7 @@ namespace Contensive.Processor.Models.Db {
         public const string contentName = "data sources";
         private const string contentTableName = "ccDataSources";
         public const string contentDataSource = "default";
+        public const bool nameFieldIsUnique = true;
         //
         public enum DataSourceTypeEnum {
             sqlServerOdbc = 1,
@@ -110,15 +111,23 @@ namespace Contensive.Processor.Models.Db {
             try {
                 CsController cs = new CsController(core);
                 List<string> ignoreCacheNames = new List<string>();
-                if (cs.open(contentName, "", "id", true, "id")) {
+                if ( cs.openSQL( "select id from ccdatasources where active>0")) {
                     do {
-                        var tmpList = new List<string>();
-                        DataSourceModel instance = create(core, cs.getInteger("id"), ref tmpList);
+                        DataSourceModel instance = create(core, cs.getInteger("id"));
                         if (instance != null) {
                             result.Add(instance.name.ToLower(), instance);
                         }
                     } while (true);
                 }
+                //if (cs.open(contentName, "", "id", true, "id")) {
+                //    do {
+                //        var tmpList = new List<string>();
+                //        DataSourceModel instance = create(core, cs.getInteger("id"), ref tmpList);
+                //        if (instance != null) {
+                //            result.Add(instance.name.ToLower(), instance);
+                //        }
+                //    } while (true);
+                //}
                 if (!result.ContainsKey("default")) {
                     result.Add("default", getDefaultDatasource(core));
                 }
@@ -196,13 +205,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static DataSourceModel createByName(CoreController core, string recordName) {
-            return (string.IsNullOrWhiteSpace(recordName)|(recordName.ToLower()=="default")) ? getDefaultDatasource(core) : createByName<DataSourceModel>(core, recordName);
+        public static DataSourceModel createByUniqueName(CoreController core, string recordName) {
+            return (string.IsNullOrWhiteSpace(recordName)|(recordName.ToLower()=="default")) ? getDefaultDatasource(core) : createByUniqueName<DataSourceModel>(core, recordName );
         }
         //
         //====================================================================================================
-        public static DataSourceModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return (string.IsNullOrWhiteSpace(recordName) | (recordName.ToLower() == "default")) ? getDefaultDatasource(core) : createByName<DataSourceModel>(core, recordName, ref callersCacheNameList);
+        public static DataSourceModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return (string.IsNullOrWhiteSpace(recordName) | (recordName.ToLower() == "default")) ? getDefaultDatasource(core) : createByUniqueName<DataSourceModel>(core, recordName, ref callersCacheNameList);
             //return createByName<DataSourceModel>(core, recordName, ref callersCacheNameList);
         }
         //
