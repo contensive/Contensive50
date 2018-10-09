@@ -529,14 +529,10 @@ namespace Contensive.Processor.Controllers {
         public DataTable insertTableRecordGetDataTable(string DataSourceName, string TableName, int MemberID = 0) {
             DataTable returnDt = null;
             try {
-                SqlFieldListClass sqlList = new SqlFieldListClass();
-                //string CreateKeyString = null;
-                //string sqlDateAdded = null;
-                string sqlGuid = encodeSQLText( GenericController.getGUID());
+                string sqlGuid = encodeSQLText(GenericController.getGUID());
                 string sqlDateAdded = encodeSQLDate(DateTime.Now);
-                //CreateKeyString = encodeSQLNumber(genericController.GetRandomInteger(core));
+                SqlFieldListClass sqlList = new SqlFieldListClass();
                 sqlList.add("ccguid", sqlGuid);
-                //sqlList.add("createkey", CreateKeyString);
                 sqlList.add("dateadded", sqlDateAdded);
                 sqlList.add("createdby", encodeSQLNumber(MemberID));
                 sqlList.add("ModifiedDate", sqlDateAdded);
@@ -547,7 +543,6 @@ namespace Contensive.Processor.Controllers {
                 //
                 insertTableRecord(DataSourceName, TableName, sqlList);
                 returnDt = openTable(DataSourceName, TableName, "(DateAdded=" + sqlDateAdded + ")and(ccguid=" + sqlGuid + ")", "ID DESC", "", 1);
-                //returnDt = openTable(DataSourceName, TableName, "(DateAdded=" + DateAddedString + ")and(CreateKey=" + CreateKeyString + ")", "ID DESC", "", 1);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
@@ -4291,7 +4286,11 @@ namespace Contensive.Processor.Controllers {
                         //
                         // ----- Content definition not found, create it
                         //
-                        Models.Domain.CDefModel.addContent(core, true, DataSource, TableName, ContentName);
+                        Models.Domain.CDefModel.verifyContent_returnId(core, new CDefModel() {
+                             dataSourceName = DataSource.name,
+                              tableName = TableName,
+                              name = ContentName
+                        });
                         //ContentID = csv_GetContentID(ContentName)
                         SQL = "Select ID from ccContent where name=" + core.db.encodeSQLText(ContentName);
                         dt = core.db.executeQuery(SQL);
@@ -4558,7 +4557,7 @@ namespace Contensive.Processor.Controllers {
                         field.defaultValue = "0";
                         break;
                 }
-                Models.Domain.CDefModel.verifyCDefField_ReturnID(core, ContentName, field);
+                Models.Domain.CDefModel.verifyContentField_returnID(core, ContentName, field);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;

@@ -72,7 +72,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     if ( root == null ) {
                         LogController.logInfo(core, "root user not found, adding root/contensive");
-                        root = PersonModel.add(core);
+                        root = PersonModel.addEmpty(core);
                         root.name = defaultRootUserName;
                         root.FirstName = defaultRootUserName;
                         root.Username = defaultRootUserUsername;
@@ -105,7 +105,7 @@ namespace Contensive.Processor.Controllers {
                         // -- verify root is in site managers
                         var memberRuleList = MemberRuleModel.createList(core, "(groupid=" + group.id.ToString() + ")and(MemberID=" + root.id.ToString() + ")");
                         if (memberRuleList.Count == 0) {
-                            var memberRule = MemberRuleModel.add(core);
+                            var memberRule = MemberRuleModel.addEmpty(core);
                             memberRule.GroupID = group.id;
                             memberRule.MemberID = root.id;
                             memberRule.save(core);
@@ -233,14 +233,14 @@ namespace Contensive.Processor.Controllers {
                         // -- primary domain
                         DomainModel domain = DomainModel.createByUniqueName(core, primaryDomain);
                         if (domain == null) {
-                            domain = DomainModel.add(core);
+                            domain = DomainModel.addEmpty(core);
                             domain.name = primaryDomain;
                         }
                         //
                         // -- Landing Page
                         PageContentModel landingPage = PageContentModel.create(core, DefaultLandingPageGuid);
                         if (landingPage == null) {
-                            landingPage = PageContentModel.add(core);
+                            landingPage = PageContentModel.addEmpty(core);
                             landingPage.name = "Home";
                             landingPage.ccguid = DefaultLandingPageGuid;
                         }
@@ -248,7 +248,7 @@ namespace Contensive.Processor.Controllers {
                         // -- default template
                         PageTemplateModel defaultTemplate = PageTemplateModel.createByUniqueName(core, "Default");
                         if (defaultTemplate == null) {
-                            defaultTemplate = PageTemplateModel.add(core);
+                            defaultTemplate = PageTemplateModel.addEmpty(core);
                             defaultTemplate.name = "Default";
                         }
                         defaultTemplate.bodyHTML = Properties.Resources.DefaultTemplateHtml;
@@ -1064,7 +1064,7 @@ namespace Contensive.Processor.Controllers {
                     List<Models.Db.NavigatorEntryModel> entryList = NavigatorEntryModel.createList(core, listCriteria, "id");
                     NavigatorEntryModel entry = null;
                     if (entryList.Count == 0) {
-                        entry = NavigatorEntryModel.add(core);
+                        entry = NavigatorEntryModel.addEmpty(core);
                         entry.name = EntryName.Trim();
                         entry.ParentID = parentId;
                     } else {

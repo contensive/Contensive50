@@ -68,7 +68,7 @@ namespace Contensive.Addons.PageManager {
                                 if (sortMethod == null) {
                                     //
                                     // -- create the required sortMethod
-                                    sortMethod = SortMethodModel.add(core);
+                                    sortMethod = SortMethodModel.addDefault(core);
                                     sortMethod.name = "By Alpha Sort Order Field";
                                     sortMethod.OrderByClause = "sortOrder";
                                     sortMethod.save(core);

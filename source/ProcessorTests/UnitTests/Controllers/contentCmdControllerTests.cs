@@ -20,7 +20,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         public void contentCmdController_SimpleSyntax_runAddon() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
-                AddonModel addon = AddonModel.add(cp.core);
+                AddonModel addon = AddonModel.addDefault(cp.core);
                 addon.name = "testaddon" + GenericController.GetRandomInteger(cp.core).ToString() ;
                 addon.copyText = "foo";
                 addon.save(cp.core);
@@ -41,12 +41,12 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         public void contentCmdController_SimpleSyntax_mulipleContextSwitch() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
-                AddonModel addonFoo = AddonModel.add(cp.core);
+                AddonModel addonFoo = AddonModel.addDefault(cp.core);
                 addonFoo.name = "addonFoo" + GenericController.GetRandomInteger(cp.core).ToString();
                 addonFoo.copyText = "foo";
                 addonFoo.save(cp.core);
                 //
-                AddonModel addonBar = AddonModel.add(cp.core);
+                AddonModel addonBar = AddonModel.addDefault(cp.core);
                 addonBar.name = "addonBar" + GenericController.GetRandomInteger(cp.core).ToString();
                 addonBar.copyText = "Bar";
                 addonBar.save(cp.core);
@@ -66,12 +66,12 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         public void contentCmdController_SimpleSyntax_CommandList() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
-                AddonModel addonFoo = AddonModel.add(cp.core);
+                AddonModel addonFoo = AddonModel.addDefault(cp.core);
                 addonFoo.name = "addonFoo" + GenericController.GetRandomInteger(cp.core).ToString();
                 addonFoo.copyText = "foo";
                 addonFoo.save(cp.core);
                 //
-                AddonModel addonBar = AddonModel.add(cp.core);
+                AddonModel addonBar = AddonModel.addDefault(cp.core);
                 addonBar.name = "addonBar" + GenericController.GetRandomInteger(cp.core).ToString();
                 addonBar.copyText = "Bar";
                 addonBar.save(cp.core);
@@ -92,12 +92,12 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         public void contentCmdController_SimpleSyntax_CommandList_MultipleCommands() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
-                AddonModel addonFoo = AddonModel.add(cp.core);
+                AddonModel addonFoo = AddonModel.addDefault(cp.core);
                 addonFoo.name = "addonFoo" + GenericController.GetRandomInteger(cp.core).ToString();
                 addonFoo.copyText = "foo";
                 addonFoo.save(cp.core);
                 //
-                AddonModel addonBar = AddonModel.add(cp.core);
+                AddonModel addonBar = AddonModel.addDefault(cp.core);
                 addonBar.name = "addonBar" + GenericController.GetRandomInteger(cp.core).ToString();
                 addonBar.copyText = "$cmdAccumulator$Bar";
                 addonBar.save(cp.core);
@@ -117,7 +117,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         public void contentCmdController_JsonSyntax() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
-                AddonModel addonFoo = AddonModel.add(cp.core);
+                AddonModel addonFoo = AddonModel.addDefault(cp.core);
                 addonFoo.name = "addonFoo" + GenericController.GetRandomInteger(cp.core).ToString();
                 addonFoo.copyText = "foo";
                 addonFoo.save(cp.core);
@@ -137,7 +137,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         public void contentCmdController_JsonSyntax_WithArgument() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
-                AddonModel addonFoo = AddonModel.add(cp.core);
+                AddonModel addonFoo = AddonModel.addDefault(cp.core);
                 addonFoo.name = "addonFoo" + GenericController.GetRandomInteger(cp.core).ToString();
                 addonFoo.copyText = "foo$ReplaceMe$";
                 addonFoo.save(cp.core);
@@ -157,7 +157,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         public void Controllers_JsonSyntax_executeAddonTest_argumentReplacement() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
-                AddonModel addon = AddonModel.add(cp.core);
+                AddonModel addon = AddonModel.addDefault(cp.core);
                 addon.name = "testaddon" + GenericController.GetRandomInteger(cp.core).ToString();
                 addon.copyText = "foo$insert$";
                 addon.save(cp.core);

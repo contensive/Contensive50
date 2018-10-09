@@ -55,13 +55,18 @@ namespace Contensive.Processor.Models.Db {
         public bool allowCORS { get; set; }
         //
         //====================================================================================================
-        public static DomainModel add(CoreController core) {
-            return add<DomainModel>(core);
+        public static DomainModel addEmpty(CoreController core) {
+            return addEmpty<DomainModel>(core);
         }
         //
         //====================================================================================================
-        public static DomainModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<DomainModel>(core, ref callersCacheNameList);
+        public static DomainModel addDefault(CoreController core) {
+            return addDefault<DomainModel>(core);
+        }
+        //
+        //====================================================================================================
+        public static DomainModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
+            return addDefault<DomainModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================

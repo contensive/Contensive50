@@ -88,13 +88,18 @@ namespace Contensive.Processor.Models.Db {
         public int Viewings { get; set; }
         //
         //====================================================================================================
-        public static PageContentModel add(CoreController core) {
-            return add<PageContentModel>(core);
+        public static PageContentModel addEmpty(CoreController core) {
+            return addEmpty<PageContentModel>(core);
         }
         //
         //====================================================================================================
-        public static PageContentModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<PageContentModel>(core, ref callersCacheNameList);
+        public static PageContentModel addDefault(CoreController core) {
+            return addDefault<PageContentModel>(core);
+        }
+        //
+        //====================================================================================================
+        public static PageContentModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
+            return addDefault<PageContentModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================

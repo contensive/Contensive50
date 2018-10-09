@@ -22,13 +22,13 @@ namespace Contensive.Processor.Models.Db {
         public bool submitted { get; set; }
         //
         //====================================================================================================
-        public static ConditionalEmailModel add(CoreController core) {
-            return add<ConditionalEmailModel>(core);
+        public static ConditionalEmailModel addDefault(CoreController core) {
+            return addDefault<ConditionalEmailModel>(core);
         }
         //
         //====================================================================================================
-        public static ConditionalEmailModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<ConditionalEmailModel>(core, ref callersCacheNameList);
+        public static ConditionalEmailModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
+            return addDefault<ConditionalEmailModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================

@@ -38,13 +38,13 @@ namespace Contensive.Processor.Models.Db {
         public int testMemberID { get; set; }
         //
         //====================================================================================================
-        public static SystemEmailModel add(CoreController core) {
-            return add<SystemEmailModel>(core);
+        public static SystemEmailModel addDefault(CoreController core) {
+            return addDefault<SystemEmailModel>(core);
         }
         //
         //====================================================================================================
-        public static SystemEmailModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<SystemEmailModel>(core, ref callersCacheNameList);
+        public static SystemEmailModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
+            return addDefault<SystemEmailModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================

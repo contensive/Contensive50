@@ -20,13 +20,13 @@ namespace Contensive.Processor.Models.Db {
         public bool publicJoin { get; set; }
         //
         //====================================================================================================
-        public static GroupModel add(CoreController core) {
-            return add<GroupModel>(core);
+        public static GroupModel addDefault(CoreController core) {
+            return addDefault<GroupModel>(core);
         }
         //
         //====================================================================================================
-        public static GroupModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<GroupModel>(core, ref callersCacheNameList);
+        public static GroupModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
+            return addDefault<GroupModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================

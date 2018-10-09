@@ -16,7 +16,7 @@ using static Contensive.Processor.constants;
 //
 namespace Contensive.Addons.AdminSite {
     //
-    public class closeAjaxIndexFilterClass : Contensive.BaseClasses.AddonBaseClass {
+    public class CloseAjaxIndexFilterClass : Contensive.BaseClasses.AddonBaseClass {
         //
         //====================================================================================================
         /// <summary>

@@ -21,7 +21,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         public void Controllers_Addon_simpleDoNothingAddon() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
-                var addon = Processor.Models.Db.AddonModel.add(cp.core);
+                var addon = Processor.Models.Db.AddonModel.addDefault(cp.core);
                 addon.save(cp.core);
                 // act
                 string result = cp.core.addon.execute(addon, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
@@ -61,7 +61,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         public void Controllers_Addon_copy() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
-                var addon = Processor.Models.Db.AddonModel.add(cp.core);
+                var addon = Processor.Models.Db.AddonModel.addDefault(cp.core);
                 addon.copy = "test" + GenericController.GetRandomInteger(cp.core).ToString();
                 addon.save(cp.core);
                 // act

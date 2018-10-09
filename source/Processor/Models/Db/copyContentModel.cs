@@ -17,13 +17,13 @@ namespace Contensive.Processor.Models.Db {
         public string copy { get; set; }
         //
         //====================================================================================================
-        public static CopyContentModel add(CoreController core) {
-            return add<CopyContentModel>(core);
+        public static CopyContentModel addDefault(CoreController core) {
+            return addDefault<CopyContentModel>(core);
         }
         //
         //====================================================================================================
-        public static CopyContentModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<CopyContentModel>(core, ref callersCacheNameList);
+        public static CopyContentModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
+            return addDefault<CopyContentModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================

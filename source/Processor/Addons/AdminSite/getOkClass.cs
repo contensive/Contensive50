@@ -16,7 +16,7 @@ using static Contensive.Processor.constants;
 //
 namespace Contensive.Addons.AdminSite {
     //
-    public class getOKClass : Contensive.BaseClasses.AddonBaseClass {
+    public class GetOKClass : Contensive.BaseClasses.AddonBaseClass {
         //
         //====================================================================================================
         /// <summary>

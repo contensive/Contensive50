@@ -31,13 +31,13 @@ namespace Contensive.Processor.Models.Db {
         public string queryStringSuffix { get; set; }
         //
         //====================================================================================================
-        public static LinkAliasModel add(CoreController core) {
-            return add<LinkAliasModel>(core);
+        public static LinkAliasModel addDefault(CoreController core) {
+            return addDefault<LinkAliasModel>(core);
         }
         //
         //====================================================================================================
-        public static LinkAliasModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<LinkAliasModel>(core, ref callersCacheNameList);
+        public static LinkAliasModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
+            return addDefault<LinkAliasModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================

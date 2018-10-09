@@ -53,13 +53,13 @@ namespace Contensive.Processor.Models.Db {
         public bool visitorNew { get; set; }
         //
         //====================================================================================================
-        public static VisitModel add(CoreController core) {
-            return add<VisitModel>(core);
+        public static VisitModel addDefault(CoreController core) {
+            return addDefault<VisitModel>(core);
         }
         //
         //====================================================================================================
-        public static VisitModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<VisitModel>(core, ref callersCacheNameList);
+        public static VisitModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
+            return addDefault<VisitModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================

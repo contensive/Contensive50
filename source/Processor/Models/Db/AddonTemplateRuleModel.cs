@@ -18,13 +18,13 @@ namespace Contensive.Processor.Models.Db {
         public int templateId { get; set; }
         //
         //====================================================================================================
-        public static AddonTemplateRuleModel add(CoreController core) {
-            return add<AddonTemplateRuleModel>(core);
+        public static AddonTemplateRuleModel addDefault(CoreController core) {
+            return addDefault<AddonTemplateRuleModel>(core);
         }
         //
         //====================================================================================================
-        public static AddonTemplateRuleModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<AddonTemplateRuleModel>(core, ref callersCacheNameList);
+        public static AddonTemplateRuleModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
+            return addDefault<AddonTemplateRuleModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================

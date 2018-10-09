@@ -16,7 +16,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Addons.AdminSite {
-    public class openAjaxIndexFilterGetContentClass : Contensive.BaseClasses.AddonBaseClass {
+    public class OpenAjaxIndexFilterGetContentClass : Contensive.BaseClasses.AddonBaseClass {
         //
         //====================================================================================================
         /// <summary>
@@ -31,14 +31,13 @@ namespace Contensive.Addons.AdminSite {
 
                 //
                 core.visitProperty.setProperty("IndexFilterOpen", "1");
-                GetHtmlBodyClass adminSite = new GetHtmlBodyClass(core.cp_forAddonExecutionOnly);
                 int ContentID = core.docProperties.getInteger("cid");
                 if (ContentID == 0) {
                     result = "No filter is available";
                 } else {
                     //cdefModel cdef = cdefModel.getCdef(core, ContentID);
-                    var adminContext = new adminInfoDomainModel(core);
-                    result = adminSite.getForm_IndexFilterContent(adminContext);
+                    var adminContext = new AdminInfoDomainModel(core);
+                    result = BodyIndexClass.getForm_IndexFilterContent(core, adminContext);
                 }
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);

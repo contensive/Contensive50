@@ -38,13 +38,13 @@ namespace Contensive.Processor.Models.Db {
         public int width { get; set; }
         //
         //====================================================================================================
-        public static LibraryFilesModel add(CoreController core) {
-            return add<LibraryFilesModel>(core);
+        public static LibraryFilesModel addDefault(CoreController core) {
+            return addDefault<LibraryFilesModel>(core);
         }
         //
         //====================================================================================================
-        public static LibraryFilesModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<LibraryFilesModel>(core, ref callersCacheNameList);
+        public static LibraryFilesModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
+            return addDefault<LibraryFilesModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================

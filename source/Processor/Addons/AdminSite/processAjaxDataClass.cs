@@ -16,7 +16,7 @@ using static Contensive.Processor.constants;
 //
 namespace Contensive.Addons.AdminSite {
     //
-    public class processAjaxDataClass : Contensive.BaseClasses.AddonBaseClass {
+    public class ProcessAjaxDataClass : Contensive.BaseClasses.AddonBaseClass {
         //
         //====================================================================================================
         /// <summary>

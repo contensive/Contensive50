@@ -19,13 +19,13 @@ namespace Contensive.Processor.Models.Db {
         public string fieldValue { get; set; }
         //
         //====================================================================================================
-        public static SitePropertyModel add(CoreController core) {
-            return add<SitePropertyModel>(core);
+        public static SitePropertyModel addDefault(CoreController core) {
+            return addDefault<SitePropertyModel>(core);
         }
         //
         //====================================================================================================
-        public static SitePropertyModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<SitePropertyModel>(core, ref callersCacheNameList);
+        public static SitePropertyModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
+            return addDefault<SitePropertyModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================

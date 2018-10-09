@@ -16,14 +16,20 @@ namespace Contensive.Processor.Models.Db {
         // -- instance properties
         public int dataSourceID { get; set; }                   //<------ replace this with a list all model fields not part of the base model
         //
+        // todo -- add addEmpty to all models
         //====================================================================================================
-        public static _BlankModel add(CoreController core) {
-            return add<_BlankModel>(core);
+        public static _BlankModel addEmpty(CoreController core) {
+            return addEmpty<_BlankModel>(core);
         }
         //
         //====================================================================================================
-        public static _BlankModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<_BlankModel>(core, ref callersCacheNameList);
+        public static _BlankModel addDefault(CoreController core) {
+            return addDefault<_BlankModel>(core);
+        }
+        //
+        //====================================================================================================
+        public static _BlankModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
+            return addDefault<_BlankModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================

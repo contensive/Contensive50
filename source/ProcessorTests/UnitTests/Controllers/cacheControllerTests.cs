@@ -190,7 +190,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 cp.core.cache.setObject(keyTest, originalObject, content);
                 cp.Utils.Sleep(1);
                 var valueBefore = cp.core.cache.getObject<cacheTestClass>(keyTest);
-                var person = PersonModel.add(cp.core );
+                var person = PersonModel.addDefault(cp.core );
                 cp.Utils.Sleep(1);
                 var valueAfter = cp.core.cache.getObject<cacheTestClass>(keyTest);
                 // assert
@@ -213,7 +213,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 cp.core.cache.setObject(keyTest, originalObject, table);
                 cp.Utils.Sleep(1);
                 var valueBefore = cp.core.cache.getObject<cacheTestClass>(keyTest);
-                var person = PersonModel.add(cp.core);
+                var person = PersonModel.addDefault(cp.core);
                 cp.Utils.Sleep(1);
                 var valueAfter = cp.core.cache.getObject<cacheTestClass>(keyTest);
                 // assert

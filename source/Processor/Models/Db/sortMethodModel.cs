@@ -29,13 +29,13 @@ namespace Contensive.Processor.Models.Db {
         public string OrderByClause { get; set; }
         //
         //====================================================================================================
-        public static SortMethodModel add(CoreController core) {
-            return add<SortMethodModel>(core);
+        public static SortMethodModel addDefault(CoreController core) {
+            return addDefault<SortMethodModel>(core);
         }
         //
         //====================================================================================================
-        public static SortMethodModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<SortMethodModel>(core, ref callersCacheNameList);
+        public static SortMethodModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
+            return addDefault<SortMethodModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================

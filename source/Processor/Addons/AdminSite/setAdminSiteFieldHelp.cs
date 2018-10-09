@@ -17,7 +17,7 @@ using static Contensive.Processor.constants;
 //
 namespace Contensive.Addons.AdminSite {
     //
-    public class setAdminSiteFieldHelpClass : Contensive.BaseClasses.AddonBaseClass {
+    public class SetAdminSiteFieldHelpClass : Contensive.BaseClasses.AddonBaseClass {
         //
         //====================================================================================================
         /// <summary>
@@ -33,7 +33,7 @@ namespace Contensive.Addons.AdminSite {
                     int fieldId = cp.Doc.GetInteger("fieldId");
                     ContentFieldHelpModel help = ContentFieldHelpModel.createByFieldId(core, fieldId);
                     if (help == null) {
-                        help = ContentFieldHelpModel.add(core);
+                        help = ContentFieldHelpModel.addDefault(core);
                         help.fieldID = fieldId;
                     }
                     help.helpCustom = cp.Doc.GetText("helpcustom");

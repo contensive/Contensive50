@@ -70,13 +70,13 @@ namespace Contensive.Processor.Models.Db {
         public string stylesLinkHref { get; set; }
         public bool template { get; set; }
         //====================================================================================================
-        public static AddonModel add(CoreController core) {
-            return add<AddonModel>(core);
+        public static AddonModel addDefault(CoreController core) {
+            return addDefault<AddonModel>(core);
         }
         //
         //====================================================================================================
-        public static AddonModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<AddonModel>(core, ref callersCacheNameList);
+        public static AddonModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
+            return addDefault<AddonModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================

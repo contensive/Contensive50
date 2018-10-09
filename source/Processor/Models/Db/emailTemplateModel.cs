@@ -18,13 +18,13 @@ namespace Contensive.Processor.Models.Db {
         public string source { get; set; }
         //
         //====================================================================================================
-        public static EmailTemplateModel add(CoreController core) {
-            return add<EmailTemplateModel>(core);
+        public static EmailTemplateModel addDefault(CoreController core) {
+            return addDefault<EmailTemplateModel>(core);
         }
         //
         //====================================================================================================
-        public static EmailTemplateModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<EmailTemplateModel>(core, ref callersCacheNameList);
+        public static EmailTemplateModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
+            return addDefault<EmailTemplateModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================

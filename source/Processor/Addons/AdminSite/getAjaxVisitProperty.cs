@@ -16,7 +16,7 @@ using static Contensive.Processor.constants;
 //
 namespace Contensive.Addons.AdminSite {
     //
-    public class getAjaxVisitPropertyClass : Contensive.BaseClasses.AddonBaseClass {
+    public class GetAjaxVisitPropertyClass : Contensive.BaseClasses.AddonBaseClass {
         //
         //====================================================================================================
         /// <summary>

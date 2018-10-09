@@ -28,13 +28,13 @@ namespace Contensive.Processor.Models.Db {
         public int type { get; set; }
         //
         //====================================================================================================
-        public static DataSourceModel add(CoreController core) {
-            return add<DataSourceModel>(core);
+        public static DataSourceModel addDefault(CoreController core) {
+            return addDefault<DataSourceModel>(core);
         }
         //
         //====================================================================================================
-        public static DataSourceModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<DataSourceModel>(core, ref callersCacheNameList);
+        public static DataSourceModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
+            return addDefault<DataSourceModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================

@@ -47,13 +47,13 @@ namespace Contensive.Processor.Models.Db {
         public string zip { get; set; }
         //
         //====================================================================================================
-        public static OrganizationModel add(CoreController core) {
-            return add<OrganizationModel>(core);
+        public static OrganizationModel addDefault(CoreController core) {
+            return addDefault<OrganizationModel>(core);
         }
         //
         //====================================================================================================
-        public static OrganizationModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<OrganizationModel>(core, ref callersCacheNameList);
+        public static OrganizationModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
+            return addDefault<OrganizationModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================

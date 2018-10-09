@@ -17,13 +17,13 @@ namespace Contensive.Processor.Models.Db {
         public int emailID { get; set; }
         //
         //====================================================================================================
-        public static EmailDropModel add(CoreController core) {
-            return add<EmailDropModel>(core);
+        public static EmailDropModel addDefault(CoreController core) {
+            return addDefault<EmailDropModel>(core);
         }
         //
         //====================================================================================================
-        public static EmailDropModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<EmailDropModel>(core, ref callersCacheNameList);
+        public static EmailDropModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
+            return addDefault<EmailDropModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================

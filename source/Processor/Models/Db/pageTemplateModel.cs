@@ -38,13 +38,18 @@ namespace Contensive.Processor.Models.Db {
         // Public Property OtherHeadTags As String
         //
         //====================================================================================================
-        public static PageTemplateModel add(CoreController core) {
-            return add<PageTemplateModel>(core);
+        public static PageTemplateModel addEmpty(CoreController core) {
+            return addEmpty<PageTemplateModel>(core);
         }
         //
         //====================================================================================================
-        public static PageTemplateModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<PageTemplateModel>(core, ref callersCacheNameList);
+        public static PageTemplateModel addDefault(CoreController core) {
+            return addDefault<PageTemplateModel>(core);
+        }
+        //
+        //====================================================================================================
+        public static PageTemplateModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
+            return addDefault<PageTemplateModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================

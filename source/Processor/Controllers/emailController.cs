@@ -319,7 +319,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 SystemEmailModel email = SystemEmailModel.createByUniqueName(core, emailName );
                 if (email == null) {
-                    email = SystemEmailModel.add(core);
+                    email = SystemEmailModel.addDefault(core);
                     email.name = emailName;
                     email.subject = emailName;
                     email.fromAddress = core.siteProperties.getText("EmailAdmin", "webmaster@" + core.appConfig.domainList[0]);
@@ -680,7 +680,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         private static void queueEmail(CoreController core, bool immediate, EmailClass email) {
             try {
-                var record = EmailQueueModel.add(core);
+                var record = EmailQueueModel.addDefault(core);
                 record.immediate = immediate;
                 record.toAddress = email.toAddress;
                 record.subject = email.subject;
@@ -706,7 +706,7 @@ namespace Contensive.Processor.Controllers {
                     if (SmtpController.sendSmtp(core, email, ref reasonForFail)) {
                         //
                         // -- success, log the send
-                        var log = EmailLogModel.add(core);
+                        var log = EmailLogModel.addDefault(core);
                         log.toAddress = email.toAddress;
                         log.fromAddress = email.fromAddress;
                         log.subject = email.subject;
@@ -722,7 +722,7 @@ namespace Contensive.Processor.Controllers {
                         if (email.attempts >= 3) {
                             //
                             // -- too many retries, log error
-                            var log = EmailLogModel.add(core);
+                            var log = EmailLogModel.addDefault(core);
                             log.toAddress = email.toAddress;
                             log.fromAddress = email.fromAddress;
                             log.subject = email.subject;
@@ -736,7 +736,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // -- fail, add back to end of queue for retry
                             email.attempts += 1;
-                            var log = EmailLogModel.add(core);
+                            var log = EmailLogModel.addDefault(core);
                             log.toAddress = email.toAddress;
                             log.fromAddress = email.fromAddress;
                             log.subject = email.subject;

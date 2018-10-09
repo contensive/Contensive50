@@ -74,57 +74,6 @@ namespace Contensive.Processor {
             SortableSetza = 2,
             SortableNotSet = 3
         }
-        //
-        //
-        public class IndexConfigSortClass {
-            //Dim FieldPtr As Integer
-            public string fieldName;
-            public int direction; // 1=forward, 2=reverse, 0=ignore/remove this sort
-            public int order; // 1...n, if multiple sorts, the order of the sort
-        }
-        //
-        public class IndexConfigFindWordClass {
-            public string Name;
-            public string Value;
-            public int Type;
-            public FindWordMatchEnum MatchOption;
-        }
-        //
-        public class IndexConfigColumnClass {
-            public string Name;
-            //Public FieldId As Integer
-            public int Width;
-            public int SortPriority;
-            public int SortDirection;
-        }
-        //
-        public class IndexConfigClass {
-            public bool Loaded;
-            public int ContentID;
-            public int PageNumber;
-            public int RecordsPerPage;
-            public int RecordTop;
-
-            //FindWordList As String
-            public Dictionary<string, IndexConfigFindWordClass> FindWords = new Dictionary<string, IndexConfigFindWordClass>();
-            //Public FindWordCnt As Integer
-            public bool ActiveOnly;
-            public bool LastEditedByMe;
-            public bool LastEditedToday;
-            public bool LastEditedPast7Days;
-            public bool LastEditedPast30Days;
-            public bool Open;
-            //public SortCnt As Integer
-            public Dictionary<string, IndexConfigSortClass> Sorts = new Dictionary<string, IndexConfigSortClass>();
-            public int GroupListCnt;
-            public string[] GroupList;
-            //public ColumnCnt As Integer
-            public List<IndexConfigColumnClass> columns = new List<IndexConfigColumnClass>() { };
-            //public Dictionary<string, indexConfigColumnClass> Columns = new Dictionary<string, indexConfigColumnClass>();
-            //SubCDefs() as integer
-            //SubCDefCnt as integer
-            public int SubCDefID;
-        }
         public class ButtonMetadata {
             public string name = "button";
             public string value = "";
@@ -1492,140 +1441,6 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         /// <summary>
-        /// Title Bar for the index page
-        /// </summary>
-        /// <param name="core"></param>
-        /// <param name="IndexConfig"></param>
-        /// <param name="adminContext.content"></param>
-        /// <param name="recordCnt"></param>
-        /// <param name="ContentAccessLimitMessage"></param>
-        /// <returns></returns>
-        public static string getForm_Index_Header(CoreController core, IndexConfigClass IndexConfig, CDefModel content, int recordCnt, string ContentAccessLimitMessage) {
-            //
-            // ----- TitleBar
-            //
-            string Title = "";
-            string filterLine = "";
-            if (IndexConfig.ActiveOnly) {
-                filterLine = filterLine + ", active records";
-            }
-            string filterLastEdited = "";
-            if (IndexConfig.LastEditedByMe) {
-                filterLastEdited = filterLastEdited + " by " + core.session.user.name;
-            }
-            if (IndexConfig.LastEditedPast30Days) {
-                filterLastEdited = filterLastEdited + " in the past 30 days";
-            }
-            if (IndexConfig.LastEditedPast7Days) {
-                filterLastEdited = filterLastEdited + " in the week";
-            }
-            if (IndexConfig.LastEditedToday) {
-                filterLastEdited = filterLastEdited + " today";
-            }
-            if (!string.IsNullOrEmpty(filterLastEdited)) {
-                filterLine = filterLine + ", last edited" + filterLastEdited;
-            }
-            foreach (var kvp in IndexConfig.FindWords) {
-                IndexConfigFindWordClass findWord = kvp.Value;
-                if (!string.IsNullOrEmpty(findWord.Name)) {
-                    string FieldCaption = CDefModel.GetContentFieldProperty(core, content.name, findWord.Name, "caption");
-                    switch (findWord.MatchOption) {
-                        case FindWordMatchEnum.MatchEmpty:
-                            filterLine = filterLine + ", " + FieldCaption + " is empty";
-                            break;
-                        case FindWordMatchEnum.MatchEquals:
-                            filterLine = filterLine + ", " + FieldCaption + " = '" + findWord.Value + "'";
-                            break;
-                        case FindWordMatchEnum.MatchFalse:
-                            filterLine = filterLine + ", " + FieldCaption + " is false";
-                            break;
-                        case FindWordMatchEnum.MatchGreaterThan:
-                            filterLine = filterLine + ", " + FieldCaption + " &gt; '" + findWord.Value + "'";
-                            break;
-                        case FindWordMatchEnum.matchincludes:
-                            filterLine = filterLine + ", " + FieldCaption + " includes '" + findWord.Value + "'";
-                            break;
-                        case FindWordMatchEnum.MatchLessThan:
-                            filterLine = filterLine + ", " + FieldCaption + " &lt; '" + findWord.Value + "'";
-                            break;
-                        case FindWordMatchEnum.MatchNotEmpty:
-                            filterLine = filterLine + ", " + FieldCaption + " is not empty";
-                            break;
-                        case FindWordMatchEnum.MatchTrue:
-                            filterLine = filterLine + ", " + FieldCaption + " is true";
-                            break;
-                    }
-
-                }
-            }
-            if (IndexConfig.SubCDefID > 0) {
-                string ContentName = CDefModel.getContentNameByID(core, IndexConfig.SubCDefID);
-                if (!string.IsNullOrEmpty(ContentName)) {
-                    filterLine = filterLine + ", in Sub-content '" + ContentName + "'";
-                }
-            }
-            //
-            // add groups to caption
-            //
-            if ((content.tableName.ToLower() == "ccmembers") && (IndexConfig.GroupListCnt > 0)) {
-                string GroupList = "";
-                for (int Ptr = 0; Ptr < IndexConfig.GroupListCnt; Ptr++) {
-                    if (IndexConfig.GroupList[Ptr] != "") {
-                        GroupList += "\t" + IndexConfig.GroupList[Ptr];
-                    }
-                }
-                if (!string.IsNullOrEmpty(GroupList)) {
-                    string[] Groups = GroupList.Split('\t');
-                    if (Groups.GetUpperBound(0) == 0) {
-                        filterLine = filterLine + ", in group '" + Groups[0] + "'";
-                    } else if (Groups.GetUpperBound(0) == 1) {
-                        filterLine = filterLine + ", in groups '" + Groups[0] + "' and '" + Groups[1] + "'";
-                    } else {
-                        int Ptr;
-                        string filterGroups = "";
-                        for (Ptr = 0; Ptr < Groups.GetUpperBound(0); Ptr++) {
-                            filterGroups += ", '" + Groups[Ptr] + "'";
-                        }
-                        filterLine = filterLine + ", in groups" + filterGroups.Substring(1) + " and '" + Groups[Ptr] + "'";
-                    }
-
-                }
-            }
-            //
-            // add sort details to caption
-            //
-            string sortLine = "";
-            foreach (var kvp in IndexConfig.Sorts) {
-                IndexConfigSortClass sort = kvp.Value;
-                if (sort.direction > 0) {
-                    sortLine = sortLine + ", then " + content.fields[sort.fieldName].caption;
-                    if (sort.direction > 1) {
-                        sortLine += " reverse";
-                    }
-                }
-            }
-            string pageNavigation = getForm_index_pageNavigation(core, IndexConfig.PageNumber, IndexConfig.RecordsPerPage, recordCnt, content.name);
-            Title = HtmlController.div("<strong>" + content.name + "</strong><div style=\"float:right;\">" + pageNavigation + "</div>");
-            int TitleRows = 0;
-            if (!string.IsNullOrEmpty(filterLine)) {
-                string link = "/" + core.appConfig.adminRoute + "?cid=" + content.id + "&af=1&IndexFilterRemoveAll=1";
-                Title += HtmlController.div(getIconDeleteLink(link) + "&nbsp;Filter: " + HtmlController.encodeHtml(filterLine.Substring(2)));
-                TitleRows = TitleRows + 1;
-            }
-            if (!string.IsNullOrEmpty(sortLine)) {
-                string link = "/" + core.appConfig.adminRoute + "?cid=" + content.id + "&af=1&IndexSortRemoveAll=1";
-                Title += HtmlController.div(getIconDeleteLink(link) + "&nbsp;Sort: " + HtmlController.encodeHtml(sortLine.Substring(6)));
-                TitleRows = TitleRows + 1;
-            }
-            if (!string.IsNullOrEmpty(ContentAccessLimitMessage)) {
-                Title +=  "<div style=\"clear:both\">" + ContentAccessLimitMessage + "</div>";
-                TitleRows = TitleRows + 1;
-            }
-            return Title;
-        }
-        //
-        // ====================================================================================================
-        /// <summary>
         /// get linked icon for remove (red x)
         /// </summary>
         /// <param name="link"></param>
@@ -2068,6 +1883,20 @@ namespace Contensive.Processor {
                     }
                 }
                 core.db.csClose(ref csChildContent);
+            }
+            return result;
+        }
+        //
+        //
+        //
+        public static string GetFormInputWithFocus2(CoreController core, string ElementName, string CurrentValue = "", int Height = -1, int Width = -1, string ElementID = "", string OnFocusJavascript = "", string HtmlClass = "") {
+            string result = "";
+            result = HtmlController.inputText(core, ElementName, CurrentValue, Height, Width, ElementID);
+            if (!string.IsNullOrEmpty(OnFocusJavascript)) {
+                result = GenericController.vbReplace(result, ">", " onFocus=\"" + OnFocusJavascript + "\">");
+            }
+            if (!string.IsNullOrEmpty(HtmlClass)) {
+                result = GenericController.vbReplace(result, ">", " class=\"" + HtmlClass + "\">");
             }
             return result;
         }

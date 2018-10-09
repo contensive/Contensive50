@@ -28,13 +28,13 @@ namespace Contensive.Processor.Models.Db {
         public string body { get; set; }
         //
         //====================================================================================================
-        public static EmailLogModel add(CoreController core) {
-            return add<EmailLogModel>(core);
+        public static EmailLogModel addDefault(CoreController core) {
+            return addDefault<EmailLogModel>(core);
         }
         //
         //====================================================================================================
-        public static EmailLogModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<EmailLogModel>(core, ref callersCacheNameList);
+        public static EmailLogModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
+            return addDefault<EmailLogModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================

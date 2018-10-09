@@ -31,13 +31,18 @@ namespace Contensive.Processor.Models.Db {
         public int MemberID { get; set; }
         //
         //====================================================================================================
-        public static MemberRuleModel add(CoreController core) {
-            return add<MemberRuleModel>(core);
+        public static MemberRuleModel addEmpty(CoreController core) {
+            return addEmpty<MemberRuleModel>(core);
         }
         //
         //====================================================================================================
-        public static MemberRuleModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<MemberRuleModel>(core, ref callersCacheNameList);
+        public static MemberRuleModel addDefault(CoreController core) {
+            return addDefault<MemberRuleModel>(core);
+        }
+        //
+        //====================================================================================================
+        public static MemberRuleModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
+            return addDefault<MemberRuleModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================

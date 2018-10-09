@@ -1033,392 +1033,369 @@ namespace Contensive.Processor.Models.Domain {
             }
             return returnName;
         }
-
-        //========================================================================
-        //   Create a content definition
-        //       called from upgrade and DeveloperTools
-        //========================================================================
         //
-        public static int addContent(CoreController core, bool Active, DataSourceModel datasource, string TableName, string contentName, bool AdminOnly = false, bool DeveloperOnly = false, bool AllowAdd = true, bool AllowDelete = true, string ParentName = "", string DefaultSortMethod = "", string DropDownFieldList = "", bool AllowWorkflowAuthoring = false, bool AllowCalendarEvents = false, bool AllowContentTracking = false, bool AllowTopicRules = false, bool AllowContentChildTool = false, bool ignore1 = false, string IconLink = "", int IconWidth = 0, int IconHeight = 0, int IconSprites = 0, string ccGuid = "", bool IsBaseContent = false, string installedByCollectionGuid = "", bool clearMetaCache = false) {
+        //========================================================================
+        /// <summary>
+        /// Verify a content entry and return the id. If it does not exist, it is added with default values
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="cdef"></param>
+        /// <returns></returns>
+        public static int verifyContent_returnId(CoreController core, CDefModel cdef ) { // bool Active, DataSourceModel datasource, string TableName, string contentName, bool AdminOnly = false, bool DeveloperOnly = false, bool AllowAdd = true, bool AllowDelete = true, string ParentName = "", string DefaultSortMethod = "", string DropDownFieldList = "", bool AllowWorkflowAuthoring = false, bool AllowCalendarEvents = false, bool AllowContentTracking = false, bool AllowTopicRules = false, bool AllowContentChildTool = false, bool ignore1 = false, string IconLink = "", int IconWidth = 0, int IconHeight = 0, int IconSprites = 0, string ccGuid = "", bool IsBaseContent = false, string installedByCollectionGuid = "", bool clearMetaCache = false) {
             int returnContentId = 0;
             try {
                 //
-                LogController.logTrace(core, "addContent, contentName [" + contentName + "], tableName [" + TableName + "]");
+                LogController.logTrace(core, "addContent, contentName [" + cdef.name + "], tableName [" + cdef.tableName + "]");
                 //
-                bool ContentIsBaseContent = false;
-                string NewGuid = null;
-                string LcContentGuid = null;
-                string SQL = null;
-                int parentId = 0;
-                DataTable dt = null;
-                int TableID = 0;
-                string iDefaultSortMethod = null;
-                int DefaultSortMethodID = 0;
-                bool CDefFound = false;
-                int InstalledByCollectionID = 0;
-                SqlFieldListClass sqlList = null;
-                Models.Domain.CDefFieldModel field = null;
-                int ContentIDofContent = 0;
-                //
-                if (string.IsNullOrEmpty(contentName)) {
+                if (string.IsNullOrEmpty(cdef.name)) {
                     throw new ApplicationException("contentName can not be blank");
+                } else if (string.IsNullOrEmpty(cdef.tableName)) {
+                    throw new ApplicationException("Tablename can not be blank");
                 } else {
                     //
-                    if (string.IsNullOrEmpty(TableName)) {
-                        throw new ApplicationException("Tablename can not be blank");
+                    core.db.createSQLTable(cdef.dataSourceName, cdef.tableName);
+                    //
+                    string contentGuid = "";
+                    bool ContentIsBaseContent = false;
+                    //
+                    // get contentId, guid, IsBaseContent
+                    //
+                    string SQL = "select ID,ccguid,IsBaseContent from ccContent where (name=" + core.db.encodeSQLText(cdef.name) + ") order by id;";
+                    DataTable dt = core.db.executeQuery(SQL);
+                    if (dt.Rows.Count > 0) {
+                        returnContentId = GenericController.encodeInteger(dt.Rows[0]["ID"]);
+                        contentGuid = GenericController.vbLCase(GenericController.encodeText(dt.Rows[0]["ccguid"]));
+                        ContentIsBaseContent = GenericController.encodeBoolean(dt.Rows[0]["IsBaseContent"]);
+                    }
+                    dt.Dispose();
+                    //
+                    // get contentid of content
+                    //
+                    int ContentIDofContent = 0;
+                    if (cdef.name.ToLower() == "content") {
+                        ContentIDofContent = returnContentId;
                     } else {
-                        //
-                        // Create the SQL table
-                        //
-                        core.db.createSQLTable(datasource.name, TableName);
-                        //
-                        // Check for a Content Definition
-                        //
-                        returnContentId = 0;
-                        LcContentGuid = "";
-                        ContentIsBaseContent = false;
-                        NewGuid = encodeEmpty(ccGuid, "");
-                        //
-                        // get contentId, guid, IsBaseContent
-                        //
-                        SQL = "select ID,ccguid,IsBaseContent from ccContent where (name=" + core.db.encodeSQLText(contentName) + ") order by id;";
+                        SQL = "select ID from ccContent where (name='content') order by id;";
                         dt = core.db.executeQuery(SQL);
                         if (dt.Rows.Count > 0) {
-                            returnContentId = GenericController.encodeInteger(dt.Rows[0]["ID"]);
-                            LcContentGuid = GenericController.vbLCase(GenericController.encodeText(dt.Rows[0]["ccguid"]));
-                            ContentIsBaseContent = GenericController.encodeBoolean(dt.Rows[0]["IsBaseContent"]);
+                            ContentIDofContent = GenericController.encodeInteger(dt.Rows[0]["ID"]);
                         }
                         dt.Dispose();
-                        //
-                        // get contentid of content
-                        //
-                        ContentIDofContent = 0;
-                        if (contentName.ToLower() == "content") {
-                            ContentIDofContent = returnContentId;
-                        } else {
-                            SQL = "select ID from ccContent where (name='content') order by id;";
-                            dt = core.db.executeQuery(SQL);
-                            if (dt.Rows.Count > 0) {
-                                ContentIDofContent = GenericController.encodeInteger(dt.Rows[0]["ID"]);
-                            }
-                            dt.Dispose();
+                    }
+                    int parentId = 0;
+                    //
+                    // get parentId
+                    //
+                    if (!string.IsNullOrEmpty(cdef.parentName)) {
+                        SQL = "select id from ccContent where (name=" + core.db.encodeSQLText(cdef.parentName) + ") order by id;";
+                        dt = core.db.executeQuery(SQL);
+                        if (dt.Rows.Count > 0) {
+                            parentId = GenericController.encodeInteger(dt.Rows[0][0]);
+                        }
+                        dt.Dispose();
+                    }
+                    //
+                    // get InstalledByCollectionID
+                    //
+                    int InstalledByCollectionID = 0;
+                    if (!string.IsNullOrEmpty(cdef.installedByCollectionGuid)) {
+                        SQL = "select id from ccAddonCollections where ccGuid=" + core.db.encodeSQLText(cdef.installedByCollectionGuid);
+                        dt = core.db.executeQuery(SQL);
+                        if (dt.Rows.Count > 0) {
+                            InstalledByCollectionID = GenericController.encodeInteger(dt.Rows[0]["ID"]);
+                        }
+                    }
+                    //
+                    // Block non-base update of a base field
+                    //
+                    {
+                        bool CDefFound = (returnContentId != 0);
+                        if (!CDefFound) {
+                            //
+                            // ----- Create a new empty Content Record (to get ContentID)
+                            //
+                            returnContentId = core.db.insertTableRecordGetId("Default", "ccContent", SystemMemberID);
                         }
                         //
-                        // get parentId
+                        // ----- Get the Table Definition ID, create one if missing
                         //
-                        if (!string.IsNullOrEmpty(ParentName)) {
-                            SQL = "select id from ccContent where (name=" + core.db.encodeSQLText(ParentName) + ") order by id;";
-                            dt = core.db.executeQuery(SQL);
-                            if (dt.Rows.Count > 0) {
-                                parentId = GenericController.encodeInteger(dt.Rows[0][0]);
-                            }
-                            dt.Dispose();
-                        }
-                        //
-                        // get InstalledByCollectionID
-                        //
-                        InstalledByCollectionID = 0;
-                        if (!string.IsNullOrEmpty(installedByCollectionGuid)) {
-                            SQL = "select id from ccAddonCollections where ccGuid=" + core.db.encodeSQLText(installedByCollectionGuid);
-                            dt = core.db.executeQuery(SQL);
-                            if (dt.Rows.Count > 0) {
-                                InstalledByCollectionID = GenericController.encodeInteger(dt.Rows[0]["ID"]);
-                            }
-                        }
-                        //
-                        // Block non-base update of a base field
-                        //
-                        // 20180412 - odd case where emailQueue cctable entry was not made during a repair. temp fix
-                        { 
-                        //if (ContentIsBaseContent && !IsBaseContent) {
-                        //    throw new ApplicationException("Attempt to update a Base Content Definition [" + contentName + "] as non-base. This is not allowed.");
-                        //} else {
-                            CDefFound = (returnContentId != 0);
-                            if (!CDefFound) {
-                                //
-                                // ----- Create a new empty Content Record (to get ContentID)
-                                //
-                                returnContentId = core.db.insertTableRecordGetId("Default", "ccContent", SystemMemberID);
-                            }
+                        SQL = "SELECT ID from ccTables where (active<>0) and (name=" + core.db.encodeSQLText(cdef.tableName) + ");";
+                        dt = core.db.executeQuery(SQL);
+                        int TableID = 0;
+                        SqlFieldListClass sqlList = null;
+                        if (dt.Rows.Count <= 0) {
                             //
-                            // ----- Get the Table Definition ID, create one if missing
+                            LogController.logTrace(core, "addContent, create ccTable record, tableName [" + cdef.tableName + "]");
                             //
-                            SQL = "SELECT ID from ccTables where (active<>0) and (name=" + core.db.encodeSQLText(TableName) + ");";
-                            dt = core.db.executeQuery(SQL);
-                            if (dt.Rows.Count <= 0) {
-                                //
-                                LogController.logTrace(core, "addContent, create ccTable record, tableName [" + TableName + "]");
-                                //
-                                //
-                                // ----- no table definition found, create one
-                                //
-                                //If genericController.vbUCase(DataSourceName) = "DEFAULT" Then
-                                //    DataSourceID = -1
-                                //ElseIf DataSourceName = "" Then
-                                //    DataSourceID = -1
-                                //Else
-                                //    DataSourceID = core.db.getDataSourceId(DataSourceName)
-                                //    If DataSourceID = -1 Then
-                                //        throw (New ApplicationException("Could not find DataSource [" & DataSourceName & "] for table [" & TableName & "]"))
-                                //    End If
-                                //End If
-                                TableID = core.db.insertTableRecordGetId("Default", "ccTables", SystemMemberID);
-                                //
-                                sqlList = new SqlFieldListClass();
-                                sqlList.add("name", core.db.encodeSQLText(TableName));
-                                sqlList.add("active", SQLTrue);
-                                sqlList.add("DATASOURCEID", core.db.encodeSQLNumber(datasource.id));
-                                sqlList.add("CONTENTCONTROLID", core.db.encodeSQLNumber(Models.Domain.CDefModel.getContentId(core, "Tables")));
-                                //
-                                core.db.updateTableRecord("Default", "ccTables", "ID=" + TableID, sqlList);
-                                TableModel.invalidateRecordCache(core, TableID);
-                            } else {
-                                TableID = GenericController.encodeInteger(dt.Rows[0]["ID"]);
-                            }
                             //
-                            // ----- Get Sort Method ID from SortMethod
-                            iDefaultSortMethod = encodeEmpty(DefaultSortMethod, "");
-                            DefaultSortMethodID = 0;
+                            // ----- no table definition found, create one
                             //
-                            // First - try lookup by name
-                            //
-                            if (string.IsNullOrEmpty(iDefaultSortMethod)) {
-                                DefaultSortMethodID = 0;
-                            } else {
-                                dt = core.db.openTable("Default", "ccSortMethods", "(name=" + core.db.encodeSQLText(iDefaultSortMethod) + ")and(active<>0)", "ID", "ID", 1, 1);
-                                if (dt.Rows.Count > 0) {
-                                    DefaultSortMethodID = GenericController.encodeInteger(dt.Rows[0]["ID"]);
-                                }
-                            }
-                            if (DefaultSortMethodID == 0) {
-                                //
-                                // fallback - maybe they put the orderbyclause in (common mistake)
-                                //
-                                dt = core.db.openTable("Default", "ccSortMethods", "(OrderByClause=" + core.db.encodeSQLText(iDefaultSortMethod) + ")and(active<>0)", "ID", "ID", 1, 1);
-                                if (dt.Rows.Count > 0) {
-                                    DefaultSortMethodID = GenericController.encodeInteger(dt.Rows[0]["ID"]);
-                                }
-                            }
-                            //
-                            // determine parentId from parentName
-                            //
-
-                            //
-                            // ----- update record
+                            //If genericController.vbUCase(DataSourceName) = "DEFAULT" Then
+                            //    DataSourceID = -1
+                            //ElseIf DataSourceName = "" Then
+                            //    DataSourceID = -1
+                            //Else
+                            //    DataSourceID = core.db.getDataSourceId(DataSourceName)
+                            //    If DataSourceID = -1 Then
+                            //        throw (New ApplicationException("Could not find DataSource [" & DataSourceName & "] for table [" & TableName & "]"))
+                            //    End If
+                            //End If
+                            TableID = core.db.insertTableRecordGetId("Default", "ccTables", SystemMemberID);
                             //
                             sqlList = new SqlFieldListClass();
-                            sqlList.add("name", core.db.encodeSQLText(contentName));
-                            sqlList.add("CREATEKEY", "0");
-                            sqlList.add("active", core.db.encodeSQLBoolean(Active));
-                            sqlList.add("ContentControlID", core.db.encodeSQLNumber(ContentIDofContent));
-                            sqlList.add("AllowAdd", core.db.encodeSQLBoolean(AllowAdd));
-                            sqlList.add("AllowDelete", core.db.encodeSQLBoolean(AllowDelete));
-                            sqlList.add("AllowWorkflowAuthoring", core.db.encodeSQLBoolean(AllowWorkflowAuthoring));
-                            sqlList.add("DeveloperOnly", core.db.encodeSQLBoolean(DeveloperOnly));
-                            sqlList.add("AdminOnly", core.db.encodeSQLBoolean(AdminOnly));
-                            sqlList.add("ParentID", core.db.encodeSQLNumber(parentId));
-                            sqlList.add("DefaultSortMethodID", core.db.encodeSQLNumber(DefaultSortMethodID));
-                            sqlList.add("DropDownFieldList", core.db.encodeSQLText(encodeEmpty(DropDownFieldList, "Name")));
-                            sqlList.add("ContentTableID", core.db.encodeSQLNumber(TableID));
-                            sqlList.add("AuthoringTableID", core.db.encodeSQLNumber(TableID));
-                            sqlList.add("ModifiedDate", core.db.encodeSQLDate(DateTime.Now));
-                            sqlList.add("CreatedBy", core.db.encodeSQLNumber(SystemMemberID));
-                            sqlList.add("ModifiedBy", core.db.encodeSQLNumber(SystemMemberID));
-                            sqlList.add("AllowCalendarEvents", core.db.encodeSQLBoolean(AllowCalendarEvents));
-                            sqlList.add("AllowContentTracking", core.db.encodeSQLBoolean(AllowContentTracking));
-                            sqlList.add("AllowTopicRules", core.db.encodeSQLBoolean(AllowTopicRules));
-                            sqlList.add("AllowContentChildTool", core.db.encodeSQLBoolean(AllowContentChildTool));
-                            //Call sqlList.add("AllowMetaContent", core.db.encodeSQLBoolean(ignore1))
-                            sqlList.add("IconLink", core.db.encodeSQLText(encodeEmpty(IconLink, "")));
-                            sqlList.add("IconHeight", core.db.encodeSQLNumber(IconHeight));
-                            sqlList.add("IconWidth", core.db.encodeSQLNumber(IconWidth));
-                            sqlList.add("IconSprites", core.db.encodeSQLNumber(IconSprites));
-                            sqlList.add("installedByCollectionid", core.db.encodeSQLNumber(InstalledByCollectionID));
-                            if ((string.IsNullOrEmpty(LcContentGuid)) && (!string.IsNullOrEmpty(NewGuid))) {
-                                //
-                                // hard one - only update guid if the tables supports it, and it the new guid is not blank
-                                // if the new guid does no match te old guid
-                                //
-                                sqlList.add("ccGuid", core.db.encodeSQLText(NewGuid));
-                            } else if ((!string.IsNullOrEmpty(NewGuid)) & (LcContentGuid != GenericController.vbLCase(NewGuid))) {
-                                //
-                                // installing content definition with matching name, but different guid -- this is an error that needs to be fixed
-                                //
-                                LogController.handleError( core,new ApplicationException("createContent call, content.name match found but content.ccGuid did not, name [" + contentName + "], newGuid [" + NewGuid + "], installedGuid [" + LcContentGuid + "] "));
-                            }
-                            core.db.updateTableRecord("Default", "ccContent", "ID=" + returnContentId, sqlList);
-                            ContentModel.invalidateRecordCache(core, returnContentId);
+                            sqlList.add("name", core.db.encodeSQLText(cdef.tableName));
+                            sqlList.add("active", SQLTrue);
+                            sqlList.add("DATASOURCEID", core.db.encodeSQLNumber(cdef.dataSourceId));
+                            sqlList.add("CONTENTCONTROLID", core.db.encodeSQLNumber(Models.Domain.CDefModel.getContentId(core, "Tables")));
                             //
-                            //-----------------------------------------------------------------------------------------------
-                            // Verify Core Content Definition Fields
-                            //-----------------------------------------------------------------------------------------------
-                            //
-                            if (parentId < 1) {
-                                //
-                                // CDef does not inherit its fields, create what is needed for a non-inherited CDef
-                                //
-                                if (!core.db.isCdefField(returnContentId, "ID")) {
-                                    field = new Models.Domain.CDefFieldModel();
-                                    field.nameLc = "id";
-                                    field.active = true;
-                                    field.fieldTypeId = FieldTypeIdAutoIdIncrement;
-                                    field.editSortPriority = 100;
-                                    field.authorable = false;
-                                    field.caption = "ID";
-                                    field.defaultValue = "";
-                                    field.isBaseField = IsBaseContent;
-                                    verifyCDefField_ReturnID(core, contentName, field);
-                                }
-                                //
-                                if (!core.db.isCdefField(returnContentId, "name")) {
-                                    field = new Models.Domain.CDefFieldModel();
-                                    field.nameLc = "name";
-                                    field.active = true;
-                                    field.fieldTypeId = FieldTypeIdText;
-                                    field.editSortPriority = 110;
-                                    field.authorable = true;
-                                    field.caption = "Name";
-                                    field.defaultValue = "";
-                                    field.isBaseField = IsBaseContent;
-                                    verifyCDefField_ReturnID(core, contentName, field);
-                                }
-                                //
-                                if (!core.db.isCdefField(returnContentId, "active")) {
-                                    field = new Models.Domain.CDefFieldModel();
-                                    field.nameLc = "active";
-                                    field.active = true;
-                                    field.fieldTypeId = FieldTypeIdBoolean;
-                                    field.editSortPriority = 200;
-                                    field.authorable = true;
-                                    field.caption = "Active";
-                                    field.defaultValue = "1";
-                                    field.isBaseField = IsBaseContent;
-                                    verifyCDefField_ReturnID(core, contentName, field);
-                                }
-                                //
-                                if (!core.db.isCdefField(returnContentId, "sortorder")) {
-                                    field = new Models.Domain.CDefFieldModel();
-                                    field.nameLc = "sortorder";
-                                    field.active = true;
-                                    field.fieldTypeId = FieldTypeIdText;
-                                    field.editSortPriority = 2000;
-                                    field.authorable = false;
-                                    field.caption = "Alpha Sort Order";
-                                    field.defaultValue = "";
-                                    field.isBaseField = IsBaseContent;
-                                    verifyCDefField_ReturnID(core, contentName, field);
-                                }
-                                //
-                                if (!core.db.isCdefField(returnContentId, "dateadded")) {
-                                    field = new Models.Domain.CDefFieldModel();
-                                    field.nameLc = "dateadded";
-                                    field.active = true;
-                                    field.fieldTypeId = FieldTypeIdDate;
-                                    field.editSortPriority = 9999;
-                                    field.authorable = false;
-                                    field.caption = "Date Added";
-                                    field.defaultValue = "";
-                                    field.isBaseField = IsBaseContent;
-                                    verifyCDefField_ReturnID(core, contentName, field);
-                                }
-                                if (!core.db.isCdefField(returnContentId, "createdby")) {
-                                    field = new Models.Domain.CDefFieldModel();
-                                    field.nameLc = "createdby";
-                                    field.active = true;
-                                    field.fieldTypeId = FieldTypeIdLookup;
-                                    field.editSortPriority = 9999;
-                                    field.authorable = false;
-                                    field.caption = "Created By";
-                                    field.set_lookupContentName(core, "People");
-                                    field.defaultValue = "";
-                                    field.isBaseField = IsBaseContent;
-                                    verifyCDefField_ReturnID(core, contentName, field);
-                                }
-                                if (!core.db.isCdefField(returnContentId, "modifieddate")) {
-                                    field = new Models.Domain.CDefFieldModel();
-                                    field.nameLc = "modifieddate";
-                                    field.active = true;
-                                    field.fieldTypeId = FieldTypeIdDate;
-                                    field.editSortPriority = 9999;
-                                    field.authorable = false;
-                                    field.caption = "Date Modified";
-                                    field.defaultValue = "";
-                                    field.isBaseField = IsBaseContent;
-                                    verifyCDefField_ReturnID(core, contentName, field);
-                                }
-                                if (!core.db.isCdefField(returnContentId, "modifiedby")) {
-                                    field = new Models.Domain.CDefFieldModel();
-                                    field.nameLc = "modifiedby";
-                                    field.active = true;
-                                    field.fieldTypeId = FieldTypeIdLookup;
-                                    field.editSortPriority = 9999;
-                                    field.authorable = false;
-                                    field.caption = "Modified By";
-                                    field.set_lookupContentName(core, "People");
-                                    field.defaultValue = "";
-                                    field.isBaseField = IsBaseContent;
-                                    verifyCDefField_ReturnID(core, contentName, field);
-                                }
-                                if (!core.db.isCdefField(returnContentId, "ContentControlId")) {
-                                    field = new Models.Domain.CDefFieldModel();
-                                    field.nameLc = "contentcontrolid";
-                                    field.active = true;
-                                    field.fieldTypeId = FieldTypeIdLookup;
-                                    field.editSortPriority = 9999;
-                                    field.authorable = false;
-                                    field.caption = "Controlling Content";
-                                    field.set_lookupContentName(core, "Content");
-                                    field.defaultValue = "";
-                                    field.isBaseField = IsBaseContent;
-                                    verifyCDefField_ReturnID(core, contentName, field);
-                                }
-                                if (!core.db.isCdefField(returnContentId, "CreateKey")) {
-                                    field = new Models.Domain.CDefFieldModel();
-                                    field.nameLc = "createkey";
-                                    field.active = true;
-                                    field.fieldTypeId = FieldTypeIdInteger;
-                                    field.editSortPriority = 9999;
-                                    field.authorable = false;
-                                    field.caption = "Create Key";
-                                    field.defaultValue = "";
-                                    field.isBaseField = IsBaseContent;
-                                    verifyCDefField_ReturnID(core, contentName, field);
-                                }
-                                if (!core.db.isCdefField(returnContentId, "ccGuid")) {
-                                    field = new Models.Domain.CDefFieldModel();
-                                    field.nameLc = "ccguid";
-                                    field.active = true;
-                                    field.fieldTypeId = FieldTypeIdText;
-                                    field.editSortPriority = 9999;
-                                    field.authorable = false;
-                                    field.caption = "Guid";
-                                    field.defaultValue = "";
-                                    field.isBaseField = IsBaseContent;
-                                    verifyCDefField_ReturnID(core, contentName, field);
-                                }
-                                // -- 20171029 - had to un-deprecate because compatibility issues are too timeconsuming
-                                if (!core.db.isCdefField(returnContentId, "ContentCategoryId")) {
-                                    field = new Models.Domain.CDefFieldModel();
-                                    field.nameLc = "contentcategoryid";
-                                    field.active = true;
-                                    field.fieldTypeId = FieldTypeIdInteger;
-                                    field.editSortPriority = 9999;
-                                    field.authorable = false;
-                                    field.caption = "Content Category";
-                                    field.defaultValue = "";
-                                    field.isBaseField = IsBaseContent;
-                                    verifyCDefField_ReturnID(core, contentName, field);
-                                }
-                            }
-                            //
-                            // ----- Load CDef
-                            //
-                            if (clearMetaCache) {
-                                ContentModel.invalidateTableCache(core);
-                                ContentFieldModel.invalidateTableCache(core);
-                                core.doc.clearMetaData();
+                            core.db.updateTableRecord("Default", "ccTables", "ID=" + TableID, sqlList);
+                            TableModel.invalidateRecordCache(core, TableID);
+                        } else {
+                            TableID = GenericController.encodeInteger(dt.Rows[0]["ID"]);
+                        }
+                        //
+                        // ----- Get Sort Method ID from SortMethod
+                        string iDefaultSortMethod = encodeEmpty(cdef.defaultSortMethod, "");
+                        int DefaultSortMethodID = 0;
+                        //
+                        // First - try lookup by name
+                        //
+                        if (string.IsNullOrEmpty(iDefaultSortMethod)) {
+                            DefaultSortMethodID = 0;
+                        } else {
+                            dt = core.db.openTable("Default", "ccSortMethods", "(name=" + core.db.encodeSQLText(iDefaultSortMethod) + ")and(active<>0)", "ID", "ID", 1, 1);
+                            if (dt.Rows.Count > 0) {
+                                DefaultSortMethodID = GenericController.encodeInteger(dt.Rows[0]["ID"]);
                             }
                         }
+                        if (DefaultSortMethodID == 0) {
+                            //
+                            // fallback - maybe they put the orderbyclause in (common mistake)
+                            //
+                            dt = core.db.openTable("Default", "ccSortMethods", "(OrderByClause=" + core.db.encodeSQLText(iDefaultSortMethod) + ")and(active<>0)", "ID", "ID", 1, 1);
+                            if (dt.Rows.Count > 0) {
+                                DefaultSortMethodID = GenericController.encodeInteger(dt.Rows[0]["ID"]);
+                            }
+                        }
+                        //
+                        // determine parentId from parentName
+                        //
+
+                        //
+                        // ----- update record
+                        //
+                        sqlList = new SqlFieldListClass();
+                        sqlList.add("name", core.db.encodeSQLText(cdef.name));
+                        sqlList.add("CREATEKEY", "0");
+                        sqlList.add("active", core.db.encodeSQLBoolean(cdef.active));
+                        sqlList.add("ContentControlID", core.db.encodeSQLNumber(ContentIDofContent));
+                        sqlList.add("AllowAdd", core.db.encodeSQLBoolean(cdef.allowAdd));
+                        sqlList.add("AllowDelete", core.db.encodeSQLBoolean(cdef.allowDelete));
+                        sqlList.add("AllowWorkflowAuthoring", core.db.encodeSQLBoolean(false));
+                        sqlList.add("DeveloperOnly", core.db.encodeSQLBoolean(cdef.developerOnly));
+                        sqlList.add("AdminOnly", core.db.encodeSQLBoolean(cdef.adminOnly));
+                        sqlList.add("ParentID", core.db.encodeSQLNumber(parentId));
+                        sqlList.add("DefaultSortMethodID", core.db.encodeSQLNumber(DefaultSortMethodID));
+                        sqlList.add("DropDownFieldList", core.db.encodeSQLText(encodeEmpty(cdef.dropDownFieldList, "Name")));
+                        sqlList.add("ContentTableID", core.db.encodeSQLNumber(TableID));
+                        sqlList.add("AuthoringTableID", core.db.encodeSQLNumber(TableID));
+                        sqlList.add("ModifiedDate", core.db.encodeSQLDate(DateTime.Now));
+                        sqlList.add("CreatedBy", core.db.encodeSQLNumber(SystemMemberID));
+                        sqlList.add("ModifiedBy", core.db.encodeSQLNumber(SystemMemberID));
+                        sqlList.add("AllowCalendarEvents", core.db.encodeSQLBoolean(cdef.allowCalendarEvents));
+                        sqlList.add("AllowContentTracking", core.db.encodeSQLBoolean(cdef.allowContentTracking));
+                        sqlList.add("AllowTopicRules", core.db.encodeSQLBoolean(cdef.allowTopicRules));
+                        sqlList.add("AllowContentChildTool", core.db.encodeSQLBoolean(cdef.allowContentChildTool));
+                        //Call sqlList.add("AllowMetaContent", core.db.encodeSQLBoolean(ignore1))
+                        sqlList.add("IconLink", core.db.encodeSQLText(encodeEmpty(cdef.iconLink, "")));
+                        sqlList.add("IconHeight", core.db.encodeSQLNumber(cdef.iconHeight));
+                        sqlList.add("IconWidth", core.db.encodeSQLNumber(cdef.iconWidth));
+                        sqlList.add("IconSprites", core.db.encodeSQLNumber(cdef.iconSprites));
+                        sqlList.add("installedByCollectionid", core.db.encodeSQLNumber(InstalledByCollectionID));
+                        sqlList.add("supportLegacyContentControl", core.db.encodeSQLBoolean(cdef.supportLegacyContentControl));
+                        if ((string.IsNullOrEmpty(contentGuid)) && (!string.IsNullOrEmpty(cdef.guid))) {
+                            //
+                            // hard one - only update guid if the tables supports it, and it the new guid is not blank
+                            // if the new guid does no match te old guid
+                            //
+                            sqlList.add("ccGuid", core.db.encodeSQLText(cdef.guid));
+                        } else if ((!string.IsNullOrEmpty(cdef.guid)) & (contentGuid != GenericController.vbLCase(cdef.guid))) {
+                            //
+                            // installing content definition with matching name, but different guid -- this is an error that needs to be fixed
+                            //
+                            LogController.handleError( core,new ApplicationException("createContent call, content.name match found but content.ccGuid did not, name [" + cdef.name + "], newGuid [" + cdef.guid + "], installedGuid [" + contentGuid + "] "));
+                        }
+                        core.db.updateTableRecord("Default", "ccContent", "ID=" + returnContentId, sqlList);
+                        ContentModel.invalidateRecordCache(core, returnContentId);
+                        //
+                        //-----------------------------------------------------------------------------------------------
+                        // Verify Core Content Definition Fields
+                        //-----------------------------------------------------------------------------------------------
+                        //
+                        if (parentId < 1) {
+                            CDefFieldModel field = null;
+                            //
+                            // CDef does not inherit its fields, create what is needed for a non-inherited CDef
+                            //
+                            if (!core.db.isCdefField(returnContentId, "ID")) {
+                                field = new Models.Domain.CDefFieldModel();
+                                field.nameLc = "id";
+                                field.active = true;
+                                field.fieldTypeId = FieldTypeIdAutoIdIncrement;
+                                field.editSortPriority = 100;
+                                field.authorable = false;
+                                field.caption = "ID";
+                                field.defaultValue = "";
+                                field.isBaseField = cdef.isBaseContent;
+                                verifyContentField_returnID(core, cdef.name, field);
+                            }
+                            //
+                            if (!core.db.isCdefField(returnContentId, "name")) {
+                                field = new Models.Domain.CDefFieldModel();
+                                field.nameLc = "name";
+                                field.active = true;
+                                field.fieldTypeId = FieldTypeIdText;
+                                field.editSortPriority = 110;
+                                field.authorable = true;
+                                field.caption = "Name";
+                                field.defaultValue = "";
+                                field.isBaseField = cdef.isBaseContent;
+                                verifyContentField_returnID(core, cdef.name, field);
+                            }
+                            //
+                            if (!core.db.isCdefField(returnContentId, "active")) {
+                                field = new Models.Domain.CDefFieldModel();
+                                field.nameLc = "active";
+                                field.active = true;
+                                field.fieldTypeId = FieldTypeIdBoolean;
+                                field.editSortPriority = 200;
+                                field.authorable = true;
+                                field.caption = "Active";
+                                field.defaultValue = "1";
+                                field.isBaseField = cdef.isBaseContent;
+                                verifyContentField_returnID(core, cdef.name, field);
+                            }
+                            //
+                            if (!core.db.isCdefField(returnContentId, "sortorder")) {
+                                field = new Models.Domain.CDefFieldModel();
+                                field.nameLc = "sortorder";
+                                field.active = true;
+                                field.fieldTypeId = FieldTypeIdText;
+                                field.editSortPriority = 2000;
+                                field.authorable = false;
+                                field.caption = "Alpha Sort Order";
+                                field.defaultValue = "";
+                                field.isBaseField = cdef.isBaseContent;
+                                verifyContentField_returnID(core, cdef.name, field);
+                            }
+                            //
+                            if (!core.db.isCdefField(returnContentId, "dateadded")) {
+                                field = new Models.Domain.CDefFieldModel();
+                                field.nameLc = "dateadded";
+                                field.active = true;
+                                field.fieldTypeId = FieldTypeIdDate;
+                                field.editSortPriority = 9999;
+                                field.authorable = false;
+                                field.caption = "Date Added";
+                                field.defaultValue = "";
+                                field.isBaseField = cdef.isBaseContent;
+                                verifyContentField_returnID(core, cdef.name, field);
+                            }
+                            if (!core.db.isCdefField(returnContentId, "createdby")) {
+                                field = new Models.Domain.CDefFieldModel();
+                                field.nameLc = "createdby";
+                                field.active = true;
+                                field.fieldTypeId = FieldTypeIdLookup;
+                                field.editSortPriority = 9999;
+                                field.authorable = false;
+                                field.caption = "Created By";
+                                field.set_lookupContentName(core, "People");
+                                field.defaultValue = "";
+                                field.isBaseField = cdef.isBaseContent;
+                                verifyContentField_returnID(core, cdef.name, field);
+                            }
+                            if (!core.db.isCdefField(returnContentId, "modifieddate")) {
+                                field = new Models.Domain.CDefFieldModel();
+                                field.nameLc = "modifieddate";
+                                field.active = true;
+                                field.fieldTypeId = FieldTypeIdDate;
+                                field.editSortPriority = 9999;
+                                field.authorable = false;
+                                field.caption = "Date Modified";
+                                field.defaultValue = "";
+                                field.isBaseField = cdef.isBaseContent;
+                                verifyContentField_returnID(core, cdef.name, field);
+                            }
+                            if (!core.db.isCdefField(returnContentId, "modifiedby")) {
+                                field = new Models.Domain.CDefFieldModel();
+                                field.nameLc = "modifiedby";
+                                field.active = true;
+                                field.fieldTypeId = FieldTypeIdLookup;
+                                field.editSortPriority = 9999;
+                                field.authorable = false;
+                                field.caption = "Modified By";
+                                field.set_lookupContentName(core, "People");
+                                field.defaultValue = "";
+                                field.isBaseField = cdef.isBaseContent;
+                                verifyContentField_returnID(core, cdef.name, field);
+                            }
+                            if (!core.db.isCdefField(returnContentId, "ContentControlId")) {
+                                field = new Models.Domain.CDefFieldModel();
+                                field.nameLc = "contentcontrolid";
+                                field.active = true;
+                                field.fieldTypeId = FieldTypeIdLookup;
+                                field.editSortPriority = 9999;
+                                field.authorable = false;
+                                field.caption = "Controlling Content";
+                                field.set_lookupContentName(core, "Content");
+                                field.defaultValue = "";
+                                field.isBaseField = cdef.isBaseContent;
+                                verifyContentField_returnID(core, cdef.name, field);
+                            }
+                            if (!core.db.isCdefField(returnContentId, "CreateKey")) {
+                                field = new Models.Domain.CDefFieldModel();
+                                field.nameLc = "createkey";
+                                field.active = true;
+                                field.fieldTypeId = FieldTypeIdInteger;
+                                field.editSortPriority = 9999;
+                                field.authorable = false;
+                                field.caption = "Create Key";
+                                field.defaultValue = "";
+                                field.isBaseField = cdef.isBaseContent;
+                                verifyContentField_returnID(core, cdef.name, field);
+                            }
+                            if (!core.db.isCdefField(returnContentId, "ccGuid")) {
+                                field = new Models.Domain.CDefFieldModel();
+                                field.nameLc = "ccguid";
+                                field.active = true;
+                                field.fieldTypeId = FieldTypeIdText;
+                                field.editSortPriority = 9999;
+                                field.authorable = false;
+                                field.caption = "Guid";
+                                field.defaultValue = "";
+                                field.isBaseField = cdef.isBaseContent;
+                                verifyContentField_returnID(core, cdef.name, field);
+                            }
+                            // -- 20171029 - had to un-deprecate because compatibility issues are too timeconsuming
+                            if (!core.db.isCdefField(returnContentId, "ContentCategoryId")) {
+                                field = new Models.Domain.CDefFieldModel();
+                                field.nameLc = "contentcategoryid";
+                                field.active = true;
+                                field.fieldTypeId = FieldTypeIdInteger;
+                                field.editSortPriority = 9999;
+                                field.authorable = false;
+                                field.caption = "Content Category";
+                                field.defaultValue = "";
+                                field.isBaseField = cdef.isBaseContent;
+                                verifyContentField_returnID(core, cdef.name, field);
+                            }
+                        }
+                        //
+                        // ----- Load CDef
+                        //
+                        ContentModel.invalidateTableCache(core);
+                        ContentFieldModel.invalidateTableCache(core);
+                        core.doc.clearMetaData();
                     }
                 }
             } catch (Exception ex) {
@@ -1437,7 +1414,7 @@ namespace Contensive.Processor.Models.Domain {
         //
         // ====================================================================================================================
         //
-        public static int verifyCDefField_ReturnID(CoreController core, string ContentName, Models.Domain.CDefFieldModel field) // , ByVal FieldName As String, ByVal Args As String, ByVal Delimiter As String) As Integer
+        public static int verifyContentField_returnID(CoreController core, string ContentName, Models.Domain.CDefFieldModel field) // , ByVal FieldName As String, ByVal Args As String, ByVal Delimiter As String) As Integer
         {
             int returnId = 0;
             try {

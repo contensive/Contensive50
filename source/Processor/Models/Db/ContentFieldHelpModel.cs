@@ -20,13 +20,13 @@ namespace Contensive.Processor.Models.Db {
         public string helpDefault { get; set; }
         //
         //====================================================================================================
-        public static ContentFieldHelpModel add(CoreController core) {
-            return add<ContentFieldHelpModel>(core);
+        public static ContentFieldHelpModel addDefault(CoreController core) {
+            return addDefault<ContentFieldHelpModel>(core);
         }
         //
         //====================================================================================================
-        public static ContentFieldHelpModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<ContentFieldHelpModel>(core, ref callersCacheNameList);
+        public static ContentFieldHelpModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
+            return addDefault<ContentFieldHelpModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================

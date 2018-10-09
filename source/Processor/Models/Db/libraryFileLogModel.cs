@@ -31,13 +31,13 @@ namespace Contensive.Processor.Models.Db {
         public int visitID { get; set; }
         //
         //====================================================================================================
-        public static LibraryFileLogModel add(CoreController core) {
-            return add<LibraryFileLogModel>(core);
+        public static LibraryFileLogModel addDefault(CoreController core) {
+            return addDefault<LibraryFileLogModel>(core);
         }
         //
         //====================================================================================================
-        public static LibraryFileLogModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<LibraryFileLogModel>(core, ref callersCacheNameList);
+        public static LibraryFileLogModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
+            return addDefault<LibraryFileLogModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================

@@ -21,13 +21,13 @@ namespace Contensive.Processor.Models.Db {
         public int attempts { get; set; }
         //
         //====================================================================================================
-        public static EmailQueueModel add(CoreController core) {
-            return add<EmailQueueModel>(core);
+        public static EmailQueueModel addDefault(CoreController core) {
+            return addDefault<EmailQueueModel>(core);
         }
         //
         //====================================================================================================
-        public static EmailQueueModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<EmailQueueModel>(core, ref callersCacheNameList);
+        public static EmailQueueModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
+            return addDefault<EmailQueueModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================

@@ -41,12 +41,12 @@
 //        public int TemplateID { get; set; }
 //        //
 //        //====================================================================================================
-//        public static SiteSectionModel add(CoreController core) {
+//        public static SiteSectionModel addDefault(CoreController core) {
 //            return add<SiteSectionModel>(core);
 //        }
 //        //
 //        //====================================================================================================
-//        public static SiteSectionModel add(CoreController core, ref List<string> callersCacheNameList) {
+//        public static SiteSectionModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
 //            return add<SiteSectionModel>(core, ref callersCacheNameList);
 //        }
 //        //

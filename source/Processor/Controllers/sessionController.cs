@@ -71,7 +71,7 @@ namespace Contensive.Processor.Controllers {
                     if (_language == null) {
                         //
                         // -- add english to the table
-                        _language = LanguageModel.add(core);
+                        _language = LanguageModel.addDefault(core);
                         _language.name = "English";
                         _language.http_Accept_Language = "en";
                         _language.save(core);
@@ -197,12 +197,12 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     // -- visit record is missing, create a new visit
                                     LogController.logTrace(core, "SessionController.create(), visit record is missing, create a new visit");
-                                    resultSessionContext.visit = VisitModel.add(core);
+                                    resultSessionContext.visit = VisitModel.addDefault(core);
                                 } else if (resultSessionContext.visit.lastVisitTime.AddHours(1) < core.doc.profileStartTime) {
                                     //
                                     // -- visit has expired, create new visit
                                     LogController.logTrace(core, "SessionController.create(), visit has expired, create new visit");
-                                    resultSessionContext.visit = VisitModel.add(core);
+                                    resultSessionContext.visit = VisitModel.addDefault(core);
                                 } else {
                                     //
                                     // -- visit object is valid, share its data with other objects
@@ -240,7 +240,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // -- create new visit record
                                 LogController.logTrace(core, "SessionController.create(), visit id=0, create new visit");
-                                resultSessionContext.visit = VisitModel.add(core);
+                                resultSessionContext.visit = VisitModel.addDefault(core);
                                 if (string.IsNullOrEmpty(resultSessionContext.visit.name)) {
                                     resultSessionContext.visit.name = "User";
                                 }
@@ -289,7 +289,7 @@ namespace Contensive.Processor.Controllers {
                                 if (resultSessionContext.visitor.id == 0) {
                                     //
                                     // -- create new visitor
-                                    resultSessionContext.visitor = VisitorModel.add(core);
+                                    resultSessionContext.visitor = VisitorModel.addDefault(core);
                                     visitor_changes = false;
                                     //
                                     resultSessionContext.visit.visitorNew = true;
@@ -446,7 +446,7 @@ namespace Contensive.Processor.Controllers {
                             if (resultSessionContext.visitor.id == 0) {
                                 //
                                 // -- create new visitor
-                                resultSessionContext.visitor = VisitorModel.add(core);
+                                resultSessionContext.visitor = VisitorModel.addDefault(core);
                                 visitor_changes = false;
                                 //
                                 resultSessionContext.visit.visitorNew = true;
@@ -662,7 +662,7 @@ namespace Contensive.Processor.Controllers {
                 LogController.addSiteActivity(core, "logout", user.id, user.OrganizationID);
                 //
                 // new guest
-                user = PersonModel.add(core);
+                user = PersonModel.addDefault(core);
                 visit.memberID = user.id;
                 visit.visitAuthenticated = false;
                 visit.save(core);
@@ -1092,10 +1092,10 @@ namespace Contensive.Processor.Controllers {
             bool result = false;
             try {
                 if (sessionContext.visitor.id == 0) {
-                    sessionContext.visitor = VisitorModel.add(core);
+                    sessionContext.visitor = VisitorModel.addDefault(core);
                 }
                 if (sessionContext.visit.id == 0) {
-                    sessionContext.visit = VisitModel.add(core);
+                    sessionContext.visit = VisitModel.addDefault(core);
                 }
                 PersonModel contextUser = PersonModel.create(core, userId);
                 if (contextUser != null) {

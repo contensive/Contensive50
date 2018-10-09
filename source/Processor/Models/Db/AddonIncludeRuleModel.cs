@@ -18,13 +18,13 @@ namespace Contensive.Processor.Models.Db {
         public int includedAddonID { get; set; }
         //
         //====================================================================================================
-        public static AddonIncludeRuleModel add(CoreController core) {
-            return add<AddonIncludeRuleModel>(core);
+        public static AddonIncludeRuleModel addDefault(CoreController core) {
+            return addDefault<AddonIncludeRuleModel>(core);
         }
         //
         //====================================================================================================
-        public static AddonIncludeRuleModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<AddonIncludeRuleModel>(core, ref callersCacheNameList);
+        public static AddonIncludeRuleModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
+            return addDefault<AddonIncludeRuleModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================

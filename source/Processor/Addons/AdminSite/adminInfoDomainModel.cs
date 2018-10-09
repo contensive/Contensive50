@@ -21,7 +21,7 @@ namespace Contensive.Addons.AdminSite {
     /// <summary>
     /// object that contains the context for the admin site, like recordsPerPage, etc. Should eventually include the loadContext and be its own document
     /// </summary>
-    public class adminInfoDomainModel {
+    public class AdminInfoDomainModel {
 
         public const int AdminActionNop = 0; // do nothing
         public const int AdminActionDelete = 4; // delete record
@@ -238,7 +238,7 @@ namespace Contensive.Addons.AdminSite {
         /// loads the context for the admin site, controlled by request inputs like rnContent (cid) and rnRecordId (id)
         /// </summary>
         /// <param name="core"></param>
-        public adminInfoDomainModel( CoreController core) {
+        public AdminInfoDomainModel( CoreController core) {
             try {
                 //
                 // Tab Control

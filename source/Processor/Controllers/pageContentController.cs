@@ -234,7 +234,7 @@ namespace Contensive.Processor.Controllers {
                 // ----- Do not allow blank message - if still nothing, create default
                 if (string.IsNullOrEmpty(result)) {
                     result = "<p>The content on this page has restricted access. If you have a username and password for this system, <a href=\"?method=login\" rel=\"nofollow\">Click Here</a>. For more information, please contact the administrator.</p>";
-                    copyRecord = CopyContentModel.add(core);
+                    copyRecord = CopyContentModel.addDefault(core);
                     copyRecord.name = ContentBlockCopyName;
                     copyRecord.copy = result;
                     copyRecord.save(core);
@@ -358,7 +358,7 @@ namespace Contensive.Processor.Controllers {
                     if (core.doc.pageController.pageToRootList.Count == 0) {
                         //
                         // -- attempt failed, create default page
-                        core.doc.pageController.page = PageContentModel.add(core);
+                        core.doc.pageController.page = PageContentModel.addDefault(core);
                         core.doc.pageController.page.name = DefaultNewLandingPageName + ", " + domain.name;
                         core.doc.pageController.page.copyfilename.content = landingPageDefaultHtml;
                         core.doc.pageController.page.save(core);
@@ -409,7 +409,7 @@ namespace Contensive.Processor.Controllers {
                             if (core.doc.pageController.template == null) {
                                 //
                                 // -- ceate new template named Default
-                                core.doc.pageController.template = PageTemplateModel.add(core );
+                                core.doc.pageController.template = PageTemplateModel.addDefault(core );
                                 core.doc.pageController.template.name = defaultTemplateName;
                                 core.doc.pageController.template.bodyHTML = core.appRootFiles.readFileText(defaultTemplateHomeFilename);
                                 core.doc.pageController.template.save(core);
@@ -472,7 +472,7 @@ namespace Contensive.Processor.Controllers {
                         if (landingPage == null) {
                             //
                             // -- create detault landing page
-                            landingPage = PageContentModel.add(core);
+                            landingPage = PageContentModel.addDefault(core);
                             landingPage.name = DefaultNewLandingPageName + ", " + domain.name;
                             landingPage.copyfilename.content = landingPageDefaultHtml;
                             landingPage.save(core);
@@ -905,7 +905,7 @@ namespace Contensive.Processor.Controllers {
                                 if (file.filename != "") {
                                     //
                                     // -- create log entry
-                                    LibraryFileLogModel log = LibraryFileLogModel.add(core);
+                                    LibraryFileLogModel log = LibraryFileLogModel.addDefault(core);
                                     if (log != null) {
                                         log.fileID = file.id;
                                         log.visitID = core.session.visit.id;

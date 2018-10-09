@@ -232,6 +232,8 @@ namespace Contensive.Processor.Models.Db {
                 return fieldInfo.GetRawConstantValue().ToString();
             }
         }
+        //
+        //====================================================================================================
         /// <summary>
         /// returns the boolean value of the constant nameIsUnique in the derived class. Setting true enables a name cache ptr.
         /// </summary>
@@ -261,20 +263,19 @@ namespace Contensive.Processor.Models.Db {
         /// <typeparam name="T"></typeparam>
         /// <param name="core"></param>
         /// <returns></returns>
-        protected static T add<T>(CoreController core) where T : BaseModel {
+        protected static T addDefault<T>(CoreController core) where T : BaseModel {
             var tempVar = new List<string>();
-            return add<T>(core, ref tempVar);
+            return addDefault<T>(core, ref tempVar);
         }
         //
         //====================================================================================================
         /// <summary>
-        /// Add a new recod to the db and open it. Starting a new model with this method will use the default values in Contensive metadata (active, contentcontrolid, etc).
-        /// include callersCacheNameList to get a list of cacheNames used to assemble this response
+        /// Add a new record to the db populated with default values from the content definition and return an object of it
         /// </summary>
         /// <param name="core"></param>
         /// <param name="callersCacheNameList"></param>
         /// <returns></returns>
-        protected static T add<T>(CoreController core, ref List<string> callersCacheNameList) where T : BaseModel {
+        protected static T addDefault<T>(CoreController core, ref List<string> callersCacheNameList) where T : BaseModel {
             T result = default(T);
             try {
                 if (core.serverConfig == null) {
@@ -286,13 +287,39 @@ namespace Contensive.Processor.Models.Db {
                     // -- cannot use models without an application
                     LogController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
-                    Type instanceType = typeof(T);
-                    string contentName = derivedContentName(instanceType);
-                    result = create<T>(core, core.db.insertTableRecordGetId( derivedDataSourceName(instanceType), derivedTableName(instanceType), core.session.user.id));
+                    result = create<T>(core, core.db.insertContentRecordGetID(derivedContentName(typeof(T)), core.session.user.id));
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
+            }
+            return result;
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Add a new empty record to the db and return an object of it.
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="callersCacheNameList"></param>
+        /// <returns></returns>
+        protected static T addEmpty<T>(CoreController core) where T : BaseModel {
+            T result = default(T);
+            try {
+                if (core.serverConfig == null) {
+                    //
+                    // -- cannot use models without an application
+                    LogController.handleError(core, new ApplicationException("Cannot use data models without a valid server configuration."));
+                } else if (core.appConfig == null) {
+                    //
+                    // -- cannot use models without an application
+                    LogController.handleError(core, new ApplicationException("Cannot use data models without a valid application configuration."));
+                } else {
+                    Type instanceType = typeof(T);
+                    result = create<T>(core, core.db.insertTableRecordGetId(derivedDataSourceName(instanceType), derivedTableName(instanceType), core.session.user.id));
+                }
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
                 throw;
             }
             return result;
@@ -1079,7 +1106,47 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         /// <summary>
-        /// Create a model object from the default values for each field
+        /// Create an empty model object, populating only control fields (guid, active, created/modified)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        protected static T createEmpty<T>( CoreController core ) where T : BaseModel {
+            T instance = default(T);
+            try {
+                if (core.serverConfig == null) {
+                    //
+                    // -- cannot use models without an application
+                    LogController.handleError(core, new ApplicationException("Cannot use data models without a valid server configuration."));
+                } else if (core.appConfig == null) {
+                    //
+                    // -- cannot use models without an application
+                    LogController.handleError(core, new ApplicationException("Cannot use data models without a valid application configuration."));
+                } else {
+                    Type instanceType = typeof(T);
+                    instance = (T)Activator.CreateInstance(instanceType);
+                    string guid = GenericController.getGUID();
+                    DateTime rightNow = DateTime.Now;
+                    instance.GetType().GetProperty("ccguid", BindingFlags.Instance | BindingFlags.Public).SetValue(instance, guid, null);
+                    instance.GetType().GetProperty("dateadded", BindingFlags.Instance | BindingFlags.Public).SetValue(instance, rightNow, null);
+                    instance.GetType().GetProperty("createdby", BindingFlags.Instance | BindingFlags.Public).SetValue(instance, core.session.user.id, null);
+                    instance.GetType().GetProperty("modifieddate", BindingFlags.Instance | BindingFlags.Public).SetValue(instance, rightNow, null);
+                    instance.GetType().GetProperty("modifiedby", BindingFlags.Instance | BindingFlags.Public).SetValue(instance, core.session.user.id, null);
+                    instance.GetType().GetProperty("contentcontrolid", BindingFlags.Instance | BindingFlags.Public).SetValue(instance, 0, null);
+                    instance.GetType().GetProperty("ccguid", BindingFlags.Instance | BindingFlags.Public).SetValue(instance, "", null);
+                    instance.GetType().GetProperty("active", BindingFlags.Instance | BindingFlags.Public).SetValue(instance, 0, null);
+                }
+            } catch (Exception) {
+                throw;
+            }
+            return instance;
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Create a model object from the default values for each field.
+        /// No record is created so the id is 0.
+        /// Create a record 
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="core"></param>
@@ -1087,8 +1154,6 @@ namespace Contensive.Processor.Models.Db {
         protected static T createDefault<T>(CoreController core) where T : BaseModel {
             T instance = default(T);
             try {
-                Type instanceType = typeof(T);
-                instance = (T)Activator.CreateInstance(instanceType);
                 if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
@@ -1098,7 +1163,8 @@ namespace Contensive.Processor.Models.Db {
                     // -- cannot use models without an application
                     LogController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
-                    string contentName = derivedContentName(instanceType);
+                    instance = createEmpty<T>(core);
+                    string contentName = derivedContentName(typeof(T));
                     Models.Domain.CDefModel CDef = Models.Domain.CDefModel.getCdef(core, contentName);
                     if (CDef == null) {
                         throw new ApplicationException("content [" + contentName + "] could Not be found.");

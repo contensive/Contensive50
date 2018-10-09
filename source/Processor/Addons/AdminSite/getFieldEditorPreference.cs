@@ -16,7 +16,7 @@ using static Contensive.Processor.constants;
 //
 namespace Contensive.Addons.AdminSite {
     //
-    public class getFieldEditorPreference : Contensive.BaseClasses.AddonBaseClass {
+    public class GetFieldEditorPreference : Contensive.BaseClasses.AddonBaseClass {
         //
         //====================================================================================================
         /// <summary>

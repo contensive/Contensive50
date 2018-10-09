@@ -29,12 +29,12 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static AddonCollection add(CoreController core) {
-            return add<AddonCollection>(core);
+            return addDefault<AddonCollection>(core);
         }
         //
         //====================================================================================================
         public static AddonCollection add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<AddonCollection>(core, ref callersCacheNameList);
+            return addDefault<AddonCollection>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================

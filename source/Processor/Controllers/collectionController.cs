@@ -3798,7 +3798,20 @@ namespace Contensive.Processor.Controllers {
                                         if (defaultCollection.cdef.ContainsKey(contentNameLc)) {
                                             DefaultCDef = defaultCollection.cdef[contentNameLc];
                                         } else {
-                                            DefaultCDef = new Models.Domain.CDefModel();
+                                            DefaultCDef = new Models.Domain.CDefModel() {
+                                                active = true,
+                                                activeOnly = true,
+                                                aliasID = "id",
+                                                aliasName = "name",
+                                                adminOnly = false,
+                                                allowAdd = true,
+                                                allowDelete = false,
+                                                dataSourceName = "",
+                                                dataSourceId = 0,
+                                                developerOnly = false,
+                                                dropDownFieldList = "name",
+                                                isBaseContent = IsccBaseFile
+                                            };
                                         }
                                         //
                                         ContentTableName =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "ContentTableName", DefaultCDef.tableName);
@@ -3819,7 +3832,7 @@ namespace Contensive.Processor.Controllers {
                                             //
                                             // Get CDef attributes
                                             //
-                                            Models.Domain.CDefModel tempVar = result.cdef[ContentName.ToLower()];
+                                            Models.Domain.CDefModel targetCdef = result.cdef[ContentName.ToLower()];
                                             string activeDefaultText = "1";
                                             if (!(DefaultCDef.active)) {
                                                 activeDefaultText = "0";
@@ -3828,49 +3841,49 @@ namespace Contensive.Processor.Controllers {
                                             if (string.IsNullOrEmpty(ActiveText)) {
                                                 ActiveText = "1";
                                             }
-                                            tempVar.active = GenericController.encodeBoolean(ActiveText);
-                                            tempVar.activeOnly = true;
+                                            targetCdef.active = GenericController.encodeBoolean(ActiveText);
+                                            targetCdef.activeOnly = true;
                                             //.adminColumns = ?
-                                            tempVar.adminOnly =XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "AdminOnly", DefaultCDef.adminOnly);
-                                            tempVar.aliasID = "id";
-                                            tempVar.aliasName = "name";
-                                            tempVar.allowAdd =XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "AllowAdd", DefaultCDef.allowAdd);
-                                            tempVar.allowCalendarEvents =XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "AllowCalendarEvents", DefaultCDef.allowCalendarEvents);
-                                            tempVar.allowContentChildTool =XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "AllowContentChildTool", DefaultCDef.allowContentChildTool);
-                                            tempVar.allowContentTracking =XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "AllowContentTracking", DefaultCDef.allowContentTracking);
-                                            tempVar.allowDelete =XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "AllowDelete", DefaultCDef.allowDelete);
-                                            tempVar.allowTopicRules =XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "AllowTopicRules", DefaultCDef.allowTopicRules);
-                                            tempVar.guid =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "guid", DefaultCDef.guid);
-                                            tempVar.dataChanged = setAllDataChanged;
-                                            tempVar.set_childIdList(core, new List<int>());
-                                            tempVar.legacyContentControlCriteria = "";
-                                            tempVar.dataSourceName =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "ContentDataSourceName", DefaultCDef.dataSourceName);
-                                            tempVar.tableName =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "ContentTableName", DefaultCDef.tableName);
-                                            tempVar.dataSourceId = 0;
-                                            tempVar.defaultSortMethod =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "DefaultSortMethod", DefaultCDef.defaultSortMethod);
-                                            if ((tempVar.defaultSortMethod == "") || (tempVar.defaultSortMethod.ToLower() == "name")) {
-                                                tempVar.defaultSortMethod = "By Name";
-                                            } else if (GenericController.vbLCase(tempVar.defaultSortMethod) == "sortorder") {
-                                                tempVar.defaultSortMethod = "By Alpha Sort Order Field";
-                                            } else if (GenericController.vbLCase(tempVar.defaultSortMethod) == "date") {
-                                                tempVar.defaultSortMethod = "By Date";
+                                            targetCdef.adminOnly =XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "AdminOnly", DefaultCDef.adminOnly);
+                                            targetCdef.aliasID = "id";
+                                            targetCdef.aliasName = "name";
+                                            targetCdef.allowAdd =XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "AllowAdd", DefaultCDef.allowAdd);
+                                            targetCdef.allowCalendarEvents =XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "AllowCalendarEvents", DefaultCDef.allowCalendarEvents);
+                                            targetCdef.allowContentChildTool =XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "AllowContentChildTool", DefaultCDef.allowContentChildTool);
+                                            targetCdef.allowContentTracking =XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "AllowContentTracking", DefaultCDef.allowContentTracking);
+                                            targetCdef.allowDelete =XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "AllowDelete", DefaultCDef.allowDelete);
+                                            targetCdef.allowTopicRules =XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "AllowTopicRules", DefaultCDef.allowTopicRules);
+                                            targetCdef.guid =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "guid", DefaultCDef.guid);
+                                            targetCdef.dataChanged = setAllDataChanged;
+                                            targetCdef.set_childIdList(core, new List<int>());
+                                            targetCdef.legacyContentControlCriteria = "";
+                                            targetCdef.dataSourceName =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "ContentDataSourceName", DefaultCDef.dataSourceName);
+                                            targetCdef.tableName =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "ContentTableName", DefaultCDef.tableName);
+                                            targetCdef.dataSourceId = 0;
+                                            targetCdef.defaultSortMethod =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "DefaultSortMethod", DefaultCDef.defaultSortMethod);
+                                            if ((targetCdef.defaultSortMethod == "") || (targetCdef.defaultSortMethod.ToLower() == "name")) {
+                                                targetCdef.defaultSortMethod = "By Name";
+                                            } else if (GenericController.vbLCase(targetCdef.defaultSortMethod) == "sortorder") {
+                                                targetCdef.defaultSortMethod = "By Alpha Sort Order Field";
+                                            } else if (GenericController.vbLCase(targetCdef.defaultSortMethod) == "date") {
+                                                targetCdef.defaultSortMethod = "By Date";
                                             }
-                                            tempVar.developerOnly =XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "DeveloperOnly", DefaultCDef.developerOnly);
-                                            tempVar.dropDownFieldList =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "DropDownFieldList", DefaultCDef.dropDownFieldList);
-                                            tempVar.editorGroupName =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "EditorGroupName", DefaultCDef.editorGroupName);
-                                            tempVar.fields = new Dictionary<string, Models.Domain.CDefFieldModel>();
-                                            tempVar.iconLink =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "IconLink", DefaultCDef.iconLink);
-                                            tempVar.iconHeight =XmlController.GetXMLAttributeInteger(core, Found, CDef_NodeWithinLoop, "IconHeight", DefaultCDef.iconHeight);
-                                            tempVar.iconWidth =XmlController.GetXMLAttributeInteger(core, Found, CDef_NodeWithinLoop, "IconWidth", DefaultCDef.iconWidth);
-                                            tempVar.iconSprites =XmlController.GetXMLAttributeInteger(core, Found, CDef_NodeWithinLoop, "IconSprites", DefaultCDef.iconSprites);
-                                            tempVar.supportLegacyContentControl =XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "supportLegacyContentControl", DefaultCDef.supportLegacyContentControl);
-                                            tempVar.includesAFieldChange = false;
-                                            tempVar.installedByCollectionGuid =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "installedByCollection", DefaultCDef.installedByCollectionGuid);
-                                            tempVar.isBaseContent = IsccBaseFile ||XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "IsBaseContent", false);
-                                            tempVar.isModifiedSinceInstalled =XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "IsModified", DefaultCDef.isModifiedSinceInstalled);
-                                            tempVar.name = ContentName;
-                                            tempVar.parentName =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "Parent", DefaultCDef.parentName);
-                                            tempVar.whereClause =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "WhereClause", DefaultCDef.whereClause);
+                                            targetCdef.developerOnly =XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "DeveloperOnly", DefaultCDef.developerOnly);
+                                            targetCdef.dropDownFieldList =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "DropDownFieldList", DefaultCDef.dropDownFieldList);
+                                            targetCdef.editorGroupName =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "EditorGroupName", DefaultCDef.editorGroupName);
+                                            targetCdef.fields = new Dictionary<string, Models.Domain.CDefFieldModel>();
+                                            targetCdef.iconLink =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "IconLink", DefaultCDef.iconLink);
+                                            targetCdef.iconHeight =XmlController.GetXMLAttributeInteger(core, Found, CDef_NodeWithinLoop, "IconHeight", DefaultCDef.iconHeight);
+                                            targetCdef.iconWidth =XmlController.GetXMLAttributeInteger(core, Found, CDef_NodeWithinLoop, "IconWidth", DefaultCDef.iconWidth);
+                                            targetCdef.iconSprites =XmlController.GetXMLAttributeInteger(core, Found, CDef_NodeWithinLoop, "IconSprites", DefaultCDef.iconSprites);
+                                            targetCdef.supportLegacyContentControl =XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "supportLegacyContentControl", DefaultCDef.supportLegacyContentControl);
+                                            targetCdef.includesAFieldChange = false;
+                                            targetCdef.installedByCollectionGuid =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "installedByCollection", DefaultCDef.installedByCollectionGuid);
+                                            targetCdef.isBaseContent = IsccBaseFile ||XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "IsBaseContent", false);
+                                            targetCdef.isModifiedSinceInstalled =XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "IsModified", DefaultCDef.isModifiedSinceInstalled);
+                                            targetCdef.name = ContentName;
+                                            targetCdef.parentName =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "Parent", DefaultCDef.parentName);
+                                            targetCdef.whereClause =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "WhereClause", DefaultCDef.whereClause);
                                             //
                                             // Get CDef field nodes
                                             //
@@ -4518,7 +4531,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // -- update definition (use SingleRecord as an update flag)
                         var datasource = DataSourceModel.createByUniqueName(core, cdef.dataSourceName);
-                        CDefModel.addContent(core, true, datasource, cdef.tableName, cdef.name, cdef.adminOnly, cdef.developerOnly, cdef.allowAdd, cdef.allowDelete, cdef.parentName, cdef.defaultSortMethod, cdef.dropDownFieldList, false, cdef.allowCalendarEvents, cdef.allowContentTracking, cdef.allowTopicRules, cdef.allowContentChildTool, false, cdef.iconLink, cdef.iconWidth, cdef.iconHeight, cdef.iconSprites, cdef.guid, cdef.isBaseContent, cdef.installedByCollectionGuid);
+                        CDefModel.verifyContent_returnId(core, cdef); // true, datasource, cdef.tableName, cdef.name, cdef.adminOnly, cdef.developerOnly, cdef.allowAdd, cdef.allowDelete, cdef.parentName, cdef.defaultSortMethod, cdef.dropDownFieldList, false, cdef.allowCalendarEvents, cdef.allowContentTracking, cdef.allowTopicRules, cdef.allowContentChildTool, false, cdef.iconLink, cdef.iconWidth, cdef.iconHeight, cdef.iconSprites, cdef.guid, cdef.isBaseContent, cdef.installedByCollectionGuid);
                         ////
                         //// -- Other fields not in the csv call
                         ////int EditorGroupID = 0;
@@ -4547,7 +4560,7 @@ namespace Contensive.Processor.Controllers {
                         CDefFieldModel field = nameValuePair.Value;
                         int fieldId = 0;
                         if (field.dataChanged) {
-                            fieldId = Models.Domain.CDefModel.verifyCDefField_ReturnID(core, cdef.name, field);
+                            fieldId = Models.Domain.CDefModel.verifyContentField_returnID(core, cdef.name, field);
                         }
                         //
                         // -- update content field help records
@@ -4559,7 +4572,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // -- no current field help record, if adding help, create record
                                 if ( (!string.IsNullOrWhiteSpace(field.helpDefault)) | (!string.IsNullOrWhiteSpace(field.helpCustom)) ) {
-                                    fieldHelp = ContentFieldHelpModel.add(core);
+                                    fieldHelp = ContentFieldHelpModel.addDefault(core);
                                     fieldHelp.helpDefault = field.helpDefault;
                                     fieldHelp.helpCustom = field.helpCustom;
                                     fieldHelp.save(core);

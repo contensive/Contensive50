@@ -30,13 +30,13 @@ namespace Contensive.Processor.Models.Db {
         public int ForceBrowserMobile { get; set; }
         //
         //====================================================================================================
-        public static VisitorModel add(CoreController core) {
-            return add<VisitorModel>(core);
+        public static VisitorModel addDefault(CoreController core) {
+            return addDefault<VisitorModel>(core);
         }
         //
         //====================================================================================================
-        public static VisitorModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<VisitorModel>(core, ref callersCacheNameList);
+        public static VisitorModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
+            return addDefault<VisitorModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================

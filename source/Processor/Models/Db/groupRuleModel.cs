@@ -20,13 +20,13 @@ namespace Contensive.Processor.Models.Db {
         public int groupID { get; set; }
         //
         //====================================================================================================
-        public static GroupRuleModel add(CoreController core) {
-            return add<GroupRuleModel>(core);
+        public static GroupRuleModel addDefault(CoreController core) {
+            return addDefault<GroupRuleModel>(core);
         }
         //
         //====================================================================================================
-        public static GroupRuleModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<GroupRuleModel>(core, ref callersCacheNameList);
+        public static GroupRuleModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
+            return addDefault<GroupRuleModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================

@@ -15,7 +15,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Addons.AdminSite {
-    public class openAjaxAdminNavClass : Contensive.BaseClasses.AddonBaseClass {
+    public class OpenAjaxAdminNavClass : Contensive.BaseClasses.AddonBaseClass {
         //
         //====================================================================================================
         /// <summary>

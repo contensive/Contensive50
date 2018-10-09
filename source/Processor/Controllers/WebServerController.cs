@@ -400,7 +400,7 @@ namespace Contensive.Processor.Controllers {
                     foreach (string domain in core.appConfig.domainList) {
                         if (!core.domainDictionary.ContainsKey(domain.ToLower())) {
                             LogController.logTrace(core, "adding domain record because configList domain not found [" + domain.ToLower() + "]");
-                            var newDomain = DomainModel.add(core);
+                            var newDomain = DomainModel.addDefault(core);
                             newDomain.name = domain;
                             newDomain.rootPageId = 0;
                             newDomain.noFollow = false;
@@ -419,7 +419,7 @@ namespace Contensive.Processor.Controllers {
                     // -- verify request domain
                     if (!core.domainDictionary.ContainsKey(requestDomain.ToLower())) {
                         LogController.logTrace(core, "adding domain record because requestDomain [" + requestDomain.ToLower() + "] not found");
-                        var newDomain = DomainModel.add( core );
+                        var newDomain = DomainModel.addDefault( core );
                         newDomain.name = requestDomain;
                         newDomain.rootPageId = 0;
                         newDomain.noFollow = false;

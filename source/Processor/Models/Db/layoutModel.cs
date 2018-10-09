@@ -30,13 +30,13 @@ namespace Contensive.Processor.Models.Db {
         public string stylesFilename { get; set; }
         //
         //====================================================================================================
-        public static LayoutModel add(CoreController core) {
-            return add<LayoutModel>(core);
+        public static LayoutModel addDefault(CoreController core) {
+            return addDefault<LayoutModel>(core);
         }
         //
         //====================================================================================================
-        public static LayoutModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<LayoutModel>(core, ref callersCacheNameList);
+        public static LayoutModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
+            return addDefault<LayoutModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================

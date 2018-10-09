@@ -18,13 +18,13 @@ namespace Contensive.Processor.Models.Db {
         public int contentFieldTypeID { get; set; }
         //
         //====================================================================================================
-        public static AddonContentFieldTypeRulesModel add(CoreController core) {
-            return add<AddonContentFieldTypeRulesModel>(core);
+        public static AddonContentFieldTypeRulesModel addDefault(CoreController core) {
+            return addDefault<AddonContentFieldTypeRulesModel>(core);
         }
         //
         //====================================================================================================
-        public static AddonContentFieldTypeRulesModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<AddonContentFieldTypeRulesModel>(core, ref callersCacheNameList);
+        public static AddonContentFieldTypeRulesModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
+            return addDefault<AddonContentFieldTypeRulesModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================

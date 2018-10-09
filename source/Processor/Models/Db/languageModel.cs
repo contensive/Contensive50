@@ -29,13 +29,13 @@ namespace Contensive.Processor.Models.Db {
         public string http_Accept_Language { get; set; }
         //
         //====================================================================================================
-        public static LanguageModel add(CoreController core) {
-            return add<LanguageModel>(core);
+        public static LanguageModel addDefault(CoreController core) {
+            return addDefault<LanguageModel>(core);
         }
         //
         //====================================================================================================
-        public static LanguageModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<LanguageModel>(core, ref callersCacheNameList);
+        public static LanguageModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
+            return addDefault<LanguageModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================

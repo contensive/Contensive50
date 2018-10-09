@@ -38,13 +38,13 @@ namespace Contensive.Processor.Models.Db {
         public string cmdDetail { get; set; }
         //
         //====================================================================================================
-        public static TaskModel add(CoreController core) {
-            return add<TaskModel>(core);
+        public static TaskModel addDefault(CoreController core) {
+            return addDefault<TaskModel>(core);
         }
         //
         //====================================================================================================
-        public static TaskModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<TaskModel>(core, ref callersCacheNameList);
+        public static TaskModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
+            return addDefault<TaskModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================

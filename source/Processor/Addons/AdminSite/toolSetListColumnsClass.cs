@@ -18,13 +18,13 @@ using Contensive.Addons.Tools;
 using static Contensive.Processor.AdminUIController;
 //
 namespace Contensive.Addons.AdminSite {
-    public class toolSetListColumnsClass {
+    public class ToolSetListColumnsClass {
         //
         //=============================================================================
         //   Print the Configure Index Form
         //=============================================================================
         //
-        public static string GetForm_Index_SetColumns(CoreController core, adminInfoDomainModel adminContext) {
+        public static string GetForm_Index_SetColumns(CoreController core, AdminInfoDomainModel adminContext) {
             string result = "";
             try {
                 // todo refactor out
@@ -40,9 +40,9 @@ namespace Contensive.Addons.AdminSite {
                 if (Button == ButtonReset) {
                     //
                     //   Process reset
-                    core.userProperty.setProperty(adminInfoDomainModel.IndexConfigPrefix + adminContent.id.ToString(), "");
+                    core.userProperty.setProperty(AdminInfoDomainModel.IndexConfigPrefix + adminContent.id.ToString(), "");
                 }
-                IndexConfigClass IndexConfig = GetHtmlBodyClass.loadIndexConfig(core, adminContext);
+                IndexConfigClass IndexConfig = IndexConfigClass.get(core, adminContext);
                 int ToolsAction = core.docProperties.getInteger("dta");
                 int TargetFieldID = core.docProperties.getInteger("fi");
                 string TargetFieldName = core.docProperties.getText("FieldName");
@@ -139,12 +139,12 @@ namespace Contensive.Addons.AdminSite {
                                     // Add a field to the index form
                                     //
                                     if (FieldIDToAdd != 0) {
-                                        IndexConfigColumnClass column = null;
+                                        IndexConfigClass.IndexConfigColumnClass column = null;
                                         foreach (var columnx in IndexConfig.columns) {
                                             columnx.Width = encodeInteger((columnx.Width * 80) / (double)ColumnWidthTotal);
                                         }
                                         {
-                                            column = new IndexConfigColumnClass();
+                                            column = new IndexConfigClass.IndexConfigColumnClass();
                                             int CSPointer = core.db.csOpenRecord("Content Fields", FieldIDToAdd, false, false);
                                             if (core.db.csOk(CSPointer)) {
                                                 column.Name = core.db.csGet(CSPointer, "name");
@@ -162,7 +162,7 @@ namespace Contensive.Addons.AdminSite {
                                     //
                                     // Remove a field to the index form
                                     int columnWidthTotal = 0;
-                                    var dstColumns = new List<IndexConfigColumnClass>() { };
+                                    var dstColumns = new List<IndexConfigClass.IndexConfigColumnClass>() { };
                                     foreach (var column in IndexConfig.columns) {
                                         if (column.Name != TargetFieldName.ToLower()) {
                                             dstColumns.Add(column);
@@ -246,7 +246,7 @@ namespace Contensive.Addons.AdminSite {
                                 column.Width = encodeInteger((1000 * column.Width) / (double)ColumnWidthTotal);
                             }
                             GetHtmlBodyClass.setIndexSQL_SaveIndexConfig(core, IndexConfig);
-                            IndexConfig = GetHtmlBodyClass.loadIndexConfig(core, adminContext);
+                            IndexConfig = IndexConfigClass.get(core, adminContext);
                         }
                     }
                     //

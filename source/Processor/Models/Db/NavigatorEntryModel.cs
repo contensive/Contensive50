@@ -43,13 +43,18 @@ namespace Contensive.Processor.Models.Db {
         public bool NewWindow { get; set; }
         //
         //====================================================================================================
-        public static NavigatorEntryModel add(CoreController core) {
-            return add<NavigatorEntryModel>(core);
+        public static NavigatorEntryModel addEmpty(CoreController core) {
+            return addEmpty<NavigatorEntryModel>(core);
         }
         //
         //====================================================================================================
-        public static NavigatorEntryModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<NavigatorEntryModel>(core, ref callersCacheNameList);
+        public static NavigatorEntryModel addDefault(CoreController core) {
+            return addDefault<NavigatorEntryModel>(core);
+        }
+        //
+        //====================================================================================================
+        public static NavigatorEntryModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
+            return addDefault<NavigatorEntryModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================

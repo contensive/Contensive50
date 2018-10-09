@@ -51,7 +51,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 // arrange
                 string source = "<Ac Type=\"Member\" Field=\"Name\">";
                 string testPersonName = "test" + GenericController.GetRandomInteger(cp.core);
-                var testPerson = Contensive.Processor.Models.Db.PersonModel.add(cp.core);
+                var testPerson = Contensive.Processor.Models.Db.PersonModel.addDefault(cp.core);
                 testPerson.name = testPersonName;
                 testPerson.save(cp.core);
                 cp.User.LoginByID(testPerson.id);
@@ -77,10 +77,10 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 // arrange
                 string source = "<Ac Type=\"Organization\" Field=\"Name\">";
                 string testOrgName = "testOrg" + GenericController.GetRandomInteger(cp.core);
-                var testOrg = Contensive.Processor.Models.Db.OrganizationModel.add(cp.core);
+                var testOrg = Contensive.Processor.Models.Db.OrganizationModel.addDefault(cp.core);
                 testOrg.name = testOrgName;
                 testOrg.save(cp.core);
-                var testPerson = Contensive.Processor.Models.Db.PersonModel.add(cp.core);
+                var testPerson = Contensive.Processor.Models.Db.PersonModel.addDefault(cp.core);
                 testPerson.OrganizationID = testOrg.id;
                 string testPersonName = "testPerson" + GenericController.GetRandomInteger(cp.core);
                 testPerson.name = testPersonName;

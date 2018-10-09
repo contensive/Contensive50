@@ -32,13 +32,13 @@ namespace Contensive.Processor.Models.Db {
         public int Viewings;
         //
         //====================================================================================================
-        public static LinkForwardModel add(CoreController core) {
-            return add<LinkForwardModel>(core);
+        public static LinkForwardModel addDefault(CoreController core) {
+            return addDefault<LinkForwardModel>(core);
         }
         //
         //====================================================================================================
-        public static LinkForwardModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<LinkForwardModel>(core, ref callersCacheNameList);
+        public static LinkForwardModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
+            return addDefault<LinkForwardModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================

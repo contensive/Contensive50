@@ -304,7 +304,7 @@ namespace Contensive.Processor {
             field.Scramble = false;
             field.textBuffered = false;
             field.uniqueName = false;
-            return Models.Domain.CDefModel.verifyCDefField_ReturnID(core, ContentName, field);
+            return Models.Domain.CDefModel.verifyContentField_returnID(core, ContentName, field);
         }
         //
         //====================================================================================================
@@ -324,7 +324,11 @@ namespace Contensive.Processor {
         public override int AddContent(string ContentName, string sqlTableName, string dataSourceName) {
             var tmpList = new List<string> { };
             DataSourceModel dataSource = DataSourceModel.createByUniqueName(core, dataSourceName, ref tmpList);
-            return Models.Domain.CDefModel.addContent(core, true, dataSource, sqlTableName, ContentName, false, false, true, false, "", "sort order", "name", false, false, false, false, false, false, "", 0, 0, 0, "", false, "", true);
+            return Models.Domain.CDefModel.verifyContent_returnId(core, new Models.Domain.CDefModel() {
+                dataSourceName = dataSource.name,
+                tableName = sqlTableName,
+                name = ContentName
+            });
         }
         //
         //====================================================================================================

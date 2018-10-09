@@ -38,13 +38,13 @@ namespace Contensive.Processor.Models.Db {
         public bool supportLegacyContentControl { get; set; }
         //
         //====================================================================================================
-        public static ContentModel add(CoreController core) {
-            return add<ContentModel>(core);
+        public static ContentModel addDefault(CoreController core) {
+            return addDefault<ContentModel>(core);
         }
         //
         //====================================================================================================
-        public static ContentModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<ContentModel>(core, ref callersCacheNameList);
+        public static ContentModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
+            return addDefault<ContentModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================

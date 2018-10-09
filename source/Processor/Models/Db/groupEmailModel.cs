@@ -31,13 +31,13 @@ namespace Contensive.Processor.Models.Db {
         public int testMemberID { get; set; }
         //
         //====================================================================================================
-        public static GroupEmailModel add(CoreController core) {
-            return add<GroupEmailModel>(core);
+        public static GroupEmailModel addDefault(CoreController core) {
+            return addDefault<GroupEmailModel>(core);
         }
         //
         //====================================================================================================
-        public static GroupEmailModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<GroupEmailModel>(core, ref callersCacheNameList);
+        public static GroupEmailModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
+            return addDefault<GroupEmailModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================

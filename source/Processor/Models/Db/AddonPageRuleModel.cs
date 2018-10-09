@@ -18,13 +18,13 @@ namespace Contensive.Processor.Models.Db {
         public int pageId { get; set; }
         //
         //====================================================================================================
-        public static AddonPageRuleModel add(CoreController core) {
-            return add<AddonPageRuleModel>(core);
+        public static AddonPageRuleModel addDefault(CoreController core) {
+            return addDefault<AddonPageRuleModel>(core);
         }
         //
         //====================================================================================================
-        public static AddonPageRuleModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<AddonPageRuleModel>(core, ref callersCacheNameList);
+        public static AddonPageRuleModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
+            return addDefault<AddonPageRuleModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================

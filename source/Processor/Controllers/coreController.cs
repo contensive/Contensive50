@@ -572,52 +572,52 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // moved to Addons.AdminSite
                                 doc.continueProcessing = false;
-                                return (new Addons.AdminSite.getFieldEditorPreference()).Execute(cp_forAddonExecutionOnly).ToString();
+                                return (new Addons.AdminSite.GetFieldEditorPreference()).Execute(cp_forAddonExecutionOnly).ToString();
                             case AjaxGetDefaultAddonOptionString:
                                 //
                                 // moved to Addons.AdminSite
                                 doc.continueProcessing = false;
-                                return (new Addons.AdminSite.getAjaxDefaultAddonOptionStringClass()).Execute(cp_forAddonExecutionOnly).ToString();
+                                return (new Addons.AdminSite.GetAjaxDefaultAddonOptionStringClass()).Execute(cp_forAddonExecutionOnly).ToString();
                             case AjaxSetVisitProperty:
                                 //
                                 // moved to Addons.AdminSite
                                 doc.continueProcessing = false;
-                                return (new Addons.AdminSite.setAjaxVisitPropertyClass()).Execute(cp_forAddonExecutionOnly).ToString();
+                                return (new Addons.AdminSite.SetAjaxVisitPropertyClass()).Execute(cp_forAddonExecutionOnly).ToString();
                             case AjaxGetVisitProperty:
                                 //
                                 // moved to Addons.AdminSite
                                 doc.continueProcessing = false;
-                                return (new Addons.AdminSite.getAjaxVisitPropertyClass()).Execute(cp_forAddonExecutionOnly).ToString();
+                                return (new Addons.AdminSite.GetAjaxVisitPropertyClass()).Execute(cp_forAddonExecutionOnly).ToString();
                             case AjaxData:
                                 //
                                 // moved to Addons.AdminSite
                                 doc.continueProcessing = false;
-                                return (new Addons.AdminSite.processAjaxDataClass()).Execute(cp_forAddonExecutionOnly).ToString();
+                                return (new Addons.AdminSite.ProcessAjaxDataClass()).Execute(cp_forAddonExecutionOnly).ToString();
                             case AjaxPing:
                                 //
                                 // moved to Addons.AdminSite
                                 doc.continueProcessing = false;
-                                return (new Addons.AdminSite.getOKClass()).Execute(cp_forAddonExecutionOnly).ToString();
+                                return (new Addons.AdminSite.GetOKClass()).Execute(cp_forAddonExecutionOnly).ToString();
                             case AjaxOpenIndexFilter:
                                 //
                                 // moved to Addons.AdminSite
                                 doc.continueProcessing = false;
-                                return (new Addons.AdminSite.openAjaxIndexFilterClass()).Execute(cp_forAddonExecutionOnly).ToString();
+                                return (new Addons.AdminSite.OpenAjaxIndexFilterClass()).Execute(cp_forAddonExecutionOnly).ToString();
                             case AjaxOpenIndexFilterGetContent:
                                 //
                                 // moved to Addons.AdminSite
                                 doc.continueProcessing = false;
-                                return (new Addons.AdminSite.openAjaxIndexFilterGetContentClass()).Execute(cp_forAddonExecutionOnly).ToString();
+                                return (new Addons.AdminSite.OpenAjaxIndexFilterGetContentClass()).Execute(cp_forAddonExecutionOnly).ToString();
                             case AjaxCloseIndexFilter:
                                 //
                                 // moved to Addons.AdminSite
                                 doc.continueProcessing = false;
-                                return (new Addons.AdminSite.closeAjaxIndexFilterClass()).Execute(cp_forAddonExecutionOnly).ToString();
+                                return (new Addons.AdminSite.CloseAjaxIndexFilterClass()).Execute(cp_forAddonExecutionOnly).ToString();
                             case AjaxOpenAdminNav:
                                 //
                                 // moved to Addons.AdminSite
                                 doc.continueProcessing = false;
-                                return (new Addons.AdminSite.openAjaxAdminNavClass()).Execute(cp_forAddonExecutionOnly).ToString();
+                                return (new Addons.AdminSite.OpenAjaxAdminNavClass()).Execute(cp_forAddonExecutionOnly).ToString();
                             default:
                                 //
                                 // -- unknown method, log warning

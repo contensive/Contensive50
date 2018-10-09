@@ -84,13 +84,18 @@ namespace Contensive.Processor.Models.Db {
         public string Zip { get; set; }
         //
         //====================================================================================================
-        public static PersonModel add(CoreController core) {
-            return add<PersonModel>(core);
+        public static PersonModel addEmpty(CoreController core) {
+            return addEmpty<PersonModel>(core);
         }
         //
         //====================================================================================================
-        public static PersonModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<PersonModel>(core, ref callersCacheNameList);
+        public static PersonModel addDefault(CoreController core) {
+            return addDefault<PersonModel>(core);
+        }
+        //
+        //====================================================================================================
+        public static PersonModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
+            return addDefault<PersonModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================

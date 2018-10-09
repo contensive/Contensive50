@@ -36,13 +36,13 @@ namespace Contensive.Processor.Models.Db {
         public bool toAll { get; set; }
         //
         //====================================================================================================
-        public static EmailModel add(CoreController core) {
-            return add<EmailModel>(core);
+        public static EmailModel addDefault(CoreController core) {
+            return addDefault<EmailModel>(core);
         }
         //
         //====================================================================================================
-        public static EmailModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<EmailModel>(core, ref callersCacheNameList);
+        public static EmailModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
+            return addDefault<EmailModel>(core, ref callersCacheNameList);
         }
         //
         //====================================================================================================
