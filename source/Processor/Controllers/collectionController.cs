@@ -3115,7 +3115,12 @@ namespace Contensive.Processor.Controllers {
                                         // when importing a collectin that will be used for an include
                                         //
                                         ScriptingLanguage = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "language", "");
-                                        scriptinglanguageid = core.db.getRecordID("scripting languages", ScriptingLanguage);
+                                        if ( ScriptingLanguage.ToLower() =="jscript") {
+                                            scriptinglanguageid = 2;
+                                        } else {
+                                            scriptinglanguageid = 1;
+                                        }
+                                        //scriptinglanguageid = core.db.getRecordID("scripting languages", ScriptingLanguage);
                                         core.db.csSet(CS, "scriptinglanguageid", scriptinglanguageid);
                                         ScriptingEntryPoint = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "entrypoint", "");
                                         core.db.csSet(CS, "ScriptingEntryPoint", ScriptingEntryPoint);
