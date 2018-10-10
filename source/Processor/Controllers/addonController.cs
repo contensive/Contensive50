@@ -603,7 +603,7 @@ namespace Contensive.Processor.Controllers {
                                         if (core.visitProperty.getBoolean("AllowAdvancedEditor")) {
                                             string addonArgumentListPassToBubbleEditor = ""; // comes from method in this class the generates it from addon and instance properites - lost it in the shuffle
                                             string AddonEditIcon = getIconSprite("", 0, "/ccLib/images/tooledit.png", 22, 22, "Edit the " + addon.name + " Add-on", "Edit the " + addon.name + " Add-on", "", true, "");
-                                            AddonEditIcon = "<a href=\"/" + core.appConfig.adminRoute + "?cid=" + CDefModel.getContentId(core, cnAddons) + "&id=" + addon.id + "&af=4&aa=2&ad=1\" tabindex=\"-1\">" + AddonEditIcon + "</a>";
+                                            AddonEditIcon = "<a href=\"/" + core.appConfig.adminRoute + "?cid=" + CdefController.getContentId(core, cnAddons) + "&id=" + addon.id + "&af=4&aa=2&ad=1\" tabindex=\"-1\">" + AddonEditIcon + "</a>";
                                             string InstanceSettingsEditIcon = getInstanceBubble(addon.name, addonArgumentListPassToBubbleEditor, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, executeContext.hostRecord.fieldName, executeContext.instanceGuid, executeContext.addonType, ref DialogList);
                                             string HTMLViewerEditIcon = getHTMLViewerBubble(addon.id, "editWrapper" + core.doc.editWrapperCnt, ref DialogList);
                                             string SiteStylesEditIcon = ""; // ?????

@@ -34,6 +34,11 @@ namespace Contensive.Processor.Models.Db {
         public bool submitted { get; set; }
         public int testMemberID { get; set; }
         public bool toAll { get; set; }
+        // 
+        //====================================================================================================
+        public static EmailModel addEmpty(CoreController core) {
+            return addEmpty<EmailModel>(core);
+        }
         //
         //====================================================================================================
         public static EmailModel addDefault(CoreController core) {

@@ -16,6 +16,11 @@ namespace Contensive.Processor.Models.Db {
         // -- instance properties
         public string bodyHTML { get; set; }
         public string source { get; set; }
+        // 
+        //====================================================================================================
+        public static EmailTemplateModel addEmpty(CoreController core) {
+            return addEmpty<EmailTemplateModel>(core);
+        }
         //
         //====================================================================================================
         public static EmailTemplateModel addDefault(CoreController core) {

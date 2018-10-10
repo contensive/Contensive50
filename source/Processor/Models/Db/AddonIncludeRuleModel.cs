@@ -16,6 +16,11 @@ namespace Contensive.Processor.Models.Db {
         // -- instance properties
         public int addonID { get; set; }
         public int includedAddonID { get; set; }
+        // 
+        //====================================================================================================
+        public static AddonIncludeRuleModel addEmpty(CoreController core) {
+            return addEmpty<AddonIncludeRuleModel>(core);
+        }
         //
         //====================================================================================================
         public static AddonIncludeRuleModel addDefault(CoreController core) {

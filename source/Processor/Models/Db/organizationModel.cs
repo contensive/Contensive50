@@ -45,6 +45,11 @@ namespace Contensive.Processor.Models.Db {
         public int viewings { get; set; }
         public string web { get; set; }
         public string zip { get; set; }
+        // 
+        //====================================================================================================
+        public static OrganizationModel addEmpty(CoreController core) {
+            return addEmpty<OrganizationModel>(core);
+        }
         //
         //====================================================================================================
         public static OrganizationModel addDefault(CoreController core) {

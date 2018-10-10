@@ -423,7 +423,7 @@ namespace Contensive.Addons.Tools {
                         core.db.createContentFromSQLTable(datasource, TableName, ContentName);
                         core.cache.invalidateAll();
                         core.doc.clearMetaData();
-                        ContentID = Processor.Models.Domain.CDefModel.getContentId(core, ContentName);
+                        ContentID = CdefController.getContentId(core, ContentName);
                         ParentNavID = core.db.getRecordID(cnNavigatorEntries, "Manage Site Content");
                         if (ParentNavID != 0) {
                             CS = core.db.csOpen(cnNavigatorEntries, "(name=" + core.db.encodeSQLText("Advanced") + ")and(parentid=" + ParentNavID + ")");
@@ -446,7 +446,7 @@ namespace Contensive.Addons.Tools {
                                 core.db.csClose(ref CS);
                             }
                         }
-                        ContentID = Processor.Models.Domain.CDefModel.getContentId(core, ContentName);
+                        ContentID = CdefController.getContentId(core, ContentName);
                         Stream.Add("<P>Content Definition was created. An admin menu entry for this definition has been added under 'Site Content', and will be visible on the next page view. Use the [<a href=\"?af=105&ContentID=" + ContentID + "\">Edit Content Definition Fields</a>] tool to review and edit this definition's fields.</P>");
                     } else {
                         Stream.Add("<P>Error, a required field is missing. Content not created.</P>");
@@ -530,7 +530,7 @@ namespace Contensive.Addons.Tools {
                 if (ContentID != 0) {
                     ButtonList = ButtonCancel + "," + ButtonSaveandInvalidateCache;
                     ContentName = Local_GetContentNameByID(ContentID);
-                    CDef = Processor.Models.Domain.CDefModel.getCdef(core, ContentID, true, false);
+                    CDef = Processor.Models.Domain.CDefModel.create(core, ContentID, false, true );
                     if (ToolsAction != 0) {
                         //
                         // Block contentautoload, then force a load at the end
@@ -875,7 +875,7 @@ namespace Contensive.Addons.Tools {
                         //
                         // Get a new copy of the content definition
                         //
-                        CDef = Processor.Models.Domain.CDefModel.getCdef(core, ContentID, true, false);
+                        CDef = Processor.Models.Domain.CDefModel.create(core, ContentID, false, true);
                     }
                     if (Button == ButtonSaveandInvalidateCache) {
                         core.cache.invalidateAll();
@@ -1653,7 +1653,7 @@ namespace Contensive.Addons.Tools {
                         // Create Definition
                         //
                         Stream.Add("<P>Creating content [" + ChildContentName + "] from [" + ParentContentName + "]");
-                        Processor.Models.Domain.CDefModel.createContentChild(core, ChildContentName, ParentContentName, core.session.user.id);
+                        CdefController.createContentChild(core, ChildContentName, ParentContentName, core.session.user.id);
                         //
                         Stream.Add("<br>Reloading Content Definitions...");
                         core.cache.invalidateAll();
@@ -1765,7 +1765,7 @@ namespace Contensive.Addons.Tools {
                     CSContent = core.db.csOpen("Content", "", "", false, 0, false, false, "id");
                     if (core.db.csOk(CSContent)) {
                         do {
-                            CD = Processor.Models.Domain.CDefModel.getCdef(core, core.db.csGetInteger(CSContent, "id"));
+                            CD = Processor.Models.Domain.CDefModel.create(core, core.db.csGetInteger(CSContent, "id"));
                             TableName = CD.tableName;
                             Stream.Add("Synchronizing Content " + CD.name + " to table " + TableName + "<br>");
                             core.db.createSQLTable(CD.dataSourceName, TableName);
@@ -2917,7 +2917,7 @@ namespace Contensive.Addons.Tools {
         //
         //
         private Processor.Models.Domain.CDefModel GetCDef(string ContentName) {
-            return Processor.Models.Domain.CDefModel.getCdef(core, ContentName);
+            return Processor.Models.Domain.CDefModel.create(core, ContentName);
         }
 
 
@@ -3152,7 +3152,7 @@ namespace Contensive.Addons.Tools {
         //                '
         //                ParentID = core.db.cs_getInteger(CSContent, "parentID")
         //                If ParentID <> 0 Then
-        //                    ParentContentName = Models.Complex.cdefModel.getContentNameByID(core,ParentID)
+        //                    ParentContentName = Models.Complex.CdefController.getContentNameByID(core,ParentID)
         //                    If ParentContentName <> "" Then
         //                        LoadCDef = LoadCDef(ParentContentName)
         //                    End If

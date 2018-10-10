@@ -26,6 +26,11 @@ namespace Contensive.Processor.Models.Db {
         public string toAddress { get; set; }
         public int visitID { get; set; }
         public string body { get; set; }
+        // 
+        //====================================================================================================
+        public static EmailLogModel addEmpty(CoreController core) {
+            return addEmpty<EmailLogModel>(core);
+        }
         //
         //====================================================================================================
         public static EmailLogModel addDefault(CoreController core) {

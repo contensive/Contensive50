@@ -701,7 +701,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 result = (ChildRecordID == ParentRecordID);
                 if (!result) {
-                    Models.Domain.CDefModel CDef = Models.Domain.CDefModel.getCdef(core, ContentName);
+                    Models.Domain.CDefModel CDef = Models.Domain.CDefModel.create(core, ContentName);
                     if (GenericController.isInDelimitedString(CDef.selectCommaList.ToUpper(), "PARENTID", ",")) {
                         result = main_IsChildRecord_Recurse(core, CDef.dataSourceName, CDef.tableName, ChildRecordID, ParentRecordID, "");
                     }
@@ -872,7 +872,7 @@ namespace Contensive.Processor.Controllers {
                     if (core.doc.redirectContentID != 0) {
                         core.doc.redirectRecordID = (core.docProperties.getInteger(rnRedirectRecordId));
                         if (core.doc.redirectRecordID != 0) {
-                            string contentName = Models.Domain.CDefModel.getContentNameByID(core, core.doc.redirectContentID);
+                            string contentName = CdefController.getContentNameByID(core, core.doc.redirectContentID);
                             if (!string.IsNullOrEmpty(contentName)) {
                                 if (WebServerController.main_RedirectByRecord_ReturnStatus(core, contentName, core.doc.redirectRecordID)) {
                                     //
@@ -945,7 +945,7 @@ namespace Contensive.Processor.Controllers {
                         core.visitProperty.setProperty("Clipboard", "");
                         GenericController.modifyQueryString(core.doc.refreshQueryString, RequestNamePasteParentContentID, "");
                         GenericController.modifyQueryString(core.doc.refreshQueryString, RequestNamePasteParentRecordID, "");
-                        string ClipParentContentName = Models.Domain.CDefModel.getContentNameByID(core, ClipParentContentID);
+                        string ClipParentContentName = CdefController.getContentNameByID(core, ClipParentContentID);
                         if (string.IsNullOrEmpty(ClipParentContentName)) {
                             // state not working...
                         } else if (string.IsNullOrEmpty(ClipBoard)) {
@@ -967,13 +967,13 @@ namespace Contensive.Processor.Controllers {
                                     } else {
                                         int ClipChildContentID = GenericController.encodeInteger(ClipBoardArray[0]);
                                         int ClipChildRecordID = GenericController.encodeInteger(ClipBoardArray[1]);
-                                        if (!Models.Domain.CDefModel.isWithinContent(core, ClipChildContentID, ClipParentContentID)) {
+                                        if (!CdefController.isWithinContent(core, ClipChildContentID, ClipParentContentID)) {
                                             ErrorController.addUserError(core, "The paste operation failed because the destination location is not compatible with the clipboard data.");
                                         } else {
                                             //
                                             // the content definition relationship is OK between the child and parent record
                                             //
-                                            string ClipChildContentName = Models.Domain.CDefModel.getContentNameByID(core, ClipChildContentID);
+                                            string ClipChildContentName = CdefController.getContentNameByID(core, ClipChildContentID);
                                             if (!(!string.IsNullOrEmpty(ClipChildContentName))) {
                                                 ErrorController.addUserError(core, "The paste operation failed because the clipboard data content is undefined.");
                                             } else {
@@ -1365,7 +1365,7 @@ namespace Contensive.Processor.Controllers {
                                 // People Record
                                 //
                                 FormValue = core.docProperties.getText(tempVar.PeopleField);
-                                if ((!string.IsNullOrEmpty(FormValue)) & GenericController.encodeBoolean(Models.Domain.CDefModel.GetContentFieldProperty(core, "people", tempVar.PeopleField, "uniquename"))) {
+                                if ((!string.IsNullOrEmpty(FormValue)) & GenericController.encodeBoolean(CdefController.GetContentFieldProperty(core, "people", tempVar.PeopleField, "uniquename"))) {
                                     string SQL = "select count(*) from ccMembers where " + tempVar.PeopleField + "=" + core.db.encodeSQLText(FormValue);
                                     CS = core.db.csOpenSql(SQL);
                                     if (core.db.csOk(CS)) {
@@ -1376,7 +1376,7 @@ namespace Contensive.Processor.Controllers {
                                         ErrorController.addUserError(core, "The field [" + tempVar.Caption + "] must be unique, and the value [" + HtmlController.encodeHtml(FormValue) + "] has already been used.");
                                     }
                                 }
-                                if ((tempVar.REquired | GenericController.encodeBoolean(Models.Domain.CDefModel.GetContentFieldProperty(core, "people", tempVar.PeopleField, "required"))) && string.IsNullOrEmpty(FormValue)) {
+                                if ((tempVar.REquired | GenericController.encodeBoolean(CdefController.GetContentFieldProperty(core, "people", tempVar.PeopleField, "required"))) && string.IsNullOrEmpty(FormValue)) {
                                     Success = false;
                                     ErrorController.addUserError(core, "The field [" + HtmlController.encodeHtml(tempVar.Caption) + "] is required.");
                                 } else {
@@ -1617,7 +1617,7 @@ namespace Contensive.Processor.Controllers {
                                 CSPeople = core.db.csOpenRecord("people", core.session.user.id);
                             }
                             Caption = tempVar.Caption;
-                            if (tempVar.REquired | GenericController.encodeBoolean(Models.Domain.CDefModel.GetContentFieldProperty(core, "People", tempVar.PeopleField, "Required"))) {
+                            if (tempVar.REquired | GenericController.encodeBoolean(CdefController.GetContentFieldProperty(core, "People", tempVar.PeopleField, "Required"))) {
                                 Caption = "*" + Caption;
                             }
                             if (core.db.csOk(CSPeople)) {
@@ -2379,7 +2379,7 @@ namespace Contensive.Processor.Controllers {
             string result = "";
             try {
                 if (RecordID > 0) {
-                    int ContentID = Models.Domain.CDefModel.getContentId(core, ContentName);
+                    int ContentID = CdefController.getContentId(core, ContentName);
                     bool IsEditingLocal = false;
                     if (ContentID > 0) {
                         //
@@ -2388,7 +2388,7 @@ namespace Contensive.Processor.Controllers {
                     } else {
                         //
                         // ----- if iContentName was bad, maybe they put table in, no authoring
-                        ContentID = Models.Domain.CDefModel.getContentIDByTablename(core, ContentName);
+                        ContentID = CdefController.getContentIDByTablename(core, ContentName);
                     }
                     int SeeAlsoCount = 0;
                     if (ContentID > 0) {

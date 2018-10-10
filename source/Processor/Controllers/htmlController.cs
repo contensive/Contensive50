@@ -176,7 +176,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // This was commented out -- I really do not know why -- seems like the best way
                     //
-                    CDef = Models.Domain.CDefModel.getCdef(core, ContentName);
+                    CDef = Models.Domain.CDefModel.create(core, ContentName);
                     TableName = CDef.tableName;
                     DataSource = CDef.dataSourceName;
                     ContentControlCriteria = CDef.legacyContentControlCriteria;
@@ -477,10 +477,9 @@ namespace Contensive.Processor.Controllers {
                         //
                         // ----- Generate Drop Down Field Names
                         //
-                        string DropDownFieldList = Models.Domain.CDefModel.GetContentProperty(core, "people", "DropDownFieldList");
-                        if (string.IsNullOrEmpty(DropDownFieldList)) {
-                            DropDownFieldList = "NAME";
-                        }
+                        string DropDownFieldList = "name";
+                        var peopleCdef = Models.Domain.CDefModel.create(core, "people");
+                        if ( peopleCdef != null ) DropDownFieldList = peopleCdef.dropDownFieldList;
                         int DropDownFieldCount = 0;
                         string CharAllowed = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
                         string DropDownPreField = "";
@@ -1140,7 +1139,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 if (true) {
                     fieldFound = false;
-                    Contentdefinition = Models.Domain.CDefModel.getCdef(core, ContentName);
+                    Contentdefinition = Models.Domain.CDefModel.create(core, ContentName);
                     foreach (KeyValuePair<string, Models.Domain.CDefFieldModel> keyValuePair in Contentdefinition.fields) {
                         Models.Domain.CDefFieldModel field = keyValuePair.Value;
                         if (GenericController.vbUCase(field.nameLc) == GenericController.vbUCase(FieldName)) {
@@ -1291,7 +1290,7 @@ namespace Contensive.Processor.Controllers {
                                     break;
                                 case FieldTypeIdLookup:
                                     FieldValueInteger = GenericController.encodeInteger(FieldValueVariant);
-                                    FieldLookupContentName = Models.Domain.CDefModel.getContentNameByID(core, FieldLookupContentID);
+                                    FieldLookupContentName = CdefController.getContentNameByID(core, FieldLookupContentID);
                                     if (!string.IsNullOrEmpty(FieldLookupContentName)) {
                                         //
                                         // Lookup into Content
@@ -1451,9 +1450,10 @@ namespace Contensive.Processor.Controllers {
                         //
                         // Personalization Tag
                         //
-                        string FieldList = Models.Domain.CDefModel.GetContentProperty(core, "people", "SelectFieldList");
-                        FieldList = GenericController.vbReplace(FieldList, ",", "|");
-                        IconIDControlString = "AC,PERSONALIZATION,0,Personalization,field=[" + FieldList + "]";
+                        string selectOptions = "";
+                        var peopleCdef = Models.Domain.CDefModel.create(core, "people");
+                        if (peopleCdef != null) selectOptions = string.Join("|", peopleCdef.selectList);
+                        IconIDControlString = "AC,PERSONALIZATION,0,Personalization,field=[" + selectOptions + "]";
                         IconImg = AddonController.getAddonIconImg("/" + core.appConfig.adminRoute, 0, 0, 0, true, IconIDControlString, "", core.appConfig.cdnFileUrl, "Any Personalization Field", "Renders as any Personalization Field", "", 0);
                         IconImg = GenericController.EncodeJavascriptStringSingleQuote(IconImg);
                         Items[ItemsCnt] = "['Personalization','" + IconImg + "']";
@@ -1791,7 +1791,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 //
                                 // ListField
-                                int CID = Models.Domain.CDefModel.getContentId(core, ContentName);
+                                int CID = CdefController.getContentId(core, ContentName);
                                 CS = core.db.csOpen("Content Fields", "Contentid=" + CID, "name", true, 0, false, false, "ID,Name");
                             }
 
@@ -2299,7 +2299,7 @@ namespace Contensive.Processor.Controllers {
                 // Clear Caches
                 //
                 if (!string.IsNullOrEmpty(ContentName)) {
-                    string contentTablename = Models.Domain.CDefModel.getContentTablename(core, ContentName);                    
+                    string contentTablename = CdefController.getContentTablename(core, ContentName);                    
                     core.cache.invalidateAllKeysInTable(contentTablename);
                 }
             }
@@ -2404,8 +2404,8 @@ namespace Contensive.Processor.Controllers {
                     //
                     // ----- Gather all the SecondaryContent that associates to the PrimaryContent
                     //
-                    int PrimaryContentID = Models.Domain.CDefModel.getContentId(core, PrimaryContentName);
-                    SecondaryCDef = Models.Domain.CDefModel.getCdef(core, SecondaryContentName);
+                    int PrimaryContentID = CdefController.getContentId(core, PrimaryContentName);
+                    SecondaryCDef = Models.Domain.CDefModel.create(core, SecondaryContentName);
                     string SecondaryTablename = SecondaryCDef.tableName;
                     int SecondaryContentID = SecondaryCDef.id;
                     ContentIDList.Add(SecondaryContentID);
@@ -2413,7 +2413,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     //
                     //
-                    string rulesTablename = Models.Domain.CDefModel.getContentTablename(core, RulesContentName);
+                    string rulesTablename = CdefController.getContentTablename(core, RulesContentName);
                     SingularPrefixHtmlEncoded = HtmlController.encodeHtml(GenericController.getSingular_Sortof(SecondaryContentName)) + "&nbsp;";
                     //
                     int main_MemberShipCount = 0;
@@ -2899,7 +2899,7 @@ namespace Contensive.Processor.Controllers {
                             //            '
                             //            ' Path is blocked
                             //            '
-                            //            Tag = core.html.html_GetFormInputCheckBox2(TagID, True, TagID) & "&nbsp;Path is blocked [" & core.webServer.requestPath & "] [<a href=""" & htmlController.encodeHTML("/" & core.appConfig.adminRoute & "?af=" & AdminFormEdit & "&id=" & PathID & "&cid=" & Models.Complex.cdefModel.getContentId(core,"paths") & "&ad=1") & """ target=""_blank"">edit</a>]</LABEL>"
+                            //            Tag = core.html.html_GetFormInputCheckBox2(TagID, True, TagID) & "&nbsp;Path is blocked [" & core.webServer.requestPath & "] [<a href=""" & htmlController.encodeHTML("/" & core.appConfig.adminRoute & "?af=" & AdminFormEdit & "&id=" & PathID & "&cid=" & Models.Complex.CdefController.getContentId(core,"paths") & "&ad=1") & """ target=""_blank"">edit</a>]</LABEL>"
                             //        Else
                             //            '
                             //            ' Path is not blocked
@@ -3485,11 +3485,11 @@ namespace Contensive.Processor.Controllers {
                 //
                 // Test if RuleCopy is supported
                 //
-                SupportRuleCopy = Models.Domain.CDefModel.isContentFieldSupported(core, rulesContentName, "RuleCopy");
+                SupportRuleCopy = CdefController.isContentFieldSupported(core, rulesContentName, "RuleCopy");
                 if (SupportRuleCopy) {
-                    SupportRuleCopy = SupportRuleCopy && Models.Domain.CDefModel.isContentFieldSupported(core, secondaryContentName, "AllowRuleCopy");
+                    SupportRuleCopy = SupportRuleCopy && CdefController.isContentFieldSupported(core, secondaryContentName, "AllowRuleCopy");
                     if (SupportRuleCopy) {
-                        SupportRuleCopy = SupportRuleCopy && Models.Domain.CDefModel.isContentFieldSupported(core, secondaryContentName, "RuleCopyCaption");
+                        SupportRuleCopy = SupportRuleCopy && CdefController.isContentFieldSupported(core, secondaryContentName, "RuleCopyCaption");
                     }
                 }
                 //
@@ -3500,7 +3500,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 currentRulesCnt = 0;
                 dupRuleIdList = "";
-                rulesTablename = Models.Domain.CDefModel.getContentTablename(core, rulesContentName);
+                rulesTablename = CdefController.getContentTablename(core, rulesContentName);
                 SQL = "select " + rulesSecondaryFieldName + ",id from " + rulesTablename + " where (" + rulesPrimaryFieldname + "=" + primaryRecordID + ")and(active<>0) order by " + rulesSecondaryFieldName;
                 currentRulesCnt = 0;
                 currentRules = core.db.executeQuery(SQL);
@@ -3580,7 +3580,7 @@ namespace Contensive.Processor.Controllers {
                 }
             }
             if (RuleContentChanged) {
-                string tablename = Models.Domain.CDefModel.getContentTablename(core, rulesContentName);
+                string tablename = CdefController.getContentTablename(core, rulesContentName);
                 core.cache.invalidateAllKeysInTable(tablename);
             }
         }

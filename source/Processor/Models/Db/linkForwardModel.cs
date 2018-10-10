@@ -30,6 +30,11 @@ namespace Contensive.Processor.Models.Db {
         public int GroupID;
         public string SourceLink;
         public int Viewings;
+        // 
+        //====================================================================================================
+        public static LinkForwardModel addEmpty(CoreController core) {
+            return addEmpty<LinkForwardModel>(core);
+        }
         //
         //====================================================================================================
         public static LinkForwardModel addDefault(CoreController core) {

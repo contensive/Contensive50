@@ -1076,7 +1076,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             LinkPrefix = core.webServer.requestContentWatchPrefix;
                             ContentID = (core.db.csGetInteger(CSPointer, "ContentID"));
-                            HostContentName = Models.Domain.CDefModel.getContentNameByID(core, ContentID);
+                            HostContentName = CdefController.getContentNameByID(core, ContentID);
                             if (string.IsNullOrEmpty(HostContentName)) {
                                 //
                                 // ----- Content Watch with a bad ContentID, mark inactive
@@ -1107,7 +1107,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // ----- if a content watch record is blocked, delete the content tracking
                                 //
-                                core.db.deleteContentRules(Models.Domain.CDefModel.getContentId(core, HostContentName), HostRecordID);
+                                core.db.deleteContentRules(CdefController.getContentId(core, HostContentName), HostRecordID);
                             }
                             break;
                     }

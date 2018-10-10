@@ -50,7 +50,7 @@
 //                        core.db.csSet(CS, "ShipState", core.docProperties.getText("address_state"));
 //                        core.db.csSet(CS, "ShipZip", core.docProperties.getText("address_zip"));
 //                        core.db.csSet(CS, "BilleMail", core.docProperties.getText("payer_email"));
-//                        core.db.csSet(CS, "ContentControlID", cdefModel.getContentId(core, "Orders Completed"));
+//                        core.db.csSet(CS, "ContentControlID", CdefController.getContentId(core, "Orders Completed"));
 //                        core.db.csSave2(CS);
 //                    }
 //                    core.db.csClose(ref CS);

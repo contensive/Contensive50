@@ -834,7 +834,7 @@ namespace Contensive.Processor.Controllers {
                 double EditLockTimeoutMinutes = 0;
                 Models.Domain.CDefModel CDef = null;
                 //
-                CDef = Models.Domain.CDefModel.getCdef(core, ContentName);
+                CDef = Models.Domain.CDefModel.create(core, ContentName);
                 ContentID = CDef.id;
                 if (ContentID != 0) {
                     AuthoringCriteria = getAuthoringControlCriteria(ContentName, RecordID);
@@ -905,7 +905,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // Get Workflow Locks
                     //
-                    CDef = Models.Domain.CDefModel.getCdef(core, ContentName);
+                    CDef = Models.Domain.CDefModel.create(core, ContentName);
                     ContentID = CDef.id;
                     if (ContentID > 0) {
                         //If false And core.siteProperties.allowWorkflowAuthoring Then

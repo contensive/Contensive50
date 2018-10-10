@@ -41,7 +41,7 @@ namespace Contensive.Processor.Controllers {
                 core.html.addStyleLink("/quickEditor/styles.css", "Quick Editor");
                 //
                 // -- First Active Record - Output Quick Editor form
-                Models.Domain.CDefModel CDef = Models.Domain.CDefModel.getCdef(core, PageContentModel.contentName);
+                Models.Domain.CDefModel CDef = Models.Domain.CDefModel.create(core, PageContentModel.contentName);
                 bool IsEditLocked = core.workflow.GetEditLockStatus(PageContentModel.contentName, core.doc.pageController.page.id);
                 string editLockMemberName = "";
                 DateTime editLockDateExpires = default(DateTime);
@@ -72,7 +72,7 @@ namespace Contensive.Processor.Controllers {
                 bool AllowDelete = false;
                 bool readOnlyField = false;
                 core.doc.getAuthoringPermissions(PageContentModel.contentName, core.doc.pageController.page.id, ref AllowInsert, ref AllowCancel, ref allowSave, ref AllowDelete, ref tempVar, ref tempVar2, ref tempVar3, ref tempVar4, ref readOnlyField);
-                bool AllowMarkReviewed = Models.Domain.CDefModel.isContentFieldSupported(core, PageContentModel.contentName, "DateReviewed");
+                bool AllowMarkReviewed = CdefController.isContentFieldSupported(core, PageContentModel.contentName, "DateReviewed");
                 string OptionsPanelAuthoringStatus = core.session.getAuthoringStatusMessage(core, false, IsEditLocked, editLockMemberName, editLockDateExpires, IsApproved, ApprovedMemberName, IsSubmitted, SubmittedMemberName, IsDeleted, IsInserted, IsModified, ModifiedMemberName);
                 //
                 // Set Editing Authoring Control

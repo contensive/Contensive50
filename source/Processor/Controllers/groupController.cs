@@ -54,7 +54,7 @@ namespace Contensive.Processor.Controllers {
                 if (dt.Rows.Count > 0) {
                     returnGroupId = GenericController.encodeInteger(dt.Rows[0]["ID"]);
                 } else {
-                    cid = Models.Domain.CDefModel.getContentId(core, "groups");
+                    cid = CdefController.getContentId(core, "groups");
                     createkey = GenericController.GetRandomInteger(core);
                     sql = "insert into ccgroups (contentcontrolid,active,createkey,name,caption) values (" + cid + ",1," + createkey + "," + sqlGroupName + "," + sqlGroupName + ")";
                     core.db.executeQuery(sql);

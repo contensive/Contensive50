@@ -26,6 +26,11 @@ namespace Contensive.Processor.Models.Db {
         public string username { get; set; }
         public string password { get; set; }
         public int type { get; set; }
+        // 
+        //====================================================================================================
+        public static DataSourceModel addEmpty(CoreController core) {
+            return addEmpty<DataSourceModel>(core);
+        }
         //
         //====================================================================================================
         public static DataSourceModel addDefault(CoreController core) {

@@ -16,6 +16,11 @@ namespace Contensive.Processor.Models.Db {
         // -- instance properties
         public int addonId { get; set; }
         public int pageId { get; set; }
+        // 
+        //====================================================================================================
+        public static AddonPageRuleModel addEmpty(CoreController core) {
+            return addEmpty<AddonPageRuleModel>(core);
+        }
         //
         //====================================================================================================
         public static AddonPageRuleModel addDefault(CoreController core) {

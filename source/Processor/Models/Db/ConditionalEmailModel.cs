@@ -20,6 +20,11 @@ namespace Contensive.Processor.Models.Db {
         public int conditionPeriod { get; set; }
         public bool sent { get; set; }
         public bool submitted { get; set; }
+        // 
+        //====================================================================================================
+        public static ConditionalEmailModel addEmpty(CoreController core) {
+            return addEmpty<ConditionalEmailModel>(core);
+        }
         //
         //====================================================================================================
         public static ConditionalEmailModel addDefault(CoreController core) {

@@ -58,9 +58,9 @@ namespace Contensive.Addons.Email {
                     + "";
                 int CSEmail = core.db.csOpen("Email", Criteria);
                 if (core.db.csOk(CSEmail)) {
-                    string SQLTablePeople = CDefModel.getContentTablename(core, "People");
-                    string SQLTableMemberRules =  CDefModel.getContentTablename(core, "Member Rules");
-                    string SQLTableGroups = CDefModel.getContentTablename(core, "Groups");
+                    string SQLTablePeople = CdefController.getContentTablename(core, "People");
+                    string SQLTableMemberRules =  CdefController.getContentTablename(core, "Member Rules");
+                    string SQLTableGroups = CdefController.getContentTablename(core, "Groups");
                     string BounceAddress = core.siteProperties.getText("EmailBounceAddress", "");
                     string PrimaryLink = "http://" + core.appConfig.domainList[0];
                     while (core.db.csOk(CSEmail)) {

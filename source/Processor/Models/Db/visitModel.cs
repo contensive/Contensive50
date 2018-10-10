@@ -51,6 +51,11 @@ namespace Contensive.Processor.Models.Db {
         public bool visitAuthenticated { get; set; }
         public int visitorID { get; set; }
         public bool visitorNew { get; set; }
+        // 
+        //====================================================================================================
+        public static VisitModel addEmpty(CoreController core) {
+            return addEmpty<VisitModel>(core);
+        }
         //
         //====================================================================================================
         public static VisitModel addDefault(CoreController core) {

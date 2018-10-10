@@ -645,7 +645,7 @@ namespace Contensive.Processor.Controllers {
                 sqlList.add("CreatedBy", "0");
                 sqlList.add("OrderByClause", core.db.encodeSQLText(OrderByCriteria));
                 sqlList.add("active", SQLTrue);
-                sqlList.add("ContentControlID", Models.Domain.CDefModel.getContentId(core, "Sort Methods").ToString());
+                sqlList.add("ContentControlID", CdefController.getContentId(core, "Sort Methods").ToString());
                 //
                 dt = core.db.openTable("Default", "ccSortMethods", "Name=" + core.db.encodeSQLText(Name), "ID", "ID", 1);
                 if (dt.Rows.Count > 0) {
@@ -738,7 +738,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 RowsNeeded = FieldTypeIdMax - RowsFound;
                 if (RowsNeeded > 0) {
-                    CID = Models.Domain.CDefModel.getContentId(core, "Content Field Types");
+                    CID = CdefController.getContentId(core, "Content Field Types");
                     if (CID <= 0) {
                         //
                         // Problem
@@ -1936,7 +1936,7 @@ namespace Contensive.Processor.Controllers {
                                                     //
                                                     // Install new on this application
                                                     //
-                                                    collection = AddonCollection.add(core);
+                                                    collection = AddonCollection.addEmpty(core);
                                                     LogController.logInfo(core, "install collection [" + Collectionname + "], GUID [" + CollectionGuid + "], App does not have this collection so it will be installed.");
                                                     OKToInstall = true;
                                                 }
@@ -2058,7 +2058,7 @@ namespace Contensive.Processor.Controllers {
                                                                         //
                                                                         // setup cdef rule
                                                                         //
-                                                                        int ContentID = Models.Domain.CDefModel.getContentId(core, ContentName);
+                                                                        int ContentID = CdefController.getContentId(core, ContentName);
                                                                         if (ContentID > 0) {
                                                                             int CS = core.db.csInsertRecord("Add-on Collection CDef Rules", 0);
                                                                             if (core.db.csOk(CS)) {
@@ -2110,7 +2110,7 @@ namespace Contensive.Processor.Controllers {
                                                                                 //
                                                                                 // create or update the record
                                                                                 //
-                                                                                Models.Domain.CDefModel CDef = Models.Domain.CDefModel.getCdef(core, ContentName);
+                                                                                Models.Domain.CDefModel CDef = Models.Domain.CDefModel.create(core, ContentName);
                                                                                 int cs = -1;
                                                                                 if (!string.IsNullOrEmpty(ContentRecordGuid)) {
                                                                                     cs = core.db.csOpen(ContentName, "ccguid=" + core.db.encodeSQLText(ContentRecordGuid));
@@ -2429,7 +2429,7 @@ namespace Contensive.Processor.Controllers {
                                                                             string ContentRecordGuid =XmlController.GetXMLAttribute(core, IsFound, ContentNode, "guid", "");
                                                                             string ContentRecordName =XmlController.GetXMLAttribute(core, IsFound, ContentNode, "name", "");
                                                                             if ((!string.IsNullOrEmpty(ContentRecordGuid)) | (!string.IsNullOrEmpty(ContentRecordName))) {
-                                                                                Models.Domain.CDefModel CDef = Models.Domain.CDefModel.getCdef(core, ContentName);
+                                                                                Models.Domain.CDefModel CDef = Models.Domain.CDefModel.create(core, ContentName);
                                                                                 int cs = -1;
                                                                                 if (!string.IsNullOrEmpty(ContentRecordGuid)) {
                                                                                     cs = core.db.csOpen(ContentName, "ccguid=" + core.db.encodeSQLText(ContentRecordGuid));
@@ -2467,9 +2467,9 @@ namespace Contensive.Processor.Controllers {
                                                                                                             //
                                                                                                             // read in text value, if a guid, use it, otherwise assume name
                                                                                                             if (FieldLookupContentID != 0) {
-                                                                                                                string FieldLookupContentName = Models.Domain.CDefModel.getContentNameByID(core, FieldLookupContentID);
+                                                                                                                string FieldLookupContentName = CdefController.getContentNameByID(core, FieldLookupContentID);
                                                                                                                 if (!string.IsNullOrEmpty(FieldLookupContentName)) {
-                                                                                                                    if ((FieldValue.Left(1) == "{") && (FieldValue.Substring(FieldValue.Length - 1) == "}") && Models.Domain.CDefModel.isContentFieldSupported(core, FieldLookupContentName, "ccguid")) {
+                                                                                                                    if ((FieldValue.Left(1) == "{") && (FieldValue.Substring(FieldValue.Length - 1) == "}") && CdefController.isContentFieldSupported(core, FieldLookupContentName, "ccguid")) {
                                                                                                                         //
                                                                                                                         // Lookup by guid
                                                                                                                         int fieldLookupId = GenericController.encodeInteger(core.db.getRecordIDByGuid(FieldLookupContentName, FieldValue));
@@ -4491,7 +4491,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 //
                 LogController.logInfo(core, "Update db cdef [" + cdef.name + "]");
-                //int FieldHelpCID = Models.Domain.CDefModel.getContentId(core, "Content Field Help");
+                //int FieldHelpCID = CdefController.getContentId(core, "Content Field Help");
                 //var tmpList = new List<string> { };
                 //var datasource = DataSourceModel.createByUniqueName(core, cdef.dataSourceName);
                 //
@@ -4531,7 +4531,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // -- update definition (use SingleRecord as an update flag)
                         var datasource = DataSourceModel.createByUniqueName(core, cdef.dataSourceName);
-                        CDefModel.verifyContent_returnId(core, cdef); // true, datasource, cdef.tableName, cdef.name, cdef.adminOnly, cdef.developerOnly, cdef.allowAdd, cdef.allowDelete, cdef.parentName, cdef.defaultSortMethod, cdef.dropDownFieldList, false, cdef.allowCalendarEvents, cdef.allowContentTracking, cdef.allowTopicRules, cdef.allowContentChildTool, false, cdef.iconLink, cdef.iconWidth, cdef.iconHeight, cdef.iconSprites, cdef.guid, cdef.isBaseContent, cdef.installedByCollectionGuid);
+                        CdefController.verifyContent_returnId(core, cdef); // true, datasource, cdef.tableName, cdef.name, cdef.adminOnly, cdef.developerOnly, cdef.allowAdd, cdef.allowDelete, cdef.parentName, cdef.defaultSortMethod, cdef.dropDownFieldList, false, cdef.allowCalendarEvents, cdef.allowContentTracking, cdef.allowTopicRules, cdef.allowContentChildTool, false, cdef.iconLink, cdef.iconWidth, cdef.iconHeight, cdef.iconSprites, cdef.guid, cdef.isBaseContent, cdef.installedByCollectionGuid);
                         ////
                         //// -- Other fields not in the csv call
                         ////int EditorGroupID = 0;
@@ -4560,7 +4560,7 @@ namespace Contensive.Processor.Controllers {
                         CDefFieldModel field = nameValuePair.Value;
                         int fieldId = 0;
                         if (field.dataChanged) {
-                            fieldId = Models.Domain.CDefModel.verifyContentField_returnID(core, cdef.name, field);
+                            fieldId = CdefController.verifyContentField_returnID(core, cdef.name, field);
                         }
                         //
                         // -- update content field help records

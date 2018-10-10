@@ -29,6 +29,11 @@ namespace Contensive.Processor.Models.Db {
         public string subject { get; set; }
         public bool submitted { get; set; }
         public int testMemberID { get; set; }
+        // 
+        //====================================================================================================
+        public static GroupEmailModel addEmpty(CoreController core) {
+            return addEmpty<GroupEmailModel>(core);
+        }
         //
         //====================================================================================================
         public static GroupEmailModel addDefault(CoreController core) {

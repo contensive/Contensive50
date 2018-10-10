@@ -537,7 +537,7 @@ namespace Contensive.Addons.AdminSite {
             foreach (var kvp in IndexConfig.FindWords) {
                 IndexConfigClass.IndexConfigFindWordClass findWord = kvp.Value;
                 if (!string.IsNullOrEmpty(findWord.Name)) {
-                    string FieldCaption = CDefModel.GetContentFieldProperty(core, content.name, findWord.Name, "caption");
+                    string FieldCaption = CdefController.GetContentFieldProperty(core, content.name, findWord.Name, "caption");
                     switch (findWord.MatchOption) {
                         case FindWordMatchEnum.MatchEmpty:
                             filterLine = filterLine + ", " + FieldCaption + " is empty";
@@ -568,7 +568,7 @@ namespace Contensive.Addons.AdminSite {
                 }
             }
             if (IndexConfig.SubCDefID > 0) {
-                string ContentName = CDefModel.getContentNameByID(core, IndexConfig.SubCDefID);
+                string ContentName = CdefController.getContentNameByID(core, IndexConfig.SubCDefID);
                 if (!string.IsNullOrEmpty(ContentName)) {
                     filterLine = filterLine + ", in Sub-content '" + ContentName + "'";
                 }
@@ -1052,10 +1052,10 @@ namespace Contensive.Addons.AdminSite {
                         if (field.fieldTypeId == FieldTypeIdMemberSelect) {
                             LookupContentName = "people";
                         } else {
-                            LookupContentName = CDefModel.getContentNameByID(core, field.lookupContentID);
+                            LookupContentName = CdefController.getContentNameByID(core, field.lookupContentID);
                         }
                         if (!string.IsNullOrEmpty(LookupContentName)) {
-                            JoinTablename = CDefModel.getContentTablename(core, LookupContentName);
+                            JoinTablename = CdefController.getContentTablename(core, LookupContentName);
                         }
                         IncludedInLeftJoin = IncludedInColumns;
                         if (IndexConfig.FindWords.Count > 0) {
@@ -1101,8 +1101,8 @@ namespace Contensive.Addons.AdminSite {
                 // Sub CDef filter
                 //
                 if (IndexConfig.SubCDefID > 0) {
-                    ContentName = CDefModel.getContentNameByID(core, IndexConfig.SubCDefID);
-                    return_SQLWhere += "AND(" + CDefModel.getContentControlCriteria(core, ContentName) + ")";
+                    ContentName = CdefController.getContentNameByID(core, IndexConfig.SubCDefID);
+                    return_SQLWhere += "AND(" + CdefController.getContentControlCriteria(core, ContentName) + ")";
                 }
                 //
                 // Return_sqlFrom and Where Clause for Groups filter
@@ -1140,7 +1140,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // This person can see all the records
                     //
-                    return_SQLWhere += "AND(" + CDefModel.getContentControlCriteria(core, adminContext.adminContent.name) + ")";
+                    return_SQLWhere += "AND(" + CdefController.getContentControlCriteria(core, adminContext.adminContent.name) + ")";
                 } else {
                     //
                     // Limit the Query to what they can see
@@ -1163,7 +1163,7 @@ namespace Contensive.Addons.AdminSite {
                                     ContentID = GenericController.encodeInteger(ListSplit[Ptr].Left(Pos - 1));
                                     if (ContentID > 0 && (ContentID != adminContext.adminContent.id) & AdminInfoDomainModel.userHasContentAccess(core, ContentID)) {
                                         SubQuery = SubQuery + "OR(" + adminContext.adminContent.tableName + ".ContentControlID=" + ContentID + ")";
-                                        return_ContentAccessLimitMessage = return_ContentAccessLimitMessage + ", '<a href=\"?cid=" + ContentID + "\">" + CDefModel.getContentNameByID(core, ContentID) + "</a>'";
+                                        return_ContentAccessLimitMessage = return_ContentAccessLimitMessage + ", '<a href=\"?cid=" + ContentID + "\">" + CdefController.getContentNameByID(core, ContentID) + "</a>'";
                                         SubContactList += "," + ContentID;
                                         SubContentCnt = SubContentCnt + 1;
                                     }
@@ -1529,7 +1529,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 IndexConfig = IndexConfigClass.get(core, adminContext);
                 //
-                ContentName = CDefModel.getContentNameByID(core, adminContext.adminContent.id);
+                ContentName = CdefController.getContentNameByID(core, adminContext.adminContent.id);
                 RQS = "cid=" + adminContext.adminContent.id + "&af=1";
                 //
                 //-------------------------------------------------------------------------------------
@@ -1578,7 +1578,7 @@ namespace Contensive.Addons.AdminSite {
                     string SubContentName = null;
                     SubFilterList = "";
                     if (IndexConfig.SubCDefID > 0) {
-                        SubContentName = CDefModel.getContentNameByID(core, IndexConfig.SubCDefID);
+                        SubContentName = CdefController.getContentNameByID(core, IndexConfig.SubCDefID);
                         QS = RQS;
                         QS = GenericController.modifyQueryString(QS, "IndexFilterRemoveCDef", encodeText(IndexConfig.SubCDefID));
                         Link = "/" + core.appConfig.adminRoute + "?" + QS;
@@ -1627,7 +1627,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     foreach (var findWordKvp in IndexConfig.FindWords) {
                         IndexConfigClass.IndexConfigFindWordClass findWord = findWordKvp.Value;
-                        FieldCaption = GenericController.encodeText(CDefModel.GetContentFieldProperty(core, ContentName, findWord.Name, "caption"));
+                        FieldCaption = GenericController.encodeText(CdefController.GetContentFieldProperty(core, ContentName, findWord.Name, "caption"));
                         QS = RQS;
                         QS = GenericController.modifyQueryString(QS, "IndexFilterRemoveFind", findWord.Name);
                         Link = "/" + core.appConfig.adminRoute + "?" + QS;
@@ -1702,7 +1702,7 @@ namespace Contensive.Addons.AdminSite {
                 // Sub Content Definitions
                 //
                 SubFilterList = "";
-                list = CDefModel.getContentControlCriteria(core, ContentName);
+                list = CdefController.getContentControlCriteria(core, ContentName);
                 if (!string.IsNullOrEmpty(list)) {
                     ListSplit = list.Split('=');
                     Cnt = ListSplit.GetUpperBound(0) + 1;
@@ -1712,7 +1712,7 @@ namespace Contensive.Addons.AdminSite {
                             if (Pos > 0) {
                                 subContentID = GenericController.encodeInteger(ListSplit[Ptr].Left(Pos - 1));
                                 if (subContentID > 0 && (subContentID != adminContext.adminContent.id) & (subContentID != IndexConfig.SubCDefID)) {
-                                    Caption = "<span style=\"white-space:nowrap;\">" + CDefModel.getContentNameByID(core, subContentID) + "</span>";
+                                    Caption = "<span style=\"white-space:nowrap;\">" + CdefController.getContentNameByID(core, subContentID) + "</span>";
                                     QS = RQS;
                                     QS = GenericController.modifyQueryString(QS, "IndexFilterAddCDef", subContentID.ToString(), true);
                                     Link = "/" + core.appConfig.adminRoute + "?" + QS;
@@ -1728,7 +1728,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // people filters
                 //
-                TableName = CDefModel.getContentTablename(core, ContentName);
+                TableName = CdefController.getContentTablename(core, ContentName);
                 SubFilterList = "";
                 if (GenericController.vbLCase(TableName) == GenericController.vbLCase("ccMembers")) {
                     SQL = core.db.getSQLSelect("default", "ccGroups", "ID,Caption,Name", "(active<>0)", "Caption,Name");

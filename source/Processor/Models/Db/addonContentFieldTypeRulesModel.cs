@@ -16,6 +16,11 @@ namespace Contensive.Processor.Models.Db {
         // -- instance properties
         public int addonID { get; set; }
         public int contentFieldTypeID { get; set; }
+        // 
+        //====================================================================================================
+        public static AddonContentFieldTypeRulesModel addEmpty(CoreController core) {
+            return addEmpty<AddonContentFieldTypeRulesModel>(core);
+        }
         //
         //====================================================================================================
         public static AddonContentFieldTypeRulesModel addDefault(CoreController core) {

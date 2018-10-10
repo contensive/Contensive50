@@ -26,7 +26,7 @@ namespace Contensive.Processor {
         #endregion
         //
         private CPClass cp { get; set; }
-        private Contensive.Processor.Controllers.CoreController core { get; set; }
+        private CoreController core { get; set; }
         protected bool disposed { get; set; } = false;
         //
         //====================================================================================================
@@ -63,31 +63,36 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override string GetContentControlCriteria(string ContentName) {
-            return Models.Domain.CDefModel.getContentControlCriteria(core, ContentName);
+            return CdefController.getContentControlCriteria(core, ContentName);
         }
         //
         //====================================================================================================
         //
         public override string GetFieldProperty(string ContentName, string FieldName, string PropertyName) {
-            return Models.Domain.CDefModel.GetContentFieldProperty(core, ContentName, FieldName, PropertyName);
+            return CdefController.GetContentFieldProperty(core, ContentName, FieldName, PropertyName);
         }
         //
         //====================================================================================================
         //
         public override int GetID(string ContentName) {
-            return Models.Domain.CDefModel.getContentId(core, ContentName);
+            return CdefController.getContentId(core, ContentName);
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// will be deprecated. Instead create cdef domain model and reference property
+        /// </summary>
+        /// <param name="ContentName"></param>
+        /// <param name="PropertyName"></param>
+        /// <returns></returns>
         public override string GetProperty(string ContentName, string PropertyName) {
-            return Models.Domain.CDefModel.GetContentProperty(cp.core, ContentName, PropertyName);
+            return CdefController.getContentProperty(cp.core, ContentName, PropertyName);
         }
         //
         //====================================================================================================
         //
         public override string GetDataSource(string ContentName) {
-            return Models.Domain.CDefModel.getContentDataSource(core, ContentName);
+            return CdefController.getContentDataSource(core, ContentName);
         }
         //
         //====================================================================================================
@@ -128,7 +133,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override string GetTable(string ContentName) {
-            return Models.Domain.CDefModel.getContentTablename(core, ContentName);
+            return CdefController.getContentTablename(core, ContentName);
         }
         //
         //====================================================================================================
@@ -141,7 +146,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override bool IsField(string ContentName, string FieldName) {
-            return Models.Domain.CDefModel.isContentFieldSupported(core, ContentName, FieldName);
+            return CdefController.isContentFieldSupported(core, ContentName, FieldName);
         }
         //
         //====================================================================================================
@@ -153,7 +158,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override bool IsChildContent(string ChildContentID, string ParentContentID) {
-            return Models.Domain.CDefModel.isWithinContent(cp.core, GenericController.encodeInteger(ChildContentID), GenericController.encodeInteger(ParentContentID));
+            return CdefController.isWithinContent(cp.core, GenericController.encodeInteger(ChildContentID), GenericController.encodeInteger(ParentContentID));
         }
         //
         //====================================================================================================
@@ -259,7 +264,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override void DeleteContent(string ContentName) {
-            ContentModel.delete(core, Models.Domain.CDefModel.getContentId(core, ContentName));
+            ContentModel.delete(core, CdefController.getContentId(core, ContentName));
         }
         //
         //====================================================================================================
@@ -271,7 +276,7 @@ namespace Contensive.Processor {
             field.authorable = true;
             field.blockAccess = false;
             field.caption = FieldName;
-            field.contentId = Models.Domain.CDefModel.getContentId(core, ContentName);
+            field.contentId = CdefController.getContentId(core, ContentName);
             field.developerOnly = false;
             field.editSortPriority = 9999;
             field.editTabName = "";
@@ -304,7 +309,7 @@ namespace Contensive.Processor {
             field.Scramble = false;
             field.textBuffered = false;
             field.uniqueName = false;
-            return Models.Domain.CDefModel.verifyContentField_returnID(core, ContentName, field);
+            return CdefController.verifyContentField_returnID(core, ContentName, field);
         }
         //
         //====================================================================================================
@@ -324,7 +329,7 @@ namespace Contensive.Processor {
         public override int AddContent(string ContentName, string sqlTableName, string dataSourceName) {
             var tmpList = new List<string> { };
             DataSourceModel dataSource = DataSourceModel.createByUniqueName(core, dataSourceName, ref tmpList);
-            return Models.Domain.CDefModel.verifyContent_returnId(core, new Models.Domain.CDefModel() {
+            return CdefController.verifyContent_returnId(core, new Models.Domain.CDefModel() {
                 dataSourceName = dataSource.name,
                 tableName = sqlTableName,
                 name = ContentName
@@ -334,7 +339,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override string GetListLink(string ContentName) {
-            return AdminUIController.getIconEditAdminLink(core, Models.Domain.CDefModel.getCdef(core, ContentName));
+            return AdminUIController.getIconEditAdminLink(core, Models.Domain.CDefModel.create(core, ContentName));
         }
         //
         //====================================================================================================

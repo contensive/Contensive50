@@ -137,7 +137,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // ----- List out all fields
                 //
-                CDef = CDefModel.getCdef(core, adminContext.adminContent.name);
+                CDef = CDefModel.create(core, adminContext.adminContent.name);
                 FieldSize = 100;
                 Array.Resize(ref FieldNames, FieldSize + 1);
                 Array.Resize(ref FieldCaption, FieldSize + 1);
@@ -168,7 +168,7 @@ namespace Contensive.Addons.AdminSite {
                     if (fieldTypeId[FieldPtr] == FieldTypeIdLookup) {
                         ContentID = field.lookupContentID;
                         if (ContentID > 0) {
-                            FieldLookupContentName[FieldPtr] = CDefModel.getContentNameByID(core, ContentID);
+                            FieldLookupContentName[FieldPtr] = CdefController.getContentNameByID(core, ContentID);
                         }
                         FieldLookupList[FieldPtr] = field.lookupList;
                     }
@@ -204,7 +204,7 @@ namespace Contensive.Addons.AdminSite {
                 //            If FieldType(FieldPtr) = 7 Then
                 //                ContentID = core.app.cs_getInteger(CS, "LookupContentID")
                 //                If ContentID > 0 Then
-                //                    FieldLookupContentName(FieldPtr) = cdefmodel.getContentNameByID(core,ContentID)
+                //                    FieldLookupContentName(FieldPtr) = CdefController.getContentNameByID(core,ContentID)
                 //                End If
                 //                FieldLookupList(FieldPtr) = core.db.cs_getText(CS, "LookupList")
                 //            End If

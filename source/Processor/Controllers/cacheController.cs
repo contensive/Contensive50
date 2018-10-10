@@ -436,7 +436,7 @@ namespace Contensive.Processor.Controllers {
         //        //
         //        // -- save the cache key that represents any record in the content, set as a dependent key for saves
         //        invalidate(ContentName);
-        //        invalidate(Models.Domain.CDefModel.getContentTablename(core, ContentName));
+        //        invalidate(CdefController.getContentTablename(core, ContentName));
         //    } catch (Exception ex) {
         //        logController.handleError( core,ex);
         //        throw;

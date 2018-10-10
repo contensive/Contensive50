@@ -449,7 +449,7 @@ namespace Contensive.Processor.Controllers {
                 CSPointer = main_OpenCSWhatsNew(core, SortFieldList);
                 //
                 if (this.core.db.csOk(CSPointer)) {
-                    ContentID = Models.Domain.CDefModel.getContentId(core, "Content Watch");
+                    ContentID = CdefController.getContentId(core, "Content Watch");
                     while (this.core.db.csOk(CSPointer)) {
                         Link = this.core.db.csGetText(CSPointer, "link");
                         LinkLabel = this.core.db.csGetText(CSPointer, "LinkLabel");
@@ -492,7 +492,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 if (this.core.db.csOk(CS)) {
-                    ContentID = Models.Domain.CDefModel.getContentId(core, "Content Watch");
+                    ContentID = CdefController.getContentId(core, "Content Watch");
                     while (this.core.db.csOk(CS)) {
                         Link = this.core.db.csGetText(CS, "link");
                         LinkLabel = this.core.db.csGetText(CS, "LinkLabel");
@@ -740,7 +740,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 if (core.session.isAuthenticatedAdmin(core)) {
                     tempbypassContentBlock = true;
-                } else if (core.session.isAuthenticatedContentManager(core, Models.Domain.CDefModel.getContentNameByID(core, ContentID))) {
+                } else if (core.session.isAuthenticatedContentManager(core, CdefController.getContentNameByID(core, ContentID))) {
                     tempbypassContentBlock = true;
                 } else {
                     SQL = "SELECT ccMemberRules.MemberID"
@@ -876,7 +876,7 @@ namespace Contensive.Processor.Controllers {
                     core.workflow.getAuthoringStatus(ContentName, RecordID, ref IsSubmitted, ref IsApproved, ref SubmittedName, ref ApprovedName, ref IsInserted, ref IsDeleted, ref IsModified, ref ModifiedName, ref ModifiedDate, ref SubmittedDate, ref ApprovedDate);
                 }
                 //
-                CDef = Models.Domain.CDefModel.getCdef(core, ContentName);
+                CDef = Models.Domain.CDefModel.create(core, ContentName);
                 //
                 // Set Buttons based on Status
                 //
@@ -1053,7 +1053,7 @@ namespace Contensive.Processor.Controllers {
                 string FromAddress = null;
                 //
                 FromAddress = core.siteProperties.getText("EmailPublishSubmitFrom", core.siteProperties.emailAdmin);
-                CDef = Models.Domain.CDefModel.getCdef(core, ContentName);
+                CDef = Models.Domain.CDefModel.create(core, ContentName);
                 Link = "/" + core.appConfig.adminRoute + "?af=" + AdminFormPublishing;
                 Copy = Msg_AuthoringSubmittedNotification;
                 Copy = GenericController.vbReplace(Copy, "<DOMAINNAME>", "<a href=\"" + HtmlController.encodeHtml(Link) + "\">" + core.webServer.requestDomain + "</a>");
@@ -1084,7 +1084,7 @@ namespace Contensive.Processor.Controllers {
         public string getContentWatchLinkByName(string ContentName, int RecordID, string DefaultLink = "", bool IncrementClicks = true) {
             string result = "";
             try {
-                string ContentRecordKey = Models.Domain.CDefModel.getContentId(core, GenericController.encodeText(ContentName)) + "." + GenericController.encodeInteger(RecordID);
+                string ContentRecordKey = CdefController.getContentId(core, GenericController.encodeText(ContentName)) + "." + GenericController.encodeInteger(RecordID);
                 result = getContentWatchLinkByKey(ContentRecordKey, DefaultLink, IncrementClicks);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -1406,8 +1406,8 @@ namespace Contensive.Processor.Controllers {
             int ContentID = 0;
             int ActivityLogOrganizationID = 0;
             //
-            ContentID = Models.Domain.CDefModel.getContentId(core, ContentName);
-            TableName = Models.Domain.CDefModel.getContentTablename(core, ContentName);
+            ContentID = CdefController.getContentId(core, ContentName);
+            TableName = CdefController.getContentTablename(core, ContentName);
             markRecordReviewed(ContentName, RecordID);
             //
             // -- invalidate the specific cache for this record
@@ -1665,11 +1665,11 @@ namespace Contensive.Processor.Controllers {
         //
         public void markRecordReviewed(string ContentName, int RecordID) {
             try {
-                if (Models.Domain.CDefModel.isContentFieldSupported(core, ContentName, "DateReviewed")) {
-                    string DataSourceName = Models.Domain.CDefModel.getContentDataSource(core, ContentName);
-                    string TableName = Models.Domain.CDefModel.getContentTablename(core, ContentName);
+                if (CdefController.isContentFieldSupported(core, ContentName, "DateReviewed")) {
+                    string DataSourceName = CdefController.getContentDataSource(core, ContentName);
+                    string TableName = CdefController.getContentTablename(core, ContentName);
                     string SQL = "update " + TableName + " set DateReviewed=" + core.db.encodeSQLDate(core.doc.profileStartTime);
-                    if (Models.Domain.CDefModel.isContentFieldSupported(core, ContentName, "ReviewedBy")) {
+                    if (CdefController.isContentFieldSupported(core, ContentName, "ReviewedBy")) {
                         SQL += ",ReviewedBy=" + core.session.user.id;
                     }
                     //

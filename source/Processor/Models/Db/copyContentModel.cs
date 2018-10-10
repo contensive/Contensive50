@@ -15,6 +15,11 @@ namespace Contensive.Processor.Models.Db {
         //====================================================================================================
         // -- instance properties
         public string copy { get; set; }
+        // 
+        //====================================================================================================
+        public static CopyContentModel addEmpty(CoreController core) {
+            return addEmpty<CopyContentModel>(core);
+        }
         //
         //====================================================================================================
         public static CopyContentModel addDefault(CoreController core) {

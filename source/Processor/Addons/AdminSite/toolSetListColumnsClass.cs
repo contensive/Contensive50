@@ -63,7 +63,7 @@ namespace Contensive.Addons.AdminSite {
                 //--------------------------------------------------------------------------------
                 //
                 if (adminContent.id != 0) {
-                    CDefModel CDef = CDefModel.getCdef(core, adminContent.id);
+                    CDefModel CDef = CDefModel.create(core, adminContent.id);
                     int ColumnWidthTotal = 0;
                     if (ToolsAction != 0) {
                         //
@@ -230,7 +230,7 @@ namespace Contensive.Addons.AdminSite {
                         if (reloadMetadata) {
                             core.doc.clearMetaData();
                             core.cache.invalidateAll();
-                            CDef = CDefModel.getCdef(core, adminContent.name);
+                            CDef = CDefModel.create(core, adminContent.name);
                         }
                         //
                         // save indexconfig

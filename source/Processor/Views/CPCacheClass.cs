@@ -56,7 +56,7 @@ namespace Contensive.Processor {
             if (!string.IsNullOrEmpty(ContentNameList)) {
                 List<string> tableNameList = new List<string>();
                 foreach (var contentName in new List<string>(ContentNameList.ToLower().Split(','))) {
-                    string tableName = Models.Domain.CDefModel.getContentTablename(core, contentName).ToLower();
+                    string tableName = CdefController.getContentTablename(core, contentName).ToLower();
                     if (!tableNameList.Contains(tableName)) {
                         tableNameList.Add(tableName);
                         core.cache.invalidateAllKeysInTable(tableName);
@@ -221,7 +221,7 @@ namespace Contensive.Processor {
         }
         //
         public override void InvalidateContentRecord(string contentName, int recordId) {
-            core.cache.invalidateDbRecord(recordId, Models.Domain.CDefModel.getContentTablename( core,  contentName));
+            core.cache.invalidateDbRecord(recordId, CdefController.getContentTablename( core,  contentName));
         }
         #region  IDisposable Support 
         //

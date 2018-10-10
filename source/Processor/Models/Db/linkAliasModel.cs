@@ -29,6 +29,11 @@ namespace Contensive.Processor.Models.Db {
         //Public Property Link As String
         public int pageID { get; set; }
         public string queryStringSuffix { get; set; }
+        // 
+        //====================================================================================================
+        public static LinkAliasModel addEmpty(CoreController core) {
+            return addEmpty<LinkAliasModel>(core);
+        }
         //
         //====================================================================================================
         public static LinkAliasModel addDefault(CoreController core) {

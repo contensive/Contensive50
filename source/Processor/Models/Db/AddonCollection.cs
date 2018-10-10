@@ -26,14 +26,19 @@ namespace Contensive.Processor.Models.Db {
         public bool system { get; set; }
         public bool updatable { get; set; }
         public string wwwFileList { get; set; }
+        // 
+        //====================================================================================================
+        public static AddonCollection addEmpty(CoreController core) {
+            return addEmpty<AddonCollection>(core);
+        }
         //
         //====================================================================================================
-        public static AddonCollection add(CoreController core) {
+        public static AddonCollection addDefault(CoreController core) {
             return addDefault<AddonCollection>(core);
         }
         //
         //====================================================================================================
-        public static AddonCollection add(CoreController core, ref List<string> callersCacheNameList) {
+        public static AddonCollection addDefault(CoreController core, ref List<string> callersCacheNameList) {
             return addDefault<AddonCollection>(core, ref callersCacheNameList);
         }
         //

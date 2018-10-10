@@ -5,6 +5,27 @@ using System.Collections.Generic;
 namespace Contensive.Processor {
     public static class constants {
         //
+        // -- data layers, 
+        //      - only allow calls from top to bottom
+        //      - NEVER CALL UP
+        //
+        //      ContentSets: a convenient way to open data that follows the content definition rules (active, contentcontrolId, guid, etc)
+        //          = csController
+        //
+        //      CdefModel: the model for content definitions, and methods to create them
+        //
+        //      CdefController: static methods for all things ContentDefinition (cdef)
+        //          - getContentId, getCdef, etc.
+        //
+        //      DbModels: convenient, cached access to database records
+        //  
+        //      DbController: fast access to database records without consideration for content-definition structure, like contentcontrolid
+        //          manages active, guid and create/modified user/date
+        //
+        //      CacheController: 
+        //
+        //
+        //
         // code version for this build. This is saved in a site property and checked in the housekeeping event - checkDataVersion
         //
         public const int codeVersion = 0;

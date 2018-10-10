@@ -210,6 +210,7 @@
     <Compile Include="Controllers\CollectionXmlController.cs" />
     <Compile Include="Controllers\XmlController.cs" />
     <Compile Include="Controllers\QuickEditController.cs" />
+    <Compile Include="Controllers\CdefController.cs" />
     <Compile Include="Controllers\_BlankController.cs" />
     <Compile Include="Extensions\extensionMethodsClass.cs" />
     <Compile Include="Extensions\webClientExtensionClass.cs" />
@@ -230,7 +231,6 @@
     <Compile Include="Models\Db\GroupRuleModel.cs" />
     <Compile Include="Models\Db\MemberRuleModel.cs" />
     <Compile Include="Models\Db\EmailModel.cs" />
-    <Compile Include="Models\Db\SiteSectionModel.cs" />
     <Compile Include="Models\Db\TaskModel.cs" />
     <Compile Include="Models\Domain\NameValueModel.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -336,6 +336,7 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

@@ -15,6 +15,11 @@ namespace Contensive.Processor.Models.Db {
         //====================================================================================================
         // -- instance properties
         public int emailID { get; set; }
+        // 
+        //====================================================================================================
+        public static EmailDropModel addEmpty(CoreController core) {
+            return addEmpty<EmailDropModel>(core);
+        }
         //
         //====================================================================================================
         public static EmailDropModel addDefault(CoreController core) {

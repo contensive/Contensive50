@@ -253,7 +253,7 @@ namespace Contensive.Addons.AdminSite {
                 // adminContext.content init
                 requestedContentId = core.docProperties.getInteger("cid");
                 if (requestedContentId != 0) {
-                    adminContent = CDefModel.getCdef(core, requestedContentId);
+                    adminContent = CDefModel.create(core, requestedContentId);
                     if (adminContent == null) {
                         adminContent = new CDefModel();
                         adminContent.id = 0;
@@ -290,7 +290,7 @@ namespace Contensive.Addons.AdminSite {
                         if (adminContent.id <= 0) {
                             adminContent.id = requestedContentId;
                         } else if (adminContent.id != requestedContentId) {
-                            adminContent = CDefModel.getCdef(core, adminContent.id);
+                            adminContent = CDefModel.create(core, adminContent.id);
                         }
                     }
                     core.db.csClose(ref CS);
@@ -487,7 +487,7 @@ namespace Contensive.Addons.AdminSite {
         public static  bool userHasContentAccess(CoreController core, int ContentID) {
             bool result = false;
             try {
-                string ContentName = CDefModel.getContentNameByID(core, ContentID);
+                string ContentName = CdefController.getContentNameByID(core, ContentID);
                 if (!string.IsNullOrEmpty(ContentName)) {
                     result = core.session.isAuthenticatedContentManager(core, ContentName);
                 }

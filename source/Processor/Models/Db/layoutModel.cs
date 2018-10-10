@@ -28,6 +28,11 @@ namespace Contensive.Processor.Models.Db {
         // -- instance properties
         public string layout { get; set; }
         public string stylesFilename { get; set; }
+        // 
+        //====================================================================================================
+        public static LayoutModel addEmpty(CoreController core) {
+            return addEmpty<LayoutModel>(core);
+        }
         //
         //====================================================================================================
         public static LayoutModel addDefault(CoreController core) {

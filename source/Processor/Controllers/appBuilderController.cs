@@ -503,7 +503,7 @@ namespace Contensive.Processor.Controllers {
                 string sql3 = null;
                 //
                 Active = !InActive;
-                Models.Domain.CDefModel cdef = Models.Domain.CDefModel.getCdef(core, ContentName);
+                Models.Domain.CDefModel cdef = Models.Domain.CDefModel.create(core, ContentName);
                 string tableName = cdef.tableName;
                 int cid = cdef.id;
                 //
@@ -1059,7 +1059,7 @@ namespace Contensive.Processor.Controllers {
                 if (!string.IsNullOrEmpty(EntryName.Trim())) {
                     int addonId = core.db.getRecordID(cnAddons, AddonName);
                     int parentId = verifyNavigatorEntry_getParentIdFromNameSpace(core, menuNameSpace);
-                    int contentId = Models.Domain.CDefModel.getContentId(core, ContentName);
+                    int contentId = CdefController.getContentId(core, ContentName);
                     string listCriteria = "(name=" + core.db.encodeSQLText(EntryName) + ")and(Parentid=" + parentId + ")";
                     List<Models.Db.NavigatorEntryModel> entryList = NavigatorEntryModel.createList(core, listCriteria, "id");
                     NavigatorEntryModel entry = null;

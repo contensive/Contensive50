@@ -28,6 +28,11 @@ namespace Contensive.Processor.Models.Db {
         // -- instance properties
         public int domainId { get; set; }
         public int templateId { get; set; }
+        // 
+        //====================================================================================================
+        public static TemplateDomainRuleModel addEmpty(CoreController core) {
+            return addEmpty<TemplateDomainRuleModel>(core);
+        }
         //
         //====================================================================================================
         public static TemplateDomainRuleModel addDefault(CoreController core) {

@@ -18,6 +18,11 @@ namespace Contensive.Processor.Models.Db {
         public int fieldID { get; set; }
         public string helpCustom { get; set; }
         public string helpDefault { get; set; }
+        // 
+        //====================================================================================================
+        public static ContentFieldHelpModel addEmpty(CoreController core) {
+            return addEmpty<ContentFieldHelpModel>(core);
+        }
         //
         //====================================================================================================
         public static ContentFieldHelpModel addDefault(CoreController core) {

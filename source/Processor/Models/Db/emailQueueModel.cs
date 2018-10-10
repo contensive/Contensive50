@@ -19,6 +19,11 @@ namespace Contensive.Processor.Models.Db {
         public string content { get; set; }
         public bool immediate { get; set;  }
         public int attempts { get; set; }
+        // 
+        //====================================================================================================
+        public static EmailQueueModel addEmpty(CoreController core) {
+            return addEmpty<EmailQueueModel>(core);
+        }
         //
         //====================================================================================================
         public static EmailQueueModel addDefault(CoreController core) {

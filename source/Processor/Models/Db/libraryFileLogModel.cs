@@ -29,6 +29,11 @@ namespace Contensive.Processor.Models.Db {
         public int fileID { get; set; }
         public int memberID { get; set; }
         public int visitID { get; set; }
+        // 
+        //====================================================================================================
+        public static LibraryFileLogModel addEmpty(CoreController core) {
+            return addEmpty<LibraryFileLogModel>(core);
+        }
         //
         //====================================================================================================
         public static LibraryFileLogModel addDefault(CoreController core) {

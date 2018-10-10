@@ -27,6 +27,11 @@ namespace Contensive.Processor.Models.Db {
         //====================================================================================================
         // -- instance properties
         public int dataSourceID { get; set; }
+        // 
+        //====================================================================================================
+        public static TableModel addEmpty(CoreController core) {
+            return addEmpty<TableModel>(core);
+        }
         //
         //====================================================================================================
         public static TableModel addDefault(CoreController core) {

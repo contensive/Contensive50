@@ -36,6 +36,11 @@ namespace Contensive.Processor.Models.Db {
         public string resultMessage { get; set; }
         public string sqlQuery { get; set; }
         public string cmdDetail { get; set; }
+        // 
+        //====================================================================================================
+        public static TaskModel addEmpty(CoreController core) {
+            return addEmpty<TaskModel>(core);
+        }
         //
         //====================================================================================================
         public static TaskModel addDefault(CoreController core) {

@@ -17,6 +17,11 @@ namespace Contensive.Processor.Models.Db {
         //====================================================================================================
         // -- instance properties
         public string fieldValue { get; set; }
+        // 
+        //====================================================================================================
+        public static SitePropertyModel addEmpty(CoreController core) {
+            return addEmpty<SitePropertyModel>(core);
+        }
         //
         //====================================================================================================
         public static SitePropertyModel addDefault(CoreController core) {

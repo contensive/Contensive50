@@ -18,6 +18,11 @@ namespace Contensive.Processor.Models.Db {
         public bool allowDelete { get; set; }        
         public int contentID { get; set; }
         public int groupID { get; set; }
+        // 
+        //====================================================================================================
+        public static GroupRuleModel addEmpty(CoreController core) {
+            return addEmpty<GroupRuleModel>(core);
+        }
         //
         //====================================================================================================
         public static GroupRuleModel addDefault(CoreController core) {

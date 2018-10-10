@@ -287,7 +287,9 @@ namespace Contensive.Processor.Models.Db {
                     // -- cannot use models without an application
                     LogController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
-                    result = create<T>(core, core.db.insertContentRecordGetID(derivedContentName(typeof(T)), core.session.user.id));
+                    // 20181010 - db models shouldnt access content layer, just db and cache layer
+                    result = create<T>(core, core.db.insertTableRecordGetId(derivedDataSourceName(typeof(T)), derivedTableName(typeof(T)), core.session.user.id));
+                    //result = create<T>(core, core.db.insertContentRecordGetID(derivedContentName(typeof(T)), core.session.user.id));
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -360,7 +362,7 @@ namespace Contensive.Processor.Models.Db {
                         result = readRecordCache<T>(core, recordId);
                         if (result == null) {
                             using (var cs = new CsController(core)) {
-                                if (cs.openSQL(getSelectSql<T>(null, "(id=" + recordId + ")"))) {
+                                if (cs.openSQL(getSelectSql<T>(core, null, "(id=" + recordId + ")","", derivedContentName(typeof(T))))) {
                                     result = loadRecord<T>(core, cs, ref callersCacheNameList);
                                 }
                             }
@@ -439,7 +441,7 @@ namespace Contensive.Processor.Models.Db {
                         result = readRecordCacheByGuidPtr<T>(core, recordGuid);
                         if (result == null) {
                             using (var cs = new CsController(core)) {
-                                if (cs.openSQL(getSelectSql<T>(null, "(ccGuid=" + core.db.encodeSQLText(recordGuid) + ")"))) {
+                                if (cs.openSQL(getSelectSql<T>(core, null, "(ccGuid=" + core.db.encodeSQLText(recordGuid) + ")","", derivedContentName(typeof(T))))) {
                                     result = loadRecord<T>(core, cs, ref callersCacheNameList);
                                 }
                             }
@@ -493,7 +495,7 @@ namespace Contensive.Processor.Models.Db {
                         result = (derivedNameFieldIsUnique(instanceType)) ? readRecordCacheByUniqueNamePtr<T>(core, recordName) : null;
                         if (result == null) {
                             using (var cs = new CsController(core)) {
-                                if (cs.openSQL(getSelectSql<T>(null, "(name=" + core.db.encodeSQLText(recordName) + ")"))) {
+                                if (cs.openSQL(getSelectSql<T>(core, null, "(name=" + core.db.encodeSQLText(recordName) + ")","", derivedContentName(typeof(T))))) {
                                     result = loadRecord<T>(core, cs, ref callersCacheNameList);
                                 }
                             }
@@ -519,7 +521,7 @@ namespace Contensive.Processor.Models.Db {
             try {
                 if (cs.ok()) {
                     Type instanceType = typeof(T);
-                    string contentName = derivedContentName(instanceType);
+                    //string contentName = derivedContentName(instanceType);
                     string tableName = derivedTableName(instanceType);
                     int recordId = cs.getInteger("id");
                     modelInstance = (T)Activator.CreateInstance(instanceType);
@@ -933,7 +935,7 @@ namespace Contensive.Processor.Models.Db {
                     LogController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
                     using (var cs = new CsController(core)) {
-                        if (cs.openSQL(getSelectSql<T>(null, sqlCriteria, sqlOrderBy))) {
+                        if (cs.openSQL(getSelectSql<T>(core,null, sqlCriteria, sqlOrderBy, derivedContentName(typeof(T))))) {
                             T instance = default(T);
                             do {
                                 instance = loadRecord<T>(core, cs, ref callersCacheNameList);
@@ -1165,7 +1167,7 @@ namespace Contensive.Processor.Models.Db {
                 } else {
                     instance = createEmpty<T>(core);
                     string contentName = derivedContentName(typeof(T));
-                    Models.Domain.CDefModel CDef = Models.Domain.CDefModel.getCdef(core, contentName);
+                    Models.Domain.CDefModel CDef = Models.Domain.CDefModel.create(core, contentName);
                     if (CDef == null) {
                         throw new ApplicationException("content [" + contentName + "] could Not be found.");
                     } else if (CDef.id <= 0) {
@@ -1228,7 +1230,7 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         //
-        private static string getSelectSql<T>(List<string> fieldList = null, string criteria = "", string orderBy = "") where T : BaseModel {
+        private static string getSelectSql<T>( CoreController core, List<string> fieldList = null, string criteria = "", string orderBy = "", string contentName = "" ) where T : BaseModel {
             string result = "";
             Type instanceType = typeof(T);
             string tableName = derivedTableName(instanceType);
@@ -1240,6 +1242,12 @@ namespace Contensive.Processor.Models.Db {
                 }
             }
             result = "select " + string.Join(",", fieldList.ToArray()) + " from " + tableName + " where (active>0)";
+            if (!string.IsNullOrEmpty(contentName)) {
+                var cdef = Models.Domain.CDefModel.create(core, contentName);
+                if (cdef.supportLegacyContentControl) {
+                    result += "and(" + cdef.legacyContentControlCriteria + ")";
+                }
+            }
             if (!string.IsNullOrEmpty(criteria)) {
                 result += "and(" + criteria + ")";
             }

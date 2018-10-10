@@ -207,12 +207,12 @@ namespace Contensive.Processor.Controllers {
                                         //
                                         if (DupCausesWarning) {
                                             if (LinkAliasPageID == 0) {
-                                                int PageContentCID = Models.Domain.CDefModel.getContentId(core, "Page Content");
+                                                int PageContentCID = CdefController.getContentId(core, "Page Content");
                                                 return_WarningMessage = ""
                                                     + "This page has been saved, but the Link Alias could not be created (" + WorkingLinkAlias + ") because it is already in use for another page."
                                                     + " To use Link Aliasing (friendly page names) for this page, the Link Alias value must be unique on this site. To set or change the Link Alias, clicke the Link Alias tab and select a name not used by another page or a folder in your website.";
                                             } else {
-                                                int PageContentCID = Models.Domain.CDefModel.getContentId(core, "Page Content");
+                                                int PageContentCID = CdefController.getContentId(core, "Page Content");
                                                 return_WarningMessage = ""
                                                     + "This page has been saved, but the Link Alias could not be created (" + WorkingLinkAlias + ") because it is already in use for another page (<a href=\"?af=4&cid=" + PageContentCID + "&id=" + LinkAliasPageID + "\">edit</a>)."
                                                     + " To use Link Aliasing (friendly page names) for this page, the Link Alias value must be unique. To set or change the Link Alias, click the Link Alias tab and select a name not used by another page or a folder in your website.";

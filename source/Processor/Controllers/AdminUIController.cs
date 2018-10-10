@@ -1081,7 +1081,7 @@ namespace Contensive.Processor {
         public static string getDefaultEditor_LookupContent( CoreController core, string fieldName, int fieldValue, int lookupContentID, ref bool IsEmptyList, bool readOnly = false, string htmlId = "", string WhyReadOnlyMsg = "", bool fieldRequired = false, string sqlFilter = "") {
             string result = "";
             string LookupContentName = "";
-            if (lookupContentID != 0) LookupContentName = GenericController.encodeText(Models.Domain.CDefModel.getContentNameByID(core, lookupContentID));
+            if (lookupContentID != 0) LookupContentName = GenericController.encodeText(CdefController.getContentNameByID(core, lookupContentID));
             if (readOnly) {
                 //
                 // ----- Lookup ReadOnly
@@ -1246,7 +1246,7 @@ namespace Contensive.Processor {
                         EditorString += "&nbsp;[Edit <a TabIndex=-1 href=\"?af=4&cid=" + selectedUser.contentControlID.ToString() + "&id=" + selectedRecordId.ToString() + "\">" + HtmlController.encodeHtml( recordName ) + "</a>]";
                     }
                 }
-                EditorString += ("&nbsp;[Select from members of <a TabIndex=-1 href=\"?cid=" + Models.Domain.CDefModel.getContentId(core, "groups") + "\">" + groupName + "</a>]");
+                EditorString += ("&nbsp;[Select from members of <a TabIndex=-1 href=\"?cid=" + CdefController.getContentId(core, "groups") + "\">" + groupName + "</a>]");
             }
             return EditorString;
         }
@@ -1256,9 +1256,9 @@ namespace Contensive.Processor {
         public static string getDefaultEditor_manyToMany(CoreController core, CDefFieldModel field, string htmlName, string currentValueCommaList, int editRecordId, bool readOnly = false, string WhyReadOnlyMsg = "" ) {
             string result = "";
             //
-            string MTMContent0 =   CDefModel.getContentNameByID(core, field.contentId);
-            string MTMContent1 = CDefModel.getContentNameByID(core, field.manyToManyContentID);
-            string MTMRuleContent = CDefModel.getContentNameByID(core, field.manyToManyRuleContentID);
+            string MTMContent0 =   CdefController.getContentNameByID(core, field.contentId);
+            string MTMContent1 = CdefController.getContentNameByID(core, field.manyToManyContentID);
+            string MTMRuleContent = CdefController.getContentNameByID(core, field.manyToManyRuleContentID);
             string MTMRuleField0 = field.ManyToManyRulePrimaryField;
             string MTMRuleField1 = field.ManyToManyRuleSecondaryField;
             result += core.html.getCheckList(htmlName, MTMContent0, editRecordId, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, "", "", false, false, currentValueCommaList);
@@ -1563,7 +1563,7 @@ namespace Contensive.Processor {
                         throw (new ApplicationException("RecordID [" + recordID + "] is invalid"));
                     } else {
                         if (IsEditing) {
-                            var cdef = Models.Domain.CDefModel.getCdef(core, contentName);
+                            var cdef = Models.Domain.CDefModel.create(core, contentName);
                             if ( cdef==null) {
                                 throw new ApplicationException("getRecordEditLink called with contentName [" + contentName + "], but no content found with this name.");
                             } else {
@@ -1623,7 +1623,7 @@ namespace Contensive.Processor {
                     if (string.IsNullOrEmpty(iContentName)) {
                         throw (new ApplicationException("Method called with blank ContentName")); // handleLegacyError14(MethodName, "")
                     } else {
-                        iContentID = Models.Domain.CDefModel.getContentId(core, iContentName);
+                        iContentID = CdefController.getContentId(core, iContentName);
                         csChildContent = core.db.csOpen("Content", "ParentID=" + iContentID, "", true, 0, false, false, "id");
                         useFlyout = core.db.csOk(csChildContent);
                         core.db.csClose(ref csChildContent);
@@ -1662,7 +1662,7 @@ namespace Contensive.Processor {
                                         ClipboardContentID = GenericController.encodeInteger(ClipBoardArray[0]);
                                         ClipChildRecordID = GenericController.encodeInteger(ClipBoardArray[1]);
                                         //iContentID = main_GetContentID(iContentName)
-                                        if (Models.Domain.CDefModel.isWithinContent(core, ClipboardContentID, iContentID)) {
+                                        if (CdefController.isWithinContent(core, ClipboardContentID, iContentID)) {
                                             if (GenericController.vbInstr(1, iPresetNameValueList, "PARENTID=", 1) != 0) {
                                                 //
                                                 // must test for main_IsChildRecord
@@ -1829,7 +1829,7 @@ namespace Contensive.Processor {
                             // ----- No entry found, this member does not have access, just main_Get ContentID
                             //
                             ContentRecordFound = true;
-                            ContentID = Models.Domain.CDefModel.getContentId(core, ContentName);
+                            ContentID = CdefController.getContentId(core, ContentName);
                             ContentAllowAdd = false;
                             GroupRulesAllowAdd = false;
                             MemberRulesAllow = false;

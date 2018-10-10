@@ -477,7 +477,7 @@ namespace Contensive.Processor.Controllers {
                                 // lazy create a user if/when it is needed
                                 string DefaultMemberName = resultSessionContext.visit.name;
                                 if (DefaultMemberName.Left(5).ToLower() == "visit") {
-                                    DefaultMemberName = CDefModel.GetContentFieldProperty(core, "people", "name", "default");
+                                    DefaultMemberName = CdefController.GetContentFieldProperty(core, "people", "name", "default");
                                 }
                                 resultSessionContext.user = new PersonModel {
                                     name = DefaultMemberName
@@ -900,7 +900,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // admin is content manager if the CDef is not developer only
                         //
-                        CDefModel CDef = CDefModel.getCdef(core, ContentName);
+                        CDefModel CDef = CDefModel.create(core, ContentName);
                         if (CDef.id != 0) {
                             if (!CDef.developerOnly) {
                                 returnAllowEdit = true;
@@ -912,7 +912,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // Authenticated and not admin or developer
                         //
-                        ContentID = CDefModel.getContentId(core, ContentName);
+                        ContentID = CdefController.getContentId(core, ContentName);
                         getContentAccessRights_NonAdminByContentId(core, ContentID, ref returnAllowEdit, ref returnAllowAdd, ref returnAllowDelete, "");
                     }
                 }
@@ -990,9 +990,9 @@ namespace Contensive.Processor.Controllers {
                         //
                         // ----- Not a content manager for this one, check the parent
                         //
-                        ContentName = CDefModel.getContentNameByID(core, ContentID);
+                        ContentName = CdefController.getContentNameByID(core, ContentID);
                         if (!string.IsNullOrEmpty(ContentName)) {
-                            CDef = CDefModel.getCdef(core, ContentName);
+                            CDef = CDefModel.create(core, ContentName);
                             ParentID = CDef.parentID;
                             if (ParentID > 0) {
                                 getContentAccessRights_NonAdminByContentId(core, ParentID, ref returnAllowEdit, ref returnAllowAdd, ref returnAllowDelete, usedContentIdList + "," + ContentID.ToString());
@@ -1175,7 +1175,7 @@ namespace Contensive.Processor.Controllers {
         public bool isAuthenticatedMember(CoreController core) {
             bool result = false;
             try {
-                result = visit.visitAuthenticated & (Models.Domain.CDefModel.isWithinContent(core, user.contentControlID, CDefModel.getContentId(core, "members")));
+                result = visit.visitAuthenticated & (CdefController.isWithinContent(core, user.contentControlID, CdefController.getContentId(core, "members")));
                 //If (Not property_user_isMember_isLoaded) And (visit_initialized) Then
                 //    property_user_isMember = isAuthenticated() And core.IsWithinContent(user.ContentControlID, core.main_GetContentID("members"))
                 //    property_user_isMember_isLoaded = True
@@ -1349,7 +1349,7 @@ namespace Contensive.Processor.Controllers {
                         if (core.visitProperty.getBoolean("AllowEditing") | core.visitProperty.getBoolean("AllowAdvancedEditor")) {
                             if (!string.IsNullOrEmpty(contentNameOrId)) {
                                 if (contentNameOrId.IsNumeric()) {
-                                    contentNameOrId = CDefModel.getContentNameByID(core, encodeInteger(contentNameOrId));
+                                    contentNameOrId = CdefController.getContentNameByID(core, encodeInteger(contentNameOrId));
                                 }
                             }
                             result = isAuthenticatedContentManager(core, contentNameOrId);

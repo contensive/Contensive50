@@ -28,6 +28,11 @@ namespace Contensive.Processor.Models.Db {
         // -- instance properties
         public int MemberID { get; set; }
         public int ForceBrowserMobile { get; set; }
+        // 
+        //====================================================================================================
+        public static VisitorModel addEmpty(CoreController core) {
+            return addEmpty<VisitorModel>(core);
+        }
         //
         //====================================================================================================
         public static VisitorModel addDefault(CoreController core) {

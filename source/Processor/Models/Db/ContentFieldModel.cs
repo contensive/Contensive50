@@ -52,6 +52,11 @@ namespace Contensive.Processor.Models.Db {
         public int type { get; set; }
         public bool uniqueName { get; set; }
         public bool isBaseField { get; set; }
+        // 
+        //====================================================================================================
+        public static ContentFieldModel addEmpty(CoreController core) {
+            return addEmpty<ContentFieldModel>(core);
+        }
         //
         //====================================================================================================
         public static ContentFieldModel addDefault(CoreController core) {

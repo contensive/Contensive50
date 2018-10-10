@@ -27,6 +27,11 @@ namespace Contensive.Processor.Models.Db {
         //====================================================================================================
         // -- instance properties
         public string OrderByClause { get; set; }
+        // 
+        //====================================================================================================
+        public static SortMethodModel addEmpty(CoreController core) {
+            return addEmpty<SortMethodModel>(core);
+        }
         //
         //====================================================================================================
         public static SortMethodModel addDefault(CoreController core) {

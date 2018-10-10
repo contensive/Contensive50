@@ -18,6 +18,11 @@ namespace Contensive.Processor.Models.Db {
         public string caption { get; set; }        
         public string copyFilename { get; set; }
         public bool publicJoin { get; set; }
+        // 
+        //====================================================================================================
+        public static GroupModel addEmpty(CoreController core) {
+            return addEmpty<GroupModel>(core);
+        }
         //
         //====================================================================================================
         public static GroupModel addDefault(CoreController core) {

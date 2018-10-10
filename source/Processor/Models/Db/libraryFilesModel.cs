@@ -36,6 +36,11 @@ namespace Contensive.Processor.Models.Db {
         public int folderId { get; set; }
         public int height { get; set; }
         public int width { get; set; }
+        // 
+        //====================================================================================================
+        public static LibraryFilesModel addEmpty(CoreController core) {
+            return addEmpty<LibraryFilesModel>(core);
+        }
         //
         //====================================================================================================
         public static LibraryFilesModel addDefault(CoreController core) {

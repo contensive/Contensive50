@@ -69,6 +69,12 @@ namespace Contensive.Processor.Models.Db {
         public FieldTypeCSSFile stylesFilename { get; set; }
         public string stylesLinkHref { get; set; }
         public bool template { get; set; }
+        // 
+        //====================================================================================================
+        public static AddonModel addEmpty(CoreController core) {
+            return addEmpty<AddonModel>(core);
+        }
+        //
         //====================================================================================================
         public static AddonModel addDefault(CoreController core) {
             return addDefault<AddonModel>(core);

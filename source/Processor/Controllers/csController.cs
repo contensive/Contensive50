@@ -251,7 +251,7 @@ namespace Contensive.Processor {
             int RecordID = 0;
             if (core.db.csIsFieldSupported(CSPointer, "id") & core.db.csIsFieldSupported(CSPointer, "contentcontrolId")) {
                 RecordID = core.db.csGetInteger(CSPointer, "id");
-                ContentName = Models.Domain.CDefModel.getContentNameByID(core, core.db.csGetInteger(CSPointer, "contentcontrolId"));
+                ContentName = CdefController.getContentNameByID(core, core.db.csGetInteger(CSPointer, "contentcontrolId"));
             }
             string source = core.db.csGet(CSPointer, FieldName);
             return ActiveContentController.renderHtmlForWeb(core, source, ContentName, RecordID, core.session.user.id, "", 0, CPUtilsBaseClass.addonContext.ContextPage);

@@ -50,7 +50,7 @@ namespace Contensive.Addons.Tools {
                     if (!string.IsNullOrEmpty(ContentName)) {
                         TableName = cp.Content.GetTable(ContentName);
                         dataSourceName = cp.Content.GetDataSource(ContentName);
-                        CDef = Processor.Models.Domain.CDefModel.getCdef(core, ContentID, true, true);
+                        CDef = Processor.Models.Domain.CDefModel.create(core, ContentID, true, true);
                     }
                 }
                 int RecordCount = 0;
@@ -233,19 +233,19 @@ namespace Contensive.Addons.Tools {
                     Stream.Add( HtmlController.div( "There was a problem saving these changes" + "<UL>" + ErrorMessage + "</UL>","ccError"));
                 }
                 if (ReloadCDef) {
-                    CDef = Processor.Models.Domain.CDefModel.getCdef(core, ContentID, true, true);
+                    CDef = Processor.Models.Domain.CDefModel.create(core, ContentID, true, true);
                 }
                 if (ContentID == 0) {
                     //
                     // content tables that have edit forms to Configure
                     bool isEmptyList = false;
-                    Stream.Add(AdminUIController.getToolFormInputRow(core, "Select a Content Definition to Configure", AdminUIController.getDefaultEditor_LookupContent(core,RequestNameToolContentID, ContentID, Processor.Models.Domain.CDefModel.getContentId( core,"Content" ), ref isEmptyList)));
+                    Stream.Add(AdminUIController.getToolFormInputRow(core, "Select a Content Definition to Configure", AdminUIController.getDefaultEditor_LookupContent(core,RequestNameToolContentID, ContentID, CdefController.getContentId( core,"Content" ), ref isEmptyList)));
                 } else {
                     //
                     // Configure edit form
                     Stream.Add(HtmlController.inputHidden(RequestNameToolContentID, ContentID));
 Stream.Add(core.html.getPanelTop());
-                    ContentName = Processor.Models.Domain.CDefModel.getContentNameByID(core, ContentID);
+                    ContentName = CdefController.getContentNameByID(core, ContentID);
                     ButtonList = ButtonCancel + "," + ButtonSave + "," + ButtonOK + "," + ButtonAdd;
                     //
                     // Get a new copy of the content definition
@@ -260,8 +260,8 @@ Stream.Add(core.html.getPanelTop());
                         AllowCDefInherit = false;
                     } else {
                         AllowCDefInherit = true;
-                        string ParentContentName = Processor.Models.Domain.CDefModel.getContentNameByID(core, ParentContentID);
-                        ParentCDef = Processor.Models.Domain.CDefModel.getCdef(core, ParentContentID, true, true);
+                        string ParentContentName = CdefController.getContentNameByID(core, ParentContentID);
+                        ParentCDef = Processor.Models.Domain.CDefModel.create(core, ParentContentID, true, true);
                     }
                     bool NeedFootNote1 = false;
                     bool NeedFootNote2 = false;
@@ -326,7 +326,7 @@ Stream.Add(core.html.getPanelTop());
                         }
                         fieldList.Sort((p1, p2) => p1.sort.CompareTo(p2.sort));
                         StringBuilderLegacyController StreamValidRows = new StringBuilderLegacyController();
-                        var contentFieldsCdef = Processor.Models.Domain.CDefModel.getCdef(core, "content fields");
+                        var contentFieldsCdef = Processor.Models.Domain.CDefModel.create(core, "content fields");
                         foreach (fieldSortClass fieldsort in fieldList) {
                             StringBuilderLegacyController streamRow = new StringBuilderLegacyController();
                             bool rowValid = true;
