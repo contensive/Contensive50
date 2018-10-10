@@ -6,6 +6,7 @@ using Contensive.Processor.Controllers;
 using Contensive.Processor.Models.Domain;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor;
+using System.Linq;
 
 namespace Contensive.CLI {
     class mainClass {
@@ -353,6 +354,32 @@ namespace Contensive.CLI {
                                 case "--uninstallservice":
                                     string unInstallService = "/C C:\\Windows\\Microsoft.NET\\Framework64\\v4.0.30319\\installutil /u TaskService.exe";
                                     System.Diagnostics.Process.Start("cmd.exe", unInstallService);
+                                    break;
+                                case "--execute":
+                                    //
+                                    // -- execute an addon
+                                    cpServer.core.serverConfig.allowTaskSchedulerService = Contensive.Processor.Controllers.GenericController.encodeBoolean(args[argPtr]);
+                                    if (cpServer.core.serverConfig.apps.Count==1) {
+                                        appName = cpServer.core.serverConfig.apps.First().Value.name;
+                                    }
+                                    if ( string.IsNullOrWhiteSpace( appName )) {
+                                        Console.WriteLine("ERROR, execute requires an application name (-a appName --execute addonNameOrGuid) because this server has 2+ apps");
+                                    } else {
+                                        if (argPtr > (args.Length + 1)) {
+                                            Console.WriteLine("ERROR, execute requires a parameter for the addon you want to run");
+                                        } else { 
+                                            argPtr++;
+                                            string addonNameOrGuid = args[argPtr];
+                                            if (string.IsNullOrWhiteSpace(addonNameOrGuid)) {
+                                                Console.WriteLine("ERROR, execute requires a parameter for the addon you want to run");
+                                            } else {
+                                                Console.WriteLine("executing addon [" + addonNameOrGuid + "], app  [" + appName + "]");
+                                                using ( var cp = new CPClass( appName )) {
+                                                    cp.executeAddon(addonNameOrGuid);
+                                                }
+                                            }
+                                        }
+                                    }
                                     break;
                                 //
                                 // -- run task in ccTasks table in application appName 

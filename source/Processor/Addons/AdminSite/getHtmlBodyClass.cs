@@ -4038,16 +4038,16 @@ namespace Contensive.Addons.AdminSite {
                             EmailSent = encodeBoolean(adminInfo.editRecord.fieldsLc["sent"].value);
                         }
                         string EditSectionButtonBar = AdminUIController.getButtonBarForEdit(core, new EditButtonBarInfoClass() {
-                            allowActivate = !EmailSubmitted & (LastSendTestDate == DateTime.MinValue) && (!AllowEmailSendWithoutTest),
-                            allowDeactivate = EmailSubmitted,
+                            allowActivate = false,
+                            allowDeactivate = false,
                             allowAdd = allowAdd && adminInfo.adminContent.allowAdd & adminInfo.editRecord.AllowInsert,
                             allowCancel = adminInfo.editRecord.AllowCancel,
                             allowCreateDuplicate = allowAdd && (adminInfo.editRecord.id != 0),
-                            allowDelete = AllowDelete && adminInfo.editRecord.AllowDelete && core.session.isAuthenticatedDeveloper(core),
+                            allowDelete = !EmailSubmitted & (AllowDelete && adminInfo.editRecord.AllowDelete),
                             allowMarkReviewed = false,
                             allowRefresh = AllowRefresh,
-                            allowSave = allowSave && adminInfo.editRecord.AllowSave && !EmailSubmitted,
-                            allowSend = false,
+                            allowSave = !EmailSubmitted & (allowSave && adminInfo.editRecord.AllowSave),
+                            allowSend = !EmailSubmitted & ((LastSendTestDate != DateTime.MinValue) | AllowEmailSendWithoutTest),
                             allowSendTest = !EmailSubmitted,
                             hasChildRecords = false,
                             isPageContent = false
