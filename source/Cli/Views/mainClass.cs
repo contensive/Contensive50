@@ -365,7 +365,7 @@ namespace Contensive.CLI {
                                     if ( string.IsNullOrWhiteSpace( appName )) {
                                         Console.WriteLine("ERROR, execute requires an application name (-a appName --execute addonNameOrGuid) because this server has 2+ apps");
                                     } else {
-                                        if (argPtr <= (args.Length + 1)) {
+                                        if (argPtr > (args.Length + 1)) {
                                             Console.WriteLine("ERROR, execute requires a parameter for the addon you want to run");
                                         } else { 
                                             argPtr++;

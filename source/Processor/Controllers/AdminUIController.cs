@@ -256,7 +256,7 @@ namespace Contensive.Processor {
                     if (info.allowAdd) buttonsLeft += getButtonPrimary(ButtonSaveAddNew, "return processSubmit(this);");
                 }
                 if (info.allowSendTest) buttonsLeft += getButtonPrimary(ButtonSendTest, "Return processSubmit(this)");
-                if (info.allowSend) buttonsLeft += getButtonPrimary(ButtonSendTest, "Return processSubmit(this)");
+                if (info.allowSend) buttonsLeft += getButtonPrimary(ButtonSend, "Return processSubmit(this)");
                 if (info.allowMarkReviewed) buttonsLeft +=  getButtonPrimary(ButtonMarkReviewed);
                 if (info.allowCreateDuplicate) buttonsLeft += getButtonPrimary(ButtonCreateDuplicate, "return processSubmit(this)");
                 if (info.allowActivate) buttonsLeft += getButtonPrimary(ButtonActivate, "return processSubmit(this)");
@@ -922,13 +922,18 @@ namespace Contensive.Processor {
         }
         //
         public static string getEditForm_TitleBarDetails_EditorString(DateTime editDate, PersonModel editor, string notEditedMessage) {
-            if ((editDate < new DateTime(1990, 1, 1))&(editor.id==0)) {
-                return notEditedMessage;
-            } else if (editDate < new DateTime(1990, 1, 1)) {
-                return "unknown date, by " + editor.getDisplayName();
+            string result = "";
+            if (editDate < new DateTime(1990, 1, 1)) {
+                result += "unknown date";
             } else {
-                return editDate.ToString() + " by " + editor.getDisplayName();
+                result += editDate.ToString() + ", by ";
+                if (editor == null) {
+                    result += "unknown user";
+                } else {
+                    result += editor.getDisplayName();
+                }
             }
+            return result;
         }
         //
         // ====================================================================================================

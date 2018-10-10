@@ -78,7 +78,8 @@ namespace Contensive.Processor.Controllers {
                         root.Username = defaultRootUserUsername;
                         root.Password = defaultRootUserPassword;
                         root.Developer = true;
-                        try {
+                        try 
+                            {
                             root.save(core);
                         } catch (Exception) {
                             LogController.logInfo(core, "error prevented root user update");
