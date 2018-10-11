@@ -23,13 +23,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static AddonPageRuleModel addDefault(CoreController core) {
-            return addDefault<AddonPageRuleModel>(core);
+        public static AddonPageRuleModel addDefault(CoreController core, Domain.CDefModel cdef) {
+            return addDefault<AddonPageRuleModel>(core, cdef);
         }
         //
         //====================================================================================================
-        public static AddonPageRuleModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
-            return addDefault<AddonPageRuleModel>(core, ref callersCacheNameList);
+        public static AddonPageRuleModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefModel cdef) {
+            return addDefault<AddonPageRuleModel>(core, cdef, ref callersCacheNameList);
         }
         //
         //====================================================================================================

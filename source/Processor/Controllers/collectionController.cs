@@ -4,7 +4,7 @@ using System.Xml;
 using System.Collections.Generic;
 using Contensive.Processor.Models.Db;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 using System.IO;
 using System.Data;
 using System.Threading;
@@ -1914,7 +1914,7 @@ namespace Contensive.Processor.Controllers {
                                                 //
                                                 bool OKToInstall = false;
                                                 LogController.logInfo(core, "install collection [" + Collectionname + "], pass 1 done, create collection record.");
-                                                AddonCollection collection = AddonCollection.create(core, CollectionGuid);
+                                                AddonCollectionModel collection = AddonCollectionModel.create(core, CollectionGuid);
                                                 if (collection != null) {
                                                     //
                                                     // Upgrade addon
@@ -1936,7 +1936,7 @@ namespace Contensive.Processor.Controllers {
                                                     //
                                                     // Install new on this application
                                                     //
-                                                    collection = AddonCollection.addEmpty(core);
+                                                    collection = AddonCollectionModel.addEmpty(core);
                                                     LogController.logInfo(core, "install collection [" + Collectionname + "], GUID [" + CollectionGuid + "], App does not have this collection so it will be installed.");
                                                     OKToInstall = true;
                                                 }
@@ -4572,7 +4572,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // -- no current field help record, if adding help, create record
                                 if ( (!string.IsNullOrWhiteSpace(field.helpDefault)) | (!string.IsNullOrWhiteSpace(field.helpCustom)) ) {
-                                    fieldHelp = ContentFieldHelpModel.addDefault(core);
+                                    fieldHelp = ContentFieldHelpModel.addDefault(core, cdef);
                                     fieldHelp.helpDefault = field.helpDefault;
                                     fieldHelp.helpCustom = field.helpCustom;
                                     fieldHelp.save(core);

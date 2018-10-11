@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Models.Db {
     public class LayoutModel : BaseModel {
@@ -35,13 +35,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static LayoutModel addDefault(CoreController core) {
-            return addDefault<LayoutModel>(core);
+        public static LayoutModel addDefault(CoreController core, Domain.CDefModel cdef) {
+            return addDefault<LayoutModel>(core, cdef);
         }
         //
         //====================================================================================================
-        public static LayoutModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
-            return addDefault<LayoutModel>(core, ref callersCacheNameList);
+        public static LayoutModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefModel cdef) {
+            return addDefault<LayoutModel>(core, cdef, ref callersCacheNameList);
         }
         //
         //====================================================================================================

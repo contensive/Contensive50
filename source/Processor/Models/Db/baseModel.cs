@@ -3,7 +3,7 @@ using System;
 using System.Reflection;
 using System.Collections.Generic;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 using System.Data;
 //
 namespace Contensive.Processor.Models.Db {
@@ -264,9 +264,9 @@ namespace Contensive.Processor.Models.Db {
         /// <typeparam name="T"></typeparam>
         /// <param name="core"></param>
         /// <returns></returns>
-        protected static T addDefault<T>(CoreController core) where T : BaseModel {
-            var tempVar = new List<string>();
-            return addDefault<T>(core, ref tempVar);
+        protected static T addDefault<T>(CoreController core, Domain.CDefModel cdef) where T : BaseModel {
+            var callersCacheNameList = new List<string>();
+            return addDefault<T>(core, cdef, ref callersCacheNameList);
         }
         //
         //====================================================================================================
@@ -276,21 +276,78 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="core"></param>
         /// <param name="callersCacheNameList"></param>
         /// <returns></returns>
-        protected static T addDefault<T>(CoreController core, ref List<string> callersCacheNameList) where T : BaseModel {
+        protected static T addDefault<T>(CoreController core, Domain.CDefModel cdef, ref List<string> callersCacheNameList) where T : BaseModel {
             T result = default(T);
             try {
-                if (core.serverConfig == null) {
-                    //
-                    // -- cannot use models without an application
-                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
-                } else if (core.appConfig == null) {
-                    //
-                    // -- cannot use models without an application
-                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
-                } else {
-                    // 20181010 - db models shouldnt access content layer, just db and cache layer
-                    result = create<T>(core, core.db.insertTableRecordGetId(derivedDataSourceName(typeof(T)), derivedTableName(typeof(T)), core.session.user.id));
-                    //result = create<T>(core, core.db.insertContentRecordGetID(derivedContentName(typeof(T)), core.session.user.id));
+                result = addEmpty<T>(core);
+                if ( result != null ) {
+                    foreach (PropertyInfo modelProperty in result.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
+                        string propertyName = modelProperty.Name;
+                        string propertyValue = "";
+                        if (cdef.fields.ContainsKey(propertyName)) {
+                            propertyValue = cdef.fields[propertyName].defaultValue;
+                        }
+                        switch (propertyName.ToLower()) {
+                            case "specialcasefield":
+                                break;
+                            default:
+                                switch (modelProperty.PropertyType.Name) {
+                                    case "Int32": {
+                                            modelProperty.SetValue(result, GenericController.encodeInteger(propertyValue), null);
+                                            break;
+                                        }
+                                    case "Boolean": {
+                                            modelProperty.SetValue(result, GenericController.encodeBoolean(propertyValue), null);
+                                            break;
+                                        }
+                                    case "DateTime": {
+                                            modelProperty.SetValue(result, GenericController.encodeDate(propertyValue), null);
+                                            break;
+                                        }
+                                    case "Double": {
+                                            modelProperty.SetValue(result, GenericController.encodeNumber(propertyValue), null);
+                                            break;
+                                        }
+                                    case "String": {
+                                            modelProperty.SetValue(result, propertyValue, null);
+                                            break;
+                                        }
+                                    case "FieldTypeTextFile": {
+                                            //
+                                            // -- cdn files
+                                            FieldTypeTextFile instanceFileType = new FieldTypeTextFile {filename = propertyValue};
+                                            modelProperty.SetValue(result, instanceFileType);
+                                            break;
+                                        }
+                                    case "FieldTypeJavascriptFile": {
+                                            //
+                                            // -- cdn files
+                                            FieldTypeJavascriptFile instanceFileType = new FieldTypeJavascriptFile {filename = propertyValue};
+                                            modelProperty.SetValue(result, instanceFileType);
+                                            break;
+                                        }
+                                    case "FieldTypeCSSFile": {
+                                            //
+                                            // -- cdn files
+                                            FieldTypeCSSFile instanceFileType = new FieldTypeCSSFile {filename = propertyValue};
+                                            modelProperty.SetValue(result, instanceFileType);
+                                            break;
+                                        }
+                                    case "FieldTypeHTMLFile": {
+                                            //
+                                            // -- private files
+                                            FieldTypeHTMLFile instanceFileType = new FieldTypeHTMLFile {filename = propertyValue};
+                                            modelProperty.SetValue(result, instanceFileType);
+                                            break;
+                                        }
+                                    default: {
+                                            modelProperty.SetValue(result, propertyValue, null);
+                                            break;
+                                        }
+                                }
+                                break;
+                        }
+                    }
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -536,6 +593,7 @@ namespace Contensive.Processor.Models.Db {
                     string tableName = derivedTableName(instanceType);
                     int recordId = GenericController.encodeInteger(row["id"]);
                     modelInstance = (T)Activator.CreateInstance(instanceType);
+
                     foreach (PropertyInfo modelProperty in modelInstance.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
                         string propertyName = modelProperty.Name;
                         string propertyValue = row[propertyName].ToString();
@@ -608,6 +666,7 @@ namespace Contensive.Processor.Models.Db {
                                 break;
                         }
                     }
+
                     if (modelInstance != null) {
                         //
                         // -- set primary cache to the object created
@@ -631,120 +690,6 @@ namespace Contensive.Processor.Models.Db {
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
-                throw;
-            }
-            return modelInstance;
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// open an existing object
-        /// </summary>
-        /// <param name="cp"></param>
-        /// <param name="sqlCriteria"></param>
-        /// <param name="callersCacheKeyList"></param>
-        private static T loadRecord<T>(CoreController core, CsController cs, ref List<string> callersCacheKeyList) where T : BaseModel {
-            T modelInstance = default(T);
-            try {
-                if (cs.ok()) {
-                    Type instanceType = typeof(T);
-                    //string contentName = derivedContentName(instanceType);
-                    string tableName = derivedTableName(instanceType);
-                    int recordId = cs.getInteger("id");
-                    modelInstance = (T)Activator.CreateInstance(instanceType);
-                    foreach (PropertyInfo modelProperty in modelInstance.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
-                        switch (modelProperty.Name.ToLower()) {
-                            case "specialcasefield":
-                                break;
-                            default:
-                                switch (modelProperty.PropertyType.Name) {
-                                    case "Int32": {
-                                            modelProperty.SetValue(modelInstance, cs.getInteger(modelProperty.Name), null);
-                                            break;
-                                        }
-                                    case "Boolean": {
-                                            modelProperty.SetValue(modelInstance, cs.getBoolean(modelProperty.Name), null);
-                                            break;
-                                        }
-                                    case "DateTime": {
-                                            modelProperty.SetValue(modelInstance, cs.getDate(modelProperty.Name), null);
-                                            break;
-                                        }
-                                    case "Double": {
-                                            modelProperty.SetValue(modelInstance, cs.getNumber(modelProperty.Name), null);
-                                            break;
-                                        }
-                                    case "String": {
-                                            modelProperty.SetValue(modelInstance, cs.getText(modelProperty.Name), null);
-                                            break;
-                                        }
-                                    case "FieldTypeTextFile": {
-                                            //
-                                            // -- cdn files
-                                            FieldTypeTextFile instanceFileType = new FieldTypeTextFile {
-                                                filename = cs.getValue(modelProperty.Name)
-                                            };
-                                            modelProperty.SetValue(modelInstance, instanceFileType);
-                                            break;
-                                        }
-                                    case "FieldTypeJavascriptFile": {
-                                            //
-                                            // -- cdn files
-                                            FieldTypeJavascriptFile instanceFileType = new FieldTypeJavascriptFile {
-                                                filename = cs.getValue(modelProperty.Name)
-                                            };
-                                            modelProperty.SetValue(modelInstance, instanceFileType);
-                                            break;
-                                        }
-                                    case "FieldTypeCSSFile": {
-                                            //
-                                            // -- cdn files
-                                            FieldTypeCSSFile instanceFileType = new FieldTypeCSSFile {
-                                                filename = cs.getValue(modelProperty.Name)
-                                            };
-                                            modelProperty.SetValue(modelInstance, instanceFileType);
-                                            break;
-                                        }
-                                    case "FieldTypeHTMLFile": {
-                                            //
-                                            // -- private files
-                                            FieldTypeHTMLFile instanceFileType = new FieldTypeHTMLFile {
-                                                filename = cs.getValue(modelProperty.Name)
-                                            };
-                                            modelProperty.SetValue(modelInstance, instanceFileType);
-                                            break;
-                                        }
-                                    default: {
-                                            modelProperty.SetValue(modelInstance, cs.getText(modelProperty.Name), null);
-                                            break;
-                                        }
-                                }
-                                break;
-                        }
-                    }
-                    if (modelInstance != null) {
-                        //
-                        // -- set primary cache to the object created
-                        // -- set secondary caches to the primary cache
-                        // -- add all cachenames to the injected cachenamelist
-                        if (modelInstance is BaseModel baseInstance) {
-                            string datasourceName = derivedDataSourceName(instanceType);
-                            string cacheKey = CacheController.getCacheKey_forDbRecord(baseInstance.id, tableName, datasourceName);
-                            callersCacheKeyList.Add(cacheKey);
-                            core.cache.setObject(cacheKey, modelInstance);
-                            //
-                            string cachePtr = CacheController.getCachePtr_forDbRecord_guid(baseInstance.ccguid, tableName, datasourceName);
-                            core.cache.setPtr(cachePtr, cacheKey);
-                            //
-                            if (derivedNameFieldIsUnique(instanceType)) {
-                                cachePtr = CacheController.getCachePtr_forDbRecord_uniqueName(baseInstance.name, tableName, datasourceName);
-                                core.cache.setPtr(cachePtr, cacheKey);
-                            }
-                        }
-                    }
-                }
-            } catch (Exception ex) {
-                LogController.handleError(core, ex);
                 throw;
             }
             return modelInstance;

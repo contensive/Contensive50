@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
 using Contensive.Addons.Tools;
 using static Contensive.Processor.AdminUIController;
@@ -537,7 +537,7 @@ namespace Contensive.Addons.AdminSite {
             foreach (var kvp in IndexConfig.FindWords) {
                 IndexConfigClass.IndexConfigFindWordClass findWord = kvp.Value;
                 if (!string.IsNullOrEmpty(findWord.Name)) {
-                    string FieldCaption = CdefController.GetContentFieldProperty(core, content.name, findWord.Name, "caption");
+                    string FieldCaption = CdefController.getContentFieldProperty(core, content.name, findWord.Name, "caption");
                     switch (findWord.MatchOption) {
                         case FindWordMatchEnum.MatchEmpty:
                             filterLine = filterLine + ", " + FieldCaption + " is empty";
@@ -1627,7 +1627,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     foreach (var findWordKvp in IndexConfig.FindWords) {
                         IndexConfigClass.IndexConfigFindWordClass findWord = findWordKvp.Value;
-                        FieldCaption = GenericController.encodeText(CdefController.GetContentFieldProperty(core, ContentName, findWord.Name, "caption"));
+                        FieldCaption = GenericController.encodeText(CdefController.getContentFieldProperty(core, ContentName, findWord.Name, "caption"));
                         QS = RQS;
                         QS = GenericController.modifyQueryString(QS, "IndexFilterRemoveFind", findWord.Name);
                         Link = "/" + core.appConfig.adminRoute + "?" + QS;

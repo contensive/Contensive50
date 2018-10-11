@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
 //
 namespace Contensive.Processor {
@@ -77,7 +77,7 @@ namespace Contensive.Processor {
         public override int Id {
             get {
                 if (CP.core.session.user.id==0) {
-                    var user = PersonModel.addDefault(core);
+                    var user = PersonModel.addDefault(core, CDefModel.create( core, PersonModel.contentName));
                     user.CreatedByVisit = true;
                     user.save(core);
                     SessionController.recognizeById(core, user.id, ref CP.core.session);

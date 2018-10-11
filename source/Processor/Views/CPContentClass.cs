@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 //
 using Contensive.BaseClasses;
 //
@@ -69,7 +69,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override string GetFieldProperty(string ContentName, string FieldName, string PropertyName) {
-            return CdefController.GetContentFieldProperty(core, ContentName, FieldName, PropertyName);
+            return CdefController.getContentFieldProperty(core, ContentName, FieldName, PropertyName);
         }
         //
         //====================================================================================================

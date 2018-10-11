@@ -33,13 +33,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static DataSourceModel addDefault(CoreController core) {
-            return addDefault<DataSourceModel>(core);
+        public static DataSourceModel addDefault(CoreController core, Domain.CDefModel cdef) {
+            return addDefault<DataSourceModel>(core, cdef);
         }
         //
         //====================================================================================================
-        public static DataSourceModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
-            return addDefault<DataSourceModel>(core, ref callersCacheNameList);
+        public static DataSourceModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefModel cdef) {
+            return addDefault<DataSourceModel>(core, cdef, ref callersCacheNameList);
         }
         //
         //====================================================================================================

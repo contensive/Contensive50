@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
 using Contensive.Addons.Tools;
 using static Contensive.Processor.AdminUIController;
@@ -3894,15 +3894,15 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // ----- determine contentType for editor
                 //
-                contentTypeEnum ContentType;
+                ContentTypeEnum ContentType;
                 if (GenericController.vbLCase(adminInfo.adminContent.name) == "email templates") {
-                    ContentType = contentTypeEnum.contentTypeEmailTemplate;
+                    ContentType = ContentTypeEnum.contentTypeEmailTemplate;
                 } else if (GenericController.vbLCase(adminInfo.adminContent.tableName) == "cctemplates") {
-                    ContentType = contentTypeEnum.contentTypeWebTemplate;
+                    ContentType = ContentTypeEnum.contentTypeWebTemplate;
                 } else if (GenericController.vbLCase(adminInfo.adminContent.tableName) == "ccemail") {
-                    ContentType = contentTypeEnum.contentTypeEmail;
+                    ContentType = ContentTypeEnum.contentTypeEmail;
                 } else {
-                    ContentType = contentTypeEnum.contentTypeWeb;
+                    ContentType = ContentTypeEnum.contentTypeWeb;
                 }
                 //
                 //-----Create edit page
@@ -4618,7 +4618,7 @@ namespace Contensive.Addons.AdminSite {
         //   Generate the content of a tab in the Edit Screen
         //========================================================================
         //
-        private string GetForm_Edit_Tab(AdminInfoDomainModel adminContext, int RecordID, int ContentID, bool record_readOnly, bool IsLandingPage, bool IsRootPage, string EditTab, contentTypeEnum EditorContext, ref string return_NewFieldList, int TemplateIDForStyles, int HelpCnt, int[] HelpIDCache, string[] helpDefaultCache, string[] HelpCustomCache, bool AllowHelpMsgCustom, KeyPtrController helpIdIndex, string[] fieldTypeDefaultEditors, string fieldEditorPreferenceList, string styleList, string styleOptionList, int emailIdForStyles, bool IsTemplateTable, string editorAddonListJSON) {
+        private string GetForm_Edit_Tab(AdminInfoDomainModel adminContext, int RecordID, int ContentID, bool record_readOnly, bool IsLandingPage, bool IsRootPage, string EditTab, ContentTypeEnum EditorContext, ref string return_NewFieldList, int TemplateIDForStyles, int HelpCnt, int[] HelpIDCache, string[] helpDefaultCache, string[] HelpCustomCache, bool AllowHelpMsgCustom, KeyPtrController helpIdIndex, string[] fieldTypeDefaultEditors, string fieldEditorPreferenceList, string styleList, string styleOptionList, int emailIdForStyles, bool IsTemplateTable, string editorAddonListJSON) {
             string returnHtml = "";
             try {
                 // todo
@@ -8599,7 +8599,7 @@ namespace Contensive.Addons.AdminSite {
         //
         //
         //
-        private string GetForm_Edit_Tabs(AdminInfoDomainModel adminContext, bool readOnlyField, bool IsLandingPage, bool IsRootPage, contentTypeEnum EditorContext, bool allowAjaxTabs, int TemplateIDForStyles, string[] fieldTypeDefaultEditors, string fieldEditorPreferenceList, string styleList, string styleOptionList, int emailIdForStyles, bool IsTemplateTable, string editorAddonListJSON) {
+        private string GetForm_Edit_Tabs(AdminInfoDomainModel adminContext, bool readOnlyField, bool IsLandingPage, bool IsRootPage, ContentTypeEnum EditorContext, bool allowAjaxTabs, int TemplateIDForStyles, string[] fieldTypeDefaultEditors, string fieldEditorPreferenceList, string styleList, string styleOptionList, int emailIdForStyles, bool IsTemplateTable, string editorAddonListJSON) {
             string returnHtml = "";
             try {
                 // todo

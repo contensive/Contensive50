@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 //
 using Contensive.BaseClasses;
 //
@@ -169,7 +169,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     //
                     // -- if fpo_QuickEdit it there, replace it out
-                    string addonListJSON = core.html.getWysiwygAddonList(contentTypeEnum.contentTypeWeb);
+                    string addonListJSON = core.html.getWysiwygAddonList(ContentTypeEnum.contentTypeWeb);
                     string Editor = core.html.getFormInputHTML("copyFilename", core.doc.quickEditCopy, FieldRows.ToString(), "100%", false, true, addonListJSON, "", "");
                     returnHtml = GenericController.vbReplace(returnHtml, html_quickEdit_fpo, Editor);
                 }
@@ -234,7 +234,7 @@ namespace Contensive.Processor.Controllers {
                 // ----- Do not allow blank message - if still nothing, create default
                 if (string.IsNullOrEmpty(result)) {
                     result = "<p>The content on this page has restricted access. If you have a username and password for this system, <a href=\"?method=login\" rel=\"nofollow\">Click Here</a>. For more information, please contact the administrator.</p>";
-                    copyRecord = CopyContentModel.addDefault(core);
+                    copyRecord = CopyContentModel.addDefault(core, Models.Domain.CDefModel.create(core, CopyContentModel.contentName));
                     copyRecord.name = ContentBlockCopyName;
                     copyRecord.copy = result;
                     copyRecord.save(core);
@@ -358,7 +358,7 @@ namespace Contensive.Processor.Controllers {
                     if (core.doc.pageController.pageToRootList.Count == 0) {
                         //
                         // -- attempt failed, create default page
-                        core.doc.pageController.page = PageContentModel.addDefault(core);
+                        core.doc.pageController.page = PageContentModel.addDefault(core, Models.Domain.CDefModel.create(core, PageContentModel.contentName));
                         core.doc.pageController.page.name = DefaultNewLandingPageName + ", " + domain.name;
                         core.doc.pageController.page.copyfilename.content = landingPageDefaultHtml;
                         core.doc.pageController.page.save(core);
@@ -409,7 +409,7 @@ namespace Contensive.Processor.Controllers {
                             if (core.doc.pageController.template == null) {
                                 //
                                 // -- ceate new template named Default
-                                core.doc.pageController.template = PageTemplateModel.addDefault(core );
+                                core.doc.pageController.template = PageTemplateModel.addDefault(core, Models.Domain.CDefModel.create(core, PageTemplateModel.contentName));
                                 core.doc.pageController.template.name = defaultTemplateName;
                                 core.doc.pageController.template.bodyHTML = core.appRootFiles.readFileText(defaultTemplateHomeFilename);
                                 core.doc.pageController.template.save(core);
@@ -472,7 +472,7 @@ namespace Contensive.Processor.Controllers {
                         if (landingPage == null) {
                             //
                             // -- create detault landing page
-                            landingPage = PageContentModel.addDefault(core);
+                            landingPage = PageContentModel.addDefault(core, Models.Domain.CDefModel.create(core, PageContentModel.contentName));
                             landingPage.name = DefaultNewLandingPageName + ", " + domain.name;
                             landingPage.copyfilename.content = landingPageDefaultHtml;
                             landingPage.save(core);
@@ -905,7 +905,7 @@ namespace Contensive.Processor.Controllers {
                                 if (file.filename != "") {
                                     //
                                     // -- create log entry
-                                    LibraryFileLogModel log = LibraryFileLogModel.addDefault(core);
+                                    LibraryFileLogModel log = LibraryFileLogModel.addEmpty(core);
                                     if (log != null) {
                                         log.fileID = file.id;
                                         log.visitID = core.session.visit.id;
@@ -1336,7 +1336,7 @@ namespace Contensive.Processor.Controllers {
                     FormInstructions = core.db.csGetText(CS, "Instructions");
                 }
                 core.db.csClose(ref CS);
-                main_FormPagetype f;
+                Main_FormPagetype f;
                 if (!string.IsNullOrEmpty(FormInstructions)) {
                     //
                     // Load the instructions
@@ -1365,7 +1365,7 @@ namespace Contensive.Processor.Controllers {
                                 // People Record
                                 //
                                 FormValue = core.docProperties.getText(tempVar.PeopleField);
-                                if ((!string.IsNullOrEmpty(FormValue)) & GenericController.encodeBoolean(CdefController.GetContentFieldProperty(core, "people", tempVar.PeopleField, "uniquename"))) {
+                                if ((!string.IsNullOrEmpty(FormValue)) & GenericController.encodeBoolean(CdefController.getContentFieldProperty(core, "people", tempVar.PeopleField, "uniquename"))) {
                                     string SQL = "select count(*) from ccMembers where " + tempVar.PeopleField + "=" + core.db.encodeSQLText(FormValue);
                                     CS = core.db.csOpenSql(SQL);
                                     if (core.db.csOk(CS)) {
@@ -1376,7 +1376,7 @@ namespace Contensive.Processor.Controllers {
                                         ErrorController.addUserError(core, "The field [" + tempVar.Caption + "] must be unique, and the value [" + HtmlController.encodeHtml(FormValue) + "] has already been used.");
                                     }
                                 }
-                                if ((tempVar.REquired | GenericController.encodeBoolean(CdefController.GetContentFieldProperty(core, "people", tempVar.PeopleField, "required"))) && string.IsNullOrEmpty(FormValue)) {
+                                if ((tempVar.REquired | GenericController.encodeBoolean(CdefController.getContentFieldProperty(core, "people", tempVar.PeopleField, "required"))) && string.IsNullOrEmpty(FormValue)) {
                                     Success = false;
                                     ErrorController.addUserError(core, "The field [" + HtmlController.encodeHtml(tempVar.Caption) + "] is required.");
                                 } else {
@@ -1503,8 +1503,8 @@ namespace Contensive.Processor.Controllers {
         //   {{CAPTION}} tags -- main_Gets the caption for each instruction line
         //   {{FIELD}} tags -- main_Gets the form field for each instruction line
         //
-        internal static main_FormPagetype loadFormPageInstructions(CoreController core, string FormInstructions, string Formhtml) {
-            main_FormPagetype result = new main_FormPagetype();
+        internal static Main_FormPagetype loadFormPageInstructions(CoreController core, string FormInstructions, string Formhtml) {
+            Main_FormPagetype result = new Main_FormPagetype();
             try {
                 //
                 if (true) {
@@ -1579,7 +1579,7 @@ namespace Contensive.Processor.Controllers {
         internal static string getFormPage(CoreController core, string FormPageName, int GroupIDToJoinOnSuccess) {
             string result = null;
             try {
-                main_FormPagetype f;
+                Main_FormPagetype f;
                 bool IsRetry =  (core.docProperties.getInteger("ContensiveFormPageID") != 0);
                 int CS = core.db.csOpen("Form Pages", "name=" + core.db.encodeSQLText(FormPageName));
                 string Formhtml = "";
@@ -1617,7 +1617,7 @@ namespace Contensive.Processor.Controllers {
                                 CSPeople = core.db.csOpenRecord("people", core.session.user.id);
                             }
                             Caption = tempVar.Caption;
-                            if (tempVar.REquired | GenericController.encodeBoolean(CdefController.GetContentFieldProperty(core, "People", tempVar.PeopleField, "Required"))) {
+                            if (tempVar.REquired | GenericController.encodeBoolean(CdefController.getContentFieldProperty(core, "People", tempVar.PeopleField, "Required"))) {
                                 Caption = "*" + Caption;
                             }
                             if (core.db.csOk(CSPeople)) {

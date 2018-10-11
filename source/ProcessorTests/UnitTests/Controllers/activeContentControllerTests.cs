@@ -13,12 +13,12 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
     //====================================================================================================
     //
     [TestClass()]
-    public class activeContentControllerTests {
+    public class ActiveContentControllerTests {
         //
         //====================================================================================================
         //
         [TestMethod()]
-        public void Controllers_ActiveContent_date() {
+        public void controllers_ActiveContent_date() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
                 string source = "<ac Type=\"Date\">";
@@ -36,7 +36,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 );
                 DateTime dateAfter = DateTime.Now.AddSeconds(1);
                 // assert
-                DateTime dateResult;
+                DateTime dateResult = DateTime.MinValue;
                 Assert.IsTrue(DateTime.TryParse(resultString, out dateResult),"The result string was not a date [" + dateResult + "]");
                 Assert.IsTrue(dateBefore.CompareTo(dateResult) <= 0,"The date returned was before the start of the test, return: [" + dateResult + "], test start [" + dateBefore + "]");
                 Assert.IsTrue(dateAfter.CompareTo(dateResult) >= 0, "The date returned was after the end of the test, return: [" + dateResult + "], test end [" + dateAfter + "]");
@@ -46,12 +46,12 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         //====================================================================================================
         //
         [TestMethod()]
-        public void Controllers_ActiveContent_memberName() {
+        public void controllers_ActiveContent_memberName() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
                 string source = "<Ac Type=\"Member\" Field=\"Name\">";
                 string testPersonName = "test" + GenericController.GetRandomInteger(cp.core);
-                var testPerson = Contensive.Processor.Models.Db.PersonModel.addDefault(cp.core);
+                var testPerson = Contensive.Processor.Models.Db.PersonModel.addDefault(cp.core, Processor.Models.Domain.CDefModel.create(cp.core, Processor.Models.Db.PersonModel.contentName));
                 testPerson.name = testPersonName;
                 testPerson.save(cp.core);
                 cp.User.LoginByID(testPerson.id);
@@ -72,15 +72,15 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         //====================================================================================================
         //
         [TestMethod()]
-        public void Controllers_ActiveContent_organizationName() {
+        public void controllers_ActiveContent_organizationName() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
                 string source = "<Ac Type=\"Organization\" Field=\"Name\">";
                 string testOrgName = "testOrg" + GenericController.GetRandomInteger(cp.core);
-                var testOrg = Contensive.Processor.Models.Db.OrganizationModel.addDefault(cp.core);
+                var testOrg = Contensive.Processor.Models.Db.OrganizationModel.addDefault(cp.core, Processor.Models.Domain.CDefModel.create(cp.core, Processor.Models.Db.OrganizationModel.contentName));
                 testOrg.name = testOrgName;
                 testOrg.save(cp.core);
-                var testPerson = Contensive.Processor.Models.Db.PersonModel.addDefault(cp.core);
+                var testPerson = Contensive.Processor.Models.Db.PersonModel.addDefault(cp.core, Processor.Models.Domain.CDefModel.create(cp.core, Processor.Models.Db.PersonModel.contentName));
                 testPerson.OrganizationID = testOrg.id;
                 string testPersonName = "testPerson" + GenericController.GetRandomInteger(cp.core);
                 testPerson.name = testPersonName;

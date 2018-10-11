@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Models.Db {
     public class NavigatorEntryModel : BaseModel {
@@ -48,13 +48,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static NavigatorEntryModel addDefault(CoreController core) {
-            return addDefault<NavigatorEntryModel>(core);
+        public static NavigatorEntryModel addDefault(CoreController core, Domain.CDefModel cdef) {
+            return addDefault<NavigatorEntryModel>(core, cdef);
         }
         //
         //====================================================================================================
-        public static NavigatorEntryModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
-            return addDefault<NavigatorEntryModel>(core, ref callersCacheNameList);
+        public static NavigatorEntryModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefModel cdef) {
+            return addDefault<NavigatorEntryModel>(core, cdef, ref callersCacheNameList);
         }
         //
         //====================================================================================================

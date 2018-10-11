@@ -71,7 +71,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 cp.core.mockSmtp = true;
                 // arrange
                 string body = GenericController.GetRandomInteger(cp.core).ToString();
-                var toPerson = Processor.Models.Db.PersonModel.addDefault(cp.core);
+                var toPerson = Processor.Models.Db.PersonModel.addDefault(cp.core, Processor.Models.Domain.CDefModel.create(cp.core, Processor.Models.Db.PersonModel.contentName));
                 Assert.IsNotNull(toPerson);
                 toPerson.Email = GenericController.GetRandomInteger(cp.core).ToString() + "@kma.net";
                 toPerson.FirstName = GenericController.GetRandomInteger(cp.core).ToString();

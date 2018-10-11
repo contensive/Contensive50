@@ -76,13 +76,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static AddonModel addDefault(CoreController core) {
-            return addDefault<AddonModel>(core);
+        public static AddonModel addDefault(CoreController core, Domain.CDefModel cdef) {
+            return addDefault<AddonModel>(core, cdef);
         }
         //
         //====================================================================================================
-        public static AddonModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
-            return addDefault<AddonModel>(core, ref callersCacheNameList);
+        public static AddonModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefModel cdef) {
+            return addDefault<AddonModel>(core, cdef, ref callersCacheNameList);
         }
         //
         //====================================================================================================

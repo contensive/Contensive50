@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Models.Db {
     public class SystemEmailModel : BaseModel {
@@ -43,13 +43,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static SystemEmailModel addDefault(CoreController core) {
-            return addDefault<SystemEmailModel>(core);
+        public static SystemEmailModel addDefault(CoreController core, Domain.CDefModel cdef) {
+            return addDefault<SystemEmailModel>(core, cdef);
         }
         //
         //====================================================================================================
-        public static SystemEmailModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
-            return addDefault<SystemEmailModel>(core, ref callersCacheNameList);
+        public static SystemEmailModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefModel cdef) {
+            return addDefault<SystemEmailModel>(core, cdef, ref callersCacheNameList);
         }
         //
         //====================================================================================================

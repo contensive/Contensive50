@@ -13,15 +13,15 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
     //====================================================================================================
     //
     [TestClass()]
-    public class addonControllerTests {
+    public class AddonControllerTests {
         [TestMethod()]
         //
         //====================================================================================================
         //
-        public void Controllers_Addon_simpleDoNothingAddon() {
+        public void controllers_Addon_simpleDoNothingAddon() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
-                var addon = Processor.Models.Db.AddonModel.addDefault(cp.core);
+                var addon = Processor.Models.Db.AddonModel.addDefault(cp.core, Processor.Models.Domain.CDefModel.create(cp.core, Processor.Models.Db.AddonModel.contentName));
                 addon.save(cp.core);
                 // act
                 string result = cp.core.addon.execute(addon, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
@@ -58,10 +58,10 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         //
         //====================================================================================================
         //
-        public void Controllers_Addon_copy() {
+        public void controllers_Addon_copy() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
-                var addon = Processor.Models.Db.AddonModel.addDefault(cp.core);
+                var addon = Processor.Models.Db.AddonModel.addDefault(cp.core, Processor.Models.Domain.CDefModel.create(cp.core, Processor.Models.Db.AddonModel.contentName));
                 addon.copy = "test" + GenericController.GetRandomInteger(cp.core).ToString();
                 addon.save(cp.core);
                 // act

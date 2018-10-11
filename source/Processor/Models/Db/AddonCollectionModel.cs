@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Contensive.Processor.Controllers;
 //
 namespace Contensive.Processor.Models.Db {
-    public class AddonCollection : BaseModel {
+    public class AddonCollectionModel : BaseModel {
         //
         //====================================================================================================
         //-- const
@@ -28,48 +28,48 @@ namespace Contensive.Processor.Models.Db {
         public string wwwFileList { get; set; }
         // 
         //====================================================================================================
-        public static AddonCollection addEmpty(CoreController core) {
-            return addEmpty<AddonCollection>(core);
+        public static AddonCollectionModel addEmpty(CoreController core) {
+            return addEmpty<AddonCollectionModel>(core);
         }
         //
         //====================================================================================================
-        public static AddonCollection addDefault(CoreController core) {
-            return addDefault<AddonCollection>(core);
+        public static AddonCollectionModel addDefault(CoreController core, Domain.CDefModel cdef) {
+            return addDefault<AddonCollectionModel>(core, cdef);
         }
         //
         //====================================================================================================
-        public static AddonCollection addDefault(CoreController core, ref List<string> callersCacheNameList) {
-            return addDefault<AddonCollection>(core, ref callersCacheNameList);
+        public static AddonCollectionModel addDefault(CoreController core, Domain.CDefModel cdef, ref List<string> callersCacheNameList) {
+            return addDefault<AddonCollectionModel>(core, cdef, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static AddonCollection create(CoreController core, int recordId) {
-            return create<AddonCollection>(core, recordId);
+        public static AddonCollectionModel create(CoreController core, int recordId) {
+            return create<AddonCollectionModel>(core, recordId);
         }
         //
         //====================================================================================================
-        public static AddonCollection create(CoreController core, int recordId, ref List<string> callersCacheNameList) {
-            return create<AddonCollection>(core, recordId, ref callersCacheNameList);
+        public static AddonCollectionModel create(CoreController core, int recordId, ref List<string> callersCacheNameList) {
+            return create<AddonCollectionModel>(core, recordId, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static AddonCollection create(CoreController core, string recordGuid) {
-            return create<AddonCollection>(core, recordGuid);
+        public static AddonCollectionModel create(CoreController core, string recordGuid) {
+            return create<AddonCollectionModel>(core, recordGuid);
         }
         //
         //====================================================================================================
-        public static AddonCollection create(CoreController core, string recordGuid, ref List<string> callersCacheNameList) {
-            return create<AddonCollection>(core, recordGuid, ref callersCacheNameList);
+        public static AddonCollectionModel create(CoreController core, string recordGuid, ref List<string> callersCacheNameList) {
+            return create<AddonCollectionModel>(core, recordGuid, ref callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static AddonCollection createByUniqueName(CoreController core, string recordName) {
-            return createByUniqueName<AddonCollection>(core, recordName);
+        public static AddonCollectionModel createByUniqueName(CoreController core, string recordName) {
+            return createByUniqueName<AddonCollectionModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static AddonCollection createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByUniqueName<AddonCollection>(core, recordName, ref callersCacheNameList);
+        public static AddonCollectionModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByUniqueName<AddonCollectionModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================
@@ -77,47 +77,47 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static void delete(CoreController core, int recordId) {
-            delete<AddonCollection>(core, recordId);
+            delete<AddonCollectionModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static void delete(CoreController core, string ccGuid) {
-            delete<AddonCollection>(core, ccGuid);
+            delete<AddonCollectionModel>(core, ccGuid);
         }
         //
         //====================================================================================================
-        public static List<AddonCollection> createList(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
-            return createList<AddonCollection>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
+        public static List<AddonCollectionModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
+            return createList<AddonCollectionModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
         }
         //
         //====================================================================================================
-        public static List<AddonCollection> createList(CoreController core, string sqlCriteria, string sqlOrderBy) {
-            return createList<AddonCollection>(core, sqlCriteria, sqlOrderBy);
+        public static List<AddonCollectionModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy) {
+            return createList<AddonCollectionModel>(core, sqlCriteria, sqlOrderBy);
         }
         //
         //====================================================================================================
-        public static List<AddonCollection> createList(CoreController core, string sqlCriteria) {
-            return createList<AddonCollection>(core, sqlCriteria);
+        public static List<AddonCollectionModel> createList(CoreController core, string sqlCriteria) {
+            return createList<AddonCollectionModel>(core, sqlCriteria);
         }
         //
         //====================================================================================================
         public static void invalidateRecordCache(CoreController core, int recordId) {
-            invalidateRecordCache<AddonCollection>(core, recordId);
+            invalidateRecordCache<AddonCollectionModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return BaseModel.getRecordName<AddonCollection>(core, recordId);
+            return BaseModel.getRecordName<AddonCollectionModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return BaseModel.getRecordName<AddonCollection>(core, ccGuid);
+            return BaseModel.getRecordName<AddonCollectionModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return BaseModel.getRecordId<AddonCollection>(core, ccGuid);
+            return BaseModel.getRecordId<AddonCollectionModel>(core, ccGuid);
         }
         //
         //====================================================================================================
@@ -132,7 +132,7 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="core"></param>
         /// <returns></returns>
         public static string getTableInvalidationKey(CoreController core) {
-            return getTableCacheKey<AddonCollection>(core);
+            return getTableCacheKey<AddonCollectionModel>(core);
         }
     }
 }

@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Models.Db {
     public class MemberRuleModel : BaseModel {
@@ -36,13 +36,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static MemberRuleModel addDefault(CoreController core) {
-            return addDefault<MemberRuleModel>(core);
+        public static MemberRuleModel addDefault(CoreController core, Domain.CDefModel cdef) {
+            return addDefault<MemberRuleModel>(core, cdef);
         }
         //
         //====================================================================================================
-        public static MemberRuleModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
-            return addDefault<MemberRuleModel>(core, ref callersCacheNameList);
+        public static MemberRuleModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefModel cdef) {
+            return addDefault<MemberRuleModel>(core, cdef, ref callersCacheNameList);
         }
         //
         //====================================================================================================

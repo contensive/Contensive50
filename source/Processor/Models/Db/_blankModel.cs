@@ -23,13 +23,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static _BlankModel addDefault(CoreController core) {
-            return addDefault<_BlankModel>(core);
+        public static _BlankModel addDefault(CoreController core, Domain.CDefModel cdef) {
+            return addDefault<_BlankModel>(core, cdef);
         }
         //
         //====================================================================================================
-        public static _BlankModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
-            return addDefault<_BlankModel>(core, ref callersCacheNameList);
+        public static _BlankModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefModel cdef) {
+            return addDefault<_BlankModel>(core, cdef, ref callersCacheNameList);
         }
         //
         //====================================================================================================

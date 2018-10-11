@@ -27,13 +27,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static ConditionalEmailModel addDefault(CoreController core) {
-            return addDefault<ConditionalEmailModel>(core);
+        public static ConditionalEmailModel addDefault(CoreController core, Domain.CDefModel cdef) {
+            return addDefault<ConditionalEmailModel>(core, cdef);
         }
         //
         //====================================================================================================
-        public static ConditionalEmailModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
-            return addDefault<ConditionalEmailModel>(core, ref callersCacheNameList);
+        public static ConditionalEmailModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefModel cdef) {
+            return addDefault<ConditionalEmailModel>(core, cdef, ref callersCacheNameList);
         }
         //
         //====================================================================================================

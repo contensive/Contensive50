@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Models.Db {
     public class OrganizationModel : BaseModel {
@@ -52,13 +52,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static OrganizationModel addDefault(CoreController core) {
-            return addDefault<OrganizationModel>(core);
+        public static OrganizationModel addDefault(CoreController core, Domain.CDefModel cdef) {
+            return addDefault<OrganizationModel>(core, cdef);
         }
         //
         //====================================================================================================
-        public static OrganizationModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
-            return addDefault<OrganizationModel>(core, ref callersCacheNameList);
+        public static OrganizationModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefModel cdef) {
+            return addDefault<OrganizationModel>(core, cdef, ref callersCacheNameList);
         }
         //
         //====================================================================================================

@@ -8,7 +8,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
 using System.Data;
 using System.Linq;
@@ -657,155 +657,167 @@ namespace Contensive.Processor.Controllers {
                             // CDef does not inherit its fields, create what is needed for a non-inherited CDef
                             //
                             if (!core.db.isCdefField(returnContentId, "ID")) {
-                                field = new Models.Domain.CDefFieldModel();
-                                field.nameLc = "id";
-                                field.active = true;
-                                field.fieldTypeId = FieldTypeIdAutoIdIncrement;
-                                field.editSortPriority = 100;
-                                field.authorable = false;
-                                field.caption = "ID";
-                                field.defaultValue = "";
-                                field.isBaseField = cdef.isBaseContent;
+                                field = new Models.Domain.CDefFieldModel {
+                                    nameLc = "id",
+                                    active = true,
+                                    fieldTypeId = FieldTypeIdAutoIdIncrement,
+                                    editSortPriority = 100,
+                                    authorable = false,
+                                    caption = "ID",
+                                    defaultValue = "",
+                                    isBaseField = cdef.isBaseContent
+                                };
                                 verifyContentField_returnID(core, cdef.name, field);
                             }
                             //
                             if (!core.db.isCdefField(returnContentId, "name")) {
-                                field = new Models.Domain.CDefFieldModel();
-                                field.nameLc = "name";
-                                field.active = true;
-                                field.fieldTypeId = FieldTypeIdText;
-                                field.editSortPriority = 110;
-                                field.authorable = true;
-                                field.caption = "Name";
-                                field.defaultValue = "";
-                                field.isBaseField = cdef.isBaseContent;
+                                field = new Models.Domain.CDefFieldModel {
+                                    nameLc = "name",
+                                    active = true,
+                                    fieldTypeId = FieldTypeIdText,
+                                    editSortPriority = 110,
+                                    authorable = true,
+                                    caption = "Name",
+                                    defaultValue = "",
+                                    isBaseField = cdef.isBaseContent
+                                };
                                 verifyContentField_returnID(core, cdef.name, field);
                             }
                             //
                             if (!core.db.isCdefField(returnContentId, "active")) {
-                                field = new Models.Domain.CDefFieldModel();
-                                field.nameLc = "active";
-                                field.active = true;
-                                field.fieldTypeId = FieldTypeIdBoolean;
-                                field.editSortPriority = 200;
-                                field.authorable = true;
-                                field.caption = "Active";
-                                field.defaultValue = "1";
-                                field.isBaseField = cdef.isBaseContent;
+                                field = new Models.Domain.CDefFieldModel {
+                                    nameLc = "active",
+                                    active = true,
+                                    fieldTypeId = FieldTypeIdBoolean,
+                                    editSortPriority = 200,
+                                    authorable = true,
+                                    caption = "Active",
+                                    defaultValue = "1",
+                                    isBaseField = cdef.isBaseContent
+                                };
                                 verifyContentField_returnID(core, cdef.name, field);
                             }
                             //
                             if (!core.db.isCdefField(returnContentId, "sortorder")) {
-                                field = new Models.Domain.CDefFieldModel();
-                                field.nameLc = "sortorder";
-                                field.active = true;
-                                field.fieldTypeId = FieldTypeIdText;
-                                field.editSortPriority = 2000;
-                                field.authorable = false;
-                                field.caption = "Alpha Sort Order";
-                                field.defaultValue = "";
-                                field.isBaseField = cdef.isBaseContent;
+                                field = new Models.Domain.CDefFieldModel {
+                                    nameLc = "sortorder",
+                                    active = true,
+                                    fieldTypeId = FieldTypeIdText,
+                                    editSortPriority = 2000,
+                                    authorable = false,
+                                    caption = "Alpha Sort Order",
+                                    defaultValue = "",
+                                    isBaseField = cdef.isBaseContent
+                                };
                                 verifyContentField_returnID(core, cdef.name, field);
                             }
                             //
                             if (!core.db.isCdefField(returnContentId, "dateadded")) {
-                                field = new Models.Domain.CDefFieldModel();
-                                field.nameLc = "dateadded";
-                                field.active = true;
-                                field.fieldTypeId = FieldTypeIdDate;
-                                field.editSortPriority = 9999;
-                                field.authorable = false;
-                                field.caption = "Date Added";
-                                field.defaultValue = "";
-                                field.isBaseField = cdef.isBaseContent;
+                                field = new Models.Domain.CDefFieldModel {
+                                    nameLc = "dateadded",
+                                    active = true,
+                                    fieldTypeId = FieldTypeIdDate,
+                                    editSortPriority = 9999,
+                                    authorable = false,
+                                    caption = "Date Added",
+                                    defaultValue = "",
+                                    isBaseField = cdef.isBaseContent
+                                };
                                 verifyContentField_returnID(core, cdef.name, field);
                             }
                             if (!core.db.isCdefField(returnContentId, "createdby")) {
-                                field = new Models.Domain.CDefFieldModel();
-                                field.nameLc = "createdby";
-                                field.active = true;
-                                field.fieldTypeId = FieldTypeIdLookup;
-                                field.editSortPriority = 9999;
-                                field.authorable = false;
-                                field.caption = "Created By";
+                                field = new Models.Domain.CDefFieldModel {
+                                    nameLc = "createdby",
+                                    active = true,
+                                    fieldTypeId = FieldTypeIdLookup,
+                                    editSortPriority = 9999,
+                                    authorable = false,
+                                    caption = "Created By"
+                                };
                                 field.set_lookupContentName(core, "People");
                                 field.defaultValue = "";
                                 field.isBaseField = cdef.isBaseContent;
                                 verifyContentField_returnID(core, cdef.name, field);
                             }
                             if (!core.db.isCdefField(returnContentId, "modifieddate")) {
-                                field = new Models.Domain.CDefFieldModel();
-                                field.nameLc = "modifieddate";
-                                field.active = true;
-                                field.fieldTypeId = FieldTypeIdDate;
-                                field.editSortPriority = 9999;
-                                field.authorable = false;
-                                field.caption = "Date Modified";
-                                field.defaultValue = "";
-                                field.isBaseField = cdef.isBaseContent;
+                                field = new Models.Domain.CDefFieldModel {
+                                    nameLc = "modifieddate",
+                                    active = true,
+                                    fieldTypeId = FieldTypeIdDate,
+                                    editSortPriority = 9999,
+                                    authorable = false,
+                                    caption = "Date Modified",
+                                    defaultValue = "",
+                                    isBaseField = cdef.isBaseContent
+                                };
                                 verifyContentField_returnID(core, cdef.name, field);
                             }
                             if (!core.db.isCdefField(returnContentId, "modifiedby")) {
-                                field = new Models.Domain.CDefFieldModel();
-                                field.nameLc = "modifiedby";
-                                field.active = true;
-                                field.fieldTypeId = FieldTypeIdLookup;
-                                field.editSortPriority = 9999;
-                                field.authorable = false;
-                                field.caption = "Modified By";
+                                field = new Models.Domain.CDefFieldModel {
+                                    nameLc = "modifiedby",
+                                    active = true,
+                                    fieldTypeId = FieldTypeIdLookup,
+                                    editSortPriority = 9999,
+                                    authorable = false,
+                                    caption = "Modified By"
+                                };
                                 field.set_lookupContentName(core, "People");
                                 field.defaultValue = "";
                                 field.isBaseField = cdef.isBaseContent;
                                 verifyContentField_returnID(core, cdef.name, field);
                             }
                             if (!core.db.isCdefField(returnContentId, "ContentControlId")) {
-                                field = new Models.Domain.CDefFieldModel();
-                                field.nameLc = "contentcontrolid";
-                                field.active = true;
-                                field.fieldTypeId = FieldTypeIdLookup;
-                                field.editSortPriority = 9999;
-                                field.authorable = false;
-                                field.caption = "Controlling Content";
+                                field = new Models.Domain.CDefFieldModel {
+                                    nameLc = "contentcontrolid",
+                                    active = true,
+                                    fieldTypeId = FieldTypeIdLookup,
+                                    editSortPriority = 9999,
+                                    authorable = false,
+                                    caption = "Controlling Content"
+                                };
                                 field.set_lookupContentName(core, "Content");
                                 field.defaultValue = "";
                                 field.isBaseField = cdef.isBaseContent;
                                 verifyContentField_returnID(core, cdef.name, field);
                             }
                             if (!core.db.isCdefField(returnContentId, "CreateKey")) {
-                                field = new Models.Domain.CDefFieldModel();
-                                field.nameLc = "createkey";
-                                field.active = true;
-                                field.fieldTypeId = FieldTypeIdInteger;
-                                field.editSortPriority = 9999;
-                                field.authorable = false;
-                                field.caption = "Create Key";
-                                field.defaultValue = "";
-                                field.isBaseField = cdef.isBaseContent;
+                                field = new Models.Domain.CDefFieldModel {
+                                    nameLc = "createkey",
+                                    active = true,
+                                    fieldTypeId = FieldTypeIdInteger,
+                                    editSortPriority = 9999,
+                                    authorable = false,
+                                    caption = "Create Key",
+                                    defaultValue = "",
+                                    isBaseField = cdef.isBaseContent
+                                };
                                 verifyContentField_returnID(core, cdef.name, field);
                             }
                             if (!core.db.isCdefField(returnContentId, "ccGuid")) {
-                                field = new Models.Domain.CDefFieldModel();
-                                field.nameLc = "ccguid";
-                                field.active = true;
-                                field.fieldTypeId = FieldTypeIdText;
-                                field.editSortPriority = 9999;
-                                field.authorable = false;
-                                field.caption = "Guid";
-                                field.defaultValue = "";
-                                field.isBaseField = cdef.isBaseContent;
+                                field = new Models.Domain.CDefFieldModel {
+                                    nameLc = "ccguid",
+                                    active = true,
+                                    fieldTypeId = FieldTypeIdText,
+                                    editSortPriority = 9999,
+                                    authorable = false,
+                                    caption = "Guid",
+                                    defaultValue = "",
+                                    isBaseField = cdef.isBaseContent
+                                };
                                 verifyContentField_returnID(core, cdef.name, field);
                             }
                             // -- 20171029 - had to un-deprecate because compatibility issues are too timeconsuming
                             if (!core.db.isCdefField(returnContentId, "ContentCategoryId")) {
-                                field = new Models.Domain.CDefFieldModel();
-                                field.nameLc = "contentcategoryid";
-                                field.active = true;
-                                field.fieldTypeId = FieldTypeIdInteger;
-                                field.editSortPriority = 9999;
-                                field.authorable = false;
-                                field.caption = "Content Category";
-                                field.defaultValue = "";
-                                field.isBaseField = cdef.isBaseContent;
+                                field = new Models.Domain.CDefFieldModel {
+                                    nameLc = "contentcategoryid",
+                                    active = true,
+                                    fieldTypeId = FieldTypeIdInteger,
+                                    editSortPriority = 9999,
+                                    authorable = false,
+                                    caption = "Content Category",
+                                    defaultValue = "",
+                                    isBaseField = cdef.isBaseContent
+                                };
                                 verifyContentField_returnID(core, cdef.name, field);
                             }
                         }
@@ -863,11 +875,11 @@ namespace Contensive.Processor.Controllers {
                 int RecordID = 0;
                 //
                 bool RecordIsBaseField = false;
-                bool isNewFieldRecord = true;
+                //bool isNewFieldRecord = true;
                 {
                     var contentFieldList = ContentFieldModel.createList(core, "(ContentID=" + core.db.encodeSQLNumber(ContentID) + ")and(name=" + core.db.encodeSQLText(field.nameLc) + ")");
                     if (contentFieldList.Count > 0) {
-                        isNewFieldRecord = false;
+                        //isNewFieldRecord = false;
                         RecordID = contentFieldList.First().id;
                         RecordIsBaseField = contentFieldList.First().isBaseField;
                     }
@@ -980,7 +992,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             int InstalledByCollectionID = 0;
                             if (!string.IsNullOrEmpty(installedByCollectionGuid)) {
-                                var addonCollection = AddonCollection.create(core, installedByCollectionGuid);
+                                var addonCollection = AddonCollectionModel.create(core, installedByCollectionGuid);
                                 if (addonCollection != null) {
                                     InstalledByCollectionID = addonCollection.id;
                                 }
@@ -1236,7 +1248,7 @@ namespace Contensive.Processor.Controllers {
         //
         // ====================================================================================================
         //
-        public static string GetContentFieldProperty(CoreController core, string ContentName, string FieldName, string PropertyName) {
+        public static string getContentFieldProperty(CoreController core, string ContentName, string FieldName, string PropertyName) {
             string result = "";
             try {
                 CDefModel Contentdefinition = CDefModel.create(core, ContentName);

@@ -158,7 +158,7 @@
     <Compile Include="Addons\PageManager\getHtmlBodyClass.cs" />
     <Compile Include="Addons\Tools\configureContentEditClass.cs" />
     <Compile Include="Addons\Tools\legacyToolsClass.cs" />
-    <Compile Include="constants.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="Controllers\AddonController.cs" />
     <Compile Include="Controllers\CollectionController.cs" />
     <Compile Include="Controllers\AdminUIController.cs" />
@@ -271,7 +271,7 @@
     <Compile Include="Models\Domain\StylesheetContextModel.cs" />
     <Compile Include="Models\Domain\UploadFileModel.cs" />
     <Compile Include="Models\Domain\_BlankModel.cs" />
-    <Compile Include="Models\Db\AddonCollection.cs" />
+    <Compile Include="Models\Db\AddonCollectionModel.cs" />
     <Compile Include="Models\Db\AddonContentFieldTypeRulesModel.cs" />
     <Compile Include="Models\Db\AddonIncludeRuleModel.cs" />
     <Compile Include="Models\Db\AddonModel.cs" />

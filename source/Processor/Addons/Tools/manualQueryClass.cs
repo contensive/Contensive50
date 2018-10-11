@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 //
 namespace Contensive.Addons.Tools {
     //
@@ -195,11 +195,11 @@ namespace Contensive.Addons.Tools {
                 {
                     //
                     // -- sql list
-                    var lookupList = new List<nameValueClass> { };
+                    var lookupList = new List<NameValueClass> { };
                     string[] delimiters = new string[] { "\r\n" };
                     List<string> SqlArchiveList = SQLArchive.Split( delimiters,StringSplitOptions.RemoveEmptyEntries).ToList();
                     foreach( string sql in SqlArchiveList) {
-                        lookupList.Add(new nameValueClass() { name = sql, value=sql });
+                        lookupList.Add(new NameValueClass() { name = sql, value=sql });
                     }
 
                     string inputSelect = AdminUIController.getDefaultEditor_LookupList(core, "SQLList", "0" , lookupList,false, "SQLList");

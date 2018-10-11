@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 
 namespace Contensive.Processor {
-    public static class constants {
+    public static class Constants {
         //
         // -- data layers, 
         //      - only allow calls from top to bottom
@@ -1163,7 +1163,7 @@ namespace Contensive.Processor {
         public const string contentReplaceEscapeStart = "{%";
         public const string contentReplaceEscapeEnd = "%}";
         //
-        public class fieldEditorType {
+        public class FieldEditorType {
             public int fieldId;
             public int addonid;
         }
@@ -1414,7 +1414,7 @@ namespace Contensive.Processor {
         // put content definitions here
         //
         //
-        public class nameValueClass {
+        public class NameValueClass {
             public string name;
             public string value;
         }
@@ -1440,7 +1440,7 @@ namespace Contensive.Processor {
         //
         //Declare Function GetTickCount Lib "kernel32" () As Integer
         [System.Runtime.InteropServices.DllImport("kernel32", EntryPoint = "GetCurrentProcessId", ExactSpelling = true, CharSet = System.Runtime.InteropServices.CharSet.Ansi, SetLastError = true)]
-        public static extern int GetCurrentProcessId();
+        public static extern int getCurrentProcessId();
         //Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Integer)
         //
         //========================================================================
@@ -1549,7 +1549,7 @@ namespace Contensive.Processor {
         public const string tableCellEnd = "</td>";
         public const string kmaEndTableRow = "</tr>";
         //
-        public enum contentTypeEnum {
+        public enum ContentTypeEnum {
             contentTypeWeb = 1,
             contentTypeEmail = 2,
             contentTypeWebTemplate = 3,
@@ -1781,7 +1781,7 @@ namespace Contensive.Processor {
         public const int main_IPosPeopleField = 3;
         public const int main_IPosGroupName = 3;
         //
-        public struct main_FormPagetype_InstType {
+        public struct Main_FormPagetype_InstType {
             public int Type;
             public string Caption;
             public bool REquired;
@@ -1789,18 +1789,18 @@ namespace Contensive.Processor {
             public string GroupName;
         }
         //
-        public struct main_FormPagetype {
+        public struct Main_FormPagetype {
             public string PreRepeat;
             public string PostRepeat;
             public string RepeatCell;
             public string AddGroupNameList;
             public bool AuthenticateOnFormProcess;
-            public main_FormPagetype_InstType[] Inst;
+            public Main_FormPagetype_InstType[] Inst;
         }
         //
         // Cache the input selects (admin uses the same ones over and over)
         //
-        public class cacheInputSelectClass {
+        public class CacheInputSelectClass {
             public string SelectRaw;
             public string ContentName;
             public string Criteria;
@@ -1808,15 +1808,15 @@ namespace Contensive.Processor {
         }
         //
         // -- htmlAssetTypes
-        public enum htmlAssetTypeEnum {
+        public enum HtmlAssetTypeEnum {
             script, // -- script at end of body (code or link)
             style, // -- css style at end of body (code or link)
             scriptOnLoad // -- special case, text is assumed to be script to run on load
         }
         //
         // -- assets to be added to the head section (and end-of-body) of html documents
-        public class htmlAssetClass {
-            public htmlAssetTypeEnum assetType; // the type of asset, css, js, etc
+        public class HtmlAssetClass {
+            public HtmlAssetTypeEnum assetType; // the type of asset, css, js, etc
             public bool inHead; // if true, asset goes in head else it goes at end of body
             public bool isLink; // if true, the content property is a link to the asset, else use the content as the asset
             public string content; // either link or content depending on the isLink property

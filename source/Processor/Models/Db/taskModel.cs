@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Models.Db {
     public class TaskModel : BaseModel {
@@ -43,13 +43,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static TaskModel addDefault(CoreController core) {
-            return addDefault<TaskModel>(core);
+        public static TaskModel addDefault(CoreController core, Domain.CDefModel cdef) {
+            return addDefault<TaskModel>(core, cdef);
         }
         //
         //====================================================================================================
-        public static TaskModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
-            return addDefault<TaskModel>(core, ref callersCacheNameList);
+        public static TaskModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefModel cdef) {
+            return addDefault<TaskModel>(core, cdef, ref callersCacheNameList);
         }
         //
         //====================================================================================================

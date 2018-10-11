@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Models.Db {
     public class PersonModel : BaseModel {
@@ -89,13 +89,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static PersonModel addDefault(CoreController core) {
-            return addDefault<PersonModel>(core);
+        public static PersonModel addDefault(CoreController core, Domain.CDefModel cdef) {
+            return addDefault<PersonModel>(core, cdef);
         }
         //
         //====================================================================================================
-        public static PersonModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
-            return addDefault<PersonModel>(core, ref callersCacheNameList);
+        public static PersonModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefModel cdef) {
+            return addDefault<PersonModel>(core, cdef, ref callersCacheNameList);
         }
         //
         //====================================================================================================

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Collections.Generic;
 using Contensive.Processor.Models.Db;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 using Contensive.BaseClasses;
 //
 namespace Contensive.Processor.Controllers {
@@ -48,7 +48,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// head tags, script tags, style tags, etc
         /// </summary>
-        public List<htmlAssetClass> htmlAssetList { get; set; } = new List<htmlAssetClass>();
+        public List<HtmlAssetClass> htmlAssetList { get; set; } = new List<HtmlAssetClass>();
         /// <summary>
         /// head meta tag list (convert to list object)
         /// </summary>
@@ -78,7 +78,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public string htmlForEndOfBody { get; set; } = "";
         //
-        public Dictionary<contentTypeEnum, string> wysiwygAddonList;
+        public Dictionary<ContentTypeEnum, string> wysiwygAddonList;
         //
         // -- others to be sorted
         public int editWrapperCnt { get; set; } = 0;
@@ -152,7 +152,7 @@ namespace Contensive.Processor.Controllers {
         public int inputDateCnt { get; set; } = 0;
         //
         // -- todo
-        public List<cacheInputSelectClass> inputSelectCache = new List<cacheInputSelectClass>() { };
+        public List<CacheInputSelectClass> inputSelectCache = new List<CacheInputSelectClass>() { };
         //
         // -- todo
         public int formInputTextCnt { get; set; } = 0;
@@ -337,7 +337,7 @@ namespace Contensive.Processor.Controllers {
             domain = new DomainModel();
             cdefDictionary = new Dictionary<string, Models.Domain.CDefModel>();
             tableSchemaDictionary = null;
-            wysiwygAddonList = new Dictionary<contentTypeEnum, string>();
+            wysiwygAddonList = new Dictionary<ContentTypeEnum, string>();
         }
         //
         //========================================================================

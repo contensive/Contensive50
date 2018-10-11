@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 //
 namespace Contensive.Addons.PageManager {
     public class saveChildPageListDraggableClass : Contensive.BaseClasses.AddonBaseClass {
@@ -68,7 +68,7 @@ namespace Contensive.Addons.PageManager {
                                 if (sortMethod == null) {
                                     //
                                     // -- create the required sortMethod
-                                    sortMethod = SortMethodModel.addDefault(core);
+                                    sortMethod = SortMethodModel.addDefault(core, Processor.Models.Domain.CDefModel.create(core, SortMethodModel.contentName));
                                     sortMethod.name = "By Alpha Sort Order Field";
                                     sortMethod.OrderByClause = "sortOrder";
                                     sortMethod.save(core);

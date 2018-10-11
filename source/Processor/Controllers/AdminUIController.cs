@@ -8,7 +8,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
 //
 namespace Contensive.Processor {
@@ -1162,13 +1162,13 @@ namespace Contensive.Processor {
             }
             return result;
         }
-        public static string getDefaultEditor_LookupList(CoreController core, string htmlName, string defaultValue, List<nameValueClass> lookupList, bool readOnly = false, string htmlId = "", string WhyReadOnlyMsg = "", bool fieldRequired = false) {
+        public static string getDefaultEditor_LookupList(CoreController core, string htmlName, string defaultValue, List<NameValueClass> lookupList, bool readOnly = false, string htmlId = "", string WhyReadOnlyMsg = "", bool fieldRequired = false) {
             string result = "";
             if (readOnly) {
                 //
                 // ----- Lookup ReadOnly
                 result += (HtmlController.inputHidden(htmlName, GenericController.encodeText(defaultValue)));
-                nameValueClass nameValue = lookupList.Find(x => x.name.ToLower() == htmlName.ToLower());
+                NameValueClass nameValue = lookupList.Find(x => x.name.ToLower() == htmlName.ToLower());
                 if (nameValue == null) {
                     result += "none";
                 } else {

@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Models.Db {
     public class TemplateDomainRuleModel : BaseModel {
@@ -35,13 +35,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static TemplateDomainRuleModel addDefault(CoreController core) {
-            return addDefault<TemplateDomainRuleModel>(core);
+        public static TemplateDomainRuleModel addDefault(CoreController core, Domain.CDefModel cdef) {
+            return addDefault<TemplateDomainRuleModel>(core, cdef);
         }
         //
         //====================================================================================================
-        public static TemplateDomainRuleModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
-            return addDefault<TemplateDomainRuleModel>(core, ref callersCacheNameList);
+        public static TemplateDomainRuleModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefModel cdef) {
+            return addDefault<TemplateDomainRuleModel>(core, cdef, ref callersCacheNameList);
         }
         //
         //====================================================================================================

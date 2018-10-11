@@ -8,7 +8,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 using Contensive.BaseClasses;
 using System.IO;
 using System.Data;
@@ -458,7 +458,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // -- DotNet
                                 if (addon.dotNetClass != "") {
-                                    result += execute_assembly(executeContext, addon, AddonCollection.create(core, addon.collectionID));
+                                    result += execute_assembly(executeContext, addon, AddonCollectionModel.create(core, addon.collectionID));
                                 }
                                 //
                                 // -- RemoteAssetLink
@@ -1679,7 +1679,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        private string execute_assembly(CPUtilsBaseClass.addonExecuteContext executeContext, Models.Db.AddonModel addon, AddonCollection addonCollection) {
+        private string execute_assembly(CPUtilsBaseClass.addonExecuteContext executeContext, Models.Db.AddonModel addon, AddonCollectionModel addonCollection) {
             string result = "";
             try {
                 LogController.logTrace(core, "execute_assembly dotNetClass [" + addon.dotNetClass + "], enter");
@@ -3671,7 +3671,7 @@ namespace Contensive.Processor.Controllers {
             string addonDescription = "[invalid addon]";
             if (addon != null) {
                 string collectionName = "invalid collection or collection not set";
-                AddonCollection collection = AddonCollection.create(core, addon.collectionID);
+                AddonCollectionModel collection = AddonCollectionModel.create(core, addon.collectionID);
                 if (collection != null) {
                     collectionName = collection.name;
                 }

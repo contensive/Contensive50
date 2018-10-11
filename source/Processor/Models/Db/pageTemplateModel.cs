@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Models.Db {
     public class PageTemplateModel : BaseModel {
@@ -43,13 +43,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static PageTemplateModel addDefault(CoreController core) {
-            return addDefault<PageTemplateModel>(core);
+        public static PageTemplateModel addDefault(CoreController core, Domain.CDefModel cdef) {
+            return addDefault<PageTemplateModel>(core, cdef);
         }
         //
         //====================================================================================================
-        public static PageTemplateModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
-            return addDefault<PageTemplateModel>(core, ref callersCacheNameList);
+        public static PageTemplateModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefModel cdef) {
+            return addDefault<PageTemplateModel>(core, cdef, ref callersCacheNameList);
         }
         //
         //====================================================================================================

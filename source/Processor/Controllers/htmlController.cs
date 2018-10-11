@@ -15,7 +15,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 using System.Net;
 
 namespace Contensive.Processor.Controllers {
@@ -62,11 +62,11 @@ namespace Contensive.Processor.Controllers {
                 // -- body Javascript
                 bool allowDebugging = core.visitProperty.getBoolean("AllowDebugging");
                 var scriptOnLoad = new List<string>();
-                foreach (var asset in core.doc.htmlAssetList.FindAll((a) => ((a.assetType == htmlAssetTypeEnum.script) || (a.assetType == htmlAssetTypeEnum.scriptOnLoad)) && (!a.inHead) && (!string.IsNullOrEmpty(a.content)))) {
+                foreach (var asset in core.doc.htmlAssetList.FindAll((a) => ((a.assetType == HtmlAssetTypeEnum.script) || (a.assetType == HtmlAssetTypeEnum.scriptOnLoad)) && (!a.inHead) && (!string.IsNullOrEmpty(a.content)))) {
                     if ((asset.addedByMessage != "") && allowDebugging) {
                         result.Add("\r\n<!-- from " + asset.addedByMessage + " -->\r\n");
                     }
-                    if (asset.assetType == htmlAssetTypeEnum.scriptOnLoad) {
+                    if (asset.assetType == HtmlAssetTypeEnum.scriptOnLoad) {
                         scriptOnLoad.Add(asset.content + ";");
                     }
                     if (!asset.isLink) {
@@ -159,7 +159,7 @@ namespace Contensive.Processor.Controllers {
                 return_IsEmptyList = true;
                 //
                 CurrentValueText = CurrentValue.ToString();
-                foreach (constants.cacheInputSelectClass inputSelect in core.doc.inputSelectCache) {
+                foreach (Constants.CacheInputSelectClass inputSelect in core.doc.inputSelectCache) {
                     if ((inputSelect.ContentName == ContentName) && (inputSelect.Criteria == LcaseCriteria) && (inputSelect.CurrentValue == CurrentValueText)) {
                         SelectRaw = inputSelect.SelectRaw;
                         return_IsEmptyList = false;
@@ -397,7 +397,7 @@ namespace Contensive.Processor.Controllers {
                     // Save the SelectRaw
                     //
                     if (!return_IsEmptyList) {
-                        core.doc.inputSelectCache.Add(new constants.cacheInputSelectClass() {
+                        core.doc.inputSelectCache.Add(new Constants.CacheInputSelectClass() {
                             ContentName = ContentName,
                             Criteria = Criteria,
                             CurrentValue = CurrentValue.ToString(),
@@ -434,7 +434,7 @@ namespace Contensive.Processor.Controllers {
                 string sqlCriteria = "";
                 //
                 string SelectRaw = "";
-                foreach (constants.cacheInputSelectClass cacheInputSelect in core.doc.inputSelectCache) {
+                foreach (Constants.CacheInputSelectClass cacheInputSelect in core.doc.inputSelectCache) {
                     if ((cacheInputSelect.ContentName == "Group:" + GroupID) && (cacheInputSelect.Criteria == sqlCriteria) && (GenericController.encodeInteger(cacheInputSelect.CurrentValue) == currentValue)) {
                         SelectRaw = cacheInputSelect.SelectRaw;
                         break;
@@ -639,7 +639,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // Save the SelectRaw
                     //
-                    core.doc.inputSelectCache.Add(new constants.cacheInputSelectClass() {
+                    core.doc.inputSelectCache.Add(new Constants.CacheInputSelectClass() {
                         ContentName = "Group:" + GroupID,
                         Criteria = sqlCriteria,
                         CurrentValue = currentValue.ToString(),
@@ -673,7 +673,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="htmlId"></param>
         /// <param name="HtmlClass"></param>
         /// <returns></returns>
-        public static string selectFromList(CoreController core, string MenuName, string CurrentValue, List<nameValueClass> lookupList, string NoneCaption, string htmlId, string HtmlClass = "") {
+        public static string selectFromList(CoreController core, string MenuName, string CurrentValue, List<NameValueClass> lookupList, string NoneCaption, string htmlId, string HtmlClass = "") {
             string result = "";
             try {
                 StringBuilderLegacyController FastString = new StringBuilderLegacyController();
@@ -689,7 +689,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // ----- select values
                 string CurrentValueLower = CurrentValue.ToLower();
-                foreach (nameValueClass nameValue in lookupList) {
+                foreach (NameValueClass nameValue in lookupList) {
                     string selected = (nameValue.value.ToLower() == CurrentValueLower) ? " selected" : "";
                     FastString.Add("<option value=\"" + nameValue.value + "\" " + selected + ">" + nameValue.name + "</option>");
                 }
@@ -1412,7 +1412,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="contentType"></param>
         /// <returns></returns>
-        public string getWysiwygAddonList(contentTypeEnum contentType) {
+        public string getWysiwygAddonList(ContentTypeEnum contentType) {
             string result = "";
             try {
                 if (core.doc.wysiwygAddonList.ContainsKey(contentType)) {
@@ -1442,7 +1442,7 @@ namespace Contensive.Processor.Controllers {
                     Index.setPtr("Block Text", ItemsCnt);
                     ItemsCnt += 1;
                     //
-                    if ((contentType == contentTypeEnum.contentTypeEmail) || (contentType == contentTypeEnum.contentTypeEmailTemplate)) {
+                    if ((contentType == ContentTypeEnum.contentTypeEmail) || (contentType == ContentTypeEnum.contentTypeEmailTemplate)) {
                         //
                         // ----- Email Only AC tags
                         //
@@ -1460,7 +1460,7 @@ namespace Contensive.Processor.Controllers {
                         Index.setPtr("Personalization", ItemsCnt);
                         ItemsCnt += 1;
                         //
-                        if (contentType == contentTypeEnum.contentTypeEmailTemplate) {
+                        if (contentType == ContentTypeEnum.contentTypeEmailTemplate) {
                             //
                             // Editing Email Templates
                             //   This is a special case
@@ -1517,13 +1517,13 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- addons
                     string Criteria = "(1=1)";
-                    if (contentType == contentTypeEnum.contentTypeEmail) {
+                    if (contentType == ContentTypeEnum.contentTypeEmail) {
                         //
                         // select only addons with email placement (dont need to check main_version bc if email, must be >4.0.325
                         //
                         Criteria = Criteria + "and(email<>0)";
                     } else {
-                        if (contentType == contentTypeEnum.contentTypeWeb) {
+                        if (contentType == ContentTypeEnum.contentTypeWeb) {
                             //
                             // Non Templates
                             Criteria = Criteria + "and(content<>0)";
@@ -1541,7 +1541,7 @@ namespace Contensive.Processor.Controllers {
                         while (core.db.csOk(CSAddons)) {
                             string addonGuid = core.db.csGetText(CSAddons, "ccguid");
                             string ObjectProgramID2 = core.db.csGetText(CSAddons, "ObjectProgramID");
-                            if ((contentType == contentTypeEnum.contentTypeEmail) && (!string.IsNullOrEmpty(ObjectProgramID2))) {
+                            if ((contentType == ContentTypeEnum.contentTypeEmail) && (!string.IsNullOrEmpty(ObjectProgramID2))) {
                                 //
                                 // Block activex addons from email
                                 //
@@ -3182,19 +3182,19 @@ namespace Contensive.Processor.Controllers {
                 if (core.doc.htmlAssetList.Count > 0) {
                     List<string> headScriptList = new List<string>();
                     List<string> styleList = new List<string>();
-                    foreach (var asset in core.doc.htmlAssetList.FindAll((htmlAssetClass item) => (item.inHead))) {
+                    foreach (var asset in core.doc.htmlAssetList.FindAll((HtmlAssetClass item) => (item.inHead))) {
                         string debugComment = "\r\n";
                         if ((core.doc.visitPropertyAllowDebugging) && (!string.IsNullOrEmpty(asset.addedByMessage))) {
                             debugComment = "\r\n<!-- added by " + HtmlController.encodeHtml(asset.addedByMessage) + " -->";
                         }
-                        if (asset.assetType.Equals(htmlAssetTypeEnum.style)) {
+                        if (asset.assetType.Equals(HtmlAssetTypeEnum.style)) {
                             styleList.Add(debugComment);
                             if (asset.isLink) {
                                 styleList.Add("<link rel=\"stylesheet\" type=\"text/css\" href=\"" + asset.content + "\" >");
                             } else {
                                 styleList.Add("<style>" + asset.content + "</style>");
                             }
-                        } else if (asset.assetType.Equals(htmlAssetTypeEnum.script)) {
+                        } else if (asset.assetType.Equals(HtmlAssetTypeEnum.script)) {
                             headScriptList.Add(debugComment);
                             if (asset.isLink) {
                                 headScriptList.Add("<script type=\"text/javascript\" src=\"" + asset.content + "\"></script>");
@@ -3225,8 +3225,8 @@ namespace Contensive.Processor.Controllers {
         public void addScriptCode_onLoad(string code, string addedByMessage) {
             try {
                 if (!string.IsNullOrEmpty(code)) {
-                    core.doc.htmlAssetList.Add(new htmlAssetClass() {
-                        assetType = htmlAssetTypeEnum.scriptOnLoad,
+                    core.doc.htmlAssetList.Add(new HtmlAssetClass() {
+                        assetType = HtmlAssetTypeEnum.scriptOnLoad,
                         addedByMessage = addedByMessage,
                         isLink = false,
                         content = code
@@ -3243,7 +3243,7 @@ namespace Contensive.Processor.Controllers {
         public void addScriptCode(string code, string addedByMessage, bool forceHead = false, int sourceAddonId = 0) {
             try {
                 if (!string.IsNullOrWhiteSpace(code)) {
-                    htmlAssetClass asset = null;
+                    HtmlAssetClass asset = null;
                     if (sourceAddonId != 0) {
                         asset = core.doc.htmlAssetList.Find(t => t.sourceAddonId == sourceAddonId);
                     }
@@ -3254,8 +3254,8 @@ namespace Contensive.Processor.Controllers {
                     } else {
                         //
                         // add to list
-                        core.doc.htmlAssetList.Add(new htmlAssetClass() {
-                            assetType = htmlAssetTypeEnum.script,
+                        core.doc.htmlAssetList.Add(new HtmlAssetClass() {
+                            assetType = HtmlAssetTypeEnum.script,
                             inHead = forceHead,
                             addedByMessage = addedByMessage,
                             isLink = false,
@@ -3274,7 +3274,7 @@ namespace Contensive.Processor.Controllers {
         public void addScriptLinkSrc( string scriptLinkSrc, string addedByMessage, bool forceHead = false, int sourceAddonId = 0) {
             try {
                 if (!string.IsNullOrWhiteSpace(scriptLinkSrc)) {
-                    htmlAssetClass asset = null;
+                    HtmlAssetClass asset = null;
                     if (sourceAddonId != 0) {
                         asset = core.doc.htmlAssetList.Find(t => t.sourceAddonId == sourceAddonId);
                     }
@@ -3285,8 +3285,8 @@ namespace Contensive.Processor.Controllers {
                     } else {
                         //
                         // add to list
-                        core.doc.htmlAssetList.Add(new htmlAssetClass {
-                            assetType = htmlAssetTypeEnum.script,
+                        core.doc.htmlAssetList.Add(new HtmlAssetClass {
+                            assetType = HtmlAssetTypeEnum.script,
                             addedByMessage = addedByMessage,
                             isLink = true,
                             inHead = forceHead,
@@ -3335,9 +3335,9 @@ namespace Contensive.Processor.Controllers {
         public void addStyleLink(string StyleSheetLink, string addedByMessage) {
             try {
                 if (!string.IsNullOrEmpty(StyleSheetLink.Trim())) {
-                    core.doc.htmlAssetList.Add(new htmlAssetClass() {
+                    core.doc.htmlAssetList.Add(new HtmlAssetClass() {
                         addedByMessage = addedByMessage,
-                        assetType = htmlAssetTypeEnum.style,
+                        assetType = HtmlAssetTypeEnum.style,
                         inHead = true,
                         isLink = true,
                         content = StyleSheetLink

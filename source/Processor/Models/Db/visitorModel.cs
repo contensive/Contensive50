@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Models.Db {
     public class VisitorModel : BaseModel {
@@ -35,13 +35,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static VisitorModel addDefault(CoreController core) {
-            return addDefault<VisitorModel>(core);
+        public static VisitorModel addDefault(CoreController core, Domain.CDefModel cdef) {
+            return addDefault<VisitorModel>(core, cdef);
         }
         //
         //====================================================================================================
-        public static VisitorModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
-            return addDefault<VisitorModel>(core, ref callersCacheNameList);
+        public static VisitorModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefModel cdef) {
+            return addDefault<VisitorModel>(core, cdef, ref callersCacheNameList);
         }
         //
         //====================================================================================================

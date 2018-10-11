@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Models.Db {
     public class LinkForwardModel : BaseModel {
@@ -37,13 +37,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static LinkForwardModel addDefault(CoreController core) {
-            return addDefault<LinkForwardModel>(core);
+        public static LinkForwardModel addDefault(CoreController core, Domain.CDefModel cdef) {
+            return addDefault<LinkForwardModel>(core, cdef);
         }
         //
         //====================================================================================================
-        public static LinkForwardModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
-            return addDefault<LinkForwardModel>(core, ref callersCacheNameList);
+        public static LinkForwardModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefModel cdef) {
+            return addDefault<LinkForwardModel>(core, cdef, ref callersCacheNameList);
         }
         //
         //====================================================================================================

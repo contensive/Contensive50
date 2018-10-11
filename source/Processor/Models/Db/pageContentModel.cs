@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Models.Db {
     public class PageContentModel : BaseModel {
@@ -93,13 +93,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static PageContentModel addDefault(CoreController core) {
-            return addDefault<PageContentModel>(core);
+        public static PageContentModel addDefault(CoreController core, Domain.CDefModel cdef) {
+            return addDefault<PageContentModel>(core, cdef);
         }
         //
         //====================================================================================================
-        public static PageContentModel addDefault(CoreController core, ref List<string> callersCacheNameList) {
-            return addDefault<PageContentModel>(core, ref callersCacheNameList);
+        public static PageContentModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefModel cdef) {
+            return addDefault<PageContentModel>(core, cdef, ref callersCacheNameList);
         }
         //
         //====================================================================================================
