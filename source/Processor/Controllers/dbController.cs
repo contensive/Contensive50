@@ -3340,7 +3340,9 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // -- unique violation
                                 if (dt.Rows.Count > 0) {
-                                    throw new ApplicationException(("Can not save record to content [" + contentSet.CDef.name + "] because it would create a non-unique record for one or more of the following field(s) [" + UniqueViolationFieldList + "]"));
+                                    LogController.logWarn(core, "Can not save record to content [" + contentSet.CDef.name + "] because it would create a non-unique record for one or more of the following field(s) [" + UniqueViolationFieldList + "]");
+                                    return;
+                                    //throw new ApplicationException(("Can not save record to content [" + contentSet.CDef.name + "] because it would create a non-unique record for one or more of the following field(s) [" + UniqueViolationFieldList + "]"));
                                 }
                             }
                         }

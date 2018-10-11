@@ -10,6 +10,7 @@ using System.Security;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using Contensive.Processor.Models.Domain;
+using System.Reflection;
 
 namespace Contensive.CLI {
     class CreateAppClass {
@@ -40,8 +41,11 @@ namespace Contensive.CLI {
                     // -- app name
                     bool appNameOk = false;
                     do {
-                        string appNameDefault = "app" + rightNow.Year + rightNow.Month.ToString().PadLeft(2, '0') + rightNow.Day.ToString().PadLeft(2, '0');
-                        //string appNameDefault = "app" + rightNow.Year + rightNow.Month.ToString().PadLeft(2, '0') + rightNow.Day.ToString().PadLeft(2, '0') + rightNow.Hour.ToString().PadLeft(2, '0') + rightNow.Minute.ToString().PadLeft(2, '0') + rightNow.Second.ToString().PadLeft(2, '0');
+                        Type myType = typeof(Processor.Controllers.CoreController);
+                        Assembly myAssembly = Assembly.GetAssembly(myType);
+                        AssemblyName myAssemblyname = myAssembly.GetName();
+                        Version myVersion = myAssemblyname.Version;
+                        string appNameDefault = "app" + rightNow.Year + rightNow.Month.ToString().PadLeft(2, '0') + rightNow.Day.ToString().PadLeft(2, '0') + "v" + myVersion.Major.ToString("0") + myVersion.Minor.ToString("00");
                         appName = cliController.promptForReply("Application Name", appNameDefault).ToLower();
                         appNameOk = !cp.core.serverConfig.apps.ContainsKey(appName.ToLower());
                         if (!appNameOk) { Console.Write("\n\nThere is already an application with this name. To get the current server configuration, use cc -s"); }
