@@ -286,11 +286,10 @@ namespace Contensive.Addons.AdminSite {
                     int CS = core.db.csOpenRecord(adminContent.name, requestedRecordId, false, false, "ContentControlID");
                     if (core.db.csOk(CS)) {
                         editRecord.id = requestedRecordId;
-                        adminContent.id = core.db.csGetInteger(CS, "ContentControlID");
-                        if (adminContent.id <= 0) {
-                            adminContent.id = requestedContentId;
-                        } else if (adminContent.id != requestedContentId) {
-                            adminContent = CDefModel.getCdef(core, adminContent.id);
+                        int recordContentId = core.db.csGetInteger(CS, "ContentControlID");
+                        //adminContent.id = core.db.csGetInteger(CS, "ContentControlID");
+                        if ((recordContentId > 0) & (recordContentId != adminContent.id)) {
+                            adminContent = CDefModel.getCdef(core, recordContentId);
                         }
                     }
                     core.db.csClose(ref CS);
