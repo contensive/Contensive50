@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.Constants;
+using static Contensive.Processor.constants;
 using Contensive.Processor.Models.Domain;
 using Contensive.Addons.Tools;
 using static Contensive.Processor.AdminUIController;
@@ -21,7 +21,7 @@ namespace Contensive.Addons.AdminSite {
     /// <summary>
     /// object that contains the context for the admin site, like recordsPerPage, etc. Should eventually include the loadContext and be its own document
     /// </summary>
-    public class AdminInfoDomainModel {
+    public class adminInfoDomainModel {
 
         public const int AdminActionNop = 0; // do nothing
         public const int AdminActionDelete = 4; // delete record
@@ -238,7 +238,7 @@ namespace Contensive.Addons.AdminSite {
         /// loads the context for the admin site, controlled by request inputs like rnContent (cid) and rnRecordId (id)
         /// </summary>
         /// <param name="core"></param>
-        public AdminInfoDomainModel( CoreController core) {
+        public adminInfoDomainModel( CoreController core) {
             try {
                 //
                 // Tab Control
@@ -253,7 +253,7 @@ namespace Contensive.Addons.AdminSite {
                 // adminContext.content init
                 requestedContentId = core.docProperties.getInteger("cid");
                 if (requestedContentId != 0) {
-                    adminContent = CDefModel.create(core, requestedContentId);
+                    adminContent = CDefModel.getCdef(core, requestedContentId);
                     if (adminContent == null) {
                         adminContent = new CDefModel();
                         adminContent.id = 0;
@@ -286,11 +286,10 @@ namespace Contensive.Addons.AdminSite {
                     int CS = core.db.csOpenRecord(adminContent.name, requestedRecordId, false, false, "ContentControlID");
                     if (core.db.csOk(CS)) {
                         editRecord.id = requestedRecordId;
-                        adminContent.id = core.db.csGetInteger(CS, "ContentControlID");
-                        if (adminContent.id <= 0) {
-                            adminContent.id = requestedContentId;
-                        } else if (adminContent.id != requestedContentId) {
-                            adminContent = CDefModel.create(core, adminContent.id);
+                        int recordContentId = core.db.csGetInteger(CS, "ContentControlID");
+                        //adminContent.id = core.db.csGetInteger(CS, "ContentControlID");
+                        if ((recordContentId > 0) & (recordContentId != adminContent.id)) {
+                            adminContent = CDefModel.getCdef(core, recordContentId);
                         }
                     }
                     core.db.csClose(ref CS);
@@ -487,7 +486,7 @@ namespace Contensive.Addons.AdminSite {
         public static  bool userHasContentAccess(CoreController core, int ContentID) {
             bool result = false;
             try {
-                string ContentName = CdefController.getContentNameByID(core, ContentID);
+                string ContentName = CDefModel.getContentNameByID(core, ContentID);
                 if (!string.IsNullOrEmpty(ContentName)) {
                     result = core.session.isAuthenticatedContentManager(core, ContentName);
                 }

@@ -12,7 +12,7 @@ using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using Contensive.Processor.Models.Domain;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.Constants;
+using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -186,7 +186,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <returns>
         /// </returns>
-        public string getConnectionStringADONET(string catalogName, string dataSourceName = "default") {
+        public string getConnectionStringADONET(string catalogName, string dataSourceName = "") {
             //
             // (OLEDB) OLE DB Provider for SQL Server > "Provider=sqloledb;Data Source=MyServerName;Initial Catalog=MyDatabaseName;User Id=MyUsername;Password=MyPassword;"
             //     https://www.codeproject.com/Articles/2304/ADO-Connection-Strings#OLE%20DB%20SqlServer
@@ -382,7 +382,7 @@ namespace Contensive.Processor.Controllers {
         ///// <param name="startRecord"></param>
         ///// <param name="maxRecords"></param>
         ///// <returns>You must close the recordset after use.</returns>
-        //public ADODB.Recordset executeSql_getRecordSet(string sql, string dataSourceName = "default", int startRecord = 0, int maxRecords = 9999) {
+        //public ADODB.Recordset executeSql_getRecordSet(string sql, string dataSourceName = "", int startRecord = 0, int maxRecords = 9999) {
         //    //
         //    // from - https://support.microsoft.com/en-us/kb/308611
         //    //
@@ -454,7 +454,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="sql"></param>
         /// <param name="dataSourceName"></param>
-        public void executeNonQueryAsync(string sql, string dataSourceName = "default") {
+        public void executeNonQueryAsync(string sql, string dataSourceName = "") {
             try {
                 if (dbEnabled) {
                     Stopwatch sw = Stopwatch.StartNew();
@@ -529,10 +529,14 @@ namespace Contensive.Processor.Controllers {
         public DataTable insertTableRecordGetDataTable(string DataSourceName, string TableName, int MemberID = 0) {
             DataTable returnDt = null;
             try {
-                string sqlGuid = encodeSQLText(GenericController.getGUID());
-                string sqlDateAdded = encodeSQLDate(DateTime.Now);
                 SqlFieldListClass sqlList = new SqlFieldListClass();
+                //string CreateKeyString = null;
+                //string sqlDateAdded = null;
+                string sqlGuid = encodeSQLText( GenericController.getGUID());
+                string sqlDateAdded = encodeSQLDate(DateTime.Now);
+                //CreateKeyString = encodeSQLNumber(genericController.GetRandomInteger(core));
                 sqlList.add("ccguid", sqlGuid);
+                //sqlList.add("createkey", CreateKeyString);
                 sqlList.add("dateadded", sqlDateAdded);
                 sqlList.add("createdby", encodeSQLNumber(MemberID));
                 sqlList.add("ModifiedDate", sqlDateAdded);
@@ -543,6 +547,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 insertTableRecord(DataSourceName, TableName, sqlList);
                 returnDt = openTable(DataSourceName, TableName, "(DateAdded=" + sqlDateAdded + ")and(ccguid=" + sqlGuid + ")", "ID DESC", "", 1);
+                //returnDt = openTable(DataSourceName, TableName, "(DateAdded=" + DateAddedString + ")and(CreateKey=" + CreateKeyString + ")", "ID DESC", "", 1);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
@@ -788,7 +793,6 @@ namespace Contensive.Processor.Controllers {
                         }
                         executeQuery(SQL, DataSourceName).Dispose();
                         //
-                        TableSchemaModel.tableSchemaListClear(core);
                         if (clearMetaCache) {
                             core.cache.invalidateAll();
                             core.doc.clearMetaData();
@@ -956,42 +960,42 @@ namespace Contensive.Processor.Controllers {
             string returnType = "";
             try {
                 switch (fieldType) {
-                    case Constants.FieldTypeIdBoolean:
+                    case constants.FieldTypeIdBoolean:
                         returnType = "Int NULL";
                         break;
-                    case Constants.FieldTypeIdCurrency:
+                    case constants.FieldTypeIdCurrency:
                         returnType = "Float NULL";
                         break;
-                    case Constants.FieldTypeIdDate:
+                    case constants.FieldTypeIdDate:
                         // 20180416 - ms recommends using new, higher precision. Code requires 3 digits so 7 is more than enough
                         returnType = "DateTime2(7) NULL";
                         break;
-                    case Constants.FieldTypeIdFloat:
+                    case constants.FieldTypeIdFloat:
                         returnType = "Float NULL";
                         break;
-                    case Constants.FieldTypeIdInteger:
+                    case constants.FieldTypeIdInteger:
                         returnType = "Int NULL";
                         break;
-                    case Constants.FieldTypeIdLookup:
-                    case Constants.FieldTypeIdMemberSelect:
+                    case constants.FieldTypeIdLookup:
+                    case constants.FieldTypeIdMemberSelect:
                         returnType = "Int NULL";
                         break;
-                    case Constants.FieldTypeIdManyToMany:
-                    case Constants.FieldTypeIdRedirect:
-                    case Constants.FieldTypeIdFileImage:
-                    case Constants.FieldTypeIdLink:
-                    case Constants.FieldTypeIdResourceLink:
-                    case Constants.FieldTypeIdText:
-                    case Constants.FieldTypeIdFile:
-                    case Constants.FieldTypeIdFileText:
-                    case Constants.FieldTypeIdFileJavascript:
-                    case Constants.FieldTypeIdFileXML:
-                    case Constants.FieldTypeIdFileCSS:
-                    case Constants.FieldTypeIdFileHTML:
+                    case constants.FieldTypeIdManyToMany:
+                    case constants.FieldTypeIdRedirect:
+                    case constants.FieldTypeIdFileImage:
+                    case constants.FieldTypeIdLink:
+                    case constants.FieldTypeIdResourceLink:
+                    case constants.FieldTypeIdText:
+                    case constants.FieldTypeIdFile:
+                    case constants.FieldTypeIdFileText:
+                    case constants.FieldTypeIdFileJavascript:
+                    case constants.FieldTypeIdFileXML:
+                    case constants.FieldTypeIdFileCSS:
+                    case constants.FieldTypeIdFileHTML:
                         returnType = "VarChar(255) NULL";
                         break;
-                    case Constants.FieldTypeIdLongText:
-                    case Constants.FieldTypeIdHTML:
+                    case constants.FieldTypeIdLongText:
+                    case constants.FieldTypeIdHTML:
                         //
                         // ----- Longtext, depends on datasource
                         //
@@ -1007,7 +1011,7 @@ namespace Contensive.Processor.Controllers {
                         //        csv_returnType = "VarChar(65535)"
                         //End Select
                         break;
-                    case Constants.FieldTypeIdAutoIdIncrement:
+                    case constants.FieldTypeIdAutoIdIncrement:
                         //
                         // ----- autoincrement type, depends on datasource
                         //
@@ -1054,10 +1058,10 @@ namespace Contensive.Processor.Controllers {
                     if (null != ts.indexes.Find(x => x.index_name.ToLower() == IndexName.ToLower())) {
                         DataSourceType = getDataSourceType(DataSourceName);
                         switch (DataSourceType) {
-                            case Constants.DataSourceTypeODBCAccess:
+                            case constants.DataSourceTypeODBCAccess:
                                 sql = "DROP INDEX " + IndexName + " On " + TableName + ";";
                                 break;
-                            case Constants.DataSourceTypeODBCMySQL:
+                            case constants.DataSourceTypeODBCMySQL:
                                 throw new NotImplementedException("mysql");
                             default:
                                 sql = "DROP INDEX [" + TableName + "].[" + IndexName + "];";
@@ -1104,7 +1108,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         //
         public int getDataSourceType(string DataSourceName) {
-            return Constants.DataSourceTypeODBCSQLServer;
+            return constants.DataSourceTypeODBCSQLServer;
         }
         //
         //========================================================================
@@ -1119,37 +1123,37 @@ namespace Contensive.Processor.Controllers {
                 switch (ADOFieldType) {
 
                     case 2:
-                        returnType = Constants.FieldTypeIdFloat;
+                        returnType = constants.FieldTypeIdFloat;
                         break;
                     case 3:
-                        returnType = Constants.FieldTypeIdInteger;
+                        returnType = constants.FieldTypeIdInteger;
                         break;
                     case 4:
-                        returnType = Constants.FieldTypeIdFloat;
+                        returnType = constants.FieldTypeIdFloat;
                         break;
                     case 5:
-                        returnType = Constants.FieldTypeIdFloat;
+                        returnType = constants.FieldTypeIdFloat;
                         break;
                     case 6:
-                        returnType = Constants.FieldTypeIdInteger;
+                        returnType = constants.FieldTypeIdInteger;
                         break;
                     case 11:
-                        returnType = Constants.FieldTypeIdBoolean;
+                        returnType = constants.FieldTypeIdBoolean;
                         break;
                     case 135:
-                        returnType = Constants.FieldTypeIdDate;
+                        returnType = constants.FieldTypeIdDate;
                         break;
                     case 200:
-                        returnType = Constants.FieldTypeIdText;
+                        returnType = constants.FieldTypeIdText;
                         break;
                     case 201:
-                        returnType = Constants.FieldTypeIdLongText;
+                        returnType = constants.FieldTypeIdLongText;
                         break;
                     case 202:
-                        returnType = Constants.FieldTypeIdText;
+                        returnType = constants.FieldTypeIdText;
                         break;
                     default:
-                        returnType = Constants.FieldTypeIdText;
+                        returnType = constants.FieldTypeIdText;
                         break;
                 }
             } catch (Exception ex) {
@@ -1169,88 +1173,88 @@ namespace Contensive.Processor.Controllers {
             int returnTypeId = 0;
             try {
                 switch (GenericController.vbLCase(FieldTypeName)) {
-                    case Constants.FieldTypeNameLcaseBoolean:
-                        returnTypeId = Constants.FieldTypeIdBoolean;
+                    case constants.FieldTypeNameLcaseBoolean:
+                        returnTypeId = constants.FieldTypeIdBoolean;
                         break;
-                    case Constants.FieldTypeNameLcaseCurrency:
-                        returnTypeId = Constants.FieldTypeIdCurrency;
+                    case constants.FieldTypeNameLcaseCurrency:
+                        returnTypeId = constants.FieldTypeIdCurrency;
                         break;
-                    case Constants.FieldTypeNameLcaseDate:
-                        returnTypeId = Constants.FieldTypeIdDate;
+                    case constants.FieldTypeNameLcaseDate:
+                        returnTypeId = constants.FieldTypeIdDate;
                         break;
-                    case Constants.FieldTypeNameLcaseFile:
-                        returnTypeId = Constants.FieldTypeIdFile;
+                    case constants.FieldTypeNameLcaseFile:
+                        returnTypeId = constants.FieldTypeIdFile;
                         break;
-                    case Constants.FieldTypeNameLcaseFloat:
-                        returnTypeId = Constants.FieldTypeIdFloat;
+                    case constants.FieldTypeNameLcaseFloat:
+                        returnTypeId = constants.FieldTypeIdFloat;
                         break;
-                    case Constants.FieldTypeNameLcaseImage:
-                        returnTypeId = Constants.FieldTypeIdFileImage;
+                    case constants.FieldTypeNameLcaseImage:
+                        returnTypeId = constants.FieldTypeIdFileImage;
                         break;
-                    case Constants.FieldTypeNameLcaseLink:
-                        returnTypeId = Constants.FieldTypeIdLink;
+                    case constants.FieldTypeNameLcaseLink:
+                        returnTypeId = constants.FieldTypeIdLink;
                         break;
-                    case Constants.FieldTypeNameLcaseResourceLink:
+                    case constants.FieldTypeNameLcaseResourceLink:
                     case "resource link":
-                        returnTypeId = Constants.FieldTypeIdResourceLink;
+                        returnTypeId = constants.FieldTypeIdResourceLink;
                         break;
-                    case Constants.FieldTypeNameLcaseInteger:
-                        returnTypeId = Constants.FieldTypeIdInteger;
+                    case constants.FieldTypeNameLcaseInteger:
+                        returnTypeId = constants.FieldTypeIdInteger;
                         break;
-                    case Constants.FieldTypeNameLcaseLongText:
+                    case constants.FieldTypeNameLcaseLongText:
                     case "Long text":
-                        returnTypeId = Constants.FieldTypeIdLongText;
+                        returnTypeId = constants.FieldTypeIdLongText;
                         break;
-                    case Constants.FieldTypeNameLcaseLookup:
+                    case constants.FieldTypeNameLcaseLookup:
                     case "lookuplist":
                     case "lookup list":
-                        returnTypeId = Constants.FieldTypeIdLookup;
+                        returnTypeId = constants.FieldTypeIdLookup;
                         break;
-                    case Constants.FieldTypeNameLcaseMemberSelect:
-                        returnTypeId = Constants.FieldTypeIdMemberSelect;
+                    case constants.FieldTypeNameLcaseMemberSelect:
+                        returnTypeId = constants.FieldTypeIdMemberSelect;
                         break;
-                    case Constants.FieldTypeNameLcaseRedirect:
-                        returnTypeId = Constants.FieldTypeIdRedirect;
+                    case constants.FieldTypeNameLcaseRedirect:
+                        returnTypeId = constants.FieldTypeIdRedirect;
                         break;
-                    case Constants.FieldTypeNameLcaseManyToMany:
-                        returnTypeId = Constants.FieldTypeIdManyToMany;
+                    case constants.FieldTypeNameLcaseManyToMany:
+                        returnTypeId = constants.FieldTypeIdManyToMany;
                         break;
-                    case Constants.FieldTypeNameLcaseTextFile:
+                    case constants.FieldTypeNameLcaseTextFile:
                     case "text file":
-                        returnTypeId = Constants.FieldTypeIdFileText;
+                        returnTypeId = constants.FieldTypeIdFileText;
                         break;
-                    case Constants.FieldTypeNameLcaseCSSFile:
+                    case constants.FieldTypeNameLcaseCSSFile:
                     case "css file":
-                        returnTypeId = Constants.FieldTypeIdFileCSS;
+                        returnTypeId = constants.FieldTypeIdFileCSS;
                         break;
-                    case Constants.FieldTypeNameLcaseXMLFile:
+                    case constants.FieldTypeNameLcaseXMLFile:
                     case "xml file":
-                        returnTypeId = Constants.FieldTypeIdFileXML;
+                        returnTypeId = constants.FieldTypeIdFileXML;
                         break;
-                    case Constants.FieldTypeNameLcaseJavascriptFile:
+                    case constants.FieldTypeNameLcaseJavascriptFile:
                     case "javascript file":
                     case "js file":
                     case "jsfile":
-                        returnTypeId = Constants.FieldTypeIdFileJavascript;
+                        returnTypeId = constants.FieldTypeIdFileJavascript;
                         break;
-                    case Constants.FieldTypeNameLcaseText:
-                        returnTypeId = Constants.FieldTypeIdText;
+                    case constants.FieldTypeNameLcaseText:
+                        returnTypeId = constants.FieldTypeIdText;
                         break;
                     case "autoincrement":
-                        returnTypeId = Constants.FieldTypeIdAutoIdIncrement;
+                        returnTypeId = constants.FieldTypeIdAutoIdIncrement;
                         break;
-                    case Constants.FieldTypeNameLcaseHTML:
-                        returnTypeId = Constants.FieldTypeIdHTML;
+                    case constants.FieldTypeNameLcaseHTML:
+                        returnTypeId = constants.FieldTypeIdHTML;
                         break;
-                    case Constants.FieldTypeNameLcaseHTMLFile:
+                    case constants.FieldTypeNameLcaseHTMLFile:
                     case "html file":
-                        returnTypeId = Constants.FieldTypeIdFileHTML;
+                        returnTypeId = constants.FieldTypeIdFileHTML;
                         break;
                     default:
                         //
                         // Bad field type is a text field
                         //
-                        returnTypeId = Constants.FieldTypeIdText;
+                        returnTypeId = constants.FieldTypeIdText;
                         break;
                 }
             } catch (Exception ex) {
@@ -1283,7 +1287,7 @@ namespace Contensive.Processor.Controllers {
                 if (string.IsNullOrEmpty(ContentName)) {
                     throw new ArgumentException("ContentName cannot be blank");
                 } else {
-                    CDefModel CDef = CDefModel.create(core, ContentName);
+                    CDefModel CDef = CDefModel.getCdef(core, ContentName);
                     if (CDef == null) {
                         throw (new ApplicationException("No content found For [" + ContentName + "]"));
                     } else if (CDef.id <= 0) {
@@ -1307,7 +1311,7 @@ namespace Contensive.Processor.Controllers {
                         }
                         //
                         // ----- fixup the criteria to include the ContentControlID(s) / EditSourceID
-                        string sqlContentCriteria = CDef.legacyContentControlCriteria;
+                        string sqlContentCriteria = CDef.contentControlCriteria;
                         if (string.IsNullOrEmpty(sqlContentCriteria)) {
                             sqlContentCriteria = "(1=1)";
                         } else {
@@ -1376,7 +1380,7 @@ namespace Contensive.Processor.Controllers {
                                 contentSet.PageNumber = 1;
                             }
                             if (contentSet.PageSize < 0) {
-                                contentSet.PageSize = Constants.maxLongValue;
+                                contentSet.PageSize = constants.maxLongValue;
                             } else if (contentSet.PageSize == 0) {
                                 contentSet.PageSize = pageSizeDefault;
                             }
@@ -1417,7 +1421,7 @@ namespace Contensive.Processor.Controllers {
                 if (string.IsNullOrEmpty(ContentName)) {
                     throw new ArgumentException("ContentName cannot be blank");
                 } else {
-                    CDefModel CDef = CDefModel.create(core, ContentName);
+                    CDefModel CDef = CDefModel.getCdef(core, ContentName);
                     if (CDef == null) {
                         throw (new ApplicationException("No content found For [" + ContentName + "]"));
                     } else if (CDef.id <= 0) {
@@ -1560,11 +1564,11 @@ namespace Contensive.Processor.Controllers {
                                 fieldName = field.nameLc;
                                 string Filename = null;
                                 switch (field.fieldTypeId) {
-                                    case Constants.FieldTypeIdFile:
-                                    case Constants.FieldTypeIdFileImage:
-                                    case Constants.FieldTypeIdFileCSS:
-                                    case Constants.FieldTypeIdFileJavascript:
-                                    case Constants.FieldTypeIdFileXML:
+                                    case constants.FieldTypeIdFile:
+                                    case constants.FieldTypeIdFileImage:
+                                    case constants.FieldTypeIdFileCSS:
+                                    case constants.FieldTypeIdFileJavascript:
+                                    case constants.FieldTypeIdFileXML:
                                         //
                                         // public content files
                                         //
@@ -1574,8 +1578,8 @@ namespace Contensive.Processor.Controllers {
                                             //Call core.cdnFiles.deleteFile(core.cdnFiles.joinPath(core.appConfig.cdnFilesNetprefix, Filename))
                                         }
                                         break;
-                                    case Constants.FieldTypeIdFileText:
-                                    case Constants.FieldTypeIdFileHTML:
+                                    case constants.FieldTypeIdFileText:
+                                    case constants.FieldTypeIdFileHTML:
                                         //
                                         // private files
                                         //
@@ -1617,7 +1621,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="pageSize"></param>
         /// <param name="pageNumber"></param>
         /// <returns></returns>
-        public int csOpenSql(string sql, string dataSourceName = "default", int pageSize = 9999, int pageNumber = 1) {
+        public int csOpenSql(string sql, string dataSourceName = "", int pageSize = 9999, int pageNumber = 1) {
             int returnCs = -1;
             try {
                 returnCs = csInit(core.session.user.id);
@@ -2068,7 +2072,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // CS is SQL-based, use the contentname
                             //
-                            TableName = CdefController.getContentTablename(core, ContentName);
+                            TableName = CDefModel.getContentTablename(core, ContentName);
                         } else {
                             //
                             // no Contentname given
@@ -2081,9 +2085,9 @@ namespace Contensive.Processor.Controllers {
                         if (fieldTypeId == 0) {
                             if (string.IsNullOrEmpty(ContentName)) {
                                 if (string.IsNullOrEmpty(OriginalFilename)) {
-                                    fieldTypeId = Constants.FieldTypeIdText;
+                                    fieldTypeId = constants.FieldTypeIdText;
                                 } else {
-                                    fieldTypeId = Constants.FieldTypeIdFile;
+                                    fieldTypeId = constants.FieldTypeIdFile;
                                 }
                             } else if (tempVar.writeable) {
                                 //
@@ -2093,9 +2097,9 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // -- else assume text
                                 if (string.IsNullOrEmpty(OriginalFilename)) {
-                                    fieldTypeId = Constants.FieldTypeIdText;
+                                    fieldTypeId = constants.FieldTypeIdText;
                                 } else {
-                                    fieldTypeId = Constants.FieldTypeIdFile;
+                                    fieldTypeId = constants.FieldTypeIdFile;
                                 }
                             }
                         }
@@ -2210,7 +2214,7 @@ namespace Contensive.Processor.Controllers {
                         throw new ApplicationException("Cannot save this dataset because it is read-only.");
                     } else {
                         string OldFilename = csGetText(CSPointer, FieldName);
-                        string Filename = csGetFieldFilename(CSPointer, FieldName, "", ContentName, Constants.FieldTypeIdFileText);
+                        string Filename = csGetFieldFilename(CSPointer, FieldName, "", ContentName, constants.FieldTypeIdFileText);
                         if (OldFilename != Filename) {
                             //
                             // Filename changed, mark record changed
@@ -2267,24 +2271,23 @@ namespace Contensive.Processor.Controllers {
         /// <param name="MemberID"></param>
         /// <returns></returns>
         ///
-        /// deprecated - db layer should not call conent layer
-        //public int insertContentRecordGetID(string ContentName, int MemberID) {
-        //    int result = -1;
-        //    try {
-        //        int CS = csInsertRecord(ContentName, MemberID);
-        //        if (!csOk(CS)) {
-        //            csClose(ref CS);
-        //            throw new ApplicationException("could not insert record in content [" + ContentName + "]");
-        //        } else {
-        //            result = csGetInteger(CS, "ID");
-        //        }
-        //        csClose(ref CS);
-        //    } catch (Exception ex) {
-        //        LogController.handleError( core,ex);
-        //        throw;
-        //    }
-        //    return result;
-        //}
+        public int insertContentRecordGetID(string ContentName, int MemberID) {
+            int result = -1;
+            try {
+                int CS = csInsertRecord(ContentName, MemberID);
+                if (!csOk(CS)) {
+                    csClose(ref CS);
+                    throw new ApplicationException("could not insert record in content [" + ContentName + "]");
+                } else {
+                    result = csGetInteger(CS, "ID");
+                }
+                csClose(ref CS);
+            } catch (Exception ex) {
+                LogController.handleError( core,ex);
+                throw;
+            }
+            return result;
+        }
         //
         //========================================================================
         /// <summary>
@@ -2332,7 +2335,7 @@ namespace Contensive.Processor.Controllers {
                 } else if (string.IsNullOrEmpty(Criteria.Trim())) {
                     throw new ArgumentException("criteria cannot be blank");
                 } else {
-                    CDef = Models.Domain.CDefModel.create(core, ContentName);
+                    CDef = Models.Domain.CDefModel.getCdef(core, ContentName);
                     if (CDef == null) {
                         throw new ArgumentException("ContentName [" + ContentName + "] was not found");
                     } else if (CDef.id == 0) {
@@ -2385,7 +2388,7 @@ namespace Contensive.Processor.Controllers {
                 if (string.IsNullOrEmpty(ContentName.Trim())) {
                     throw new ArgumentException("ContentName cannot be blank");
                 } else {
-                    CDef = Models.Domain.CDefModel.create(core, ContentName);
+                    CDef = Models.Domain.CDefModel.getCdef(core, ContentName);
                     if (CDef == null) {
                         throw new ApplicationException("content [" + ContentName + "] could Not be found.");
                     } else if (CDef.id <= 0) {
@@ -2419,32 +2422,32 @@ namespace Contensive.Processor.Controllers {
                                             // General case
                                             //
                                             switch (field.fieldTypeId) {
-                                                case Constants.FieldTypeIdAutoIdIncrement:
+                                                case constants.FieldTypeIdAutoIdIncrement:
                                                     //
                                                     // cannot insert an autoincremnt
                                                     //
                                                     break;
-                                                case Constants.FieldTypeIdRedirect:
-                                                case Constants.FieldTypeIdManyToMany:
+                                                case constants.FieldTypeIdRedirect:
+                                                case constants.FieldTypeIdManyToMany:
                                                     //
                                                     // ignore these fields, they have no associated DB field
                                                     //
                                                     break;
-                                                case Constants.FieldTypeIdBoolean:
+                                                case constants.FieldTypeIdBoolean:
                                                     sqlList.add(FieldName, encodeSQLBoolean(GenericController.encodeBoolean(field.defaultValue)));
                                                     break;
-                                                case Constants.FieldTypeIdCurrency:
-                                                case Constants.FieldTypeIdFloat:
+                                                case constants.FieldTypeIdCurrency:
+                                                case constants.FieldTypeIdFloat:
                                                     sqlList.add(FieldName, encodeSQLNumber(GenericController.encodeNumber(field.defaultValue)));
                                                     break;
-                                                case Constants.FieldTypeIdInteger:
-                                                case Constants.FieldTypeIdMemberSelect:
+                                                case constants.FieldTypeIdInteger:
+                                                case constants.FieldTypeIdMemberSelect:
                                                     sqlList.add(FieldName, encodeSQLNumber(GenericController.encodeInteger(field.defaultValue)));
                                                     break;
-                                                case Constants.FieldTypeIdDate:
+                                                case constants.FieldTypeIdDate:
                                                     sqlList.add(FieldName, encodeSQLDate(GenericController.encodeDate(field.defaultValue)));
                                                     break;
-                                                case Constants.FieldTypeIdLookup:
+                                                case constants.FieldTypeIdLookup:
                                                     //
                                                     // refactor --
                                                     // This is a problem - the defaults should come in as the ID values, not the names
@@ -2455,7 +2458,7 @@ namespace Contensive.Processor.Controllers {
                                                         DefaultValueText = "null";
                                                     } else {
                                                         if (field.lookupContentID != 0) {
-                                                            LookupContentName = CdefController.getContentNameByID(core, field.lookupContentID);
+                                                            LookupContentName = Models.Domain.CDefModel.getContentNameByID(core, field.lookupContentID);
                                                             if (!string.IsNullOrEmpty(LookupContentName)) {
                                                                 DefaultValueText = getRecordID(LookupContentName, DefaultValueText).ToString();
                                                             }
@@ -2604,14 +2607,14 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 int sourceFieldTypeId = csGetFieldTypeId(CSSource, FieldName);
                                 switch (sourceFieldTypeId) {
-                                    case Constants.FieldTypeIdRedirect:
-                                    case Constants.FieldTypeIdManyToMany:
+                                    case constants.FieldTypeIdRedirect:
+                                    case constants.FieldTypeIdManyToMany:
                                         break;
-                                    case Constants.FieldTypeIdFile:
-                                    case Constants.FieldTypeIdFileImage:
-                                    case Constants.FieldTypeIdFileCSS:
-                                    case Constants.FieldTypeIdFileXML:
-                                    case Constants.FieldTypeIdFileJavascript:
+                                    case constants.FieldTypeIdFile:
+                                    case constants.FieldTypeIdFileImage:
+                                    case constants.FieldTypeIdFileCSS:
+                                    case constants.FieldTypeIdFileXML:
+                                    case constants.FieldTypeIdFileJavascript:
                                         //
                                         // ----- cdn file
                                         //
@@ -2622,8 +2625,8 @@ namespace Contensive.Processor.Controllers {
                                             core.cdnFiles.copyFile(SourceFilename, DestFilename);
                                         }
                                         break;
-                                    case Constants.FieldTypeIdFileText:
-                                    case Constants.FieldTypeIdFileHTML:
+                                    case constants.FieldTypeIdFileText:
+                                    case constants.FieldTypeIdFileHTML:
                                         //
                                         // ----- private file
                                         //
@@ -2741,8 +2744,8 @@ namespace Contensive.Processor.Controllers {
                                 DataTable rs = null;
                                 if (tempVar.CDef.fields.ContainsKey("id")) {
                                     RecordID = GenericController.encodeInteger(csGetValue(CSPointer, "id"));
-                                    ContentName = CdefController.getContentNameByID(core, field.manyToManyRuleContentID);
-                                    DbTable = CdefController.getContentTablename(core, ContentName);
+                                    ContentName = Models.Domain.CDefModel.getContentNameByID(core, field.manyToManyRuleContentID);
+                                    DbTable = Models.Domain.CDefModel.getContentTablename(core, ContentName);
                                     SQL = "Select " + field.ManyToManyRuleSecondaryField + " from " + DbTable + " where " + field.ManyToManyRulePrimaryField + "=" + RecordID;
                                     rs = executeQuery(SQL);
                                     if (DbController.isDataTableOk(rs)) {
@@ -2792,7 +2795,7 @@ namespace Contensive.Processor.Controllers {
                                             //
                                             if (FieldValueVariant.IsNumeric()) {
                                                 fieldLookupId = field.lookupContentID;
-                                                LookupContentName = CdefController.getContentNameByID(core, fieldLookupId);
+                                                LookupContentName = Models.Domain.CDefModel.getContentNameByID(core, fieldLookupId);
                                                 LookupList = field.lookupList;
                                                 if (!string.IsNullOrEmpty(LookupContentName)) {
                                                     //
@@ -3332,13 +3335,14 @@ namespace Contensive.Processor.Controllers {
                         // ----- Do the unique check on the content table, if necessary
                         //
                         if (!string.IsNullOrEmpty(SQLCriteriaUnique)) {
-                            string sqlUnique = "SELECT ID FROM " + contentSet.CDef.tableName + " WHERE (ID<>" + id + ")AND(" + SQLCriteriaUnique + ")and(" + contentSet.CDef.legacyContentControlCriteria + ");";
+                            string sqlUnique = "SELECT ID FROM " + contentSet.CDef.tableName + " WHERE (ID<>" + id + ")AND(" + SQLCriteriaUnique + ")and(" + contentSet.CDef.contentControlCriteria + ");";
                             using (DataTable dt = executeQuery(sqlUnique, contentSet.CDef.dataSourceName)) {
                                 //
                                 // -- unique violation
                                 if (dt.Rows.Count > 0) {
-                                    LogController.handleError(core, new ApplicationException(("Can not save record to content [" + contentSet.CDef.name + "] because it would create a non-unique record for one or more of the following field(s) [" + UniqueViolationFieldList + "]")));
+                                    LogController.logWarn(core, "Can not save record to content [" + contentSet.CDef.name + "] because it would create a non-unique record for one or more of the following field(s) [" + UniqueViolationFieldList + "]");
                                     return;
+                                    //throw new ApplicationException(("Can not save record to content [" + contentSet.CDef.name + "] because it would create a non-unique record for one or more of the following field(s) [" + UniqueViolationFieldList + "]"));
                                 }
                             }
                         }
@@ -3353,7 +3357,6 @@ namespace Contensive.Processor.Controllers {
                                 } else {
                                     executeNonQuery(SQLUpdate, contentSet.CDef.dataSourceName);
                                 }
-                                core.cache.invalidateDbRecord(id, contentSet.CDef.tableName, contentSet.CDef.dataSourceName);
                             }
                         }
                         contentSet.LastUsed = DateTime.Now;
@@ -3605,7 +3608,7 @@ namespace Contensive.Processor.Controllers {
                 } else if (RecordID <= 0) {
                     throw new ArgumentException("recordid is not valid");
                 } else {
-                    CDef = Models.Domain.CDefModel.create(core, ContentName);
+                    CDef = Models.Domain.CDefModel.getCdef(core, ContentName);
                     if (CDef.id == 0) {
                         throw new ApplicationException("contentname [" + ContentName + "] is not a valid content");
                     } else {
@@ -3730,46 +3733,26 @@ namespace Contensive.Processor.Controllers {
         /// csv_DeleteTableRecord
         /// </summary>
         /// <param name="DataSourceName"></param>
-        /// <param name="tableName"></param>
-        /// <param name="recordId"></param>
+        /// <param name="TableName"></param>
+        /// <param name="RecordID"></param>
         //
-        public void deleteTableRecord(int recordId, string tableName, string dataSourceName = "default") {
+        public void deleteTableRecord(int RecordID, string TableName, string DataSourceName = "") {
             try {
-                if (string.IsNullOrEmpty(tableName.Trim())) {
+                if (string.IsNullOrEmpty(TableName.Trim())) {
                     throw new ApplicationException("tablename cannot be blank");
-                } else if (recordId <= 0) {
-                    throw new ApplicationException("record id is not valid [" + recordId + "]");
+                } else if (RecordID <= 0) {
+                    throw new ApplicationException("record id is not valid [" + RecordID + "]");
                 } else {
-                    core.db.executeNonQuery("delete from " + tableName + " where id=" + recordId, dataSourceName);
+                    deleteTableRecords(TableName, "ID=" + RecordID, DataSourceName);
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.handleError( core,ex);
                 throw;
             }
         }
-        /// <summary>
-        /// Delete a record with matching guid
-        /// </summary>
-        /// <param name="guid"></param>
-        /// <param name="tableName"></param>
-        /// <param name="dataSourceName"></param>
-        public void deleteTableRecord(string guid, string tableName, string dataSourceName = "default") {
-            try {
-                if (string.IsNullOrWhiteSpace(tableName)) {
-                    throw new ApplicationException("tablename cannot be blank");
-                } else if (string.IsNullOrWhiteSpace(guid)) {
-                    throw new ApplicationException("guid cannot be blank");
-                } else {
-                    core.db.executeNonQuery("delete from " + tableName + " where ccguid=" + encodeSQLText(guid),dataSourceName);
-                }
-            } catch (Exception ex) {
-                LogController.handleError(core, ex);
-                throw;
-            }
-        }
-        //
-        public void deprecate_argsreversed_deleteTableRecord(string TableName, int RecordID, string dataSourceName = "default") {
-            deleteTableRecord(RecordID, TableName, dataSourceName);
+        // todo deprecate
+        public void deprecate_argsreversed_deleteTableRecord(string TableName, int RecordID, string DataSourceName = "") {
+            deleteTableRecord(RecordID, TableName, DataSourceName);
         }
             //
             //==================================================================================================
@@ -3794,8 +3777,8 @@ namespace Contensive.Processor.Controllers {
                 } else {
                     ContentRecordKey = ContentID.ToString() + "." + RecordID.ToString();
                     Criteria = "(ContentRecordKey=" + encodeSQLText(ContentRecordKey) + ")";
-                    ContentName = CdefController.getContentNameByID(core, ContentID);
-                    TableName = CdefController.getContentTablename(core, ContentName);
+                    ContentName = Models.Domain.CDefModel.getContentNameByID(core, ContentID);
+                    TableName = Models.Domain.CDefModel.getContentTablename(core, ContentName);
                     //
                     // ----- Table Specific rules
                     //
@@ -4302,16 +4285,12 @@ namespace Contensive.Processor.Controllers {
                     // --- Find/Create the Content Definition
                     //----------------------------------------------------------------
                     //
-                    ContentID = CdefController.getContentId(core, ContentName);
+                    ContentID = Models.Domain.CDefModel.getContentId(core, ContentName);
                     if (ContentID <= 0) {
                         //
                         // ----- Content definition not found, create it
                         //
-                        CdefController.verifyContent_returnId(core, new CDefModel() {
-                             dataSourceName = DataSource.name,
-                              tableName = TableName,
-                              name = ContentName
-                        });
+                        Models.Domain.CDefModel.addContent(core, true, DataSource, TableName, ContentName);
                         //ContentID = csv_GetContentID(ContentName)
                         SQL = "Select ID from ccContent where name=" + core.db.encodeSQLText(ContentName);
                         dt = core.db.executeQuery(SQL);
@@ -4578,7 +4557,7 @@ namespace Contensive.Processor.Controllers {
                         field.defaultValue = "0";
                         break;
                 }
-                CdefController.verifyContentField_returnID(core, ContentName, field);
+                Models.Domain.CDefModel.verifyCDefField_ReturnID(core, ContentName, field);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
@@ -4742,10 +4721,10 @@ namespace Contensive.Processor.Controllers {
                         if (KeySplit.GetUpperBound(0) == 1) {
                             ContentID = GenericController.encodeInteger(KeySplit[0]);
                             if (ContentID != 0) {
-                                ContentName = CdefController.getContentNameByID(core, ContentID);
+                                ContentName = Models.Domain.CDefModel.getContentNameByID(core, ContentID);
                                 RecordID = GenericController.encodeInteger(KeySplit[1]);
                                 if (!string.IsNullOrEmpty(ContentName) & RecordID != 0) {
-                                    if (CdefController.getContentTablename(core, ContentName) == "ccPageContent") {
+                                    if (Models.Domain.CDefModel.getContentTablename(core, ContentName) == "ccPageContent") {
                                         CSPointer = core.db.csOpenRecord(ContentName, RecordID, false, false, "TemplateID,ParentID");
                                         if (csOk(CSPointer)) {
                                             recordfound = true;
@@ -4758,7 +4737,7 @@ namespace Contensive.Processor.Controllers {
                                             // This content record does not exist - remove any records with this ContentRecordKey pointer
                                             //
                                             deleteContentRecords("Content Watch", "ContentRecordKey=" + encodeSQLText(ContentRecordKey));
-                                            core.db.deleteContentRules(CdefController.getContentId(core, ContentName), RecordID);
+                                            core.db.deleteContentRules(Models.Domain.CDefModel.getContentId(core, ContentName), RecordID);
                                         } else {
 
                                             if (templateId != 0) {
@@ -4769,8 +4748,8 @@ namespace Contensive.Processor.Controllers {
                                                 csClose(ref CSPointer);
                                             }
                                             if (string.IsNullOrEmpty(result) && ParentID != 0) {
-                                                TableName = CdefController.getContentTablename(core, ContentName);
-                                                DataSource = CdefController.getContentDataSource(core, ContentName);
+                                                TableName = Models.Domain.CDefModel.getContentTablename(core, ContentName);
+                                                DataSource = Models.Domain.CDefModel.getContentDataSource(core, ContentName);
                                                 CSPointer = csOpenSql("Select ContentControlID from " + TableName + " where ID=" + RecordID, DataSource);
                                                 if (csOk(CSPointer)) {
                                                     ParentContentID = GenericController.encodeInteger(csGetText(CSPointer, "ContentControlID"));
@@ -4926,7 +4905,7 @@ namespace Contensive.Processor.Controllers {
                     RecordID = (core.db.csGetInteger(iCSPointer, "ID"));
                     RecordName = core.db.csGetText(iCSPointer, "Name");
                     ContentControlID = (core.db.csGetInteger(iCSPointer, "contentcontrolid"));
-                    ContentName = CdefController.getContentNameByID(core, ContentControlID);
+                    ContentName = Models.Domain.CDefModel.getContentNameByID(core, ContentControlID);
                     if (!string.IsNullOrEmpty(ContentName)) {
                         result = AdminUIController.getRecordEditLink(core,ContentName, RecordID, GenericController.encodeBoolean(AllowCut), RecordName, core.session.isEditing(ContentName));
                     }
