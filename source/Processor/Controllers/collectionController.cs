@@ -4556,6 +4556,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     //
                     // -- update Content Field Records and Content Field Help records
+                    CDefModel cdefFieldHelp = CDefModel.create(core, ContentFieldHelpModel.contentName);
                     foreach (var nameValuePair in cdef.fields) {
                         CDefFieldModel field = nameValuePair.Value;
                         int fieldId = 0;
@@ -4572,7 +4573,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // -- no current field help record, if adding help, create record
                                 if ( (!string.IsNullOrWhiteSpace(field.helpDefault)) | (!string.IsNullOrWhiteSpace(field.helpCustom)) ) {
-                                    fieldHelp = ContentFieldHelpModel.addDefault(core, cdef);
+                                    fieldHelp = ContentFieldHelpModel.addEmpty(core);
                                     fieldHelp.helpDefault = field.helpDefault;
                                     fieldHelp.helpCustom = field.helpCustom;
                                     fieldHelp.save(core);

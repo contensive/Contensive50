@@ -284,68 +284,68 @@ namespace Contensive.Processor.Models.Db {
                     foreach (PropertyInfo modelProperty in result.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
                         string propertyName = modelProperty.Name;
                         string propertyValue = "";
-                        if (cdef.fields.ContainsKey(propertyName)) {
-                            propertyValue = cdef.fields[propertyName].defaultValue;
-                        }
-                        switch (propertyName.ToLower()) {
-                            case "specialcasefield":
-                                break;
-                            default:
-                                switch (modelProperty.PropertyType.Name) {
-                                    case "Int32": {
-                                            modelProperty.SetValue(result, GenericController.encodeInteger(propertyValue), null);
-                                            break;
-                                        }
-                                    case "Boolean": {
-                                            modelProperty.SetValue(result, GenericController.encodeBoolean(propertyValue), null);
-                                            break;
-                                        }
-                                    case "DateTime": {
-                                            modelProperty.SetValue(result, GenericController.encodeDate(propertyValue), null);
-                                            break;
-                                        }
-                                    case "Double": {
-                                            modelProperty.SetValue(result, GenericController.encodeNumber(propertyValue), null);
-                                            break;
-                                        }
-                                    case "String": {
-                                            modelProperty.SetValue(result, propertyValue, null);
-                                            break;
-                                        }
-                                    case "FieldTypeTextFile": {
-                                            //
-                                            // -- cdn files
-                                            FieldTypeTextFile instanceFileType = new FieldTypeTextFile {filename = propertyValue};
-                                            modelProperty.SetValue(result, instanceFileType);
-                                            break;
-                                        }
-                                    case "FieldTypeJavascriptFile": {
-                                            //
-                                            // -- cdn files
-                                            FieldTypeJavascriptFile instanceFileType = new FieldTypeJavascriptFile {filename = propertyValue};
-                                            modelProperty.SetValue(result, instanceFileType);
-                                            break;
-                                        }
-                                    case "FieldTypeCSSFile": {
-                                            //
-                                            // -- cdn files
-                                            FieldTypeCSSFile instanceFileType = new FieldTypeCSSFile {filename = propertyValue};
-                                            modelProperty.SetValue(result, instanceFileType);
-                                            break;
-                                        }
-                                    case "FieldTypeHTMLFile": {
-                                            //
-                                            // -- private files
-                                            FieldTypeHTMLFile instanceFileType = new FieldTypeHTMLFile {filename = propertyValue};
-                                            modelProperty.SetValue(result, instanceFileType);
-                                            break;
-                                        }
-                                    default: {
-                                            modelProperty.SetValue(result, propertyValue, null);
-                                            break;
-                                        }
-                                }
-                                break;
+                        if (cdef.fields.ContainsKey(propertyName.ToLower())) {
+                            propertyValue = cdef.fields[propertyName.ToLower()].defaultValue;
+                            switch (propertyName.ToLower()) {
+                                case "specialcasefield":
+                                    break;
+                                default:
+                                    switch (modelProperty.PropertyType.Name) {
+                                        case "Int32": {
+                                                modelProperty.SetValue(result, GenericController.encodeInteger(propertyValue), null);
+                                                break;
+                                            }
+                                        case "Boolean": {
+                                                modelProperty.SetValue(result, GenericController.encodeBoolean(propertyValue), null);
+                                                break;
+                                            }
+                                        case "DateTime": {
+                                                modelProperty.SetValue(result, GenericController.encodeDate(propertyValue), null);
+                                                break;
+                                            }
+                                        case "Double": {
+                                                modelProperty.SetValue(result, GenericController.encodeNumber(propertyValue), null);
+                                                break;
+                                            }
+                                        case "String": {
+                                                modelProperty.SetValue(result, propertyValue, null);
+                                                break;
+                                            }
+                                        case "FieldTypeTextFile": {
+                                                //
+                                                // -- cdn files
+                                                FieldTypeTextFile instanceFileType = new FieldTypeTextFile { filename = propertyValue };
+                                                modelProperty.SetValue(result, instanceFileType);
+                                                break;
+                                            }
+                                        case "FieldTypeJavascriptFile": {
+                                                //
+                                                // -- cdn files
+                                                FieldTypeJavascriptFile instanceFileType = new FieldTypeJavascriptFile { filename = propertyValue };
+                                                modelProperty.SetValue(result, instanceFileType);
+                                                break;
+                                            }
+                                        case "FieldTypeCSSFile": {
+                                                //
+                                                // -- cdn files
+                                                FieldTypeCSSFile instanceFileType = new FieldTypeCSSFile { filename = propertyValue };
+                                                modelProperty.SetValue(result, instanceFileType);
+                                                break;
+                                            }
+                                        case "FieldTypeHTMLFile": {
+                                                //
+                                                // -- private files
+                                                FieldTypeHTMLFile instanceFileType = new FieldTypeHTMLFile { filename = propertyValue };
+                                                modelProperty.SetValue(result, instanceFileType);
+                                                break;
+                                            }
+                                        default: {
+                                                modelProperty.SetValue(result, propertyValue, null);
+                                                break;
+                                            }
+                                    }
+                                    break;
+                            }
                         }
                     }
                 }
