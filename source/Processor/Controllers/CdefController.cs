@@ -128,8 +128,6 @@ namespace Contensive.Processor.Controllers {
                 if (core.doc.contentNameIdDictionary.ContainsKey(contentName.ToLower())) {
                     returnId = core.doc.contentNameIdDictionary[contentName.ToLower()];
                 } else {
-
-                    DataTable dt = core.db.executeQuery("");
                     ContentModel content = ContentModel.createByUniqueName(core, contentName);
                     if (content != null) {
                         core.doc.contentNameIdDictionary.Add(contentName.ToLower(), content.id);

@@ -183,9 +183,9 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static AddonModel createDefault(CoreController core) {
-            return createDefault<AddonModel>(core);
-        }
+        //public static AddonModel createDefault(CoreController core) {
+        //    return createDefault<AddonModel>(core);
+        //}
         //
         //====================================================================================================
         /// <summary>

@@ -140,9 +140,9 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static OrganizationModel createDefault(CoreController core) {
-            return createDefault<OrganizationModel>(core);
-        }
+        //public static OrganizationModel createDefault(CoreController core) {
+        //    return createDefault<OrganizationModel>(core);
+        //}
         //
         //====================================================================================================
         /// <summary>

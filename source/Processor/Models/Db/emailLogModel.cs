@@ -121,9 +121,9 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static EmailLogModel createDefault(CoreController core) {
-            return createDefault<EmailLogModel>(core);
-        }
+        //public static EmailLogModel createDefault(CoreController core) {
+        //    return createDefault<EmailLogModel>(core);
+        //}
         //
         //====================================================================================================
         /// <summary>

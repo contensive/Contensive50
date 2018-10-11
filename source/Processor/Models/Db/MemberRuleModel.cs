@@ -124,9 +124,9 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static MemberRuleModel createDefault(CoreController core) {
-            return createDefault<MemberRuleModel>(core);
-        }
+        //public static MemberRuleModel createDefault(CoreController core) {
+        //    return createDefault<MemberRuleModel>(core);
+        //}
         //
         //====================================================================================================
         /// <summary>

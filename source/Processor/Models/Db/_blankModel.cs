@@ -114,11 +114,11 @@ namespace Contensive.Processor.Models.Db {
         public static int getRecordId(CoreController core, string ccGuid) {
             return BaseModel.getRecordId<_BlankModel>(core, ccGuid);
         }
-        //
-        //====================================================================================================
-        public static _BlankModel createDefault(CoreController core) {
-            return createDefault<_BlankModel>(core);
-        }
+        ////
+        ////====================================================================================================
+        //public static _BlankModel createDefault(CoreController core) {
+        //    return createDefault<_BlankModel>(core);
+        //}
         //
         //====================================================================================================
         /// <summary>

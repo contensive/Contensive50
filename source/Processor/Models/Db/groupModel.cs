@@ -113,9 +113,9 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static GroupModel createDefault(CoreController core) {
-            return createDefault<GroupModel>(core);
-        }
+        //public static GroupModel createDefault(CoreController core) {
+        //    return createDefault<GroupModel>(core);
+        //}
         //
         //====================================================================================================
         /// <summary>

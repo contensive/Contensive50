@@ -129,9 +129,9 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static EmailModel createDefault(CoreController core) {
-            return createDefault<EmailModel>(core);
-        }
+        //public static EmailModel createDefault(CoreController core) {
+        //    return createDefault<EmailModel>(core);
+        //}
         //
         //====================================================================================================
         /// <summary>

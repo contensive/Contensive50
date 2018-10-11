@@ -131,9 +131,9 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static LibraryFilesModel createDefault(CoreController core) {
-            return createDefault<LibraryFilesModel>(core);
-        }
+        //public static LibraryFilesModel createDefault(CoreController core) {
+        //    return createDefault<LibraryFilesModel>(core);
+        //}
         //
         //====================================================================================================
         /// <summary>

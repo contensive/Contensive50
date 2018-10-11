@@ -152,9 +152,9 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static ContentFieldModel createDefault(CoreController core) {
-            return createDefault<ContentFieldModel>(core);
-        }
+        //public static ContentFieldModel createDefault(CoreController core) {
+        //    return createDefault<ContentFieldModel>(core);
+        //}
         //
         //====================================================================================================
         /// <summary>

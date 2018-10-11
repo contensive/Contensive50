@@ -124,9 +124,9 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static GroupEmailModel createDefault(CoreController core) {
-            return createDefault<GroupEmailModel>(core);
-        }
+        //public static GroupEmailModel createDefault(CoreController core) {
+        //    return createDefault<GroupEmailModel>(core);
+        //}
         //
         //====================================================================================================
         /// <summary>

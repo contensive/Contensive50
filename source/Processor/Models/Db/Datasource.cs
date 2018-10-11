@@ -106,9 +106,9 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static DataSourceModel createDefault(CoreController core) {
-            return createDefault<DataSourceModel>(core);
-        }
+        //public static DataSourceModel createDefault(CoreController core) {
+        //    return createDefault<DataSourceModel>(core);
+        //}
         //
         //====================================================================================================
         public static Dictionary<string, DataSourceModel> getNameDict(CoreController core) {

@@ -136,9 +136,9 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static NavigatorEntryModel createDefault(CoreController core) {
-            return createDefault<NavigatorEntryModel>(core);
-        }
+        //public static NavigatorEntryModel createDefault(CoreController core) {
+        //    return createDefault<NavigatorEntryModel>(core);
+        //}
         //
         //====================================================================================================
         /// <summary>

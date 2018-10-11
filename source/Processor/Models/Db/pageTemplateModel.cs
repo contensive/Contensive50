@@ -131,9 +131,9 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static PageTemplateModel createDefault(CoreController core) {
-            return createDefault<PageTemplateModel>(core);
-        }
+        //public static PageTemplateModel createDefault(CoreController core) {
+        //    return createDefault<PageTemplateModel>(core);
+        //}
         //
         //====================================================================================================
         /// <summary>

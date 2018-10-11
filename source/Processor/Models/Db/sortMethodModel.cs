@@ -122,9 +122,9 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static SortMethodModel createDefault(CoreController core) {
-            return createDefault<SortMethodModel>(core);
-        }
+        //public static SortMethodModel createDefault(CoreController core) {
+        //    return createDefault<SortMethodModel>(core);
+        //}
         //
         //====================================================================================================
         /// <summary>

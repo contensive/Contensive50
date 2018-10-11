@@ -125,9 +125,9 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static LinkForwardModel createDefault(CoreController core) {
-            return createDefault<LinkForwardModel>(core);
-        }
+        //public static LinkForwardModel createDefault(CoreController core) {
+        //    return createDefault<LinkForwardModel>(core);
+        //}
         //
         //====================================================================================================
         /// <summary>

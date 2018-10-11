@@ -111,9 +111,9 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static AddonPageRuleModel createDefault(CoreController core) {
-            return createDefault<AddonPageRuleModel>(core);
-        }
+        //public static AddonPageRuleModel createDefault(CoreController core) {
+        //    return createDefault<AddonPageRuleModel>(core);
+        //}
         //
         //====================================================================================================
         /// <summary>

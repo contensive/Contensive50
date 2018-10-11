@@ -110,9 +110,9 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static CopyContentModel createDefault(CoreController core) {
-            return createDefault<CopyContentModel>(core);
-        }
+        //public static CopyContentModel createDefault(CoreController core) {
+        //    return createDefault<CopyContentModel>(core);
+        //}
         //
         //====================================================================================================
         /// <summary>

@@ -118,9 +118,9 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static GroupRuleModel createDefault(CoreController core) {
-            return createDefault<GroupRuleModel>(core);
-        }
+        //public static GroupRuleModel createDefault(CoreController core) {
+        //    return createDefault<GroupRuleModel>(core);
+        //}
         //
         //====================================================================================================
         /// <summary>

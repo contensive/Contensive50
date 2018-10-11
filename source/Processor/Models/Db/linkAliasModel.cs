@@ -125,9 +125,9 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static LinkAliasModel createDefault(CoreController core) {
-            return createDefault<LinkAliasModel>(core);
-        }
+        //public static LinkAliasModel createDefault(CoreController core) {
+        //    return createDefault<LinkAliasModel>(core);
+        //}
         //
         //====================================================================================================
         public static List<LinkAliasModel> createList(CoreController core, int pageId, string queryStringSuffix) {

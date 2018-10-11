@@ -122,9 +122,9 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static TableModel createDefault(CoreController core) {
-            return createDefault<TableModel>(core);
-        }
+        //public static TableModel createDefault(CoreController core) {
+        //    return createDefault<TableModel>(core);
+        //}
         //
         //====================================================================================================
         /// <summary>

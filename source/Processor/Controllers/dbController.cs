@@ -3730,24 +3730,44 @@ namespace Contensive.Processor.Controllers {
         /// csv_DeleteTableRecord
         /// </summary>
         /// <param name="DataSourceName"></param>
-        /// <param name="TableName"></param>
-        /// <param name="RecordID"></param>
+        /// <param name="tableName"></param>
+        /// <param name="recordId"></param>
         //
-        public void deleteTableRecord(int RecordID, string TableName, string dataSourceName = "default") {
+        public void deleteTableRecord(int recordId, string tableName, string dataSourceName = "default") {
             try {
-                if (string.IsNullOrEmpty(TableName.Trim())) {
+                if (string.IsNullOrEmpty(tableName.Trim())) {
                     throw new ApplicationException("tablename cannot be blank");
-                } else if (RecordID <= 0) {
-                    throw new ApplicationException("record id is not valid [" + RecordID + "]");
+                } else if (recordId <= 0) {
+                    throw new ApplicationException("record id is not valid [" + recordId + "]");
                 } else {
-                    deleteTableRecords(TableName, "ID=" + RecordID, dataSourceName);
+                    core.db.executeNonQuery("delete from " + tableName + " where id=" + recordId, dataSourceName);
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, ex);
                 throw;
             }
         }
-        // todo deprecate
+        /// <summary>
+        /// Delete a record with matching guid
+        /// </summary>
+        /// <param name="guid"></param>
+        /// <param name="tableName"></param>
+        /// <param name="dataSourceName"></param>
+        public void deleteTableRecord(string guid, string tableName, string dataSourceName = "default") {
+            try {
+                if (string.IsNullOrWhiteSpace(tableName)) {
+                    throw new ApplicationException("tablename cannot be blank");
+                } else if (string.IsNullOrWhiteSpace(guid)) {
+                    throw new ApplicationException("guid cannot be blank");
+                } else {
+                    core.db.executeNonQuery("delete from " + tableName + " where ccguid=" + encodeSQLText(guid),dataSourceName);
+                }
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+                throw;
+            }
+        }
+        //
         public void deprecate_argsreversed_deleteTableRecord(string TableName, int RecordID, string dataSourceName = "default") {
             deleteTableRecord(RecordID, TableName, dataSourceName);
         }

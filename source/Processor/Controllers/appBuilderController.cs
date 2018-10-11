@@ -78,6 +78,7 @@ namespace Contensive.Processor.Controllers {
                         root.Username = defaultRootUserUsername;
                         root.Password = defaultRootUserPassword;
                         root.Developer = true;
+                        root.contentControlID = CdefController.getContentId(core, "people");
                         try 
                             {
                             root.save(core);

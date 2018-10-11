@@ -177,9 +177,9 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static PersonModel createDefault(CoreController core) {
-            return createDefault<PersonModel>(core);
-        }
+        //public static PersonModel createDefault(CoreController core) {
+        //    return createDefault<PersonModel>(core);
+        //}
         //
         //====================================================================================================
         //

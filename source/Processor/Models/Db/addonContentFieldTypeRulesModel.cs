@@ -111,9 +111,9 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static AddonContentFieldTypeRulesModel createDefault(CoreController core) {
-            return createDefault<AddonContentFieldTypeRulesModel>(core);
-        }
+        //public static AddonContentFieldTypeRulesModel createDefault(CoreController core) {
+        //    return createDefault<AddonContentFieldTypeRulesModel>(core);
+        //}
         //
         //====================================================================================================
         /// <summary>

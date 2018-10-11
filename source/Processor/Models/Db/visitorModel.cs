@@ -121,11 +121,11 @@ namespace Contensive.Processor.Models.Db {
         public static int getRecordId(CoreController core, string ccGuid) {
             return BaseModel.getRecordId<VisitorModel>(core, ccGuid);
         }
-        //
-        //====================================================================================================
-        public static VisitorModel createDefault(CoreController core) {
-            return createDefault<VisitorModel>(core);
-        }
+        ////
+        ////====================================================================================================
+        //public static VisitorModel createDefault(CoreController core) {
+        //    return createDefault<VisitorModel>(core);
+        //}
         //
         //====================================================================================================
         /// <summary>

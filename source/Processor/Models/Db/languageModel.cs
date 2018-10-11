@@ -122,9 +122,9 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static LanguageModel createDefault(CoreController core) {
-            return createDefault<LanguageModel>(core);
-        }
+        //public static LanguageModel createDefault(CoreController core) {
+        //    return createDefault<LanguageModel>(core);
+        //}
         //
         //====================================================================================================
         /// <summary>

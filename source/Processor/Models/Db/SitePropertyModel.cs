@@ -117,9 +117,9 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static SitePropertyModel createDefault(CoreController core) {
-            return createDefault<SitePropertyModel>(core);
-        }
+        //public static SitePropertyModel createDefault(CoreController core) {
+        //    return createDefault<SitePropertyModel>(core);
+        //}
         //
         //====================================================================================================
         /// <summary>

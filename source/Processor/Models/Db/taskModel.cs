@@ -131,9 +131,9 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static TaskModel createDefault(CoreController core) {
-            return createDefault<TaskModel>(core);
-        }
+        //public static TaskModel createDefault(CoreController core) {
+        //    return createDefault<TaskModel>(core);
+        //}
         //
         //====================================================================================================
         /// <summary>

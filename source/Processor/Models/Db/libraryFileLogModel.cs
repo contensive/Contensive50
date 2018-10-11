@@ -124,9 +124,9 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static LibraryFileLogModel createDefault(CoreController core) {
-            return createDefault<LibraryFileLogModel>(core);
-        }
+        //public static LibraryFileLogModel createDefault(CoreController core) {
+        //    return createDefault<LibraryFileLogModel>(core);
+        //}
         //
         //====================================================================================================
         /// <summary>

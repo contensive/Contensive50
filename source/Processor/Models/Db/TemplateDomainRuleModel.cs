@@ -121,11 +121,11 @@ namespace Contensive.Processor.Models.Db {
         public static int getRecordId(CoreController core, string ccGuid) {
             return BaseModel.getRecordId<TemplateDomainRuleModel>(core, ccGuid);
         }
-        //
-        //====================================================================================================
-        public static TemplateDomainRuleModel createDefault(CoreController core) {
-            return createDefault<TemplateDomainRuleModel>(core);
-        }
+        ////
+        ////====================================================================================================
+        //public static TemplateDomainRuleModel createDefault(CoreController core) {
+        //    return createDefault<TemplateDomainRuleModel>(core);
+        //}
         //
         //====================================================================================================
         /// <summary>

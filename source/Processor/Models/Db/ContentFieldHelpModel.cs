@@ -113,9 +113,9 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static ContentFieldHelpModel createDefault(CoreController core) {
-            return createDefault<ContentFieldHelpModel>(core);
-        }
+        //public static ContentFieldHelpModel createDefault(CoreController core) {
+        //    return createDefault<ContentFieldHelpModel>(core);
+        //}
         //
         //====================================================================================================
         /// <summary>

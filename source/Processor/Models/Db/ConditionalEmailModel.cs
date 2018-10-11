@@ -114,10 +114,10 @@ namespace Contensive.Processor.Models.Db {
             return BaseModel.getRecordId<ConditionalEmailModel>(core, ccGuid);
         }
         //
-        //====================================================================================================
-        public static ConditionalEmailModel createDefault(CoreController core) {
-            return createDefault<ConditionalEmailModel>(core);
-        }
+        ////====================================================================================================
+        //public static ConditionalEmailModel createDefault(CoreController core) {
+        //    return createDefault<ConditionalEmailModel>(core);
+        //}
         //
         //====================================================================================================
         /// <summary>

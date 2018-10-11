@@ -123,9 +123,9 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static LayoutModel createDefault(CoreController core) {
-            return createDefault<LayoutModel>(core);
-        }
+        //public static LayoutModel createDefault(CoreController core) {
+        //    return createDefault<LayoutModel>(core);
+        //}
         //
         //====================================================================================================
         /// <summary>

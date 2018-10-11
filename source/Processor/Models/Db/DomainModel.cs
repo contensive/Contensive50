@@ -148,9 +148,9 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static DomainModel createDefault(CoreController core) {
-            return createDefault<DomainModel>(core);
-        }
+        //public static DomainModel createDefault(CoreController core) {
+        //    return createDefault<DomainModel>(core);
+        //}
         //
         //====================================================================================================
         public static Dictionary<string,DomainModel> createDictionary(CoreController core, string sqlCriteria) {

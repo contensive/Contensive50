@@ -110,9 +110,9 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static EmailDropModel createDefault(CoreController core) {
-            return createDefault<EmailDropModel>(core);
-        }
+        //public static EmailDropModel createDefault(CoreController core) {
+        //    return createDefault<EmailDropModel>(core);
+        //}
         //
         //====================================================================================================
         /// <summary>
