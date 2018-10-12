@@ -3,7 +3,7 @@ using System;
 using Contensive.BaseClasses;
 using Contensive.Processor.Models.Db;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.Constants;
+using static Contensive.Processor.constants;
 
 namespace Contensive.Processor.Controllers {
     /// <summary>

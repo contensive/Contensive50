@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 
 namespace Contensive.Processor {
-    public static class Constants {
+    public static class constants {
         //
         // -- data layers, 
         //      - only allow calls from top to bottom

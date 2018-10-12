@@ -5,7 +5,7 @@ using System.Data;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.Constants;
+using static Contensive.Processor.constants;
 using System.Linq;
 //
 namespace Contensive.Processor.Models.Domain {
@@ -683,6 +683,12 @@ namespace Contensive.Processor.Models.Domain {
             return returnCdef;
         }
         //
+        //====================================================================================================
+        /// <summary>
+        /// Get cache key for a cdef object in cache
+        /// </summary>
+        /// <param name="contentId"></param>
+        /// <returns></returns>
         public static string getCacheKey(int contentId) {
             return CacheController.getCacheKey_forObject("cdef", contentId.ToString());
         }

@@ -4,7 +4,7 @@ using System.Xml;
 using System.Collections.Generic;
 using Contensive.Processor.Models.Db;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.Constants;
+using static Contensive.Processor.constants;
 using System.Data;
 using System.Linq;
 using Contensive.Processor.Models.Domain;
@@ -265,7 +265,7 @@ namespace Contensive.Processor.Controllers {
                         domain.save(core);
                         //
                         landingPage.TemplateID = defaultTemplate.id;
-                        landingPage.copyfilename.content = Constants.defaultLandingPageHtml;
+                        landingPage.copyfilename.content = constants.defaultLandingPageHtml;
                         landingPage.save(core);
                         //
                         if (core.siteProperties.getInteger("LandingPageID", landingPage.id) == 0) {

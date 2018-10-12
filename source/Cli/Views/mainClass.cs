@@ -139,7 +139,7 @@ namespace Contensive.CLI {
                                         // -- housekeep app
                                         using (Contensive.Processor.CPClass cpApp = new Contensive.Processor.CPClass(appName)) {
                                             cpApp.Doc.SetProperty("force", "1");
-                                            cpApp.executeAddon(Contensive.Processor.Constants.addonGuidHousekeep, BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple);
+                                            cpApp.executeAddon(Contensive.Processor.constants.addonGuidHousekeep, BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple);
                                         }
                                     } else {
                                         //
@@ -148,7 +148,7 @@ namespace Contensive.CLI {
                                             String housekeepAppName = kvp.Key;
                                             using (Contensive.Processor.CPClass cpApp = new Contensive.Processor.CPClass(housekeepAppName)) {
                                                 cpApp.Doc.SetProperty("force", "1");
-                                                cpApp.executeAddon(Contensive.Processor.Constants.addonGuidHousekeep, BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple);
+                                                cpApp.executeAddon(Contensive.Processor.constants.addonGuidHousekeep, BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple);
                                             }
                                         }
                                     }

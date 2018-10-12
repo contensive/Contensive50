@@ -8,7 +8,7 @@ using System.Linq;
 using System.Xml.Linq;
 
 using Contensive.Processor;
-using static Contensive.Processor.Constants;
+using static Contensive.Processor.constants;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 

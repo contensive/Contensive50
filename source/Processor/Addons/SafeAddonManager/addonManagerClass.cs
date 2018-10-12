@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.Constants;
+using static Contensive.Processor.constants;
 //
 namespace Contensive.Addons.SafeAddonManager {
     public class addonManagerClass {
@@ -125,10 +125,10 @@ namespace Contensive.Addons.SafeAddonManager {
 
                 DbUpToDate = (dataBuildVersion == coreVersion);
                 //
-                Button = core.docProperties.getText(Constants.RequestNameButton);
+                Button = core.docProperties.getText(constants.RequestNameButton);
                 AllowInstallFromFolder = false;
                 GuidFieldName = "ccguid";
-                if (Button == Constants.ButtonCancel) {
+                if (Button == constants.ButtonCancel) {
                     //
                     // ----- redirect back to the root
                     //
@@ -138,13 +138,13 @@ namespace Contensive.Addons.SafeAddonManager {
                         //
                         // ----- Put up error message
                         //
-                        ButtonList = Constants.ButtonCancel;
+                        ButtonList = constants.ButtonCancel;
                         Content.Add(AdminUIController.getFormBodyAdminOnly());
                     } else {
                         //
                         InstallFolder = "temp\\CollectionUpload" + encodeText(GenericController.GetRandomInteger(core));
                         privateFilesInstallPath = InstallFolder + "\\";
-                        if (Button == Constants.ButtonOK) {
+                        if (Button == constants.ButtonOK) {
                             //
                             //---------------------------------------------------------------------------------------------
                             // Download and install Collections from the Collection Library
@@ -182,7 +182,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                         //
                                         // Delete any addons from this collection
                                         //
-                                        core.db.deleteContentRecords(Constants.cnAddons, "collectionid=" + TargetCollectionID);
+                                        core.db.deleteContentRecords(constants.cnAddons, "collectionid=" + TargetCollectionID);
 
                                         //                            '
                                         //                            ' Load all collections into local collection storage
@@ -415,7 +415,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                         //
                                         if (TargetCollectionID > 0) {
                                             AddonNavigatorID = 0;
-                                            CS = core.db.csOpen(Constants.cnNavigatorEntries, "name='Manage Add-ons' and ((parentid=0)or(parentid is null))");
+                                            CS = core.db.csOpen(constants.cnNavigatorEntries, "name='Manage Add-ons' and ((parentid=0)or(parentid is null))");
                                             if (core.db.csOk(CS)) {
                                                 AddonNavigatorID = core.db.csGetInteger(CS, "ID");
                                             }
@@ -430,7 +430,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                             //
                                             // Delete Navigator Entries set as installed by the collection (this may be all that is needed)
                                             //
-                                            core.db.deleteContentRecords(Constants.cnNavigatorEntries, "installedbycollectionid=" + TargetCollectionID);
+                                            core.db.deleteContentRecords(constants.cnNavigatorEntries, "installedbycollectionid=" + TargetCollectionID);
                                         }
                                     }
                                 }
@@ -444,7 +444,7 @@ namespace Contensive.Addons.SafeAddonManager {
                             if (Cnt > 0) {
                                 for (Ptr = 0; Ptr < Cnt; Ptr++) {
                                     if (core.docProperties.getBoolean("ao" + Ptr)) {
-                                        core.db.deleteContentRecord(Constants.cnAddons, core.docProperties.getInteger("aoID" + Ptr));
+                                        core.db.deleteContentRecord(constants.cnAddons, core.docProperties.getInteger("aoID" + Ptr));
                                     }
                                 }
                             }

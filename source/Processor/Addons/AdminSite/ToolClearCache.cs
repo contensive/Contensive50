@@ -23,8 +23,8 @@ namespace Contensive.Addons.AdminSite {
                 string Description = null;
                 string ButtonList = null;
                 //
-                Button = core.docProperties.getText( Constants.RequestNameButton);
-                if (Button == Constants.ButtonCancel) {
+                Button = core.docProperties.getText( constants.RequestNameButton);
+                if (Button == constants.ButtonCancel) {
                     //
                     // Cancel just exits with no content
                     //
@@ -33,7 +33,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // Not Admin Error
                     //
-                    ButtonList = Constants.ButtonCancel;
+                    ButtonList = constants.ButtonCancel;
                     Content.Add(AdminUIController.getFormBodyAdminOnly());
                 } else {
                     Content.Add(AdminUIController.editTableOpen);
@@ -44,15 +44,15 @@ namespace Contensive.Addons.AdminSite {
                     // Process Requests
                     //
                     switch (Button) {
-                        case Constants.ButtonApply:
-                        case Constants.ButtonOK:
+                        case constants.ButtonApply:
+                        case constants.ButtonOK:
                             //
                             // Clear the cache
                             //
                             core.cache.invalidateAll();
                             break;
                     }
-                    if (Button == Constants.ButtonOK) {
+                    if (Button == constants.ButtonOK) {
                         //
                         // Exit on OK or cancel
                         //
@@ -61,12 +61,12 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // Buttons
                     //
-                    ButtonList = Constants.ButtonCancel + "," + Constants.ButtonApply + "," + Constants.ButtonOK;
+                    ButtonList = constants.ButtonCancel + "," + constants.ButtonApply + "," + constants.ButtonOK;
                     //
                     // Close Tables
                     //
                     Content.Add(AdminUIController.editTableClose);
-                    Content.Add(HtmlController.inputHidden(Constants.rnAdminSourceForm, Constants.AdminFormClearCache));
+                    Content.Add(HtmlController.inputHidden(constants.rnAdminSourceForm, constants.AdminFormClearCache));
                 }
                 //
                 Description = "Hit Apply or OK to clear all current content caches";
