@@ -874,13 +874,12 @@ namespace Contensive.Processor.Models.Db {
                         if (id == 0) {
                             //
                             // -- insert
-                            core.db.insertTableRecord(datasourceName, tableName, sqlPairs);
+                            core.db.insertTableRecord(datasourceName, tableName, sqlPairs, asyncSave);
                         } else {
                             //
                             // -- update
-                            core.db.updateTableRecord(datasourceName, tableName, "(id=" + id.ToString() + ")", sqlPairs);
+                            core.db.updateTableRecord(datasourceName, tableName, "(id=" + id.ToString() + ")", sqlPairs, asyncSave);
                         }
-
                     }
                     //cs.close(asyncSave);
                     //

@@ -485,10 +485,14 @@ namespace Contensive.Processor.Controllers {
         /// <param name="TableName"></param>
         /// <param name="Criteria"></param>
         /// <param name="sqlList"></param>
-        public void updateTableRecord(string DataSourceName, string TableName, string Criteria, SqlFieldListClass sqlList) {
+        public void updateTableRecord(string DataSourceName, string TableName, string Criteria, SqlFieldListClass sqlList, bool asyncSave = false ) {
             try {
                 string SQL = "update " + TableName + " set " + sqlList.getNameValueList() + " where " + Criteria + ";";
-                executeNonQuery(SQL, DataSourceName);
+                if (!asyncSave) {
+                    executeNonQuery(SQL, DataSourceName);
+                } else {
+                    executeNonQueryAsync(SQL, DataSourceName);
+                }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
@@ -562,12 +566,15 @@ namespace Contensive.Processor.Controllers {
         /// <param name="DataSourceName"></param>
         /// <param name="TableName"></param>
         /// <param name="sqlList"></param>
-        public void insertTableRecord(string DataSourceName, string TableName, SqlFieldListClass sqlList) {
+        public void insertTableRecord(string DataSourceName, string TableName, SqlFieldListClass sqlList, bool asyncSave = false ) {
             try {
                 if (sqlList.count > 0) {
                     string sql = "INSERT INTO " + TableName + "(" + sqlList.getNameList() + ")values(" + sqlList.getValueList() + ")";
-                    DataTable dt = executeQuery(sql, DataSourceName);
-                    dt.Dispose();
+                    if ( !asyncSave ) {
+                        executeNonQuery(sql, DataSourceName);
+                    } else {
+                        executeNonQueryAsync(sql, DataSourceName);
+                    }
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -791,7 +798,8 @@ namespace Contensive.Processor.Controllers {
                             //
                             SQL += getSQLAlterColumnType(DataSourceName, fieldType);
                         }
-                        executeQuery(SQL, DataSourceName).Dispose();
+                        executeNonQuery(SQL, DataSourceName);
+                        TableSchemaModel.tableSchemaListClear(core);
                         //
                         if (clearMetaCache) {
                             core.cache.invalidateAll();
@@ -1594,7 +1602,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // non-workflow mode, delete the live record
                         //
-                        deprecate_argsreversed_deleteTableRecord(ContentTableName, LiveRecordID, ContentDataSourceName);
+                        deleteTableRecord(LiveRecordID, ContentTableName, ContentDataSourceName);
                         //
                         // -- invalidate the special cache name used to detect a change in any record
                         // todo remove all these. do not invalidate the table for a record delete. it is up to the object to set invaliation dependencies
@@ -3730,30 +3738,50 @@ namespace Contensive.Processor.Controllers {
         //
         //========================================================================
         /// <summary>
-        /// csv_DeleteTableRecord
+        /// delete a record
         /// </summary>
-        /// <param name="DataSourceName"></param>
-        /// <param name="TableName"></param>
-        /// <param name="RecordID"></param>
+        /// <param name="dataSourceName"></param>
+        /// <param name="tableName"></param>
+        /// <param name="recordId"></param>
         //
-        public void deleteTableRecord(int RecordID, string TableName, string DataSourceName = "") {
+        public void deleteTableRecord(int recordId, string tableName, string dataSourceName = "") {
             try {
-                if (string.IsNullOrEmpty(TableName.Trim())) {
+                if (string.IsNullOrEmpty(tableName.Trim())) {
                     throw new ApplicationException("tablename cannot be blank");
-                } else if (RecordID <= 0) {
-                    throw new ApplicationException("record id is not valid [" + RecordID + "]");
+                } else if (recordId <= 0) {
+                    throw new ApplicationException("record id is not valid [" + recordId + "]");
                 } else {
-                    deleteTableRecords(TableName, "ID=" + RecordID, DataSourceName);
+                    executeNonQuery("delete from " + tableName + " where id=" + recordId, dataSourceName);
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
             }
         }
-        // todo deprecate
-        public void deprecate_argsreversed_deleteTableRecord(string TableName, int RecordID, string DataSourceName = "") {
-            deleteTableRecord(RecordID, TableName, DataSourceName);
+        /// <summary>
+        /// delete a record based on a guid
+        /// </summary>
+        /// <param name="guid"></param>
+        /// <param name="tableName"></param>
+        /// <param name="dataSourceName"></param>
+        public void deleteTableRecord(string guid, string tableName, string dataSourceName = "") {
+            try {
+                if (string.IsNullOrEmpty(tableName.Trim())) {
+                    throw new ApplicationException("tablename cannot be blank");
+                } else if (!isGuid( guid )) {
+                    throw new ApplicationException("Guid is not valid [" + guid + "]");
+                } else {
+                    executeNonQuery("delete from " + tableName + " where ccguid=" + encodeSQLText(guid) , dataSourceName);
+                }
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+                throw;
+            }
         }
+        //// todo deprecate
+        //public void deleteTableRecord(string TableName, int RecordID, string DataSourceName = "") {
+        //    deleteTableRecord(RecordID, TableName, DataSourceName);
+        //}
             //
             //==================================================================================================
             /// <summary>
@@ -4290,8 +4318,12 @@ namespace Contensive.Processor.Controllers {
                         //
                         // ----- Content definition not found, create it
                         //
-                        CDefModel.addContent(core, true, DataSource, TableName, ContentName);
-                        //ContentID = csv_GetContentID(ContentName)
+                        CdefController.verifyContent_returnId(core, new Models.Domain.CDefModel() {
+                            dataSourceName = DataSource.name,
+                            tableName = TableName,
+                            name = ContentName,
+                            active = true
+                        });
                         SQL = "Select ID from ccContent where name=" + core.db.encodeSQLText(ContentName);
                         dt = core.db.executeQuery(SQL);
                         if (dt.Rows.Count == 0) {

@@ -826,7 +826,7 @@ namespace Contensive.Processor.Controllers {
                         QuickEditing = core.session.isQuickEditing(core, "page content");
                         for (Ptr = 0; Ptr < IDCnt; Ptr++) {
                             int deleteRecordId = encodeInteger(IDs[Ptr]);
-                            core.db.deprecate_argsreversed_deleteTableRecord( PageContentModel.contentTableName, deleteRecordId, "");
+                            core.db.deleteTableRecord( deleteRecordId, PageContentModel.contentTableName);
                             PageContentModel.invalidateRecordCache(core, deleteRecordId);
                         }
                     }

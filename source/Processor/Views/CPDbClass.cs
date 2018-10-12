@@ -52,7 +52,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override void Delete(string DataSourcename, string TableName, int RecordId) {
-            cp.core.db.deprecate_argsreversed_deleteTableRecord(TableName, RecordId, DataSourcename);
+            cp.core.db.deleteTableRecord(RecordId, TableName, DataSourcename);
         }
         //
         //====================================================================================================

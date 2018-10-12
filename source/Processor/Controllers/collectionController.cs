@@ -653,7 +653,7 @@ namespace Contensive.Processor.Controllers {
                     // update sort method
                     //
                     int recordId = GenericController.encodeInteger(dt.Rows[0]["ID"]);
-                    core.db.updateTableRecord("Default", "ccSortMethods", "ID=" + recordId.ToString(), sqlList);
+                    core.db.updateTableRecord("Default", "ccSortMethods", "ID=" + recordId.ToString(), sqlList, true);
                     SortMethodModel.invalidateRecordCache(core, recordId);
                 } else {
                     //

@@ -1540,7 +1540,7 @@ namespace Contensive.Addons.AdminSite {
                                     ErrorController.addUserError(core, "Your request was blocked because the record you specified is now locked by another authcontext.user.");
                                 } else {
                                     LoadEditRecord(adminContext);
-                                    core.db.deprecate_argsreversed_deleteTableRecord(adminContext.adminContent.tableName, adminContext.editRecord.id, adminContext.adminContent.dataSourceName);
+                                    core.db.deleteTableRecord(adminContext.editRecord.id,adminContext.adminContent.tableName,  adminContext.adminContent.dataSourceName);
                                     core.doc.processAfterSave(true, adminContext.editRecord.contentControlId_Name, adminContext.editRecord.id, adminContext.editRecord.nameLc, adminContext.editRecord.parentID, UseContentWatchLink);
                                 }
                                 adminContext.Admin_Action = AdminInfoDomainModel.AdminActionNop;
@@ -9286,7 +9286,7 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 MemberRuleID = core.db.csGetInteger(CSRule, "ID");
                                 core.db.csClose(ref CSRule);
-                                core.db.deprecate_argsreversed_deleteTableRecord("ccMemberRules", MemberRuleID, "Default");
+                                core.db.deleteTableRecord(MemberRuleID,"ccMemberRules",  "Default");
                             }
                         }
                     }
