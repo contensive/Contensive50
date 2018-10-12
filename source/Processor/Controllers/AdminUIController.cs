@@ -1036,7 +1036,7 @@ namespace Contensive.Processor {
         public static string getDefaultEditor_TextArea(CoreController core, string fieldName, string fieldValue, bool readOnly = false, string htmlId = "") {
             //
             // longer text data, or text that contains a CR
-            return HtmlController.inputTextarea(core, fieldName, fieldValue, 10, -1, htmlId, false, readOnly, "text form-control", false, 255);
+            return HtmlController.inputTextarea(core, fieldName, fieldValue, 10, -1, htmlId, false, readOnly, "text form-control", false);
         }
         //
         // ====================================================================================================
