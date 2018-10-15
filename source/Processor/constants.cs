@@ -1361,38 +1361,6 @@ namespace Contensive.Processor {
         //public const int KEY_EXECUTE = KEY_READ;
         public const int maxLongValue = 2147483647;
         //
-        // Error Definitions
-        //
-        //public const int ERR_UNKNOWN = Microsoft.VisualBasic.Constants.vbObjectError + 101;
-        //public const int ERR_FIELD_DOES_NOT_EXIST = Microsoft.VisualBasic.Constants.vbObjectError + 102;
-        //public const int ERR_FILESIZE_NOT_ALLOWED = Microsoft.VisualBasic.Constants.vbObjectError + 103;
-        //public const int ERR_FOLDER_DOES_NOT_EXIST = Microsoft.VisualBasic.Constants.vbObjectError + 104;
-        //public const int ERR_FILE_ALREADY_EXISTS = Microsoft.VisualBasic.Constants.vbObjectError + 105;
-        //public const int ERR_FILE_TYPE_NOT_ALLOWED = Microsoft.VisualBasic.Constants.vbObjectError + 106;
-
-        //
-        // addonIncludeRules cache
-        //
-        public const string cache_addonIncludeRules_cacheName = "cache_addonIncludeRules";
-        public const string cache_addonIncludeRules_fieldList = "addonId,includedAddonId";
-        public const int addonIncludeRulesCache_addonId = 0;
-        public const int addonIncludeRulesCache_includedAddonId = 1;
-        public const int addonIncludeRulesCacheColCnt = 2;
-        //
-        // addonIncludeRules cache
-        //
-        public const string cache_LibraryFiles_cacheName = "cache_LibraryFiles";
-        public const string cache_LibraryFiles_fieldList = "id,ccguid,clicks,filename,width,height,AltText,altsizelist";
-        public const int LibraryFilesCache_Id = 0;
-        public const int LibraryFilesCache_ccGuid = 1;
-        public const int LibraryFilesCache_clicks = 2;
-        public const int LibraryFilesCache_filename = 3;
-        public const int LibraryFilesCache_width = 4;
-        public const int LibraryFilesCache_height = 5;
-        public const int LibraryFilesCache_alttext = 6;
-        public const int LibraryFilesCache_altsizelist = 7;
-        public const int LibraryFilesCacheColCnt = 8;
-        //
         // link forward cache
         //
         public const string cache_linkForward_cacheName = "cache_linkForward";

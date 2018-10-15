@@ -508,14 +508,17 @@ namespace Contensive.Addons.AdminSite {
                         //
                         // Included Addons
                         //
-                        SQL = "select IncludedAddonID from ccAddonIncludeRules where AddonID=" + HelpAddonID;
-                        CS = core.db.csOpenSql(SQL, "Default");
-                        while (core.db.csOk(CS)) {
-                            IncludeID = core.db.csGetInteger(CS, "IncludedAddonID");
-                            IncludeHelp = IncludeHelp + GetAddonHelp(IncludeID, HelpAddonID + "," + IncludeID.ToString());
-                            core.db.csGoNext(CS);
+                        foreach (var addonon in core.addonCache.getDependsOnList( HelpAddonID )) {
+                            IncludeHelp += GetAddonHelp(addonon.id, HelpAddonID + "," + addonon.id.ToString());
                         }
-                        core.db.csClose(ref CS);
+                        //SQL = "select IncludedAddonID from ccAddonIncludeRules where AddonID=" + HelpAddonID;
+                        //CS = core.db.csOpenSql(SQL, "Default");
+                        //while (core.db.csOk(CS)) {
+                        //    IncludeID = core.db.csGetInteger(CS, "IncludedAddonID");
+                        //    IncludeHelp = IncludeHelp + GetAddonHelp(IncludeID, HelpAddonID + "," + IncludeID.ToString());
+                        //    core.db.csGoNext(CS);
+                        //}
+                        //core.db.csClose(ref CS);
                         //
                         if (!string.IsNullOrEmpty(helpLink)) {
                             if (!string.IsNullOrEmpty(AddonHelpCopy)) {

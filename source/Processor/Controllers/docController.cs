@@ -17,21 +17,21 @@ namespace Contensive.Processor.Controllers {
         /// parent object
         /// </summary>
         private CoreController core;
-        //
-        public List<int> getAddonIncludeRuleList(int addonId) {
-            if (_includeRuleDict==null) {
-                _includeRuleDict = new Dictionary<int, List<int>>();
-            }
-            if (!_includeRuleDict.ContainsKey(addonId)) {
-                var includeRuleList = new List<int>();
-                foreach (var rule in AddonIncludeRuleModel.createList(core, "(addonId=" + addonId + ")")) {
-                    includeRuleList.Add(rule.includedAddonID);
-                }
-                _includeRuleDict.Add(addonId, includeRuleList);
-            }
-            return _includeRuleDict[addonId];
-        }
-        private Dictionary<int, List<int>> _includeRuleDict;
+        ////
+        //public List<int> getAddonIncludeRuleList(int addonId) {
+        //    if (_includeRuleDict==null) {
+        //        _includeRuleDict = new Dictionary<int, List<int>>();
+        //    }
+        //    if (!_includeRuleDict.ContainsKey(addonId)) {
+        //        var includeRuleList = new List<int>();
+        //        foreach (var rule in AddonIncludeRuleModel.createList(core, "(addonId=" + addonId + ")")) {
+        //            includeRuleList.Add(rule.includedAddonID);
+        //        }
+        //        _includeRuleDict.Add(addonId, includeRuleList);
+        //    }
+        //    return _includeRuleDict[addonId];
+        //}
+        //private Dictionary<int, List<int>> _includeRuleDict;
         /// <summary>
         /// this documents unique guid (created on the fly)
         /// </summary>

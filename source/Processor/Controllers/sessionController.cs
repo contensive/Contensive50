@@ -233,6 +233,9 @@ namespace Contensive.Processor.Controllers {
                                     }
                                 }
                             }
+                            //
+                            LogController.logTrace(core, "SessionController.create(), load session from cookied complete, visit.id [" + resultSessionContext.visit.id + "], visitor.id [" + resultSessionContext.visitor.id + "], user.id [" + resultSessionContext.user.id + "]");
+                            //
                             bool visit_changes = false;
                             bool visitor_changes = false;
                             bool user_changes = false;
@@ -447,9 +450,10 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // -- create new visitor
                                 resultSessionContext.visitor = VisitorModel.addEmpty(core);
-                                visitor_changes = false;
+                                visitor_changes = true;
                                 //
                                 resultSessionContext.visit.visitorNew = true;
+                                resultSessionContext.visit.visitorID = resultSessionContext.visitor.id;
                                 visit_changes = true;
                             }
                             //
@@ -457,12 +461,14 @@ namespace Contensive.Processor.Controllers {
                             if (memberLinkLoginID != 0) {
                                 //
                                 // -- Link Login
+                                LogController.logTrace(core, "SessionController.create(), attempt link Login, memberLinkLoginID [" + memberLinkLoginID + "]");
                                 if (authenticateById(core, memberLinkLoginID, resultSessionContext)) {
                                     LogController.addSiteActivity(core, "link login with eid " + memberLinkinEID, resultSessionContext.user.id, resultSessionContext.user.OrganizationID);
                                 }
                             } else if (memberLinkRecognizeID != 0) {
                                 //
                                 // -- Link Recognize
+                                LogController.logTrace(core, "SessionController.create(), attempt link Recognize, memberLinkRecognizeID [" + memberLinkRecognizeID + "]");
                                 if (recognizeById(core, memberLinkRecognizeID, ref resultSessionContext)) {
                                     LogController.addSiteActivity(core, "Successful link recognize with eid " + memberLinkinEID, resultSessionContext.user.id, resultSessionContext.user.OrganizationID);
                                 } else {
@@ -482,12 +488,20 @@ namespace Contensive.Processor.Controllers {
                                 resultSessionContext.user = new PersonModel {
                                     name = DefaultMemberName
                                 };
-                                user_changes = false;
-                                resultSessionContext.visitor.MemberID = 0;
-                                visitor_changes = true;
-                                resultSessionContext.visit.visitAuthenticated = false;
-                                resultSessionContext.visit.memberID = 0;
-                                visit_changes = true;
+                                //user_changes = false;
+                                if (!resultSessionContext.visitor.MemberID.Equals(0)) {
+                                    resultSessionContext.visitor.MemberID = 0;
+                                    visitor_changes = true;
+                                }
+                                if (!resultSessionContext.visit.memberID.Equals(0)) {
+                                    resultSessionContext.visit.memberID = 0;
+                                    resultSessionContext.visit.visitAuthenticated = false;
+                                    visit_changes = true;
+                                }
+                                if (resultSessionContext.visit.visitAuthenticated) {
+                                    resultSessionContext.visit.visitAuthenticated = false;
+                                    visit_changes = true;
+                                }
                             }
                             //
                             // -- check for changes in interrelationships
@@ -507,6 +521,7 @@ namespace Contensive.Processor.Controllers {
                             }
                             //
                             // -- count the page hit
+                            LogController.logTrace(core, "SessionController.create(), attempt visit count update");
                             resultSessionContext.visit.excludeFromAnalytics |= resultSessionContext.visit.bot | resultSessionContext.user.ExcludeFromAnalytics | resultSessionContext.user.Admin | resultSessionContext.user.Developer;
                             if (!core.webServer.pageExcludeFromAnalytics) {
                                 resultSessionContext.visit.pageVisits += 1;
@@ -514,6 +529,7 @@ namespace Contensive.Processor.Controllers {
                             }
                             //
                             // -- Save anything that changed
+                            LogController.logTrace(core, "SessionController.create(), save visit,visitor,user if updated");
                             if (visit_changes) {
                                 resultSessionContext.visit.save(core,true);
                             }
@@ -528,17 +544,19 @@ namespace Contensive.Processor.Controllers {
                                 visitCookie = visitCookieNew;
                             }
                         }
-                        if ((AllowOnNewVisitEvent) && (true)) {
-                            foreach (AddonModel addon in AddonModel.createList_OnNewVisitEvent(core, new List<string>())) {
+                        if (AllowOnNewVisitEvent) {
+                            LogController.logTrace(core, "SessionController.create(), execute onNewVisitEvent");
+                            foreach ( var addon in core.addonCache.getOnNewVisitAddonList()) {
                                 CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
                                     addonType = CPUtilsBaseClass.addonContext.ContextOnNewVisit,
-                                    errorContextMessage = "new visit event running addon  [" + addon.name +"]"
+                                    errorContextMessage = "new visit event running addon  [" + addon.name + "]"
                                 };
                                 core.addon.execute(addon, executeContext);
                             }
                         }
                         //
                         // -- Write Visit Cookie
+                        LogController.logTrace(core, "SessionController.create(), write visit cookie");
                         visitCookie = SecurityController.encodeToken( core,resultSessionContext.visit.id, core.doc.profileStartTime);
                         // -- very trial-error fix - W4S site does not send cookies from ajax calls right after changing from requestAppRootPath to appRootPath
                         core.webServer.addResponseCookie(appNameCookiePrefix + constants.cookieNameVisit, visitCookie, default(DateTime), "", @"/", false);

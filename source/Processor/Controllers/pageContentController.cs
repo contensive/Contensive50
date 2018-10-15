@@ -2079,8 +2079,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- OnPageStartEvent
                     core.doc.bodyContent = returnHtml;
-                    List<AddonModel> addonList = AddonModel.createList_OnPageStartEvent(core, new List<string>());
-                    foreach (Models.Db.AddonModel addon in addonList) {
+                    foreach( var addon in core.addonCache.getOnPageStartAddonList()) {
                         CPUtilsBaseClass.addonExecuteContext pageStartContext = new CPUtilsBaseClass.addonExecuteContext() {
                             instanceGuid = "-1",
                             instanceArguments = instanceArguments,

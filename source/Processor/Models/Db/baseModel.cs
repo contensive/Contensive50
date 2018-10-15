@@ -1003,15 +1003,12 @@ namespace Contensive.Processor.Models.Db {
                     // -- cannot use models without an application
                     LogController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
                 } else {
-                    using (var cs = new CsController(core)) {
-
-                        using (var dt = core.db.executeQuery(getSelectSql<T>(core, null, sqlCriteria, sqlOrderBy))) {
-                            T instance = default(T);
-                            foreach( DataRow row in dt.Rows) {
-                                instance = loadRecord<T>(core, row, ref callersCacheNameList);
-                                if (instance != null) {
-                                    result.Add(instance);
-                                }
+                    using (var dt = core.db.executeQuery(getSelectSql<T>(core, null, sqlCriteria, sqlOrderBy))) {
+                        T instance = default(T);
+                        foreach (DataRow row in dt.Rows) {
+                            instance = loadRecord<T>(core, row, ref callersCacheNameList);
+                            if (instance != null) {
+                                result.Add(instance);
                             }
                         }
                     }

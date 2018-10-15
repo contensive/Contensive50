@@ -312,22 +312,23 @@ namespace Contensive.Processor.Controllers {
         private FileController _cdnFiles = null;
         //
         //===================================================================================================
-        public AddonModel.AddonCacheClass addonCache {
+        /// <summary>
+        /// provide an addon cache object lazy populated from the Domain.addonCacheModel. This object provides an
+        /// interface to lookup read addon data and common lists
+        /// </summary>
+        public AddonCacheModel addonCache {
             get {
                 if (_addonCache == null) {
-                    _addonCache = cache.getObject<AddonModel.AddonCacheClass>(cacheObject_addonCache);
+                    _addonCache = cache.getObject<AddonCacheModel>(cacheObject_addonCache);
                     if (_addonCache == null) {
-                        _addonCache = new AddonModel.AddonCacheClass();
-                        foreach (AddonModel addon in AddonModel.createList(this, "")) {
-                            _addonCache.add(this, addon);
-                        }
+                        _addonCache = new AddonCacheModel(this);
                         cache.setObject(cacheObject_addonCache, _addonCache);
                     }
                 }
                 return _addonCache;
             }
         }
-        private AddonModel.AddonCacheClass _addonCache = null;
+        private AddonCacheModel _addonCache = null;
         //
         //===================================================================================================
         /// <summary>
@@ -1155,33 +1156,6 @@ namespace Contensive.Processor.Controllers {
             Version myVersion = myAssemblyname.Version;
             return myVersion.Major.ToString("0") + "." + myVersion.Minor.ToString("00") + "." + myVersion.Build.ToString("00000000");
         }
-        ////
-        ////===================================================================================================
-        ///// <summary>
-        ///// lazy document scope cache for routedictionary
-        ///// </summary>
-        //public Dictionary<string, CPSiteBaseClass.routeClass> routeDictionary {
-        //    get {
-        //        // prevent multiple calls from re-reading the entire dictionary - it is large and make of several large caches
-        //        // must add cacheclear to RouteDictionary
-        //        if((_routeDictionary == null) | routeDictionaryChanges ) {
-        //            _routeDictionary = RouteMapModel.create(this);
-        //            routeDictionaryChanges = false;
-        //        }
-        //        return _routeDictionary;
-        //        // -- when an addon changes, the route map has to reload on page exit so it is ready on the next hit. lazy cache here clears on page load, so this does work
-        //        //return RouteDictionaryModel.create(this);
-        //        //If (_routeDictionary Is Nothing) Then
-        //        //    _routeDictionary = Models.Complex.routeDictionaryModel.create(Me)
-        //        //End If
-        //        //Return _routeDictionary
-        //    }
-        //} private Dictionary<String, CPSiteBaseClass.routeClass> _routeDictionary = null;
-        ///// <summary>
-        ///// route dictionary needs to be reloaded - this is a short-term solution. when true, the route Dictionary was updated during this document process and should be updated on exit. Long-term, each webserver instance has to flush cache
-        ///// </summary>
-        //public bool routeDictionaryChanges = false;
-
         //
         //====================================================================================================
         #region  IDisposable Support 
@@ -1258,12 +1232,24 @@ namespace Contensive.Processor.Controllers {
                                         pagetitle = doc.htmlMetaContent_TitleList[0].content;
                                     }
                                     string SQL = "insert into ccviewings ("
-                                        + "Name,VisitId,MemberID,Host,Path,Page,QueryString,Form,Referer,DateAdded,StateOK,ContentControlID,pagetime,Active,CreateKey,RecordID,ExcludeFromAnalytics,pagetitle"
+                                        + "Name,VisitId,MemberID,Host,Path,Page,QueryString,Form,Referer,DateAdded,StateOK,pagetime,Active,RecordID,ExcludeFromAnalytics,pagetitle"
                                         + ")values("
-                                        + " " + db.encodeSQLText(ViewingName) + "," + db.encodeSQLNumber(session.visit.id) + "," + db.encodeSQLNumber(session.user.id) + "," + db.encodeSQLText(webServer.requestDomain) + "," + db.encodeSQLText(webServer.requestPath) + "," + db.encodeSQLText(webServer.requestPage) + "," + db.encodeSQLText(webServer.requestQueryString.Left(255)) + "," + db.encodeSQLText(requestFormSerialized.Left(255)) + "," + db.encodeSQLText(webServer.requestReferrer.Left(255)) + "," + db.encodeSQLDate(doc.profileStartTime) + "," + db.encodeSQLBoolean(session.visit_stateOK) + "," + db.encodeSQLNumber(CdefController.getContentId(this, "Viewings")) + "," + db.encodeSQLNumber(doc.appStopWatch.ElapsedMilliseconds) + ",1"
-                                        + "," + db.encodeSQLNumber(0) + "," + db.encodeSQLNumber(PageID);
-                                    SQL += "," + db.encodeSQLBoolean(webServer.pageExcludeFromAnalytics);
-                                    SQL += "," + db.encodeSQLText(pagetitle);
+                                        + " " + db.encodeSQLText(ViewingName) 
+                                        + "," + session.visit.id.ToString() 
+                                        + "," + session.user.id.ToString() 
+                                        + "," + db.encodeSQLText(webServer.requestDomain) 
+                                        + "," + db.encodeSQLText(webServer.requestPath) 
+                                        + "," + db.encodeSQLText(webServer.requestPage) 
+                                        + "," + db.encodeSQLText(webServer.requestQueryString.Left(255)) 
+                                        + "," + db.encodeSQLText(requestFormSerialized.Left(255)) 
+                                        + "," + db.encodeSQLText(webServer.requestReferrer.Left(255)) 
+                                        + "," + db.encodeSQLDate(doc.profileStartTime) 
+                                        + "," + db.encodeSQLBoolean(session.visit_stateOK) 
+                                        + "," + doc.appStopWatch.ElapsedMilliseconds.ToString() 
+                                        + ",1" 
+                                        + "," + PageID.ToString()
+                                        + "," + db.encodeSQLBoolean(webServer.pageExcludeFromAnalytics)
+                                        + "," + db.encodeSQLText(pagetitle);
                                     SQL += ");";
                                     db.executeNonQueryAsync(SQL);
                                 }

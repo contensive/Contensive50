@@ -233,6 +233,7 @@
     <Compile Include="Models\Db\EmailModel.cs" />
     <Compile Include="Models\Db\TaskModel.cs" />
     <Compile Include="Models\Domain\NameValueModel.cs" />
+    <Compile Include="Models\Domain\AddonCacheModel.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
