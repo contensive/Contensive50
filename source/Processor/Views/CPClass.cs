@@ -561,10 +561,7 @@ namespace Contensive.Processor {
             get {
                 return core.routeMap;
             }
-        } private RouteMapModel _routeMap = null;
-        public void routeMapClearLocalCache() {
-            core.routeMapClearLocalCache();
-        }
+        } 
         //
         //====================================================================================================
         #region  IDisposable Support 

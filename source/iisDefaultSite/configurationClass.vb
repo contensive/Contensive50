@@ -75,17 +75,15 @@ Public Class ConfigurationClass
         If (Not cp.routeMap.dateCreated.Equals(HttpContext.Current.Application("RouteMapDateCreated"))) Then
             ' 20180307, added clear to resolve error 
             RouteTable.Routes.Clear()
-            For Each kvp In cp.routeMap.routeDictionary
+            For Each newRouteKeyValuePair In cp.routeMap.routeDictionary
                 Try
-                    Dim newRouteName As String = kvp.Key
-                    Dim newRoute As RouteMapModel.routeClass = kvp.Value
                     '
-                    LogController.forceNLog("configurationClass, loadRouteMap, [" + cp.Site.Name + "] [" + newRoute.virtualRoute + "], [" + newRoute.physicalRoute + "]", LogController.logLevel.Trace)
+                    LogController.forceNLog("configurationClass, loadRouteMap, [" + cp.Site.Name + "] [" + newRouteKeyValuePair.Value.virtualRoute + "], [" + newRouteKeyValuePair.Value.physicalRoute + "]", LogController.logLevel.Trace)
                     '
-                    RouteTable.Routes.Remove(RouteTable.Routes(newRouteName))
-                    RouteTable.Routes.MapPageRoute(newRoute.virtualRoute, newRoute.virtualRoute, newRoute.physicalRoute)
+                    RouteTable.Routes.Remove(RouteTable.Routes(newRouteKeyValuePair.Key))
+                    RouteTable.Routes.MapPageRoute(newRouteKeyValuePair.Value.virtualRoute, newRouteKeyValuePair.Value.virtualRoute, newRouteKeyValuePair.Value.physicalRoute)
                 Catch ex As Exception
-                    cp.Site.ErrorReport(ex, "Unexpected exception adding virtualRoute [" & kvp.Key & "]")
+                    cp.Site.ErrorReport(ex, "Unexpected exception adding virtualRoute [" & newRouteKeyValuePair.Key & "]")
                 End Try
             Next
             HttpContext.Current.Application("routeMapDateCreated") = cp.routeMap.dateCreated

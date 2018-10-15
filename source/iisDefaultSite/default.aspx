@@ -12,8 +12,6 @@
                 Using cp As New Contensive.Processor.CPClass(serverConfig.apps(0).name, serverConfig, HttpContext.Current)
                     Response.Write(cp.executeRoute())
                     DefaultSite.ConfigurationClass.loadRouteMap(cp)
-                    ' - todo need a better solution, route changes in other processes (background, other front-ends) will no auto reload anyway
-                    ' If (cp.routeDictionaryChanges) Then DefaultSite.configurationClass.loadRouteMap(cp)
                 End Using
             Else
                 '
@@ -21,8 +19,6 @@
                 Using cp As New Contensive.Processor.CPClass(DefaultSite.configurationClass.getAppName(), HttpContext.Current)
                     Response.Write(cp.executeRoute())
                     DefaultSite.ConfigurationClass.loadRouteMap(cp)
-                    ' - todo need a better solution, route changes in other processes (background, other front-ends) will no auto reload anyway
-                    ' If (cp.routeDictionaryChanges) Then DefaultSite.configurationClass.loadRouteMap(cp)
                 End Using
             End If
         Catch ex As Exception

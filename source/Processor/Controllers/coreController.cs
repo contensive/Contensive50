@@ -460,7 +460,11 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// The route map is a dictionary of route names and route details that tell how to execute the route
+        /// The route map is a dictionary of route names plus route details that tell how to execute the route.
+        /// local instance is used to speed up multiple local requests.
+        /// If during a page hit the route table entries are updated, cache is cleared and the instance object is cleared. When the next reference is 
+        /// made the data is refreshed. At the end of every pageload, if the routemap updates it reloads the iis route table so if a new route
+        /// is added and the next hit is to that method, it will be loaded.
         /// </summary>
         public RouteMapModel routeMap {
             get {
@@ -472,10 +476,7 @@ namespace Contensive.Processor.Controllers {
         }
         private RouteMapModel _routeMap = null;
         /// <summary>
-        /// method to clear the core instance of routeMap. local instance is used to speed up multiple local requests, but at the end of the
-        /// page hit, if the route table entries are updated, cache is cleared and the instance object is cleared. When the next reference is 
-        /// made the data is refreshed. At the end of every pageload, if the routemap updates it reloads the iis route table so if a new route
-        /// is added and the next hit is to that method, it will be loaded.
+        /// method to clear the core instance of routeMap. Explained in routeMap.
         /// </summary>
         public void routeMapClearLocalCache() {
             _routeMap = null;

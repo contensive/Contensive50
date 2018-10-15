@@ -1,18 +1,8 @@
 ﻿
 using System;
-using System.Reflection;
-using System.Xml;
-using System.Diagnostics;
-using System.Linq;
-using System.Text.RegularExpressions;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
-using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Models.Domain {
     /// <summary>
@@ -70,8 +60,7 @@ namespace Contensive.Processor.Models.Domain {
                     }
                     //
                     // -- remote methods
-                    List<Contensive.Processor.Models.Db.AddonModel> remoteMethods = Contensive.Processor.Models.Db.AddonModel.createList_RemoteMethods(core, new List<string>());
-                    foreach (Contensive.Processor.Models.Db.AddonModel remoteMethod in remoteMethods) {
+                    foreach (var remoteMethod in AddonModel.createList_RemoteMethods(core, new List<string>())) {
                         string route = GenericController.normalizeRoute(remoteMethod.name);
                         if (!string.IsNullOrWhiteSpace(route)) {
                             if (result.routeDictionary.ContainsKey(route)) {
@@ -88,8 +77,7 @@ namespace Contensive.Processor.Models.Domain {
                     }
                     //
                     // -- link forwards
-                    List<Models.Db.LinkForwardModel> linkForwards = LinkForwardModel.createList(core, "name Is Not null");
-                    foreach (Models.Db.LinkForwardModel linkForward in linkForwards) {
+                    foreach (var linkForward in LinkForwardModel.createList(core, "name Is Not null")) {
                         string route = GenericController.normalizeRoute(linkForward.name);
                         if (!string.IsNullOrEmpty(route)) {
                             if (result.routeDictionary.ContainsKey(route)) {
@@ -106,8 +94,7 @@ namespace Contensive.Processor.Models.Domain {
                     }
                     //
                     // -- link aliases
-                    List<Models.Db.LinkAliasModel> linkAliasList = LinkAliasModel.createList(core, "name Is Not null");
-                    foreach (Models.Db.LinkAliasModel linkAlias in linkAliasList) {
+                    foreach (var linkAlias in LinkAliasModel.createList(core, "name Is Not null")) {
                         string route = GenericController.normalizeRoute(linkAlias.name);
                         if (!string.IsNullOrEmpty(route)) {
                             if (result.routeDictionary.ContainsKey(route)) {
@@ -134,9 +121,9 @@ namespace Contensive.Processor.Models.Domain {
         //
         public static void setCache(CoreController core, RouteMapModel routeDictionary) {
             var dependentKeyList = new List<string> {
-                AddonModel.contentTableName,
-                LinkAliasModel.contentTableName,
-                LinkForwardModel.contentTableName
+                CacheController.getCacheKey_forDbTable( AddonModel.contentTableName),
+                CacheController.getCacheKey_forDbTable(LinkAliasModel.contentTableName),
+                CacheController.getCacheKey_forDbTable(LinkForwardModel.contentTableName)
             };
             core.cache.setObject(cacheNameRouteMap, routeDictionary,dependentKeyList);
         }
