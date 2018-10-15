@@ -2,6 +2,7 @@
 Option Explicit On
 Option Strict On
 
+Imports System.Web.SessionState
 Imports Contensive.Processor
 Imports Contensive.Processor.Controllers
 Imports Contensive.Processor.Controllers.GenericController
@@ -9,7 +10,7 @@ Imports System.Web.Routing
 Imports System.IO
 Imports Contensive.Processor.Models.Domain
 
-Public Class configurationClass
+Public Class ConfigurationClass
     '
     '====================================================================================================
     ''' <summary>
@@ -67,23 +68,28 @@ Public Class configurationClass
         Return serverConfig
     End Function
     '
-    Public Shared Sub loadRouteMap(cp As Contensive.BaseClasses.CPBaseClass)
+    Public Shared Sub loadRouteMap(cp As CPClass)
         LogController.forceNLog("configurationClass, loadRouteMap, [" + cp.Site.Name + "]", LogController.logLevel.Trace)
-        ' 20180307, added clear to resolve error 
-        RouteTable.Routes.Clear()
-        For Each kvp In cp.Site.getRouteDictionary()
-            Try
-                Dim newRouteName As String = kvp.Key
-                Dim newRoute As Contensive.BaseClasses.CPSiteBaseClass.routeClass = kvp.Value
-                '
-                LogController.forceNLog("configurationClass, loadRouteMap, [" + cp.Site.Name + "] [" + newRoute.virtualRoute + "], [" + newRoute.physicalRoute + "]", LogController.logLevel.Trace)
-                '
-                RouteTable.Routes.Remove(RouteTable.Routes(newRouteName))
-                RouteTable.Routes.MapPageRoute(newRoute.virtualRoute, newRoute.virtualRoute, newRoute.physicalRoute)
-            Catch ex As Exception
-                cp.Site.ErrorReport(ex, "Unexpected exception adding virtualRoute [" & kvp.Key & "]")
-            End Try
-        Next
+        '
+        ' test if route map needs to be loaded (routeMap.dateCreated <> application[routeMapDateCreated])
+        If (Not cp.routeMap.dateCreated.Equals(HttpContext.Current.Application("RouteMapDateCreated"))) Then
+            ' 20180307, added clear to resolve error 
+            RouteTable.Routes.Clear()
+            For Each kvp In cp.routeMap.routeDictionary
+                Try
+                    Dim newRouteName As String = kvp.Key
+                    Dim newRoute As RouteMapModel.routeClass = kvp.Value
+                    '
+                    LogController.forceNLog("configurationClass, loadRouteMap, [" + cp.Site.Name + "] [" + newRoute.virtualRoute + "], [" + newRoute.physicalRoute + "]", LogController.logLevel.Trace)
+                    '
+                    RouteTable.Routes.Remove(RouteTable.Routes(newRouteName))
+                    RouteTable.Routes.MapPageRoute(newRoute.virtualRoute, newRoute.virtualRoute, newRoute.physicalRoute)
+                Catch ex As Exception
+                    cp.Site.ErrorReport(ex, "Unexpected exception adding virtualRoute [" & kvp.Key & "]")
+                End Try
+            Next
+            HttpContext.Current.Application("routeMapDateCreated") = cp.routeMap.dateCreated
+        End If
     End Sub
 End Class
 

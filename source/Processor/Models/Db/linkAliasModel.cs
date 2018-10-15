@@ -106,7 +106,15 @@ namespace Contensive.Processor.Models.Db {
         //====================================================================================================
         public static void invalidateRecordCache(CoreController core, int recordId) {
             invalidateRecordCache<LinkAliasModel>(core, recordId);
-            Models.Domain.RouteDictionaryModel.invalidateCache(core);
+            Domain.RouteMapModel.invalidateCache(core);
+            core.routeMapClearLocalCache();
+        }
+        //
+        //====================================================================================================
+        public static void invalidateTableCache(CoreController core) {
+            invalidateTableCache<LinkAliasModel>(core);
+            Domain.RouteMapModel.invalidateCache(core);
+            core.routeMapClearLocalCache();
         }
         //
         //====================================================================================================

@@ -82,14 +82,14 @@ namespace Contensive.Processor {
                 return core.appConfig.appStatus;
             }
         }
-        /// <summary>
-        /// When a change is make data used for the route table, this flag is set in core. Use this flag to reload the webserver's route tables
-        /// </summary>
-        public bool routeDictionaryChanges {
-            get {
-                return core.doc.routeDictionaryChanges;
-            }
-        }
+        ///// <summary>
+        ///// When a change is make data used for the route table, this flag is set in core. Use this flag to reload the webserver's route tables
+        ///// </summary>
+        //public bool routeDictionaryChanges {
+        //    get {
+        //        return core.routeDictionaryChanges;
+        //    }
+        //}
         //
         //=========================================================================================================
         //
@@ -349,7 +349,9 @@ namespace Contensive.Processor {
         private CPContextClass _contextObj;
         //
         //=========================================================================================================
-        //
+        /// <summary>
+        /// Properties and methods helpful in access the database
+        /// </summary>
         public override CPDbBaseClass Db {
             get {
                 if (_dbObj == null) {
@@ -361,7 +363,9 @@ namespace Contensive.Processor {
         private CPDbClass _dbObj;
         //
         //=========================================================================================================
-        //
+        /// <summary>
+        /// Properties and methods helpful in creating a return document. 
+        /// </summary>
         public override CPDocBaseClass Doc {
             get {
                 if (_docObj == null) {
@@ -373,7 +377,9 @@ namespace Contensive.Processor {
         private CPDocClass _docObj;
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Properties and methods helpful in managing email
+        /// </summary>
         public override CPEmailBaseClass Email {
             get {
                 if (_emailObj == null) {
@@ -385,7 +391,9 @@ namespace Contensive.Processor {
         private CPEmailClass _emailObj;
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Legacy method that provides access the current application server. AS of v5, access is limited to that provided by privatefiles, wwwRoot, temp and appFiles
+        /// </summary>
         [Obsolete()] public override CPFileBaseClass File {
             get {
                 if (_fileObj == null) {
@@ -397,7 +405,9 @@ namespace Contensive.Processor {
         private CPFileClass _fileObj;
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Properties and methods helpful in managing groups
+        /// </summary>
         public override CPGroupBaseClass Group {
             get {
                 if (_groupObj == null) {
@@ -409,7 +419,9 @@ namespace Contensive.Processor {
         private CPGroupClass _groupObj;
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Properties and methods helpful in creating html documents
+        /// </summary>
         public override CPHtmlBaseClass Html {
             get {
                 if (_htmlObj == null) {
@@ -421,7 +433,9 @@ namespace Contensive.Processor {
         private CPHtmlClass _htmlObj;
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Valid during the execution of an addon. This object provides access to the addon currently executing.
+        /// </summary>
         public override CPAddonBaseClass MyAddon {
             get {
                 return Addon;
@@ -429,8 +443,10 @@ namespace Contensive.Processor {
         }
         //
         //====================================================================================================
-        //
-        public override CPFileSystemBaseClass privateFiles {
+        /// <summary>
+        /// Access to private files for the application. Private files are not available online.
+        /// </summary>
+        public override CPFileSystemBaseClass PrivateFiles {
             get {
                 if (_privateFiles == null) {
                     _privateFiles = new CPFileSystemClass(core, core.privateFiles);
@@ -441,7 +457,9 @@ namespace Contensive.Processor {
         private CPFileSystemClass _privateFiles;
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Object that provides access to the application request, typically a webserver request.
+        /// </summary>
         public override CPRequestBaseClass Request {
             get {
                 if (_requestObj == null) {
@@ -453,7 +471,9 @@ namespace Contensive.Processor {
         private CPRequestClass _requestObj;
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Object that provides access to the application response, typically a webserver response.
+        /// </summary>
         public override CPResponseBaseClass Response {
             get {
                 if (_responseObj == null) {
@@ -465,7 +485,9 @@ namespace Contensive.Processor {
         private CPResponseClass _responseObj;
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// An object that includes properties and methods that descript the application
+        /// </summary>
         public override CPSiteBaseClass Site {
             get {
                 if (_siteObj == null) {
@@ -477,7 +499,9 @@ namespace Contensive.Processor {
         private CPSiteClass _siteObj;
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// An object that provides basic methods helpful is application execute.
+        /// </summary>
         public override CPUtilsBaseClass Utils {
             get {
                 if (_utilsObj == null) {
@@ -489,7 +513,9 @@ namespace Contensive.Processor {
         private CPUtilsClass _utilsObj;
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// An object that represents the visit. A visit is typically used for Internet applications and represents a sequence of route hits
+        /// </summary>
         public override CPVisitBaseClass Visit {
             get {
                 if (_visitObj == null) {
@@ -501,7 +527,9 @@ namespace Contensive.Processor {
         private CPVisitClass _visitObj;
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// An object that represents the visitor. The visitor is typically used for Internet applications and represents a sequence of visits
+        /// </summary>
         public override CPVisitorBaseClass Visitor {
             get {
                 if (_visitorObj == null) {
@@ -513,7 +541,9 @@ namespace Contensive.Processor {
         private CPVisitorClass _visitorObj;
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// A file object with access to the domain's primary web root files. This is typically where design files are stored, like styles sheets, js, etc.
+        /// </summary>
         public override CPFileSystemBaseClass wwwFiles {
             get {
                 if (_appRootFiles == null) {
@@ -521,8 +551,20 @@ namespace Contensive.Processor {
                 }
                 return _appRootFiles;
             }
+        } private CPFileSystemClass _appRootFiles;
+        //
+        //====================================================================================================
+        /// <summary>
+        /// The route map is a dictionary of route names and route details that tell how to execute the route
+        /// </summary>
+        public RouteMapModel routeMap {
+            get {
+                return core.routeMap;
+            }
+        } private RouteMapModel _routeMap = null;
+        public void routeMapClearLocalCache() {
+            core.routeMapClearLocalCache();
         }
-        private CPFileSystemClass _appRootFiles;
         //
         //====================================================================================================
         #region  IDisposable Support 

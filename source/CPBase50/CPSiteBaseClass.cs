@@ -187,34 +187,6 @@ namespace Contensive.BaseClasses
         /// <param name="returnUserError"></param>
         /// <returns></returns>
         public abstract bool installCollectionFromLibrary(string collectionGuid, ref string returnUserError);
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Returns a list of routes used to configure endpoints, always in Unix slash format without a leading slash
-        /// </summary>
-        /// <returns></returns>
-        public abstract Dictionary<string, routeClass> getRouteDictionary();
-		//
-		//====================================================================================================
-		//
-		public class routeClass
-		{
-			public string virtualRoute;
-			public string physicalRoute;
-			public routeTypeEnum routeType;
-			public int remoteMethodAddonId;
-			public int linkAliasId;
-			public int linkForwardId;
-		}
-		//
-		public enum routeTypeEnum
-		{
-			admin,
-			remoteMethod,
-			linkAlias,
-			linkForward
-		}
-
 	}
 
 }

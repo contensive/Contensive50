@@ -347,12 +347,15 @@ namespace Contensive.Processor {
         public override bool installCollectionFromLibrary(string collectionGuid, ref string returnUserError) {
             return false;
         }
-        //
-        //====================================================================================================
-        //
-        public override Dictionary<string, routeClass> getRouteDictionary() {
-            return core.routeDictionary;
-        }
+        ////
+        ////====================================================================================================
+        ///// <summary>
+        ///// deprecated. Use cp.RouteMap.routeDictionary.
+        ///// </summary>
+        ///// <returns></returns>
+        //[Obsolete("Use cp.RouteMap.routeDictionary instead",false)] public override Dictionary<string, routeClass> getRouteDictionary() {
+        //    return core.routeMap.routeDictionary;
+        //}
 
         #region  IDisposable Support 
         // Do not change or add Overridable to these methods.

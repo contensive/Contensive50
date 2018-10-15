@@ -42,10 +42,6 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public bool isHtml { get; set; } = false;
         /// <summary>
-        /// route dictionary needs to be reloaded - this is a short-term solution. when true, the route Dictionary was updated during this document process and should be updated on exit. Long-term, each webserver instance has to flush cache
-        /// </summary>
-        public bool routeDictionaryChanges = false;
-        /// <summary>
         /// head tags, script tags, style tags, etc
         /// </summary>
         public List<HtmlAssetClass> htmlAssetList { get; set; } = new List<HtmlAssetClass>();
@@ -1416,18 +1412,18 @@ namespace Contensive.Processor.Controllers {
             switch (GenericController.vbLCase(TableName)) {
                 case LinkForwardModel.contentTableName:
                     //
-                    Models.Domain.RouteDictionaryModel.invalidateCache(core);
-                    routeDictionaryChanges = true;
+                    Models.Domain.RouteMapModel.invalidateCache(core);
+                    core.routeMapClearLocalCache();
                     break;
                 case LinkAliasModel.contentTableName:
                     //
-                    Models.Domain.RouteDictionaryModel.invalidateCache(core);
-                    routeDictionaryChanges = true;
+                    Models.Domain.RouteMapModel.invalidateCache(core);
+                    core.routeMapClearLocalCache();
                     break;
                 case AddonModel.contentTableName:
                     //
-                    Models.Domain.RouteDictionaryModel.invalidateCache(core);
-                    routeDictionaryChanges = true;
+                    Models.Domain.RouteMapModel.invalidateCache(core);
+                    core.routeMapClearLocalCache();
                     core.cache.invalidate(cacheObject_addonCache);
                     core.cache.invalidateDbRecord(RecordID, TableName);
                     break;

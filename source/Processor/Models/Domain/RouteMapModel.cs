@@ -18,9 +18,29 @@ namespace Contensive.Processor.Models.Domain {
     /// <summary>
     /// Dictionary of Routes
     /// </summary>
-    public class RouteDictionaryModel {
+    public class RouteMapModel {
         //
-        private const string cacheNameRouteDictionary = "routeDictionary";
+        private const string cacheNameRouteMap = "routeMap";
+        //
+        //====================================================================================================
+        //
+        public class routeClass {
+            public string virtualRoute;
+            public string physicalRoute;
+            public routeTypeEnum routeType;
+            public int remoteMethodAddonId;
+            public int linkAliasId;
+            public int linkForwardId;
+        }
+        //
+        public enum routeTypeEnum {
+            admin,
+            remoteMethod,
+            linkAlias,
+            linkForward
+        }
+        //
+        public Dictionary<string, routeClass> routeDictionary;
         //
         //===================================================================================================
         /// <summary>
@@ -28,21 +48,24 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         /// <param name="core"></param>
         /// <returns></returns>
-        public static Dictionary<string, BaseClasses.CPSiteBaseClass.routeClass> create(CoreController core) {
-            Dictionary<string, BaseClasses.CPSiteBaseClass.routeClass> result = new Dictionary<string, BaseClasses.CPSiteBaseClass.routeClass>();
+        public static RouteMapModel create(CoreController core) {
+            RouteMapModel result = new RouteMapModel();
             try {
                 result = getCache(core);
                 if (result == null) {
-                    result = new Dictionary<string, BaseClasses.CPSiteBaseClass.routeClass>();
+                    result = new RouteMapModel {
+                        dateCreated = DateTime.Now,
+                        routeDictionary = new Dictionary<string, routeClass>()
+                    };
                     string physicalFile = "~/" + core.siteProperties.serverPageDefault;
                     //
                     // -- admin route
                     string adminRoute = GenericController.normalizeRoute(core.appConfig.adminRoute);
                     if (!string.IsNullOrWhiteSpace(adminRoute)) {
-                        result.Add(adminRoute, new BaseClasses.CPSiteBaseClass.routeClass() {
+                        result.routeDictionary.Add(adminRoute, new routeClass() {
                             physicalRoute = physicalFile,
                             virtualRoute = adminRoute,
-                            routeType = BaseClasses.CPSiteBaseClass.routeTypeEnum.admin
+                            routeType = routeTypeEnum.admin
                         });
                     }
                     //
@@ -51,13 +74,13 @@ namespace Contensive.Processor.Models.Domain {
                     foreach (Contensive.Processor.Models.Db.AddonModel remoteMethod in remoteMethods) {
                         string route = GenericController.normalizeRoute(remoteMethod.name);
                         if (!string.IsNullOrWhiteSpace(route)) {
-                            if (result.ContainsKey(route)) {
+                            if (result.routeDictionary.ContainsKey(route)) {
                                 LogController.handleWarn( core,new ApplicationException("Route [" + route + "] cannot be added because it is a matches the Admin Route or another Remote Method."));
                             } else {
-                                result.Add(route, new BaseClasses.CPSiteBaseClass.routeClass() {
+                                result.routeDictionary.Add(route, new routeClass() {
                                     physicalRoute = physicalFile,
                                     virtualRoute = route,
-                                    routeType = BaseClasses.CPSiteBaseClass.routeTypeEnum.remoteMethod,
+                                    routeType = routeTypeEnum.remoteMethod,
                                     remoteMethodAddonId = remoteMethod.id
                                 });
                             }
@@ -69,13 +92,13 @@ namespace Contensive.Processor.Models.Domain {
                     foreach (Models.Db.LinkForwardModel linkForward in linkForwards) {
                         string route = GenericController.normalizeRoute(linkForward.name);
                         if (!string.IsNullOrEmpty(route)) {
-                            if (result.ContainsKey(route)) {
+                            if (result.routeDictionary.ContainsKey(route)) {
                                 LogController.handleError( core,new ApplicationException("Link Foward Route [" + route + "] cannot be added because it is a matches the Admin Route, a Remote Method or another Link Forward."));
                             } else {
-                                result.Add(route, new BaseClasses.CPSiteBaseClass.routeClass() {
+                                result.routeDictionary.Add(route, new routeClass() {
                                     physicalRoute = physicalFile,
                                     virtualRoute = route,
-                                    routeType = BaseClasses.CPSiteBaseClass.routeTypeEnum.linkForward,
+                                    routeType = routeTypeEnum.linkForward,
                                     linkForwardId = linkForward.id
                                 });
                             }
@@ -87,13 +110,13 @@ namespace Contensive.Processor.Models.Domain {
                     foreach (Models.Db.LinkAliasModel linkAlias in linkAliasList) {
                         string route = GenericController.normalizeRoute(linkAlias.name);
                         if (!string.IsNullOrEmpty(route)) {
-                            if (result.ContainsKey(route)) {
+                            if (result.routeDictionary.ContainsKey(route)) {
                                 LogController.handleError( core,new ApplicationException("Link Alias route [" + route + "] cannot be added because it is a matches the Admin Route, a Remote Method, a Link Forward o another Link Alias."));
                             } else {
-                                result.Add(route, new BaseClasses.CPSiteBaseClass.routeClass() {
+                                result.routeDictionary.Add(route, new routeClass() {
                                     physicalRoute = physicalFile,
                                     virtualRoute = route,
-                                    routeType = BaseClasses.CPSiteBaseClass.routeTypeEnum.linkAlias,
+                                    routeType = routeTypeEnum.linkAlias,
                                     linkAliasId = linkAlias.id
                                 });
                             }
@@ -108,23 +131,31 @@ namespace Contensive.Processor.Models.Domain {
         }
         //
         //====================================================================================================
-        public static void setCache(CoreController core, Dictionary<string, BaseClasses.CPSiteBaseClass.routeClass> routeDictionary) {
-            var dependentKeyList = new List<string>();
-            dependentKeyList.Add(Models.Db.AddonModel.contentTableName);
-            dependentKeyList.Add(Models.Db.LinkAliasModel.contentTableName);
-            dependentKeyList.Add(Models.Db.LinkForwardModel.contentTableName);
-            core.cache.setObject(cacheNameRouteDictionary, routeDictionary,dependentKeyList);
+        //
+        public static void setCache(CoreController core, RouteMapModel routeDictionary) {
+            var dependentKeyList = new List<string> {
+                AddonModel.contentTableName,
+                LinkAliasModel.contentTableName,
+                LinkForwardModel.contentTableName
+            };
+            core.cache.setObject(cacheNameRouteMap, routeDictionary,dependentKeyList);
         }
         //
         //====================================================================================================
-        public static Dictionary<string, BaseClasses.CPSiteBaseClass.routeClass> getCache(CoreController core) {
-            return core.cache.getObject<Dictionary<string, BaseClasses.CPSiteBaseClass.routeClass>>(cacheNameRouteDictionary);
+        public static RouteMapModel getCache(CoreController core) {
+            return core.cache.getObject<RouteMapModel>(cacheNameRouteMap);
         }
         //
         //====================================================================================================
         public static void invalidateCache(CoreController core) {
-            core.cache.invalidate(cacheNameRouteDictionary);
+            core.cache.invalidate(cacheNameRouteMap);
         }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// The date and time when this route dictionary was created. Used by iis app to detect if the route table needs to be updated.
+        /// </summary>
+        public DateTime dateCreated { get; set; }
     }
 }
 

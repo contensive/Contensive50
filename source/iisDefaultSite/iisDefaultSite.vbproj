@@ -633,7 +633,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="configurationClass.vb" />
+    <Compile Include="ConfigurationClass.vb" />
     <Compile Include="default.aspx.designer.vb">
       <DependentUpon>default.aspx</DependentUpon>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

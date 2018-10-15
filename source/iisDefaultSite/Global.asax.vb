@@ -19,12 +19,13 @@ Public Class Global_asax
     ''' <param name="e"></param>
     Sub Application_Start(ByVal sender As Object, ByVal e As EventArgs)
         Try
-            LogController.forceNLog("Global.asax, Application_Start [" & configurationClass.getAppName() & "]", LogController.logLevel.Trace)
-            Using cp As New Contensive.Processor.CPClass(configurationClass.getAppName())
-                DefaultSite.configurationClass.loadRouteMap(cp)
+            Application("asdf") = ""
+            LogController.forceNLog("Global.asax, Application_Start [" & ConfigurationClass.getAppName() & "]", LogController.logLevel.Trace)
+            Using cp As New Contensive.Processor.CPClass(ConfigurationClass.getAppName())
+                DefaultSite.ConfigurationClass.loadRouteMap(cp)
             End Using
         Catch ex As Exception
-            LogController.forceNLog("Global.asax, Application_Start exception [" & configurationClass.getAppName() & "]" & getAppDescription("Application_Start ERROR exit") + ", ex [" & ex.ToString() & "]", Contensive.Processor.Controllers.LogController.logLevel.Fatal)
+            LogController.forceNLog("Global.asax, Application_Start exception [" & ConfigurationClass.getAppName() & "]" & getAppDescription("Application_Start ERROR exit") + ", ex [" & ex.ToString() & "]", Contensive.Processor.Controllers.LogController.logLevel.Fatal)
         End Try
     End Sub
     '

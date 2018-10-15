@@ -226,8 +226,8 @@ namespace Contensive.Processor.Controllers {
                             core.cache.invalidateDbRecord(linkAliasId, LinkAliasModel.contentTableName);
                             //
                             // -- force route reload if this is a webserver page
-                            Models.Domain.RouteDictionaryModel.invalidateCache(core);
-                            core.doc.routeDictionaryChanges = true;
+                            Models.Domain.RouteMapModel.invalidateCache(core);
+                            core.routeMapClearLocalCache();
                         }
                     }
                 }

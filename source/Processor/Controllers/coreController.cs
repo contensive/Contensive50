@@ -460,6 +460,29 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
+        /// The route map is a dictionary of route names and route details that tell how to execute the route
+        /// </summary>
+        public RouteMapModel routeMap {
+            get {
+                if (_routeMap == null) {
+                    _routeMap = RouteMapModel.create(this);
+                }
+                return _routeMap;
+            }
+        }
+        private RouteMapModel _routeMap = null;
+        /// <summary>
+        /// method to clear the core instance of routeMap. local instance is used to speed up multiple local requests, but at the end of the
+        /// page hit, if the route table entries are updated, cache is cleared and the instance object is cleared. When the next reference is 
+        /// made the data is refreshed. At the end of every pageload, if the routemap updates it reloads the iis route table so if a new route
+        /// is added and the next hit is to that method, it will be loaded.
+        /// </summary>
+        public void routeMapClearLocalCache() {
+            _routeMap = null;
+        }
+        //
+        //====================================================================================================
+        /// <summary>
         /// coreClass constructor for app, non-Internet use. coreClass is the primary object internally, created by cp.
         /// </summary>
         /// <param name="cp"></param>
@@ -744,7 +767,7 @@ namespace Contensive.Processor.Controllers {
                     bool routeFound = false;
                     int routeCnt = 100;
                     do {
-                        routeFound = routeDictionary.ContainsKey(routeTest);
+                        routeFound = routeMap.routeDictionary.ContainsKey(routeTest);
                         if (routeFound) {
                             break;
                         }
@@ -757,9 +780,9 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- execute route
                     if (routeFound) {
-                        CPSiteBaseClass.routeClass route = routeDictionary[routeTest];
+                         RouteMapModel.routeClass route = routeMap.routeDictionary[routeTest];
                         switch (route.routeType) {
-                            case CPSiteBaseClass.routeTypeEnum.admin: {
+                            case RouteMapModel.routeTypeEnum.admin: {
                                     //
                                     // -- admin site
                                     AddonModel addon = AddonModel.create(this, addonGuidAdminSite);
@@ -773,7 +796,7 @@ namespace Contensive.Processor.Controllers {
                                         });
                                     }
                                 }
-                            case CPSiteBaseClass.routeTypeEnum.remoteMethod: {
+                            case RouteMapModel.routeTypeEnum.remoteMethod: {
                                     //
                                     // -- remote method
                                     AddonModel addon = addonCache.getAddonById(route.remoteMethodAddonId);
@@ -797,7 +820,7 @@ namespace Contensive.Processor.Controllers {
                                         return this.addon.execute(addon, executeContext);
                                     }
                                 }
-                            case CPSiteBaseClass.routeTypeEnum.linkAlias:
+                            case RouteMapModel.routeTypeEnum.linkAlias:
                                 //
                                 // - link alias
                                 LinkAliasModel linkAlias = LinkAliasModel.create(this, route.linkAliasId);
@@ -819,7 +842,7 @@ namespace Contensive.Processor.Controllers {
 
                                 }
                                 break;
-                            case CPSiteBaseClass.routeTypeEnum.linkForward:
+                            case RouteMapModel.routeTypeEnum.linkForward:
                                 //
                                 // -- link forward
                                 LinkForwardModel linkForward = LinkForwardModel.create(this, route.linkForwardId);
@@ -1131,22 +1154,33 @@ namespace Contensive.Processor.Controllers {
             Version myVersion = myAssemblyname.Version;
             return myVersion.Major.ToString("0") + "." + myVersion.Minor.ToString("00") + "." + myVersion.Build.ToString("00000000");
         }
-        //
-        //===================================================================================================
-        /// <summary>
-        /// future lazy initializer, for now just a proxy
-        /// </summary>
-        public Dictionary<string, CPSiteBaseClass.routeClass> routeDictionary {
-            get {
-                // -- when an addon changes, the route map has to reload on page exit so it is ready on the next hit. lazy cache here clears on page load, so this does work
-                return Models.Domain.RouteDictionaryModel.create(this);
-                //If (_routeDictionary Is Nothing) Then
-                //    _routeDictionary = Models.Complex.routeDictionaryModel.create(Me)
-                //End If
-                //Return _routeDictionary
-            }
-        }
-        //Private _routeDictionary As Dictionary(Of String, CPSiteBaseClass.routeClass) = Nothing
+        ////
+        ////===================================================================================================
+        ///// <summary>
+        ///// lazy document scope cache for routedictionary
+        ///// </summary>
+        //public Dictionary<string, CPSiteBaseClass.routeClass> routeDictionary {
+        //    get {
+        //        // prevent multiple calls from re-reading the entire dictionary - it is large and make of several large caches
+        //        // must add cacheclear to RouteDictionary
+        //        if((_routeDictionary == null) | routeDictionaryChanges ) {
+        //            _routeDictionary = RouteMapModel.create(this);
+        //            routeDictionaryChanges = false;
+        //        }
+        //        return _routeDictionary;
+        //        // -- when an addon changes, the route map has to reload on page exit so it is ready on the next hit. lazy cache here clears on page load, so this does work
+        //        //return RouteDictionaryModel.create(this);
+        //        //If (_routeDictionary Is Nothing) Then
+        //        //    _routeDictionary = Models.Complex.routeDictionaryModel.create(Me)
+        //        //End If
+        //        //Return _routeDictionary
+        //    }
+        //} private Dictionary<String, CPSiteBaseClass.routeClass> _routeDictionary = null;
+        ///// <summary>
+        ///// route dictionary needs to be reloaded - this is a short-term solution. when true, the route Dictionary was updated during this document process and should be updated on exit. Long-term, each webserver instance has to flush cache
+        ///// </summary>
+        //public bool routeDictionaryChanges = false;
+
         //
         //====================================================================================================
         #region  IDisposable Support 
