@@ -400,47 +400,42 @@ namespace Contensive.Processor.Controllers {
                                 }
                                 //
                                 // -- text components
-                                result += addon.copyText + addon.copy;
+                                string contentParts = addon.copyText + addon.copy;
                                 if (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextEditor) {
                                     //
                                     // not editor, encode the content parts of the addon
                                     //
-                                    result = addon.copyText + addon.copy;
                                     switch (executeContext.addonType) {
                                         case CPUtilsBaseClass.addonContext.ContextEditor:
-                                            result = ActiveContentController.renderHtmlForWysiwygEditor(core, result);
+                                            contentParts = ActiveContentController.renderHtmlForWysiwygEditor(core, contentParts);
                                             break;
                                         case CPUtilsBaseClass.addonContext.ContextEmail:
-                                            result = ActiveContentController.renderHtmlForEmail(core, result, executeContext.personalizationPeopleId, "");
+                                            contentParts = ActiveContentController.renderHtmlForEmail(core, contentParts, executeContext.personalizationPeopleId, "");
                                             break;
                                         case CPUtilsBaseClass.addonContext.ContextFilter:
                                         case CPUtilsBaseClass.addonContext.ContextOnBodyEnd:
                                         case CPUtilsBaseClass.addonContext.ContextOnBodyStart:
-                                        //case CPUtilsBaseClass.addonContext.ContextOnBodyEnd:
                                         case CPUtilsBaseClass.addonContext.ContextOnPageEnd:
                                         case CPUtilsBaseClass.addonContext.ContextOnPageStart:
                                         case CPUtilsBaseClass.addonContext.ContextPage:
                                         case CPUtilsBaseClass.addonContext.ContextTemplate:
                                         case CPUtilsBaseClass.addonContext.ContextAdmin:
                                         case CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml:
-                                            //result = contentCmdController.executeContentCommands(core, result, CPUtilsBaseClass.addonContext.ContextAdmin, executeContext.personalizationPeopleId, executeContext.personalizationAuthenticated, ref ignoreLayoutErrors);
-                                            result = ActiveContentController.renderHtmlForWeb(core, result, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, executeContext.personalizationPeopleId, "", 0, executeContext.addonType);
+                                            contentParts = ActiveContentController.renderHtmlForWeb(core, contentParts, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, executeContext.personalizationPeopleId, "", 0, executeContext.addonType);
                                             break;
                                         case CPUtilsBaseClass.addonContext.ContextOnContentChange:
                                         case CPUtilsBaseClass.addonContext.ContextSimple:
-                                            //result = contentCmdController.executeContentCommands(core, result, CPUtilsBaseClass.addonContext.ContextAdmin, executeContext.personalizationPeopleId, executeContext.personalizationAuthenticated, ref ignoreLayoutErrors);
-                                            result = ActiveContentController.renderHtmlForWeb(core, result, "", 0, executeContext.personalizationPeopleId, "", 0, executeContext.addonType);
+                                            contentParts = ActiveContentController.renderHtmlForWeb(core, contentParts, "", 0, executeContext.personalizationPeopleId, "", 0, executeContext.addonType);
                                             break;
                                         case CPUtilsBaseClass.addonContext.ContextRemoteMethodJson:
-                                            //result = contentCmdController.executeContentCommands(core, result, CPUtilsBaseClass.addonContext.ContextAdmin, executeContext.personalizationPeopleId, executeContext.personalizationAuthenticated, ref ignoreLayoutErrors);
-                                            result = ActiveContentController.renderJSONForRemoteMethod(core, result, "", 0, executeContext.personalizationPeopleId, "", 0, "", executeContext.addonType);
+                                            contentParts = ActiveContentController.renderJSONForRemoteMethod(core, contentParts, "", 0, executeContext.personalizationPeopleId, "", 0, "", executeContext.addonType);
                                             break;
                                         default:
-                                            //result = contentCmdController.executeContentCommands(core, result, CPUtilsBaseClass.addonContext.ContextAdmin, executeContext.personalizationPeopleId, executeContext.personalizationAuthenticated, ref ignoreLayoutErrors);
-                                            result = ActiveContentController.renderHtmlForWeb(core, result, "", 0, executeContext.personalizationPeopleId, "", 0, executeContext.addonType);
+                                            contentParts = ActiveContentController.renderHtmlForWeb(core, contentParts, "", 0, executeContext.personalizationPeopleId, "", 0, executeContext.addonType);
                                             break;
                                     }
                                 }
+                                result += contentParts;
                                 //
                                 // -- Scripting code
                                 if (addon.scriptingCode != "") {
