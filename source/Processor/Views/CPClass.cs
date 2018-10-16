@@ -438,7 +438,7 @@ namespace Contensive.Processor {
         /// <summary>
         /// Access to private files for the application. Private files are not available online.
         /// </summary>
-        public override CPFileSystemBaseClass PrivateFiles {
+        public override CPFileSystemBaseClass privateFiles {
             get {
                 if (_privateFiles == null) {
                     _privateFiles = new CPFileSystemClass(core, core.privateFiles);

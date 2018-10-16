@@ -229,7 +229,7 @@ namespace Contensive.BaseClasses
 		/// read and write files not available to the Internet
 		/// </summary>
 		/// <returns></returns>
-		public abstract CPFileSystemBaseClass PrivateFiles {get;}
+		public abstract CPFileSystemBaseClass privateFiles {get;}
 		//
 	}
 

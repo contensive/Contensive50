@@ -1525,7 +1525,6 @@ namespace Contensive.Addons.AdminSite {
                 string[] ListSplit = null;
                 int Cnt = 0;
                 int Pos = 0;
-                int subContentID = 0;
                 //
                 IndexConfig = IndexConfigClass.get(core, adminContext);
                 //
@@ -1702,27 +1701,15 @@ namespace Contensive.Addons.AdminSite {
                 // Sub Content Definitions
                 //
                 SubFilterList = "";
-                list = CdefController.getContentControlCriteria(core, ContentName);
-                if (!string.IsNullOrEmpty(list)) {
-                    ListSplit = list.Split('=');
-                    Cnt = ListSplit.GetUpperBound(0) + 1;
-                    if (Cnt > 0) {
-                        for (Ptr = 0; Ptr < Cnt; Ptr++) {
-                            Pos = GenericController.vbInstr(1, ListSplit[Ptr], ")");
-                            if (Pos > 0) {
-                                subContentID = GenericController.encodeInteger(ListSplit[Ptr].Left(Pos - 1));
-                                if (subContentID > 0 && (subContentID != adminContext.adminContent.id) & (subContentID != IndexConfig.SubCDefID)) {
-                                    Caption = "<span style=\"white-space:nowrap;\">" + CdefController.getContentNameByID(core, subContentID) + "</span>";
-                                    QS = RQS;
-                                    QS = GenericController.modifyQueryString(QS, "IndexFilterAddCDef", subContentID.ToString(), true);
-                                    Link = "/" + core.appConfig.adminRoute + "?" + QS;
-                                    SubFilterList = SubFilterList + "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\">" + Caption + "</a></div>";
-                                }
-                            }
-                        }
+                var contentList = ContentModel.createList(core, "(contenttableid in (select id from cctables where name=" + core.db.encodeSQLText(adminContext.adminContent.tableName) + "))");
+                if (contentList.Count>1) {
+                    foreach ( var subContent in contentList ) {
+                        Caption = "<span style=\"white-space:nowrap;\">" + subContent.name + "</span>";
+                        QS = RQS;
+                        QS = GenericController.modifyQueryString(QS, "IndexFilterAddCDef", subContent.id.ToString(), true);
+                        Link = "/" + core.appConfig.adminRoute + "?" + QS;
+                        SubFilterList = SubFilterList + "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\">" + Caption + "</a></div>";
                     }
-                }
-                if (!string.IsNullOrEmpty(SubFilterList)) {
                     returnContent += "<div class=\"ccFilterSubHead\">In Sub-content</div>" + SubFilterList;
                 }
                 //
