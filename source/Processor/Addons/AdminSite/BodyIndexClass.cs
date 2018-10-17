@@ -412,17 +412,7 @@ namespace Contensive.Addons.AdminSite {
                             string DataTable_FindRow = "<tr><td colspan=" + (2 + IndexConfig.columns.Count) + " style=\"background-color:black;height:1;\"></td></tr>";
                             DataTable_FindRow += "<tr>";
                             DataTable_FindRow += "<td valign=\"middle\" colspan=2 width=\"60\" class=\"ccPanel\" align=center style=\"vertical-align:middle;padding:8px;text-align:center ! important;\">";
-                            DataTable_FindRow += "\r\n<script language=\"javascript\" type=\"text/javascript\">"
-                                + "\r\nfunction KeyCheck(e){"
-                                + "\r\n  var code = e.keyCode;"
-                                + "\r\n  if(code==13){"
-                                + "\r\n    document.getElementById('FindButton').focus();"
-                                + "\r\n    document.getElementById('FindButton').click();"
-                                + "\r\n    return false;"
-                                + "\r\n  }"
-                                + "\r\n} "
-                                + "\r\n</script>";
-                            DataTable_FindRow += AdminUIController.getButtonPrimary(ButtonFind) + "</td>";
+                            DataTable_FindRow += AdminUIController.getButtonPrimary(ButtonFind, "", false, "FindButton") + "</td>";
                             int ColumnPointer = 0;
                             foreach (var column in IndexConfig.columns) {
                                 int ColumnWidth = column.Width;

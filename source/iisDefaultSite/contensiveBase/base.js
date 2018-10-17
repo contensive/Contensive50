@@ -60,13 +60,13 @@ window.size = function () {
             w = document.documentElement.clientWidth;
             h = document.documentElement.clientHeight;
         }
-            //quirks mode
+        //quirks mode
         else {
             w = document.body.clientWidth;
             h = document.body.clientHeight;
         }
     }
-        //w3c
+    //w3c
     else {
         w = window.innerWidth;
         h = window.innerHeight;
@@ -193,11 +193,11 @@ function hideselect(hiddenIn) {
     if (selectsHidden && menuClicks == 0) {
         selectsHidden = false;
     }
-        //
+    //
     else if (selectsHidden && menuClicks != 0 && clickButton != 2) {
         menuClicks--;
     }
-        //
+    //
     else {
         selectsHidden = true;
     }
@@ -436,7 +436,7 @@ function ccFlyoutPanelHover(event, StyleSheetPrefix) {
     var menu;
     if (browser.isIE)
         menu = getContainerWith(window.event.srcElement, "DIV", StyleSheetPrefix + "Panel");
-        //menu = getContainerWith(window.event.srcElement, "DIV", "ccFlyoutPanel");
+    //menu = getContainerWith(window.event.srcElement, "DIV", "ccFlyoutPanel");
     else
         menu = event.currentTarget;
     if (menu.title != "") {
@@ -456,7 +456,7 @@ function ccFlyoutPanelButtonHover(event, menuId, StyleSheetPrefix) {
     var maxX, maxY;
     if (browser.isIE)
         item = getContainerWith(window.event.srcElement, "A", StyleSheetPrefix + "PanelButton");
-        //item = getContainerWith(window.event.srcElement, "A", "ccFlyoutPanelButton");
+    //item = getContainerWith(window.event.srcElement, "A", "ccFlyoutPanelButton");
     else
         item = event.currentTarget;
     menu = getContainerWith(item, "DIV", StyleSheetPrefix + "Panel");
@@ -483,9 +483,9 @@ function ccFlyoutPanelButtonHover(event, menuId, StyleSheetPrefix) {
     }
     if (browser.isIE) {
         maxX = (document.documentElement.scrollLeft != 0 ? document.documentElement.scrollLeft : document.body.scrollLeft)
-			+ (document.documentElement.clientWidth != 0 ? document.documentElement.clientWidth : document.body.clientWidth);
+            + (document.documentElement.clientWidth != 0 ? document.documentElement.clientWidth : document.body.clientWidth);
         maxY = (document.documentElement.scrollTop != 0 ? document.documentElement.scrollTop : document.body.scrollTop)
-			+ (document.documentElement.clientHeight != 0 ? document.documentElement.clientHeight : document.body.clientHeight);
+            + (document.documentElement.clientHeight != 0 ? document.documentElement.clientHeight : document.body.clientHeight);
     }
     maxX -= item.subMenu.offsetWidth;
     maxY -= item.subMenu.offsetHeight;
@@ -557,7 +557,7 @@ function getContainerWith(node, tagName, className) {
     console.log("base.getContainerWith");
     while (node != null) {
         if (node.tagName != null && node.tagName == tagName &&
-				hasClassName(node, className))
+            hasClassName(node, className))
             return node;
         node = node.parentNode;
     }
@@ -2882,111 +2882,111 @@ function cjRemote(options) {
         }
     }
     jQuery.get(url,
-		function (serverResponse) {
-		    var e, start, end, test;
-		    var isSrcArray = new Array();
-		    var codeArray = new Array();
-		    var oldOnLoad = window.onload;
-		    if (serverResponse == '') {
-		        if (options.onEmptyHideId) {
-		            e = document.getElementById(options.onEmptyHideId);
-		            if (e) {
-		                e.style.display = 'none'
-		            }
-		        }
-		        if (options.onEmptyShowID) {
-		            e = document.getElementById(options.onEmptyShowID);
-		            if (e) {
-		                e.style.display = 'block'
-		            }
-		        }
-		    }
-		    else {
-		        // remove embedded scripts
-		        e = document.createElement('div');
-		        if (e) {
-		            // create array of scripts to add
-		            // this is a workaround for an issue with ie
-		            // where the scripts collection is 0ed after the first eval
-		            window.onload = '';
-		            e.innerHTML = serverResponse;
-		            if ((serverResponse != '') && (e.innerHTML == '')) {
-		                //ie7-8,blocks scripts in response
-		                test = serverResponse;
-		                start = test.indexOf('<script');
-		                while (start > -1) {
-		                    end = test.indexOf('/script>');
-		                    if (end > -1) {
-		                        serverResponse = serverResponse.substr(0, start) + serverResponse.substr(end + 8);
-		                    }
-		                    else {
-		                        serverResponse = serverResponse.substr(0, start);
-		                    }
-		                    test = serverResponse;
-		                    start = test.indexOf('<script');
-		                }
-		            }
-		            else {
-		                //e.innerText = serverResponse;
-		                //jQuery(e).html(serverResponse);
-		                scripts = e.getElementsByTagName('script');
-		                sLen = scripts.length;
-		                if (sLen > 0) {
-		                    for (i = 0; i < sLen; i++) {
-		                        if (scripts[i].src) {
-		                            isSrcArray.push(true);
-		                            codeArray.push(scripts[i].src);
-		                            scripts[i].parentNode.removeChild(scripts[i]);
-		                        }
-		                        else {
-		                            isSrcArray.push(false);
-		                            codeArray.push(scripts[i].innerHTML);
-		                            scripts[i].parentNode.removeChild(scripts[i]);
-		                        }
-		                    }
-		                    serverResponse = e.innerHTML;
-		                }
-		            }
-		        }
-		        // execute any scripts found
-		        for (i = 0; i < codeArray.length; i++) {
-		            if (isSrcArray[i]) {
-		                var s = document.createElement("script");
-		                s.src = codeArray[i];
-		                s.type = "text/javascript";
-		                document.getElementsByTagName("head")[0].appendChild(s);
-		            }
-		            else {
-		                eval(codeArray[i]);
-		            }
+        function (serverResponse) {
+            var e, start, end, test;
+            var isSrcArray = new Array();
+            var codeArray = new Array();
+            var oldOnLoad = window.onload;
+            if (serverResponse == '') {
+                if (options.onEmptyHideId) {
+                    e = document.getElementById(options.onEmptyHideId);
+                    if (e) {
+                        e.style.display = 'none'
+                    }
+                }
+                if (options.onEmptyShowID) {
+                    e = document.getElementById(options.onEmptyShowID);
+                    if (e) {
+                        e.style.display = 'block'
+                    }
+                }
+            }
+            else {
+                // remove embedded scripts
+                e = document.createElement('div');
+                if (e) {
+                    // create array of scripts to add
+                    // this is a workaround for an issue with ie
+                    // where the scripts collection is 0ed after the first eval
+                    window.onload = '';
+                    e.innerHTML = serverResponse;
+                    if ((serverResponse != '') && (e.innerHTML == '')) {
+                        //ie7-8,blocks scripts in response
+                        test = serverResponse;
+                        start = test.indexOf('<script');
+                        while (start > -1) {
+                            end = test.indexOf('/script>');
+                            if (end > -1) {
+                                serverResponse = serverResponse.substr(0, start) + serverResponse.substr(end + 8);
+                            }
+                            else {
+                                serverResponse = serverResponse.substr(0, start);
+                            }
+                            test = serverResponse;
+                            start = test.indexOf('<script');
+                        }
+                    }
+                    else {
+                        //e.innerText = serverResponse;
+                        //jQuery(e).html(serverResponse);
+                        scripts = e.getElementsByTagName('script');
+                        sLen = scripts.length;
+                        if (sLen > 0) {
+                            for (i = 0; i < sLen; i++) {
+                                if (scripts[i].src) {
+                                    isSrcArray.push(true);
+                                    codeArray.push(scripts[i].src);
+                                    scripts[i].parentNode.removeChild(scripts[i]);
+                                }
+                                else {
+                                    isSrcArray.push(false);
+                                    codeArray.push(scripts[i].innerHTML);
+                                    scripts[i].parentNode.removeChild(scripts[i]);
+                                }
+                            }
+                            serverResponse = e.innerHTML;
+                        }
+                    }
+                }
+                // execute any scripts found
+                for (i = 0; i < codeArray.length; i++) {
+                    if (isSrcArray[i]) {
+                        var s = document.createElement("script");
+                        s.src = codeArray[i];
+                        s.type = "text/javascript";
+                        document.getElementsByTagName("head")[0].appendChild(s);
+                    }
+                    else {
+                        eval(codeArray[i]);
+                    }
 
-		        }
-		        // if destination set, store html response.
-		        if (options.destinationId) {
-		            if (document.getElementById) {
-		                var el1 = document.getElementById(options.destinationId);
-		            }
-		            else if (document.all) {
-		                var el1 = document.All[options.destinationId];
-		            }
-		            else if (document.layers) {
-		                var el1 = document.layers[options.destinationId];
-		            }
-		            if (el1) {
-		                el1.innerHTML = serverResponse
-		            }
-		        }
-		    }
-		    // execute the callback which may save the response
-		    if (options.callback) {
-		        options.callback(serverResponse, options.callbackArg);
-		    }
-		    if (window.onload) {
-		        window.onload();
-		    }
-		},
-		"text"
-	);
+                }
+                // if destination set, store html response.
+                if (options.destinationId) {
+                    if (document.getElementById) {
+                        var el1 = document.getElementById(options.destinationId);
+                    }
+                    else if (document.all) {
+                        var el1 = document.All[options.destinationId];
+                    }
+                    else if (document.layers) {
+                        var el1 = document.layers[options.destinationId];
+                    }
+                    if (el1) {
+                        el1.innerHTML = serverResponse
+                    }
+                }
+            }
+            // execute the callback which may save the response
+            if (options.callback) {
+                options.callback(serverResponse, options.callbackArg);
+            }
+            if (window.onload) {
+                window.onload();
+            }
+        },
+        "text"
+    );
 }
 //
 //-------------------------------------------------------------------------
@@ -3096,3 +3096,13 @@ jQuery(document).ready(function () {
         }
     });
 })
+/*
+* Admin List, submit FindButton if enter while find input field focus 
+*/
+jQuery('.findInput').keypress(function (e) {
+    if (e.which == 13) {
+        e.stopPropagation();
+        e.preventDefault();
+        jQuery('#FindButton').click();
+    }
+});
