@@ -13,6 +13,7 @@ namespace Contensive.BaseClasses
 	/// <remarks></remarks>
 	public abstract class CPAddonBaseClass
 	{
+        // todo add executeAsync method
 		//
 		//====================================================================================================
 		/// <summary>

@@ -20,8 +20,6 @@ using static Contensive.Processor.AdminUIController;
 namespace Contensive.Addons.AdminSite {
     public class BodyIndexClass {
         //
-        const string FilterClosedLabel = "<div style=\"font-size:9px;text-align:center;\">&nbsp;<br>F<br>i<br>l<br>t<br>e<br>r<br>s</div>";
-        //
         //========================================================================
         /// <summary>
         /// Print the index form, values and all creates a sql with leftjoins, and renames lookups as TableLookupxName where x is the TarGetFieldPtr of the field that is FieldTypeLookup
@@ -180,7 +178,7 @@ namespace Contensive.Addons.AdminSite {
                                 IndexFilterContent = ""
                                     + "\r\n<div class=\"ccContentCon\">"
                                     + "\r\n<div id=\"IndexFilterContentOpened\" class=\"opened\">" + getForm_IndexFilterContent(core, adminContext) + "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"200\" height=\"1\" style=\"clear:both\"></div>"
-                                    + "\r\n<div id=\"IndexFilterContentClosed\" class=\"closed\" style=\"display:none;\">" + FilterClosedLabel + "</div>"
+                                    + "\r\n<div id=\"IndexFilterContentClosed\" class=\"closed\" style=\"display:none;\">" + adminIndexFilterClosedLabel + "</div>"
                                     + "\r\n</div>";
                                 IndexFilterJS = ""
                                     + "\r\n<script Language=\"JavaScript\" type=\"text/javascript\">"
@@ -207,7 +205,7 @@ namespace Contensive.Addons.AdminSite {
                                 IndexFilterContent = ""
                                     + "\r\n<div class=\"ccContentCon\">"
                                     + "\r\n<div id=\"IndexFilterContentOpened\" class=\"opened\" style=\"display:none;\"><div style=\"text-align:center;\"><img src=\"/ccLib/images/ajax-loader-small.gif\" width=16 height=16></div></div>"
-                                    + "\r\n<div id=\"IndexFilterContentClosed\" class=\"closed\">" + FilterClosedLabel + "</div>"
+                                    + "\r\n<div id=\"IndexFilterContentClosed\" class=\"closed\">" + adminIndexFilterClosedLabel + "</div>"
                                     + "\r\n<div id=\"IndexFilterContentMinWidth\" style=\"display:none;\"><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"200\" height=\"1\" style=\"clear:both\"></div>"
                                     + "\r\n</div>";
                                 string AjaxQS = GenericController.modifyQueryString(core.doc.refreshQueryString, RequestNameAjaxFunction, AjaxOpenIndexFilterGetContent);

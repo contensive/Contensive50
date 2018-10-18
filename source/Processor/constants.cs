@@ -75,6 +75,8 @@ namespace Contensive.Processor {
         public const string HTMLEditorDefaultCopyNoCr = HTMLEditorDefaultCopyStartMark + "<p><br></p>" + HTMLEditorDefaultCopyEndMark;
         public const string HTMLEditorDefaultCopyNoCr2 = "<p><br></p>";
         //
+        public const string adminIndexFilterClosedLabel = "<div style=\"font-size:9px;text-align:center;\">&nbsp;<br>F<br>i<br>l<br>t<br>e<br>r<br>s</div>";
+        //
         public const string IconWidthHeight = " width=21 height=22 ";
         //
         public const string baseCollectionGuid = "{7C6601A7-9D52-40A3-9570-774D0D43D758}"; // part of software dist - base cdef plus addons with classes in in core library, plus depenancy on coreCollection

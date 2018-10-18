@@ -1637,20 +1637,49 @@ namespace Contensive.Processor.Controllers {
             //
             // Process Addons marked to trigger a process call on content change
             //
+            Dictionary<string, string> instanceArguments ;
+            bool onChangeAddonsAsync = core.siteProperties.getBoolean("execute oncontentchange addons async",false);
             CS = core.db.csOpen("Add-on Content Trigger Rules", "ContentID=" + ContentID,"", false, 0, false, false, "addonid");
             if (IsDelete) {
+                instanceArguments = new Dictionary<string, string>() {
+                    {"action","contentdelete"},
+                    {"contentid",ContentID.ToString()},
+                    {"recordid",RecordID.ToString()}
+                };
                 Option_String = ""
                     + "\r\naction=contentdelete"
-                    + "\r\ncontentid=" + ContentID + "\r\nrecordid=" + RecordID + "";
+                    + "\r\ncontentid=" + ContentID
+                    + "\r\nrecordid=" + RecordID + "";
             } else {
+                instanceArguments = new Dictionary<string, string>() {
+                    {"action","contentchange"},
+                    {"contentid",ContentID.ToString()},
+                    {"recordid",RecordID.ToString()}
+                };
                 Option_String = ""
                     + "\r\naction=contentchange"
-                    + "\r\ncontentid=" + ContentID + "\r\nrecordid=" + RecordID + "";
+                    + "\r\ncontentid=" + ContentID
+                    + "\r\nrecordid=" + RecordID + "";
             }
             while (core.db.csOk(CS)) {
                 addonId = core.db.csGetInteger(CS, "Addonid");
                 //hint = hint & ",210 addonid=[" & addonId & "]"
-                core.addon.executeAsync(addonId.ToString(), Option_String);
+                // convert for forground execution for now
+                if (onChangeAddonsAsync) {
+                    //
+                    // -- execute addon async
+                    core.addon.executeAsync(addonId.ToString(), Option_String);
+                } else {
+                    //
+                    // -- execute addon
+                    core.addon.execute(addonId, new CPUtilsBaseClass.addonExecuteContext() {
+                        addonType = CPUtilsBaseClass.addonContext.ContextOnContentChange,
+                        backgroundProcess = false,
+                        errorContextMessage = "",
+                        instanceArguments = instanceArguments,
+                        personalizationPeopleId = core.session.user.id
+                    });
+                }
                 core.db.csGoNext(CS);
             }
             core.db.csClose(ref CS);

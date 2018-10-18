@@ -19,6 +19,7 @@ using static Contensive.Processor.AdminUIController;
 //
 namespace Contensive.Addons.AdminSite {
     public class GetHtmlBodyClass : Contensive.BaseClasses.AddonBaseClass {
+        // todo admin - when you add a column to the list view, add it to the left, no the right
         //
         //====================================================================================================
         // objects passed in - do not dispose, sets cp from argument For use In calls To other objects, Then core because cp cannot be used since that would be a circular depenancy
