@@ -1,24 +1,61 @@
 ﻿
 using System;
-using System.Reflection;
-using System.Xml;
-using System.Diagnostics;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
-using Contensive.Processor;
-using Contensive.Processor.Models.Db;
-using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
-//
 using System.Text;
 using System.Security.Cryptography;
+using System.IO;
+using static Contensive.Processor.Controllers.GenericController;
 //
 namespace Contensive.Processor.Controllers {
     public class SecurityController {
+        //
+        /// <summary>
+        /// Two way encrypt ciphers. des is older and aes should be used. Both are provided for possible migration.
+        /// </summary>
+        public enum TwoWayCiphers {
+            des = 0,
+            aes = 1
+        }
+        //
+        //========================================================================
+        /// <summary>
+        /// create an encrypted token with an integer and a date
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="keyInteger"></param>
+        /// <param name="keyDate"></param>
+        /// <returns></returns>
+        public static string encodeToken(CoreController core, int keyInteger, DateTime keyDate) {
+            try {
+                return twoWayEncrypt(core, keyInteger.ToString() + "\t" + keyDate.ToString());
+            } catch (Exception ex) {
+                LogController.handleError(core, ex, "EncodeToken failure. Returning blank result for keyInteger [" + keyInteger + "], keyDate [" + keyDate + "]");
+                return "";
+            }
+        }
+        //
+        //========================================================================
+        /// <summary>
+        /// decode an encrypted token with an integer and a date.
+        /// result is 0 if there was a decode error
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="token"></param>
+        /// <param name="returnNumber"></param>
+        /// <param name="returnDate"></param>
+        public static void decodeToken(CoreController core, string token, ref int returnNumber, ref DateTime returnDate) {
+            try {
+                returnNumber = 0;
+                returnDate = DateTime.MinValue;
+                string decodedString = twoWayDecrypt(core, token);
+                string[] parts = decodedString.Split(Convert.ToChar("\t"));
+                if (parts.Length == 2) {
+                    returnNumber = GenericController.encodeInteger(parts[0]);
+                    returnDate = GenericController.encodeDate(parts[1]);
+                }
+            } catch (Exception ex) {
+                LogController.handleError(core, ex, "DecodeToken failure. Returning blank result for token [" + token + "]");
+            }
+        }
         //
         //====================================================================================================
         /// <summary>
@@ -39,14 +76,14 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// return if an encrypted string matches an unencrypted string.
+        /// return true if an encrypted string matches an unencrypted string.
         /// </summary>
         /// <param name="sourceToTest"></param>
         /// <returns></returns>
-        public static bool oneWayVerify(CoreController core, string sourceToTest, string encryptedTaken) {
+        public static bool oneWayVerify(CoreController core, string sourceToTest, string encryptedToken) {
             bool returnResult = false;
             try {
-                returnResult = hashEncode.VerifyHash(sourceToTest, "SHA512", encryptedTaken);
+                returnResult = hashEncode.VerifyHash(sourceToTest, "SHA512", encryptedToken);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
@@ -56,29 +93,57 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// return an encrypted string. This is a two way so use it for little sister security, not foreign government security
+        /// return a DES encrypted string. This is a two way so use it for little sister security, not foreign government security
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="sourceToEncrypt"></param>
+        /// <param name="cipher">Select the cipher. Des is older, Aes is newer and more secure. The selection is provided </param>
+        /// <returns></returns>
+        public static string twoWayEncrypt(CoreController core, string sourceToEncrypt, TwoWayCiphers cipher = TwoWayCiphers.des) {
+            if (cipher == TwoWayCiphers.aes) {
+                return Crypto.encryptStringAES( sourceToEncrypt, core.appConfig.privateKey);
+            } else {
+                return encryptDes(core, sourceToEncrypt);
+            }
+        }
+        //
+        //====================================================================================================
+        //
+        public static string twoWayDecrypt(CoreController core, string sourceToDecrypt, TwoWayCiphers cipher = TwoWayCiphers.des) {
+            if (cipher == TwoWayCiphers.aes) {
+                return Crypto.decryptStringAES(sourceToDecrypt, core.appConfig.privateKey);
+            } else {
+                return decryptDes(core, sourceToDecrypt);
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// return a DES encrypted string. This is a two way so use it for little sister security, not foreign government security
         /// </summary>
         /// <param name="sourceToEncrypt"></param>
         /// <returns></returns>
-        public static  string twoWayEncrypt(CoreController core, string sourceToEncrypt) {
+        private static  string encryptDes(CoreController core, string sourceToEncrypt) {
             string returnResult = "";
             try {
-                byte[] Buffer = null;
-                TripleDESCryptoServiceProvider DES = new TripleDESCryptoServiceProvider();
-                MD5CryptoServiceProvider hashMD5 = new MD5CryptoServiceProvider();
-                ICryptoTransform DESEncrypt = null;
-                //
                 if (string.IsNullOrEmpty(core.appConfig.privateKey)) {
                     //
                 } else {
                     // Compute the MD5 hash.
-                    DES.Key = hashMD5.ComputeHash(System.Text.ASCIIEncoding.ASCII.GetBytes(core.appConfig.privateKey));
-                    // Set the cipher mode.
-                    DES.Mode = CipherMode.ECB;
+                    byte[] saltBytes = ASCIIEncoding.ASCII.GetBytes("notsorandomsalt");
+                    byte[] key = ASCIIEncoding.ASCII.GetBytes(hashEncode.ComputeHash(core.appConfig.privateKey,"SHA256",saltBytes));
+                    Array.Resize(ref key, 24);
+                    //byte[] key = ASCIIEncoding.ASCII.GetBytes(core.appConfig.privateKey);
+                    //MD5CryptoServiceProvider hashMD5 = new MD5CryptoServiceProvider();
+                    //byte[] key = hashMD5.ComputeHash(ASCIIEncoding.ASCII.GetBytes(core.appConfig.privateKey));
+                    TripleDESCryptoServiceProvider DES = new TripleDESCryptoServiceProvider {
+                        Key = key,
+                        Mode = CipherMode.ECB
+                    };
                     // Create the encryptor.
-                    DESEncrypt = DES.CreateEncryptor();
+                    ICryptoTransform DESEncrypt = DES.CreateEncryptor();
                     // Get a byte array of the string.
-                    Buffer = System.Text.ASCIIEncoding.ASCII.GetBytes(sourceToEncrypt);
+                    byte[] Buffer = ASCIIEncoding.ASCII.GetBytes(sourceToEncrypt);
                     // Transform and return the string.
                     Buffer = DESEncrypt.TransformFinalBlock(Buffer, 0, Buffer.Length);
                     returnResult = Convert.ToBase64String(Buffer);
@@ -92,15 +157,13 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// return an decrypted string. blank or non-base64 strings return an empty string. Exception thrown if decryption error. This is a two way so use it for little sister security, not foreign government security
+        /// return a DES decrypted string. blank or non-base64 strings return an empty string. Exception thrown if decryption error. This is a two way so use it for little sister security, not foreign government security
         /// </summary>
         /// <param name="sourceToDecrypt"></param>
         /// <returns></returns>
-        public static  string twoWayDecrypt(CoreController core, string sourceToDecrypt) {
+        private static  string decryptDes(CoreController core, string sourceToDecrypt) {
             string returnResult = "";
             try {
-                byte[] buffer = null;
-                //
                 if (string.IsNullOrEmpty(sourceToDecrypt)) {
                     //
                     // -- source blank, decrypt to blank
@@ -109,12 +172,17 @@ namespace Contensive.Processor.Controllers {
                     // -- source invalid, decrypt to blank
                 } else {
                     // Compute the MD5 hash.
-                    buffer = System.Text.ASCIIEncoding.ASCII.GetBytes(core.appConfig.privateKey);
-                    MD5CryptoServiceProvider hashMD5 = new MD5CryptoServiceProvider();
-                    TripleDESCryptoServiceProvider DES = new TripleDESCryptoServiceProvider();
-                    DES.Key = hashMD5.ComputeHash(buffer);
-                    // Set the cipher mode.
-                    DES.Mode = CipherMode.ECB;
+                    byte[] saltBytes = ASCIIEncoding.ASCII.GetBytes("notsorandomsalt");
+                    byte[] key = ASCIIEncoding.ASCII.GetBytes(hashEncode.ComputeHash(core.appConfig.privateKey, "SHA256", saltBytes));
+                    Array.Resize(ref key, 24);
+                    //byte[] key = ASCIIEncoding.ASCII.GetBytes(core.appConfig.privateKey);
+                    //MD5CryptoServiceProvider hashMD5 = new MD5CryptoServiceProvider();
+                    //byte[] key = hashMD5.ComputeHash(ASCIIEncoding.ASCII.GetBytes(core.appConfig.privateKey));
+                    byte[] buffer = System.Text.ASCIIEncoding.ASCII.GetBytes(core.appConfig.privateKey);
+                    TripleDESCryptoServiceProvider DES = new TripleDESCryptoServiceProvider {
+                        Key = key,
+                        Mode = CipherMode.ECB
+                    };
                     // Create the decryptor.
                     ICryptoTransform DESDecrypt = DES.CreateDecryptor();
                     buffer = Convert.FromBase64String(sourceToDecrypt);
@@ -133,6 +201,7 @@ namespace Contensive.Processor.Controllers {
             return returnResult;
         }
         /// <summary>
+        /// A hash is a one-way conversion. This class is used throughout.
         /// This class generates and compares hashes using MD5, SHA1, SHA256, SHA384, 
         /// and SHA512 hashing algorithms. Before computing a hash, it appends a
         /// randomly generated salt to the plain text, and stores this salt appended
@@ -391,39 +460,126 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //========================================================================
-        //
-        public static string encodeToken(CoreController core, int keyInteger, DateTime keyDate) {
-            string returnToken = "";
-            try {
-                string sourceText = keyInteger.ToString() + "\t" + keyDate.ToString();
-                returnToken = twoWayEncrypt(core,sourceText);
-            } catch (Exception ex) {
-                LogController.handleError( core,ex, "EncodeToken failure. Returning blank result for keyInteger [" + keyInteger + "], keyDate [" + keyDate + "]");
-                returnToken = "";
-            }
-            return returnToken;
-        }
-        //
-        //========================================================================
-        //   Decode a value from an encodestring value
-        //       result is 0 if there was a decode error
-        //========================================================================
-        //
-        public static void decodeToken(CoreController core, string token, ref int returnNumber, ref DateTime returnDate) {
-            try {
-                string decodedString = "";
-                string[] parts = null;
-                //
-                decodedString = twoWayDecrypt(core, token);
-                parts = decodedString.Split(Convert.ToChar("\t"));
-                if (parts.Length == 2) {
-                    returnNumber = GenericController.encodeInteger(parts[0]);
-                    returnDate = GenericController.encodeDate(parts[1]);
+        // -- from https://stackoverflow.com/a/10366194/157247
+        /// <summary>
+        /// A class for creating a symetric encryption
+        /// </summary>
+        public class Crypto {
+            //
+            //While an app specific salt is not the best practice for
+            //password based encryption, it's probably safe enough as long as
+            //it is truly uncommon. Also too much work to alter this answer otherwise.
+            //
+            private static byte[] _salt = Encoding.ASCII.GetBytes("notreallyrandomsalt");
+            //
+            /// <summary>
+            /// Encrypt the given string using AES.  The string can be decrypted using 
+            /// DecryptStringAES().  The sharedSecret parameters must match.
+            /// </summary>
+            /// <param name="plainText">The text to encrypt.</param>
+            /// <param name="sharedSecret">A password used to generate a key for encryption.</param>
+            public static string encryptStringAES(string plainText, string sharedSecret) {
+                string outStr = null;
+                if (string.IsNullOrEmpty(plainText) | string.IsNullOrEmpty(sharedSecret)) {
+                    outStr = "";
+                } else {
+                    RijndaelManaged aesAlg = null;              // RijndaelManaged object used to encrypt the data.
+                    try {
+                        // generate the key from the shared secret and the salt
+                        Rfc2898DeriveBytes key = new Rfc2898DeriveBytes(sharedSecret, _salt);
+
+                        // Create a RijndaelManaged object
+                        aesAlg = new RijndaelManaged();
+                        aesAlg.Key = key.GetBytes(aesAlg.KeySize / 8);
+
+                        // Create a decryptor to perform the stream transform.
+                        ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
+
+                        // Create the streams used for encryption.
+                        using (MemoryStream msEncrypt = new MemoryStream()) {
+                            // prepend the IV
+                            msEncrypt.Write(BitConverter.GetBytes(aesAlg.IV.Length), 0, sizeof(int));
+                            msEncrypt.Write(aesAlg.IV, 0, aesAlg.IV.Length);
+                            using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write)) {
+                                using (StreamWriter swEncrypt = new StreamWriter(csEncrypt)) {
+                                    //Write all data to the stream.
+                                    swEncrypt.Write(plainText);
+                                }
+                            }
+                            outStr = Convert.ToBase64String(msEncrypt.ToArray());
+                        }
+                    } finally {
+                        // Clear the RijndaelManaged object.
+                        if (aesAlg != null)
+                            aesAlg.Clear();
+                    }
                 }
-            } catch (Exception ex) {
-                LogController.handleError( core,ex, "DecodeToken failure. Returning blank result for token [" + token + "]");
-                returnNumber = 0;
-                returnDate = DateTime.MinValue;
+                // Return the encrypted bytes from the memory stream.
+                return outStr;
+            }
+            //
+            /// <summary>
+            /// Decrypt the given string.  Assumes the string was encrypted using 
+            /// EncryptStringAES(), using an identical sharedSecret.
+            /// </summary>
+            /// <param name="cipherText">The text to decrypt.</param>
+            /// <param name="sharedSecret">A password used to generate a key for decryption.</param>
+            public static string decryptStringAES(string cipherText, string sharedSecret) {
+                if (string.IsNullOrEmpty(cipherText) | string.IsNullOrEmpty(sharedSecret) | !cipherText.IsBase64String()) {
+                    return "";
+                } else {
+                    // Declare the RijndaelManaged object
+                    // used to decrypt the data.
+                    RijndaelManaged aesAlg = null;
+
+                    // Declare the string used to hold
+                    // the decrypted text.
+                    string plaintext = null;
+
+                    try {
+                        // generate the key from the shared secret and the salt
+                        Rfc2898DeriveBytes key = new Rfc2898DeriveBytes(sharedSecret, _salt);
+
+                        // Create the streams used for decryption.                
+                        byte[] bytes = Convert.FromBase64String(cipherText);
+                        using (MemoryStream msDecrypt = new MemoryStream(bytes)) {
+                            // Create a RijndaelManaged object
+                            // with the specified key and IV.
+                            aesAlg = new RijndaelManaged();
+                            aesAlg.Key = key.GetBytes(aesAlg.KeySize / 8);
+                            // Get the initialization vector from the encrypted stream
+                            aesAlg.IV = ReadByteArray(msDecrypt);
+                            // Create a decrytor to perform the stream transform.
+                            ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
+                            using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read)) {
+                                using (StreamReader srDecrypt = new StreamReader(csDecrypt))
+
+                                    // Read the decrypted bytes from the decrypting stream
+                                    // and place them in a string.
+                                    plaintext = srDecrypt.ReadToEnd();
+                            }
+                        }
+                    } finally {
+                        // Clear the RijndaelManaged object.
+                        if (aesAlg != null)
+                            aesAlg.Clear();
+                    }
+                    return plaintext;
+                }
+            }
+            //
+            private static byte[] ReadByteArray(Stream s) {
+                byte[] rawLength = new byte[sizeof(int)];
+                if (s.Read(rawLength, 0, rawLength.Length) != rawLength.Length) {
+                    throw new SystemException("Stream did not contain properly formatted byte array");
+                }
+
+                byte[] buffer = new byte[BitConverter.ToInt32(rawLength, 0)];
+                if (s.Read(buffer, 0, buffer.Length) != buffer.Length) {
+                    throw new SystemException("Did not read byte array properly");
+                }
+
+                return buffer;
             }
         }
     }

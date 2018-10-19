@@ -21,10 +21,14 @@ namespace Contensive.Processor.Tests.UnitTests.Models {
                 cp.core.db.executeNonQuery("delete from " + LinkAliasModel.contentTableName);
                 cp.core.db.executeNonQuery("delete from " + LinkForwardModel.contentTableName);
                 // act
-                var routes = RouteMapModel.create(cp.core);
+                var routes = RouteDictionaryModel.create(cp.core);
                 // assert only one route, matching the default admin route
-                Assert.AreEqual(1, routes.routeDictionary.Count);
-                Assert.AreEqual(GenericController.normalizeRoute(cp.core.appConfig.adminRoute), routes.routeDictionary.First().Key);
+                string routeList = "";
+                foreach (KeyValuePair<string,BaseClasses.CPSiteBaseClass.routeClass> routeKvp in routes ) {
+                    routeList += "," + routeKvp.Value.virtualRoute;
+                }
+                Assert.IsTrue(routes.Count>0, "should have been just admin, but was [" + routeList + "]");
+                Assert.AreEqual(GenericController.normalizeRoute(cp.core.appConfig.adminRoute), routes.First().Key);
             }
         }
 

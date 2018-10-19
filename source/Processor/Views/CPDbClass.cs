@@ -219,43 +219,43 @@ namespace Contensive.Processor {
             }
         }
         public override void Delete(string TableName, int RecordId) {
-            throw new NotImplementedException();
+            cp.core.db.deleteTableRecord(RecordId, TableName);
         }
         public override string EncodeSQLNumber(int SourceNumber) {
-            throw new NotImplementedException();
+            return cp.core.db.encodeSQLNumber(SourceNumber);
         }
         public override void ExecuteNonQuery(string sql) {
-            throw new NotImplementedException();
+            cp.core.db.executeNonQuery(sql);
         }
         public override void ExecuteNonQuery(string sql, string dataSourceName) {
-            throw new NotImplementedException();
+            cp.core.db.executeNonQuery(sql,dataSourceName);
         }
         public override void ExecuteNonQuery(string sql, string dataSourceName, ref int recordsAffected) {
-            throw new NotImplementedException();
+            cp.core.db.executeNonQuery(sql, dataSourceName,ref recordsAffected);
         }
         public override void ExecuteNonQueryAsync(string sql) {
-            throw new NotImplementedException();
+            cp.core.db.executeNonQueryAsync(sql);
         }
         public override void ExecuteNonQueryAsync(string sql, string dataSourceName) {
-            throw new NotImplementedException();
+            cp.core.db.executeNonQueryAsync(sql,dataSourceName);
         }
         public override DataTable ExecuteQuery(string sql) {
-            throw new NotImplementedException();
+            return cp.core.db.executeQuery(sql);
         }
         public override DataTable ExecuteQuery(string sql, string dataSourceName) {
-            throw new NotImplementedException();
+            return cp.core.db.executeQuery(sql, dataSourceName);
         }
         public override DataTable ExecuteQuery(string sql, string dataSourceName, int startRecord) {
-            throw new NotImplementedException();
+            return cp.core.db.executeQuery(sql,dataSourceName,startRecord);
         }
         public override DataTable ExecuteQuery(string sql, string dataSourceName, int startRecord, int maxRecords) {
-            throw new NotImplementedException();
+            return cp.core.db.executeQuery(sql, dataSourceName, startRecord, maxRecords);
         }
         public override bool IsTable(string TableName) {
-            throw new NotImplementedException();
+            return cp.core.db.isSQLTable("", TableName);
         }
         public override bool IsTableField(string TableName, string FieldName) {
-            throw new NotImplementedException();
+            return cp.core.db.isSQLTableField("", TableName, FieldName);
         }
         //
         //====================================================================================================

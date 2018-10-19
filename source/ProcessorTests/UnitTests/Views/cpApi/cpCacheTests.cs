@@ -130,45 +130,6 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         /// cp.cache invalidate on content save
         /// </summary>
         [TestMethod()]
-        public void Views_cpCache_InvalidationOnEdit_integration() {
-            // arrange
-            CPClass cp = new CPClass(testAppName);
-            cp.core.siteProperties.setProperty("AllowBake", true);
-            string contentName = "testContent" + cp.Utils.GetRandomInteger().ToString();
-            try {
-                // arrange
-                cp.Content.AddContent(contentName);
-                // act
-                cp.Cache.Save("keyA", "testValue", contentName);
-                // assert
-                Assert.AreEqual("testValue", cp.Cache.Read("keyA"));
-                // act
-                string tmp = cp.Cache.Read("keyA");
-                //
-                CPCSBaseClass cs = cp.CSNew();
-                if (cs.Insert(contentName)) {
-                    cs.SetField("name", "test");
-                } else {
-                    Assert.Fail();
-                }
-                cs.Close();
-                string clearedValue = cp.Cache.Read("keyA");
-                // assert
-                Assert.AreEqual("", clearedValue);
-            } catch (Exception ex) {
-                cp.Utils.AppendLog("cpCacheInvalidationOnEdit_integration, exception, [" + ex.Message + "]");
-                Assert.Fail("exception [" + ex.Message + "]");
-            } finally {
-                cp.Utils.AppendLog("cpCacheInvalidationOnEdit_integration, exit");
-                cp.Content.DeleteContent(contentName);
-                cp.Dispose();
-            }
-        }
-        //====================================================================================================
-        /// <summary>
-        /// cp.cache invalidate on content save
-        /// </summary>
-        [TestMethod()]
         public void Views_cpCache_TagInvalidationString() {
             // arrange
             CPClass cp = new CPClass(testAppName);

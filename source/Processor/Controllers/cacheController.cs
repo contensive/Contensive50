@@ -545,13 +545,13 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// create a cache name for an object composed of data not from a signel record
+        /// create a cache name for an object composed of data not from a single record
         /// </summary>
-        /// <param name="objectName">The key</param>
-        /// <param name="uniqueObjectIdentifier"></param>
+        /// <param name="objectName">The key that describes the object. This can be more general like "person" and used with a uniqueIdentities like "5"</param>
+        /// <param name="objectUniqueIdentifier"></param>
         /// <returns></returns>
-        public static string getCacheKey_forObject(string objectName, string uniqueObjectIdentifier) {
-            string key = "obj/" + objectName + "/" + uniqueObjectIdentifier;
+        public static string getCacheKey_forObject(string objectName, string objectUniqueIdentifier = "") {
+            string key = "obj/" + objectName + "/" + objectUniqueIdentifier;
             key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
             return key;
         }
