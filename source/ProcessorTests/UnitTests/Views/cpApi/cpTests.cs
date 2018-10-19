@@ -87,35 +87,35 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         [TestMethod()]
         public void Views_cp_ExecuteRouteTest() {
             // arrange
-            CPClass cp = new CPClass(testAppName);
-            CPCSBaseClass cs = cp.CSNew();
-            string addonName = "testAddon-2-" + cp.Utils.GetRandomInteger().ToString();
-            int recordId = 0;
-            string htmlText = "12345";
-            string wysiwygText = "<b>abcde</b>";
-            string addonGuid = cp.Utils.CreateGuid();
-           // string activeScript = "cp.doc.getText(\"echo\")";
-            string activeScript = "function m\nm=cp.doc.getText(\"echo\")\nend function";
-            string echoText = "text added to document";
-            //
-            if (cs.Insert(Contensive.Processor.constants.cnAddons)) {
-                recordId = cs.GetInteger("id");
-                cs.SetField("name", addonName);
-                cs.SetField("copytext", htmlText);
-                cs.SetField("copy", wysiwygText);
-                cs.SetField("ccGuid", addonGuid);
-                cs.SetField("scriptingcode", activeScript);
-                cs.SetField("remotemethod", "1");
+            using (CPClass cp = new CPClass(testAppName)) {
+                CPCSBaseClass cs = cp.CSNew();
+                string addonName = "testAddon-2-" + cp.Utils.GetRandomInteger().ToString();
+                int recordId = 0;
+                string htmlText = "12345";
+                string wysiwygText = "<b>abcde</b>";
+                string addonGuid = cp.Utils.CreateGuid();
+                // string activeScript = "cp.doc.getText(\"echo\")";
+                string activeScript = "function m\nm=cp.doc.getText(\"echo\")\nend function";
+                string echoText = "text added to document";
+                //
+                if (cs.Insert(Contensive.Processor.constants.cnAddons)) {
+                    recordId = cs.GetInteger("id");
+                    cs.SetField("name", addonName);
+                    cs.SetField("copytext", htmlText);
+                    cs.SetField("copy", wysiwygText);
+                    cs.SetField("ccGuid", addonGuid);
+                    cs.SetField("scriptingcode", activeScript);
+                    cs.SetField("remotemethod", "1");
+                }
+                cs.Close();
+                cp.Doc.SetProperty("echo", echoText);
+                // act
+                string result = cp.executeRoute(addonName);
+                // assert
+                Assert.AreEqual(htmlText + wysiwygText + echoText, result);
+                //dispose
+                //cp.Content.Delete(Contensive.Processor.constants.cnAddons, "id=" + recordId.ToString());
             }
-            cs.Close();
-            cp.Doc.SetProperty("echo", echoText);
-            // act
-            string result = cp.executeRoute(addonName);
-            // assert
-            Assert.AreEqual(htmlText + wysiwygText + echoText, result);
-            //dispose
-            cp.Content.Delete(Contensive.Processor.constants.cnAddons, "id=" + recordId.ToString());
-            cp.Dispose();
         }
     }
 }

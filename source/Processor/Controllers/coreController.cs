@@ -790,7 +790,7 @@ namespace Contensive.Processor.Controllers {
                                     AddonModel addon = AddonModel.create(this, addonGuidAdminSite);
                                     if (addon == null) {
                                         LogController.handleError( this,new ApplicationException("The admin site addon could not be found by guid [" + addonGuidAdminSite + "]."));
-                                        return "The default admin site addon could not be found. Please run an upgrade on this application to restore default services (command line> cc -a appName -u )";
+                                        return "The default admin site addon could not be found. Please run an upgrade on this application to restore default services (command line> cc -a appName -r )";
                                     } else {
                                         return this.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() {
                                             addonType = CPUtilsBaseClass.addonContext.ContextAdmin,
