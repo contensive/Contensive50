@@ -75,9 +75,6 @@ namespace Contensive.Processor.Controllers {
                 case "ID":
                     result = Contentdefinition.id.ToString();
                     break;
-                case "SUPPORTLEGACYCONTENTCONTROL":
-                    result = Contentdefinition.supportLegacyContentControl.ToString();
-                    break;
                 case "NAME":
                     result = Contentdefinition.name;
                     break;
@@ -144,58 +141,6 @@ namespace Contensive.Processor.Controllers {
                 throw;
             }
             return returnId;
-        }
-        //
-        //========================================================================
-        //   Get Child Criteria
-        //
-        //   Dig into Content Definition Records and create an SQL Criteria statement
-        //   for parent-child relationships.
-        //
-        //   for instance, for a ContentControlCriteria, call this with:
-        //       CriteriaFieldName = "ContentID"
-        //       ContentName = "Content"
-        //
-        //   Results in (ContentID=5)or(ContentID=6)or(ContentID=10)
-        //
-        // Get a string that can be used in the where criteria of a SQL statement
-        // opening the content pointed to by the content pointer. This criteria
-        // will include both the content, and its child contents.
-        //========================================================================
-        //
-        internal static string getLegacyContentControlCriteria(CoreController core, bool supportLegacyContentControl, int contentId, string contentTableName, string contentDAtaSourceName, List<int> parentIdList) {
-            string returnCriteria = "";
-            try {
-                //
-                if (!supportLegacyContentControl) {
-                    returnCriteria = "(1=1)";
-                } else {
-                    returnCriteria = "(1=0)";
-                    if (contentId >= 0) {
-                        if (!parentIdList.Contains(contentId)) {
-                            parentIdList.Add(contentId);
-                            returnCriteria = "(" + contentTableName + ".contentcontrolId=" + contentId + ")";
-                            //
-                            // TODO -- only works if contentIdDist is fully loaded, but this is the only requirement to preload Dict, so removing this removes negative-performance requirements
-                            //
-                            foreach (var childContent in ContentModel.createList(core, "(parentid=" + contentId + ")")) {
-                                returnCriteria += "OR" + getLegacyContentControlCriteria(core, childContent.supportLegacyContentControl, childContent.id, contentTableName, contentDAtaSourceName, parentIdList);
-                            }
-                            //foreach (KeyValuePair<int, ContentModel> kvp in core.doc.contentIdDict) {
-                            //    if (kvp.Value.parentID == contentId) {
-                            //        returnCriteria += "OR" + getLegacyContentControlCriteria(core, kvp.Value.supportLegacyContentControl, kvp.Value.id, contentTableName, contentDAtaSourceName, parentIdList);
-                            //    }
-                            //}
-                            parentIdList.Remove(contentId);
-                            returnCriteria = "(" + returnCriteria + ")";
-                        }
-                    }
-                }
-            } catch (Exception ex) {
-                LogController.handleError(core, ex);
-                throw;
-            }
-            return returnCriteria;
         }
         //
         //========================================================================
@@ -631,7 +576,6 @@ namespace Contensive.Processor.Controllers {
                         sqlList.add("IconWidth", core.db.encodeSQLNumber(cdef.iconWidth));
                         sqlList.add("IconSprites", core.db.encodeSQLNumber(cdef.iconSprites));
                         sqlList.add("installedByCollectionid", core.db.encodeSQLNumber(InstalledByCollectionID));
-                        sqlList.add("supportLegacyContentControl", core.db.encodeSQLBoolean(cdef.supportLegacyContentControl));
                         if ((string.IsNullOrEmpty(contentGuid)) && (!string.IsNullOrEmpty(cdef.guid))) {
                             //
                             // hard one - only update guid if the tables supports it, and it the new guid is not blank

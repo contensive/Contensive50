@@ -35,7 +35,6 @@ namespace Contensive.Processor.Models.Db {
         public int installedByCollectionID { get; set; }
         public bool isBaseContent { get; set; }
         public int parentID { get; set; }
-        public bool supportLegacyContentControl { get; set; }
         // 
         //====================================================================================================
         public static ContentModel addEmpty(CoreController core) {

@@ -475,9 +475,9 @@ namespace Contensive.Addons.AdminSite {
                 string AddonHelpCopy = "";
                 DateTime AddonDateAdded = default(DateTime);
                 DateTime AddonLastUpdated = default(DateTime);
-                string SQL = null;
+                //string SQL = null;
                 string IncludeHelp = "";
-                int IncludeID = 0;
+                //int IncludeID = 0;
                 string IconImg = "";
                 string helpLink = "";
                 bool FoundAddon = false;

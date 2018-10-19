@@ -974,7 +974,6 @@ namespace Contensive.Processor.Controllers {
                     core.db.createSQLTableField("Default", "ccContent", "IconSprites", FieldTypeIdInteger);
                     core.db.createSQLTableField("Default", "ccContent", "installedByCollectionId", FieldTypeIdInteger);
                     core.db.createSQLTableField("Default", "ccContent", "IsBaseContent", FieldTypeIdBoolean);
-                    core.db.createSQLTableField("Default", "ccContent", "SupportLegacyContentControl", FieldTypeIdBoolean);
                     //
                     core.db.createSQLTable("Default", "ccFields");
                     core.db.createSQLTableField("Default", "ccFields", "ContentID", FieldTypeIdInteger);

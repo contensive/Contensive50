@@ -121,7 +121,6 @@ namespace Contensive.Processor.Controllers {
                             updateDst |= !textMatch(dstCdef.defaultSortMethod, srcCdef.defaultSortMethod);
                             updateDst |= !textMatch(dstCdef.dropDownFieldList, srcCdef.dropDownFieldList);
                             updateDst |= !textMatch(dstCdef.editorGroupName, srcCdef.editorGroupName);
-                            updateDst |= (dstCdef.supportLegacyContentControl != srcCdef.supportLegacyContentControl);
                             updateDst |= (dstCdef.active != srcCdef.active);
                             updateDst |= (dstCdef.allowContentChildTool != srcCdef.allowContentChildTool);
                             updateDst |= (dstCdef.parentID != srcCdef.parentID);
@@ -161,7 +160,6 @@ namespace Contensive.Processor.Controllers {
                         dstCdef.iconLink = srcCdef.iconLink;
                         dstCdef.iconSprites = srcCdef.iconSprites;
                         dstCdef.iconWidth = srcCdef.iconWidth;
-                        dstCdef.supportLegacyContentControl = srcCdef.supportLegacyContentControl;
                         dstCdef.installedByCollectionGuid = srcCdef.installedByCollectionGuid;
                         dstCdef.isBaseContent = srcCdef.isBaseContent;
                         dstCdef.isModifiedSinceInstalled = srcCdef.isModifiedSinceInstalled;
@@ -3876,7 +3874,6 @@ namespace Contensive.Processor.Controllers {
                                             targetCdef.iconHeight =XmlController.GetXMLAttributeInteger(core, Found, CDef_NodeWithinLoop, "IconHeight", DefaultCDef.iconHeight);
                                             targetCdef.iconWidth =XmlController.GetXMLAttributeInteger(core, Found, CDef_NodeWithinLoop, "IconWidth", DefaultCDef.iconWidth);
                                             targetCdef.iconSprites =XmlController.GetXMLAttributeInteger(core, Found, CDef_NodeWithinLoop, "IconSprites", DefaultCDef.iconSprites);
-                                            targetCdef.supportLegacyContentControl =XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "supportLegacyContentControl", DefaultCDef.supportLegacyContentControl);
                                             targetCdef.includesAFieldChange = false;
                                             targetCdef.installedByCollectionGuid =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "installedByCollection", DefaultCDef.installedByCollectionGuid);
                                             targetCdef.isBaseContent = IsccBaseFile ||XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "IsBaseContent", false);

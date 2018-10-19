@@ -316,10 +316,10 @@ namespace Contensive.Processor.Controllers {
             }
         }
         private string _landingLink { get; set; } = ""; // Default Landing page - managed through main_GetLandingLink() '
-        internal void contentIdDictClear() {
-            _contentIdDict = null;
-        }
-        private Dictionary<int, ContentModel> _contentIdDict = null;
+        //internal void contentIdDictClear() {
+        //    _contentIdDict = null;
+        //}
+        //private Dictionary<int, ContentModel> _contentIdDict = null;
         //
         //====================================================================================================
         /// <summary>
@@ -1780,7 +1780,7 @@ namespace Contensive.Processor.Controllers {
                     tableSchemaDictionary.Clear();
                 }
                 contentNameIdDictionaryClear();
-                contentIdDictClear();
+                //contentIdDictClear();
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;

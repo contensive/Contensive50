@@ -1509,10 +1509,10 @@ namespace Contensive.Addons.AdminSite {
                 int Ptr = 0;
                 string SubFilterList = null;
                 IndexConfigClass IndexConfig = null;
-                string list = null;
-                string[] ListSplit = null;
-                int Cnt = 0;
-                int Pos = 0;
+                //string list = null;
+                //string[] ListSplit = null;
+                //int Cnt = 0;
+                //int Pos = 0;
                 //
                 IndexConfig = IndexConfigClass.get(core, adminContext);
                 //

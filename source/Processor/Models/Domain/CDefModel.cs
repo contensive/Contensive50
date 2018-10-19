@@ -93,11 +93,6 @@ namespace Contensive.Processor.Models.Domain {
         private string _dataSourceName { get; set; } = "";
         //
         /// <summary>
-        /// if false, all records in the table are in this content
-        /// </summary>
-        public bool supportLegacyContentControl { get; set; }
-        //
-        /// <summary>
         /// deprecate - Field Name of the required "name" field
         /// </summary>
         public string aliasName { get; set; }
@@ -230,7 +225,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <returns></returns>
         public List<int> get_childIdList(CoreController core) {
             _childIdList = new List<int>();
-            if (( supportLegacyContentControl)&(_childIdList == null)) {
+            if (( parentID>0)&(_childIdList == null)) {
                 string Sql = "select id from cccontent where parentid=" + id;
                 using (DataTable dt = core.db.executeQuery(Sql)) {
                     if (dt.Rows.Count == 0) {
@@ -317,7 +312,6 @@ namespace Contensive.Processor.Models.Domain {
                             + ", ccGroups.Name as EditorGroupName"
                             + ", c.AllowContentTracking as AllowContentTracking"
                             + ", c.AllowTopicRules as AllowTopicRules";
-                        sql += ", c.supportLegacyContentControl";
                         //
                         sql += ""
                             + " from (((((ccContent c"
@@ -371,10 +365,6 @@ namespace Contensive.Processor.Models.Domain {
                                 result.activeOnly = true;
                                 result.aliasID = "ID";
                                 result.aliasName = "NAME";
-                                //
-                                // -- figure out later how to deprecate it. Test adding Db field read, but make sure system loads without field, or -u correctly adds field
-                                result.supportLegacyContentControl = GenericController.encodeBoolean(contentRow[21]);
-                                //result.supportLegacyContentControl = true;
                                 //
                                 // load parent cdef fields first so we can overlay the current cdef field
                                 //
@@ -587,7 +577,9 @@ namespace Contensive.Processor.Models.Domain {
                                 }
                                 //
                                 // ----- Create the LegacyContentControlCriteria. For compatibility, if support=false, return (1=1)
-                                result.legacyContentControlCriteria = CdefController.getLegacyContentControlCriteria(core, result.supportLegacyContentControl, result.id, result.tableName, result.dataSourceName, new List<int>());
+                                if ( result.parentID>0) {
+                                    result.legacyContentControlCriteria = getLegacyContentControlCriteria(core, result.id, result.tableName, result.dataSourceName, new List<int>());
+                                }
                                 //
                                 create_setAdminColumns(core, result);
                             }
@@ -600,6 +592,42 @@ namespace Contensive.Processor.Models.Domain {
                 LogController.handleError( core,ex);
             }
             return result;
+        }
+        //   
+        //========================================================================
+        /// <summary>
+        /// Calculates the query criteria for a content with parentId set non-zero. DO NOT CALL if parentId is not 0.
+        /// Dig into Content Definition Records and create an SQL Criteria statement for parent-child relationships.
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="contentId"></param>
+        /// <param name="contentTableName"></param>
+        /// <param name="contentDAtaSourceName"></param>
+        /// <param name="parentIdList"></param>
+        /// <returns></returns>
+        private static string getLegacyContentControlCriteria(CoreController core, int contentId, string contentTableName, string contentDAtaSourceName, List<int> parentIdList) {
+            string returnCriteria = "";
+            try {
+                //
+                {
+                    returnCriteria = "(1=0)";
+                    if (contentId >= 0) {
+                        if (!parentIdList.Contains(contentId)) {
+                            parentIdList.Add(contentId);
+                            returnCriteria = "(" + contentTableName + ".contentcontrolId=" + contentId + ")";
+                            foreach (var childContent in ContentModel.createList(core, "(parentid=" + contentId + ")")) {
+                                returnCriteria += "OR" + getLegacyContentControlCriteria(core, childContent.id, contentTableName, contentDAtaSourceName, parentIdList);
+                            }
+                            parentIdList.Remove(contentId);
+                            returnCriteria = "(" + returnCriteria + ")";
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+                throw;
+            }
+            return returnCriteria;
         }
         //
         //====================================================================================================

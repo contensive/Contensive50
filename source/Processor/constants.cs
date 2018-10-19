@@ -1607,7 +1607,7 @@ namespace Contensive.Processor {
         //    Public AllowAdd As Boolean                  ' Allow adding records
         //    Public AllowDelete As Boolean               ' Allow deleting records
         //    Public WhereClause As String                ' Used to filter records in the admin area
-        //    Public ParentID As Integer                  ' if supportLegacyContentControl, the ID of the parent content
+        //    Public ParentID As Integer                  ' 
         //    Public ChildIDList As String                ' Comma separated list of child content definition IDs
         //    Public ChildPointerList As String           ' Comma separated list of child content definition Pointers
         //    Public DefaultSortMethod As String          ' FieldName Direction, ....
@@ -1643,7 +1643,6 @@ namespace Contensive.Processor {
         //    '
         //    ' ----- future
         //    '
-        //    Public supportLegacyContentControl As Boolean     ' if FALSE, all records in the source are in this content
         //    Public AliasName As String                 ' Field Name of the required "name" field
         //    Public AliasID As String                   ' Field Name of the required "id" field
         //    '
