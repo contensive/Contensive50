@@ -429,7 +429,7 @@ namespace Contensive.Processor.Controllers {
             // -- create default auth objects for non-user methods, or until auth is available
             session = new SessionController(this);
             //
-            serverConfig = Models.Domain.ServerConfigModel.getObject(this);
+            serverConfig = ServerConfigModel.getObject(this);
             this.serverConfig.defaultDataSourceType = DataSourceModel.DataSourceTypeEnum.sqlServerNative;
             webServer.iisContext = null;
             constructorInitialize(false);
