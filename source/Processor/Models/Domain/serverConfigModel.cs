@@ -81,58 +81,13 @@ namespace Contensive.Processor.Models.Domain {
         //Public appPattern As String
         //
         // -- List of all apps on this server
-        public Dictionary<string, AppConfigModel> apps = new Dictionary<string, AppConfigModel>();
-        //
-        // -- the specific application in use for this instance (may be empty if this instance is not initialized
-//        [NonSerialized()]
-//        public appConfigModel appConfig;
-        ////
-        ////====================================================================================================
-        ///// <summary>
-        ///// application configuration class
-        ///// </summary>
-        //public class appConfigModel {
-        //    public string name = "";
-        //    public appStatusEnum appStatus = appStatusEnum.building;
-        //    public appModeEnum appMode = appModeEnum.maintainence; // must be set to normal after setup
-        //    public bool enabled = false;
-        //    public string privateKey = ""; // rename hashKey
-        //    public string appRootFilesPath = ""; // local file path to the appRoot (i.e. d:\inetpub\myApp\wwwRoot\)
-        //    public string cdnFilesPath = ""; // local file path to the content files (i.e. d:\inetpub\myApp\files\)
-        //    public string privateFilesPath = ""; // local file path to the content files (i.e. d:\inetpub\myApp\private\)
-        //    public string tempFilesPath = ""; // ephemeral storage, files live just during rendering life
-        //    public string cdnFilesNetprefix = ""; // in some cases (like legacy), cdnFiles are iis virtual folder mapped to appRoot (/appName/files/). Some cases this is a URL (http:\\cdn.domain.com pointing to s3)
-        //    public bool allowSiteMonitor = false;
-        //    public List<string> domainList = new List<string>(); // primary domain is the first item in the list
-        //    public string adminRoute = ""; // The url pathpath that executes the addon site
-        //    public string defaultPage = "default.aspx"; // when exeecuting iis
-        //}
-        ////
-        ////====================================================================================================
-        ///// <summary>
-        ///// status of the app in the appConfigModel. Only applies to the app loaded in the serverstatus.appconfig
-        ///// </summary>
-        //public enum appModeEnum {
-        //    normal = 0,
-        //    maintainence = 1
-        //}
-        ////
-        ////====================================================================================================
-        ///// <summary>
-        ///// status of the app in the appConfigModel. Only applies to the app loaded in the serverstatus.appconfig
-        ///// </summary>
-        //public enum appStatusEnum {
-        //    OK = 2,
-        //    building = 3
-        //}
+        public CaseInsensitiveDictionary<string,AppConfigModel> apps = new CaseInsensitiveDictionary<string, AppConfigModel>();
         //
         //====================================================================================================
         /// <summary>
         /// Create an empty object. needed for deserialization. Use newModel() method as constructor, includes cache
         /// </summary>
-        public ServerConfigModel() {
-            //
-        }
+        public ServerConfigModel() {}
         //
         //====================================================================================================
         /// <summary>
@@ -153,7 +108,7 @@ namespace Contensive.Processor.Models.Domain {
                     //
                     // for now it fails, maybe later let it autobuild a local cluster
                     //
-                    returnModel = new Models.Domain.ServerConfigModel();
+                    returnModel = new ServerConfigModel();
                     returnModel.allowTaskRunnerService = false;
                     returnModel.allowTaskSchedulerService = false;
                     core.programDataFiles.saveFile("config.json", json_serializer.Serialize(returnModel));
@@ -210,6 +165,15 @@ namespace Contensive.Processor.Models.Domain {
                 LogController.handleError( core,ex);
             }
             return 0;
+        }
+        //
+        /// <summary>
+        /// case insensative dictionary. Use for application lookup
+        /// </summary>
+        /// <typeparam name="V"></typeparam>
+        public class CaseInsensitiveDictionary<S,V> : Dictionary<string, V> {
+            public CaseInsensitiveDictionary() : base(StringComparer.OrdinalIgnoreCase) {
+            }
         }
     }
 }
