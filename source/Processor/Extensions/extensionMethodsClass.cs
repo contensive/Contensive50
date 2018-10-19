@@ -5,7 +5,20 @@ using System.Text.RegularExpressions;
 
 public static class ExtensionMethods {
     //
-    // -- example extention method
+    //====================================================================================================
+    //
+    public static bool isBase64String(this string s) {
+        s = s.Trim();
+        return (s.Length % 4 == 0) && Regex.IsMatch(s, @"^[a-zA-Z0-9\+/]*={0,3}$", RegexOptions.None);
+
+    }
+    //
+    //====================================================================================================
+    /// <summary>
+    /// example extention method
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
     public static string UppercaseFirstLetter(this string value) {
         // Uppercase the first letter in the string.
         if (value.Length > 0) {
@@ -15,6 +28,7 @@ public static class ExtensionMethods {
         }
         return value;
     }
+    //
     //====================================================================================================
     /// <summary>
     /// like vb Left. Return leftmost characters up to the maxLength (but no error if short)

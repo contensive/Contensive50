@@ -180,52 +180,6 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         /// set a key with a dependency on a content. insert a record into content, key should be invalidated
         /// </summary>
         [TestMethod()]
-        public void Controllers_cache_SetGetObjectWithInvalidateContent() {
-            using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
-                // arrange
-                var originalObject = new cacheTestClass();
-                string keyTest = "test" + GenericController.GetRandomInteger(cp.core).ToString();
-                string content = PersonModel.contentName;
-                // act
-                cp.core.cache.setObject(keyTest, originalObject, content);
-                cp.Utils.Sleep(1);
-                var valueBefore = cp.core.cache.getObject<cacheTestClass>(keyTest);
-                var person = PersonModel.add(cp.core );
-                cp.Utils.Sleep(1);
-                var valueAfter = cp.core.cache.getObject<cacheTestClass>(keyTest);
-                // assert
-                Assert.AreEqual(originalObject, valueBefore);
-                Assert.IsNull(valueAfter);
-            }
-        }
-        //
-        /// <summary>
-        /// set a key with a dependency on a content. insert a record into content, key should be invalidated
-        /// </summary>
-        [TestMethod()]
-        public void Controllers_cache_SetGetObjectWithInvalidateTable() {
-            using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
-                // arrange
-                var originalObject = new cacheTestClass();
-                string keyTest = "test" + GenericController.GetRandomInteger(cp.core).ToString();
-                string table = PersonModel.contentTableName;
-                // act
-                cp.core.cache.setObject(keyTest, originalObject, table);
-                cp.Utils.Sleep(1);
-                var valueBefore = cp.core.cache.getObject<cacheTestClass>(keyTest);
-                var person = PersonModel.add(cp.core);
-                cp.Utils.Sleep(1);
-                var valueAfter = cp.core.cache.getObject<cacheTestClass>(keyTest);
-                // assert
-                Assert.AreEqual(originalObject, valueBefore);
-                Assert.IsNull(valueAfter);
-            }
-        }
-        //
-        /// <summary>
-        /// set a key with a dependency on a content. insert a record into content, key should be invalidated
-        /// </summary>
-        [TestMethod()]
         public void Controllers_cache_SetGetAlias() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange

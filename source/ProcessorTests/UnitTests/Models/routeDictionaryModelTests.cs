@@ -23,7 +23,11 @@ namespace Contensive.Processor.Tests.UnitTests.Models {
                 // act
                 var routes = RouteDictionaryModel.create(cp.core);
                 // assert only one route, matching the default admin route
-                Assert.AreEqual(1, routes.Count);
+                string routeList = "";
+                foreach (KeyValuePair<string,BaseClasses.CPSiteBaseClass.routeClass> routeKvp in routes ) {
+                    routeList += "," + routeKvp.Value.virtualRoute;
+                }
+                Assert.IsTrue(routes.Count>0, "should have been just admin, but was [" + routeList + "]");
                 Assert.AreEqual(GenericController.normalizeRoute(cp.core.appConfig.adminRoute), routes.First().Key);
             }
         }

@@ -51,7 +51,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
             // arrange
             CPClass cp = new CPClass(testAppName);
             CPCSBaseClass cs = cp.CSNew();
-            string addonName = "testAddon" + cp.Utils.GetRandomInteger().ToString();
+            string addonName = "testAddon-1-" + cp.Utils.GetRandomInteger().ToString();
             int recordId = 0;
             string htmlText = "12345";
             string wysiwygText = "<b>abcde</b>";
@@ -89,7 +89,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
             // arrange
             CPClass cp = new CPClass(testAppName);
             CPCSBaseClass cs = cp.CSNew();
-            string addonName = "testAddon" + cp.Utils.GetRandomInteger().ToString();
+            string addonName = "testAddon-2-" + cp.Utils.GetRandomInteger().ToString();
             int recordId = 0;
             string htmlText = "12345";
             string wysiwygText = "<b>abcde</b>";

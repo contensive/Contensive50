@@ -21,7 +21,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
                 AddonModel addon = AddonModel.add(cp.core);
-                addon.name = "testaddon" + GenericController.GetRandomInteger(cp.core).ToString() ;
+                addon.name = "testaddon-4-" + GenericController.GetRandomInteger(cp.core).ToString() ;
                 addon.copyText = "foo";
                 addon.save(cp.core);
                 string cmd = "<div>{% \"" + addon.name + "\" %}</div>";
@@ -158,7 +158,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
                 AddonModel addon = AddonModel.add(cp.core);
-                addon.name = "testaddon" + GenericController.GetRandomInteger(cp.core).ToString();
+                addon.name = "testaddon-3-" + GenericController.GetRandomInteger(cp.core).ToString();
                 addon.copyText = "foo$insert$";
                 addon.save(cp.core);
                 string cmd = "<div class=\"sample\">{% {\"addon\":{\"addon\":\"" + addon.name + "\",\"insert\":\"bar\"}} %}</div>";
