@@ -210,7 +210,7 @@ namespace Contensive.Processor {
                     copy = LayoutModel.createByUniqueName(core, layoutRecordNameOrGuid);
                 }
                 if (copy != null) {
-                    accum = copy.layout;
+                    accum = copy.layout.content;
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
