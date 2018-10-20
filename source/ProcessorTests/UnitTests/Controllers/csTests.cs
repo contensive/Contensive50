@@ -95,9 +95,6 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 // redirect
                 // todo - find example of this field type
                 //
-                // currency
-                // todo - find example of this field type
-                //
                 // fileText
                 CPCSBaseClass csGroups = cp.CSNew();
                 if (!csGroups.Insert(Processor.Models.Db.GroupModel.contentName)) Assert.Fail("Insert Groups failed");
@@ -134,12 +131,23 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 // filecss
                 csAddon.SetField("StylesFilename", "abc123");
                 Assert.AreEqual("abc123", csAddon.GetText("StylesFilename"));
+                string cdnFilename = csAddon.GetFilename("StylesFilename");
+                Assert.AreEqual("abc123", cp.cdnFiles.read(cdnFilename));
                 //
                 // filexml
                 // todo - find example of this field type
                 //
                 // filejavascript
-                // todo - find example of this field type
+                {
+                    string valueString = Guid.NewGuid().ToString();
+                    csAddon.SetField("JSFilename", valueString);
+                    Assert.AreEqual(valueString, csAddon.GetText("JSFilename"));
+                    string jsFilename = csAddon.GetFilename("JSFilename");
+                    // todo -- dont save the value to drive until the cs.save()
+                    //    Assert.AreNotEqual(valueString, cp.cdnFiles.read(jsFilename));
+                    csAddon.Save();
+                    Assert.AreEqual(valueString, cp.cdnFiles.read(jsFilename));
+                }
                 //
                 // link
                 // todo - find example of this field type
@@ -148,10 +156,55 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 // todo - find example of this field type
                 //
                 // html
-                // todo - find example of this field type
-                //
+                {
+                    string fieldname = "copy";
+                    string valueString = Guid.NewGuid().ToString();
+                    CPCSBaseClass cs = cp.CSNew();
+                    if (!cs.Insert(Processor.Models.Db.AddonModel.contentName)) Assert.Fail("Insert addon failed");
+                    cs.SetField(fieldname, valueString);
+                    Assert.AreEqual(valueString, cs.GetText(fieldname));
+                    string filename = cs.GetFilename(fieldname);
+                    // todo -- dont save the value to drive until the cs.save()
+                    //Assert.AreNotEqual(valueString, cp.cdnFiles.read(filename));
+                    //cs.Save();
+                    //Assert.AreEqual(valueString, cp.cdnFiles.read(filename));
+                    cs.Close();
+                }
                 // filehtml
-                // todo - find example of this field type
+                {
+                    string valueString = Guid.NewGuid().ToString();
+                    CPCSBaseClass cs = cp.CSNew();
+                    if (!cs.Insert(Processor.Models.Db.LayoutModel.contentName)) Assert.Fail("Insert layout failed");
+                    cs.SetField("layout", valueString);
+                    Assert.AreEqual(valueString, cs.GetText("layout"));
+                    string filename = cs.GetFilename("layout");
+                    // todo -- dont save the value to drive until the cs.save()
+                    //    Assert.AreNotEqual(valueString, cp.cdnFiles.read(filename));
+                    cs.Save();
+                    Assert.AreEqual(valueString, cp.cdnFiles.read(filename));
+                    cs.Close();
+                }
+                //
+                // currency
+                {
+                    // create test field if missing
+                    string contentName = Contensive.Processor.Models.Db.AddonModel.contentName;
+                    string fieldName = "testField" + Guid.NewGuid().ToString().Replace("{", "").Replace("}", "").Replace("-", "");
+                    if (!cp.Content.IsField(contentName, fieldName)) {
+                        cp.Content.AddContentField(contentName, fieldName, constants.FieldTypeIdCurrency);
+                    }
+                    double testValue = ((Double)GenericController.GetRandomInteger(cp.core)) / 100.0;
+                    CPCSBaseClass cs = cp.CSNew();
+                    if (!cs.Insert(contentName)) Assert.Fail("Insert content failed");
+                    cs.SetField(fieldName, testValue);
+                    Assert.AreEqual(testValue, cs.GetNumber(fieldName));
+                    //string filename = cs.GetFilename(fieldName);
+                    // todo -- dont save the value to drive until the cs.save()
+                    //    Assert.AreNotEqual(testValue, cp.cdnFiles.read(filename));
+                    //cs.Save();
+                    //Assert.AreEqual(valueString, cp.cdnFiles.read(filename));
+                    cs.Close();
+                }
                 //
                 // act
                 // assert
