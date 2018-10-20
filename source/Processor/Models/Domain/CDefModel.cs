@@ -1710,7 +1710,7 @@ namespace Contensive.Processor.Models.Domain {
                     }
                 }
                 //
-                if (!isNewFieldRecord) {
+                if (isNewFieldRecord) {
                     core.cache.invalidateAll();
                     core.doc.clearMetaData();
                 }

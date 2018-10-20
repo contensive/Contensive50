@@ -2952,34 +2952,24 @@ namespace Contensive.Processor.Controllers {
                                     case FieldTypeIdFileText:
                                     case FieldTypeIdFileHTML:
                                         //
-                                        // Always set
-                                        // A virtual file is created to hold the content, 'tablename/FieldNameLocal/0000.ext
-                                        // the extension is different for each fieldtype
-                                        // SetCS and get return the content, not the filename
-                                        //
-                                        // Saved in the field is the filename of the virtual file
-                                        // TextFile, assume this call is only made if a change was made to the copy.
-                                        // Use the csv_SetCSTextFile to manage the modified name and date correctly.
-                                        // csv_SetCSTextFile uses this method to set the row changed, so leave this here.
-                                        //
-                                        fileNameNoExt = csGetText(CSPointer, FieldNameLc);
-                                        //FieldValue = genericController.encodeText(FieldValueVariantLocal)
-                                        if (string.IsNullOrEmpty(FieldValue)) {
-                                            if (!string.IsNullOrEmpty(fileNameNoExt)) {
-                                                core.cdnFiles.deleteFile(fileNameNoExt);
-                                                //Call publicFiles.DeleteFile(fileNameNoExt)
-                                                fileNameNoExt = "";
-                                            }
-                                        } else {
-                                            if (string.IsNullOrEmpty(fileNameNoExt)) {
-                                                fileNameNoExt = csGetFieldFilename(CSPointer, FieldName, "", ContentName, field.fieldTypeId);
-                                            }
-                                            core.cdnFiles.saveFile(fileNameNoExt, FieldValue);
-                                            //Call publicFiles.SaveFile(fileNameNoExt, FieldValue)
-                                        }
-                                        FieldValue = fileNameNoExt;
-                                        SetNeeded = true;
-                                        break;
+                                        //fileNameNoExt = csGetText(CSPointer, FieldNameLc);
+                                        ////FieldValue = genericController.encodeText(FieldValueVariantLocal)
+                                        //if (string.IsNullOrEmpty(FieldValue)) {
+                                        //    if (!string.IsNullOrEmpty(fileNameNoExt)) {
+                                        //        core.cdnFiles.deleteFile(fileNameNoExt);
+                                        //        //Call publicFiles.DeleteFile(fileNameNoExt)
+                                        //        fileNameNoExt = "";
+                                        //    }
+                                        //} else {
+                                        //    if (string.IsNullOrEmpty(fileNameNoExt)) {
+                                        //        fileNameNoExt = csGetFieldFilename(CSPointer, FieldName, "", ContentName, field.fieldTypeId);
+                                        //    }
+                                        //    core.cdnFiles.saveFile(fileNameNoExt, FieldValue);
+                                        //    //Call publicFiles.SaveFile(fileNameNoExt, FieldValue)
+                                        //}
+                                        //FieldValue = fileNameNoExt;
+                                        //SetNeeded = true;
+                                        //break;
                                     case FieldTypeIdFileCSS:
                                     case FieldTypeIdFileXML:
                                     case FieldTypeIdFileJavascript:
