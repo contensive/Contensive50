@@ -884,14 +884,8 @@ public int PathID { get; set; }
 StateModel
 
 public string Abbreviation { get; set; }
-
 public int CountryID { get; set; }
-public string FIPSState { get; set; }
 public double SalesTax { get; set; }
-public int StateRegionID { get; set; }
-
-
-
 
 ---------------------------------------------
 CountrieModel

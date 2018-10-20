@@ -750,7 +750,7 @@ namespace Contensive.Processor.Controllers {
         //
         //=========================================================================================
         //
-        private static void VerifyState(CoreController core, string Name, string Abbreviation, double SaleTax, int CountryID, string FIPSState) {
+        private static void VerifyState(CoreController core, string Name, string Abbreviation, double SaleTax, int CountryID) {
             try {
                 //
                 int CS = 0;
@@ -767,7 +767,6 @@ namespace Contensive.Processor.Controllers {
                     core.db.csSet(CS, "ACTIVE", true);
                     core.db.csSet(CS, "Abbreviation", Abbreviation);
                     core.db.csSet(CS, "CountryID", CountryID);
-                    core.db.csSet(CS, "FIPSState", FIPSState);
                 } else {
                     //
                     // verify only fields needed for contensive
@@ -794,61 +793,61 @@ namespace Contensive.Processor.Controllers {
                 VerifyCountry(core, "United States", "US");
                 CountryID = core.db.getRecordID("Countries", "United States");
                 //
-                VerifyState(core, "Alaska", "AK", 0.0D, CountryID, "");
-                VerifyState(core, "Alabama", "AL", 0.0D, CountryID, "");
-                VerifyState(core, "Arizona", "AZ", 0.0D, CountryID, "");
-                VerifyState(core, "Arkansas", "AR", 0.0D, CountryID, "");
-                VerifyState(core, "California", "CA", 0.0D, CountryID, "");
-                VerifyState(core, "Connecticut", "CT", 0.0D, CountryID, "");
-                VerifyState(core, "Colorado", "CO", 0.0D, CountryID, "");
-                VerifyState(core, "Delaware", "DE", 0.0D, CountryID, "");
-                VerifyState(core, "District of Columbia", "DC", 0.0D, CountryID, "");
-                VerifyState(core, "Florida", "FL", 0.0D, CountryID, "");
-                VerifyState(core, "Georgia", "GA", 0.0D, CountryID, "");
+                VerifyState(core, "Alaska", "AK", 0.0D, CountryID);
+                VerifyState(core, "Alabama", "AL", 0.0D, CountryID);
+                VerifyState(core, "Arizona", "AZ", 0.0D, CountryID);
+                VerifyState(core, "Arkansas", "AR", 0.0D, CountryID);
+                VerifyState(core, "California", "CA", 0.0D, CountryID);
+                VerifyState(core, "Connecticut", "CT", 0.0D, CountryID);
+                VerifyState(core, "Colorado", "CO", 0.0D, CountryID);
+                VerifyState(core, "Delaware", "DE", 0.0D, CountryID);
+                VerifyState(core, "District of Columbia", "DC", 0.0D, CountryID);
+                VerifyState(core, "Florida", "FL", 0.0D, CountryID);
+                VerifyState(core, "Georgia", "GA", 0.0D, CountryID);
 
-                VerifyState(core, "Hawaii", "HI", 0.0D, CountryID, "");
-                VerifyState(core, "Idaho", "ID", 0.0D, CountryID, "");
-                VerifyState(core, "Illinois", "IL", 0.0D, CountryID, "");
-                VerifyState(core, "Indiana", "IN", 0.0D, CountryID, "");
-                VerifyState(core, "Iowa", "IA", 0.0D, CountryID, "");
-                VerifyState(core, "Kansas", "KS", 0.0D, CountryID, "");
-                VerifyState(core, "Kentucky", "KY", 0.0D, CountryID, "");
-                VerifyState(core, "Louisiana", "LA", 0.0D, CountryID, "");
-                VerifyState(core, "Massachusetts", "MA", 0.0D, CountryID, "");
-                VerifyState(core, "Maine", "ME", 0.0D, CountryID, "");
+                VerifyState(core, "Hawaii", "HI", 0.0D, CountryID);
+                VerifyState(core, "Idaho", "ID", 0.0D, CountryID);
+                VerifyState(core, "Illinois", "IL", 0.0D, CountryID);
+                VerifyState(core, "Indiana", "IN", 0.0D, CountryID);
+                VerifyState(core, "Iowa", "IA", 0.0D, CountryID);
+                VerifyState(core, "Kansas", "KS", 0.0D, CountryID);
+                VerifyState(core, "Kentucky", "KY", 0.0D, CountryID);
+                VerifyState(core, "Louisiana", "LA", 0.0D, CountryID);
+                VerifyState(core, "Massachusetts", "MA", 0.0D, CountryID);
+                VerifyState(core, "Maine", "ME", 0.0D, CountryID);
 
-                VerifyState(core, "Maryland", "MD", 0.0D, CountryID, "");
-                VerifyState(core, "Michigan", "MI", 0.0D, CountryID, "");
-                VerifyState(core, "Minnesota", "MN", 0.0D, CountryID, "");
-                VerifyState(core, "Missouri", "MO", 0.0D, CountryID, "");
-                VerifyState(core, "Mississippi", "MS", 0.0D, CountryID, "");
-                VerifyState(core, "Montana", "MT", 0.0D, CountryID, "");
-                VerifyState(core, "North Carolina", "NC", 0.0D, CountryID, "");
-                VerifyState(core, "Nebraska", "NE", 0.0D, CountryID, "");
-                VerifyState(core, "New Hampshire", "NH", 0.0D, CountryID, "");
-                VerifyState(core, "New Mexico", "NM", 0.0D, CountryID, "");
+                VerifyState(core, "Maryland", "MD", 0.0D, CountryID);
+                VerifyState(core, "Michigan", "MI", 0.0D, CountryID);
+                VerifyState(core, "Minnesota", "MN", 0.0D, CountryID);
+                VerifyState(core, "Missouri", "MO", 0.0D, CountryID);
+                VerifyState(core, "Mississippi", "MS", 0.0D, CountryID);
+                VerifyState(core, "Montana", "MT", 0.0D, CountryID);
+                VerifyState(core, "North Carolina", "NC", 0.0D, CountryID);
+                VerifyState(core, "Nebraska", "NE", 0.0D, CountryID);
+                VerifyState(core, "New Hampshire", "NH", 0.0D, CountryID);
+                VerifyState(core, "New Mexico", "NM", 0.0D, CountryID);
 
-                VerifyState(core, "New Jersey", "NJ", 0.0D, CountryID, "");
-                VerifyState(core, "New York", "NY", 0.0D, CountryID, "");
-                VerifyState(core, "Nevada", "NV", 0.0D, CountryID, "");
-                VerifyState(core, "North Dakota", "ND", 0.0D, CountryID, "");
-                VerifyState(core, "Ohio", "OH", 0.0D, CountryID, "");
-                VerifyState(core, "Oklahoma", "OK", 0.0D, CountryID, "");
-                VerifyState(core, "Oregon", "OR", 0.0D, CountryID, "");
-                VerifyState(core, "Pennsylvania", "PA", 0.0D, CountryID, "");
-                VerifyState(core, "Rhode Island", "RI", 0.0D, CountryID, "");
-                VerifyState(core, "South Carolina", "SC", 0.0D, CountryID, "");
+                VerifyState(core, "New Jersey", "NJ", 0.0D, CountryID);
+                VerifyState(core, "New York", "NY", 0.0D, CountryID);
+                VerifyState(core, "Nevada", "NV", 0.0D, CountryID);
+                VerifyState(core, "North Dakota", "ND", 0.0D, CountryID);
+                VerifyState(core, "Ohio", "OH", 0.0D, CountryID);
+                VerifyState(core, "Oklahoma", "OK", 0.0D, CountryID);
+                VerifyState(core, "Oregon", "OR", 0.0D, CountryID);
+                VerifyState(core, "Pennsylvania", "PA", 0.0D, CountryID);
+                VerifyState(core, "Rhode Island", "RI", 0.0D, CountryID);
+                VerifyState(core, "South Carolina", "SC", 0.0D, CountryID);
 
-                VerifyState(core, "South Dakota", "SD", 0.0D, CountryID, "");
-                VerifyState(core, "Tennessee", "TN", 0.0D, CountryID, "");
-                VerifyState(core, "Texas", "TX", 0.0D, CountryID, "");
-                VerifyState(core, "Utah", "UT", 0.0D, CountryID, "");
-                VerifyState(core, "Vermont", "VT", 0.0D, CountryID, "");
-                VerifyState(core, "Virginia", "VA", 0.045, CountryID, "");
-                VerifyState(core, "Washington", "WA", 0.0D, CountryID, "");
-                VerifyState(core, "Wisconsin", "WI", 0.0D, CountryID, "");
-                VerifyState(core, "West Virginia", "WV", 0.0D, CountryID, "");
-                VerifyState(core, "Wyoming", "WY", 0.0D, CountryID, "");
+                VerifyState(core, "South Dakota", "SD", 0.0D, CountryID);
+                VerifyState(core, "Tennessee", "TN", 0.0D, CountryID);
+                VerifyState(core, "Texas", "TX", 0.0D, CountryID);
+                VerifyState(core, "Utah", "UT", 0.0D, CountryID);
+                VerifyState(core, "Vermont", "VT", 0.0D, CountryID);
+                VerifyState(core, "Virginia", "VA", 0.045, CountryID);
+                VerifyState(core, "Washington", "WA", 0.0D, CountryID);
+                VerifyState(core, "Wisconsin", "WI", 0.0D, CountryID);
+                VerifyState(core, "West Virginia", "WV", 0.0D, CountryID);
+                VerifyState(core, "Wyoming", "WY", 0.0D, CountryID);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
