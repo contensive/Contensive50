@@ -209,6 +209,7 @@
     <Compile Include="Extensions\webClientExtensionClass.cs" />
     <Compile Include="Models\Db\Datasource.cs" />
     <Compile Include="Models\Db\SitePropertyModel.cs" />
+    <Compile Include="Models\Db\StateModel.cs" />
     <Compile Include="Models\Domain\AppConfigModel.cs" />
     <Compile Include="Models\Db\EmailQueueModel.cs" />
     <Compile Include="Models\Db\ConditionalEmailModel.cs" />

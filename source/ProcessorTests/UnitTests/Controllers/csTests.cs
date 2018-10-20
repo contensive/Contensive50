@@ -48,8 +48,6 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 // arrange
                 CPCSBaseClass csAddon = cp.CSNew();
                 if (!csAddon.Insert(Processor.Models.Db.AddonModel.contentName)) Assert.Fail("Insert addon failed");
-                CPCSBaseClass csLibraryFile = cp.CSNew();
-                if (!csLibraryFile.Insert(Processor.Models.Db.LibraryFilesModel.contentName)) Assert.Fail("Insert Library File failed");
                 // integer
                 csAddon.SetField("IconHeight", 123);
                 Assert.AreEqual(123, csAddon.GetInteger("IconHeight"));
@@ -86,7 +84,8 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 csAddon.SetField("ProcessNextRun", DateTime.MinValue);
                 Assert.AreEqual(DateTime.MinValue, csAddon.GetDate("ProcessNextRun"));
                 // file
-                //csLibraryFile.SetFile("", "", "");
+                // todo - find example of this field type
+                //
                 // lookup
                 int baseCollectionId = cp.Content.GetRecordID("Add-on Collections", "Base5");
                 Assert.AreNotEqual(0, baseCollectionId, "Base5 add-on collection Id cannot be 0.");
@@ -94,20 +93,57 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 Assert.AreEqual(baseCollectionId, csAddon.GetInteger("collectionId"));
                 Assert.AreEqual("Base5", csAddon.GetText("collectionId"), "cs.getText of a lookup field returns the name of the referenced record");
                 // redirect
+                // todo - find example of this field type
+                //
                 // currency
+                // todo - find example of this field type
+                //
                 // fileText
+                CPCSBaseClass csGroups = cp.CSNew();
+                if (!csGroups.Insert(Processor.Models.Db.GroupModel.contentName)) Assert.Fail("Insert Groups failed");
+                csGroups.SetField("CopyFilename", "abcdef");
+                Assert.AreEqual("abcdef", csGroups.GetText("CopyFilename"));
+                csGroups.Close();
                 // fileImage
+                // todo - find example of this field type
+                //
                 // float (double)
+                CPCSBaseClass csState = cp.CSNew();
+                if (!csState.Insert(Processor.Models.Db.StateModel.contentName)) Assert.Fail("Insert states failed");
+                csState.SetField("SalesTax", 0.045);
+                Assert.AreEqual(0.045, csState.GetNumber("SalesTax"));
+                csState.Close();
+                //
                 // autoIncrement
+                // todo - find example of this field type
+                //
                 // manytomany
+                // todo - find example of this field type
+                //
                 // memberselect
+                // todo - find example of this field type
+                //
                 // filecss
+                // todo - find example of this field type
+                //
                 // filexml
+                // todo - find example of this field type
+                //
                 // filejavascript
+                // todo - find example of this field type
+                //
                 // link
+                // todo - find example of this field type
+                //
                 // resourceLink
+                // todo - find example of this field type
+                //
                 // html
+                // todo - find example of this field type
+                //
                 // filehtml
+                // todo - find example of this field type
+                //
                 // act
                 // assert
             }
