@@ -121,10 +121,19 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 // todo - find example of this field type
                 //
                 // memberselect
-                // todo - find example of this field type
+                var testPerson = Contensive.Processor.Models.Db.PersonModel.add(cp.core);
+                testPerson.name = "person" + testPerson.id;
+                testPerson.save(cp.core);
+                CPCSBaseClass csEmail = cp.CSNew();
+                if (!csEmail.Insert(Processor.Models.Db.EmailModel.contentName)) Assert.Fail("Insert email failed");
+                csEmail.SetField("TestMemberID", testPerson.id);
+                Assert.AreEqual(testPerson.id, csEmail.GetInteger("TestMemberID"));
+                Assert.AreEqual(testPerson.name, csEmail.GetText("TestMemberID"), "cs.getText of a memberselect field returns the name of the referenced record");
+                csEmail.Close();
                 //
                 // filecss
-                // todo - find example of this field type
+                csAddon.SetField("StylesFilename", "abc123");
+                Assert.AreEqual("abc123", csAddon.GetText("StylesFilename"));
                 //
                 // filexml
                 // todo - find example of this field type
