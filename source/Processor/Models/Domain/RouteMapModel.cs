@@ -9,11 +9,15 @@ namespace Contensive.Processor.Models.Domain {
     /// Dictionary of Routes
     /// </summary>
     public class RouteMapModel {
-        //
-        private const string cacheNameRouteMap = "routeMap";
+        /// <summary>
+        /// cache object name
+        /// </summary>
+        private const string cacheNameRouteMap = "RouteMapModel";
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// model for stored route
+        /// </summary>
         public class routeClass {
             public string virtualRoute;
             public string physicalRoute;
@@ -23,6 +27,10 @@ namespace Contensive.Processor.Models.Domain {
             public int linkForwardId;
         }
         //
+        //====================================================================================================
+        /// <summary>
+        /// Types of routes stored
+        /// </summary>
         public enum routeTypeEnum {
             admin,
             remoteMethod,
@@ -30,6 +38,16 @@ namespace Contensive.Processor.Models.Domain {
             linkForward
         }
         //
+        //====================================================================================================
+        /// <summary>
+        /// The date and time when this route dictionary was created. Used by iis app to detect if the route table needs to be updated.
+        /// </summary>
+        public DateTime dateCreated { get; set; }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// public dictionary of routes in the model
+        /// </summary>
         public Dictionary<string, routeClass> routeDictionary;
         //
         //===================================================================================================
@@ -133,10 +151,14 @@ namespace Contensive.Processor.Models.Domain {
         }
         //
         //====================================================================================================
-        //
-        public static void setCache(CoreController core, RouteMapModel routeDictionary) {
+        /// <summary>
+        /// save the model afer it is created. Depends on addons, linkAlias and LinkForwards
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="routeDictionary"></param>
+        private static void setCache(CoreController core, RouteMapModel routeDictionary) {
             var dependentKeyList = new List<string> {
-                CacheController.getCacheKey_forDbTable( AddonModel.contentTableName),
+                CacheController.getCacheKey_forDbTable(AddonModel.contentTableName),
                 CacheController.getCacheKey_forDbTable(LinkAliasModel.contentTableName),
                 CacheController.getCacheKey_forDbTable(LinkForwardModel.contentTableName)
             };
@@ -144,20 +166,23 @@ namespace Contensive.Processor.Models.Domain {
         }
         //
         //====================================================================================================
-        public static RouteMapModel getCache(CoreController core) {
+        /// <summary>
+        /// load the model from cache. returns null if cache not valid
+        /// </summary>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        private static RouteMapModel getCache(CoreController core) {
             return core.cache.getObject<RouteMapModel>(cacheNameRouteMap);
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// invalidate cache if anything is modified
+        /// </summary>
+        /// <param name="core"></param>
         public static void invalidateCache(CoreController core) {
             core.cache.invalidate(cacheNameRouteMap);
         }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// The date and time when this route dictionary was created. Used by iis app to detect if the route table needs to be updated.
-        /// </summary>
-        public DateTime dateCreated { get; set; }
     }
 }
 

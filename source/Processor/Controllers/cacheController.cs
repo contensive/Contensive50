@@ -77,7 +77,7 @@ namespace Contensive.Processor.Controllers {
         //
         //========================================================================
         /// <summary>
-        /// get an object from cache. If the cache misses or is invalidated, nothing object is returned
+        /// get an object from cache. If the cache misses or is invalidated, null object is returned
         /// </summary>
         /// <typeparam name="objectClass"></typeparam>
         /// <param name="key"></param>

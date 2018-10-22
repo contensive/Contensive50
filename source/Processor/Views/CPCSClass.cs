@@ -480,20 +480,25 @@ namespace Contensive.Processor {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, ex);
                 throw;
             }
         }
         //
-        //====================================================================================================
+        public override void SetField(string FieldName, int FieldValue) {
+            core.db.csSet(cs, FieldName, FieldValue);
+        }
         //
-        public override void SetField(string FieldName, string FieldValue) {
-            try {
-                core.db.csSet(cs, FieldName, FieldValue);
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-                throw;
-            }
+        public override void SetField(string FieldName, bool FieldValue) {
+            core.db.csSet(cs, FieldName, FieldValue);
+        }
+        //
+        public override void SetField(string FieldName, DateTime FieldValue) {
+            core.db.csSet(cs, FieldName, FieldValue);
+        }
+        //
+        public override void SetField(string FieldName, String FieldValue) {
+            core.db.csSet(cs, FieldName, FieldValue);
         }
         //
         //====================================================================================================

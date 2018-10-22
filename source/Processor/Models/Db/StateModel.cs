@@ -17,14 +17,20 @@ namespace Contensive.Processor.Models.Db {
         public int countryID { get; set; }
         public double salesTax { get; set; }
         //
+        // todo -- add addEmpty to all models
         //====================================================================================================
-        public static StateModel add(CoreController core) {
-            return add<StateModel>(core);
+        public static StateModel addEmpty(CoreController core) {
+            return addEmpty<StateModel>(core);
         }
         //
         //====================================================================================================
-        public static StateModel add(CoreController core, ref List<string> callersCacheNameList) {
-            return add<StateModel>(core, ref callersCacheNameList);
+        public static StateModel addDefault(CoreController core, Domain.CDefModel cdef) {
+            return addDefault<StateModel>(core, cdef);
+        }
+        //
+        //====================================================================================================
+        public static StateModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefModel cdef) {
+            return addDefault<StateModel>(core, cdef, ref callersCacheNameList);
         }
         //
         //====================================================================================================
@@ -48,13 +54,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static StateModel createByName(CoreController core, string recordName) {
-            return createByName<StateModel>(core, recordName);
+        public static StateModel createByUniqueName(CoreController core, string recordName) {
+            return createByUniqueName<StateModel>(core, recordName);
         }
         //
         //====================================================================================================
-        public static StateModel createByName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByName<StateModel>(core, recordName, ref callersCacheNameList);
+        public static StateModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
+            return createByUniqueName<StateModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================
@@ -109,11 +115,11 @@ namespace Contensive.Processor.Models.Db {
         public static int getRecordId(CoreController core, string ccGuid) {
             return BaseModel.getRecordId<StateModel>(core, ccGuid);
         }
-        //
-        //====================================================================================================
-        public static StateModel createDefault(CoreController core) {
-            return createDefault<StateModel>(core);
-        }
+        ////
+        ////====================================================================================================
+        //public static StateModel createDefault(CoreController core) {
+        //    return createDefault<StateModel>(core);
+        //}
         //
         //====================================================================================================
         /// <summary>

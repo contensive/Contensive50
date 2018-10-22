@@ -17,6 +17,12 @@ namespace Contensive.Processor.Models.Domain {
     [Serializable]
     public class CDefModel {
         //
+        // -- constructor to setup defaults for fields required
+        public CDefModel() {
+            // set defaults, create methods require name, table
+            active = true;
+        }
+        //
         /// <summary>
         /// index in content table
         /// </summary>
@@ -577,9 +583,7 @@ namespace Contensive.Processor.Models.Domain {
                                 }
                                 //
                                 // ----- Create the LegacyContentControlCriteria. For compatibility, if support=false, return (1=1)
-                                if ( result.parentID>0) {
-                                    result.legacyContentControlCriteria = getLegacyContentControlCriteria(core, result.id, result.tableName, result.dataSourceName, new List<int>());
-                                }
+                                result.legacyContentControlCriteria = (result.parentID <= 0) ? "(1=1)" : getLegacyContentControlCriteria(core, result.id, result.tableName, result.dataSourceName, new List<int>());
                                 //
                                 create_setAdminColumns(core, result);
                             }

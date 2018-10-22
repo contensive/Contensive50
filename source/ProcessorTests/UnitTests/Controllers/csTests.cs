@@ -118,7 +118,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 // todo - find example of this field type
                 //
                 // memberselect
-                var testPerson = Contensive.Processor.Models.Db.PersonModel.add(cp.core);
+                var testPerson = Contensive.Processor.Models.Db.PersonModel.addEmpty(cp.core);
                 testPerson.name = "person" + testPerson.id;
                 testPerson.save(cp.core);
                 CPCSBaseClass csEmail = cp.CSNew();

@@ -111,6 +111,7 @@ namespace Contensive.Processor.Models.Db {
                 }
                 get {
                     if (!contentLoaded) {
+                        // todo if internalcore is not set, throw an error
                         if ((!string.IsNullOrEmpty(filename)) && (internalcore != null)) {
                             contentLoaded = true;
                             _content = internalcore.cdnFiles.readFileText(filename);
@@ -626,7 +627,8 @@ namespace Contensive.Processor.Models.Db {
                                             //
                                             // -- cdn files
                                             FieldTypeTextFile instanceFileType = new FieldTypeTextFile {
-                                                filename = propertyValue
+                                                filename = propertyValue,
+                                                 internalcore = core
                                             };
                                             modelProperty.SetValue(modelInstance, instanceFileType);
                                             break;
@@ -635,7 +637,8 @@ namespace Contensive.Processor.Models.Db {
                                             //
                                             // -- cdn files
                                             FieldTypeJavascriptFile instanceFileType = new FieldTypeJavascriptFile {
-                                                filename = propertyValue
+                                                filename = propertyValue,
+                                                internalcore = core
                                             };
                                             modelProperty.SetValue(modelInstance, instanceFileType);
                                             break;
@@ -644,7 +647,8 @@ namespace Contensive.Processor.Models.Db {
                                             //
                                             // -- cdn files
                                             FieldTypeCSSFile instanceFileType = new FieldTypeCSSFile {
-                                                filename = propertyValue
+                                                filename = propertyValue,
+                                                internalcore = core
                                             };
                                             modelProperty.SetValue(modelInstance, instanceFileType);
                                             break;
@@ -653,7 +657,8 @@ namespace Contensive.Processor.Models.Db {
                                             //
                                             // -- private files
                                             FieldTypeHTMLFile instanceFileType = new FieldTypeHTMLFile {
-                                                filename = propertyValue
+                                                filename = propertyValue,
+                                                internalcore = core
                                             };
                                             modelProperty.SetValue(modelInstance, instanceFileType);
                                             break;
@@ -716,28 +721,6 @@ namespace Contensive.Processor.Models.Db {
                     Type instanceType = this.GetType();
                     string tableName = derivedTableName(instanceType);
                     string datasourceName = derivedDataSourceName(instanceType);
-                    //if (id > 0) {
-
-                    //    //
-                    //    // need a new cs method here... openForUpdate( optional id )
-                    //    //  creates a cs with no read data and an empty write buffer
-                    //    //  read buffer get() is blocked, but you can setField()
-                    //    //  cs.save() writes values, if id=0 it does insert, else just update
-                    //    //
-                    //    if (!cs.openForUpdate(contentName, id)) {
-                    //        string message = "Unable to open record in content [" + contentName + "], with id [" + id + "]";
-                    //        cs.close();
-                    //        id = 0;
-                    //        throw new ApplicationException(message);
-                    //    }
-                    //} else {
-                    //    if (!cs.insert(contentName)) {
-                    //        cs.close();
-                    //        id = 0;
-                    //        throw new ApplicationException("Unable to insert record in content [" + contentName + "]");
-                    //    }
-                    //}
-                    //int recordId = cs.getInteger("id");
                     var sqlPairs = new SqlFieldListClass();
                     foreach (PropertyInfo instanceProperty in this.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
                         switch (instanceProperty.Name.ToLower()) {
@@ -1172,21 +1155,48 @@ namespace Contensive.Processor.Models.Db {
         //
         private static T readRecordCache<T>(CoreController core, int recordId) where T : BaseModel {
             Type instanceType = typeof(T);
-            return core.cache.getObject<T>(CacheController.getCacheKey_forDbRecord(recordId, derivedTableName(instanceType), derivedDataSourceName(instanceType)));
+            T result = core.cache.getObject<T>(CacheController.getCacheKey_forDbRecord(recordId, derivedTableName(instanceType), derivedDataSourceName(instanceType)));
+            restoreCacheDataObjects(core, result);
+            return result;
         }
         //
         //====================================================================================================
         //
         private static T readRecordCacheByGuidPtr<T>(CoreController core, string ccGuid) where T : BaseModel {
             Type instanceType = typeof(T);
-            return core.cache.getObject<T>(CacheController.getCachePtr_forDbRecord_guid(ccGuid, derivedTableName(instanceType), derivedDataSourceName(instanceType)));
+            T result = core.cache.getObject<T>(CacheController.getCachePtr_forDbRecord_guid(ccGuid, derivedTableName(instanceType), derivedDataSourceName(instanceType)));
+            restoreCacheDataObjects(core, result);
+            return result;
         }
         //
         //====================================================================================================
         //
         private static T readRecordCacheByUniqueNamePtr<T>(CoreController core, string uniqueName) where T : BaseModel {
             Type instanceType = typeof(T);
-            return core.cache.getObject<T>(CacheController.getCachePtr_forDbRecord_uniqueName(uniqueName, derivedTableName(instanceType), derivedDataSourceName(instanceType)));
+            T result = core.cache.getObject<T>(CacheController.getCachePtr_forDbRecord_uniqueName(uniqueName, derivedTableName(instanceType), derivedDataSourceName(instanceType)));
+            restoreCacheDataObjects(core, result);
+            return result;
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// After reading a cached Db object, go through instance properties and verify internal core objects populated
+        /// </summary>
+        private static void restoreCacheDataObjects<T>( CoreController core, T restoredInstance ) {
+            if (restoredInstance != null) {
+                foreach (PropertyInfo instanceProperty in restoredInstance.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
+                    // todo change test to is-subsclass-of-fieldCdnFile
+                    switch (instanceProperty.PropertyType.Name) {
+                        case "FieldTypeTextFile":
+                        case "FieldTypeCSSFile":
+                        case "FieldTypeHTMLFile":
+                        case "FieldTypeJavascriptFile":
+                            FieldCdnFile fileProperty = (FieldCdnFile)instanceProperty.GetValue(restoredInstance);
+                            fileProperty.internalcore = core;
+                            break;
+                    }
+                }
+            }
         }
         //
         //====================================================================================================

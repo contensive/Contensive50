@@ -257,15 +257,38 @@ namespace Contensive.BaseClasses
 		/// <param name="FieldValue"></param>
 		/// <remarks></remarks>
 		public abstract void SetField(string FieldName, object FieldValue);
-		public abstract void SetField(string FieldName, string FieldValue);
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="FieldName"></param>
-		/// <param name="Copy"></param>
-		/// <param name="ContentName"></param>
-		/// <remarks></remarks>
-		public abstract void SetFile(string FieldName, string Copy, string ContentName);
+        /// <summary>
+        /// Sets a value in a field of the current row.
+        /// </summary>
+        /// <param name="FieldName"></param>
+        /// <param name="FieldValue"></param>
+        public abstract void SetField(string FieldName, string FieldValue);
+        /// <summary>
+        /// Sets a value in a field of the current row.
+        /// </summary>
+        /// <param name="FieldName"></param>
+        /// <param name="FieldValue"></param>
+        public abstract void SetField(string FieldName, int FieldValue);
+        /// <summary>
+        /// Sets a value in a field of the current row.
+        /// </summary>
+        /// <param name="FieldName"></param>
+        /// <param name="FieldValue"></param>
+        public abstract void SetField(string FieldName, bool FieldValue);
+        /// <summary>
+        /// Sets a value in a field of the current row.
+        /// </summary>
+        /// <param name="FieldName"></param>
+        /// <param name="FieldValue"></param>
+        public abstract void SetField(string FieldName, DateTime FieldValue);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="FieldName"></param>
+        /// <param name="Copy"></param>
+        /// <param name="ContentName"></param>
+        /// <remarks></remarks>
+        public abstract void SetFile(string FieldName, string Copy, string ContentName);
 		/// <summary>
 		/// Processes a value from the incoming request to a field in the current row.
 		/// </summary>

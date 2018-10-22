@@ -12,23 +12,21 @@ using static Contensive.Processor.Tests.testConstants;
 
 namespace Contensive.Processor.Tests.UnitTests.Models {
     [TestClass()]
-    public class routeDictionaryModelTests {
+    public class routeMapModelTests {
         [TestMethod()]
-        public void Models_RouteDictionary_NoRoutes() {
+        public void Models_RouteMap_DictionaryHasAdmin() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
-                cp.core.db.executeNonQuery("delete from " + AddonModel.contentTableName);
-                cp.core.db.executeNonQuery("delete from " + LinkAliasModel.contentTableName);
-                cp.core.db.executeNonQuery("delete from " + LinkForwardModel.contentTableName);
                 // act
                 var routes = RouteMapModel.create(cp.core);
                 // assert only one route, matching the default admin route
-                string routeList = "";
-                foreach (KeyValuePair<string,RouteMapModel.routeClass> routeKvp in routes.routeDictionary ) {
-                    routeList += "," + routeKvp.Value.virtualRoute;
-                }
-                Assert.IsTrue(routes.routeDictionary.Count > 0, "should have been just admin, but was [" + routeList + "]");
-                Assert.AreEqual(GenericController.normalizeRoute(cp.core.appConfig.adminRoute), routes.routeDictionary.First().Key);
+                //string routeList = "";
+                Assert.IsTrue(routes.routeDictionary.ContainsKey(cp.core.appConfig.adminRoute));
+                //foreach (KeyValuePair<string,RouteMapModel.routeClass> routeKvp in routes.routeDictionary ) {
+                //    routeList += "," + routeKvp.Value.virtualRoute;
+                //}
+                //Assert.IsTrue(routes.routeDictionary.Count > 0, "should have been just admin, but was [" + routeList + "]");
+                //Assert.AreEqual(GenericController.normalizeRoute(cp.core.appConfig.adminRoute), routes.routeDictionary.First().Key);
             }
         }
 

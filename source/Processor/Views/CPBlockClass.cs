@@ -195,22 +195,22 @@ namespace Contensive.Processor {
         public override void OpenLayout(string layoutRecordNameOrGuid) {
             try {
                 accum = "";
-                LayoutModel copy;
+                LayoutModel layout;
                 if (layoutRecordNameOrGuid.IsNumeric()) {
                     //
                     // -- recordId
-                    copy = LayoutModel.create(core, GenericController.encodeInteger(layoutRecordNameOrGuid));
+                    layout = LayoutModel.create(core, GenericController.encodeInteger(layoutRecordNameOrGuid));
                 } else if (GenericController.isGuid(layoutRecordNameOrGuid)) {
                     //
                     // -- record guid
-                    copy = LayoutModel.create(core, layoutRecordNameOrGuid);
+                    layout = LayoutModel.create(core, layoutRecordNameOrGuid);
                 } else {
                     //
                     // -- record name
-                    copy = LayoutModel.createByUniqueName(core, layoutRecordNameOrGuid);
+                    layout = LayoutModel.createByUniqueName(core, layoutRecordNameOrGuid);
                 }
-                if (copy != null) {
-                    accum = copy.layout.content;
+                if (layout != null) {
+                    accum = layout.layout.content;
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);

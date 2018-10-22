@@ -4488,68 +4488,14 @@ namespace Contensive.Processor.Controllers {
             try {
                 //
                 LogController.logInfo(core, "Update db cdef [" + cdef.name + "]");
-                //int FieldHelpCID = CdefController.getContentId(core, "Content Field Help");
-                //var tmpList = new List<string> { };
-                //var datasource = DataSourceModel.createByUniqueName(core, cdef.dataSourceName);
                 //
                 // -- get contentid and protect content with IsBaseContent true
                 { 
-                    //var content = ContentModel.createByUniqueName(core, cdef.name);
-                    //if (content == null) {
-                    //    //
-                    //    // -- content name not found, cannot update
-                    //    throw new ApplicationException("Cannot update content because def [" + cdef.name + "] was not found");
-                    //} else {
-                    //
-                    //bool ContentIsBaseContent = content.isBaseContent;
-                    //string SQL = core.db.getSQLSelect("default", "ccContent", "ID,IsBaseContent", "name=" + core.db.encodeSQLText(cdef.name), "ID", "", 1);
-                    //DataTable dt = core.db.executeQuery(SQL);
-                    //if (DbController.isDataTableOk(dt)) {
-                    //    if (dt.Rows.Count > 0) {
-                    //        ContentID = GenericController.encodeInteger(core.db.getDataRowColumnName(dt.Rows[0], "ID"));
-                    //        ContentIsBaseContent = GenericController.encodeBoolean(core.db.getDataRowColumnName(dt.Rows[0], "IsBaseContent"));
-                    //    }
-                    //}
-                    //dt.Dispose();
-                    //
-                    // -- Update Content Record
-                    // 20180412 - emailQueue cdef was there, table created, but cctable record missing and cdef.tableid=0, fixed here
-                    // 20181007 -- speed up upgrade. need to find what the problem here was.
-                    // cdef.dataChanged = true;
                     if (cdef.dataChanged) {
-                        ////
-                        //// -- Content needs to be updated
-                        //if (content.isBaseContent && !cdef.isBaseContent) {
-                        //    //
-                        //    // -- Can not update a base content with a non-base content
-                        //    LogController.handleError(core, new ApplicationException("Warning: An attempt was made to update Content Definition [" + cdef.name + "] from base to non-base. This should only happen when a base cdef is removed from the base collection. The update was ignored."));
-                        //    cdef.isBaseContent = content.isBaseContent;
-                        //}
                         //
                         // -- update definition (use SingleRecord as an update flag)
                         var datasource = DataSourceModel.createByUniqueName(core, cdef.dataSourceName);
-                        CdefController.verifyContent_returnId(core, cdef); // true, datasource, cdef.tableName, cdef.name, cdef.adminOnly, cdef.developerOnly, cdef.allowAdd, cdef.allowDelete, cdef.parentName, cdef.defaultSortMethod, cdef.dropDownFieldList, false, cdef.allowCalendarEvents, cdef.allowContentTracking, cdef.allowTopicRules, cdef.allowContentChildTool, false, cdef.iconLink, cdef.iconWidth, cdef.iconHeight, cdef.iconSprites, cdef.guid, cdef.isBaseContent, cdef.installedByCollectionGuid);
-                        ////
-                        //// -- Other fields not in the csv call
-                        ////int EditorGroupID = 0;
-                        //if (cdef.editorGroupName != "") {
-                        //    var group = GroupModel.createByUniqueName(core, cdef.editorGroupName);
-                        //    if (group != null) {
-                        //        content.editorGroupID = group.id;
-                        //    }
-                        //    //DataTable dt = core.db.executeQuery("select ID from ccGroups where name=" + core.db.encodeSQLText(cdef.editorGroupName));
-                        //    //if (DbController.isDataTableOk(dt)) {
-                        //    //    if (dt.Rows.Count > 0) {
-                        //    //        EditorGroupID = GenericController.encodeInteger(core.db.getDataRowColumnName(dt.Rows[0], "ID"));
-                        //    //    }
-                        //    //}
-                        //    //dt.Dispose();
-                        //}
-                        ////content.editorGroupID = EditorGroupID;
-                        //content.isBaseContent = cdef.isBaseContent;
-                        ////content.save(core, true);
-                        ////string SQL = "update ccContent set EditorGroupID=" + EditorGroupID + ",isbasecontent=" + core.db.encodeSQLBoolean(cdef.isBaseContent) + " where id=" + ContentID + "";
-                        ////core.db.executeQuery(SQL);
+                        CdefController.verifyContent_returnId(core, cdef);
                     }
                     //
                     // -- update Content Field Records and Content Field Help records
@@ -4586,26 +4532,6 @@ namespace Contensive.Processor.Controllers {
                                     fieldHelp.save(core);
                                 }
                             }
-                            //DataTable dt = core.db.executeQuery("select ID from ccFieldHelp where fieldid=" + fieldId);
-                            //if (DbController.isDataTableOk(dt)) {
-                            //    if (dt.Rows.Count > 0) {
-                            //        FieldHelpID = GenericController.encodeInteger(core.db.getDataRowColumnName(dt.Rows[0], "ID"));
-                            //    }
-                            //}
-                            //dt.Dispose();
-                            //
-                            //if (FieldHelpID == 0) {
-                            //    FieldHelpID = core.db.insertTableRecordGetId("default", "ccFieldHelp", 0);
-                            //}
-                            //fieldHelp.helpDefault = field.helpDefault;
-                            //fieldHelp.helpCustom = field.helpCustom;
-                            //fieldHelp.save(core);
-                            //if (FieldHelpID != 0) {
-                            //    string SQL = "update ccfieldhelp"
-                            //        + " set fieldid=" + fieldId + ",active=1"
-                            //        + ",contentcontrolid=" + FieldHelpCID + ",helpdefault=" + core.db.encodeSQLText(field.helpDefault) + ",helpcustom=" + core.db.encodeSQLText(field.helpCustom) + " where id=" + FieldHelpID;
-                            //    core.db.executeQuery(SQL);
-                            //}
                         }
                     }
                     //

@@ -789,295 +789,181 @@ namespace Contensive.Processor.Controllers {
         //
         // ====================================================================================================================
         //
-        public static int verifyContentField_returnID(CoreController core, string ContentName, Models.Domain.CDefFieldModel field) // , ByVal FieldName As String, ByVal Args As String, ByVal Delimiter As String) As Integer
+        public static int verifyContentField_returnID(CoreController core, string ContentName, Models.Domain.CDefFieldModel field, bool blockCacheClear = false)
         {
             int returnId = 0;
             try {
-                string[] SQLName = new string[101];
-                string[] SQLValue = new string[101];
-                //
-                //
-                // determine contentid and tableid
-                int ContentID = -1;
-                int TableID = 0;
-                {
-                    var content = ContentModel.createByUniqueName(core, ContentName);
-                    if (content != null) {
-                        ContentID = content.id;
-                        TableID = content.contentTableID;
-                    }
-                }
-                //SQL = "select ID,ContentTableID from ccContent where name=" + core.db.encodeSQLText(ContentName) + ";";
-                //rs = core.db.executeQuery(SQL);
-                //if (DbController.isDataTableOk(rs)) {
-                //    ContentID = GenericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "ID"));
-                //    TableID = GenericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "ContentTableID"));
-                //}
-                //
-                // test if field definition found or not
-                //
-                int RecordID = 0;
-                //
-                bool RecordIsBaseField = false;
-                //bool isNewFieldRecord = true;
-                {
-                    var contentFieldList = ContentFieldModel.createList(core, "(ContentID=" + core.db.encodeSQLNumber(ContentID) + ")and(name=" + core.db.encodeSQLText(field.nameLc) + ")");
-                    if (contentFieldList.Count > 0) {
-                        //isNewFieldRecord = false;
-                        RecordID = contentFieldList.First().id;
-                        RecordIsBaseField = contentFieldList.First().isBaseField;
-                    }
-                }
-                //SQL = "select ID,IsBaseField from ccFields where (ContentID=" + core.db.encodeSQLNumber(ContentID) + ")and(name=" + core.db.encodeSQLText(field.nameLc) + ");";
-                //rs = core.db.executeQuery(SQL);
-                //if (DbController.isDataTableOk(rs)) {
-                //    isNewFieldRecord = false;
-                //    RecordID = GenericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "ID"));
-                //    RecordIsBaseField = GenericController.encodeBoolean(core.db.getDataRowColumnName(rs.Rows[0], "IsBaseField"));
-                //}
-                //
-                // check if this is a non-base field updating a base field
-                //
-                bool IsBaseField = field.isBaseField;
-                if ((!IsBaseField) && (RecordIsBaseField)) {
+                var content = ContentModel.createByUniqueName(core, ContentName);
+                if (content == null) {
                     //
-                    // This update is not allowed
+                    throw (new ApplicationException("Could not create field [" + field.nameLc + "] because Content Definition [" + ContentName + "] was not found In ccContent Table."));
+                } else if (content.contentTableID <= 0) {
                     //
-                    LogController.handleWarn(core, new ApplicationException("Warning, updating non-base field with base field, content [" + ContentName + "], field [" + field.nameLc + "]"));
-                }
-                {
-                    //FieldAdminOnly = field.adminOnly
-                    bool FieldDeveloperOnly = field.developerOnly;
-                    bool FieldActive = field.active;
-                    string FieldCaption = field.caption;
-                    bool FieldReadOnly = field.readOnly;
-                    int fieldTypeId = field.fieldTypeId;
-                    bool FieldAuthorable = field.authorable;
-                    string DefaultValue = GenericController.encodeText(field.defaultValue);
-                    bool NotEditable = field.notEditable;
-                    string LookupContentName = field.get_lookupContentName(core);
-                    string AdminIndexWidth = field.indexWidth;
-                    int AdminIndexSort = field.indexSortOrder;
-                    string RedirectContentName = field.get_redirectContentName(core);
-                    string RedirectIDField = field.redirectID;
-                    string RedirectPath = field.redirectPath;
-                    bool HTMLContent = field.htmlContent;
-                    bool UniqueName = field.uniqueName;
-                    bool Password = field.password;
-                    bool FieldRequired = field.required;
-                    bool RSSTitle = field.RSSTitleField;
-                    bool RSSDescription = field.RSSDescriptionField;
-                    int MemberSelectGroupID = field.memberSelectGroupId_get(core);
-                    string installedByCollectionGuid = field.installedByCollectionGuid;
-                    string EditTab = field.editTabName;
-                    string LookupList = field.lookupList;
+                    // Content Definition not found
+                    throw (new ApplicationException("Could not create field [" + field.nameLc + "] because Content Definition [" + ContentName + "] has no associated Content Table."));
+                } else if (field.fieldTypeId <= 0) {
                     //
-                    // ----- Check error conditions before starting
-                    //
-                    if (ContentID == -1) {
+                    // invalid field type
+                    throw (new ApplicationException("Could Not create Field [" + field.nameLc + "] because the field type [" + field.fieldTypeId + "] Is Not valid."));
+                } else {
+                    var table = TableModel.create(core, content.contentTableID);
+                    if (table == null) {
                         //
-                        // Content Definition not found
+                        throw (new ApplicationException("Could not create field [" + field.nameLc + "] because Content Definition [" + ContentName + "] does not have a valid table."));
+                    } else { 
+                        bool RecordIsBaseField = false;
+                        var contentFieldList = ContentFieldModel.createList(core, "(ContentID=" + core.db.encodeSQLNumber(content.id) + ")and(name=" + core.db.encodeSQLText(field.nameLc) + ")");
+                        if (contentFieldList.Count > 0) {
+                            returnId = contentFieldList.First().id;
+                            RecordIsBaseField = contentFieldList.First().isBaseField;
+                        }
                         //
-                        throw (new ApplicationException("Could not create field [" + field.nameLc + "] because Content Definition [" + ContentName + "] was not found In ccContent Table."));
-                    } else if (TableID <= 0) {
-                        //
-                        // Content Definition not found
-                        //
-                        throw (new ApplicationException("Could not create field [" + field.nameLc + "] because Content Definition [" + ContentName + "] has no associated Content Table."));
-                    } else if (fieldTypeId <= 0) {
-                        //
-                        // invalid field type
-                        //
-                        throw (new ApplicationException("Could Not create Field [" + field.nameLc + "] because the field type [" + fieldTypeId + "] Is Not valid."));
-                    } else {
-                        //
+                        // check if this is a non-base field updating a base field
+                        if ((!field.isBaseField) && (RecordIsBaseField)) {
+                            //
+                            // This update is not allowed
+                            LogController.handleWarn(core, new ApplicationException("Warning, updating non-base field with base field, content [" + ContentName + "], field [" + field.nameLc + "]"));
+                        }
+                        //                    
                         // Get the TableName and DataSourceID
+                        string LookupContentName = field.get_lookupContentName(core);
+                        string RedirectContentName = field.get_redirectContentName(core);
+                        int MemberSelectGroupID = field.memberSelectGroupId_get(core);
+                        string LookupList = field.lookupList;
                         //
-                        string TableName = "";
-                        int DataSourceID = 0;
-                        {
-                            var table = TableModel.create(core, TableID);
-                            if (table != null) {
-                                DataSourceID = table.dataSourceID;
-                                TableName = table.name;
+                        // Get the DataSourceName - special case model, returns default object if input not valid
+                        var dataSource = DataSourceModel.create(core, table.dataSourceID);
+                        //
+                        // Get the installedByCollectionId
+                        int InstalledByCollectionID = 0;
+                        if (!string.IsNullOrEmpty(field.installedByCollectionGuid)) {
+                            var addonCollection = AddonCollectionModel.create(core, field.installedByCollectionGuid);
+                            if (addonCollection != null) {
+                                InstalledByCollectionID = addonCollection.id;
                             }
                         }
-                        //rs = core.db.executeQuery("Select Name, DataSourceID from ccTables where ID=" + core.db.encodeSQLNumber(TableID) + ";");
-                        //if (!DbController.isDataTableOk(rs)) {
-                        //    throw (new ApplicationException("Could Not create Field [" + field.nameLc + "] because table For tableID [" + TableID + "] was not found."));
-                        //} else {
-                        //    DataSourceID = GenericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "DataSourceID"));
-                        //    TableName = GenericController.encodeText(core.db.getDataRowColumnName(rs.Rows[0], "Name"));
-                        //}
-                        //rs.Dispose();
-                        if (!string.IsNullOrEmpty(TableName)) {
+                        //
+                        // Create or update the Table Field
+                        if (field.fieldTypeId == FieldTypeIdRedirect) {
                             //
-                            // Get the DataSourceName - special case model, returns default object if input not valid
-                            var dataSource = DataSourceModel.create(core, DataSourceID);
-                            string DataSourceName = dataSource.name;
-                            //if (DataSourceID < 1) {
-                            //    DataSourceName = "Default";
-                            //} else {
-                            //    rs = core.db.executeQuery("Select Name from ccDataSources where ID=" + core.db.encodeSQLNumber(DataSourceID) + ";");
-                            //    if (!DbController.isDataTableOk(rs)) {
-
-                            //        DataSourceName = "Default";
-                            //        // change condition to successful -- the goal is 1) deliver pages 2) report problems
-                            //        // this problem, if translated to default, is really no longer a problem, unless the
-                            //        // resulting datasource does not have this data, then other errors will be generated anyway.
-                            //        //Call csv_HandleClassInternalError(MethodName, "Could Not create Field [" & field.name & "] because datasource For ID [" & DataSourceID & "] was not found.")
-                            //    } else {
-                            //        DataSourceName = GenericController.encodeText(core.db.getDataRowColumnName(rs.Rows[0], "Name"));
-                            //    }
-                            //    rs.Dispose();
-                            //}
+                            // Redirect Field
+                        } else if (field.fieldTypeId == FieldTypeIdManyToMany) {
                             //
-                            // Get the installedByCollectionId
+                            // ManyToMany Field
+                        } else {
                             //
-                            int InstalledByCollectionID = 0;
-                            if (!string.IsNullOrEmpty(installedByCollectionGuid)) {
-                                var addonCollection = AddonCollectionModel.create(core, installedByCollectionGuid);
-                                if (addonCollection != null) {
-                                    InstalledByCollectionID = addonCollection.id;
+                            // All other fields
+                            core.db.createSQLTableField(dataSource.name, table.name, field.nameLc, field.fieldTypeId);
+                        }
+                        //
+                        // create or update the field
+                        SqlFieldListClass sqlList = new SqlFieldListClass();
+                        sqlList.add("ACTIVE", core.db.encodeSQLBoolean(field.active));
+                        sqlList.add("MODIFIEDBY", core.db.encodeSQLNumber(SystemMemberID));
+                        sqlList.add("MODIFIEDDATE", core.db.encodeSQLDate(DateTime.Now));
+                        sqlList.add("TYPE", core.db.encodeSQLNumber(field.fieldTypeId));
+                        sqlList.add("CAPTION", core.db.encodeSQLText(field.caption));
+                        sqlList.add("ReadOnly", core.db.encodeSQLBoolean(field.readOnly));
+                        sqlList.add("REQUIRED", core.db.encodeSQLBoolean(field.required));
+                        sqlList.add("TEXTBUFFERED", SQLFalse);
+                        sqlList.add("PASSWORD", core.db.encodeSQLBoolean(field.password));
+                        sqlList.add("EDITSORTPRIORITY", core.db.encodeSQLNumber(field.editSortPriority));
+                        sqlList.add("ADMINONLY", core.db.encodeSQLBoolean(field.adminOnly));
+                        sqlList.add("DEVELOPERONLY", core.db.encodeSQLBoolean(field.developerOnly));
+                        sqlList.add("CONTENTCONTROLID", core.db.encodeSQLNumber(CdefController.getContentId(core, "Content Fields")));
+                        sqlList.add("DefaultValue", core.db.encodeSQLText(field.defaultValue));
+                        sqlList.add("HTMLCONTENT", core.db.encodeSQLBoolean(field.htmlContent));
+                        sqlList.add("NOTEDITABLE", core.db.encodeSQLBoolean(field.notEditable));
+                        sqlList.add("AUTHORABLE", core.db.encodeSQLBoolean(field.authorable));
+                        sqlList.add("INDEXCOLUMN", core.db.encodeSQLNumber(field.indexColumn));
+                        sqlList.add("INDEXWIDTH", core.db.encodeSQLText(field.indexWidth));
+                        sqlList.add("INDEXSORTPRIORITY", core.db.encodeSQLNumber(field.indexSortOrder));
+                        sqlList.add("REDIRECTID", core.db.encodeSQLText(field.redirectID));
+                        sqlList.add("REDIRECTPATH", core.db.encodeSQLText(field.redirectPath));
+                        sqlList.add("UNIQUENAME", core.db.encodeSQLBoolean(field.uniqueName));
+                        sqlList.add("RSSTITLEFIELD", core.db.encodeSQLBoolean(field.RSSTitleField));
+                        sqlList.add("RSSDESCRIPTIONFIELD", core.db.encodeSQLBoolean(field.RSSDescriptionField));
+                        sqlList.add("MEMBERSELECTGROUPID", core.db.encodeSQLNumber(MemberSelectGroupID));
+                        sqlList.add("installedByCollectionId", core.db.encodeSQLNumber(InstalledByCollectionID));
+                        sqlList.add("EDITTAB", core.db.encodeSQLText(field.editTabName));
+                        sqlList.add("SCRAMBLE", core.db.encodeSQLBoolean(false));
+                        sqlList.add("ISBASEFIELD", core.db.encodeSQLBoolean(field.isBaseField));
+                        sqlList.add("LOOKUPLIST", core.db.encodeSQLText(LookupList));
+                        int RedirectContentID = 0;
+                        int LookupContentID = 0;
+                        //
+                        // -- conditional fields
+                        switch (field.fieldTypeId) {
+                            case FieldTypeIdLookup:
+                                //
+                                // -- lookup field
+                                //
+                                if (!string.IsNullOrEmpty(LookupContentName)) {
+                                    LookupContentID = CdefController.getContentId(core, LookupContentName);
+                                    if (LookupContentID <= 0) {
+                                        LogController.logError(core, "Could not create lookup field [" + field.nameLc + "] for content definition [" + ContentName + "] because no content definition was found For lookup-content [" + LookupContentName + "].");
+                                    }
                                 }
-                                //rs = core.db.executeQuery("Select id from ccAddonCollections where ccguid=" + core.db.encodeSQLText(installedByCollectionGuid) + ";");
-                                //if (DbController.isDataTableOk(rs)) {
-                                //    InstalledByCollectionID = GenericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "Id"));
-                                //}
-                                //rs.Dispose();
-                            }
-                            //
-                            // Create or update the Table Field
-                            //
-                            if (fieldTypeId == FieldTypeIdRedirect) {
+                                sqlList.add("LOOKUPCONTENTID", core.db.encodeSQLNumber(LookupContentID));
+                                break;
+                            case FieldTypeIdManyToMany:
                                 //
-                                // Redirect Field
+                                // -- many-to-many field
                                 //
-                            } else if (fieldTypeId == FieldTypeIdManyToMany) {
-                                //
-                                // ManyToMany Field
-                                //
-                            } else {
-                                //
-                                // All other fields
-                                //
-                                core.db.createSQLTableField(DataSourceName, TableName, field.nameLc, fieldTypeId);
-                            }
-                            //
-                            // create or update the field
-                            //
-                            SqlFieldListClass sqlList = new SqlFieldListClass();
-                            sqlList.add("ACTIVE", core.db.encodeSQLBoolean(field.active));
-                            sqlList.add("MODIFIEDBY", core.db.encodeSQLNumber(SystemMemberID));
-                            sqlList.add("MODIFIEDDATE", core.db.encodeSQLDate(DateTime.Now));
-                            sqlList.add("TYPE", core.db.encodeSQLNumber(fieldTypeId));
-                            sqlList.add("CAPTION", core.db.encodeSQLText(FieldCaption));
-                            sqlList.add("ReadOnly", core.db.encodeSQLBoolean(FieldReadOnly));
-                            sqlList.add("REQUIRED", core.db.encodeSQLBoolean(FieldRequired));
-                            sqlList.add("TEXTBUFFERED", SQLFalse);
-                            sqlList.add("PASSWORD", core.db.encodeSQLBoolean(Password));
-                            sqlList.add("EDITSORTPRIORITY", core.db.encodeSQLNumber(field.editSortPriority));
-                            sqlList.add("ADMINONLY", core.db.encodeSQLBoolean(field.adminOnly));
-                            sqlList.add("DEVELOPERONLY", core.db.encodeSQLBoolean(FieldDeveloperOnly));
-                            sqlList.add("CONTENTCONTROLID", core.db.encodeSQLNumber(CdefController.getContentId(core, "Content Fields")));
-                            sqlList.add("DefaultValue", core.db.encodeSQLText(DefaultValue));
-                            sqlList.add("HTMLCONTENT", core.db.encodeSQLBoolean(HTMLContent));
-                            sqlList.add("NOTEDITABLE", core.db.encodeSQLBoolean(NotEditable));
-                            sqlList.add("AUTHORABLE", core.db.encodeSQLBoolean(FieldAuthorable));
-                            sqlList.add("INDEXCOLUMN", core.db.encodeSQLNumber(field.indexColumn));
-                            sqlList.add("INDEXWIDTH", core.db.encodeSQLText(AdminIndexWidth));
-                            sqlList.add("INDEXSORTPRIORITY", core.db.encodeSQLNumber(AdminIndexSort));
-                            sqlList.add("REDIRECTID", core.db.encodeSQLText(RedirectIDField));
-                            sqlList.add("REDIRECTPATH", core.db.encodeSQLText(RedirectPath));
-                            sqlList.add("UNIQUENAME", core.db.encodeSQLBoolean(UniqueName));
-                            sqlList.add("RSSTITLEFIELD", core.db.encodeSQLBoolean(RSSTitle));
-                            sqlList.add("RSSDESCRIPTIONFIELD", core.db.encodeSQLBoolean(RSSDescription));
-                            sqlList.add("MEMBERSELECTGROUPID", core.db.encodeSQLNumber(MemberSelectGroupID));
-                            sqlList.add("installedByCollectionId", core.db.encodeSQLNumber(InstalledByCollectionID));
-                            sqlList.add("EDITTAB", core.db.encodeSQLText(EditTab));
-                            sqlList.add("SCRAMBLE", core.db.encodeSQLBoolean(false));
-                            sqlList.add("ISBASEFIELD", core.db.encodeSQLBoolean(IsBaseField));
-                            sqlList.add("LOOKUPLIST", core.db.encodeSQLText(LookupList));
-                            int RedirectContentID = 0;
-                            int LookupContentID = 0;
-                            //
-                            // -- conditional fields
-                            switch (fieldTypeId) {
-                                case FieldTypeIdLookup:
-                                    //
-                                    // -- lookup field
-                                    //
-                                    if (!string.IsNullOrEmpty(LookupContentName)) {
-                                        LookupContentID = CdefController.getContentId(core, LookupContentName);
-                                        if (LookupContentID <= 0) {
-                                            LogController.logError(core, "Could not create lookup field [" + field.nameLc + "] for content definition [" + ContentName + "] because no content definition was found For lookup-content [" + LookupContentName + "].");
-                                        }
+                                string ManyToManyContent = field.get_manyToManyContentName(core);
+                                if (!string.IsNullOrEmpty(ManyToManyContent)) {
+                                    int ManyToManyContentID = CdefController.getContentId(core, ManyToManyContent);
+                                    if (ManyToManyContentID <= 0) {
+                                        LogController.logError(core, "Could not create many-to-many field [" + field.nameLc + "] for [" + ContentName + "] because no content definition was found For many-to-many-content [" + ManyToManyContent + "].");
                                     }
-                                    sqlList.add("LOOKUPCONTENTID", core.db.encodeSQLNumber(LookupContentID));
-                                    break;
-                                case FieldTypeIdManyToMany:
-                                    //
-                                    // -- many-to-many field
-                                    //
-                                    string ManyToManyContent = field.get_manyToManyContentName(core);
-                                    if (!string.IsNullOrEmpty(ManyToManyContent)) {
-                                        int ManyToManyContentID = CdefController.getContentId(core, ManyToManyContent);
-                                        if (ManyToManyContentID <= 0) {
-                                            LogController.logError(core, "Could not create many-to-many field [" + field.nameLc + "] for [" + ContentName + "] because no content definition was found For many-to-many-content [" + ManyToManyContent + "].");
-                                        }
-                                        sqlList.add("MANYTOMANYCONTENTID", core.db.encodeSQLNumber(ManyToManyContentID));
+                                    sqlList.add("MANYTOMANYCONTENTID", core.db.encodeSQLNumber(ManyToManyContentID));
+                                }
+                                //
+                                string ManyToManyRuleContent = field.get_manyToManyRuleContentName(core);
+                                if (!string.IsNullOrEmpty(ManyToManyRuleContent)) {
+                                    int ManyToManyRuleContentID = CdefController.getContentId(core, ManyToManyRuleContent);
+                                    if (ManyToManyRuleContentID <= 0) {
+                                        LogController.logError(core, "Could not create many-to-many field [" + field.nameLc + "] for [" + ContentName + "] because no content definition was found For many-to-many-rule-content [" + ManyToManyRuleContent + "].");
                                     }
-                                    //
-                                    string ManyToManyRuleContent = field.get_manyToManyRuleContentName(core);
-                                    if (!string.IsNullOrEmpty(ManyToManyRuleContent)) {
-                                        int ManyToManyRuleContentID = CdefController.getContentId(core, ManyToManyRuleContent);
-                                        if (ManyToManyRuleContentID <= 0) {
-                                            LogController.logError(core, "Could not create many-to-many field [" + field.nameLc + "] for [" + ContentName + "] because no content definition was found For many-to-many-rule-content [" + ManyToManyRuleContent + "].");
-                                        }
-                                        sqlList.add("MANYTOMANYRULECONTENTID", core.db.encodeSQLNumber(ManyToManyRuleContentID));
+                                    sqlList.add("MANYTOMANYRULECONTENTID", core.db.encodeSQLNumber(ManyToManyRuleContentID));
+                                }
+                                sqlList.add("MANYTOMANYRULEPRIMARYFIELD", core.db.encodeSQLText(field.ManyToManyRulePrimaryField));
+                                sqlList.add("MANYTOMANYRULESECONDARYFIELD", core.db.encodeSQLText(field.ManyToManyRuleSecondaryField));
+                                break;
+                            case FieldTypeIdRedirect:
+                                //
+                                // -- redirect field
+                                if (!string.IsNullOrEmpty(RedirectContentName)) {
+                                    RedirectContentID = CdefController.getContentId(core, RedirectContentName);
+                                    if (RedirectContentID <= 0) {
+                                        LogController.logError(core, "Could not create redirect field [" + field.nameLc + "] for Content Definition [" + ContentName + "] because no content definition was found For redirect-content [" + RedirectContentName + "].");
                                     }
-                                    sqlList.add("MANYTOMANYRULEPRIMARYFIELD", core.db.encodeSQLText(field.ManyToManyRulePrimaryField));
-                                    sqlList.add("MANYTOMANYRULESECONDARYFIELD", core.db.encodeSQLText(field.ManyToManyRuleSecondaryField));
-                                    break;
-                                case FieldTypeIdRedirect:
-                                    //
-                                    // -- redirect field
-                                    if (!string.IsNullOrEmpty(RedirectContentName)) {
-                                        RedirectContentID = CdefController.getContentId(core, RedirectContentName);
-                                        if (RedirectContentID <= 0) {
-                                            LogController.logError(core, "Could not create redirect field [" + field.nameLc + "] for Content Definition [" + ContentName + "] because no content definition was found For redirect-content [" + RedirectContentName + "].");
-                                        }
-                                    }
-                                    sqlList.add("REDIRECTCONTENTID", core.db.encodeSQLNumber(RedirectContentID));
-                                    break;
-                            }
+                                }
+                                sqlList.add("REDIRECTCONTENTID", core.db.encodeSQLNumber(RedirectContentID));
+                                break;
+                        }
+                        //
+                        if (returnId == 0) {
+                            sqlList.add("NAME", core.db.encodeSQLText(field.nameLc));
+                            sqlList.add("CONTENTID", core.db.encodeSQLNumber(content.id));
+                            sqlList.add("CREATEKEY", "0");
+                            sqlList.add("DATEADDED", core.db.encodeSQLDate(DateTime.Now));
+                            sqlList.add("CREATEDBY", core.db.encodeSQLNumber(SystemMemberID));
+                            returnId = core.db.insertTableRecordGetId("Default", "ccFields");
                             //
-                            if (RecordID == 0) {
-                                sqlList.add("NAME", core.db.encodeSQLText(field.nameLc));
-                                sqlList.add("CONTENTID", core.db.encodeSQLNumber(ContentID));
-                                sqlList.add("CREATEKEY", "0");
-                                sqlList.add("DATEADDED", core.db.encodeSQLDate(DateTime.Now));
-                                sqlList.add("CREATEDBY", core.db.encodeSQLNumber(SystemMemberID));
-                                RecordID = core.db.insertTableRecordGetId("Default", "ccFields");
+                            if (!blockCacheClear) {
+                                core.cache.invalidateAll();
+                                core.doc.clearMetaData();
                             }
-                            if (RecordID == 0) {
-                                throw (new ApplicationException("Could Not create Field [" + field.nameLc + "] because insert into ccfields failed."));
-                            } else {
-                                core.db.updateTableRecord("Default", "ccFields", "ID=" + RecordID, sqlList);
-                                ContentFieldModel.invalidateRecordCache(core, RecordID);
-                            }
-                            //
+                        }
+                        if (returnId == 0) {
+                            throw (new ApplicationException("Could Not create Field [" + field.nameLc + "] because insert into ccfields failed."));
+                        } else {
+                            core.db.updateTableRecord("Default", "ccFields", "ID=" + returnId, sqlList);
+                            ContentFieldModel.invalidateRecordCache(core, returnId);
                         }
                     }
                 }
-                //
-                // 20181007 - what if we didnt
-                //if (!isNewFieldRecord) {
-                //    core.cache.invalidateAll();
-                //    core.doc.clearMetaData();
-                //}
-                //
-                returnId = RecordID;
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
                 throw;
