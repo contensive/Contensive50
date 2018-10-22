@@ -50,6 +50,7 @@ namespace Contensive.Addons.Housekeeping {
             try {
                 DateTime LastCheckDateTime = core.siteProperties.getDate("housekeep, last check", default(DateTime));
                 int ServerHousekeepHour = core.siteProperties.getInteger("housekeep, run time hour", 2);
+                var installedCollections = new List<string>();
                 //
                 // ----- Run Server Housekeep
                 //
@@ -78,7 +79,8 @@ namespace Contensive.Addons.Housekeeping {
                     string ignoreRefactorText = "";
                     bool ignoreRefactorBoolean = false;
                     List<string> nonCriticalErrorList = new List<string>();
-                    if (!CollectionController.upgradeLocalCollectionRepoFromRemoteCollectionRepo(core, ref ErrorMessage, ref ignoreRefactorText, ref ignoreRefactorBoolean, false, false, ref nonCriticalErrorList)) {
+                    string logPrefix = "Housekeep";
+                    if (!CollectionController.upgradeLocalCollectionRepoFromRemoteCollectionRepo(core, ref ErrorMessage, ref ignoreRefactorText, ref ignoreRefactorBoolean, false, false, ref nonCriticalErrorList, logPrefix, ref installedCollections )) {
                         if (string.IsNullOrEmpty(ErrorMessage)) {
                             ErrorMessage = "No detailed error message was returned from UpgradeAllLocalCollectionsFromLib2 although it returned 'not ok' status.";
                         }

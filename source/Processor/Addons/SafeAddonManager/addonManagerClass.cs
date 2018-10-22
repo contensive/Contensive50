@@ -62,6 +62,7 @@ namespace Contensive.Addons.SafeAddonManager {
         public string GetForm_SafeModeAddonManager() {
             string addonManager = "";
             try {
+                var installedCollections = new List<string>();
                 string LocalCollectionXML = null;
                 bool DisplaySystem = false;
                 bool DbUpToDate = false;
@@ -491,7 +492,7 @@ namespace Contensive.Addons.SafeAddonManager {
                             Cnt = LibGuids.GetUpperBound(0) + 1;
                             for (Ptr = 0; Ptr < Cnt; Ptr++) {
                                 RegisterList = "";
-                                UpgradeOK = CollectionController.installCollectionFromRemoteRepo(core, LibGuids[Ptr], ref ErrorMessage, "", false, true, ref nonCriticalErrorList);
+                                UpgradeOK = CollectionController.installCollectionFromRemoteRepo(core, LibGuids[Ptr], ref ErrorMessage, "", false, true, ref nonCriticalErrorList, "AddonManagerClass.GetForm_SaveModeAddonManager", ref installedCollections);
                                 if (!UpgradeOK) {
                                     //
                                     // block the reset because we will loose the error message
@@ -516,7 +517,8 @@ namespace Contensive.Addons.SafeAddonManager {
                         if (AllowInstallFromFolder) {
                             //InstallFolder = core.asv.config.physicalFilePath & InstallFolderName & "\"
                             if (core.privateFiles.pathExists(privateFilesInstallPath)) {
-                                UpgradeOK = CollectionController.installCollectionsFromPrivateFolder(core, privateFilesInstallPath, ref ErrorMessage, ref InstalledCollectionGuidList, false, true, ref nonCriticalErrorList);
+                                string logPrefix = "SafeModeAddonManager";
+                                UpgradeOK = CollectionController.installCollectionsFromPrivateFolder(core, privateFilesInstallPath, ref ErrorMessage, ref InstalledCollectionGuidList, false, true, ref nonCriticalErrorList, logPrefix, ref installedCollections);
                                 if (!UpgradeOK) {
                                     if (string.IsNullOrEmpty(ErrorMessage)) {
                                         ErrorController.addUserError(core, "The Add-on Collection did not install correctly, but no detailed error message was given.");

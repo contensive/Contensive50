@@ -114,7 +114,9 @@ namespace Contensive.CLI {
                                                 foreach (KeyValuePair<String, AppConfigModel> kvp in cpServer.core.serverConfig.apps) {
                                                     using (Contensive.Processor.CPClass cpApp = new Contensive.Processor.CPClass(kvp.Key)) {
                                                         string returnErrorMessage = "";
-                                                        CollectionController.installCollectionFromRemoteRepo(cpApp.core, collectionGuid, ref returnErrorMessage, "", false, repair);
+                                                        string logPrefix = "CLI";
+                                                        var installedCollections = new List<string>();
+                                                        CollectionController.installCollectionFromRemoteRepo(cpApp.core, collectionGuid, ref returnErrorMessage, "", false, repair, logPrefix, ref installedCollections);
                                                         if (!string.IsNullOrEmpty(returnErrorMessage)) {
                                                             Console.WriteLine("There was an error installing the collection: " + returnErrorMessage);
                                                         }
@@ -123,7 +125,9 @@ namespace Contensive.CLI {
                                             } else {
                                                 using (Contensive.Processor.CPClass cpApp = new Contensive.Processor.CPClass(appName)) {
                                                     string returnErrorMessage = "";
-                                                    CollectionController.installCollectionFromRemoteRepo(cpApp.core, collectionGuid, ref returnErrorMessage, "", false, repair);
+                                                    string logPrefix = "CLI";
+                                                    var installedCollections = new List<string>();
+                                                    CollectionController.installCollectionFromRemoteRepo(cpApp.core, collectionGuid, ref returnErrorMessage, "", false, repair, logPrefix, ref installedCollections);
                                                     if (!string.IsNullOrEmpty(returnErrorMessage)) {
                                                         Console.WriteLine("There was an error installing the collection: " + returnErrorMessage);
                                                     }

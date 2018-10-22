@@ -332,7 +332,9 @@ namespace Contensive.Processor {
             try {
                 string ignoreReturnedCollectionGuid = "";
                 var tmpList = new List<string> { };
-                returnOk = CollectionController.installCollectionsFromPrivateFile(core, privatePathFilename, ref returnUserError, ref ignoreReturnedCollectionGuid, false, true, ref tmpList);
+                string logPrefix = "CPSiteClass.installCollectionFile";
+                var installedCollections = new List<string>();
+                returnOk = CollectionController.installCollectionsFromPrivateFile(core, privatePathFilename, ref returnUserError, ref ignoreReturnedCollectionGuid, false, true, ref tmpList, logPrefix, ref installedCollections);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 if (!core.siteProperties.trapErrors) {
