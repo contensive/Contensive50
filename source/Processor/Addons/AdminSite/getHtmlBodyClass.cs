@@ -1659,13 +1659,15 @@ namespace Contensive.Addons.AdminSite {
                                 string FindWordValue = "";
                                 if (IndexConfig.FindWords.ContainsKey(FieldName)) {
                                     var tempVar = IndexConfig.FindWords[FieldName];
-                                    if ((tempVar.MatchOption == FindWordMatchEnum.matchincludes) || (tempVar.MatchOption == FindWordMatchEnum.MatchEquals)) {
-                                        FindWordValue = tempVar.Value;
-                                    } else if (tempVar.MatchOption == FindWordMatchEnum.MatchTrue) {
-                                        FindWordValue = "true";
-                                    } else if (tempVar.MatchOption == FindWordMatchEnum.MatchFalse) {
-                                        FindWordValue = "false";
-                                    }
+                                    // put the exact same phrase into the find for booleans as well
+                                    FindWordValue = tempVar.Value;
+                                    //if ((tempVar.MatchOption == FindWordMatchEnum.matchincludes) || (tempVar.MatchOption == FindWordMatchEnum.MatchEquals)) {
+                                    //    FindWordValue = tempVar.Value;
+                                    //} else if (tempVar.MatchOption == FindWordMatchEnum.MatchTrue) {
+                                    //    FindWordValue = "true";
+                                    //} else if (tempVar.MatchOption == FindWordMatchEnum.MatchFalse) {
+                                    //    FindWordValue = "false";
+                                    //}
                                 }
                                 DataTable_FindRow += "\r\n<td valign=\"middle\" align=\"center\" class=\"ccPanel3DReverse\" style=\"padding:8px;\">"
                                     + "<input type=hidden name=\"FindName" + ColumnPointer + "\" value=\"" + FieldName + "\">"
@@ -11766,8 +11768,9 @@ namespace Contensive.Addons.AdminSite {
                                                     //
                                                     // -- nonblank find, store it
                                                     if (IndexConfig.FindWords.ContainsKey(FindName)) {
-                                                        IndexConfig.FindWords[FindName].Value = FindValue;
-                                                    } else {
+                                                        IndexConfig.FindWords.Remove(FindName);
+                                                    }
+                                                    {
                                                         CDefFieldModel field = adminContext.adminContent.fields[FindName.ToLower()];
                                                         IndexConfigFindWordClass findWord = new IndexConfigFindWordClass {
                                                             Name = FindName,
