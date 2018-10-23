@@ -4293,8 +4293,16 @@ namespace Contensive.Processor.Controllers {
                 //----------------------------------------------------------------------------------------------------------------------
                 //
                 foreach (var keypairvalue in Collection.cdef) {
-                    if (keypairvalue.Value.name.ToLower() != "content") {
-                        installCollection_BuildDbFromCollection_UpdateDbFromCDef(core, keypairvalue.Value, BuildVersion);
+                    CDefModel cdef = keypairvalue.Value;
+                    bool fieldChanged = false;
+                    if (!cdef.dataChanged) {
+                        foreach (var field in cdef.fields) {
+                            fieldChanged = field.Value.dataChanged;
+                            if (fieldChanged) break;
+                        }
+                    }
+                    if ((fieldChanged | cdef.dataChanged) & (cdef.name.ToLower() != "content")) {
+                        installCollection_BuildDbFromCollection_UpdateDbFromCDef(core, cdef, BuildVersion);
                     }
                 }
                 core.doc.clearMetaData();
