@@ -566,7 +566,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        private static MiniCollectionModel installCollection_GetApplicationMiniCollection(CoreController core, bool isNewBuild) {
+        private static MiniCollectionModel installCollection_GetApplicationMiniCollection(CoreController core, bool isNewBuild, string logPrefix, ref List<string> installedCollections) {
             MiniCollectionModel returnColl = new MiniCollectionModel();
             try {
                 //
@@ -583,7 +583,7 @@ namespace Contensive.Processor.Controllers {
                     exportApplicationCDefXml(core, ExportPathPage, true);
                     CollectionData = core.privateFiles.readFileText(ExportPathPage);
                     core.privateFiles.deleteFile(ExportPathPage);
-                    returnColl = installCollection_LoadXmlToMiniCollection(core, CollectionData, false, false, isNewBuild, new MiniCollectionModel());
+                    returnColl = installCollection_LoadXmlToMiniCollection(core, CollectionData, false, false, isNewBuild, new MiniCollectionModel(), logPrefix, ref installedCollections);
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -959,7 +959,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static bool installCollectionFromRemoteRepo(CoreController core, string collectionGuid, ref string return_ErrorMessage, string ImportFromCollectionsGuidList, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList) {
+        public static bool installCollectionFromRemoteRepo(CoreController core, string collectionGuid, ref string return_ErrorMessage, string ImportFromCollectionsGuidList, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> installedCollections) {
             bool UpgradeOK = true;
             try {
                 if (string.IsNullOrWhiteSpace(collectionGuid)) {
@@ -1004,7 +1004,7 @@ namespace Contensive.Processor.Controllers {
                     // Upgrade the server from the collection files
                     //
                     if (UpgradeOK) {
-                        UpgradeOK = installCollectionFromLocalRepo(core, collectionGuid, core.siteProperties.dataBuildVersion, ref return_ErrorMessage, ImportFromCollectionsGuidList, IsNewBuild, repair, ref nonCriticalErrorList);
+                        UpgradeOK = installCollectionFromLocalRepo(core, collectionGuid, core.siteProperties.dataBuildVersion, ref return_ErrorMessage, ImportFromCollectionsGuidList, IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollections);
                         if (!UpgradeOK) {
                             //UpgradeOK = UpgradeOK;
                         }
@@ -1018,16 +1018,16 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //====================================================================================================
-        public static bool installCollectionFromRemoteRepo(CoreController core, string CollectionGuid, ref string return_ErrorMessage, string ImportFromCollectionsGuidList, bool IsNewBuild, bool repair) {
+        public static bool installCollectionFromRemoteRepo(CoreController core, string CollectionGuid, ref string return_ErrorMessage, string ImportFromCollectionsGuidList, bool IsNewBuild, bool repair, string logPrefix, ref List<string> installedCollections) {
             var tmpList = new List<string> { };
-            return installCollectionFromRemoteRepo(core, CollectionGuid, ref return_ErrorMessage,ImportFromCollectionsGuidList, IsNewBuild, repair, ref tmpList);
+            return installCollectionFromRemoteRepo(core, CollectionGuid, ref return_ErrorMessage,ImportFromCollectionsGuidList, IsNewBuild, repair, ref tmpList, logPrefix, ref installedCollections);
         }
         //
         //====================================================================================================
         /// <summary>
         /// Upgrades all collections, registers and resets the server if needed
         /// </summary>
-        public static bool upgradeLocalCollectionRepoFromRemoteCollectionRepo(CoreController core, ref string return_ErrorMessage, ref string return_RegisterList, ref bool return_IISResetRequired, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList) {
+        public static bool upgradeLocalCollectionRepoFromRemoteCollectionRepo(CoreController core, ref string return_ErrorMessage, ref string return_RegisterList, ref bool return_IISResetRequired, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> installedCollections) {
             bool returnOk = true;
             try {
                 bool localCollectionUpToDate = false;
@@ -1179,7 +1179,7 @@ namespace Contensive.Processor.Controllers {
                                                                             // Upgrade the apps from the collection files, do not install on any apps
                                                                             //
                                                                             if (returnOk) {
-                                                                                returnOk = installCollectionFromLocalRepo(core, LibGUID, core.siteProperties.dataBuildVersion, ref return_ErrorMessage, "", IsNewBuild, repair, ref nonCriticalErrorList);
+                                                                                returnOk = installCollectionFromLocalRepo(core, LibGUID, core.siteProperties.dataBuildVersion, ref return_ErrorMessage, "", IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollections);
                                                                             }
                                                                             //
                                                                             // make sure this issue is logged and clear the flag to let other local collections install
@@ -1673,7 +1673,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Upgrade Application from a local collection
         /// </summary>
-        public static bool installCollectionFromLocalRepo(CoreController core, string CollectionGuid, string ignore_BuildVersion, ref string return_ErrorMessage, string ImportFromCollectionsGuidList, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList) {
+        public static bool installCollectionFromLocalRepo(CoreController core, string CollectionGuid, string ignore_BuildVersion, ref string return_ErrorMessage, string ImportFromCollectionsGuidList, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> installedCollections) {
             bool result = true;
             try {
                 string CollectionVersionFolderName = "";
@@ -1869,7 +1869,7 @@ namespace Contensive.Processor.Controllers {
                                                                 LogController.logInfo(core, "Circular import detected. This collection attempts to import a collection that had previously been imported. A collection can not import itself. The collection is [" + Collectionname + "], GUID [" + CollectionGuid + "], pass 1. The collection to be imported is [" + ChildCollectionName + "], GUID [" + ChildCollectionGUID + "]");
                                                             } else {
                                                                 LogController.logInfo(core, "install collection [" + Collectionname + "], pass 1, import collection found, name [" + ChildCollectionName + "], guid [" + ChildCollectionGUID + "]");
-                                                                installCollectionFromRemoteRepo(core, ChildCollectionGUID, ref return_ErrorMessage, ImportFromCollectionsGuidList, IsNewBuild, repair, ref nonCriticalErrorList);
+                                                                installCollectionFromRemoteRepo(core, ChildCollectionGUID, ref return_ErrorMessage, ImportFromCollectionsGuidList, IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollections);
                                                                 //if (true) {
                                                                 //    installCollectionFromRemoteRepo(core, ChildCollectionGUID, ref return_ErrorMessage, ImportFromCollectionsGuidList, IsNewBuild, ref nonCriticalErrorList);
                                                                 //} else {
@@ -2032,7 +2032,7 @@ namespace Contensive.Processor.Controllers {
                                                         // -- Use the upgrade code to import this part
                                                         CollectionWrapper = "<" + CollectionFileRootNode + ">" + CollectionWrapper + "</" + CollectionFileRootNode + ">";
                                                         bool isBaseCollection = (baseCollectionGuid.ToLower() == CollectionGuid.ToLower());
-                                                        installCollectionFromLocalRepo_BuildDbFromXmlData(core, CollectionWrapper, IsNewBuild, repair, isBaseCollection, ref nonCriticalErrorList);
+                                                        installCollectionFromLocalRepo_BuildDbFromXmlData(core, CollectionWrapper, IsNewBuild, repair, isBaseCollection, ref nonCriticalErrorList, logPrefix, ref installedCollections);
                                                         //
                                                         // -- Process nodes to save Collection data
                                                         XmlDocument NavDoc = new XmlDocument();
@@ -2742,7 +2742,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Installs Addons in a source folder
         /// </summary>
-        public static bool installCollectionsFromPrivateFolder(CoreController core, string privateFolder, ref string return_ErrorMessage, ref List<string> return_CollectionGUIDList, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList) {
+        public static bool installCollectionsFromPrivateFolder(CoreController core, string privateFolder, ref string return_ErrorMessage, ref List<string> return_CollectionGUIDList, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> installedCollections) {
             bool returnSuccess = false;
             try {
                 DateTime CollectionLastChangeDate;
@@ -2756,7 +2756,7 @@ namespace Contensive.Processor.Controllers {
                     LogController.logInfo(core, "BuildLocalCollectionFolder returned false with Error Message [" + return_ErrorMessage + "], exiting without calling UpgradeAllAppsFromLocalCollection");
                 } else {
                     foreach (string collectionGuid in return_CollectionGUIDList) {
-                        if (!installCollectionFromLocalRepo(core, collectionGuid, core.siteProperties.dataBuildVersion, ref return_ErrorMessage, "", IsNewBuild, repair, ref nonCriticalErrorList)) {
+                        if (!installCollectionFromLocalRepo(core, collectionGuid, core.siteProperties.dataBuildVersion, ref return_ErrorMessage, "", IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollections)) {
                             LogController.logInfo(core, "UpgradeAllAppsFromLocalCollection returned false with Error Message [" + return_ErrorMessage + "].");
                             break;
                         }
@@ -2776,7 +2776,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Installs Addons in a source file
         /// </summary>
-        public static bool installCollectionsFromPrivateFile(CoreController core, string pathFilename, ref string return_ErrorMessage, ref string return_CollectionGUID, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList) {
+        public static bool installCollectionsFromPrivateFile(CoreController core, string pathFilename, ref string return_ErrorMessage, ref string return_CollectionGUID, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> installedCollections) {
             bool returnSuccess = false;
             try {
                 DateTime CollectionLastChangeDate;
@@ -2789,7 +2789,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     LogController.logInfo(core, "BuildLocalCollectionFolder returned false with Error Message [" + return_ErrorMessage + "], exiting without calling UpgradeAllAppsFromLocalCollection");
                 } else {
-                    returnSuccess = installCollectionFromLocalRepo(core, return_CollectionGUID, core.siteProperties.dataBuildVersion, ref return_ErrorMessage, "", IsNewBuild, repair, ref nonCriticalErrorList);
+                    returnSuccess = installCollectionFromLocalRepo(core, return_CollectionGUID, core.siteProperties.dataBuildVersion, ref return_ErrorMessage, "", IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollections);
                     if (!returnSuccess) {
                         //
                         // Upgrade all apps failed
@@ -3640,7 +3640,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Import CDef on top of current configuration and the base configuration
         /// </summary>
-        public static void installBaseCollection(CoreController core, bool isNewBuild, bool repair, ref List<string> nonCriticalErrorList) {
+        public static void installBaseCollection(CoreController core, bool isNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> installedCollections) {
             try {
                 //
                 // -- new build
@@ -3653,8 +3653,8 @@ namespace Contensive.Processor.Controllers {
                     throw new ApplicationException("Cannot load aoBase5.xml [" + core.programFiles.localAbsRootPath + "aoBase5.xml]");
                 } else {
                     LogController.logInfo(core, "Verify base collection -- new build");
-                    MiniCollectionModel baseCollection = installCollection_LoadXmlToMiniCollection(core, baseCollectionXml, true, true, isNewBuild, new MiniCollectionModel());
-                    installCollection_BuildDbFromMiniCollection(core, baseCollection, core.siteProperties.dataBuildVersion, isNewBuild, repair, ref nonCriticalErrorList);
+                    MiniCollectionModel baseCollection = installCollection_LoadXmlToMiniCollection(core, baseCollectionXml, true, true, isNewBuild, new MiniCollectionModel(), logPrefix, ref installedCollections);
+                    installCollection_BuildDbFromMiniCollection(core, baseCollection, core.siteProperties.dataBuildVersion, isNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollections);
                     //
                     // now treat as a regular collection and install - to pickup everything else 
                     string tmpFolderPath = "installBaseCollection" + GenericController.GetRandomInteger(core).ToString() + "\\";
@@ -3662,7 +3662,7 @@ namespace Contensive.Processor.Controllers {
                     core.programFiles.copyFile(baseCollectionFilename, tmpFolderPath + baseCollectionFilename, core.privateFiles);
                     List<string> ignoreList = new List<string>();
                     string returnErrorMessage = "";
-                    if (!installCollectionsFromPrivateFolder(core, tmpFolderPath, ref returnErrorMessage, ref ignoreList, isNewBuild, repair, ref nonCriticalErrorList)) {
+                    if (!installCollectionsFromPrivateFolder(core, tmpFolderPath, ref returnErrorMessage, ref ignoreList, isNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollections)) {
                         throw new ApplicationException(returnErrorMessage);
                     }
                     core.privateFiles.deleteFolder(tmpFolderPath);
@@ -3675,17 +3675,17 @@ namespace Contensive.Processor.Controllers {
         //
         //======================================================================================================
         //
-        public static void installCollectionFromLocalRepo_BuildDbFromXmlData(CoreController core, string XMLText, bool isNewBuild, bool repair, bool isBaseCollection, ref List<string> nonCriticalErrorList) {
+        public static void installCollectionFromLocalRepo_BuildDbFromXmlData(CoreController core, string XMLText, bool isNewBuild, bool repair, bool isBaseCollection, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> installedCollections) {
             try {
                 //
                 LogController.logInfo(core, "Application: " + core.appConfig.name);
                 //
                 // ----- Import any CDef files, allowing for changes
                 MiniCollectionModel miniCollectionToAdd = new MiniCollectionModel();
-                MiniCollectionModel miniCollectionWorking = installCollection_GetApplicationMiniCollection(core, isNewBuild);
-                miniCollectionToAdd = installCollection_LoadXmlToMiniCollection(core, XMLText, isBaseCollection, false, isNewBuild, miniCollectionWorking);
+                MiniCollectionModel miniCollectionWorking = installCollection_GetApplicationMiniCollection(core, isNewBuild, logPrefix, ref installedCollections);
+                miniCollectionToAdd = installCollection_LoadXmlToMiniCollection(core, XMLText, isBaseCollection, false, isNewBuild, miniCollectionWorking, logPrefix, ref installedCollections);
                 addMiniCollectionSrcToDst(core, ref miniCollectionWorking, miniCollectionToAdd);
-                installCollection_BuildDbFromMiniCollection(core, miniCollectionWorking, core.siteProperties.dataBuildVersion, isNewBuild, repair, ref nonCriticalErrorList);
+                installCollection_BuildDbFromMiniCollection(core, miniCollectionWorking, core.siteProperties.dataBuildVersion, isNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollections );
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
@@ -3696,7 +3696,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// create a collection class from a collection xml file, cdef are added to the cdefs in the application collection
         /// </summary>
-        private static MiniCollectionModel installCollection_LoadXmlToMiniCollection(CoreController core, string srcCollecionXml, bool IsccBaseFile, bool setAllDataChanged, bool IsNewBuild, MiniCollectionModel defaultCollection) {
+        private static MiniCollectionModel installCollection_LoadXmlToMiniCollection(CoreController core, string srcCollecionXml, bool IsccBaseFile, bool setAllDataChanged, bool IsNewBuild, MiniCollectionModel defaultCollection, string logPrefix, ref List<string> installedCollections ) {
             MiniCollectionModel result = null;
             try {
                 Models.Domain.CDefModel DefaultCDef = null;
@@ -4198,16 +4198,17 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Verify ccContent and ccFields records from the cdef nodes of a a collection file. This is the last step of loading teh cdef nodes of a collection file. ParentId field is set based on ParentName node.
         /// </summary>
-        private static void installCollection_BuildDbFromMiniCollection(CoreController core, MiniCollectionModel Collection, string BuildVersion, bool isNewBuild, bool repair, ref List<string> nonCriticalErrorList) {
+        private static void installCollection_BuildDbFromMiniCollection(CoreController core, MiniCollectionModel Collection, string BuildVersion, bool isNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> installedCollections) {
             try {
                 //
+                logPrefix += ", installCollection_BuildDbFromMiniCollection";
                 LogController.logInfo(core, "Application: " + core.appConfig.name + ", UpgradeCDef_BuildDbFromCollection");
                 //
                 //----------------------------------------------------------------------------------------------------------------------
                 LogController.logInfo(core, "CDef Load, stage 1: verify core sql tables");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
-                AppBuilderController.VerifyBasicTables(core);
+                AppBuilderController.VerifyBasicTables(core, logPrefix);
                 //
                 //----------------------------------------------------------------------------------------------------------------------
                 LogController.logInfo(core, "CDef Load, stage 2: create SQL tables in default datasource");
@@ -4390,12 +4391,12 @@ namespace Contensive.Processor.Controllers {
                         //
                         // This collection is installed locally, install from local collections
                         //
-                        installCollectionFromLocalRepo(core, import.Guid, core.codeVersion(), ref errorMessage, "", isNewBuild, repair, ref nonCriticalErrorList);
+                        installCollectionFromLocalRepo(core, import.Guid, core.codeVersion(), ref errorMessage, "", isNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollections);
                     } else {
                         //
                         // This is a new collection, install to the server and force it on this site
                         //
-                        bool addonInstallOk = installCollectionFromRemoteRepo(core, import.Guid, ref errorMessage, "", isNewBuild, repair, ref nonCriticalErrorList);
+                        bool addonInstallOk = installCollectionFromRemoteRepo(core, import.Guid, ref errorMessage, "", isNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollections);
                         if (!addonInstallOk) {
                             throw (new ApplicationException("Failure to install addon collection from remote repository. Collection [" + import.Guid + "] was referenced in collection [" + Collection.name + "]")); //core.handleLegacyError3(core.appConfig.name, "Error upgrading Addon Collection [" & Guid & "], " & errorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                         }

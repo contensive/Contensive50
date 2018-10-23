@@ -471,11 +471,13 @@ namespace Contensive.Processor {
         /// <summary>
         /// Install an addon collections from the collection library asynchonously. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
         /// </summary>
-        public override int installCollectionFromLibrary(string collectionGuid) {
+        public override int installCollectionFromLibrary(string collectionGuid ) {
             int taskId = 0;
             string ignoreUserMessage = "";
             var installedCollections = new List<string>();
-            CollectionController.installCollectionFromRemoteRepo(CP.core, collectionGuid, ref ignoreUserMessage, "", false, false, "CPUtilsClass.installCollectionFromLibrary [" + collectionGuid + "]", ref installedCollections);
+            string logPrefix = "installCollectionFromLibrary";
+            var nonCriticalErrorList = new List<string>();
+            CollectionController.installCollectionFromRemoteRepo(CP.core, collectionGuid, ref ignoreUserMessage, "", false, false, ref nonCriticalErrorList, logPrefix, ref installedCollections);
             return taskId;
         }
         // todo implement taskId return value, create cp.task object to track task status
