@@ -22,6 +22,11 @@ namespace Contensive.Processor.Controllers {
         //
         public static void upgrade(CoreController core, bool isNewBuild, bool repair) {
             try {
+                //
+                LogController.logInfo(core, "AppBuilderController.upgrade, app [" + core.appConfig.name + "], repair [" + repair.ToString() + "]");
+                string logPrefix = "***** upgrade[" + core.appConfig.name + "]";
+                var installedCollections = new List<string>();
+                //
                 if (core.doc.upgradeInProgress) {
                     // leftover from 4.1
                 } else {
@@ -36,42 +41,42 @@ namespace Contensive.Processor.Controllers {
                     }
                     //
                     // -- Verify core table fields (DataSources, Content Tables, Content, Content Fields, Setup, Sort Methods), then other basic system ops work, like site properties
-                    VerifyBasicTables(core);
+                    VerifyBasicTables(core, logPrefix);
                     //
                     // 20180217 - move this before base collection because during install it runs addons (like _oninstall)
                     // if anything is needed that is not there yet, I need to build a list of adds to run after the app goes to app status ok
                     // -- Update server config file
-                    LogController.logInfo(core, "Update configuration file");
+                    LogController.logInfo(core, logPrefix + ", update configuration file");
                     if (!core.appConfig.appStatus.Equals(AppConfigModel.AppStatusEnum.ok)) {
                         core.appConfig.appStatus = AppConfigModel.AppStatusEnum.ok;
                         core.serverConfig.saveObject(core);
                     }
                     //
                     // verify current database meets minimum field requirements (before installing base collection)
-                    LogController.logInfo(core, "Verify existing database fields meet requirements");
-                    VerifySqlfieldCompatibility(core);
+                    LogController.logInfo(core, logPrefix + ", verify existing database fields meet requirements");
+                    VerifySqlfieldCompatibility(core,  logPrefix);
                     //
                     // -- verify base collection
-                    LogController.logInfo(core, "Install base collection");
-                    CollectionController.installBaseCollection(core, isNewBuild, repair, ref  nonCriticalErrorList);
+                    LogController.logInfo(core, logPrefix + ", install base collection");
+                    CollectionController.installBaseCollection(core, isNewBuild, repair, ref  nonCriticalErrorList, logPrefix, ref installedCollections);
                     //
                     // -- verify iis configuration
-                    LogController.logInfo(core, "Verify iis configuration");
+                    LogController.logInfo(core, logPrefix + ", verify iis configuration");
                     Controllers.WebServerController.verifySite(core, core.appConfig.name, primaryDomain, core.appConfig.localWwwPath, "default.aspx");
                     //
                     // -- verify root developer
-                    LogController.logInfo(core, "verify developer user");
+                    LogController.logInfo(core, logPrefix + ", verify developer user");
                     var root = PersonModel.create(core, defaultRootUserGuid);
                     if (root == null) {
-                        LogController.logInfo(core, "root user guid not found, test for root username");
+                        LogController.logInfo(core, logPrefix + ", root user guid not found, test for root username");
                         var rootList = PersonModel.createList(core, "(username='root')");
                         if ( rootList.Count > 0 ) {
-                            LogController.logInfo(core, "root username found");
+                            LogController.logInfo(core, logPrefix + ", root username found");
                             root = rootList.First();
                         }
                     }
                     if ( root == null ) {
-                        LogController.logInfo(core, "root user not found, adding root/contensive");
+                        LogController.logInfo(core, logPrefix + ", root user not found, adding root/contensive");
                         root = PersonModel.addEmpty(core);
                         root.name = defaultRootUserName;
                         root.FirstName = defaultRootUserName;
@@ -83,15 +88,15 @@ namespace Contensive.Processor.Controllers {
                             {
                             root.save(core);
                         } catch (Exception) {
-                            LogController.logInfo(core, "error prevented root user update");
+                            LogController.logInfo(core, logPrefix + ", error prevented root user update");
                         }
                     }
                     //
                     // -- verify site managers group
-                    LogController.logInfo(core, "verify site managers groups");
+                    LogController.logInfo(core, logPrefix + ", verify site managers groups");
                     var group = GroupModel.create(core, defaultSiteManagerGuid);
                     if (group == null) {
-                        LogController.logInfo(core, "verify site manager group");
+                        LogController.logInfo(core, logPrefix + ", verify site manager group");
                         group.name = defaultSiteManagerName;
                         group.caption = defaultSiteManagerName;
                         group.allowBulkEmail = true;
@@ -99,7 +104,7 @@ namespace Contensive.Processor.Controllers {
                         try {
                             group.save(core);
                         } catch (Exception) {
-                            LogController.logInfo(core, "error creating site managers group");
+                            LogController.logInfo(core, logPrefix + ", error creating site managers group");
                         }
                     }
                     if ((root != null) & (group != null)) {
@@ -132,15 +137,15 @@ namespace Contensive.Processor.Controllers {
                     if (string.CompareOrdinal(DataBuildVersion, core.codeVersion()) < 0) {
                         //
                         // -- data updates
-                        LogController.logInfo(core, "Run database conversions, DataBuildVersion [" + DataBuildVersion + "], software version [" + core.codeVersion() + "]");
-                        Upgrade_Conversion(core, DataBuildVersion);
+                        LogController.logInfo(core, logPrefix + ", run database conversions, DataBuildVersion [" + DataBuildVersion + "], software version [" + core.codeVersion() + "]");
+                        Upgrade_Conversion(core, DataBuildVersion, logPrefix);
                     }
                     //
                     //---------------------------------------------------------------------
                     // ----- Verify content needed internally
                     //---------------------------------------------------------------------
                     //
-                    LogController.logInfo(core, "Verify records required");
+                    LogController.logInfo(core, logPrefix + ", verify records required");
                     //
                     //  menus are created in ccBase.xml, this just checks for dups
                     VerifyAdminMenus(core, DataBuildVersion);
@@ -156,7 +161,7 @@ namespace Contensive.Processor.Controllers {
                     //       must be after upgrade_conversion
                     //---------------------------------------------------------------------
                     //
-                    LogController.logInfo(core, "Verify Site Properties");
+                    LogController.logInfo(core, logPrefix + ", verify Site Properties");
                     if (repair) {
                         //
                         // -- repair, set values to what the default system uses
@@ -278,7 +283,7 @@ namespace Contensive.Processor.Controllers {
                     //---------------------------------------------------------------------
                     //
                     {
-                        LogController.logInfo(core, "Internal upgrade complete, set Buildversion to " + core.codeVersion());
+                        LogController.logInfo(core, logPrefix + ", internal upgrade complete, set Buildversion to " + core.codeVersion());
                         core.siteProperties.setProperty("BuildVersion", core.codeVersion());
                         //
                         //---------------------------------------------------------------------
@@ -295,9 +300,9 @@ namespace Contensive.Processor.Controllers {
                             string ErrorMessage = "";
                             bool IISResetRequired = false;
                             //RegisterList = ""
-                            LogController.logInfo(core, "Upgrading All Local Collections to new server build.");
+                            LogController.logInfo(core, logPrefix + ", upgrading All Local Collections to new server build.");
                             string tmpString = "";
-                            bool UpgradeOK = CollectionController.upgradeLocalCollectionRepoFromRemoteCollectionRepo(core, ref ErrorMessage, ref tmpString, ref  IISResetRequired, isNewBuild, repair, ref  nonCriticalErrorList);
+                            bool UpgradeOK = CollectionController.upgradeLocalCollectionRepoFromRemoteCollectionRepo(core, ref ErrorMessage, ref tmpString, ref  IISResetRequired, isNewBuild, repair, ref  nonCriticalErrorList, logPrefix, ref installedCollections);
                             if (!string.IsNullOrEmpty(ErrorMessage)) {
                                 throw (new ApplicationException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, " & ErrorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                             } else if (!UpgradeOK) {
@@ -351,8 +356,7 @@ namespace Contensive.Processor.Controllers {
                             string Collectionname = null;
                             string CollectionGuid = null;
                             bool localCollectionFound = false;
-                            LogController.logInfo(core, "Checking all installed collections for upgrades from Collection Library");
-                            LogController.logInfo(core, "...Open collectons.xml");
+                            LogController.logInfo(core, logPrefix + ", Checking all installed collections for upgrades from Collection Library...Open collectons.xml");
                             try {
                                 XmlDocument Doc = new XmlDocument();
                                 Doc.LoadXml(CollectionController.getLocalCollectionStoreListXml(core));
@@ -364,7 +368,7 @@ namespace Contensive.Processor.Controllers {
                                             //
                                             // now go through each collection in this app and check the last updated agains the one here
                                             //
-                                            LogController.logInfo(core, "...Open site collectons, iterate through all collections");
+                                            LogController.logInfo(core, logPrefix + ", Open site collectons, iterate through all collections");
                                             //Dim dt As DataTable
                                             DataTable dt = core.db.executeQuery("select * from ccaddoncollections where (ccguid is not null)and(updatable<>0)");
                                             if (dt.Rows.Count > 0) {
@@ -374,7 +378,7 @@ namespace Contensive.Processor.Controllers {
                                                     ErrorMessage = "";
                                                     CollectionGuid = GenericController.vbLCase(dt.Rows[rowptr]["ccguid"].ToString());
                                                     Collectionname = dt.Rows[rowptr]["name"].ToString();
-                                                    LogController.logInfo(core, "...checking collection [" + Collectionname + "], guid [" + CollectionGuid + "]");
+                                                    LogController.logInfo(core, logPrefix + ", checking collection [" + Collectionname + "], guid [" + CollectionGuid + "]");
                                                     if (CollectionGuid != "{7c6601a7-9d52-40a3-9570-774d0d43d758}") {
                                                         //
                                                         // upgrade all except base collection from the local collections
@@ -413,7 +417,7 @@ namespace Contensive.Processor.Controllers {
                                                                 }
                                                                 if (CollectionGuid == GenericController.vbLCase(LocalGuid)) {
                                                                     localCollectionFound = true;
-                                                                    LogController.logInfo(core, "...local collection found");
+                                                                    LogController.logInfo(core, logPrefix + ", local collection found");
                                                                     if (LocalLastChangeDate != DateTime.MinValue) {
                                                                         if (LocalLastChangeDate > LastChangeDate) {
                                                                             appendUpgradeLog(core, core.appConfig.name, "upgrade", "Upgrading collection " + dt.Rows[rowptr]["name"].ToString() + " because the collection in the local server store has a newer LastChangeDate than the collection installed on this application.");
@@ -426,18 +430,18 @@ namespace Contensive.Processor.Controllers {
                                                         }
                                                         ErrorMessage = "";
                                                         if (!localCollectionFound) {
-                                                            LogController.logInfo(core, "...site collection [" + Collectionname + "] not found in local collection, call UpgradeAllAppsFromLibCollection2 to install it.");
-                                                            bool addonInstallOk = CollectionController.installCollectionFromRemoteRepo(core, CollectionGuid, ref  ErrorMessage, "", isNewBuild, repair, ref nonCriticalErrorList);
+                                                            LogController.logInfo(core, logPrefix + ", site collection [" + Collectionname + "] not found in local collection, call UpgradeAllAppsFromLibCollection2 to install it.");
+                                                            bool addonInstallOk = CollectionController.installCollectionFromRemoteRepo(core, CollectionGuid, ref  ErrorMessage, "", isNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollections);
                                                             if (!addonInstallOk) {
                                                                 //
                                                                 // this may be OK so log, but do not call it an error
                                                                 //
-                                                                LogController.logInfo(core, "...site collection [" + Collectionname + "] not found in collection Library. It may be a custom collection just for this site. Collection guid [" + CollectionGuid + "]");
+                                                                LogController.logInfo(core, logPrefix + ", site collection [" + Collectionname + "] not found in collection Library. It may be a custom collection just for this site. Collection guid [" + CollectionGuid + "]");
                                                             }
                                                         } else {
                                                             if (upgradeCollection) {
-                                                                LogController.logInfo(core, "...upgrading collection");
-                                                                CollectionController.installCollectionFromLocalRepo(core, CollectionGuid, core.codeVersion(), ref ErrorMessage, "", isNewBuild, repair, ref nonCriticalErrorList);
+                                                                LogController.logInfo(core, logPrefix + ", upgrading collection");
+                                                                CollectionController.installCollectionFromLocalRepo(core, CollectionGuid, core.codeVersion(), ref ErrorMessage, "", isNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollections );
                                                             }
                                                         }
                                                     }
@@ -458,7 +462,7 @@ namespace Contensive.Processor.Controllers {
                     //---------------------------------------------------------------------
                     //
                     core.cache.invalidateAll();
-                    LogController.logInfo(core, "Upgrade Complete");
+                    LogController.logInfo(core, logPrefix + ", Upgrade Complete");
                     core.doc.upgradeInProgress = false;
                 }
             } catch (Exception ex) {
@@ -532,7 +536,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="core"></param>
         /// <param name="DataBuildVersion"></param>
-        private static void VerifySqlfieldCompatibility(CoreController core) {
+        private static void VerifySqlfieldCompatibility(CoreController core, string logPrefix) {
             try {
                 //
                 // verify Db field schema for fields handled internally (fix datatime2(0) problem -- need at least 3 digits for precision)
@@ -543,14 +547,14 @@ namespace Contensive.Processor.Controllers {
                         foreach (Models.Domain.TableSchemaModel.ColumnSchemaModel column in tableSchema.columns) {
                             if ((column.DATA_TYPE.ToLower() == "datetime2") & (column.DATETIME_PRECISION < 3)) {
                                 //
-                                LogController.logInfo(core, "verifySqlFieldCompatibility, conversion required, table [" + table.name + "], field [" + column.COLUMN_NAME + "], reason [datetime precision too low (" + column.DATETIME_PRECISION.ToString() + ")]");
+                                LogController.logInfo(core, logPrefix + ", verifySqlFieldCompatibility, conversion required, table [" + table.name + "], field [" + column.COLUMN_NAME + "], reason [datetime precision too low (" + column.DATETIME_PRECISION.ToString() + ")]");
                                 //
                                 // drop any indexes that use this field
                                 bool indexDropped = false;
                                 foreach( Models.Domain.TableSchemaModel.IndexSchemaModel index in tableSchema.indexes) {
                                     if ( index.indexKeyList.Contains(column.COLUMN_NAME) ) {
                                         //
-                                        LogController.logInfo(core, "verifySqlFieldCompatibility, index [" + index.index_name + "] must be dropped");
+                                        LogController.logInfo(core, logPrefix + ", verifySqlFieldCompatibility, index [" + index.index_name + "] must be dropped");
                                         core.db.deleteSqlIndex("", table.name, index.index_name);
                                         indexDropped = true;
                                         //
@@ -570,7 +574,7 @@ namespace Contensive.Processor.Controllers {
                                     foreach (Models.Domain.TableSchemaModel.IndexSchemaModel index in tableSchema.indexes) {
                                         if (index.indexKeyList.Contains(column.COLUMN_NAME)) {
                                             //
-                                            LogController.logInfo(core, "verifySqlFieldCompatibility, recreating index [" + index.index_name + "]");
+                                            LogController.logInfo(core, logPrefix + ", verifySqlFieldCompatibility, recreating index [" + index.index_name + "]");
                                             core.db.createSQLIndex("", table.name, index.index_name, index.index_keys);
                                             //
                                         }
@@ -592,7 +596,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="core"></param>
         /// <param name="DataBuildVersion"></param>
-        private static void Upgrade_Conversion(CoreController core, string DataBuildVersion) {
+        private static void Upgrade_Conversion(CoreController core, string DataBuildVersion, string logPrefix ) {
             try {
                 //
                 // -- Roll the style sheet cache if it is setup
@@ -933,11 +937,13 @@ namespace Contensive.Processor.Controllers {
         //       it will fail if they are not up to date.
         //===================================================================================================================
         //
-        internal static void VerifyBasicTables(CoreController core) {
+        internal static void VerifyBasicTables(CoreController core, string logPrefix) {
             try {
                 //
-                if (!false) {
-                    appendUpgradeLogAddStep(core, core.appConfig.name, "VerifyCoreTables", "Verify Core SQL Tables");
+                {
+                    logPrefix += "-verifyBasicTables";
+                    LogController.logInfo(core, logPrefix + ", enter");
+                    //appendUpgradeLogAddStep(core, core.appConfig.name, "VerifyCoreTables", "Verify Core SQL Tables");
                     //
                     core.db.createSQLTable("Default", "ccDataSources");
                     core.db.createSQLTableField("Default", "ccDataSources", "typeId", FieldTypeIdInteger);

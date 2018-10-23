@@ -434,7 +434,8 @@ namespace Contensive.Processor {
             string ignoreUserMessage = "";
             string ignoreGuid = "";
             var ignoreList = new List<string> { };
-            CollectionController.installCollectionsFromPrivateFile(CP.core, privateFile, ref ignoreUserMessage, ref ignoreGuid, false, true, ref ignoreList);
+            var installedCollections = new List<string>();
+            CollectionController.installCollectionsFromPrivateFile(CP.core, privateFile, ref ignoreUserMessage, ref ignoreGuid, false, true, ref ignoreList, "CPUtilsClass.installCollectionFromFile [" + privateFile + "]", ref installedCollections);
             return taskId;
         }
         // todo implement taskId return value, create cp.task object to track task status
@@ -450,7 +451,9 @@ namespace Contensive.Processor {
             string ignoreUserMessage = "";
             List<string> ignoreList1 = new List<string>();
             List<string> ignoreList2 = new List<string>();
-            CollectionController.installCollectionsFromPrivateFolder(CP.core, privateFolder, ref ignoreUserMessage, ref ignoreList1, false, false, ref ignoreList2);
+            string logPrefix = "CPUtilsClass.installCollectionsFromFolder";
+            var installedCollections = new List<string>();
+            CollectionController.installCollectionsFromPrivateFolder(CP.core, privateFolder, ref ignoreUserMessage, ref ignoreList1, false, false, ref ignoreList2, logPrefix, ref installedCollections);
             return taskId;
         }
         // todo implement taskId return value, create cp.task object to track task status
@@ -471,7 +474,8 @@ namespace Contensive.Processor {
         public override int installCollectionFromLibrary(string collectionGuid) {
             int taskId = 0;
             string ignoreUserMessage = "";
-            CollectionController.installCollectionFromRemoteRepo(CP.core, collectionGuid, ref ignoreUserMessage, "", false, false);
+            var installedCollections = new List<string>();
+            CollectionController.installCollectionFromRemoteRepo(CP.core, collectionGuid, ref ignoreUserMessage, "", false, false, "CPUtilsClass.installCollectionFromLibrary [" + collectionGuid + "]", ref installedCollections);
             return taskId;
         }
         // todo implement taskId return value, create cp.task object to track task status
