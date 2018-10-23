@@ -4208,7 +4208,7 @@ namespace Contensive.Processor.Controllers {
                 LogController.logInfo(core, "CDef Load, stage 1: verify core sql tables");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
-                AppBuilderController.VerifyBasicTables(core, logPrefix);
+                AppBuilderController.verifyBasicTables(core, logPrefix);
                 //
                 //----------------------------------------------------------------------------------------------------------------------
                 LogController.logInfo(core, "CDef Load, stage 2: create SQL tables in default datasource");

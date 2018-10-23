@@ -18,8 +18,6 @@ namespace Contensive.Processor.Controllers {
     /// </summary>
     public class AppBuilderController {
         // 
-        //=========================================================================
-        //
         public static void upgrade(CoreController core, bool isNewBuild, bool repair) {
             try {
                 //
@@ -41,7 +39,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     //
                     // -- Verify core table fields (DataSources, Content Tables, Content, Content Fields, Setup, Sort Methods), then other basic system ops work, like site properties
-                    VerifyBasicTables(core, logPrefix);
+                    verifyBasicTables(core, logPrefix);
                     //
                     // 20180217 - move this before base collection because during install it runs addons (like _oninstall)
                     // if anything is needed that is not there yet, I need to build a list of adds to run after the app goes to app status ok
@@ -498,29 +496,27 @@ namespace Contensive.Processor.Controllers {
             }
         }
         //
-        // Get the Menu for FormInputHTML
-        //
-        private static void VerifyRecord(CoreController core, string ContentName, string Name, string CodeFieldName = "", string Code = "", bool InActive = false) {
+        //====================================================================================================
+        /// <summary>
+        /// verify a simple record exists
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="contentName"></param>
+        /// <param name="name"></param>
+        /// <param name="sqlName"></param>
+        /// <param name="sqlValue"></param>
+        /// <param name="inActive"></param>
+        private static void VerifyRecord(CoreController core, string contentName, string name, string sqlName = "", string sqlValue = "") {
             try {
-                bool Active = false;
-                DataTable dt = null;
-                string sql1 = null;
-                string sql2 = null;
-                string sql3 = null;
-                //
-                Active = !InActive;
-                Models.Domain.CDefModel cdef = Models.Domain.CDefModel.create(core, ContentName);
-                string tableName = cdef.tableName;
-                int cid = cdef.id;
-                //
-                dt = core.db.executeQuery("SELECT ID FROM " + tableName + " WHERE NAME=" + core.db.encodeSQLText(Name) + ";");
+                var cdef = CDefModel.create(core, contentName);
+                DataTable dt = core.db.executeQuery("SELECT ID FROM " + cdef.tableName + " WHERE NAME=" + core.db.encodeSQLText(name) + ";");
                 if (dt.Rows.Count == 0) {
-                    sql1 = "insert into " + tableName + " (contentcontrolid,createkey,active,name";
-                    sql2 = ") values (" + cid + ",0," + core.db.encodeSQLBoolean(Active) + "," + core.db.encodeSQLText(Name);
-                    sql3 = ")";
-                    if (!string.IsNullOrEmpty(CodeFieldName)) {
-                        sql1 += "," + CodeFieldName;
-                        sql2 += "," + Code;
+                    string sql1 = "insert into " + cdef.tableName + " (active,name";
+                    string sql2 = ") values (1," + core.db.encodeSQLText(name);
+                    string sql3 = ")";
+                    if (!string.IsNullOrEmpty(sqlName)) {
+                        sql1 += "," + sqlName;
+                        sql2 += "," + sqlValue;
                     }
                     core.db.executeQuery(sql1 + sql2 + sql3);
                 }
@@ -530,7 +526,7 @@ namespace Contensive.Processor.Controllers {
             }
         }
         //
-        //========================================================================
+        //====================================================================================================
         /// <summary>
         /// gaurantee db fields meet minimum requirements. Like dateTime precision
         /// </summary>
@@ -590,7 +586,7 @@ namespace Contensive.Processor.Controllers {
             }
         }
         //
-        //========================================================================
+        //====================================================================================================
         /// <summary>
         /// when breaking changes are required for data, update them here
         /// </summary>
@@ -611,8 +607,11 @@ namespace Contensive.Processor.Controllers {
             }
         }
         //
-        //=========================================================================================
-        //
+        //====================================================================================================
+        /// <summary>
+        /// verify the basic languages are populated
+        /// </summary>
+        /// <param name="core"></param>
         public static void verifyLanguageRecords(CoreController core) {
             try {
                 //
@@ -628,8 +627,11 @@ namespace Contensive.Processor.Controllers {
             }
         }
         //
-        //   Verify Library Folder records
-        //
+        //====================================================================================================
+        /// <summary>
+        /// verify the basic library folders
+        /// </summary>
+        /// <param name="core"></param>
         private static void VerifyLibraryFolders(CoreController core) {
             try {
                 DataTable dt = null;
@@ -647,104 +649,86 @@ namespace Contensive.Processor.Controllers {
             }
         }
         //
-        //=============================================================================
-        //
-        private static int GetIDBYName(CoreController core, string TableName, string RecordName) {
-            int tempGetIDBYName = 0;
-            int returnid = 0;
-            try {
-                //
-                DataTable rs;
-                //
-                rs = core.db.executeQuery("Select ID from " + TableName + " where name=" + core.db.encodeSQLText(RecordName));
-                if (DbController.isDataTableOk(rs)) {
-                    tempGetIDBYName = GenericController.encodeInteger(rs.Rows[0]["ID"]);
-                }
-                rs.Dispose();
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-                throw;
-            }
-            return returnid;
-        }
-        //
-        //   Verify Library Folder records
-        //
+        //====================================================================================================
+        /// <summary>
+        /// verify library folder types
+        /// </summary>
+        /// <param name="core"></param>
         private static void VerifyLibraryFileTypes(CoreController core) {
             try {
                 //
                 // Load basic records -- default images are handled in the REsource Library through the /ccLib/config/DefaultValues.txt GetDefaultValue(key) mechanism
                 //
                 if (core.db.getRecordID("Library File Types", "Image") == 0) {
-                    VerifyRecord(core, "Library File Types", "Image", "ExtensionList", "'GIF,JPG,JPE,JPEG,BMP,PNG'", false);
-                    VerifyRecord(core, "Library File Types", "Image", "IsImage", "1", false);
-                    VerifyRecord(core, "Library File Types", "Image", "IsVideo", "0", false);
-                    VerifyRecord(core, "Library File Types", "Image", "IsDownload", "1", false);
-                    VerifyRecord(core, "Library File Types", "Image", "IsFlash", "0", false);
+                    VerifyRecord(core, "Library File Types", "Image", "ExtensionList", "'GIF,JPG,JPE,JPEG,BMP,PNG'");
+                    VerifyRecord(core, "Library File Types", "Image", "IsImage", "1");
+                    VerifyRecord(core, "Library File Types", "Image", "IsVideo", "0");
+                    VerifyRecord(core, "Library File Types", "Image", "IsDownload", "1");
+                    VerifyRecord(core, "Library File Types", "Image", "IsFlash", "0");
                 }
                 //
                 if (core.db.getRecordID("Library File Types", "Video") == 0) {
-                    VerifyRecord(core, "Library File Types", "Video", "ExtensionList", "'ASX,AVI,WMV,MOV,MPG,MPEG,MP4,QT,RM'", false);
-                    VerifyRecord(core, "Library File Types", "Video", "IsImage", "0", false);
-                    VerifyRecord(core, "Library File Types", "Video", "IsVideo", "1", false);
-                    VerifyRecord(core, "Library File Types", "Video", "IsDownload", "1", false);
-                    VerifyRecord(core, "Library File Types", "Video", "IsFlash", "0", false);
+                    VerifyRecord(core, "Library File Types", "Video", "ExtensionList", "'ASX,AVI,WMV,MOV,MPG,MPEG,MP4,QT,RM'");
+                    VerifyRecord(core, "Library File Types", "Video", "IsImage", "0");
+                    VerifyRecord(core, "Library File Types", "Video", "IsVideo", "1");
+                    VerifyRecord(core, "Library File Types", "Video", "IsDownload", "1");
+                    VerifyRecord(core, "Library File Types", "Video", "IsFlash", "0");
                 }
                 //
                 if (core.db.getRecordID("Library File Types", "Audio") == 0) {
-                    VerifyRecord(core, "Library File Types", "Audio", "ExtensionList", "'AIF,AIFF,ASF,CDA,M4A,M4P,MP2,MP3,MPA,WAV,WMA'", false);
-                    VerifyRecord(core, "Library File Types", "Audio", "IsImage", "0", false);
-                    VerifyRecord(core, "Library File Types", "Audio", "IsVideo", "0", false);
-                    VerifyRecord(core, "Library File Types", "Audio", "IsDownload", "1", false);
-                    VerifyRecord(core, "Library File Types", "Audio", "IsFlash", "0", false);
+                    VerifyRecord(core, "Library File Types", "Audio", "ExtensionList", "'AIF,AIFF,ASF,CDA,M4A,M4P,MP2,MP3,MPA,WAV,WMA'");
+                    VerifyRecord(core, "Library File Types", "Audio", "IsImage", "0");
+                    VerifyRecord(core, "Library File Types", "Audio", "IsVideo", "0");
+                    VerifyRecord(core, "Library File Types", "Audio", "IsDownload", "1");
+                    VerifyRecord(core, "Library File Types", "Audio", "IsFlash", "0");
                 }
                 //
                 if (core.db.getRecordID("Library File Types", "Word") == 0) {
-                    VerifyRecord(core, "Library File Types", "Word", "ExtensionList", "'DOC'", false);
-                    VerifyRecord(core, "Library File Types", "Word", "IsImage", "0", false);
-                    VerifyRecord(core, "Library File Types", "Word", "IsVideo", "0", false);
-                    VerifyRecord(core, "Library File Types", "Word", "IsDownload", "1", false);
-                    VerifyRecord(core, "Library File Types", "Word", "IsFlash", "0", false);
+                    VerifyRecord(core, "Library File Types", "Word", "ExtensionList", "'DOC'");
+                    VerifyRecord(core, "Library File Types", "Word", "IsImage", "0");
+                    VerifyRecord(core, "Library File Types", "Word", "IsVideo", "0");
+                    VerifyRecord(core, "Library File Types", "Word", "IsDownload", "1");
+                    VerifyRecord(core, "Library File Types", "Word", "IsFlash", "0");
                 }
                 //
                 if (core.db.getRecordID("Library File Types", "Flash") == 0) {
-                    VerifyRecord(core, "Library File Types", "Flash", "ExtensionList", "'SWF'", false);
-                    VerifyRecord(core, "Library File Types", "Flash", "IsImage", "0", false);
-                    VerifyRecord(core, "Library File Types", "Flash", "IsVideo", "0", false);
-                    VerifyRecord(core, "Library File Types", "Flash", "IsDownload", "1", false);
-                    VerifyRecord(core, "Library File Types", "Flash", "IsFlash", "1", false);
+                    VerifyRecord(core, "Library File Types", "Flash", "ExtensionList", "'SWF'");
+                    VerifyRecord(core, "Library File Types", "Flash", "IsImage", "0");
+                    VerifyRecord(core, "Library File Types", "Flash", "IsVideo", "0");
+                    VerifyRecord(core, "Library File Types", "Flash", "IsDownload", "1");
+                    VerifyRecord(core, "Library File Types", "Flash", "IsFlash", "1");
                 }
                 //
                 if (core.db.getRecordID("Library File Types", "PDF") == 0) {
-                    VerifyRecord(core, "Library File Types", "PDF", "ExtensionList", "'PDF'", false);
-                    VerifyRecord(core, "Library File Types", "PDF", "IsImage", "0", false);
-                    VerifyRecord(core, "Library File Types", "PDF", "IsVideo", "0", false);
-                    VerifyRecord(core, "Library File Types", "PDF", "IsDownload", "1", false);
-                    VerifyRecord(core, "Library File Types", "PDF", "IsFlash", "0", false);
+                    VerifyRecord(core, "Library File Types", "PDF", "ExtensionList", "'PDF'");
+                    VerifyRecord(core, "Library File Types", "PDF", "IsImage", "0");
+                    VerifyRecord(core, "Library File Types", "PDF", "IsVideo", "0");
+                    VerifyRecord(core, "Library File Types", "PDF", "IsDownload", "1");
+                    VerifyRecord(core, "Library File Types", "PDF", "IsFlash", "0");
                 }
                 //
                 if (core.db.getRecordID("Library File Types", "XLS") == 0) {
-                    VerifyRecord(core, "Library File Types", "Excel", "ExtensionList", "'XLS'", false);
-                    VerifyRecord(core, "Library File Types", "Excel", "IsImage", "0", false);
-                    VerifyRecord(core, "Library File Types", "Excel", "IsVideo", "0", false);
-                    VerifyRecord(core, "Library File Types", "Excel", "IsDownload", "1", false);
-                    VerifyRecord(core, "Library File Types", "Excel", "IsFlash", "0", false);
+                    VerifyRecord(core, "Library File Types", "Excel", "ExtensionList", "'XLS'");
+                    VerifyRecord(core, "Library File Types", "Excel", "IsImage", "0");
+                    VerifyRecord(core, "Library File Types", "Excel", "IsVideo", "0");
+                    VerifyRecord(core, "Library File Types", "Excel", "IsDownload", "1");
+                    VerifyRecord(core, "Library File Types", "Excel", "IsFlash", "0");
                 }
                 //
                 if (core.db.getRecordID("Library File Types", "PPT") == 0) {
-                    VerifyRecord(core, "Library File Types", "Power Point", "ExtensionList", "'PPT,PPS'", false);
-                    VerifyRecord(core, "Library File Types", "Power Point", "IsImage", "0", false);
-                    VerifyRecord(core, "Library File Types", "Power Point", "IsVideo", "0", false);
-                    VerifyRecord(core, "Library File Types", "Power Point", "IsDownload", "1", false);
-                    VerifyRecord(core, "Library File Types", "Power Point", "IsFlash", "0", false);
+                    VerifyRecord(core, "Library File Types", "Power Point", "ExtensionList", "'PPT,PPS'");
+                    VerifyRecord(core, "Library File Types", "Power Point", "IsImage", "0");
+                    VerifyRecord(core, "Library File Types", "Power Point", "IsVideo", "0");
+                    VerifyRecord(core, "Library File Types", "Power Point", "IsDownload", "1");
+                    VerifyRecord(core, "Library File Types", "Power Point", "IsFlash", "0");
                 }
                 //
                 if (core.db.getRecordID("Library File Types", "Default") == 0) {
-                    VerifyRecord(core, "Library File Types", "Default", "ExtensionList", "''", false);
-                    VerifyRecord(core, "Library File Types", "Default", "IsImage", "0", false);
-                    VerifyRecord(core, "Library File Types", "Default", "IsVideo", "0", false);
-                    VerifyRecord(core, "Library File Types", "Default", "IsDownload", "1", false);
-                    VerifyRecord(core, "Library File Types", "Default", "IsFlash", "0", false);
+                    VerifyRecord(core, "Library File Types", "Default", "ExtensionList", "''");
+                    VerifyRecord(core, "Library File Types", "Default", "IsImage", "0");
+                    VerifyRecord(core, "Library File Types", "Default", "IsVideo", "0");
+                    VerifyRecord(core, "Library File Types", "Default", "IsDownload", "1");
+                    VerifyRecord(core, "Library File Types", "Default", "IsFlash", "0");
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -752,118 +736,115 @@ namespace Contensive.Processor.Controllers {
             }
         }
         //
-        //=========================================================================================
-        //
-        private static void VerifyState(CoreController core, string Name, string Abbreviation, double SaleTax, int CountryID) {
+        //====================================================================================================
+        /// <summary>
+        /// verify a state record
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="Name"></param>
+        /// <param name="Abbreviation"></param>
+        /// <param name="SaleTax"></param>
+        /// <param name="CountryID"></param>
+        private static void verifyState(CoreController core, string Name, string Abbreviation, double SaleTax, int CountryID) {
             try {
-                //
-                int CS = 0;
-                const string ContentName = "States";
-                //
-                CS = core.db.csOpen(ContentName, "name=" + core.db.encodeSQLText(Name),"", false);
-                if (!core.db.csOk(CS)) {
-                    //
-                    // create new record
-                    //
-                    core.db.csClose(ref CS);
-                    CS = core.db.csInsertRecord(ContentName, SystemMemberID);
-                    core.db.csSet(CS, "NAME", Name);
-                    core.db.csSet(CS, "ACTIVE", true);
-                    core.db.csSet(CS, "Abbreviation", Abbreviation);
-                    core.db.csSet(CS, "CountryID", CountryID);
-                } else {
-                    //
-                    // verify only fields needed for contensive
-                    //
-                    core.db.csSet(CS, "CountryID", CountryID);
-                    core.db.csSet(CS, "Abbreviation", Abbreviation);
-                }
-                core.db.csClose(ref CS);
+                var state = Models.Db.StateModel.createByUniqueName(core, Name);
+                if ( state == null ) state = StateModel.addEmpty(core);
+                state.abbreviation = Abbreviation;
+                state.salesTax = SaleTax;
+                state.countryID = CountryID;
+                state.save(core,true);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
             }
         }
         //
-        //=========================================================================================
-        //
+        //====================================================================================================
+        /// <summary>
+        /// verify all default states
+        /// </summary>
+        /// <param name="core"></param>
         public static void verifyStates(CoreController core) {
             try {
                 //
                 appendUpgradeLogAddStep(core, core.appConfig.name, "VerifyStates", "Verify States");
                 //
-                int CountryID = 0;
+                verifyCountry(core, "United States", "US");
+                int CountryID = core.db.getRecordID("Countries", "United States");
                 //
-                VerifyCountry(core, "United States", "US");
-                CountryID = core.db.getRecordID("Countries", "United States");
-                //
-                VerifyState(core, "Alaska", "AK", 0.0D, CountryID);
-                VerifyState(core, "Alabama", "AL", 0.0D, CountryID);
-                VerifyState(core, "Arizona", "AZ", 0.0D, CountryID);
-                VerifyState(core, "Arkansas", "AR", 0.0D, CountryID);
-                VerifyState(core, "California", "CA", 0.0D, CountryID);
-                VerifyState(core, "Connecticut", "CT", 0.0D, CountryID);
-                VerifyState(core, "Colorado", "CO", 0.0D, CountryID);
-                VerifyState(core, "Delaware", "DE", 0.0D, CountryID);
-                VerifyState(core, "District of Columbia", "DC", 0.0D, CountryID);
-                VerifyState(core, "Florida", "FL", 0.0D, CountryID);
-                VerifyState(core, "Georgia", "GA", 0.0D, CountryID);
+                verifyState(core, "Alaska", "AK", 0.0D, CountryID);
+                verifyState(core, "Alabama", "AL", 0.0D, CountryID);
+                verifyState(core, "Arizona", "AZ", 0.0D, CountryID);
+                verifyState(core, "Arkansas", "AR", 0.0D, CountryID);
+                verifyState(core, "California", "CA", 0.0D, CountryID);
+                verifyState(core, "Connecticut", "CT", 0.0D, CountryID);
+                verifyState(core, "Colorado", "CO", 0.0D, CountryID);
+                verifyState(core, "Delaware", "DE", 0.0D, CountryID);
+                verifyState(core, "District of Columbia", "DC", 0.0D, CountryID);
+                verifyState(core, "Florida", "FL", 0.0D, CountryID);
+                verifyState(core, "Georgia", "GA", 0.0D, CountryID);
 
-                VerifyState(core, "Hawaii", "HI", 0.0D, CountryID);
-                VerifyState(core, "Idaho", "ID", 0.0D, CountryID);
-                VerifyState(core, "Illinois", "IL", 0.0D, CountryID);
-                VerifyState(core, "Indiana", "IN", 0.0D, CountryID);
-                VerifyState(core, "Iowa", "IA", 0.0D, CountryID);
-                VerifyState(core, "Kansas", "KS", 0.0D, CountryID);
-                VerifyState(core, "Kentucky", "KY", 0.0D, CountryID);
-                VerifyState(core, "Louisiana", "LA", 0.0D, CountryID);
-                VerifyState(core, "Massachusetts", "MA", 0.0D, CountryID);
-                VerifyState(core, "Maine", "ME", 0.0D, CountryID);
+                verifyState(core, "Hawaii", "HI", 0.0D, CountryID);
+                verifyState(core, "Idaho", "ID", 0.0D, CountryID);
+                verifyState(core, "Illinois", "IL", 0.0D, CountryID);
+                verifyState(core, "Indiana", "IN", 0.0D, CountryID);
+                verifyState(core, "Iowa", "IA", 0.0D, CountryID);
+                verifyState(core, "Kansas", "KS", 0.0D, CountryID);
+                verifyState(core, "Kentucky", "KY", 0.0D, CountryID);
+                verifyState(core, "Louisiana", "LA", 0.0D, CountryID);
+                verifyState(core, "Massachusetts", "MA", 0.0D, CountryID);
+                verifyState(core, "Maine", "ME", 0.0D, CountryID);
 
-                VerifyState(core, "Maryland", "MD", 0.0D, CountryID);
-                VerifyState(core, "Michigan", "MI", 0.0D, CountryID);
-                VerifyState(core, "Minnesota", "MN", 0.0D, CountryID);
-                VerifyState(core, "Missouri", "MO", 0.0D, CountryID);
-                VerifyState(core, "Mississippi", "MS", 0.0D, CountryID);
-                VerifyState(core, "Montana", "MT", 0.0D, CountryID);
-                VerifyState(core, "North Carolina", "NC", 0.0D, CountryID);
-                VerifyState(core, "Nebraska", "NE", 0.0D, CountryID);
-                VerifyState(core, "New Hampshire", "NH", 0.0D, CountryID);
-                VerifyState(core, "New Mexico", "NM", 0.0D, CountryID);
+                verifyState(core, "Maryland", "MD", 0.0D, CountryID);
+                verifyState(core, "Michigan", "MI", 0.0D, CountryID);
+                verifyState(core, "Minnesota", "MN", 0.0D, CountryID);
+                verifyState(core, "Missouri", "MO", 0.0D, CountryID);
+                verifyState(core, "Mississippi", "MS", 0.0D, CountryID);
+                verifyState(core, "Montana", "MT", 0.0D, CountryID);
+                verifyState(core, "North Carolina", "NC", 0.0D, CountryID);
+                verifyState(core, "Nebraska", "NE", 0.0D, CountryID);
+                verifyState(core, "New Hampshire", "NH", 0.0D, CountryID);
+                verifyState(core, "New Mexico", "NM", 0.0D, CountryID);
 
-                VerifyState(core, "New Jersey", "NJ", 0.0D, CountryID);
-                VerifyState(core, "New York", "NY", 0.0D, CountryID);
-                VerifyState(core, "Nevada", "NV", 0.0D, CountryID);
-                VerifyState(core, "North Dakota", "ND", 0.0D, CountryID);
-                VerifyState(core, "Ohio", "OH", 0.0D, CountryID);
-                VerifyState(core, "Oklahoma", "OK", 0.0D, CountryID);
-                VerifyState(core, "Oregon", "OR", 0.0D, CountryID);
-                VerifyState(core, "Pennsylvania", "PA", 0.0D, CountryID);
-                VerifyState(core, "Rhode Island", "RI", 0.0D, CountryID);
-                VerifyState(core, "South Carolina", "SC", 0.0D, CountryID);
+                verifyState(core, "New Jersey", "NJ", 0.0D, CountryID);
+                verifyState(core, "New York", "NY", 0.0D, CountryID);
+                verifyState(core, "Nevada", "NV", 0.0D, CountryID);
+                verifyState(core, "North Dakota", "ND", 0.0D, CountryID);
+                verifyState(core, "Ohio", "OH", 0.0D, CountryID);
+                verifyState(core, "Oklahoma", "OK", 0.0D, CountryID);
+                verifyState(core, "Oregon", "OR", 0.0D, CountryID);
+                verifyState(core, "Pennsylvania", "PA", 0.0D, CountryID);
+                verifyState(core, "Rhode Island", "RI", 0.0D, CountryID);
+                verifyState(core, "South Carolina", "SC", 0.0D, CountryID);
 
-                VerifyState(core, "South Dakota", "SD", 0.0D, CountryID);
-                VerifyState(core, "Tennessee", "TN", 0.0D, CountryID);
-                VerifyState(core, "Texas", "TX", 0.0D, CountryID);
-                VerifyState(core, "Utah", "UT", 0.0D, CountryID);
-                VerifyState(core, "Vermont", "VT", 0.0D, CountryID);
-                VerifyState(core, "Virginia", "VA", 0.045, CountryID);
-                VerifyState(core, "Washington", "WA", 0.0D, CountryID);
-                VerifyState(core, "Wisconsin", "WI", 0.0D, CountryID);
-                VerifyState(core, "West Virginia", "WV", 0.0D, CountryID);
-                VerifyState(core, "Wyoming", "WY", 0.0D, CountryID);
+                verifyState(core, "South Dakota", "SD", 0.0D, CountryID);
+                verifyState(core, "Tennessee", "TN", 0.0D, CountryID);
+                verifyState(core, "Texas", "TX", 0.0D, CountryID);
+                verifyState(core, "Utah", "UT", 0.0D, CountryID);
+                verifyState(core, "Vermont", "VT", 0.0D, CountryID);
+                verifyState(core, "Virginia", "VA", 0.045, CountryID);
+                verifyState(core, "Washington", "WA", 0.0D, CountryID);
+                verifyState(core, "Wisconsin", "WI", 0.0D, CountryID);
+                verifyState(core, "West Virginia", "WV", 0.0D, CountryID);
+                verifyState(core, "Wyoming", "WY", 0.0D, CountryID);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
             }
         }
         //
-        //
-        private static void VerifyCountry(CoreController core, string Name, string Abbreviation) {
+        //====================================================================================================
+        /// <summary>
+        /// verify a country
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="name"></param>
+        /// <param name="abbreviation"></param>
+        private static void verifyCountry(CoreController core, string name, string abbreviation) {
             try {
                 int CS;
                 //
-                CS = core.db.csOpen("Countries", "name=" + core.db.encodeSQLText(Name));
+                CS = core.db.csOpen("Countries", "name=" + core.db.encodeSQLText(name));
                 if (!core.db.csOk(CS)) {
                     core.db.csClose(ref CS);
                     CS = core.db.csInsertRecord("Countries", SystemMemberID);
@@ -872,9 +853,9 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
                 if (core.db.csOk(CS)) {
-                    core.db.csSet(CS, "NAME", Name);
-                    core.db.csSet(CS, "Abbreviation", Abbreviation);
-                    if (GenericController.vbLCase(Name) == "united states") {
+                    core.db.csSet(CS, "NAME", name);
+                    core.db.csSet(CS, "Abbreviation", abbreviation);
+                    if (GenericController.vbLCase(name) == "united states") {
                         core.db.csSet(CS, "DomesticShipping", "1");
                     }
                 }
@@ -885,8 +866,11 @@ namespace Contensive.Processor.Controllers {
             }
         }
         //
-        //=========================================================================================
-        //
+        //====================================================================================================
+        /// <summary>
+        /// Verify all base countries
+        /// </summary>
+        /// <param name="core"></param>
         public static void verifyCountries(CoreController core) {
             try {
                 //
@@ -898,7 +882,7 @@ namespace Contensive.Processor.Controllers {
                     if (!string.IsNullOrEmpty(row)) {
                         string[] attrs = row.Split(';');
                         foreach (var attr in attrs) {
-                            VerifyCountry(core, encodeInitialCaps(attr), attrs[1]);
+                            verifyCountry(core, encodeInitialCaps(attr), attrs[1]);
                         }
                     }
                 }
@@ -908,10 +892,11 @@ namespace Contensive.Processor.Controllers {
             }
         }
         //
-        //=========================================================================================
-        //
-        //=========================================================================================
-        //
+        //====================================================================================================
+        /// <summary>
+        /// verify default groups
+        /// </summary>
+        /// <param name="core"></param>
         public static void verifyDefaultGroups(CoreController core) {
             try {
                 //
@@ -929,15 +914,13 @@ namespace Contensive.Processor.Controllers {
             }
         }
         //
-        //
-        //===================================================================================================================
-        //   Verify all the core tables
-        //       Moved to Sub because if an Addon upgrade from another site on the server distributes the
-        //       CDef changes, this site could have to update it's ccContent and ccField records, and
-        //       it will fail if they are not up to date.
-        //===================================================================================================================
-        //
-        internal static void VerifyBasicTables(CoreController core, string logPrefix) {
+        //====================================================================================================
+        /// <summary>
+        /// Verify all the core tables
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="logPrefix"></param>
+        internal static void verifyBasicTables(CoreController core, string logPrefix) {
             try {
                 //
                 {
@@ -1038,27 +1021,38 @@ namespace Contensive.Processor.Controllers {
             }
         }
         //
-        //===========================================================================
-        //   Append Log File
+        //====================================================================================================
+        //  deprecate 
         private static void appendUpgradeLog(CoreController core, string appName, string Method, string Message) {
             LogController.logInfo(core, "app [" + appName + "], Method [" + Method + "], Message [" + Message + "]");
         }
         //
-        //=============================================================================
-        //   Get a ContentID from the ContentName using just the tables
-        //=============================================================================
-        //
+        //====================================================================================================
+        // deprecate
         private static void appendUpgradeLogAddStep(CoreController core, string appName, string Method, string Message) {
             appendUpgradeLog(core, appName, Method, Message);
         }
         //
-        //=============================================================================
-        //   Verify an Admin Navigator Entry
-        //       Entries are unique by their ccGuid
-        //       Includes InstalledByCollectionID
-        //       returns the entry id
-        //=============================================================================
-        //
+        //====================================================================================================
+        /// <summary>
+        /// verify a nanigator entry
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="ccGuid"></param>
+        /// <param name="menuNameSpace"></param>
+        /// <param name="EntryName"></param>
+        /// <param name="ContentName"></param>
+        /// <param name="LinkPage"></param>
+        /// <param name="SortOrder"></param>
+        /// <param name="AdminOnly"></param>
+        /// <param name="DeveloperOnly"></param>
+        /// <param name="NewWindow"></param>
+        /// <param name="Active"></param>
+        /// <param name="AddonName"></param>
+        /// <param name="NavIconType"></param>
+        /// <param name="NavIconTitle"></param>
+        /// <param name="InstalledByCollectionID"></param>
+        /// <returns></returns>
         public static int verifyNavigatorEntry(CoreController core, string ccGuid, string menuNameSpace, string EntryName, string ContentName, string LinkPage, string SortOrder, bool AdminOnly, bool DeveloperOnly, bool NewWindow, bool Active, string AddonName, string NavIconType, string NavIconTitle, int InstalledByCollectionID) {
             int returnEntry = 0;
             try {
@@ -1101,7 +1095,14 @@ namespace Contensive.Processor.Controllers {
             }
             return returnEntry;
         }
-             //
+        //
+        //====================================================================================================
+        /// <summary>
+        /// get navigator id from namespace
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="menuNameSpace"></param>
+        /// <returns></returns>
         public static int verifyNavigatorEntry_getParentIdFromNameSpace(CoreController core, string menuNameSpace) {
             int parentRecordId = 0;
             try {

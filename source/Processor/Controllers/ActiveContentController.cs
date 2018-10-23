@@ -16,8 +16,10 @@ namespace Contensive.Processor.Controllers {
         //              processed here
         //      2) json formatted content commands
         //              contentCommandController called (see contentcommandcontroller for syntax and details
+        //
+        //====================================================================================================
         /// <summary>
-        /// 
+        /// render active content for a web page
         /// </summary>
         /// <param name="core"></param>
         /// <param name="source"></param>
@@ -2042,7 +2044,19 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// (future) for remote methods that render in JSON
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="Source"></param>
+        /// <param name="ContextContentName"></param>
+        /// <param name="ContextRecordID"></param>
+        /// <param name="ContextContactPeopleID"></param>
+        /// <param name="ProtocolHostString"></param>
+        /// <param name="DefaultWrapperID"></param>
+        /// <param name="ignore_TemplateCaseOnly_Content"></param>
+        /// <param name="addonContext"></param>
+        /// <returns></returns>
         public static string renderJSONForRemoteMethod(CoreController core, string Source, string ContextContentName, int ContextRecordID, int ContextContactPeopleID, string ProtocolHostString, int DefaultWrapperID, string ignore_TemplateCaseOnly_Content, CPUtilsBaseClass.addonContext addonContext) {
             string result = Source;
             result = ContentCmdController.executeContentCommands(core, result, CPUtilsBaseClass.addonContext.ContextAdmin, ContextContactPeopleID, false);
@@ -2051,7 +2065,14 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// render active content for an email
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="Source"></param>
+        /// <param name="personalizationPeopleID"></param>
+        /// <param name="queryStringForLinkAppend"></param>
+        /// <returns></returns>
         public static string renderHtmlForEmail(CoreController core, string Source, int personalizationPeopleID, string queryStringForLinkAppend) {
             string result = Source;
             result = ContentCmdController.executeContentCommands(core, result, CPUtilsClass.addonContext.ContextEmail, personalizationPeopleID, true);

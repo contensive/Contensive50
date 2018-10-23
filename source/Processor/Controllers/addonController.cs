@@ -30,7 +30,6 @@ namespace Contensive.Processor.Controllers {
         //
         private CoreController core;
         //
-
         public enum ScriptLanguages {
             VBScript = 1,
             Javascript = 2
@@ -62,6 +61,12 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// execute an addon by its guid
+        /// </summary>
+        /// <param name="addonGuid"></param>
+        /// <param name="executeContext"></param>
+        /// <returns></returns>
         public string execute(string addonGuid, CPUtilsBaseClass.addonExecuteContext executeContext) {
             var addon = AddonModel.create(core, addonGuid);
             if (addon == null) {
@@ -75,6 +80,12 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// execute addon by is id
+        /// </summary>
+        /// <param name="addonId"></param>
+        /// <param name="executeContext"></param>
+        /// <returns></returns>
         public string execute(int addonId, CPUtilsBaseClass.addonExecuteContext executeContext) {
             var addon = AddonModel.create(core, addonId);
             if (addon == null) {
@@ -1394,139 +1405,10 @@ namespace Contensive.Processor.Controllers {
             }
             return result;
         }
-        ////
-        ////====================================================================================================
-        ////   Display field in the admin/edit
-        ////
-        //private string execute_formContent_decodeSelector(object nothingObject, string SitePropertyName, string SitePropertyValue, string selector) {
-        //    string result = "";
-        //    try {
-        //        string ExpandedSelector = "";
-        //        Dictionary<string, string> addonInstanceProperties = new Dictionary<string, string>();
-        //        string OptionCaption = null;
-        //        string OptionValue = null;
-        //        string OptionValue_AddonEncoded = null;
-        //        int OptionPtr = 0;
-        //        int OptionCnt = 0;
-        //        string[] OptionValues = null;
-        //        string OptionSuffix = "";
-        //        string LCaseOptionDefault = null;
-        //        int Pos = 0;
-        //        stringBuilderLegacyController FastString = null;
-        //        string Copy = "";
-        //        //
-        //        FastString = new stringBuilderLegacyController();
-        //        //
-        //        Dictionary<string, string> instanceOptions = new Dictionary<string, string>();
-        //        instanceOptions.Add(SitePropertyName, SitePropertyValue);
-        //        buildAddonOptionLists(ref addonInstanceProperties, ref ExpandedSelector, SitePropertyName + "=" + selector, instanceOptions, "0", true);
-        //        Pos = genericController.vbInstr(1, ExpandedSelector, "[");
-        //        if (Pos != 0) {
-        //            //
-        //            // List of Options, might be select, radio or checkbox
-        //            //
-        //            LCaseOptionDefault = genericController.vbLCase(ExpandedSelector.Left(Pos - 1));
-        //            int PosEqual = genericController.vbInstr(1, LCaseOptionDefault, "=");
-
-        //            if (PosEqual > 0) {
-        //                LCaseOptionDefault = LCaseOptionDefault.Substring(PosEqual);
-        //            }
-
-        //            LCaseOptionDefault = genericController.decodeNvaArgument(LCaseOptionDefault);
-        //            ExpandedSelector = ExpandedSelector.Substring(Pos);
-        //            Pos = genericController.vbInstr(1, ExpandedSelector, "]");
-        //            if (Pos > 0) {
-        //                if (Pos < ExpandedSelector.Length) {
-        //                    OptionSuffix = genericController.vbLCase((ExpandedSelector.Substring(Pos)).Trim(' '));
-        //                }
-        //                ExpandedSelector = ExpandedSelector.Left(Pos - 1);
-        //            }
-        //            OptionValues = ExpandedSelector.Split('|');
-        //            result = "";
-        //            OptionCnt = OptionValues.GetUpperBound(0) + 1;
-        //            for (OptionPtr = 0; OptionPtr < OptionCnt; OptionPtr++) {
-        //                OptionValue_AddonEncoded = OptionValues[OptionPtr].Trim(' ');
-        //                if (!string.IsNullOrEmpty(OptionValue_AddonEncoded)) {
-        //                    Pos = genericController.vbInstr(1, OptionValue_AddonEncoded, ":");
-        //                    if (Pos == 0) {
-        //                        OptionValue = genericController.decodeNvaArgument(OptionValue_AddonEncoded);
-        //                        OptionCaption = OptionValue;
-        //                    } else {
-        //                        OptionCaption = genericController.decodeNvaArgument(OptionValue_AddonEncoded.Left(Pos - 1));
-        //                        OptionValue = genericController.decodeNvaArgument(OptionValue_AddonEncoded.Substring(Pos));
-        //                    }
-        //                    switch (OptionSuffix) {
-        //                        case "checkbox":
-        //                            //
-        //                            // Create checkbox addon_execute_getFormContent_decodeSelector
-        //                            //
-        //                            if (genericController.vbInstr(1, "," + LCaseOptionDefault + ",", "," + genericController.vbLCase(OptionValue) + ",") != 0) {
-        //                                result += "<div style=\"white-space:nowrap\"><input type=\"checkbox\" name=\"" + SitePropertyName + OptionPtr + "\" value=\"" + OptionValue + "\" checked=\"checked\">" + OptionCaption + "</div>";
-        //                            } else {
-        //                                result += "<div style=\"white-space:nowrap\"><input type=\"checkbox\" name=\"" + SitePropertyName + OptionPtr + "\" value=\"" + OptionValue + "\" >" + OptionCaption + "</div>";
-        //                            }
-        //                            break;
-        //                        case "radio":
-        //                            //
-        //                            // Create Radio addon_execute_getFormContent_decodeSelector
-        //                            //
-        //                            if (genericController.vbLCase(OptionValue) == LCaseOptionDefault) {
-        //                                result += "<div style=\"white-space:nowrap\"><input type=\"radio\" name=\"" + SitePropertyName + "\" value=\"" + OptionValue + "\" checked=\"checked\" >" + OptionCaption + "</div>";
-        //                            } else {
-        //                                result += "<div style=\"white-space:nowrap\"><input type=\"radio\" name=\"" + SitePropertyName + "\" value=\"" + OptionValue + "\" >" + OptionCaption + "</div>";
-        //                            }
-        //                            break;
-        //                        default:
-        //                            //
-        //                            // Create select addon_execute_result
-        //                            //
-        //                            if (genericController.vbLCase(OptionValue) == LCaseOptionDefault) {
-        //                                result += "<option value=\"" + OptionValue + "\" selected>" + OptionCaption + "</option>";
-        //                            } else {
-        //                                result += "<option value=\"" + OptionValue + "\">" + OptionCaption + "</option>";
-        //                            }
-        //                            break;
-        //                    }
-        //                }
-        //            }
-        //            switch (OptionSuffix) {
-        //                case "checkbox":
-        //                    //
-        //                    //
-        //                    Copy += "<input type=\"hidden\" name=\"" + SitePropertyName + "CheckBoxCnt\" value=\"" + OptionCnt + "\" >";
-        //                    break;
-        //                case "radio":
-        //                    //
-        //                    // Create Radio addon_execute_result
-        //                    //
-        //                    //addon_execute_result = "<div>" & genericController.vbReplace(addon_execute_result, "><", "></div><div><") & "</div>"
-        //                    break;
-        //                default:
-        //                    //
-        //                    // Create select addon_execute_result
-        //                    //
-        //                    result = "<select name=\"" + SitePropertyName + "\">" + result + "</select>";
-        //                    break;
-        //            }
-        //        } else {
-        //            //
-        //            // Create Text addon_execute_result
-        //            //
-
-        //            selector = genericController.decodeNvaArgument(selector);
-        //            result = htmlController.inputText(core, SitePropertyName, selector, 1, 20);
-        //        }
-
-        //        FastString = null;
-        //    } catch (Exception ex) {
-        //        logController.handleError(core, ex);
-        //    }
-        //    return result;
-        //}
         //
         //====================================================================================================
         /// <summary>
-        /// 
+        /// execute vb script
         /// </summary>
         /// <param name="addon"></param>
         /// <param name="Code"></param>
@@ -1603,7 +1485,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// 
+        /// execute jscript script
         /// </summary>
         /// <param name="addon"></param>
         /// <param name="Code"></param>
@@ -1681,7 +1563,13 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// execute dotnet code
+        /// </summary>
+        /// <param name="executeContext"></param>
+        /// <param name="addon"></param>
+        /// <param name="addonCollection"></param>
+        /// <returns></returns>
         private string execute_assembly(CPUtilsBaseClass.addonExecuteContext executeContext, Models.Db.AddonModel addon, AddonCollectionModel addonCollection) {
             string result = "";
             try {
@@ -1756,10 +1644,14 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //====================================================================================================
-        //   This is the call from the COM csv code that executes a dot net addon from com.
-        //   This is not in the CP BaseClass, because it is used by addons to call back into CP for
-        //   services, and they should never call this.
-        //
+        /// <summary>
+        /// execute an assembly in a path
+        /// </summary>
+        /// <param name="addon"></param>
+        /// <param name="fullPath"></param>
+        /// <param name="IsDevAssembliesFolder"></param>
+        /// <param name="AddonFound"></param>
+        /// <returns></returns>
         private string execute_assembly_byFilePath(Models.Db.AddonModel addon, string fullPath, bool IsDevAssembliesFolder, ref bool AddonFound) {
             string returnValue = "";
             try {
@@ -1901,23 +1793,14 @@ namespace Contensive.Processor.Controllers {
             }
             return returnValue;
         }
-        //
-        //====================================================================================================================
-        //   Execte an Addon as a process
-        //
-        //   OptionString
-        //       can be & delimited or crlf delimited
-        //       must be addonencoded with call encodeNvaArgument
-        //
-        //   nothingObject
-        //       cp should be set during csv_OpenConnection3 -- do not pass it around in the arguments
-        //
-        //   WaitForReturn
-        //       if true, this routine calls the addon
-        //       if false, the server is called remotely, which starts a cccmd process, gets the command and calls this routine with true
-        //====================================================================================================================
-        //
         // todo Convert signature to match execute() methods (model + context)
+        //====================================================================================================================
+        /// <summary>
+        /// add an addon to the task queue for execution in a different process
+        /// </summary>
+        /// <param name="AddonIDGuidOrName"></param>
+        /// <param name="OptionString"></param>
+        /// <returns></returns>
         public string executeAsync(string AddonIDGuidOrName, string OptionString = "") {
             string result = "";
             try {
@@ -1952,11 +1835,18 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //===============================================================================================================================================
-        //   core.main_Get the editable options bubble
-        //       ACInstanceID required
-        //       ACInstanceID = -1 means this Add-on does not support instance options (like end-of-page scope, etc)
-        // REFACTOR - unify interface, remove core.main_ and csv_ class references
-        //
+        /// <summary>
+        /// popup menu used on pages
+        /// </summary>
+        /// <param name="AddonName"></param>
+        /// <param name="Option_String"></param>
+        /// <param name="ContentName"></param>
+        /// <param name="RecordID"></param>
+        /// <param name="FieldName"></param>
+        /// <param name="ACInstanceID"></param>
+        /// <param name="Context"></param>
+        /// <param name="return_DialogList"></param>
+        /// <returns></returns>
         public string getInstanceBubble(string AddonName, string Option_String, string ContentName, int RecordID, string FieldName, string ACInstanceID, CPUtilsBaseClass.addonContext Context, ref string return_DialogList) {
             string tempgetInstanceBubble = null;
             try {
@@ -2214,8 +2104,12 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //===============================================================================================================================================
-        //   core.main_Get Addon Styles Bubble Editor
-        //
+        /// <summary>
+        /// Get styles for help popup
+        /// </summary>
+        /// <param name="addonId"></param>
+        /// <param name="return_DialogList"></param>
+        /// <returns></returns>
         public string getAddonStylesBubble(int addonId, ref string return_DialogList) {
             string result = "";
             try {
@@ -2287,8 +2181,14 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //===============================================================================================================================================
-        //   core.main_Get inner HTML viewer Bubble
-        //
+        /// <summary>
+        /// help popup
+        /// </summary>
+        /// <param name="addonId"></param>
+        /// <param name="helpCopy"></param>
+        /// <param name="CollectionID"></param>
+        /// <param name="return_DialogList"></param>
+        /// <returns></returns>
         public string getHelpBubble(int addonId, string helpCopy, int CollectionID, ref string return_DialogList) {
             string result = "";
             string QueryString = null;
@@ -2365,8 +2265,13 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //===============================================================================================================================================
-        //   core.main_Get inner HTML viewer Bubble
-        //
+        /// <summary>
+        /// help buble
+        /// </summary>
+        /// <param name="addonId"></param>
+        /// <param name="HTMLSourceID"></param>
+        /// <param name="return_DialogList"></param>
+        /// <returns></returns>
         public string getHTMLViewerBubble(int addonId, string HTMLSourceID, ref string return_DialogList) {
             string tempgetHTMLViewerBubble = null;
             try {
@@ -2434,813 +2339,6 @@ namespace Contensive.Processor.Controllers {
             //throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError18("addon_execute_GetHTMLViewerBubble")
             return tempgetHTMLViewerBubble;
         }
-        ////
-        ////====================================================================================================
-        ////
-        //private string getFormContent(string FormXML, ref bool return_ExitRequest) {
-        //    string tempgetFormContent = null;
-        //    string result = "";
-        //    try {
-        //        int FieldCount = 0;
-        //        int RowMax = 0;
-        //        int ColumnMax = 0;
-        //        int SQLPageSize = 0;
-        //        int ErrorNumber = 0;
-        //        string ErrorDescription = null;
-        //        string[,] dataArray = null;
-        //        int RecordID = 0;
-        //        string fieldfilename = null;
-        //        string FieldDataSource = null;
-        //        string FieldSQL = null;
-        //        stringBuilderLegacyController Content = new stringBuilderLegacyController();
-        //        string Copy = null;
-        //        string Button = null;
-        //        string ButtonList = "";
-        //        string Filename = null;
-        //        string NonEncodedLink = null;
-        //        string EncodedLink = null;
-        //        string VirtualFilePath = null;
-        //        string TabName = null;
-        //        string TabDescription = null;
-        //        string TabHeading = null;
-        //        int TabCnt = 0;
-        //        stringBuilderLegacyController TabCell = null;
-        //        string FieldValue = "";
-        //        string FieldDescription = null;
-        //        string FieldDefaultValue = null;
-        //        bool IsFound = false;
-        //        string Name = "";
-        //        string Description = "";
-        //        XmlDocument Doc = new XmlDocument();
-        //        //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
-        //        //				XmlNode TabNode = null;
-        //        //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
-        //        //				XmlNode SettingNode = null;
-        //        int CS = 0;
-        //        string FieldName = null;
-        //        string FieldCaption = null;
-        //        string FieldAddon = null;
-        //        bool FieldReadOnly = false;
-        //        bool FieldHTML = false;
-        //        string fieldType = null;
-        //        string FieldSelector = null;
-        //        string DefaultFilename = null;
-        //        //
-        //        Button = core.docProperties.getText(RequestNameButton);
-        //        if (Button == ButtonCancel) {
-        //            //
-        //            // Cancel just exits with no content
-        //            //
-        //            return_ExitRequest = true;
-        //            return string.Empty;
-        //        } else if (!core.session.isAuthenticatedAdmin(core)) {
-        //            //
-        //            // Not Admin Error
-        //            //
-        //            ButtonList = ButtonCancel;
-        //            Content.Add(adminUIController.GetFormBodyAdminOnly());
-        //        } else {
-        //            if (true) {
-        //                bool loadOK = true;
-        //                try {
-
-        //                    Doc.LoadXml(FormXML);
-        //                } catch (Exception) {
-        //                    ButtonList = ButtonCancel;
-        //                    Content.Add("<div class=\"ccError\" style=\"margin:10px;padding:10px;background-color:white;\">There was a problem with the Setting Page you requested.</div>");
-        //                    loadOK = false;
-        //                }
-        //                if (loadOK) {
-        //                } else {
-        //                    //
-        //                    // data is OK
-        //                    //
-        //                    if (genericController.vbLCase(Doc.DocumentElement.Name) != "form") {
-        //                        //
-        //                        // error - Need a way to reach the user that submitted the file
-        //                        //
-        //                        ButtonList = ButtonCancel;
-        //                        Content.Add("<div class=\"ccError\" style=\"margin:10px;padding:10px;background-color:white;\">There was a problem with the Setting Page you requested.</div>");
-        //                    } else {
-        //                        //
-        //                        // ----- Process Requests
-        //                        //
-        //                        if ((Button == ButtonSave) || (Button == ButtonOK)) {
-        //                            foreach (XmlNode SettingNode in Doc.DocumentElement.ChildNodes) {
-        //                                switch (genericController.vbLCase(SettingNode.Name)) {
-        //                                    case "tab":
-        //                                        foreach (XmlNode TabNode in SettingNode.ChildNodes) {
-        //                                            switch (genericController.vbLCase(TabNode.Name)) {
-        //                                                case "siteproperty":
-        //                                                    //
-        //                                                    FieldName = xml_GetAttribute(IsFound, TabNode, "name", "");
-        //                                                    FieldValue = core.docProperties.getText(FieldName);
-        //                                                    fieldType = xml_GetAttribute(IsFound, TabNode, "type", "");
-        //                                                    switch (genericController.vbLCase(fieldType)) {
-        //                                                        case "integer":
-        //                                                            //
-        //                                                            if (!string.IsNullOrEmpty(FieldValue)) {
-        //                                                                FieldValue = genericController.encodeInteger(FieldValue).ToString();
-        //                                                            }
-        //                                                            core.siteProperties.setProperty(FieldName, FieldValue);
-        //                                                            break;
-        //                                                        case "boolean":
-        //                                                            //
-        //                                                            if (!string.IsNullOrEmpty(FieldValue)) {
-        //                                                                FieldValue = genericController.encodeBoolean(FieldValue).ToString();
-        //                                                            }
-        //                                                            core.siteProperties.setProperty(FieldName, FieldValue);
-        //                                                            break;
-        //                                                        case "float":
-        //                                                            //
-        //                                                            if (!string.IsNullOrEmpty(FieldValue)) {
-        //                                                                FieldValue = encodeNumber(FieldValue).ToString();
-        //                                                            }
-        //                                                            core.siteProperties.setProperty(FieldName, FieldValue);
-        //                                                            break;
-        //                                                        case "date":
-        //                                                            //
-        //                                                            if (!string.IsNullOrEmpty(FieldValue)) {
-        //                                                                FieldValue = genericController.encodeDate(FieldValue).ToString();
-        //                                                            }
-        //                                                            core.siteProperties.setProperty(FieldName, FieldValue);
-        //                                                            break;
-        //                                                        case "file":
-        //                                                        case "imagefile":
-        //                                                            //
-        //                                                            if (core.docProperties.getBoolean(FieldName + ".DeleteFlag")) {
-        //                                                                core.siteProperties.setProperty(FieldName, "");
-        //                                                            }
-        //                                                            if (!string.IsNullOrEmpty(FieldValue)) {
-        //                                                                Filename = FieldValue;
-        //                                                                VirtualFilePath = "Settings/" + FieldName + "/";
-        //                                                                core.cdnFiles.upload(FieldName, VirtualFilePath, ref Filename);
-        //                                                                core.siteProperties.setProperty(FieldName, VirtualFilePath + "/" + Filename);
-        //                                                            }
-        //                                                            break;
-        //                                                        case "textfile":
-        //                                                            //
-        //                                                            DefaultFilename = "Settings/" + FieldName + ".txt";
-        //                                                            Filename = core.siteProperties.getText(FieldName, DefaultFilename);
-        //                                                            if (string.IsNullOrEmpty(Filename)) {
-        //                                                                Filename = DefaultFilename;
-        //                                                                core.siteProperties.setProperty(FieldName, DefaultFilename);
-        //                                                            }
-        //                                                            core.appRootFiles.saveFile(Filename, FieldValue);
-        //                                                            break;
-        //                                                        case "cssfile":
-        //                                                            //
-        //                                                            DefaultFilename = "Settings/" + FieldName + ".css";
-        //                                                            Filename = core.siteProperties.getText(FieldName, DefaultFilename);
-        //                                                            if (string.IsNullOrEmpty(Filename)) {
-        //                                                                Filename = DefaultFilename;
-        //                                                                core.siteProperties.setProperty(FieldName, DefaultFilename);
-        //                                                            }
-        //                                                            core.appRootFiles.saveFile(Filename, FieldValue);
-        //                                                            break;
-        //                                                        case "xmlfile":
-        //                                                            //
-        //                                                            DefaultFilename = "Settings/" + FieldName + ".xml";
-        //                                                            Filename = core.siteProperties.getText(FieldName, DefaultFilename);
-        //                                                            if (string.IsNullOrEmpty(Filename)) {
-        //                                                                Filename = DefaultFilename;
-        //                                                                core.siteProperties.setProperty(FieldName, DefaultFilename);
-        //                                                            }
-        //                                                            core.appRootFiles.saveFile(Filename, FieldValue);
-        //                                                            break;
-        //                                                        case "currency":
-        //                                                            //
-        //                                                            if (!string.IsNullOrEmpty(FieldValue)) {
-        //                                                                FieldValue = encodeNumber(FieldValue).ToString();
-        //                                                                FieldValue = String.Format("C", FieldValue);
-        //                                                            }
-        //                                                            core.siteProperties.setProperty(FieldName, FieldValue);
-        //                                                            break;
-        //                                                        case "link":
-        //                                                            core.siteProperties.setProperty(FieldName, FieldValue);
-        //                                                            break;
-        //                                                        default:
-        //                                                            core.siteProperties.setProperty(FieldName, FieldValue);
-        //                                                            break;
-        //                                                    }
-        //                                                    break;
-        //                                                case "copycontent":
-        //                                                    //
-        //                                                    // A Copy Content block
-        //                                                    //
-        //                                                    FieldReadOnly = genericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
-        //                                                    if (!FieldReadOnly) {
-        //                                                        FieldName = xml_GetAttribute(IsFound, TabNode, "name", "");
-        //                                                        FieldHTML = genericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", "false"));
-        //                                                        if (FieldHTML) {
-        //                                                            //
-        //                                                            // treat html as active content for now.
-        //                                                            //
-        //                                                            FieldValue = core.docProperties.getRenderedActiveContent(FieldName);
-        //                                                        } else {
-        //                                                            FieldValue = core.docProperties.getText(FieldName);
-        //                                                        }
-
-        //                                                        CS = core.db.csOpen("Copy Content", "name=" + core.db.encodeSQLText(FieldName), "ID");
-        //                                                        if (!core.db.csOk(CS)) {
-        //                                                            core.db.csClose(ref CS);
-        //                                                            CS = core.db.csInsertRecord("Copy Content");
-        //                                                        }
-        //                                                        if (core.db.csOk(CS)) {
-        //                                                            core.db.csSet(CS, "name", FieldName);
-        //                                                            //
-        //                                                            // Set copy
-        //                                                            //
-        //                                                            core.db.csSet(CS, "copy", FieldValue);
-        //                                                            //
-        //                                                            // delete duplicates
-        //                                                            //
-        //                                                            core.db.csGoNext(CS);
-        //                                                            while (core.db.csOk(CS)) {
-        //                                                                core.db.csDeleteRecord(CS);
-        //                                                                core.db.csGoNext(CS);
-        //                                                            }
-        //                                                        }
-        //                                                        core.db.csClose(ref CS);
-        //                                                    }
-
-        //                                                    break;
-        //                                                case "filecontent":
-        //                                                    //
-        //                                                    // A File Content block
-        //                                                    //
-        //                                                    FieldReadOnly = genericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
-        //                                                    if (!FieldReadOnly) {
-        //                                                        FieldName = xml_GetAttribute(IsFound, TabNode, "name", "");
-        //                                                        fieldfilename = xml_GetAttribute(IsFound, TabNode, "filename", "");
-        //                                                        FieldValue = core.docProperties.getText(FieldName);
-        //                                                        core.appRootFiles.saveFile(fieldfilename, FieldValue);
-        //                                                    }
-        //                                                    break;
-        //                                                case "dbquery":
-        //                                                    //
-        //                                                    // dbquery has no results to process
-        //                                                    //
-        //                                                    break;
-        //                                            }
-        //                                        }
-        //                                        break;
-        //                                    default:
-        //                                        break;
-        //                                }
-        //                            }
-        //                        }
-        //                        if (Button == ButtonOK) {
-        //                            //
-        //                            // Exit on OK or cancel
-        //                            //
-        //                            return_ExitRequest = true;
-        //                            return string.Empty;
-        //                        }
-        //                        //
-        //                        // ----- Display Form
-        //                        //
-        //                        Content.Add(adminUIController.EditTableOpen);
-        //                        Name = xml_GetAttribute(IsFound, Doc.DocumentElement, "name", "");
-        //                        foreach (XmlNode SettingNode in Doc.DocumentElement.ChildNodes) {
-        //                            switch (genericController.vbLCase(SettingNode.Name)) {
-        //                                case "description":
-        //                                    Description = SettingNode.InnerText;
-        //                                    break;
-        //                                case "tab":
-        //                                    TabCnt = TabCnt + 1;
-        //                                    TabName = xml_GetAttribute(IsFound, SettingNode, "name", "");
-        //                                    TabDescription = xml_GetAttribute(IsFound, SettingNode, "description", "");
-        //                                    TabHeading = xml_GetAttribute(IsFound, SettingNode, "heading", "");
-        //                                    TabCell = new stringBuilderLegacyController();
-        //                                    foreach (XmlNode TabNode in SettingNode.ChildNodes) {
-        //                                        switch (genericController.vbLCase(TabNode.Name)) {
-        //                                            case "heading":
-        //                                                //
-        //                                                // Heading
-        //                                                //
-        //                                                FieldCaption = xml_GetAttribute(IsFound, TabNode, "caption", "");
-        //                                                TabCell.Add(adminUIController.GetEditSubheadRow(core, FieldCaption));
-        //                                                break;
-        //                                            case "siteproperty":
-        //                                                //
-        //                                                // Site property
-        //                                                //
-        //                                                FieldName = xml_GetAttribute(IsFound, TabNode, "name", "");
-        //                                                if (!string.IsNullOrEmpty(FieldName)) {
-        //                                                    FieldCaption = xml_GetAttribute(IsFound, TabNode, "caption", "");
-        //                                                    if (string.IsNullOrEmpty(FieldCaption)) {
-        //                                                        FieldCaption = FieldName;
-        //                                                    }
-        //                                                    FieldReadOnly = genericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
-        //                                                    FieldHTML = genericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", ""));
-        //                                                    fieldType = xml_GetAttribute(IsFound, TabNode, "type", "");
-        //                                                    FieldSelector = xml_GetAttribute(IsFound, TabNode, "selector", "");
-        //                                                    FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "");
-        //                                                    FieldAddon = xml_GetAttribute(IsFound, TabNode, "EditorAddon", "");
-        //                                                    FieldDefaultValue = TabNode.InnerText;
-        //                                                    FieldValue = core.siteProperties.getText(FieldName, FieldDefaultValue);
-        //                                                    //                                                    If FieldReadOnly Then
-        //                                                    //                                                        '
-        //                                                    //                                                        ' Read only = no editor
-        //                                                    //                                                        '
-        //                                                    //                                                        Copy = FieldValue & core.main_GetFormInputHidden( FieldName, FieldValue)
-        //                                                    //
-        //                                                    //                                                    ElseIf FieldAddon <> "" Then
-        //                                                    if (!string.IsNullOrEmpty(FieldAddon)) {
-        //                                                        //
-        //                                                        // Use Editor Addon
-        //                                                        //
-        //                                                        Dictionary<string, string> arguments = new Dictionary<string, string>();
-        //                                                        arguments.Add("FieldName", FieldName);
-        //                                                        arguments.Add("FieldValue", core.siteProperties.getText(FieldName, FieldDefaultValue));
-        //                                                        CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
-        //                                                            addonType = CPUtilsBaseClass.addonContext.ContextAdmin,
-        //                                                            errorContextMessage = "executing editor addon [" + FieldAddon + "] for field [" + FieldName + "]"
-        //                                                        };
-        //                                                        addonModel addon = addonModel.createByName(core, FieldAddon);
-        //                                                        Copy = core.addon.execute(addon, executeContext);
-        //                                                        //Option_String = "FieldName=" & FieldName & "&FieldValue=" & encodeNvaArgument(core.siteProperties.getText(FieldName, FieldDefaultValue))
-        //                                                        //Copy = execute_legacy5(0, FieldAddon, Option_String, CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", 0)
-        //                                                    } else if (!string.IsNullOrEmpty(FieldSelector)) {
-        //                                                        //
-        //                                                        // Use Selector
-        //                                                        //
-        //                                                        Copy = getFormContent_decodeSelector(FieldName, FieldValue, FieldSelector);
-        //                                                    } else {
-        //                                                        //
-        //                                                        // Use default editor for each field type
-        //                                                        //
-        //                                                        switch (genericController.vbLCase(fieldType)) {
-        //                                                            case "integer":
-        //                                                                //
-        //                                                                if (FieldReadOnly) {
-        //                                                                    Copy = FieldValue + htmlController.inputHidden(FieldName, FieldValue);
-        //                                                                } else {
-        //                                                                    Copy = htmlController.inputText(core, FieldName, FieldValue);
-        //                                                                }
-        //                                                                break;
-        //                                                            case "boolean":
-        //                                                                if (FieldReadOnly) {
-        //                                                                    Copy = core.html.inputCheckbox(FieldName, genericController.encodeBoolean(FieldValue));
-        //                                                                    Copy = genericController.vbReplace(Copy, ">", " disabled>");
-        //                                                                    Copy += htmlController.inputHidden(FieldName, FieldValue);
-        //                                                                } else {
-        //                                                                    Copy = core.html.inputCheckbox(FieldName, genericController.encodeBoolean(FieldValue));
-        //                                                                }
-        //                                                                break;
-        //                                                            case "float":
-        //                                                                if (FieldReadOnly) {
-        //                                                                    Copy = FieldValue + htmlController.inputHidden(FieldName, FieldValue);
-        //                                                                } else {
-        //                                                                    Copy = htmlController.inputText(core, FieldName, FieldValue);
-        //                                                                }
-        //                                                                break;
-        //                                                            case "date":
-        //                                                                if (FieldReadOnly) {
-        //                                                                    Copy = FieldValue + htmlController.inputHidden(FieldName, FieldValue);
-        //                                                                } else {
-        //                                                                    Copy = htmlController.inputDate(core, FieldName, encodeDate(FieldValue));
-        //                                                                }
-        //                                                                break;
-        //                                                            case "file":
-        //                                                            case "imagefile":
-        //                                                                //
-        //                                                                if (FieldReadOnly) {
-        //                                                                    Copy = FieldValue + htmlController.inputHidden(FieldName, FieldValue);
-        //                                                                } else {
-        //                                                                    if (string.IsNullOrEmpty(FieldValue)) {
-        //                                                                        Copy = core.html.inputFile(FieldName);
-        //                                                                    } else {
-        //                                                                        NonEncodedLink = genericController.getCdnFileLink(core, FieldValue);
-        //                                                                        //NonEncodedLink = core.webServer.requestDomain + genericController.getCdnFileLink(core, FieldValue);
-        //                                                                        EncodedLink = encodeURL(NonEncodedLink);
-        //                                                                        string FieldValuefilename = "";
-        //                                                                        string FieldValuePath = "";
-        //                                                                        core.privateFiles.splitDosPathFilename(FieldValue, ref FieldValuePath, ref FieldValuefilename);
-        //                                                                        Copy = ""
-        //                                                                        + "<a href=\"http://" + EncodedLink + "\" target=\"_blank\">[" + FieldValuefilename + "]</A>"
-        //                                                                        + "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" + core.html.inputCheckbox(FieldName + ".DeleteFlag", false) + "&nbsp;&nbsp;&nbsp;Change:&nbsp;" + core.html.inputFile(FieldName);
-        //                                                                    }
-        //                                                                }
-        //                                                                //Call s.Add("&nbsp;</span></nobr></td>")
-        //                                                                break;
-        //                                                            case "currency":
-        //                                                                //
-        //                                                                if (FieldReadOnly) {
-        //                                                                    Copy = FieldValue + htmlController.inputHidden(FieldName, FieldValue);
-        //                                                                } else {
-        //                                                                    if (!string.IsNullOrEmpty(FieldValue)) {
-        //                                                                        FieldValue = String.Format("C", FieldValue);
-        //                                                                    }
-        //                                                                    Copy = htmlController.inputText(core, FieldName, FieldValue);
-        //                                                                }
-        //                                                                break;
-        //                                                            case "textfile":
-        //                                                                //
-        //                                                                if (FieldReadOnly) {
-        //                                                                    Copy = FieldValue + htmlController.inputHidden(FieldName, FieldValue);
-        //                                                                } else {
-        //                                                                    FieldValue = core.cdnFiles.readFileText(FieldValue);
-        //                                                                    if (FieldHTML) {
-        //                                                                        Copy = core.html.getFormInputHTML(FieldName, FieldValue);
-        //                                                                    } else {
-        //                                                                        Copy = htmlController.inputTextarea(core, FieldName, FieldValue, 5);
-        //                                                                    }
-        //                                                                }
-        //                                                                break;
-        //                                                            case "cssfile":
-        //                                                                //
-        //                                                                if (FieldReadOnly) {
-        //                                                                    Copy = FieldValue + htmlController.inputHidden(FieldName, FieldValue);
-        //                                                                } else {
-        //                                                                    Copy = htmlController.inputTextarea(core, FieldName, FieldValue, 5);
-        //                                                                }
-        //                                                                break;
-        //                                                            case "xmlfile":
-        //                                                                //
-        //                                                                if (FieldReadOnly) {
-        //                                                                    Copy = FieldValue + htmlController.inputHidden(FieldName, FieldValue);
-        //                                                                } else {
-        //                                                                    Copy = htmlController.inputTextarea(core, FieldName, FieldValue, 5);
-        //                                                                }
-        //                                                                break;
-        //                                                            case "link":
-        //                                                                //
-        //                                                                if (FieldReadOnly) {
-        //                                                                    Copy = FieldValue + htmlController.inputHidden(FieldName, FieldValue);
-        //                                                                } else {
-        //                                                                    Copy = htmlController.inputText(core, FieldName, FieldValue);
-        //                                                                }
-        //                                                                break;
-        //                                                            default:
-        //                                                                //
-        //                                                                // text
-        //                                                                //
-        //                                                                if (FieldReadOnly) {
-        //                                                                    Copy = FieldValue + htmlController.inputHidden(FieldName, FieldValue);
-        //                                                                } else {
-        //                                                                    if (FieldHTML) {
-        //                                                                        Copy = core.html.getFormInputHTML(FieldName, FieldValue);
-        //                                                                    } else {
-        //                                                                        Copy = htmlController.inputText(core, FieldName, FieldValue);
-        //                                                                    }
-        //                                                                }
-        //                                                                break;
-        //                                                        }
-        //                                                    }
-        //                                                    TabCell.Add(adminUIController.getEditRowLegacy(core, Copy, FieldCaption, FieldDescription, false, false, ""));
-        //                                                }
-        //                                                break;
-        //                                            case "copycontent":
-        //                                                //
-        //                                                // Content Copy field
-        //                                                //
-        //                                                FieldName = xml_GetAttribute(IsFound, TabNode, "name", "");
-        //                                                if (!string.IsNullOrEmpty(FieldName)) {
-        //                                                    FieldCaption = xml_GetAttribute(IsFound, TabNode, "caption", "");
-        //                                                    if (string.IsNullOrEmpty(FieldCaption)) {
-        //                                                        FieldCaption = FieldName;
-        //                                                    }
-        //                                                    FieldReadOnly = genericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
-        //                                                    FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "");
-        //                                                    FieldHTML = genericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", ""));
-        //                                                    //
-        //                                                    CS = core.db.csOpen("Copy Content", "Name=" + core.db.encodeSQLText(FieldName), "ID", true, 0, false, false, "Copy");
-        //                                                    if (!core.db.csOk(CS)) {
-        //                                                        core.db.csClose(ref CS);
-        //                                                        CS = core.db.csInsertRecord("Copy Content");
-        //                                                        if (core.db.csOk(CS)) {
-        //                                                            RecordID = core.db.csGetInteger(CS, "ID");
-        //                                                            core.db.csSet(CS, "name", FieldName);
-        //                                                            core.db.csSet(CS, "copy", genericController.encodeText(TabNode.InnerText));
-        //                                                            core.db.csSave(CS);
-        //                                                            //   Call core.workflow.publishEdit("Copy Content", RecordID)
-        //                                                        }
-        //                                                    }
-        //                                                    if (core.db.csOk(CS)) {
-        //                                                        FieldValue = core.db.csGetText(CS, "copy");
-        //                                                    }
-        //                                                    if (FieldReadOnly) {
-        //                                                        //
-        //                                                        // Read only
-        //                                                        //
-        //                                                        Copy = FieldValue;
-        //                                                    } else if (FieldHTML) {
-        //                                                        //
-        //                                                        // HTML
-        //                                                        //
-        //                                                        Copy = core.html.getFormInputHTML(FieldName, FieldValue);
-        //                                                        //Copy = core.main_GetFormInputActiveContent( FieldName, FieldValue)
-        //                                                    } else {
-        //                                                        //
-        //                                                        // Text edit
-        //                                                        //
-        //                                                        Copy = htmlController.inputTextarea(core, FieldName, FieldValue);
-        //                                                    }
-        //                                                    TabCell.Add(adminUIController.getEditRowLegacy(core, Copy, FieldCaption, FieldDescription, false, false, ""));
-        //                                                }
-        //                                                break;
-        //                                            case "filecontent":
-        //                                                //
-        //                                                // Content from a flat file
-        //                                                //
-        //                                                FieldName = xml_GetAttribute(IsFound, TabNode, "name", "");
-        //                                                FieldCaption = xml_GetAttribute(IsFound, TabNode, "caption", "");
-        //                                                fieldfilename = xml_GetAttribute(IsFound, TabNode, "filename", "");
-        //                                                FieldReadOnly = genericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "readonly", ""));
-        //                                                FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "");
-        //                                                FieldDefaultValue = TabNode.InnerText;
-        //                                                Copy = "";
-        //                                                if (!string.IsNullOrEmpty(fieldfilename)) {
-        //                                                    if (core.appRootFiles.fileExists(fieldfilename)) {
-        //                                                        Copy = FieldDefaultValue;
-        //                                                    } else {
-        //                                                        Copy = core.cdnFiles.readFileText(fieldfilename);
-        //                                                    }
-        //                                                    if (!FieldReadOnly) {
-        //                                                        Copy = htmlController.inputTextarea(core, FieldName, Copy, 10);
-        //                                                    }
-        //                                                }
-        //                                                TabCell.Add(adminUIController.getEditRowLegacy(core, Copy, FieldCaption, FieldDescription, false, false, ""));
-        //                                                break;
-        //                                            case "dbquery":
-        //                                            case "querydb":
-        //                                            case "query":
-        //                                            case "db":
-        //                                                //
-        //                                                // Display the output of a query
-        //                                                //
-        //                                                Copy = "";
-        //                                                FieldDataSource = xml_GetAttribute(IsFound, TabNode, "DataSourceName", "");
-        //                                                FieldSQL = TabNode.InnerText;
-        //                                                FieldCaption = xml_GetAttribute(IsFound, TabNode, "caption", "");
-        //                                                FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "");
-        //                                                SQLPageSize = genericController.encodeInteger(xml_GetAttribute(IsFound, TabNode, "rowmax", ""));
-        //                                                if (SQLPageSize == 0) {
-        //                                                    SQLPageSize = 100;
-        //                                                }
-        //                                                //
-        //                                                // Run the SQL
-        //                                                //
-        //                                                DataTable dt = null;
-
-        //                                                if (!string.IsNullOrEmpty(FieldSQL)) {
-        //                                                    try {
-        //                                                        dt = core.db.executeQuery(FieldSQL, FieldDataSource, 1, SQLPageSize);
-        //                                                    } catch (Exception ex) {
-        //                                                        ErrorDescription = ex.ToString();
-        //                                                        loadOK = false;
-        //                                                    }
-        //                                                }
-        //                                                if (dt != null) {
-        //                                                    if (string.IsNullOrEmpty(FieldSQL)) {
-        //                                                        //
-        //                                                        // ----- Error
-        //                                                        //
-        //                                                        Copy = "No Result";
-        //                                                    } else if (ErrorNumber != 0) {
-        //                                                        //
-        //                                                        // ----- Error
-        //                                                        //
-        //                                                        //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-        //                                                        Copy = "Error: ";
-        //                                                    } else if (dt.Rows.Count <= 0) {
-        //                                                        //
-        //                                                        // ----- no result
-        //                                                        //
-        //                                                        Copy = "No Results";
-        //                                                    } else {
-        //                                                        //
-        //                                                        // ----- print results
-        //                                                        //
-        //                                                        //PageSize = RS.PageSize
-        //                                                        //
-        //                                                        // --- Create the Fields for the new table
-        //                                                        //
-        //                                                        //
-        //                                                        //Dim dtOk As Boolean = True
-        //                                                        dataArray = core.db.convertDataTabletoArray(dt);
-        //                                                        //
-        //                                                        RowMax = dataArray.GetUpperBound(1);
-        //                                                        ColumnMax = dataArray.GetUpperBound(0);
-        //                                                        if (RowMax == 0 && ColumnMax == 0) {
-        //                                                            //
-        //                                                            // Single result, display with no table
-        //                                                            //
-        //                                                            Copy = htmlController.inputText(core, "result", genericController.encodeText(dataArray[0, 0]), -1, -1, "", false, true);
-        //                                                        } else {
-        //                                                            //
-        //                                                            // Build headers
-        //                                                            //
-        //                                                            FieldCount = dt.Columns.Count;
-        //                                                            Copy += ("\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border-bottom:1px solid #444;border-right:1px solid #444;background-color:white;color:#444;\">");
-        //                                                            Copy += (cr2 + "<tr>");
-        //                                                            foreach (DataColumn dc in dt.Columns) {
-        //                                                                Copy += (cr2 + "\t<td class=\"ccadminsmall\" style=\"border-top:1px solid #444;border-left:1px solid #444;color:black;padding:2px;padding-top:4px;padding-bottom:4px;\">" + dc.ColumnName + "</td>");
-        //                                                            }
-        //                                                            Copy += (cr2 + "</tr>");
-        //                                                            //
-        //                                                            // Build output table
-        //                                                            //
-        //                                                            string RowStart = null;
-        //                                                            string RowEnd = null;
-        //                                                            string ColumnStart = null;
-        //                                                            string ColumnEnd = null;
-        //                                                            RowStart = cr2 + "<tr>";
-        //                                                            RowEnd = cr2 + "</tr>";
-        //                                                            ColumnStart = cr2 + "\t<td class=\"ccadminnormal\" style=\"border-top:1px solid #444;border-left:1px solid #444;background-color:white;color:#444;padding:2px\">";
-        //                                                            ColumnEnd = "</td>";
-        //                                                            int RowPointer = 0;
-        //                                                            for (RowPointer = 0; RowPointer <= RowMax; RowPointer++) {
-        //                                                                Copy += (RowStart);
-        //                                                                int ColumnPointer = 0;
-        //                                                                for (ColumnPointer = 0; ColumnPointer <= ColumnMax; ColumnPointer++) {
-        //                                                                    object CellData = dataArray[ColumnPointer, RowPointer];
-        //                                                                    if (IsNull(CellData)) {
-        //                                                                        Copy += (ColumnStart + "[null]" + ColumnEnd);
-        //                                                                    } else if ((CellData == null)) {
-        //                                                                        Copy += (ColumnStart + "[empty]" + ColumnEnd);
-        //                                                                    } else if (Microsoft.VisualBasic.Information.IsArray(CellData)) {
-        //                                                                        Copy += ColumnStart + "[array]";
-        //                                                                    } else if (genericController.encodeText(CellData) == "") {
-        //                                                                        Copy += (ColumnStart + "[empty]" + ColumnEnd);
-        //                                                                    } else {
-        //                                                                        Copy += (ColumnStart + htmlController.encodeHtml(genericController.encodeText(CellData)) + ColumnEnd);
-        //                                                                    }
-        //                                                                }
-        //                                                                Copy += (RowEnd);
-        //                                                            }
-        //                                                            Copy += ("\r</table>");
-        //                                                        }
-        //                                                    }
-        //                                                }
-        //                                                TabCell.Add(adminUIController.getEditRowLegacy(core, Copy, FieldCaption, FieldDescription, false, false, ""));
-        //                                                break;
-        //                                        }
-        //                                    }
-        //                                    Copy = adminUIController.GetEditPanel(core, true, TabHeading, TabDescription, adminUIController.EditTableOpen + TabCell.Text + adminUIController.EditTableClose);
-        //                                    if (!string.IsNullOrEmpty(Copy)) {
-        //                                        core.doc.menuLiveTab.AddEntry(TabName.Replace(" ", "&nbsp;"), Copy, "ccAdminTab");
-        //                                    }
-        //                                    TabCell = null;
-        //                                    break;
-        //                                default:
-        //                                    break;
-        //                            }
-        //                        }
-        //                        //
-        //                        // Buttons
-        //                        //
-        //                        ButtonList = ButtonCancel + "," + ButtonSave + "," + ButtonOK;
-        //                        //
-        //                        // Close Tables
-        //                        //
-        //                        if (TabCnt > 0) {
-        //                            Content.Add(core.doc.menuLiveTab.GetTabs(core));
-        //                        }
-        //                    }
-        //                }
-        //            }
-        //        }
-        //        //
-        //        tempgetFormContent = adminUIController.GetBody(core, Name, ButtonList, "", true, true, Description, "", 0, Content.Text);
-        //        Content = null;
-        //    } catch (Exception ex) {
-        //        logController.handleError(core, ex);
-        //    }
-        //    return result;
-        //}
-        ////
-        ////========================================================================
-        ////   Display field in the admin/edit
-        ////
-        //private string getFormContent_decodeSelector(string SitePropertyName, string SitePropertyValue, string selector) {
-        //    string tempgetFormContent_decodeSelector = null;
-        //    try {
-        //        //
-        //        string ExpandedSelector = "";
-        //        Dictionary<string, string> addonInstanceProperties = new Dictionary<string, string>();
-        //        string OptionCaption = null;
-        //        string OptionValue = null;
-        //        string OptionValue_AddonEncoded = null;
-        //        int OptionPtr = 0;
-        //        int OptionCnt = 0;
-        //        string[] OptionValues = null;
-        //        string OptionSuffix = "";
-        //        string LCaseOptionDefault = null;
-        //        int Pos = 0;
-        //        stringBuilderLegacyController FastString = null;
-        //        string Copy = "";
-        //        //
-        //        FastString = new stringBuilderLegacyController();
-        //        //
-        //        Dictionary<string, string> instanceOptions = new Dictionary<string, string>();
-        //        instanceOptions.Add(SitePropertyName, SitePropertyValue);
-        //        buildAddonOptionLists(ref addonInstanceProperties, ref ExpandedSelector, SitePropertyName + "=" + selector, instanceOptions, "0", true);
-        //        Pos = genericController.vbInstr(1, ExpandedSelector, "[");
-        //        if (Pos != 0) {
-        //            //
-        //            // List of Options, might be select, radio or checkbox
-        //            //
-        //            LCaseOptionDefault = genericController.vbLCase(ExpandedSelector.Left(Pos - 1));
-        //            int PosEqual = genericController.vbInstr(1, LCaseOptionDefault, "=");
-
-        //            if (PosEqual > 0) {
-        //                LCaseOptionDefault = LCaseOptionDefault.Substring(PosEqual);
-        //            }
-
-        //            LCaseOptionDefault = genericController.decodeNvaArgument(LCaseOptionDefault);
-        //            ExpandedSelector = ExpandedSelector.Substring(Pos);
-        //            Pos = genericController.vbInstr(1, ExpandedSelector, "]");
-        //            if (Pos > 0) {
-        //                if (Pos < ExpandedSelector.Length) {
-        //                    OptionSuffix = genericController.vbLCase((ExpandedSelector.Substring(Pos)).Trim(' '));
-        //                }
-        //                ExpandedSelector = ExpandedSelector.Left(Pos - 1);
-        //            }
-        //            OptionValues = ExpandedSelector.Split('|');
-        //            tempgetFormContent_decodeSelector = "";
-        //            OptionCnt = OptionValues.GetUpperBound(0) + 1;
-        //            for (OptionPtr = 0; OptionPtr < OptionCnt; OptionPtr++) {
-        //                OptionValue_AddonEncoded = OptionValues[OptionPtr].Trim(' ');
-        //                if (!string.IsNullOrEmpty(OptionValue_AddonEncoded)) {
-        //                    Pos = genericController.vbInstr(1, OptionValue_AddonEncoded, ":");
-        //                    if (Pos == 0) {
-        //                        OptionValue = genericController.decodeNvaArgument(OptionValue_AddonEncoded);
-        //                        OptionCaption = OptionValue;
-        //                    } else {
-        //                        OptionCaption = genericController.decodeNvaArgument(OptionValue_AddonEncoded.Left(Pos - 1));
-        //                        OptionValue = genericController.decodeNvaArgument(OptionValue_AddonEncoded.Substring(Pos));
-        //                    }
-        //                    switch (OptionSuffix) {
-        //                        case "checkbox":
-        //                            //
-        //                            // Create checkbox
-        //                            //
-        //                            if (genericController.vbInstr(1, "," + LCaseOptionDefault + ",", "," + genericController.vbLCase(OptionValue) + ",") != 0) {
-        //                                tempgetFormContent_decodeSelector = tempgetFormContent_decodeSelector + "<div style=\"white-space:nowrap\"><input type=\"checkbox\" name=\"" + SitePropertyName + OptionPtr + "\" value=\"" + OptionValue + "\" checked=\"checked\">" + OptionCaption + "</div>";
-        //                            } else {
-        //                                tempgetFormContent_decodeSelector = tempgetFormContent_decodeSelector + "<div style=\"white-space:nowrap\"><input type=\"checkbox\" name=\"" + SitePropertyName + OptionPtr + "\" value=\"" + OptionValue + "\" >" + OptionCaption + "</div>";
-        //                            }
-        //                            break;
-        //                        case "radio":
-        //                            //
-        //                            // Create Radio
-        //                            //
-        //                            if (genericController.vbLCase(OptionValue) == LCaseOptionDefault) {
-        //                                tempgetFormContent_decodeSelector = tempgetFormContent_decodeSelector + "<div style=\"white-space:nowrap\"><input type=\"radio\" name=\"" + SitePropertyName + "\" value=\"" + OptionValue + "\" checked=\"checked\" >" + OptionCaption + "</div>";
-        //                            } else {
-        //                                tempgetFormContent_decodeSelector = tempgetFormContent_decodeSelector + "<div style=\"white-space:nowrap\"><input type=\"radio\" name=\"" + SitePropertyName + "\" value=\"" + OptionValue + "\" >" + OptionCaption + "</div>";
-        //                            }
-        //                            break;
-        //                        default:
-        //                            //
-        //                            // Create select 
-        //                            //
-        //                            if (genericController.vbLCase(OptionValue) == LCaseOptionDefault) {
-        //                                tempgetFormContent_decodeSelector = tempgetFormContent_decodeSelector + "<option value=\"" + OptionValue + "\" selected>" + OptionCaption + "</option>";
-        //                            } else {
-        //                                tempgetFormContent_decodeSelector = tempgetFormContent_decodeSelector + "<option value=\"" + OptionValue + "\">" + OptionCaption + "</option>";
-        //                            }
-        //                            break;
-        //                    }
-        //                }
-        //            }
-        //            switch (OptionSuffix) {
-        //                case "checkbox":
-        //                    //
-        //                    //
-        //                    Copy += "<input type=\"hidden\" name=\"" + SitePropertyName + "CheckBoxCnt\" value=\"" + OptionCnt + "\" >";
-        //                    break;
-        //                case "radio":
-        //                    //
-        //                    // Create Radio 
-        //                    //
-        //                    //core.htmldoc.main_Addon_execute_GetFormContent_decodeSelector = "<div>" & genericController.vbReplace(core.htmldoc.main_Addon_execute_GetFormContent_decodeSelector, "><", "></div><div><") & "</div>"
-        //                    break;
-        //                default:
-        //                    //
-        //                    // Create select 
-        //                    //
-        //                    tempgetFormContent_decodeSelector = "<select name=\"" + SitePropertyName + "\">" + tempgetFormContent_decodeSelector + "</select>";
-        //                    break;
-        //            }
-        //        } else {
-        //            //
-        //            // Create Text addon_execute_GetFormContent_decodeSelector
-        //            //
-
-        //            selector = genericController.decodeNvaArgument(selector);
-        //            tempgetFormContent_decodeSelector = htmlController.inputText(core, SitePropertyName, selector, 1, 20);
-        //        }
-
-        //        FastString = null;
-        //    } catch (Exception ex) {
-        //        logController.handleError(core, ex);
-        //    }
-        //    return tempgetFormContent_decodeSelector;
-        //}
         //
         //===================================================================================================
         //   Build AddonOptionLists
