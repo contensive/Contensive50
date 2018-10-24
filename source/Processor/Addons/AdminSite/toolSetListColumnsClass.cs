@@ -24,11 +24,11 @@ namespace Contensive.Addons.AdminSite {
         //   Print the Configure Index Form
         //=============================================================================
         //
-        public static string GetForm_Index_SetColumns(CoreController core, AdminInfoDomainModel adminContext) {
+        public static string GetForm_Index_SetColumns(CoreController core, AdminDataModel adminData) {
             string result = "";
             try {
                 // todo refactor out
-                CDefModel adminContent = adminContext.adminContent;
+                CDefModel adminContent = adminData.adminContent;
                 string Button = core.docProperties.getText(RequestNameButton);
                 if (Button == ButtonOK) {
                     //
@@ -40,9 +40,9 @@ namespace Contensive.Addons.AdminSite {
                 if (Button == ButtonReset) {
                     //
                     //   Process reset
-                    core.userProperty.setProperty(AdminInfoDomainModel.IndexConfigPrefix + adminContent.id.ToString(), "");
+                    core.userProperty.setProperty(AdminDataModel.IndexConfigPrefix + adminContent.id.ToString(), "");
                 }
-                IndexConfigClass IndexConfig = IndexConfigClass.get(core, adminContext);
+                IndexConfigClass IndexConfig = IndexConfigClass.get(core, adminData);
                 int ToolsAction = core.docProperties.getInteger("dta");
                 int TargetFieldID = core.docProperties.getInteger("fi");
                 string TargetFieldName = core.docProperties.getText("FieldName");
@@ -246,7 +246,7 @@ namespace Contensive.Addons.AdminSite {
                                 column.Width = encodeInteger((1000 * column.Width) / (double)ColumnWidthTotal);
                             }
                             GetHtmlBodyClass.setIndexSQL_SaveIndexConfig(core, IndexConfig);
-                            IndexConfig = IndexConfigClass.get(core, adminContext);
+                            IndexConfig = IndexConfigClass.get(core, adminData);
                         }
                     }
                     //

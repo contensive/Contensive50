@@ -733,6 +733,7 @@ namespace Contensive.Processor.Controllers {
                 string fieldType = null;
                 string FieldSelector = null;
                 string DefaultFilename = null;
+                var adminMenu = new AdminMenuController();
                 //
                 Button = core.docProperties.getText(RequestNameButton);
                 if (Button == ButtonCancel) {
@@ -1369,9 +1370,9 @@ namespace Contensive.Processor.Controllers {
                                             }
                                             Copy = AdminUIController.getEditPanel(core, true, TabHeading, TabDescription, AdminUIController.editTableOpen + TabCell.Text + AdminUIController.editTableClose);
                                             if (!string.IsNullOrEmpty(Copy)) {
-                                                core.doc.menuLiveTab.AddEntry(TabName.Replace(" ", "&nbsp;"), Copy, "ccAdminTab");
+                                                adminMenu.menuLiveTab.AddEntry(TabName.Replace(" ", "&nbsp;"), Copy, "ccAdminTab");
                                             }
-                                            //Content.Add( GetForm_Edit_AddTab(TabName, Copy, True))
+                                            //Content.Add( GetForm_Edit_AddTab(core,TabName, Copy, True))
                                             TabCell = null;
                                             break;
                                         default:
@@ -1390,7 +1391,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 //
                                 if (TabCnt > 0) {
-                                    Content.Add(core.doc.menuLiveTab.GetTabs(core));
+                                    Content.Add(adminMenu.menuLiveTab.GetTabs(core));
                                 }
                             }
                         }
@@ -2808,7 +2809,7 @@ namespace Contensive.Processor.Controllers {
                     AddonStatusOK = false;
                 }
                 if (!AddonStatusOK) {
-                    Addons.SafeAddonManager.addonManagerClass AddonMan = new Addons.SafeAddonManager.addonManagerClass(core);
+                    Addons.SafeAddonManager.AddonManagerClass AddonMan = new Addons.SafeAddonManager.AddonManagerClass(core);
                     result = AddonMan.GetForm_SafeModeAddonManager();
                 }
             } catch (Exception ex) {

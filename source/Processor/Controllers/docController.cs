@@ -114,25 +114,6 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public bool outputBufferEnabled { get; set; } = true;
         /// <summary>
-        /// tab systems used for admin site
-        /// </summary>
-        public MenuComboTabController menuComboTab {
-            get {
-                if (_menuComboTab == null) _menuComboTab = new MenuComboTabController();
-                return _menuComboTab;
-            }
-        } private MenuComboTabController _menuComboTab;
-        /// <summary>
-        /// tab systems used for admin site
-        /// </summary>
-        public MenuLiveTabController menuLiveTab {
-            get {
-                if (_menuLiveTab == null) _menuLiveTab = new MenuLiveTabController();
-                return _menuLiveTab;
-            }
-        }
-        private MenuLiveTabController _menuLiveTab;
-        /// <summary>
         /// Message - when set displays in an admin hint box in the page
         /// </summary>
         public string adminWarning { get; set; } = "";

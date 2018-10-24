@@ -15,7 +15,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 //
 namespace Contensive.Addons.SafeAddonManager {
-    public class addonManagerClass {
+    public class AddonManagerClass {
         //
         // constructor sets cp from argument for use in calls to other objects, then core because cp cannot be uses since that would be a circular depenancy
         //
@@ -49,7 +49,7 @@ namespace Contensive.Addons.SafeAddonManager {
         /// </summary>
         /// <param name="cp"></param>
         /// <remarks></remarks>
-        public addonManagerClass(CoreController core) : base() {
+        public AddonManagerClass(CoreController core) : base() {
             this.core = core;
         }
         //
@@ -123,6 +123,8 @@ namespace Contensive.Addons.SafeAddonManager {
                 // BuildVersion = core.app.dataBuildVersion
                 string dataBuildVersion = core.siteProperties.dataBuildVersion;
                 string coreVersion = core.codeVersion();
+                var adminMenu = new AdminMenuController();
+
 
                 DbUpToDate = (dataBuildVersion == coreVersion);
                 //
@@ -772,7 +774,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                     + "";
                                     BodyHTML = AdminUIController.getEditPanel(core,true, "Add-on Collection Library", "Select an Add-on to install from the Contensive Add-on Library. Please select only one at a time. Click OK to install the selected Add-on. The site may need to be stopped during the installation, but will be available again in approximately one minute.", BodyHTML);
                                     BodyHTML = BodyHTML + HtmlController.inputHidden("AOCnt", RowPtr);
-                                    core.doc.menuLiveTab.AddEntry("<nobr>Collection&nbsp;Library</nobr>", BodyHTML, "ccAdminTab");
+                                    adminMenu.menuLiveTab.AddEntry("<nobr>Collection&nbsp;Library</nobr>", BodyHTML, "ccAdminTab");
                                 }
                                 //
                                 // --------------------------------------------------------------------------------
@@ -834,7 +836,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                 BodyHTML = "<div style=\"width:100%\">" + AdminUIController.getReport2(core, RowPtr, ColCaption, ColAlign, ColWidth, Cells, RowPtr, 1, "", PostTableCopy, RowPtr, "ccAdmin", ColSortable, 0) + "</div>";
                                 BodyHTML = AdminUIController.getEditPanel(core,true, "Add-on Collections", "Use this form to review and delete current add-on collections.", BodyHTML);
                                 BodyHTML = BodyHTML + HtmlController.inputHidden("accnt", RowPtr);
-                                core.doc.menuLiveTab.AddEntry("Installed&nbsp;Collections", BodyHTML, "ccAdminTab");
+                                adminMenu.menuLiveTab.AddEntry("Installed&nbsp;Collections", BodyHTML, "ccAdminTab");
                                 //
                                 // --------------------------------------------------------------------------------
                                 // Get the Upload Add-ons tab
@@ -860,13 +862,13 @@ namespace Contensive.Addons.SafeAddonManager {
                                     Body.Add(AdminUIController.getEditRowLegacy(core,FormInput, "&nbsp;", "", true, false, ""));
                                     Body.Add(AdminUIController.editTableClose);
                                 }
-                                core.doc.menuLiveTab.AddEntry("Add&nbsp;Manually", AdminUIController.getEditPanel(core,true, "Install or Update an Add-on Collection.", "Use this form to upload a new or updated Add-on Collection to your site. A collection file can be a single xml configuration file, a single zip file containing the configuration file and other resource files, or a configuration with other resource files uploaded separately. Use the 'Add more files' link to add as many files as you need. When you hit OK, the Collection will be checked, and only submitted if all files are uploaded.", Body.Text), "ccAdminTab");
+                                adminMenu.menuLiveTab.AddEntry("Add&nbsp;Manually", AdminUIController.getEditPanel(core,true, "Install or Update an Add-on Collection.", "Use this form to upload a new or updated Add-on Collection to your site. A collection file can be a single xml configuration file, a single zip file containing the configuration file and other resource files, or a configuration with other resource files uploaded separately. Use the 'Add more files' link to add as many files as you need. When you hit OK, the Collection will be checked, and only submitted if all files are uploaded.", Body.Text), "ccAdminTab");
                                 //
                                 // --------------------------------------------------------------------------------
                                 // Build Page from tabs
                                 // --------------------------------------------------------------------------------
                                 //
-                                Content.Add(core.doc.menuLiveTab.GetTabs(core));
+                                Content.Add(adminMenu.menuLiveTab.GetTabs(core));
                                 //
                                 ButtonList = ButtonCancel + "," + ButtonOK;
                                 Content.Add(HtmlController.inputHidden(RequestNameAdminSourceForm, AdminFormLegacyAddonManager));

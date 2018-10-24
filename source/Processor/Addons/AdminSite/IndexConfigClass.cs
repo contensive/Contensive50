@@ -42,14 +42,14 @@ namespace Contensive.Addons.AdminSite {
         //       if it is empty, setup defaults
         //=================================================================================
         //
-        public static IndexConfigClass get(CoreController core, AdminInfoDomainModel adminContext) {
+        public static IndexConfigClass get(CoreController core, AdminDataModel adminData) {
             IndexConfigClass returnIndexConfig = new IndexConfigClass();
             try {
                 // refactor this out
-                CDefModel content = adminContext.adminContent;
+                CDefModel content = adminData.adminContent;
                 //
                 // Setup defaults
-                returnIndexConfig.ContentID = adminContext.adminContent.id;
+                returnIndexConfig.ContentID = adminData.adminContent.id;
                 returnIndexConfig.ActiveOnly = false;
                 returnIndexConfig.LastEditedByMe = false;
                 returnIndexConfig.LastEditedToday = false;
@@ -58,12 +58,12 @@ namespace Contensive.Addons.AdminSite {
                 returnIndexConfig.Loaded = true;
                 returnIndexConfig.Open = false;
                 returnIndexConfig.PageNumber = 1;
-                returnIndexConfig.RecordsPerPage = AdminInfoDomainModel.RecordsPerPageDefault;
+                returnIndexConfig.RecordsPerPage = Constants.RecordsPerPageDefault;
                 returnIndexConfig.RecordTop = 0;
                 //
                 // Setup Member Properties
                 //
-                string ConfigList = core.userProperty.getText(AdminInfoDomainModel.IndexConfigPrefix + encodeText(adminContext.adminContent.id), "");
+                string ConfigList = core.userProperty.getText(AdminDataModel.IndexConfigPrefix + encodeText(adminData.adminContent.id), "");
                 if (!string.IsNullOrEmpty(ConfigList)) {
                     //
                     // load values
@@ -86,7 +86,7 @@ namespace Contensive.Addons.AdminSite {
                                         if (LineSplit.GetUpperBound(0) > 0) {
                                             string fieldName = LineSplit[0].Trim().ToLower();
                                             if (!string.IsNullOrWhiteSpace(fieldName)) {
-                                                if (adminContext.adminContent.fields.ContainsKey(fieldName)) {
+                                                if (adminData.adminContent.fields.ContainsKey(fieldName)) {
                                                     returnIndexConfig.columns.Add(new IndexConfigColumnClass() {
                                                         Name = fieldName,
                                                         Width = GenericController.encodeInteger(LineSplit[1]),
@@ -127,14 +127,14 @@ namespace Contensive.Addons.AdminSite {
                         Ptr = Ptr + 1;
                     }
                     if (returnIndexConfig.RecordsPerPage <= 0) {
-                        returnIndexConfig.RecordsPerPage = AdminInfoDomainModel.RecordsPerPageDefault;
+                        returnIndexConfig.RecordsPerPage = Constants.RecordsPerPageDefault;
                     }
                     //.PageNumber = 1 + Int(.RecordTop / .RecordsPerPage)
                 }
                 //
                 // Setup Visit Properties
                 //
-                ConfigList = core.visitProperty.getText(AdminInfoDomainModel.IndexConfigPrefix + encodeText(adminContext.adminContent.id), "");
+                ConfigList = core.visitProperty.getText(AdminDataModel.IndexConfigPrefix + encodeText(adminData.adminContent.id), "");
                 if (!string.IsNullOrEmpty(ConfigList)) {
                     //
                     // load values
@@ -222,15 +222,15 @@ namespace Contensive.Addons.AdminSite {
                         Ptr = Ptr + 1;
                     }
                     if (returnIndexConfig.RecordsPerPage <= 0) {
-                        returnIndexConfig.RecordsPerPage = AdminInfoDomainModel.RecordsPerPageDefault;
+                        returnIndexConfig.RecordsPerPage = Constants.RecordsPerPageDefault;
                     }
                     //.PageNumber = 1 + Int(.RecordTop / .RecordsPerPage)
                 }
                 //
                 // Setup defaults if not loaded
                 //
-                if ((returnIndexConfig.columns.Count == 0) && (adminContext.adminContent.adminColumns.Count > 0)) {
-                    foreach (var keyValuePair in adminContext.adminContent.adminColumns) {
+                if ((returnIndexConfig.columns.Count == 0) && (adminData.adminContent.adminColumns.Count > 0)) {
+                    foreach (var keyValuePair in adminData.adminContent.adminColumns) {
                         returnIndexConfig.columns.Add(new IndexConfigColumnClass {
                             Name = keyValuePair.Value.Name,
                             Width = keyValuePair.Value.Width
