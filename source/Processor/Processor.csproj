@@ -71,6 +71,9 @@
     <Reference Include="NUglify, Version=1.5.12.0, Culture=neutral, PublicKeyToken=15bc7810aec21b5e, processorArchitecture=MSIL">
       <HintPath>..\packages\NUglify.1.5.12\lib\net40\NUglify.dll</HintPath>
     </Reference>
+    <Reference Include="Nustache.Core, Version=1.16.0.8, Culture=neutral, PublicKeyToken=efd6f3d8f76ecd9f, processorArchitecture=MSIL">
+      <HintPath>..\packages\Nustache.1.16.0.8\lib\net20\Nustache.Core.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Configuration" />
@@ -100,26 +103,26 @@
     <Compile Include="Controllers\AdminMenuController.cs" />
     <Compile Include="Addons\AdminSite\Views\ControlEditor.cs" />
     <Compile Include="Addons\AdminSite\Views\EmailBounceEditor.cs" />
-    <Compile Include="Addons\AdminSite\LinkAliasEditor.cs" />
+    <Compile Include="Addons\AdminSite\Views\LinkAliasEditor.cs" />
     <Compile Include="Addons\AdminSite\Views\ContentTrackingEditor.cs" />
-    <Compile Include="Addons\AdminSite\ToolDownloads.cs" />
-    <Compile Include="Addons\AdminSite\FormRoot.cs" />
-    <Compile Include="Addons\AdminSite\FormQuickStats.cs" />
-    <Compile Include="Addons\AdminSite\FormEdit.cs" />
-    <Compile Include="Addons\AdminSite\ToolCustomReports.cs" />
-    <Compile Include="Addons\AdminSite\FormEditConfig.cs" />
+    <Compile Include="Addons\AdminSite\Views\ToolDownloads.cs" />
+    <Compile Include="Addons\AdminSite\Views\FormRoot.cs" />
+    <Compile Include="Addons\AdminSite\Views\FormQuickStats.cs" />
+    <Compile Include="Addons\AdminSite\Views\FormEdit.cs" />
+    <Compile Include="Addons\AdminSite\Views\ToolCustomReports.cs" />
+    <Compile Include="Addons\AdminSite\Views\FormEditConfig.cs" />
     <Compile Include="Addons\AdminSite\_BlankEditor.cs" />
     <Compile Include="Addons\AdminSite\Views\EmailTopicEditor.cs" />
     <Compile Include="Addons\AdminSite\Views\EmailRuleEditor.cs" />
-    <Compile Include="Addons\AdminSite\ToolClearCache.cs" />
+    <Compile Include="Addons\AdminSite\Views\ToolClearCache.cs" />
     <Compile Include="Addons\AdminSite\Models\AdminDataModel.cs" />
     <Compile Include="Addons\AdminSite\Controllers\ErrorController.cs" />
-    <Compile Include="Addons\AdminSite\FormIndexExport.cs" />
-    <Compile Include="Addons\AdminSite\FormIndexAdvancedSearch.cs" />
-    <Compile Include="Addons\AdminSite\IndexConfigClass.cs" />
-    <Compile Include="Addons\AdminSite\GroupRuleEditor.cs" />
-    <Compile Include="Addons\AdminSite\FormIndex.cs" />
-    <Compile Include="Addons\AdminSite\ToolSetListColumnsClass.cs" />
+    <Compile Include="Addons\AdminSite\Views\FormIndexExport.cs" />
+    <Compile Include="Addons\AdminSite\Views\FormIndexAdvancedSearch.cs" />
+    <Compile Include="Addons\AdminSite\Models\IndexConfigClass.cs" />
+    <Compile Include="Addons\AdminSite\Views\GroupRuleEditor.cs" />
+    <Compile Include="Addons\AdminSite\Views\FormIndex.cs" />
+    <Compile Include="Addons\AdminSite\Views\ToolSetListColumnsClass.cs" />
     <Compile Include="Addons\PageManager\getChildPageList.cs" />
     <Compile Include="Addons\Tools\MetakeywordToolClass.cs" />
     <Compile Include="Addons\Tools\DefineContentFieldsFromTable.cs" />
@@ -136,7 +139,7 @@
     <Compile Include="Addons\AdminSite\Views\RemoteMethods\OpenAjaxAdminNav.cs" />
     <Compile Include="Addons\AdminSite\Views\RemoteMethods\OpenAjaxIndexFilter.cs" />
     <Compile Include="Addons\AdminSite\Views\RemoteMethods\OpenAjaxIndexFilterGetContent.cs" />
-    <Compile Include="Addons\AdminSite\ProcessAjaxDataClass.cs" />
+    <Compile Include="Addons\AdminSite\Views\RemoteMethods\ProcessAjaxDataClass.cs" />
     <Compile Include="Addons\AdminSite\Views\RemoteMethods\SetAdminSiteFieldHelp.cs" />
     <Compile Include="Addons\AdminSite\Views\RemoteMethods\SetAjaxVisitPropertyClass.cs" />
     <Compile Include="Addons\Primitives\blockEmail.cs" />
@@ -325,6 +328,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Addons\AdminSite\Resources\GroupRuleEditorRow.html" />
     <Content Include="aoBase5.xml">
       <SubType>Designer</SubType>
     </Content>

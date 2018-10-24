@@ -26,8 +26,8 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         // -- instance properties
-        public DateTime DateExpires { get; set; }
-        public int GroupID { get; set; }
+        public DateTime dateExpires { get; set; }
+        public int groupId { get; set; }
         public int MemberID { get; set; }
         //
         //====================================================================================================

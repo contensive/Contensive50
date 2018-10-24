@@ -111,7 +111,7 @@ namespace Contensive.Processor.Controllers {
                         var memberRuleList = MemberRuleModel.createList(core, "(groupid=" + group.id.ToString() + ")and(MemberID=" + root.id.ToString() + ")");
                         if (memberRuleList.Count == 0) {
                             var memberRule = MemberRuleModel.addEmpty(core);
-                            memberRule.GroupID = group.id;
+                            memberRule.groupId = group.id;
                             memberRule.MemberID = root.id;
                             memberRule.save(core);
                         }
