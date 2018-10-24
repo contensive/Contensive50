@@ -1669,7 +1669,7 @@ namespace Contensive.Processor.Controllers {
                                 testAssembly = System.Reflection.Assembly.LoadFrom(TestFilePathname);
                                 //testAssemblyName = testAssembly.FullName
                             } catch (Exception ex) {
-                                LogController.logWarn(core, "Assembly.LoadFrom failure, adding DLL [" + TestFilePathname + "] to assemblySkipList, ex [" + ex.Message + "]");
+                                LogController.logInfo(core, "Assembly.LoadFrom failure, adding DLL [" + TestFilePathname + "] to assemblySkipList, ex [" + ex.Message + "]");
                                 core.assemblySkipList.Add(TestFilePathname);
                                 testFileIsValidAddonAssembly = false;
                             }
