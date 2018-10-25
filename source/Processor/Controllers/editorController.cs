@@ -142,7 +142,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // load default editors into editors() - these are the editors used when there is no editorPreference
                 //   editors(fieldtypeid) = addonid
-                editorAddonIds = new string[FieldTypeIdMax + 1];
+                editorAddonIds = new string[fieldTypeIdMax + 1];
                 string SQL = ""
                     + " select"
                     + " t.id as contentfieldtypeid"
@@ -153,7 +153,7 @@ namespace Contensive.Processor.Controllers {
                 RS = core.db.executeQuery(SQL);
                 foreach (DataRow dr in RS.Rows) {
                     fieldTypeID = GenericController.encodeInteger(dr["contentfieldtypeid"]);
-                    if (fieldTypeID <= FieldTypeIdMax) {
+                    if (fieldTypeID <= fieldTypeIdMax) {
                         editorAddonIds[fieldTypeID] = GenericController.encodeText(dr["editorAddonId"]);
                     }
                 }
@@ -163,7 +163,7 @@ namespace Contensive.Processor.Controllers {
                 RS = core.db.executeQuery(SQL);
                 foreach (DataRow dr in RS.Rows) {
                     fieldTypeID = GenericController.encodeInteger(dr["contentfieldtypeid"]);
-                    if (fieldTypeID <= FieldTypeIdMax) {
+                    if (fieldTypeID <= fieldTypeIdMax) {
                         if (string.IsNullOrEmpty(editorAddonIds[fieldTypeID])) {
                             editorAddonIds[fieldTypeID] = GenericController.encodeText(dr["editorAddonId"]);
                         }

@@ -24,7 +24,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         //
         public const string layoutContent = "content";
         public const string layoutA = "<div id=\"aid\" class=\"aclass\">" + layoutContent + "</div>";
-        public const string layoutB = "<div id=\"" + rnPageId + "\" class=\"bclass\">" + layoutA + "</div>";
+        public const string layoutB = "<div id=\"bid\" class=\"bclass\">" + layoutA + "</div>";
         public const string layoutC = "<div id=\"cid\" class=\"cclass\">" + layoutB + "</div>";
         public const string templateHeadTag = "<meta http-equiv=\"content-type\" content=\"text/html; charset=utf-8\" >";
         public const string templateA = "<html><head>" + templateHeadTag + "</head><body>" + layoutC + "</body></html>";

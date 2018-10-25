@@ -1004,37 +1004,37 @@ namespace Contensive.Addons.Tools {
                             // display the column if it is not in use
                             //
                             if (skipField) {
-                                if (field.fieldTypeId == FieldTypeIdFileText) {
+                                if (field.fieldTypeId == fieldTypeIdFileText) {
                                     //
                                     // text filename can not be search
                                     //
                                     Stream.Add("<IMG src=\"/ccLib/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (text file field)<br>");
-                                } else if (field.fieldTypeId == FieldTypeIdFileCSS) {
+                                } else if (field.fieldTypeId == fieldTypeIdFileCSS) {
                                     //
                                     // text filename can not be search
                                     //
                                     Stream.Add("<IMG src=\"/ccLib/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (css file field)<br>");
-                                } else if (field.fieldTypeId == FieldTypeIdFileXML) {
+                                } else if (field.fieldTypeId == fieldTypeIdFileXML) {
                                     //
                                     // text filename can not be search
                                     //
                                     Stream.Add("<IMG src=\"/ccLib/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (xml file field)<br>");
-                                } else if (field.fieldTypeId == FieldTypeIdFileJavascript) {
+                                } else if (field.fieldTypeId == fieldTypeIdFileJavascript) {
                                     //
                                     // text filename can not be search
                                     //
                                     Stream.Add("<IMG src=\"/ccLib/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (javascript file field)<br>");
-                                } else if (field.fieldTypeId == FieldTypeIdLongText) {
+                                } else if (field.fieldTypeId == fieldTypeIdLongText) {
                                     //
                                     // long text can not be search
                                     //
                                     Stream.Add("<IMG src=\"/ccLib/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (long text field)<br>");
-                                } else if (field.fieldTypeId == FieldTypeIdFileImage) {
+                                } else if (field.fieldTypeId == fieldTypeIdFileImage) {
                                     //
                                     // long text can not be search
                                     //
                                     Stream.Add("<IMG src=\"/ccLib/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (image field)<br>");
-                                } else if (field.fieldTypeId == FieldTypeIdRedirect) {
+                                } else if (field.fieldTypeId == fieldTypeIdRedirect) {
                                     //
                                     // long text can not be search
                                     //
@@ -1281,7 +1281,7 @@ namespace Contensive.Addons.Tools {
                                         DiagActions[1].Command = DiagActionSetFieldNotRequired.ToString() + "," + ContentName + "," + FieldName;
                                         Stream.Add(GetDiagError(DiagProblem, DiagActions));
                                     }
-                                    if ((!string.IsNullOrEmpty(FieldName)) & (fieldType != FieldTypeIdRedirect) & (fieldType != FieldTypeIdManyToMany)) {
+                                    if ((!string.IsNullOrEmpty(FieldName)) & (fieldType != fieldTypeIdRedirect) & (fieldType != fieldTypeIdManyToMany)) {
                                         SQL = "SELECT " + FieldName + " FROM " + TableName + " WHERE ID=0;";
                                         CSTest = core.db.csOpenSql( SQL, DataSourceName);
                                         if (CSTest == -1) {
@@ -1343,12 +1343,12 @@ namespace Contensive.Addons.Tools {
                                                 FieldName = core.db.csGetText(CSFields, "name");
                                                 fieldType = core.db.csGetInteger(CSFields, "Type");
                                                 switch (fieldType) {
-                                                    case FieldTypeIdManyToMany:
+                                                    case _fieldTypeIdManyToMany:
                                                         //
                                                         //   skip it
                                                         //
                                                         break;
-                                                    case FieldTypeIdRedirect:
+                                                    case _fieldTypeIdRedirect:
                                                         //
                                                         // ----- redirect type, check redirect contentid
                                                         //
@@ -1373,7 +1373,7 @@ namespace Contensive.Addons.Tools {
                                                             }
                                                         }
                                                         break;
-                                                    case FieldTypeIdLookup:
+                                                    case _fieldTypeIdLookup:
                                                         //
                                                         // ----- lookup type, read value and check lookup contentid
                                                         //
@@ -1399,7 +1399,7 @@ namespace Contensive.Addons.Tools {
                                                                 DiagActions[0].Name = "Ignore, or handle this issue manually";
                                                                 DiagActions[0].Command = "";
                                                                 DiagActions[1].Name = "Convert the field to an Integer so no lookup is provided.";
-                                                                DiagActions[1].Command = DiagActionSetFieldType.ToString() + "," + ContentName + "," + FieldName + "," + encodeText(FieldTypeIdInteger);
+                                                                DiagActions[1].Command = DiagActionSetFieldType.ToString() + "," + ContentName + "," + FieldName + "," + encodeText(fieldTypeIdInteger);
                                                                 Stream.Add(GetDiagError(DiagProblem, DiagActions));
                                                             }
                                                         }

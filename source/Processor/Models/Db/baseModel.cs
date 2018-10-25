@@ -772,7 +772,7 @@ namespace Contensive.Processor.Models.Db {
                                         string content = "";
                                         switch (instanceProperty.PropertyType.Name) {
                                             case "FieldTypeJavascriptFile": {
-                                                    fieldTypeId = FieldTypeIdFileJavascript;
+                                                    fieldTypeId = fieldTypeIdFileJavascript;
                                                     FieldTypeJavascriptFile fileProperty = (FieldTypeJavascriptFile)instanceProperty.GetValue(this);
                                                     fileProperty.internalcore = core;
                                                     contentProperty = instanceProperty.PropertyType.GetProperty("content");
@@ -782,7 +782,7 @@ namespace Contensive.Processor.Models.Db {
                                                     break;
                                                 }
                                             case "FieldTypeCSSFile": {
-                                                    fieldTypeId = FieldTypeIdFileCSS;
+                                                    fieldTypeId = fieldTypeIdFileCSS;
                                                     FieldTypeCSSFile fileProperty = (FieldTypeCSSFile)instanceProperty.GetValue(this);
                                                     fileProperty.internalcore = core;
                                                     contentProperty = instanceProperty.PropertyType.GetProperty("content");
@@ -792,7 +792,7 @@ namespace Contensive.Processor.Models.Db {
                                                     break;
                                                 }
                                             case "FieldTypeHTMLFile": {
-                                                    fieldTypeId = FieldTypeIdFileHTML;
+                                                    fieldTypeId = fieldTypeIdFileHTML;
                                                     FieldTypeHTMLFile fileProperty = (FieldTypeHTMLFile)instanceProperty.GetValue(this);
                                                     fileProperty.internalcore = core;
                                                     contentProperty = instanceProperty.PropertyType.GetProperty("content");
@@ -802,7 +802,7 @@ namespace Contensive.Processor.Models.Db {
                                                     break;
                                                 }
                                             default: {
-                                                    fieldTypeId = FieldTypeIdFileText;
+                                                    fieldTypeId = fieldTypeIdFileText;
                                                     FieldTypeTextFile fileProperty = (FieldTypeTextFile)instanceProperty.GetValue(this);
                                                     fileProperty.internalcore = core;
                                                     contentProperty = instanceProperty.PropertyType.GetProperty("content");

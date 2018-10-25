@@ -351,194 +351,195 @@ namespace Contensive.MonitorService {
                 string ErrorMessageResponse = null;
                 //
                 tempmonitorAllSites_returnEmailBody = "";
-                if (string.IsNullOrEmpty(AppList)) {
-                    //
-                    // Problem
-                    tempmonitorAllSites_returnEmailBody = tempmonitorAllSites_returnEmailBody + Environment.NewLine + " Error, no Contensive Applications were found";
-                    appendMonitorLog("GetApplicationList call returned no Contensive Applications were found");
-                } else {
-                    AppLine = GenericController.stringSplit(AppList, Environment.NewLine );
-                    AppCnt = AppLine.GetUpperBound(0) + 1;
-                    //hint = ""
-                    while (AppPtr < AppCnt && (!AbortProcess)) {
-                        AppDetails = GenericController.stringSplit(AppLine[AppPtr], "\t" );
-                        AppDetailsCnt = AppDetails.GetUpperBound(0) + 1;
-                        if (AppDetailsCnt < AppListCount) {
-                            //
-                            // Problem - can not monitor
-                            //
-                            appendMonitorLog("GetApplicationList call return less than " + AppListCount + " arguments, aborting monitor pass for this application [" + AppLine[AppPtr] + "]");
-                        } else {
-                            AppName = AppDetails[AppList_Name];
-                            if (!encodeBoolean(AppDetails[AppList_AllowSiteMonitor])) {
-                                //
-                                // Monitoring Disabled
-                                //
-                                appendMonitorLog(AppName + " monitoring disabled");
-                            } else {
-                                //
-                                // Monitor site
-                                //
-                                AppStatus = encodeInteger(AppDetails[AppList_Status]);
-                                if (false) {
-                                    //
-                                    //ElseIf AppStatus = applicationStatusEnum.ApplicationStatusPaused Then
-                                    //    '
-                                    //    ' Paused
-                                    //    '
-                                    //    Call appendMonitorLog(AppName & " paused")
-                                } else if (AppStatus == (int)AppConfigModel.AppStatusEnum.ok) {
-                                    //
-                                    // Running
-                                    //
-                                    if (AppLogCnt > 0) {
-                                        for (AppLogPtr = 0; AppLogPtr < AppLogCnt; AppLogPtr++) {
-                                            if (AppLog[AppLogPtr].Name == AppName) {
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    if (AppLogPtr >= AppLogCnt) {
-                                        //
-                                        // App not found in log, add a new log entry
-                                        //
-                                        AppLogPtr = AppLogCnt;
-                                        AppLogCnt = AppLogCnt + 1;
-                                        //todo  TASK: The following 'ReDim' could not be resolved. A possible reason may be that the object of the ReDim was not declared as an array:
-                                        //ReDim Preserve AppLog[AppLogPtr];
-                                        AppLog[AppLogPtr].Name = AppName;
-                                    }
-                                    //
-                                    // Check Site
-                                    //
-                                    AppLog[AppLogPtr].LastStatusResponse = "";
-                                    AppLog[AppLogPtr].LastCheckOK = true;
-                                    DomainName = "";
-                                    DomainNameList = AppDetails[AppList_DomainName];
-                                    if (!string.IsNullOrEmpty(DomainNameList)) {
-                                        ListSplit = DomainNameList.Split(',');
-                                        DomainName = ListSplit[0];
-                                    }
-                                    DefaultPageName = AppDetails[AppList_DefaultPage];
-                                    AppRootPath = AppDetails[AppList_RootPath];
-                                    if (string.IsNullOrEmpty(DomainName)) {
-                                        AppLog[AppLogPtr].LastCheckOK = false;
-                                        tempmonitorAllSites_returnEmailBody = tempmonitorAllSites_returnEmailBody + Environment.NewLine + "Contensive application [" + AppName + "] has no valid domain name";
-                                        AppLog[AppLogPtr].StatusCheckCount = AppLog[AppLogPtr].StatusCheckCount + 1;
-                                        AppLog[AppLogPtr].ErrorCount = AppLog[AppLogPtr].ErrorCount + 1;
-                                        appendMonitorLog(AppName + " has no valid domain name");
-                                    } else {
-                                        if (vbInstr(1, DomainName, "http://", 1) == 0) {
-                                            DomainName = "http://" + DomainName;
-                                        }
-                                        DomainName = DomainName + AppRootPath + DefaultPageName;
-                                        AppLog[AppLogPtr].SiteLink = DomainName;
-                                        DomainName = DomainName + "?method=status";
-                                        AppLog[AppLogPtr].StatusLink = DomainName;
-                                        ErrorMessageResponse = "";
-                                        AppLog[AppLogPtr].StatusCheckCount = AppLog[AppLogPtr].StatusCheckCount + 1;
-                                        //
-                                        // test
-                                        //
-                                        Response = GetDoc(DomainName, AppName, SiteTimeout, ref needsErrorRecovery);
-                                        ResponseStatusLine = getLine(ref Response);
-                                        AppLog[AppLogPtr].LastStatusResponse = ResponseStatusLine;
-                                        if (vbInstr(1, ResponseStatusLine, "Contensive OK", 1) == 1) {
-                                            //
-                                            // no error
-                                            //
-                                            appendMonitorLog(AppName + " returned OK");
-                                            AppLog[AppLogPtr].LastCheckOK = true;
-                                        } else {
-                                            //
-                                            // error
-                                            //
-                                            ErrorMessageResponse = ResponseStatusLine;
-                                            appendMonitorLog(AppName + " returned Error [" + ErrorMessageResponse + "]");
-                                            if (false) {
-                                                //
-                                                // this is a problem -- an internal contensive error problem would not be recovered (?)
-                                                //   ACNM errored for 30 minutes before someone restarted.
-                                                //
-                                                //                                If Not needsErrorRecovery Then
-                                                //                                    '
-                                                //                                    ' This error does not require recovery
-                                                //                                    '
-                                                //                                    AppLog[AppLogPtr].LastCheckOK = False
-                                                //                                    AppLog[AppLogPtr].ErrorCount = AppLog[AppLogPtr].ErrorCount + 1
-                                                //                                    monitorAllSites_returnEmailBody = monitorAllSites_returnEmailBody _
-                                                //                                        & vbCrLf & DomainName & " Error [" & ErrorMessageResponse & "], no error recovery run because this error would not be affected."
-                                                //                                    Call AppendMonitorLog("This error does not require recovery")
-                                            } else if (!allowErrorRecovery) {
-                                                //
-                                                // recoverable  error, but no error recovery allowed
-                                                //
-                                                AppLog[AppLogPtr].LastCheckOK = false;
-                                                AppLog[AppLogPtr].ErrorCount = AppLog[AppLogPtr].ErrorCount + 1;
-                                                if (!allowIISReset) {
-                                                    //
-                                                    // no reset allowed
-                                                    //
-                                                    tempmonitorAllSites_returnEmailBody = tempmonitorAllSites_returnEmailBody + Environment.NewLine + DomainName + " Error [" + ErrorMessageResponse + "], error recovery and iisreset disabled, abort testing and setting alarm.";
-                                                    appendMonitorLog("Error recovery and iisreset disabled, aborting test and setting alarm.");
-                                                } else {
-                                                    //
-                                                    // iis reset and abort
-                                                    //
-                                                    tempmonitorAllSites_returnEmailBody = tempmonitorAllSites_returnEmailBody + Environment.NewLine + DomainName + " Error [" + ErrorMessageResponse + "], error recovery disabled but iisreset disabled, calling iisreset, setting alarm and aborting test.";
-                                                    appendMonitorLog("Recovery failed, allowIISReset true, flag monitor error, calling iisreset, setting alarm and aborting test.");
-                                                    recoverError(allowErrorRecovery, true, AppName);
-                                                    break;
-                                                }
-                                            } else {
-                                                //
-                                                // recoverable error, attempt app pool recycle and retry
-                                                //
-                                                appendMonitorLog("Attempting app pool recycle and retry");
-                                                recoverError(true, false, AppName);
-                                                Response = GetDoc(DomainName, AppName, SiteTimeout, ref needsErrorRecovery);
-                                                ResponseStatusLine = getLine(ref Response);
-                                                AppLog[AppLogPtr].LastStatusResponse = "[" + AppLog[AppLogPtr].LastStatusResponse + "], after recovery [" + ResponseStatusLine + "]";
-                                                if (vbInstr(1, ResponseStatusLine, "Contensive OK", 1) == 1) {
-                                                    //
-                                                    // recovered, continue without error
-                                                    //
-                                                    AppLog[AppLogPtr].LastCheckOK = true;
-                                                    appendMonitorLog("Recycle and retry returned OK, no alarm.");
-                                                } else {
-                                                    //
-                                                    // did not recover, try iisreset and abort
-                                                    //
-                                                    AppLog[AppLogPtr].LastCheckOK = false;
-                                                    AppLog[AppLogPtr].ErrorCount = AppLog[AppLogPtr].ErrorCount + 1;
-                                                    if (!allowIISReset) {
-                                                        //
-                                                        // no reset allowed
-                                                        //
-                                                        tempmonitorAllSites_returnEmailBody = tempmonitorAllSites_returnEmailBody + Environment.NewLine + DomainName + " Error [" + ErrorMessageResponse + "], recycle failed to recover, IISReset disabled and alarm set.";
-                                                        appendMonitorLog("Recovery failed, allowIISReset false, flag monitor error, skip app and continue testing.");
-                                                    } else {
-                                                        //
-                                                        // iis reset and abort
-                                                        //
-                                                        tempmonitorAllSites_returnEmailBody = tempmonitorAllSites_returnEmailBody + Environment.NewLine + DomainName + " Error [" + ErrorMessageResponse + "], recycle failed to recover, IISReset called and alarm set.";
-                                                        appendMonitorLog("Recovery failed, allowIISReset true, flag monitor error, iisreset and abort pass.");
-                                                        recoverError(allowErrorRecovery, true, AppName);
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                } else {
-                                    appendMonitorLog(AppName + " is not running, ApplicationStatus=" + AppDetails[1]);
-                                }
-                            }
-                        }
-                        AppPtr = AppPtr + 1;
-                    }
-                }
-                //
+
+                //if (string.IsNullOrEmpty(AppList)) {
+                //    //
+                //    // Problem
+                //    tempmonitorAllSites_returnEmailBody = tempmonitorAllSites_returnEmailBody + Environment.NewLine + " Error, no Contensive Applications were found";
+                //    appendMonitorLog("GetApplicationList call returned no Contensive Applications were found");
+                //} else {
+                //    AppLine = GenericController.stringSplit(AppList, Environment.NewLine );
+                //    AppCnt = AppLine.GetUpperBound(0) + 1;
+                //    //hint = ""
+                //    while (AppPtr < AppCnt && (!AbortProcess)) {
+                //        AppDetails = GenericController.stringSplit(AppLine[AppPtr], "\t" );
+                //        AppDetailsCnt = AppDetails.GetUpperBound(0) + 1;
+                //        if (AppDetailsCnt < AppListCount) {
+                //            //
+                //            // Problem - can not monitor
+                //            //
+                //            appendMonitorLog("GetApplicationList call return less than " + AppListCount + " arguments, aborting monitor pass for this application [" + AppLine[AppPtr] + "]");
+                //        } else {
+                //            AppName = AppDetails[AppList_Name];
+                //            if (!encodeBoolean(AppDetails[AppList_AllowSiteMonitor])) {
+                //                //
+                //                // Monitoring Disabled
+                //                //
+                //                appendMonitorLog(AppName + " monitoring disabled");
+                //            } else {
+                //                //
+                //                // Monitor site
+                //                //
+                //                AppStatus = encodeInteger(AppDetails[AppList_Status]);
+                //                if (false) {
+                //                    //
+                //                    //ElseIf AppStatus = applicationStatusEnum.ApplicationStatusPaused Then
+                //                    //    '
+                //                    //    ' Paused
+                //                    //    '
+                //                    //    Call appendMonitorLog(AppName & " paused")
+                //                } else if (AppStatus == (int)AppConfigModel.AppStatusEnum.ok) {
+                //                    //
+                //                    // Running
+                //                    //
+                //                    if (AppLogCnt > 0) {
+                //                        for (AppLogPtr = 0; AppLogPtr < AppLogCnt; AppLogPtr++) {
+                //                            if (AppLog[AppLogPtr].Name == AppName) {
+                //                                break;
+                //                            }
+                //                        }
+                //                    }
+                //                    if (AppLogPtr >= AppLogCnt) {
+                //                        //
+                //                        // App not found in log, add a new log entry
+                //                        //
+                //                        AppLogPtr = AppLogCnt;
+                //                        AppLogCnt = AppLogCnt + 1;
+                //                        //todo  TASK: The following 'ReDim' could not be resolved. A possible reason may be that the object of the ReDim was not declared as an array:
+                //                        //ReDim Preserve AppLog[AppLogPtr];
+                //                        AppLog[AppLogPtr].Name = AppName;
+                //                    }
+                //                    //
+                //                    // Check Site
+                //                    //
+                //                    AppLog[AppLogPtr].LastStatusResponse = "";
+                //                    AppLog[AppLogPtr].LastCheckOK = true;
+                //                    DomainName = "";
+                //                    DomainNameList = AppDetails[AppList_DomainName];
+                //                    if (!string.IsNullOrEmpty(DomainNameList)) {
+                //                        ListSplit = DomainNameList.Split(',');
+                //                        DomainName = ListSplit[0];
+                //                    }
+                //                    DefaultPageName = AppDetails[AppList_DefaultPage];
+                //                    AppRootPath = AppDetails[AppList_RootPath];
+                //                    if (string.IsNullOrEmpty(DomainName)) {
+                //                        AppLog[AppLogPtr].LastCheckOK = false;
+                //                        tempmonitorAllSites_returnEmailBody = tempmonitorAllSites_returnEmailBody + Environment.NewLine + "Contensive application [" + AppName + "] has no valid domain name";
+                //                        AppLog[AppLogPtr].StatusCheckCount = AppLog[AppLogPtr].StatusCheckCount + 1;
+                //                        AppLog[AppLogPtr].ErrorCount = AppLog[AppLogPtr].ErrorCount + 1;
+                //                        appendMonitorLog(AppName + " has no valid domain name");
+                //                    } else {
+                //                        if (vbInstr(1, DomainName, "http://", 1) == 0) {
+                //                            DomainName = "http://" + DomainName;
+                //                        }
+                //                        DomainName = DomainName + AppRootPath + DefaultPageName;
+                //                        AppLog[AppLogPtr].SiteLink = DomainName;
+                //                        DomainName = DomainName + "?method=status";
+                //                        AppLog[AppLogPtr].StatusLink = DomainName;
+                //                        ErrorMessageResponse = "";
+                //                        AppLog[AppLogPtr].StatusCheckCount = AppLog[AppLogPtr].StatusCheckCount + 1;
+                //                        //
+                //                        // test
+                //                        //
+                //                        Response = GetDoc(DomainName, AppName, SiteTimeout, ref needsErrorRecovery);
+                //                        ResponseStatusLine = getLine(ref Response);
+                //                        AppLog[AppLogPtr].LastStatusResponse = ResponseStatusLine;
+                //                        if (vbInstr(1, ResponseStatusLine, "Contensive OK", 1) == 1) {
+                //                            //
+                //                            // no error
+                //                            //
+                //                            appendMonitorLog(AppName + " returned OK");
+                //                            AppLog[AppLogPtr].LastCheckOK = true;
+                //                        } else {
+                //                            //
+                //                            // error
+                //                            //
+                //                            ErrorMessageResponse = ResponseStatusLine;
+                //                            appendMonitorLog(AppName + " returned Error [" + ErrorMessageResponse + "]");
+                //                            if (false) {
+                //                                //
+                //                                // this is a problem -- an internal contensive error problem would not be recovered (?)
+                //                                //   ACNM errored for 30 minutes before someone restarted.
+                //                                //
+                //                                //                                If Not needsErrorRecovery Then
+                //                                //                                    '
+                //                                //                                    ' This error does not require recovery
+                //                                //                                    '
+                //                                //                                    AppLog[AppLogPtr].LastCheckOK = False
+                //                                //                                    AppLog[AppLogPtr].ErrorCount = AppLog[AppLogPtr].ErrorCount + 1
+                //                                //                                    monitorAllSites_returnEmailBody = monitorAllSites_returnEmailBody _
+                //                                //                                        & vbCrLf & DomainName & " Error [" & ErrorMessageResponse & "], no error recovery run because this error would not be affected."
+                //                                //                                    Call AppendMonitorLog("This error does not require recovery")
+                //                            } else if (!allowErrorRecovery) {
+                //                                //
+                //                                // recoverable  error, but no error recovery allowed
+                //                                //
+                //                                AppLog[AppLogPtr].LastCheckOK = false;
+                //                                AppLog[AppLogPtr].ErrorCount = AppLog[AppLogPtr].ErrorCount + 1;
+                //                                if (!allowIISReset) {
+                //                                    //
+                //                                    // no reset allowed
+                //                                    //
+                //                                    tempmonitorAllSites_returnEmailBody = tempmonitorAllSites_returnEmailBody + Environment.NewLine + DomainName + " Error [" + ErrorMessageResponse + "], error recovery and iisreset disabled, abort testing and setting alarm.";
+                //                                    appendMonitorLog("Error recovery and iisreset disabled, aborting test and setting alarm.");
+                //                                } else {
+                //                                    //
+                //                                    // iis reset and abort
+                //                                    //
+                //                                    tempmonitorAllSites_returnEmailBody = tempmonitorAllSites_returnEmailBody + Environment.NewLine + DomainName + " Error [" + ErrorMessageResponse + "], error recovery disabled but iisreset disabled, calling iisreset, setting alarm and aborting test.";
+                //                                    appendMonitorLog("Recovery failed, allowIISReset true, flag monitor error, calling iisreset, setting alarm and aborting test.");
+                //                                    recoverError(allowErrorRecovery, true, AppName);
+                //                                    break;
+                //                                }
+                //                            } else {
+                //                                //
+                //                                // recoverable error, attempt app pool recycle and retry
+                //                                //
+                //                                appendMonitorLog("Attempting app pool recycle and retry");
+                //                                recoverError(true, false, AppName);
+                //                                Response = GetDoc(DomainName, AppName, SiteTimeout, ref needsErrorRecovery);
+                //                                ResponseStatusLine = getLine(ref Response);
+                //                                AppLog[AppLogPtr].LastStatusResponse = "[" + AppLog[AppLogPtr].LastStatusResponse + "], after recovery [" + ResponseStatusLine + "]";
+                //                                if (vbInstr(1, ResponseStatusLine, "Contensive OK", 1) == 1) {
+                //                                    //
+                //                                    // recovered, continue without error
+                //                                    //
+                //                                    AppLog[AppLogPtr].LastCheckOK = true;
+                //                                    appendMonitorLog("Recycle and retry returned OK, no alarm.");
+                //                                } else {
+                //                                    //
+                //                                    // did not recover, try iisreset and abort
+                //                                    //
+                //                                    AppLog[AppLogPtr].LastCheckOK = false;
+                //                                    AppLog[AppLogPtr].ErrorCount = AppLog[AppLogPtr].ErrorCount + 1;
+                //                                    if (!allowIISReset) {
+                //                                        //
+                //                                        // no reset allowed
+                //                                        //
+                //                                        tempmonitorAllSites_returnEmailBody = tempmonitorAllSites_returnEmailBody + Environment.NewLine + DomainName + " Error [" + ErrorMessageResponse + "], recycle failed to recover, IISReset disabled and alarm set.";
+                //                                        appendMonitorLog("Recovery failed, allowIISReset false, flag monitor error, skip app and continue testing.");
+                //                                    } else {
+                //                                        //
+                //                                        // iis reset and abort
+                //                                        //
+                //                                        tempmonitorAllSites_returnEmailBody = tempmonitorAllSites_returnEmailBody + Environment.NewLine + DomainName + " Error [" + ErrorMessageResponse + "], recycle failed to recover, IISReset called and alarm set.";
+                //                                        appendMonitorLog("Recovery failed, allowIISReset true, flag monitor error, iisreset and abort pass.");
+                //                                        recoverError(allowErrorRecovery, true, AppName);
+                //                                        break;
+                //                                    }
+                //                                }
+                //                            }
+                //                        }
+                //                    }
+                //                } else {
+                //                    appendMonitorLog(AppName + " is not running, ApplicationStatus=" + AppDetails[1]);
+                //                }
+                //            }
+                //        }
+                //        AppPtr = AppPtr + 1;
+                //    }
+                //}
+                ////
                 if (!string.IsNullOrEmpty(tempmonitorAllSites_returnEmailBody)) {
                     tempmonitorAllSites_returnEmailBody = tempmonitorAllSites_returnEmailBody.Substring(2);
                 }

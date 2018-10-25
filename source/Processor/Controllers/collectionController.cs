@@ -734,7 +734,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // ----- Add the number of rows needed
                 //
-                RowsNeeded = FieldTypeIdMax - RowsFound;
+                RowsNeeded = fieldTypeIdMax - RowsFound;
                 if (RowsNeeded > 0) {
                     CID = CdefController.getContentId(core, "Content Field Types");
                     if (CID <= 0) {
@@ -2455,13 +2455,13 @@ namespace Contensive.Processor.Controllers {
                                                                                             if (IsFieldFound) {
                                                                                                 string FieldValue = FieldNode.InnerText;
                                                                                                 switch (fieldTypeId) {
-                                                                                                    case FieldTypeIdAutoIdIncrement:
-                                                                                                    case FieldTypeIdRedirect: {
+                                                                                                    case _fieldTypeIdAutoIdIncrement:
+                                                                                                    case _fieldTypeIdRedirect: {
                                                                                                             //
                                                                                                             // not supported
                                                                                                             break;
                                                                                                         }
-                                                                                                    case FieldTypeIdLookup: {
+                                                                                                    case _fieldTypeIdLookup: {
                                                                                                             //
                                                                                                             // read in text value, if a guid, use it, otherwise assume name
                                                                                                             if (FieldLookupContentID != 0) {

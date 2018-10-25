@@ -59,7 +59,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
             string activeScript = "function m\nm=cp.doc.getText(\"echo\")\nend function";
             string echoText = "text added to document";
             //
-            if (cs.Insert(Contensive.Processor.constants.cnAddons)) {
+            if (cs.Insert(Contensive.Processor.Models.Db.AddonModel.contentName)) {
                 recordId = cs.GetInteger("id");
                 cs.SetField("name", addonName);
                 cs.SetField("copytext", htmlText);
@@ -77,7 +77,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
             //
             Assert.AreEqual(htmlText + wysiwygText + echoText, cp.executeAddon(recordId.ToString()));
             //dispose
-            cp.Content.Delete(Contensive.Processor.constants.cnAddons, "id=" + recordId.ToString());
+            cp.Content.Delete(Contensive.Processor.Models.Db.AddonModel.contentName, "id=" + recordId.ToString());
             cp.Dispose();
         }
         //====================================================================================================
@@ -101,7 +101,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
                 string activeScript = "function m\nm=cp.doc.getText(\"echo\")\nend function";
                 string echoText = "text added to document";
                 //
-                if (cs.Insert(Contensive.Processor.constants.cnAddons)) {
+                if (cs.Insert(Contensive.Processor.Models.Db.AddonModel.contentName)) {
                     recordId = cs.GetInteger("id");
                     cs.SetField("name", addonName);
                     cs.SetField("copytext", htmlText);

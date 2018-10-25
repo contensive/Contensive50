@@ -1463,15 +1463,15 @@ namespace Contensive.Addons.AdminSite {
                                 // ----- save the value by field type
                                 //
                                 switch (field.fieldTypeId) {
-                                    case FieldTypeIdAutoIdIncrement:
-                                    case FieldTypeIdRedirect: {
+                                    case _fieldTypeIdAutoIdIncrement:
+                                    case _fieldTypeIdRedirect: {
                                             //
                                             // do nothing with these
                                             //
                                             break;
                                         }
-                                    case FieldTypeIdFile:
-                                    case FieldTypeIdFileImage: {
+                                    case _fieldTypeIdFile:
+                                    case _fieldTypeIdFileImage: {
                                             //
                                             // filenames, upload to cdnFiles
                                             //
@@ -1493,7 +1493,7 @@ namespace Contensive.Addons.AdminSite {
                                             }
                                             break;
                                         }
-                                    case FieldTypeIdBoolean: {
+                                    case _fieldTypeIdBoolean: {
                                             //
                                             // boolean
                                             //
@@ -1505,8 +1505,8 @@ namespace Contensive.Addons.AdminSite {
                                             }
                                             break;
                                         }
-                                    case FieldTypeIdCurrency:
-                                    case FieldTypeIdFloat: {
+                                    case _fieldTypeIdCurrency:
+                                    case _fieldTypeIdFloat: {
                                             //
                                             // Floating pointer numbers
                                             //
@@ -1518,7 +1518,7 @@ namespace Contensive.Addons.AdminSite {
                                             }
                                             break;
                                         }
-                                    case FieldTypeIdDate: {
+                                    case _fieldTypeIdDate: {
                                             //
                                             // Date
                                             //
@@ -1530,8 +1530,8 @@ namespace Contensive.Addons.AdminSite {
                                             }
                                             break;
                                         }
-                                    case FieldTypeIdInteger:
-                                    case FieldTypeIdLookup: {
+                                    case _fieldTypeIdInteger:
+                                    case _fieldTypeIdLookup: {
                                             //
                                             // Integers
                                             //
@@ -1543,14 +1543,14 @@ namespace Contensive.Addons.AdminSite {
                                             }
                                             break;
                                         }
-                                    case FieldTypeIdLongText:
-                                    case FieldTypeIdText:
-                                    case FieldTypeIdFileText:
-                                    case FieldTypeIdFileCSS:
-                                    case FieldTypeIdFileXML:
-                                    case FieldTypeIdFileJavascript:
-                                    case FieldTypeIdHTML:
-                                    case FieldTypeIdFileHTML: {
+                                    case _fieldTypeIdLongText:
+                                    case _fieldTypeIdText:
+                                    case _fieldTypeIdFileText:
+                                    case _fieldTypeIdFileCSS:
+                                    case _fieldTypeIdFileXML:
+                                    case _fieldTypeIdFileJavascript:
+                                    case _fieldTypeIdHTML:
+                                    case _fieldTypeIdFileHTML: {
                                             //
                                             // Text
                                             //
@@ -1562,7 +1562,7 @@ namespace Contensive.Addons.AdminSite {
                                             }
                                             break;
                                         }
-                                    case FieldTypeIdManyToMany: {
+                                    case _fieldTypeIdManyToMany: {
                                             //
                                             // Many to Many checklist
                                             //

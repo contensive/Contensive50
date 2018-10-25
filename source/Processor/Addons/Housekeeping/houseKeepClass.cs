@@ -723,7 +723,7 @@ namespace Contensive.Addons.Housekeeping {
                 // block duplicate redirect fields (match contentid+fieldtype+caption)
                 //
                 logHousekeeping(core, "Inactivate duplicate redirect fields");
-                CS = core.db.csOpenSql("Select ID, ContentID, Type, Caption from ccFields where (active<>0)and(Type=" + FieldTypeIdRedirect + ") Order By ContentID, Caption, ID");
+                CS = core.db.csOpenSql("Select ID, ContentID, Type, Caption from ccFields where (active<>0)and(Type=" + fieldTypeIdRedirect + ") Order By ContentID, Caption, ID");
                 FieldLast = "";
                 while (core.db.csOk(CS)) {
                     //FieldType = core.app.csv_cs_getInteger(CS, "Type")
@@ -742,7 +742,7 @@ namespace Contensive.Addons.Housekeeping {
                 // block duplicate non-redirect fields (match contentid+fieldtype+name)
                 //
                 logHousekeeping(core, "Inactivate duplicate non-redirect fields");
-                CS = core.db.csOpenSql( "Select ID, Name, ContentID, Type from ccFields where (active<>0)and(Type<>" + FieldTypeIdRedirect + ") Order By ContentID, Name, Type, ID");
+                CS = core.db.csOpenSql( "Select ID, Name, ContentID, Type from ccFields where (active<>0)and(Type<>" + fieldTypeIdRedirect + ") Order By ContentID, Name, Type, ID");
                 FieldLast = "";
                 while (core.db.csOk(CS)) {
                     fieldType = core.db.csGetInteger(CS, "Type");
@@ -1096,7 +1096,7 @@ namespace Contensive.Addons.Housekeeping {
                 // convert FieldTypeLongText + htmlContent to FieldTypeHTML
                 //
                 logHousekeeping(core, "convert FieldTypeLongText + htmlContent to FieldTypeHTML.");
-                SQL = "update ccfields set type=" + FieldTypeIdHTML + " where type=" + FieldTypeIdLongText + " and ( htmlcontent<>0 )";
+                SQL = "update ccfields set type=" + fieldTypeIdHTML + " where type=" + fieldTypeIdLongText + " and ( htmlcontent<>0 )";
                 core.db.executeQuery(SQL);
                 //
                 // convert FieldTypeTextFile + htmlContent to FieldTypeHTMLFile

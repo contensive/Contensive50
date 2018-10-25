@@ -384,7 +384,7 @@ namespace Contensive.Processor.Models.Domain {
                                         childField = (Models.Domain.CDefFieldModel)parentField.Clone();
                                         childField.inherited = true;
                                         result.fields.Add(childField.nameLc.ToLower(), childField);
-                                        if (!((parentField.fieldTypeId == FieldTypeIdManyToMany) || (parentField.fieldTypeId == FieldTypeIdRedirect))) {
+                                        if (!((parentField.fieldTypeId == fieldTypeIdManyToMany) || (parentField.fieldTypeId == fieldTypeIdRedirect))) {
                                             if (!result.selectList.Contains(parentField.nameLc)) {
                                                 result.selectList.Add(parentField.nameLc);
                                             }
@@ -508,10 +508,10 @@ namespace Contensive.Processor.Models.Domain {
                                                 //
                                                 bool fieldHtmlContent = GenericController.encodeBoolean(fieldRow[25]);
                                                 if (fieldHtmlContent) {
-                                                    if (fieldTypeId == FieldTypeIdLongText) {
-                                                        fieldTypeId = FieldTypeIdHTML;
-                                                    } else if (fieldTypeId == FieldTypeIdFileText) {
-                                                        fieldTypeId = FieldTypeIdFileHTML;
+                                                    if (fieldTypeId == fieldTypeIdLongText) {
+                                                        fieldTypeId = fieldTypeIdHTML;
+                                                    } else if (fieldTypeId == fieldTypeIdFileText) {
+                                                        fieldTypeId = fieldTypeIdFileHTML;
                                                     }
                                                 }
                                                 field.active = GenericController.encodeBoolean(fieldRow[24]);
@@ -571,7 +571,7 @@ namespace Contensive.Processor.Models.Domain {
                                                 field.HelpChanged = false;
                                                 result.fields.Add(fieldNameLower, field);
                                                 //REFACTOR
-                                                if ((field.fieldTypeId != FieldTypeIdManyToMany) & (field.fieldTypeId != FieldTypeIdRedirect) && (!result.selectList.Contains(fieldNameLower))) {
+                                                if ((field.fieldTypeId != fieldTypeIdManyToMany) & (field.fieldTypeId != fieldTypeIdRedirect) && (!result.selectList.Contains(fieldNameLower))) {
                                                     //
                                                     // add only fields that can be selected
                                                     result.selectList.Add(fieldNameLower);

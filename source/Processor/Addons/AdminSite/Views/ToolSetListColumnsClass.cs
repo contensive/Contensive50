@@ -367,47 +367,47 @@ namespace Contensive.Addons.AdminSite {
                             //
                             // display the column if it is not in use
                             if ((IndexConfig.columns.Find(x => x.Name == field.nameLc) == null)) {
-                                if (field.fieldTypeId == FieldTypeIdFile) {
+                                if (field.fieldTypeId == fieldTypeIdFile) {
                                     //
                                     // file can not be search
                                     Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (file field)"));
-                                } else if (field.fieldTypeId == FieldTypeIdFileText) {
+                                } else if (field.fieldTypeId == fieldTypeIdFileText) {
                                     //
                                     // filename can not be search
                                     Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (text file field)"));
-                                } else if (field.fieldTypeId == FieldTypeIdFileHTML) {
+                                } else if (field.fieldTypeId == fieldTypeIdFileHTML) {
                                     //
                                     // filename can not be search
                                     Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (html file field)"));
-                                } else if (field.fieldTypeId == FieldTypeIdFileCSS) {
+                                } else if (field.fieldTypeId == fieldTypeIdFileCSS) {
                                     //
                                     // css filename can not be search
                                     Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (css file field)"));
-                                } else if (field.fieldTypeId == FieldTypeIdFileXML) {
+                                } else if (field.fieldTypeId == fieldTypeIdFileXML) {
                                     //
                                     // xml filename can not be search
                                     Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (xml file field)"));
-                                } else if (field.fieldTypeId == FieldTypeIdFileJavascript) {
+                                } else if (field.fieldTypeId == fieldTypeIdFileJavascript) {
                                     //
                                     // javascript filename can not be search
                                     Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (javascript file field)"));
-                                } else if (field.fieldTypeId == FieldTypeIdLongText) {
+                                } else if (field.fieldTypeId == fieldTypeIdLongText) {
                                     //
                                     // long text can not be search
                                     Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (long text field)"));
-                                } else if (field.fieldTypeId == FieldTypeIdHTML) {
+                                } else if (field.fieldTypeId == fieldTypeIdHTML) {
                                     //
                                     // long text can not be search
                                     Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (long text field)"));
-                                } else if (field.fieldTypeId == FieldTypeIdFileImage) {
+                                } else if (field.fieldTypeId == fieldTypeIdFileImage) {
                                     //
                                     // long text can not be search
                                     Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (image field)"));
-                                } else if (field.fieldTypeId == FieldTypeIdRedirect) {
+                                } else if (field.fieldTypeId == fieldTypeIdRedirect) {
                                     //
                                     // long text can not be search
                                     Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (redirect field)"));
-                                } else if (field.fieldTypeId == FieldTypeIdManyToMany) {
+                                } else if (field.fieldTypeId == fieldTypeIdManyToMany) {
                                     //
                                     // many to many can not be search
                                     Stream.Add(HtmlController.div( iconNotAvailable + "&nbsp;" + field.caption + " (many-to-many field)"));

@@ -1444,7 +1444,7 @@ namespace Contensive.Processor.Controllers {
                         case "sectionlandinglink":
                             PageContentModel.invalidateTableCache(core);
                             break;
-                        case siteproperty_serverPageDefault_name:
+                        case _siteproperty_serverPageDefault_name:
                             PageContentModel.invalidateTableCache(core);
                             break;
                     }

@@ -156,18 +156,18 @@ namespace Contensive.Processor.Controllers {
                                 FieldNameVariant = core.db.csGetFirstFieldName(CSPointer);
                                 while (!string.IsNullOrEmpty(FieldNameVariant)) {
                                     switch (core.db.csGetFieldTypeId(CSPointer, GenericController.encodeText(FieldNameVariant))) {
-                                        case FieldTypeIdFileText:
-                                        case FieldTypeIdFileCSS:
-                                        case FieldTypeIdFileXML:
-                                        case FieldTypeIdFileJavascript:
-                                        case FieldTypeIdFileHTML:
+                                        case _fieldTypeIdFileText:
+                                        case _fieldTypeIdFileCSS:
+                                        case _fieldTypeIdFileXML:
+                                        case _fieldTypeIdFileJavascript:
+                                        case _fieldTypeIdFileHTML:
                                             Copy = CsController.getTextEncoded(core, CSPointer, GenericController.encodeText(FieldNameVariant));
                                             break;
-                                        case FieldTypeIdLookup:
+                                        case _fieldTypeIdLookup:
                                             Copy = core.db.csGetLookup(CSPointer, GenericController.encodeText(FieldNameVariant));
                                             break;
-                                        case FieldTypeIdRedirect:
-                                        case FieldTypeIdManyToMany:
+                                        case _fieldTypeIdRedirect:
+                                        case _fieldTypeIdManyToMany:
                                             break;
                                         default:
                                             Copy = core.db.csGetText(CSPointer, GenericController.encodeText(FieldNameVariant));

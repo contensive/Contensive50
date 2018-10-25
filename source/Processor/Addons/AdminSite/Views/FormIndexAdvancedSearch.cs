@@ -165,7 +165,7 @@ namespace Contensive.Addons.AdminSite {
                     FieldCaption[FieldPtr] = field.caption;
                     fieldId[FieldPtr] = field.id;
                     fieldTypeId[FieldPtr] = field.fieldTypeId;
-                    if (fieldTypeId[FieldPtr] == FieldTypeIdLookup) {
+                    if (fieldTypeId[FieldPtr] == fieldTypeIdLookup) {
                         ContentID = field.lookupContentID;
                         if (ContentID > 0) {
                             FieldLookupContentName[FieldPtr] = CdefController.getContentNameByID(core, ContentID);
@@ -256,7 +256,7 @@ namespace Contensive.Addons.AdminSite {
                     RowEven = ((RowPointer % 2) == 0);
                     FieldMatchOption = FieldMatchOptions[FieldPtr];
                     switch (fieldTypeId[FieldPtr]) {
-                        case FieldTypeIdDate:
+                        case _fieldTypeIdDate:
                             //
                             // Date
 
@@ -278,10 +278,10 @@ namespace Contensive.Addons.AdminSite {
 
 
                         //genericController.vbReplace(result, ">", ">")
-                        case FieldTypeIdCurrency:
-                        case FieldTypeIdFloat:
-                        case FieldTypeIdInteger:
-                        case FieldTypeIdAutoIdIncrement:
+                        case _fieldTypeIdCurrency:
+                        case _fieldTypeIdFloat:
+                        case _fieldTypeIdInteger:
+                        case _fieldTypeIdAutoIdIncrement:
                             //
                             // -- Numeric - changed FindWordMatchEnum.MatchEquals to MatchInclude to be compatible with Find Search
                             returnForm = returnForm + "<tr>"
@@ -300,8 +300,8 @@ namespace Contensive.Addons.AdminSite {
                             + "</tr>";
                             RowPointer += 1;
                             break;
-                        case FieldTypeIdFile:
-                        case FieldTypeIdFileImage:
+                        case _fieldTypeIdFile:
+                        case _fieldTypeIdFileImage:
                             //
                             // File
                             //
@@ -317,7 +317,7 @@ namespace Contensive.Addons.AdminSite {
                             + "</tr>";
                             RowPointer = RowPointer + 1;
                             break;
-                        case FieldTypeIdBoolean:
+                        case _fieldTypeIdBoolean:
                             //
                             // Boolean
                             //
@@ -332,13 +332,13 @@ namespace Contensive.Addons.AdminSite {
                             + "</td>"
                             + "</tr>";
                             break;
-                        case FieldTypeIdText:
-                        case FieldTypeIdLongText:
-                        case FieldTypeIdHTML:
-                        case FieldTypeIdFileHTML:
-                        case FieldTypeIdFileCSS:
-                        case FieldTypeIdFileJavascript:
-                        case FieldTypeIdFileXML:
+                        case _fieldTypeIdText:
+                        case _fieldTypeIdLongText:
+                        case _fieldTypeIdHTML:
+                        case _fieldTypeIdFileHTML:
+                        case _fieldTypeIdFileCSS:
+                        case _fieldTypeIdFileJavascript:
+                        case _fieldTypeIdFileXML:
                             //
                             // Text
                             //
@@ -356,8 +356,8 @@ namespace Contensive.Addons.AdminSite {
                             + "</tr>";
                             RowPointer = RowPointer + 1;
                             break;
-                        case FieldTypeIdLookup:
-                        case FieldTypeIdMemberSelect:
+                        case _fieldTypeIdLookup:
+                        case _fieldTypeIdMemberSelect:
                             //
                             // Lookup
                             returnForm = returnForm + "<tr>"

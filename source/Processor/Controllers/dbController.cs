@@ -705,29 +705,29 @@ namespace Contensive.Processor.Controllers {
                     //
                     if (Models.Domain.TableSchemaModel.getTableSchema(core, TableName, DataSourceName) == null) {
                         if (!AllowAutoIncrement) {
-                            string SQL = "Create Table " + TableName + "(ID " + getSQLAlterColumnType(DataSourceName, FieldTypeIdInteger) + ");";
+                            string SQL = "Create Table " + TableName + "(ID " + getSQLAlterColumnType(DataSourceName, fieldTypeIdInteger) + ");";
                             executeQuery(SQL, DataSourceName).Dispose();
                         } else {
-                            string SQL = "Create Table " + TableName + "(ID " + getSQLAlterColumnType(DataSourceName, FieldTypeIdAutoIdIncrement) + ");";
+                            string SQL = "Create Table " + TableName + "(ID " + getSQLAlterColumnType(DataSourceName, fieldTypeIdAutoIdIncrement) + ");";
                             executeQuery(SQL, DataSourceName).Dispose();
                         }
                     }
                     //
                     // ----- Test the common fields required in all tables
                     //
-                    createSQLTableField(DataSourceName, TableName, "id", FieldTypeIdAutoIdIncrement);
-                    createSQLTableField(DataSourceName, TableName, "name", FieldTypeIdText);
-                    createSQLTableField(DataSourceName, TableName, "dateAdded", FieldTypeIdDate);
-                    createSQLTableField(DataSourceName, TableName, "createdby", FieldTypeIdInteger);
-                    createSQLTableField(DataSourceName, TableName, "modifiedBy", FieldTypeIdInteger);
-                    createSQLTableField(DataSourceName, TableName, "ModifiedDate", FieldTypeIdDate);
-                    createSQLTableField(DataSourceName, TableName, "active", FieldTypeIdBoolean);
-                    createSQLTableField(DataSourceName, TableName, "createKey", FieldTypeIdInteger);
-                    createSQLTableField(DataSourceName, TableName, "sortOrder", FieldTypeIdText);
-                    createSQLTableField(DataSourceName, TableName, "contentControlID", FieldTypeIdInteger);
-                    createSQLTableField(DataSourceName, TableName, "ccGuid", FieldTypeIdText);
+                    createSQLTableField(DataSourceName, TableName, "id", fieldTypeIdAutoIdIncrement);
+                    createSQLTableField(DataSourceName, TableName, "name", fieldTypeIdText);
+                    createSQLTableField(DataSourceName, TableName, "dateAdded", fieldTypeIdDate);
+                    createSQLTableField(DataSourceName, TableName, "createdby", fieldTypeIdInteger);
+                    createSQLTableField(DataSourceName, TableName, "modifiedBy", fieldTypeIdInteger);
+                    createSQLTableField(DataSourceName, TableName, "ModifiedDate", fieldTypeIdDate);
+                    createSQLTableField(DataSourceName, TableName, "active", fieldTypeIdBoolean);
+                    createSQLTableField(DataSourceName, TableName, "createKey", fieldTypeIdInteger);
+                    createSQLTableField(DataSourceName, TableName, "sortOrder", fieldTypeIdText);
+                    createSQLTableField(DataSourceName, TableName, "contentControlID", fieldTypeIdInteger);
+                    createSQLTableField(DataSourceName, TableName, "ccGuid", fieldTypeIdText);
                     // -- 20171029 - deprecating fields makes migration difficult. add back and figure out future path
-                    createSQLTableField(DataSourceName, TableName, "ContentCategoryID", FieldTypeIdInteger);
+                    createSQLTableField(DataSourceName, TableName, "ContentCategoryID", fieldTypeIdInteger);
                     //
                     // ----- setup core indexes
                     //
@@ -759,7 +759,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="clearMetaCache"></param>
         public void createSQLTableField(string DataSourceName, string TableName, string FieldName, int fieldType, bool clearMetaCache = false) {
             try {
-                if ((fieldType == FieldTypeIdRedirect) || (fieldType == FieldTypeIdManyToMany)) {
+                if ((fieldType == fieldTypeIdRedirect) || (fieldType == fieldTypeIdManyToMany)) {
                     //
                     // OK -- contensive fields with no table field
                     //
@@ -968,42 +968,42 @@ namespace Contensive.Processor.Controllers {
             string returnType = "";
             try {
                 switch (fieldType) {
-                    case constants.FieldTypeIdBoolean:
+                    case constants._fieldTypeIdBoolean:
                         returnType = "Int NULL";
                         break;
-                    case constants.FieldTypeIdCurrency:
+                    case constants._fieldTypeIdCurrency:
                         returnType = "Float NULL";
                         break;
-                    case constants.FieldTypeIdDate:
+                    case constants._fieldTypeIdDate:
                         // 20180416 - ms recommends using new, higher precision. Code requires 3 digits so 7 is more than enough
                         returnType = "DateTime2(7) NULL";
                         break;
-                    case constants.FieldTypeIdFloat:
+                    case constants._fieldTypeIdFloat:
                         returnType = "Float NULL";
                         break;
-                    case constants.FieldTypeIdInteger:
+                    case constants._fieldTypeIdInteger:
                         returnType = "Int NULL";
                         break;
-                    case constants.FieldTypeIdLookup:
-                    case constants.FieldTypeIdMemberSelect:
+                    case constants._fieldTypeIdLookup:
+                    case constants._fieldTypeIdMemberSelect:
                         returnType = "Int NULL";
                         break;
-                    case constants.FieldTypeIdManyToMany:
-                    case constants.FieldTypeIdRedirect:
-                    case constants.FieldTypeIdFileImage:
-                    case constants.FieldTypeIdLink:
-                    case constants.FieldTypeIdResourceLink:
-                    case constants.FieldTypeIdText:
-                    case constants.FieldTypeIdFile:
-                    case constants.FieldTypeIdFileText:
-                    case constants.FieldTypeIdFileJavascript:
-                    case constants.FieldTypeIdFileXML:
-                    case constants.FieldTypeIdFileCSS:
-                    case constants.FieldTypeIdFileHTML:
+                    case constants._fieldTypeIdManyToMany:
+                    case constants._fieldTypeIdRedirect:
+                    case constants._fieldTypeIdFileImage:
+                    case constants._fieldTypeIdLink:
+                    case constants._fieldTypeIdResourceLink:
+                    case constants._fieldTypeIdText:
+                    case constants._fieldTypeIdFile:
+                    case constants._fieldTypeIdFileText:
+                    case constants._fieldTypeIdFileJavascript:
+                    case constants._fieldTypeIdFileXML:
+                    case constants._fieldTypeIdFileCSS:
+                    case constants._fieldTypeIdFileHTML:
                         returnType = "VarChar(255) NULL";
                         break;
-                    case constants.FieldTypeIdLongText:
-                    case constants.FieldTypeIdHTML:
+                    case constants._fieldTypeIdLongText:
+                    case constants._fieldTypeIdHTML:
                         //
                         // ----- Longtext, depends on datasource
                         //
@@ -1019,7 +1019,7 @@ namespace Contensive.Processor.Controllers {
                         //        csv_returnType = "VarChar(65535)"
                         //End Select
                         break;
-                    case constants.FieldTypeIdAutoIdIncrement:
+                    case constants._fieldTypeIdAutoIdIncrement:
                         //
                         // ----- autoincrement type, depends on datasource
                         //
@@ -1131,37 +1131,37 @@ namespace Contensive.Processor.Controllers {
                 switch (ADOFieldType) {
 
                     case 2:
-                        returnType = constants.FieldTypeIdFloat;
+                        returnType = constants.fieldTypeIdFloat;
                         break;
                     case 3:
-                        returnType = constants.FieldTypeIdInteger;
+                        returnType = constants.fieldTypeIdInteger;
                         break;
                     case 4:
-                        returnType = constants.FieldTypeIdFloat;
+                        returnType = constants.fieldTypeIdFloat;
                         break;
                     case 5:
-                        returnType = constants.FieldTypeIdFloat;
+                        returnType = constants.fieldTypeIdFloat;
                         break;
                     case 6:
-                        returnType = constants.FieldTypeIdInteger;
+                        returnType = constants.fieldTypeIdInteger;
                         break;
                     case 11:
-                        returnType = constants.FieldTypeIdBoolean;
+                        returnType = constants.fieldTypeIdBoolean;
                         break;
                     case 135:
-                        returnType = constants.FieldTypeIdDate;
+                        returnType = constants.fieldTypeIdDate;
                         break;
                     case 200:
-                        returnType = constants.FieldTypeIdText;
+                        returnType = constants.fieldTypeIdText;
                         break;
                     case 201:
-                        returnType = constants.FieldTypeIdLongText;
+                        returnType = constants.fieldTypeIdLongText;
                         break;
                     case 202:
-                        returnType = constants.FieldTypeIdText;
+                        returnType = constants.fieldTypeIdText;
                         break;
                     default:
-                        returnType = constants.FieldTypeIdText;
+                        returnType = constants.fieldTypeIdText;
                         break;
                 }
             } catch (Exception ex) {
@@ -1182,87 +1182,87 @@ namespace Contensive.Processor.Controllers {
             try {
                 switch (GenericController.vbLCase(FieldTypeName)) {
                     case constants.FieldTypeNameLcaseBoolean:
-                        returnTypeId = constants.FieldTypeIdBoolean;
+                        returnTypeId = constants.fieldTypeIdBoolean;
                         break;
                     case constants.FieldTypeNameLcaseCurrency:
-                        returnTypeId = constants.FieldTypeIdCurrency;
+                        returnTypeId = constants.fieldTypeIdCurrency;
                         break;
                     case constants.FieldTypeNameLcaseDate:
-                        returnTypeId = constants.FieldTypeIdDate;
+                        returnTypeId = constants.fieldTypeIdDate;
                         break;
                     case constants.FieldTypeNameLcaseFile:
-                        returnTypeId = constants.FieldTypeIdFile;
+                        returnTypeId = constants.fieldTypeIdFile;
                         break;
                     case constants.FieldTypeNameLcaseFloat:
-                        returnTypeId = constants.FieldTypeIdFloat;
+                        returnTypeId = constants.fieldTypeIdFloat;
                         break;
                     case constants.FieldTypeNameLcaseImage:
-                        returnTypeId = constants.FieldTypeIdFileImage;
+                        returnTypeId = constants.fieldTypeIdFileImage;
                         break;
                     case constants.FieldTypeNameLcaseLink:
-                        returnTypeId = constants.FieldTypeIdLink;
+                        returnTypeId = constants.fieldTypeIdLink;
                         break;
                     case constants.FieldTypeNameLcaseResourceLink:
                     case "resource link":
-                        returnTypeId = constants.FieldTypeIdResourceLink;
+                        returnTypeId = constants.fieldTypeIdResourceLink;
                         break;
                     case constants.FieldTypeNameLcaseInteger:
-                        returnTypeId = constants.FieldTypeIdInteger;
+                        returnTypeId = constants.fieldTypeIdInteger;
                         break;
                     case constants.FieldTypeNameLcaseLongText:
                     case "Long text":
-                        returnTypeId = constants.FieldTypeIdLongText;
+                        returnTypeId = constants.fieldTypeIdLongText;
                         break;
                     case constants.FieldTypeNameLcaseLookup:
                     case "lookuplist":
                     case "lookup list":
-                        returnTypeId = constants.FieldTypeIdLookup;
+                        returnTypeId = constants.fieldTypeIdLookup;
                         break;
                     case constants.FieldTypeNameLcaseMemberSelect:
-                        returnTypeId = constants.FieldTypeIdMemberSelect;
+                        returnTypeId = constants.fieldTypeIdMemberSelect;
                         break;
                     case constants.FieldTypeNameLcaseRedirect:
-                        returnTypeId = constants.FieldTypeIdRedirect;
+                        returnTypeId = constants.fieldTypeIdRedirect;
                         break;
                     case constants.FieldTypeNameLcaseManyToMany:
-                        returnTypeId = constants.FieldTypeIdManyToMany;
+                        returnTypeId = constants.fieldTypeIdManyToMany;
                         break;
                     case constants.FieldTypeNameLcaseTextFile:
                     case "text file":
-                        returnTypeId = constants.FieldTypeIdFileText;
+                        returnTypeId = constants.fieldTypeIdFileText;
                         break;
                     case constants.FieldTypeNameLcaseCSSFile:
                     case "css file":
-                        returnTypeId = constants.FieldTypeIdFileCSS;
+                        returnTypeId = constants.fieldTypeIdFileCSS;
                         break;
                     case constants.FieldTypeNameLcaseXMLFile:
                     case "xml file":
-                        returnTypeId = constants.FieldTypeIdFileXML;
+                        returnTypeId = constants.fieldTypeIdFileXML;
                         break;
                     case constants.FieldTypeNameLcaseJavascriptFile:
                     case "javascript file":
                     case "js file":
                     case "jsfile":
-                        returnTypeId = constants.FieldTypeIdFileJavascript;
+                        returnTypeId = constants.fieldTypeIdFileJavascript;
                         break;
                     case constants.FieldTypeNameLcaseText:
-                        returnTypeId = constants.FieldTypeIdText;
+                        returnTypeId = constants.fieldTypeIdText;
                         break;
                     case "autoincrement":
-                        returnTypeId = constants.FieldTypeIdAutoIdIncrement;
+                        returnTypeId = constants.fieldTypeIdAutoIdIncrement;
                         break;
                     case constants.FieldTypeNameLcaseHTML:
-                        returnTypeId = constants.FieldTypeIdHTML;
+                        returnTypeId = constants.fieldTypeIdHTML;
                         break;
                     case constants.FieldTypeNameLcaseHTMLFile:
                     case "html file":
-                        returnTypeId = constants.FieldTypeIdFileHTML;
+                        returnTypeId = constants.fieldTypeIdFileHTML;
                         break;
                     default:
                         //
                         // Bad field type is a text field
                         //
-                        returnTypeId = constants.FieldTypeIdText;
+                        returnTypeId = constants.fieldTypeIdText;
                         break;
                 }
             } catch (Exception ex) {
@@ -1572,11 +1572,11 @@ namespace Contensive.Processor.Controllers {
                                 fieldName = field.nameLc;
                                 string Filename = null;
                                 switch (field.fieldTypeId) {
-                                    case constants.FieldTypeIdFile:
-                                    case constants.FieldTypeIdFileImage:
-                                    case constants.FieldTypeIdFileCSS:
-                                    case constants.FieldTypeIdFileJavascript:
-                                    case constants.FieldTypeIdFileXML:
+                                    case constants._fieldTypeIdFile:
+                                    case constants._fieldTypeIdFileImage:
+                                    case constants._fieldTypeIdFileCSS:
+                                    case constants._fieldTypeIdFileJavascript:
+                                    case constants._fieldTypeIdFileXML:
                                         //
                                         // public content files
                                         //
@@ -1586,8 +1586,8 @@ namespace Contensive.Processor.Controllers {
                                             //Call core.cdnFiles.deleteFile(core.cdnFiles.joinPath(core.appConfig.cdnFilesNetprefix, Filename))
                                         }
                                         break;
-                                    case constants.FieldTypeIdFileText:
-                                    case constants.FieldTypeIdFileHTML:
+                                    case constants._fieldTypeIdFileText:
+                                    case constants._fieldTypeIdFileHTML:
                                         //
                                         // private files
                                         //
@@ -2093,9 +2093,9 @@ namespace Contensive.Processor.Controllers {
                         if (fieldTypeId == 0) {
                             if (string.IsNullOrEmpty(ContentName)) {
                                 if (string.IsNullOrEmpty(OriginalFilename)) {
-                                    fieldTypeId = constants.FieldTypeIdText;
+                                    fieldTypeId = constants.fieldTypeIdText;
                                 } else {
-                                    fieldTypeId = constants.FieldTypeIdFile;
+                                    fieldTypeId = constants.fieldTypeIdFile;
                                 }
                             } else if (tempVar.writeable) {
                                 //
@@ -2105,9 +2105,9 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // -- else assume text
                                 if (string.IsNullOrEmpty(OriginalFilename)) {
-                                    fieldTypeId = constants.FieldTypeIdText;
+                                    fieldTypeId = constants.fieldTypeIdText;
                                 } else {
-                                    fieldTypeId = constants.FieldTypeIdFile;
+                                    fieldTypeId = constants.fieldTypeIdFile;
                                 }
                             }
                         }
@@ -2222,7 +2222,7 @@ namespace Contensive.Processor.Controllers {
                         throw new ApplicationException("Cannot save this dataset because it is read-only.");
                     } else {
                         string OldFilename = csGetText(CSPointer, FieldName);
-                        string Filename = csGetFieldFilename(CSPointer, FieldName, "", ContentName, constants.FieldTypeIdFileText);
+                        string Filename = csGetFieldFilename(CSPointer, FieldName, "", ContentName, constants.fieldTypeIdFileText);
                         if (OldFilename != Filename) {
                             //
                             // Filename changed, mark record changed
@@ -2430,32 +2430,32 @@ namespace Contensive.Processor.Controllers {
                                             // General case
                                             //
                                             switch (field.fieldTypeId) {
-                                                case constants.FieldTypeIdAutoIdIncrement:
+                                                case constants._fieldTypeIdAutoIdIncrement:
                                                     //
                                                     // cannot insert an autoincremnt
                                                     //
                                                     break;
-                                                case constants.FieldTypeIdRedirect:
-                                                case constants.FieldTypeIdManyToMany:
+                                                case constants._fieldTypeIdRedirect:
+                                                case constants._fieldTypeIdManyToMany:
                                                     //
                                                     // ignore these fields, they have no associated DB field
                                                     //
                                                     break;
-                                                case constants.FieldTypeIdBoolean:
+                                                case constants._fieldTypeIdBoolean:
                                                     sqlList.add(FieldName, encodeSQLBoolean(GenericController.encodeBoolean(field.defaultValue)));
                                                     break;
-                                                case constants.FieldTypeIdCurrency:
-                                                case constants.FieldTypeIdFloat:
+                                                case constants._fieldTypeIdCurrency:
+                                                case constants._fieldTypeIdFloat:
                                                     sqlList.add(FieldName, encodeSQLNumber(GenericController.encodeNumber(field.defaultValue)));
                                                     break;
-                                                case constants.FieldTypeIdInteger:
-                                                case constants.FieldTypeIdMemberSelect:
+                                                case constants._fieldTypeIdInteger:
+                                                case constants._fieldTypeIdMemberSelect:
                                                     sqlList.add(FieldName, encodeSQLNumber(GenericController.encodeInteger(field.defaultValue)));
                                                     break;
-                                                case constants.FieldTypeIdDate:
+                                                case constants._fieldTypeIdDate:
                                                     sqlList.add(FieldName, encodeSQLDate(GenericController.encodeDate(field.defaultValue)));
                                                     break;
-                                                case constants.FieldTypeIdLookup:
+                                                case constants._fieldTypeIdLookup:
                                                     //
                                                     // refactor --
                                                     // This is a problem - the defaults should come in as the ID values, not the names
@@ -2615,14 +2615,14 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 int sourceFieldTypeId = csGetFieldTypeId(CSSource, FieldName);
                                 switch (sourceFieldTypeId) {
-                                    case constants.FieldTypeIdRedirect:
-                                    case constants.FieldTypeIdManyToMany:
+                                    case constants._fieldTypeIdRedirect:
+                                    case constants._fieldTypeIdManyToMany:
                                         break;
-                                    case constants.FieldTypeIdFile:
-                                    case constants.FieldTypeIdFileImage:
-                                    case constants.FieldTypeIdFileCSS:
-                                    case constants.FieldTypeIdFileXML:
-                                    case constants.FieldTypeIdFileJavascript:
+                                    case constants._fieldTypeIdFile:
+                                    case constants._fieldTypeIdFileImage:
+                                    case constants._fieldTypeIdFileCSS:
+                                    case constants._fieldTypeIdFileXML:
+                                    case constants._fieldTypeIdFileJavascript:
                                         //
                                         // ----- cdn file
                                         //
@@ -2633,8 +2633,8 @@ namespace Contensive.Processor.Controllers {
                                             core.cdnFiles.copyFile(SourceFilename, DestFilename);
                                         }
                                         break;
-                                    case constants.FieldTypeIdFileText:
-                                    case constants.FieldTypeIdFileHTML:
+                                    case constants._fieldTypeIdFileText:
+                                    case constants._fieldTypeIdFileHTML:
                                         //
                                         // ----- private file
                                         //
@@ -2741,7 +2741,7 @@ namespace Contensive.Processor.Controllers {
                         } else {
                             field = tempVar.CDef.fields[FieldName.ToLower()];
                             fieldTypeId = field.fieldTypeId;
-                            if (fieldTypeId == FieldTypeIdManyToMany) {
+                            if (fieldTypeId == fieldTypeIdManyToMany) {
                                 //
                                 // special case - recordset contains no data - return record id list
                                 //
@@ -2763,7 +2763,7 @@ namespace Contensive.Processor.Controllers {
                                         fieldValue = fieldValue.Substring(1);
                                     }
                                 }
-                            } else if (fieldTypeId == FieldTypeIdRedirect) {
+                            } else if (fieldTypeId == fieldTypeIdRedirect) {
                                 //
                                 // special case - recordset contains no data - return blank
                                 //
@@ -2775,7 +2775,7 @@ namespace Contensive.Processor.Controllers {
                                     // Field is good
                                     //
                                     switch (fieldTypeId) {
-                                        case FieldTypeIdBoolean:
+                                        case _fieldTypeIdBoolean:
                                             //
                                             //
                                             //
@@ -2786,7 +2786,7 @@ namespace Contensive.Processor.Controllers {
                                             }
                                             //NeedsHTMLEncode = False
                                             break;
-                                        case FieldTypeIdDate:
+                                        case _fieldTypeIdDate:
                                             //
                                             //
                                             //
@@ -2797,7 +2797,7 @@ namespace Contensive.Processor.Controllers {
                                                 fieldValue = GenericController.encodeDate(FieldValueVariant).ToString();
                                             }
                                             break;
-                                        case FieldTypeIdLookup:
+                                        case _fieldTypeIdLookup:
                                             //
                                             //
                                             //
@@ -2826,7 +2826,7 @@ namespace Contensive.Processor.Controllers {
                                                 }
                                             }
                                             break;
-                                        case FieldTypeIdMemberSelect:
+                                        case _fieldTypeIdMemberSelect:
                                             //
                                             //
                                             //
@@ -2834,7 +2834,7 @@ namespace Contensive.Processor.Controllers {
                                                 fieldValue = getRecordName("people", GenericController.encodeInteger(FieldValueVariant));
                                             }
                                             break;
-                                        case FieldTypeIdCurrency:
+                                        case _fieldTypeIdCurrency:
                                             //
                                             //
                                             //
@@ -2842,45 +2842,45 @@ namespace Contensive.Processor.Controllers {
                                                 fieldValue = FieldValueVariant.ToString();
                                             }
                                             break;
-                                        case FieldTypeIdFileText:
-                                        case FieldTypeIdFileHTML:
+                                        case _fieldTypeIdFileText:
+                                        case _fieldTypeIdFileHTML:
                                             //
                                             //
                                             //
                                             fieldValue = core.cdnFiles.readFileText(GenericController.encodeText(FieldValueVariant));
                                             break;
-                                        case FieldTypeIdFileCSS:
-                                        case FieldTypeIdFileXML:
-                                        case FieldTypeIdFileJavascript:
+                                        case _fieldTypeIdFileCSS:
+                                        case _fieldTypeIdFileXML:
+                                        case _fieldTypeIdFileJavascript:
                                             //
                                             //
                                             //
                                             fieldValue = core.cdnFiles.readFileText(GenericController.encodeText(FieldValueVariant));
                                             //NeedsHTMLEncode = False
                                             break;
-                                        case FieldTypeIdText:
-                                        case FieldTypeIdLongText:
-                                        case FieldTypeIdHTML:
+                                        case _fieldTypeIdText:
+                                        case _fieldTypeIdLongText:
+                                        case _fieldTypeIdHTML:
                                             //
                                             //
                                             //
                                             fieldValue = GenericController.encodeText(FieldValueVariant);
                                             break;
-                                        case FieldTypeIdFile:
-                                        case FieldTypeIdFileImage:
-                                        case FieldTypeIdLink:
-                                        case FieldTypeIdResourceLink:
-                                        case FieldTypeIdAutoIdIncrement:
-                                        case FieldTypeIdFloat:
-                                        case FieldTypeIdInteger:
+                                        case _fieldTypeIdFile:
+                                        case _fieldTypeIdFileImage:
+                                        case _fieldTypeIdLink:
+                                        case _fieldTypeIdResourceLink:
+                                        case _fieldTypeIdAutoIdIncrement:
+                                        case _fieldTypeIdFloat:
+                                        case _fieldTypeIdInteger:
                                             //
                                             //
                                             //
                                             fieldValue = GenericController.encodeText(FieldValueVariant);
                                             //NeedsHTMLEncode = False
                                             break;
-                                        case FieldTypeIdRedirect:
-                                        case FieldTypeIdManyToMany:
+                                        case _fieldTypeIdRedirect:
+                                        case _fieldTypeIdManyToMany:
                                             //
                                             // This case is covered before the select - but leave this here as safety net
                                             //
@@ -2943,22 +2943,22 @@ namespace Contensive.Processor.Controllers {
                             } else {
                                 field = dataSet.CDef.fields[FieldNameLc];
                                 switch (field.fieldTypeId) {
-                                    case FieldTypeIdAutoIdIncrement:
-                                    case FieldTypeIdRedirect:
-                                    case FieldTypeIdManyToMany:
+                                    case _fieldTypeIdAutoIdIncrement:
+                                    case _fieldTypeIdRedirect:
+                                    case _fieldTypeIdManyToMany:
                                         //
                                         // Never set
                                         //
                                         break;
-                                    case FieldTypeIdFile:
-                                    case FieldTypeIdFileImage:
+                                    case _fieldTypeIdFile:
+                                    case _fieldTypeIdFileImage:
                                         //
                                         // Always set
                                         // Saved in the field is the filename to the file
                                         SetNeeded = true;
                                         break;
-                                    case FieldTypeIdFileText:
-                                    case FieldTypeIdFileHTML:
+                                    case _fieldTypeIdFileText:
+                                    case _fieldTypeIdFileHTML:
                                         //
                                         //fileNameNoExt = csGetText(CSPointer, FieldNameLc);
                                         ////FieldValue = genericController.encodeText(FieldValueVariantLocal)
@@ -2978,9 +2978,9 @@ namespace Contensive.Processor.Controllers {
                                         //FieldValue = fileNameNoExt;
                                         //SetNeeded = true;
                                         //break;
-                                    case FieldTypeIdFileCSS:
-                                    case FieldTypeIdFileXML:
-                                    case FieldTypeIdFileJavascript:
+                                    case _fieldTypeIdFileCSS:
+                                    case _fieldTypeIdFileXML:
+                                    case _fieldTypeIdFileJavascript:
                                         //
                                         // public files - save as FieldTypeTextFile except if only white space, consider it blank
                                         //
@@ -3050,14 +3050,14 @@ namespace Contensive.Processor.Controllers {
                                         FieldValue = PathFilename;
                                         SetNeeded = true;
                                         break;
-                                    case FieldTypeIdBoolean:
+                                    case _fieldTypeIdBoolean:
                                         //
                                         // Boolean - sepcial case, block on typed GetAlways set
                                         if (GenericController.encodeBoolean(FieldValue) != csGetBoolean(CSPointer, FieldNameLc)) {
                                             SetNeeded = true;
                                         }
                                         break;
-                                    case FieldTypeIdText:
+                                    case _fieldTypeIdText:
                                         //
                                         // Set if text of value changes
                                         //
@@ -3068,8 +3068,8 @@ namespace Contensive.Processor.Controllers {
                                             }
                                         }
                                         break;
-                                    case FieldTypeIdLongText:
-                                    case FieldTypeIdHTML:
+                                    case _fieldTypeIdLongText:
+                                    case _fieldTypeIdHTML:
                                         //
                                         // Set if text of value changes
                                         //
@@ -3213,26 +3213,26 @@ namespace Contensive.Processor.Controllers {
                                 // ----- Set SQLSetPair to the name=value pair for the SQL statement
                                 //
                                 switch (field.fieldTypeId) {
-                                    case FieldTypeIdRedirect:
-                                    case FieldTypeIdManyToMany:
+                                    case _fieldTypeIdRedirect:
+                                    case _fieldTypeIdManyToMany:
                                         break;
-                                    case FieldTypeIdInteger:
-                                    case FieldTypeIdLookup:
-                                    case FieldTypeIdAutoIdIncrement:
-                                    case FieldTypeIdMemberSelect:
+                                    case _fieldTypeIdInteger:
+                                    case _fieldTypeIdLookup:
+                                    case _fieldTypeIdAutoIdIncrement:
+                                    case _fieldTypeIdMemberSelect:
                                         SQLSetPair = fieldName + "=" + encodeSQLNumber(encodeInteger(writeCacheValue));
                                         break;
-                                    case FieldTypeIdCurrency:
-                                    case FieldTypeIdFloat:
+                                    case _fieldTypeIdCurrency:
+                                    case _fieldTypeIdFloat:
                                         SQLSetPair = fieldName + "=" + encodeSQLNumber(encodeNumber(writeCacheValue));
                                         break;
-                                    case FieldTypeIdBoolean:
+                                    case _fieldTypeIdBoolean:
                                         SQLSetPair = fieldName + "=" + encodeSQLBoolean(encodeBoolean(writeCacheValue));
                                         break;
-                                    case FieldTypeIdDate:
+                                    case _fieldTypeIdDate:
                                         SQLSetPair = fieldName + "=" + encodeSQLDate(encodeDate(writeCacheValue));
                                         break;
-                                    case FieldTypeIdText:
+                                    case _fieldTypeIdText:
                                         string Copy = encodeText(writeCacheValue);
                                         if (Copy.Length > 255) {
                                             Copy = Copy.Left(255);
@@ -3242,23 +3242,23 @@ namespace Contensive.Processor.Controllers {
                                         }
                                         SQLSetPair = fieldName + "=" + encodeSQLText(Copy);
                                         break;
-                                    case FieldTypeIdLink:
-                                    case FieldTypeIdResourceLink:
-                                    case FieldTypeIdFile:
-                                    case FieldTypeIdFileImage:
-                                    case FieldTypeIdFileText:
-                                    case FieldTypeIdFileCSS:
-                                    case FieldTypeIdFileXML:
-                                    case FieldTypeIdFileJavascript:
-                                    case FieldTypeIdFileHTML:
+                                    case _fieldTypeIdLink:
+                                    case _fieldTypeIdResourceLink:
+                                    case _fieldTypeIdFile:
+                                    case _fieldTypeIdFileImage:
+                                    case _fieldTypeIdFileText:
+                                    case _fieldTypeIdFileCSS:
+                                    case _fieldTypeIdFileXML:
+                                    case _fieldTypeIdFileJavascript:
+                                    case _fieldTypeIdFileHTML:
                                         string filename = encodeText(writeCacheValue);
                                         if (filename.Length > 255) {
                                             filename = filename.Left(255);
                                         }
                                         SQLSetPair = fieldName + "=" + encodeSQLText(filename);
                                         break;
-                                    case FieldTypeIdLongText:
-                                    case FieldTypeIdHTML:
+                                    case _fieldTypeIdLongText:
+                                    case _fieldTypeIdHTML:
                                         SQLSetPair = fieldName + "=" + encodeSQLText(GenericController.encodeText(writeCacheValue));
                                         break;
                                     default:
@@ -3295,8 +3295,8 @@ namespace Contensive.Processor.Controllers {
                                             UniqueViolationFieldList += field.nameLc + "=\"" + writeCacheValueText.Left(255) + "...\"";
                                         }
                                         switch (field.fieldTypeId) {
-                                            case FieldTypeIdRedirect:
-                                            case FieldTypeIdManyToMany:
+                                            case _fieldTypeIdRedirect:
+                                            case _fieldTypeIdManyToMany:
                                                 break;
                                             default:
                                                 SQLCriteriaUnique += "(" + field.nameLc + "=" + encodeSQL(writeCacheValue, field.fieldTypeId) + ")";
@@ -3434,42 +3434,42 @@ namespace Contensive.Processor.Controllers {
         /// <param name="expression"></param>
         /// <param name="fieldType"></param>
         /// <returns></returns>
-        public string encodeSQL(object expression, int fieldType = FieldTypeIdText) {
+        public string encodeSQL(object expression, int fieldType = _fieldTypeIdText) {
             string returnResult = "";
             try {
                 switch (fieldType) {
-                    case FieldTypeIdBoolean:
+                    case _fieldTypeIdBoolean:
                         returnResult = encodeSQLBoolean(GenericController.encodeBoolean(expression));
                         break;
-                    case FieldTypeIdCurrency:
-                    case FieldTypeIdFloat:
+                    case _fieldTypeIdCurrency:
+                    case _fieldTypeIdFloat:
                         returnResult = encodeSQLNumber(GenericController.encodeNumber(expression));
                         break;
-                    case FieldTypeIdAutoIdIncrement:
-                    case FieldTypeIdInteger:
-                    case FieldTypeIdLookup:
-                    case FieldTypeIdMemberSelect:
+                    case _fieldTypeIdAutoIdIncrement:
+                    case _fieldTypeIdInteger:
+                    case _fieldTypeIdLookup:
+                    case _fieldTypeIdMemberSelect:
                         returnResult = encodeSQLNumber(GenericController.encodeInteger(expression));
                         break;
-                    case FieldTypeIdDate:
+                    case _fieldTypeIdDate:
                         returnResult = encodeSQLDate(GenericController.encodeDate(expression));
                         break;
-                    case FieldTypeIdLongText:
-                    case FieldTypeIdHTML:
+                    case _fieldTypeIdLongText:
+                    case _fieldTypeIdHTML:
                         returnResult = encodeSQLText(GenericController.encodeText(expression));
                         break;
-                    case FieldTypeIdFile:
-                    case FieldTypeIdFileImage:
-                    case FieldTypeIdLink:
-                    case FieldTypeIdResourceLink:
-                    case FieldTypeIdRedirect:
-                    case FieldTypeIdManyToMany:
-                    case FieldTypeIdText:
-                    case FieldTypeIdFileText:
-                    case FieldTypeIdFileJavascript:
-                    case FieldTypeIdFileXML:
-                    case FieldTypeIdFileCSS:
-                    case FieldTypeIdFileHTML:
+                    case _fieldTypeIdFile:
+                    case _fieldTypeIdFileImage:
+                    case _fieldTypeIdLink:
+                    case _fieldTypeIdResourceLink:
+                    case _fieldTypeIdRedirect:
+                    case _fieldTypeIdManyToMany:
+                    case _fieldTypeIdText:
+                    case _fieldTypeIdFileText:
+                    case _fieldTypeIdFileJavascript:
+                    case _fieldTypeIdFileXML:
+                    case _fieldTypeIdFileCSS:
+                    case _fieldTypeIdFileHTML:
                         returnResult = encodeSQLText(GenericController.encodeText(expression));
                         break;
                     default:
@@ -3964,73 +3964,73 @@ namespace Contensive.Processor.Controllers {
             string returnFieldTypeName = "";
             try {
                 switch (fieldType) {
-                    case FieldTypeIdBoolean:
+                    case _fieldTypeIdBoolean:
                         returnFieldTypeName = FieldTypeNameBoolean;
                         break;
-                    case FieldTypeIdCurrency:
+                    case _fieldTypeIdCurrency:
                         returnFieldTypeName = FieldTypeNameCurrency;
                         break;
-                    case FieldTypeIdDate:
+                    case _fieldTypeIdDate:
                         returnFieldTypeName = FieldTypeNameDate;
                         break;
-                    case FieldTypeIdFile:
+                    case _fieldTypeIdFile:
                         returnFieldTypeName = FieldTypeNameFile;
                         break;
-                    case FieldTypeIdFloat:
+                    case _fieldTypeIdFloat:
                         returnFieldTypeName = FieldTypeNameFloat;
                         break;
-                    case FieldTypeIdFileImage:
+                    case _fieldTypeIdFileImage:
                         returnFieldTypeName = FieldTypeNameImage;
                         break;
-                    case FieldTypeIdLink:
+                    case _fieldTypeIdLink:
                         returnFieldTypeName = FieldTypeNameLink;
                         break;
-                    case FieldTypeIdResourceLink:
+                    case _fieldTypeIdResourceLink:
                         returnFieldTypeName = FieldTypeNameResourceLink;
                         break;
-                    case FieldTypeIdInteger:
+                    case _fieldTypeIdInteger:
                         returnFieldTypeName = FieldTypeNameInteger;
                         break;
-                    case FieldTypeIdLongText:
+                    case _fieldTypeIdLongText:
                         returnFieldTypeName = FieldTypeNameLongText;
                         break;
-                    case FieldTypeIdLookup:
+                    case _fieldTypeIdLookup:
                         returnFieldTypeName = FieldTypeNameLookup;
                         break;
-                    case FieldTypeIdMemberSelect:
+                    case _fieldTypeIdMemberSelect:
                         returnFieldTypeName = FieldTypeNameMemberSelect;
                         break;
-                    case FieldTypeIdRedirect:
+                    case _fieldTypeIdRedirect:
                         returnFieldTypeName = FieldTypeNameRedirect;
                         break;
-                    case FieldTypeIdManyToMany:
+                    case _fieldTypeIdManyToMany:
                         returnFieldTypeName = FieldTypeNameManyToMany;
                         break;
-                    case FieldTypeIdFileText:
+                    case _fieldTypeIdFileText:
                         returnFieldTypeName = FieldTypeNameTextFile;
                         break;
-                    case FieldTypeIdFileCSS:
+                    case _fieldTypeIdFileCSS:
                         returnFieldTypeName = FieldTypeNameCSSFile;
                         break;
-                    case FieldTypeIdFileXML:
+                    case _fieldTypeIdFileXML:
                         returnFieldTypeName = FieldTypeNameXMLFile;
                         break;
-                    case FieldTypeIdFileJavascript:
+                    case _fieldTypeIdFileJavascript:
                         returnFieldTypeName = FieldTypeNameJavascriptFile;
                         break;
-                    case FieldTypeIdText:
+                    case _fieldTypeIdText:
                         returnFieldTypeName = FieldTypeNameText;
                         break;
-                    case FieldTypeIdHTML:
+                    case _fieldTypeIdHTML:
                         returnFieldTypeName = FieldTypeNameHTML;
                         break;
-                    case FieldTypeIdFileHTML:
+                    case _fieldTypeIdFileHTML:
                         returnFieldTypeName = FieldTypeNameHTMLFile;
                         break;
                     default:
-                        if (fieldType == FieldTypeIdAutoIdIncrement) {
+                        if (fieldType == fieldTypeIdAutoIdIncrement) {
                             returnFieldTypeName = "AutoIncrement";
-                        } else if (fieldType == FieldTypeIdMemberSelect) {
+                        } else if (fieldType == fieldTypeIdMemberSelect) {
                             returnFieldTypeName = "MemberSelect";
                         } else {
                             //
@@ -4413,7 +4413,7 @@ namespace Contensive.Processor.Controllers {
                     case "ACTIVE":
                         field.caption = "Active";
                         field.editSortPriority = 200;
-                        field.fieldTypeId = FieldTypeIdBoolean;
+                        field.fieldTypeId = fieldTypeIdBoolean;
                         field.defaultValue = "1";
                         break;
                     case "DATEADDED":
@@ -4423,7 +4423,7 @@ namespace Contensive.Processor.Controllers {
                         break;
                     case "CREATEDBY":
                         field.caption = "Created By";
-                        field.fieldTypeId = FieldTypeIdLookup;
+                        field.fieldTypeId = fieldTypeIdLookup;
                         field.set_lookupContentName(core, "Members");
                         field.readOnly = true;
                         field.editSortPriority = 5030;
@@ -4435,7 +4435,7 @@ namespace Contensive.Processor.Controllers {
                         break;
                     case "MODIFIEDBY":
                         field.caption = "Modified By";
-                        field.fieldTypeId = FieldTypeIdLookup;
+                        field.fieldTypeId = fieldTypeIdLookup;
                         field.set_lookupContentName(core, "Members");
                         field.readOnly = true;
                         field.editSortPriority = 5050;
@@ -4450,7 +4450,7 @@ namespace Contensive.Processor.Controllers {
                         break;
                     case "CONTENTCONTROLID":
                         field.caption = "Content Definition";
-                        field.fieldTypeId = FieldTypeIdLookup;
+                        field.fieldTypeId = fieldTypeIdLookup;
                         field.set_lookupContentName(core, "Content");
                         field.editSortPriority = 5070;
                         field.authorable = true;
@@ -4486,7 +4486,7 @@ namespace Contensive.Processor.Controllers {
                         break;
                     case "ORGANIZATIONID":
                         field.caption = "Organization";
-                        field.fieldTypeId = FieldTypeIdLookup;
+                        field.fieldTypeId = fieldTypeIdLookup;
                         field.set_lookupContentName(core, "Organizations");
                         field.editSortPriority = 2005;
                         field.authorable = true;
@@ -4494,30 +4494,30 @@ namespace Contensive.Processor.Controllers {
                         break;
                     case "COPYFILENAME":
                         field.caption = "Copy";
-                        field.fieldTypeId = FieldTypeIdFileHTML;
+                        field.fieldTypeId = fieldTypeIdFileHTML;
                         field.textBuffered = true;
                         field.editSortPriority = 2010;
                         break;
                     case "BRIEFFILENAME":
                         field.caption = "Overview";
-                        field.fieldTypeId = FieldTypeIdFileHTML;
+                        field.fieldTypeId = fieldTypeIdFileHTML;
                         field.textBuffered = true;
                         field.editSortPriority = 2020;
                         field.htmlContent = false;
                         break;
                     case "IMAGEFILENAME":
                         field.caption = "Image";
-                        field.fieldTypeId = FieldTypeIdFile;
+                        field.fieldTypeId = fieldTypeIdFile;
                         field.editSortPriority = 2040;
                         break;
                     case "THUMBNAILFILENAME":
                         field.caption = "Thumbnail";
-                        field.fieldTypeId = FieldTypeIdFile;
+                        field.fieldTypeId = fieldTypeIdFile;
                         field.editSortPriority = 2050;
                         break;
                     case "CONTENTID":
                         field.caption = "Content";
-                        field.fieldTypeId = FieldTypeIdLookup;
+                        field.fieldTypeId = fieldTypeIdLookup;
                         field.set_lookupContentName(core, "Content");
                         field.readOnly = false;
                         field.editSortPriority = 2060;
@@ -4527,21 +4527,21 @@ namespace Contensive.Processor.Controllers {
                         break;
                     case "PARENTID":
                         field.caption = "Parent";
-                        field.fieldTypeId = FieldTypeIdLookup;
+                        field.fieldTypeId = fieldTypeIdLookup;
                         field.set_lookupContentName(core, ContentName);
                         field.readOnly = false;
                         field.editSortPriority = 3000;
                         break;
                     case "MEMBERID":
                         field.caption = "Member";
-                        field.fieldTypeId = FieldTypeIdLookup;
+                        field.fieldTypeId = fieldTypeIdLookup;
                         field.set_lookupContentName(core, "Members");
                         field.readOnly = false;
                         field.editSortPriority = 3005;
                         break;
                     case "CONTACTMEMBERID":
                         field.caption = "Contact";
-                        field.fieldTypeId = FieldTypeIdLookup;
+                        field.fieldTypeId = fieldTypeIdLookup;
                         field.set_lookupContentName(core, "Members");
                         field.readOnly = false;
                         field.editSortPriority = 3010;
@@ -4952,27 +4952,27 @@ namespace Contensive.Processor.Controllers {
                     LocalRequestName = FieldName;
                 }
                 switch (core.db.csGetFieldTypeId(CSPointer, FieldName)) {
-                    case FieldTypeIdBoolean:
+                    case _fieldTypeIdBoolean:
                         //
                         // -- Boolean
                         core.db.csSet(CSPointer, FieldName, core.docProperties.getBoolean(LocalRequestName));
                         break;
-                    case FieldTypeIdCurrency:
-                    case FieldTypeIdFloat:
-                    case FieldTypeIdInteger:
-                    case FieldTypeIdLookup:
-                    case FieldTypeIdManyToMany:
+                    case _fieldTypeIdCurrency:
+                    case _fieldTypeIdFloat:
+                    case _fieldTypeIdInteger:
+                    case _fieldTypeIdLookup:
+                    case _fieldTypeIdManyToMany:
                         //
                         // -- Numbers
                         core.db.csSet(CSPointer, FieldName, core.docProperties.getNumber(LocalRequestName));
                         break;
-                    case FieldTypeIdDate:
+                    case _fieldTypeIdDate:
                         //
                         // -- Date
                         core.db.csSet(CSPointer, FieldName, core.docProperties.getDate(LocalRequestName));
                         break;
-                    case FieldTypeIdFile:
-                    case FieldTypeIdFileImage:
+                    case _fieldTypeIdFile:
+                    case _fieldTypeIdFileImage:
                         //
                         // -- upload file
                         Filename = core.docProperties.getText(LocalRequestName);

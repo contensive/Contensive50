@@ -604,7 +604,7 @@ namespace Contensive.Processor.Controllers {
                                 field = new Models.Domain.CDefFieldModel {
                                     nameLc = "id",
                                     active = true,
-                                    fieldTypeId = FieldTypeIdAutoIdIncrement,
+                                    fieldTypeId = fieldTypeIdAutoIdIncrement,
                                     editSortPriority = 100,
                                     authorable = false,
                                     caption = "ID",
@@ -618,7 +618,7 @@ namespace Contensive.Processor.Controllers {
                                 field = new Models.Domain.CDefFieldModel {
                                     nameLc = "name",
                                     active = true,
-                                    fieldTypeId = FieldTypeIdText,
+                                    fieldTypeId = fieldTypeIdText,
                                     editSortPriority = 110,
                                     authorable = true,
                                     caption = "Name",
@@ -632,7 +632,7 @@ namespace Contensive.Processor.Controllers {
                                 field = new Models.Domain.CDefFieldModel {
                                     nameLc = "active",
                                     active = true,
-                                    fieldTypeId = FieldTypeIdBoolean,
+                                    fieldTypeId = fieldTypeIdBoolean,
                                     editSortPriority = 200,
                                     authorable = true,
                                     caption = "Active",
@@ -646,7 +646,7 @@ namespace Contensive.Processor.Controllers {
                                 field = new Models.Domain.CDefFieldModel {
                                     nameLc = "sortorder",
                                     active = true,
-                                    fieldTypeId = FieldTypeIdText,
+                                    fieldTypeId = fieldTypeIdText,
                                     editSortPriority = 2000,
                                     authorable = false,
                                     caption = "Alpha Sort Order",
@@ -660,7 +660,7 @@ namespace Contensive.Processor.Controllers {
                                 field = new Models.Domain.CDefFieldModel {
                                     nameLc = "dateadded",
                                     active = true,
-                                    fieldTypeId = FieldTypeIdDate,
+                                    fieldTypeId = fieldTypeIdDate,
                                     editSortPriority = 9999,
                                     authorable = false,
                                     caption = "Date Added",
@@ -673,7 +673,7 @@ namespace Contensive.Processor.Controllers {
                                 field = new Models.Domain.CDefFieldModel {
                                     nameLc = "createdby",
                                     active = true,
-                                    fieldTypeId = FieldTypeIdLookup,
+                                    fieldTypeId = fieldTypeIdLookup,
                                     editSortPriority = 9999,
                                     authorable = false,
                                     caption = "Created By"
@@ -687,7 +687,7 @@ namespace Contensive.Processor.Controllers {
                                 field = new Models.Domain.CDefFieldModel {
                                     nameLc = "modifieddate",
                                     active = true,
-                                    fieldTypeId = FieldTypeIdDate,
+                                    fieldTypeId = fieldTypeIdDate,
                                     editSortPriority = 9999,
                                     authorable = false,
                                     caption = "Date Modified",
@@ -700,7 +700,7 @@ namespace Contensive.Processor.Controllers {
                                 field = new Models.Domain.CDefFieldModel {
                                     nameLc = "modifiedby",
                                     active = true,
-                                    fieldTypeId = FieldTypeIdLookup,
+                                    fieldTypeId = fieldTypeIdLookup,
                                     editSortPriority = 9999,
                                     authorable = false,
                                     caption = "Modified By"
@@ -714,7 +714,7 @@ namespace Contensive.Processor.Controllers {
                                 field = new Models.Domain.CDefFieldModel {
                                     nameLc = "contentcontrolid",
                                     active = true,
-                                    fieldTypeId = FieldTypeIdLookup,
+                                    fieldTypeId = fieldTypeIdLookup,
                                     editSortPriority = 9999,
                                     authorable = false,
                                     caption = "Controlling Content"
@@ -728,7 +728,7 @@ namespace Contensive.Processor.Controllers {
                                 field = new Models.Domain.CDefFieldModel {
                                     nameLc = "createkey",
                                     active = true,
-                                    fieldTypeId = FieldTypeIdInteger,
+                                    fieldTypeId = fieldTypeIdInteger,
                                     editSortPriority = 9999,
                                     authorable = false,
                                     caption = "Create Key",
@@ -741,7 +741,7 @@ namespace Contensive.Processor.Controllers {
                                 field = new Models.Domain.CDefFieldModel {
                                     nameLc = "ccguid",
                                     active = true,
-                                    fieldTypeId = FieldTypeIdText,
+                                    fieldTypeId = fieldTypeIdText,
                                     editSortPriority = 9999,
                                     authorable = false,
                                     caption = "Guid",
@@ -755,7 +755,7 @@ namespace Contensive.Processor.Controllers {
                                 field = new Models.Domain.CDefFieldModel {
                                     nameLc = "contentcategoryid",
                                     active = true,
-                                    fieldTypeId = FieldTypeIdInteger,
+                                    fieldTypeId = fieldTypeIdInteger,
                                     editSortPriority = 9999,
                                     authorable = false,
                                     caption = "Content Category",
@@ -844,10 +844,10 @@ namespace Contensive.Processor.Controllers {
                         }
                         //
                         // Create or update the Table Field
-                        if (field.fieldTypeId == FieldTypeIdRedirect) {
+                        if (field.fieldTypeId == fieldTypeIdRedirect) {
                             //
                             // Redirect Field
-                        } else if (field.fieldTypeId == FieldTypeIdManyToMany) {
+                        } else if (field.fieldTypeId == fieldTypeIdManyToMany) {
                             //
                             // ManyToMany Field
                         } else {
@@ -894,7 +894,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // -- conditional fields
                         switch (field.fieldTypeId) {
-                            case FieldTypeIdLookup:
+                            case _fieldTypeIdLookup:
                                 //
                                 // -- lookup field
                                 //
@@ -906,7 +906,7 @@ namespace Contensive.Processor.Controllers {
                                 }
                                 sqlList.add("LOOKUPCONTENTID", core.db.encodeSQLNumber(LookupContentID));
                                 break;
-                            case FieldTypeIdManyToMany:
+                            case _fieldTypeIdManyToMany:
                                 //
                                 // -- many-to-many field
                                 //
@@ -930,7 +930,7 @@ namespace Contensive.Processor.Controllers {
                                 sqlList.add("MANYTOMANYRULEPRIMARYFIELD", core.db.encodeSQLText(field.ManyToManyRulePrimaryField));
                                 sqlList.add("MANYTOMANYRULESECONDARYFIELD", core.db.encodeSQLText(field.ManyToManyRuleSecondaryField));
                                 break;
-                            case FieldTypeIdRedirect:
+                            case _fieldTypeIdRedirect:
                                 //
                                 // -- redirect field
                                 if (!string.IsNullOrEmpty(RedirectContentName)) {

@@ -1339,16 +1339,16 @@ namespace Contensive.Processor.Controllers {
                 idFilename = recordID.ToString().PadLeft(12, '0');
             }
             switch (fieldType) {
-                case FieldTypeIdFileCSS:
+                case _fieldTypeIdFileCSS:
                     result = getVirtualTableFieldUnixPath(tableName, fieldName) + idFilename + ".css";
                     break;
-                case FieldTypeIdFileXML:
+                case _fieldTypeIdFileXML:
                     result = getVirtualTableFieldUnixPath(tableName, fieldName) + idFilename + ".xml";
                     break;
-                case FieldTypeIdFileJavascript:
+                case _fieldTypeIdFileJavascript:
                     result = getVirtualTableFieldUnixPath(tableName, fieldName) + idFilename + ".js";
                     break;
-                case FieldTypeIdFileHTML:
+                case _fieldTypeIdFileHTML:
                     result = getVirtualTableFieldUnixPath(tableName, fieldName) + idFilename + ".html";
                     break;
                 default:

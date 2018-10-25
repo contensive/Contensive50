@@ -818,26 +818,26 @@ namespace Contensive.Addons.AdminSite {
                     //    End If
                     if (field.active & !GenericController.IsNull(defaultValue)) {
                         switch (field.fieldTypeId) {
-                            case FieldTypeIdInteger:
-                            case FieldTypeIdAutoIdIncrement:
-                            case FieldTypeIdMemberSelect:
+                            case _fieldTypeIdInteger:
+                            case _fieldTypeIdAutoIdIncrement:
+                            case _fieldTypeIdMemberSelect:
                                 //
                                 editRecord.fieldsLc[field.nameLc].value = GenericController.encodeInteger(defaultValue);
                                 break;
-                            case FieldTypeIdCurrency:
-                            case FieldTypeIdFloat:
+                            case _fieldTypeIdCurrency:
+                            case _fieldTypeIdFloat:
                                 //
                                 editRecord.fieldsLc[field.nameLc].value = GenericController.encodeNumber(defaultValue);
                                 break;
-                            case FieldTypeIdBoolean:
+                            case _fieldTypeIdBoolean:
                                 //
                                 editRecord.fieldsLc[field.nameLc].value = GenericController.encodeBoolean(defaultValue);
                                 break;
-                            case FieldTypeIdDate:
+                            case _fieldTypeIdDate:
                                 //
                                 editRecord.fieldsLc[field.nameLc].value = GenericController.encodeDate(defaultValue);
                                 break;
-                            case FieldTypeIdLookup:
+                            case _fieldTypeIdLookup:
 
                                 DefaultValueText = GenericController.encodeText(field.defaultValue);
                                 if (!string.IsNullOrEmpty(DefaultValueText)) {
@@ -916,26 +916,26 @@ namespace Contensive.Addons.AdminSite {
                     DefaultValueText = getWherePairValue(field.nameLc);
                     if (field.active & (!string.IsNullOrEmpty(DefaultValueText))) {
                         switch (field.fieldTypeId) {
-                            case FieldTypeIdInteger:
-                            case FieldTypeIdLookup:
-                            case FieldTypeIdAutoIdIncrement:
+                            case _fieldTypeIdInteger:
+                            case _fieldTypeIdLookup:
+                            case _fieldTypeIdAutoIdIncrement:
                                 //
                                 editRecord.fieldsLc[field.nameLc].value = GenericController.encodeInteger(DefaultValueText);
                                 break;
-                            case FieldTypeIdCurrency:
-                            case FieldTypeIdFloat:
+                            case _fieldTypeIdCurrency:
+                            case _fieldTypeIdFloat:
                                 //
                                 editRecord.fieldsLc[field.nameLc].value = GenericController.encodeNumber(DefaultValueText);
                                 break;
-                            case FieldTypeIdBoolean:
+                            case _fieldTypeIdBoolean:
                                 //
                                 editRecord.fieldsLc[field.nameLc].value = GenericController.encodeBoolean(DefaultValueText);
                                 break;
-                            case FieldTypeIdDate:
+                            case _fieldTypeIdDate:
                                 //
                                 editRecord.fieldsLc[field.nameLc].value = GenericController.encodeDate(DefaultValueText);
                                 break;
-                            case FieldTypeIdManyToMany:
+                            case _fieldTypeIdManyToMany:
                                 //
                                 // Many to Many can capture a list of ID values representing the 'secondary' values in the Many-To-Many Rules table
                                 //
@@ -1062,15 +1062,15 @@ namespace Contensive.Addons.AdminSite {
                             // Load the current Database value
                             //
                             switch (adminContentcontent.fieldTypeId) {
-                                case FieldTypeIdRedirect:
-                                case FieldTypeIdManyToMany:
+                                case _fieldTypeIdRedirect:
+                                case _fieldTypeIdManyToMany:
                                     DBValueVariant = "";
                                     break;
-                                case FieldTypeIdFileText:
-                                case FieldTypeIdFileCSS:
-                                case FieldTypeIdFileXML:
-                                case FieldTypeIdFileJavascript:
-                                case FieldTypeIdFileHTML:
+                                case _fieldTypeIdFileText:
+                                case _fieldTypeIdFileCSS:
+                                case _fieldTypeIdFileXML:
+                                case _fieldTypeIdFileJavascript:
+                                case _fieldTypeIdFileHTML:
                                     DBValueVariant = core.db.csGet(CSPointer, adminContentcontent.nameLc);
                                     break;
                                 default:
@@ -1381,7 +1381,7 @@ namespace Contensive.Addons.AdminSite {
                                 // Is blocked from authoring, leave current value
                                 //
                                 ResponseFieldValueIsOKToSave = false;
-                            } else if ((field.fieldTypeId == FieldTypeIdAutoIdIncrement) || (field.fieldTypeId == FieldTypeIdRedirect) || (field.fieldTypeId == FieldTypeIdManyToMany)) {
+                            } else if ((field.fieldTypeId == fieldTypeIdAutoIdIncrement) || (field.fieldTypeId == fieldTypeIdRedirect) || (field.fieldTypeId == fieldTypeIdManyToMany)) {
                                 //
                                 // These fields types have no values to load, leave current value
                                 // (many to many is handled during save)
@@ -1418,7 +1418,7 @@ namespace Contensive.Addons.AdminSite {
                                 // Test input value for valid data
                                 //
                                 switch (field.fieldTypeId) {
-                                    case FieldTypeIdInteger:
+                                    case _fieldTypeIdInteger:
                                         //
                                         // ----- Integer
                                         //
@@ -1432,8 +1432,8 @@ namespace Contensive.Addons.AdminSite {
                                             }
                                         }
                                         break;
-                                    case FieldTypeIdCurrency:
-                                    case FieldTypeIdFloat:
+                                    case _fieldTypeIdCurrency:
+                                    case _fieldTypeIdFloat:
                                         //
                                         // ----- Floating point number
                                         //
@@ -1447,7 +1447,7 @@ namespace Contensive.Addons.AdminSite {
                                             }
                                         }
                                         break;
-                                    case FieldTypeIdLookup:
+                                    case _fieldTypeIdLookup:
                                         //
                                         // ----- Must be a recordID
                                         //
@@ -1461,7 +1461,7 @@ namespace Contensive.Addons.AdminSite {
                                             }
                                         }
                                         break;
-                                    case FieldTypeIdDate:
+                                    case _fieldTypeIdDate:
                                         //
                                         // ----- Must be a Date value
                                         //
@@ -1474,13 +1474,13 @@ namespace Contensive.Addons.AdminSite {
                                         }
                                         //End Case
                                         break;
-                                    case FieldTypeIdBoolean:
+                                    case _fieldTypeIdBoolean:
                                         //
                                         // ----- translate to boolean
                                         //
                                         ResponseFieldValueText = GenericController.encodeBoolean(ResponseFieldValueText).ToString();
                                         break;
-                                    case FieldTypeIdLink:
+                                    case _fieldTypeIdLink:
                                         //
                                         // ----- Link field - if it starts with 'www.', add the http:// automatically
                                         //
@@ -1489,8 +1489,8 @@ namespace Contensive.Addons.AdminSite {
                                             ResponseFieldValueText = "http//" + ResponseFieldValueText;
                                         }
                                         break;
-                                    case FieldTypeIdHTML:
-                                    case FieldTypeIdFileHTML:
+                                    case _fieldTypeIdHTML:
+                                    case _fieldTypeIdFileHTML:
                                         //
                                         // ----- Html fields
                                         //
