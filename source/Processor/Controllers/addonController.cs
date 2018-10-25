@@ -947,7 +947,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // ----- Display Form
                                 //
-                                Content.Add(AdminUIController.editTableOpen);
+                                //Content.Add(AdminUIController.editTableOpen);
                                 Name = xml_GetAttribute(IsFound, Doc.DocumentElement, "name", "");
                                 foreach (XmlNode SettingNode in Doc.DocumentElement.ChildNodes) {
                                     switch (GenericController.vbLCase(SettingNode.Name)) {
@@ -1368,7 +1368,7 @@ namespace Contensive.Processor.Controllers {
                                                         break;
                                                 }
                                             }
-                                            Copy = AdminUIController.getEditPanel(core, true, TabHeading, TabDescription, AdminUIController.editTableOpen + TabCell.Text + AdminUIController.editTableClose);
+                                            Copy = AdminUIController.getEditPanel(core, true, TabHeading, TabDescription, AdminUIController.editTable( TabCell.Text ));
                                             if (!string.IsNullOrEmpty(Copy)) {
                                                 adminMenu.menuLiveTab.AddEntry(TabName.Replace(" ", "&nbsp;"), Copy, "ccAdminTab");
                                             }

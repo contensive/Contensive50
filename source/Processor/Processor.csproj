@@ -328,6 +328,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Addons\AdminSite\Resources\GroupRuleEditorRow2.html" />
     <Content Include="Addons\AdminSite\Resources\GroupRuleEditorRow.html" />
     <Content Include="aoBase5.xml">
       <SubType>Designer</SubType>

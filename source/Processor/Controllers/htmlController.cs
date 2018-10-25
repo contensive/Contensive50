@@ -916,19 +916,21 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static string inputText( CoreController core, string htmlName, string defaultValue, int heightRows = 1, int widthCharacters = 20, string htmlId = "", bool passwordField = false, bool readOnly = false, string htmlClass = "", int maxLength = -1, bool disabled = false ) {
+        public static string inputText( CoreController core, string htmlName, string defaultValue, int heightRows = 1, int widthCharacters = 20, string htmlId = "", bool passwordField = false, bool readOnly = false, string htmlClass = "", int maxLength = -1, bool disabled = false, string placeholder = "" ) {
             string result = "";
             try {
                 if ((heightRows>1) & !passwordField) {
                     result = inputTextarea(core, htmlName, defaultValue, heightRows, widthCharacters, htmlId, true, readOnly, htmlClass, disabled, maxLength);
                 } else {
                     defaultValue = HtmlController.encodeHtml(defaultValue);
+                    // todo replace concat with stringbuilder
                     string attrList = " name=\"" + htmlName + "\"";
                     attrList += (string.IsNullOrEmpty(htmlId)) ? "" : " id=\"" + htmlId + "\"";
                     attrList += (string.IsNullOrEmpty(htmlClass)) ? "" : " class=\"" + htmlClass + "\"";
                     attrList += (!readOnly) ? "" : " readonly";
                     attrList += (!disabled) ? "" : " disabled";
                     attrList += (maxLength <= 0) ? "" : " maxlength=" + maxLength.ToString();
+                    attrList += (string.IsNullOrEmpty(placeholder)) ? "" : " placeholder=\"" + placeholder + "\"";
                     if (passwordField) {
                         attrList += (widthCharacters <= 0) ? " size=\"" + core.siteProperties.defaultFormInputWidth.ToString() + "\"" : " size=\"" + widthCharacters.ToString() + "\"";
                         result = "<input type=\"password\" value=\"" + defaultValue + "\"" + attrList + ">";

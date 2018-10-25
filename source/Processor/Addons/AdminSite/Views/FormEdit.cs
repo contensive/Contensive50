@@ -1540,7 +1540,7 @@ namespace Contensive.Addons.AdminSite {
                         fieldCaption = "Content Fields - " + EditTab;
                     }
                     adminData.EditSectionPanelCount = adminData.EditSectionPanelCount + 1;
-                    returnHtml = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), fieldCaption, "", AdminUIController.editTableOpen + resultBody.Text + AdminUIController.editTableClose);
+                    returnHtml = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), fieldCaption, "", AdminUIController.editTable( resultBody.Text ));
                     adminData.EditSectionPanelCount = adminData.EditSectionPanelCount + 1;
                     resultBody = null;
                 }
@@ -1894,7 +1894,7 @@ namespace Contensive.Addons.AdminSite {
                 //Call FastString.Add(adminUIController.EditTableClose)
                 //Call core.main_PrintPanelBottom("ccPanel", "ccPanelShadow", "ccPanelHilite", "100%", 5)
                 //
-                tempGetForm_Edit_GroupRules = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), "Authoring Permissions", "The following groups can edit this content.", AdminUIController.editTableOpen + FastString.Text + AdminUIController.editTableClose);
+                tempGetForm_Edit_GroupRules = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), "Authoring Permissions", "The following groups can edit this content.", AdminUIController.editTable( FastString.Text ));
                 adminData.EditSectionPanelCount = adminData.EditSectionPanelCount + 1;
                 FastString = null;
             } catch (Exception ex) {

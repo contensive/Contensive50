@@ -485,27 +485,42 @@ namespace Contensive.Processor {
         }
         //
         //====================================================================================================
-        // Edit Table Open
-        public static string editTableOpen {
-            get {
-                return "<table border=0 cellpadding=3 cellspacing=0 width=\"100%\">";
-            }
-        }
-        //
-        //====================================================================================================
-        // Edit Table Close
-        public static string editTableClose {
-            get {
-                string tempEditTableClose = null;
-                tempEditTableClose = "<tr>"
-                    + "<td width=20%><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"100%\" height=1 ></td>"
-                    + "<td width=80%><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"100%\" height=1 ></td>"
+        // Edit Table
+        public static string editTable( string innerHtml ) {
+            return ""
+                + "<table border=0 cellpadding=3 cellspacing=0 width=\"100%\">" 
+                    + innerHtml
+                    + "<tr>"
+                        + "<td width=20%><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"100%\" height=1 ></td>"
+                        + "<td width=80%><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"100%\" height=1 ></td>"
                     + "</tr>"
-                    + "</table>";
-                return tempEditTableClose;
-            }
-
+                + "</table>"; 
         }
+        ////
+        ////====================================================================================================
+        //// Edit Table Open
+        //[Obsolete("use editTable",true)]
+        //public static string editTableOpen {
+        //    get {
+        //        return "<table border=0 cellpadding=3 cellspacing=0 width=\"100%\">";
+        //    }
+        //}
+        ////
+        ////====================================================================================================
+        //// Edit Table Close
+        //[Obsolete("", true)]
+        //public static string editTableClose {
+        //    get {
+        //        string tempEditTableClose = null;
+        //        tempEditTableClose = "<tr>"
+        //            + "<td width=20%><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"100%\" height=1 ></td>"
+        //            + "<td width=80%><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"100%\" height=1 ></td>"
+        //            + "</tr>"
+        //            + "</table>";
+        //        return tempEditTableClose;
+        //    }
+
+        //}
         //
         //====================================================================================================
         private static string getReport_Cell(CoreController core, string Copy, string Align, int Columns, int RowPointer) {
@@ -837,16 +852,24 @@ namespace Contensive.Processor {
         //
         public static string getButtonPrimary(string buttonValue, string onclick = "", bool disabled = false, string htmlId = "", string htmlName = "button") {
             return HtmlController.getHtmlInputSubmit(buttonValue, htmlName, htmlId, onclick, disabled, "btn btn-primary mr-1 btn-sm");
-            // string htmlClass = "btn btn-primary mr-1 btn-sm btn-sm";
-            // string button = "<input type=submit name=button value=\"" + buttonValue + "\" id=\"" + htmlId + "\"OnClick=\"" + onclick + "\" class=\"" + htmlClass + "\">";
         }
         //
         // ====================================================================================================
         //
         public static string getButtonDanger(string buttonValue, string onclick = "", bool disabled = false, string htmlId = "") {
             return HtmlController.getHtmlInputSubmit(buttonValue, "button", htmlId, onclick, disabled, "btn btn-danger mr-1 btn-sm");
-            // string htmlClass = "btn btn-primary mr-1 btn-sm btn-sm";
-            // string button = "<input type=submit name=button value=\"" + buttonValue + "\" id=\"" + htmlId + "\"OnClick=\"" + onclick + "\" class=\"" + htmlClass + "\">";
+        }
+        //
+        // ====================================================================================================
+        //
+        public static string getButtonPrimaryAnchor(string buttonCaption, string href) {
+            return HtmlController.a(buttonCaption, href, "btn btn-primary mr-1 btn-sm");
+        }
+        //
+        // ====================================================================================================
+        //
+        public static string getButtonDangerAnchor(string buttonCaption, string href) {
+            return HtmlController.a(buttonCaption, href, "btn btn-danger mr-1 btn-sm");
         }
         //
         // ====================================================================================================

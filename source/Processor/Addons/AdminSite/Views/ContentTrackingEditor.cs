@@ -135,7 +135,9 @@ namespace Contensive.Addons.AdminSite {
                         // ----- close the panel
                         //
                         string s = ""
-                        + AdminUIController.editTableOpen + FastString.Text + AdminUIController.editTableClose + HtmlController.inputHidden("WhatsNewResponse", "-1") + HtmlController.inputHidden("contentwatchrecordid", adminData.ContentWatchRecordID.ToString());
+                            + AdminUIController.editTable(FastString.Text) 
+                            + HtmlController.inputHidden("WhatsNewResponse", "-1") 
+                            + HtmlController.inputHidden("contentwatchrecordid", adminData.ContentWatchRecordID.ToString());
                         tempGetForm_Edit_ContentTracking = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), "Content Tracking", "Include in Content Watch Lists", s);
                         adminData.EditSectionPanelCount = adminData.EditSectionPanelCount + 1;
                         //

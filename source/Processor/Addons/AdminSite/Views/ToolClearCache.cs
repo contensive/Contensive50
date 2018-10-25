@@ -36,10 +36,6 @@ namespace Contensive.Addons.AdminSite {
                     ButtonList = Processor.constants.ButtonCancel;
                     Content.Add(AdminUIController.getFormBodyAdminOnly());
                 } else {
-                    Content.Add(AdminUIController.editTableOpen);
-                    //
-                    // Set defaults
-                    //
                     //
                     // Process Requests
                     //
@@ -65,7 +61,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // Close Tables
                     //
-                    Content.Add(AdminUIController.editTableClose);
+                    Content.Add(AdminUIController.editTable("<p>Click OK or Apply to invalidate all local and remote cache data.</p>"));
                     Content.Add(HtmlController.inputHidden(Processor.constants.rnAdminSourceForm, Processor.constants.AdminFormClearCache));
                 }
                 //

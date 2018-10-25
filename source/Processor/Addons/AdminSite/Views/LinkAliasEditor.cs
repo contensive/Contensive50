@@ -93,7 +93,7 @@ namespace Contensive.Addons.AdminSite {
                         f.Add(LinkList);
                         f.Add("</span></td></tr>");
                     }
-                    tabContent = AdminUIController.editTableOpen + f.Text + AdminUIController.editTableClose;
+                    tabContent = AdminUIController.editTable( f.Text );
                 }
                 //
                 tempGetForm_Edit_LinkAliases = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), "Link Aliases", TabDescription, tabContent);

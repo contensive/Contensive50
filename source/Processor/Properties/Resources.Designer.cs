@@ -171,19 +171,43 @@ namespace Contensive.Processor.Properties {
         
         /// <summary>
         ///   Looks up a localized string similar to &lt;tr&gt;
-        ///    &lt;td class=&quot;ccAdminEditCaption&quot;&gt;
-        ///        &lt;span class=&quot;ccAdminSmall&quot;&gt;{{rowCaption}}&lt;/span&gt;
-        ///    &lt;/td&gt;
+        ///    &lt;td class=&quot;ccAdminEditCaption&quot;&gt;{{rowCaption}}&lt;/td&gt;
         ///    &lt;td class=&quot;ccAdminEditField&quot;&gt;
         ///        &lt;table border=&quot;0&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; width=&quot;100%&quot;&gt;
         ///            &lt;tbody&gt;
         ///                &lt;tr&gt;
-        ///                    &lt;td width=&quot;40%&quot;&gt;&lt;input type=&quot;hidden&quot; name=&quot;{{hiddenId}}&quot; value=&quot;{{hiddenValue}}&quot;&gt;&lt;input type=&quot;checkbox&quot; name=&quot;{{checkboxName}}&quot; value=&quot;1&quot; {{checkboxChecked}}&gt;Site Managers&lt;/td&gt;
-        ///                    &lt;td width=&quot;30%&quot;&gt;Expires&lt;input t [rest of string was truncated]&quot;;.
+        ///                    &lt;td width=&quot;40%&quot;&gt;{{{checkboxInput}}}{{groupCaption}}&lt;/td&gt;
+        ///                    &lt;td width=&quot;30%&quot;&gt;Expires{{{expiresInput}}}&lt;/td&gt;
+        ///                    &lt;td width=&quot;30%&quot;&gt;{{{relatedButtonList}}}{{{idHidden}}}&lt;/td&gt;
+        ///                &lt;/tr&gt;
+        ///            &lt;/tbody&gt;
+        ///        &lt;/table&gt;
+        ///    &lt;/td&gt;        /// [rest of string was truncated]&quot;;.
         /// </summary>
         public static string GroupRuleEditorRow {
             get {
                 return ResourceManager.GetString("GroupRuleEditorRow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;tr&gt;
+        ///    &lt;td class=&quot;ccAdminEditCaption&quot;&gt;{{rowCaption}}&lt;/td&gt;
+        ///    &lt;td class=&quot;ccAdminEditField&quot;&gt;
+        ///        &lt;table border=&quot;0&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; width=&quot;100%&quot;&gt;
+        ///            &lt;tbody&gt;
+        ///                &lt;tr&gt;
+        ///                    &lt;td width=&quot;40%&quot;&gt;{{{checkboxInput}}}{{groupCaption}}&lt;/td&gt;
+        ///                    &lt;td width=&quot;30%&quot;&gt;Expires{{{expiresInput}}}&lt;/td&gt;
+        ///                    &lt;td width=&quot;30%&quot;&gt;{{{relatedButtonList}}}{{{idHidden}}}&lt;/td&gt;
+        ///                &lt;/tr&gt;
+        ///            &lt;/tbody&gt;
+        ///        &lt;/table&gt;
+        ///    &lt;/td&gt;        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string GroupRuleEditorRow2 {
+            get {
+                return ResourceManager.GetString("GroupRuleEditorRow2", resourceCulture);
             }
         }
     }

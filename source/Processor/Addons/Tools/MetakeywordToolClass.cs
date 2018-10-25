@@ -56,7 +56,6 @@ namespace Contensive.Addons.Tools {
                     ButtonList = ButtonCancel;
                     Content.Add(AdminUIController.getFormBodyAdminOnly());
                 } else {
-                    Content.Add(AdminUIController.editTableOpen);
                     //
                     // Process Requests
                     //
@@ -104,7 +103,6 @@ namespace Contensive.Addons.Tools {
                     //
                     Copy = HtmlController.inputTextarea(core, "KeywordList", "", 10);
                     Copy += "<div>Paste your Meta Keywords into this text box, separated by either commas or enter keys. When you hit Save or OK, Meta Keyword records will be made out of each word. These can then be checked on any content page.</div>";
-                    Content.Add(AdminUIController.getEditRowLegacy(core, Copy, "Paste Meta Keywords", "", false, false, ""));
                     //
                     // Buttons
                     //
@@ -112,7 +110,7 @@ namespace Contensive.Addons.Tools {
                     //
                     // Close Tables
                     //
-                    Content.Add(AdminUIController.editTableClose);
+                    Content.Add(AdminUIController.editTable(AdminUIController.getEditRowLegacy(core, Copy, "Paste Meta Keywords", "", false, false, "")));
                     Content.Add(HtmlController.inputHidden(rnAdminSourceForm, AdminFormSecurityControl));
                 }
                 //

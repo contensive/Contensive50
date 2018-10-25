@@ -319,7 +319,7 @@ namespace Contensive.Addons.AdminSite {
                     string fieldEditor = AdminUIController.getDefaultEditor_Text(core, "ignore_modifiedBy", fieldValue, true, "");
                     tabPanel.Add(AdminUIController.getEditRow(core, fieldEditor, "Modified Date", FieldHelp, false, false, ""));
                 }
-                string s = AdminUIController.editTableOpen + tabPanel.Text + AdminUIController.editTableClose;
+                string s = AdminUIController.editTable( tabPanel.Text );
                 result = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), "Control Information", "", s);
                 adminData.EditSectionPanelCount = adminData.EditSectionPanelCount + 1;
                 tabPanel = null;

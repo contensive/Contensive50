@@ -29,6 +29,7 @@ namespace Contensive.Addons.AdminSite {
             try {
                 //
                 var groupRuleEditor = new GroupRuleEditorModel {
+                    listCaption = "Groups",
                     rowList = new List<GroupRuleEditorRowModel>()
                 };
                 //
@@ -95,55 +96,56 @@ namespace Contensive.Addons.AdminSite {
                                     }
                                 }
                             }
-                            string ReportLink = "";
-                            int GroupContentID = CdefController.getContentId(core, "Groups");
-                            ReportLink = ReportLink + "[<a href=\"?af=4&cid=" + GroupContentID + "&id=" + GroupID + "\">Edit&nbsp;Group</a>]";
-                            if (GroupID > 0) {
-                                ReportLink = ReportLink + "&nbsp;[<a href=\"?" + rnAdminForm + "=12&rid=35&recordid=" + GroupID + "\">Group&nbsp;Report</a>]";
-                            }
+                            string relatedButtonList = "";
+                            relatedButtonList += AdminUIController.getButtonPrimaryAnchor("Edit", "?af=4&cid=" + CdefController.getContentId(core, "Groups") + "&id=" + GroupID);
+                            relatedButtonList += AdminUIController.getButtonPrimaryAnchor("Members", "?af=1&cid=" + CdefController.getContentId(core, "people") + "&IndexFilterAddGroup=" + GenericController.encodeURL(GroupName));
+                            //relatedButtonList += "[<a href=\"?af=4&cid=" + CdefController.getContentId(core, "Groups") + "&id=" + GroupID + "\">Edit&nbsp;Group</a>]";
+                            //relatedButtonList += "&nbsp;[<a href=\"?af=12&rid=35&recordid=" + GroupID + "\">Group&nbsp;Report</a>]";
+                            //relatedButtonList += "&nbsp;[<a href=\"\">People</a>]";
                             //
-                            string Caption = "";
-                            if (GroupCount == 0) {
-                                Caption = SpanClassAdminSmall + "Groups</span>";
-                            } else {
-                                Caption = "&nbsp;";
-                            }
-                            groupRuleEditor.rowList.Add(new GroupRuleEditorRowModel() {
-                                rowCaption = Caption,
-                                hiddenId = "Memberrules." + GroupCount + ".ID",
-                                hiddenValue = GroupID.ToString(),
-                                checkboxName = "MemberRules." + GroupCount.ToString(),
-                                checkboxChecked = (GroupActive) ? " checked" : "",
-                                expiresName = "MemberRules." + GroupCount + ".DateExpires",
-                                expiresValue = DateExpireValue,
-                                groupCaption = GroupCaption
-                            });
-                            body.Add( Render.StringToString(Resources.GroupRuleEditorRow, groupRuleEditor));
+                            var row = new GroupRuleEditorRowModel() {
+                                idHidden = HtmlController.inputHidden("Memberrules." + GroupCount + ".ID", GroupID),
+                                checkboxInput = HtmlController.checkbox("MemberRules." + GroupCount, GroupActive),
+                                groupCaption = GroupCaption,
+                                expiresInput = HtmlController.inputText(core, "MemberRules." + GroupCount + ".DateExpires", DateExpireValue, 1, 20,"",false,false, "text form-control", -1,false,"expires"),
+                                relatedButtonList = relatedButtonList,
+                            };
+                            groupRuleEditor.rowList.Add(row);
                             //body.Add("<tr><td class=\"ccAdminEditCaption\">" + Caption + "</td>");
                             //body.Add("<td class=\"ccAdminEditField\">");
                             //body.Add("<table border=0 cellpadding=0 cellspacing=0 width=\"100%\" ><tr>");
                             //body.Add("<td width=\"40%\">" + HtmlController.inputHidden("Memberrules." + GroupCount + ".ID", GroupID) + HtmlController.checkbox("MemberRules." + GroupCount, GroupActive) + GroupCaption + "</td>");
                             //body.Add("<td width=\"30%\"> Expires " + HtmlController.inputText(core, "MemberRules." + GroupCount + ".DateExpires", DateExpireValue, 1, 20) + "</td>");
-                            //body.Add("<td width=\"30%\">" + ReportLink + "</td>");
+                            //body.Add("<td width=\"30%\">" + relatedButtonList + "</td>");
                             //body.Add("</tr></table>");
                             //body.Add("</td></tr>");
-                            GroupCount = GroupCount + 1;
+                            GroupCount += 1;
                         }
                         core.db.csGoNext(CS2);
                     }
                     core.db.csClose(ref CS2);
                 }
-                if (GroupCount == 0) {
-                    body.Add("<tr><td valign=middle align=right>" + SpanClassAdminSmall + "Groups</span></td><td>" + SpanClassAdminNormal + "There are currently no groups defined</span></td></tr>");
-                } else {
-                    body.Add("<input type=\"hidden\" name=\"MemberRules.RowCount\" value=\"" + GroupCount + "\">");
-                }
-                body.Add("<tr>");
-                body.Add("<td class=\"ccAdminEditCaption\">&nbsp;</td>");
-                body.Add("<td class=\"ccAdminEditField\">" + SpanClassAdminNormal + "[<a href=?cid=" + CdefController.getContentId(core, "Groups") + " target=_blank>Manage Groups</a>]</span></td>");
-                body.Add("</tr>");
+                //
+                // -- add a row for group count and Add Group button
+                groupRuleEditor.rowList.Add(new GroupRuleEditorRowModel() {
+                    idHidden = HtmlController.inputHidden("MemberRules.RowCount", GroupCount),
+                    checkboxInput = AdminUIController.getButtonPrimaryAnchor("Add Group", "?af=4&cid=" + CdefController.getContentId(core, "Groups")),
+                    groupCaption = "",
+                    expiresInput = "",
+                    relatedButtonList = "",
+                });
+                body.Add(Render.StringToString(Resources.GroupRuleEditorRow2, groupRuleEditor));
+                //if (GroupCount == 0) {
+                //    body.Add("<tr><td valign=middle align=right>" + SpanClassAdminSmall + "Groups</span></td><td>" + SpanClassAdminNormal + "There are currently no groups defined</span></td></tr>");
+                //} else {
+                //    body.Add("<input type=\"hidden\" name=\"MemberRules.RowCount\" value=\"" + GroupCount + "\">");
+                //}
+                //body.Add("<tr>");
+                //body.Add("<td class=\"ccAdminEditCaption\">&nbsp;</td>");
+                //body.Add("<td class=\"ccAdminEditField\">" + SpanClassAdminNormal + "[<a href=?cid=" + CdefController.getContentId(core, "Groups") + " target=_blank>Manage Groups</a>]</span></td>");
+                //body.Add("</tr>");
 
-                result = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), "Group Membership", "This person is a member of these groups", AdminUIController.editTableOpen + body.Text + AdminUIController.editTableClose);
+                result = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), "Group Membership", "This person is a member of these groups", body.Text );
                 adminData.EditSectionPanelCount = adminData.EditSectionPanelCount + 1;
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
@@ -152,16 +154,15 @@ namespace Contensive.Addons.AdminSite {
         }
         //
         public class GroupRuleEditorRowModel {
-            public string rowCaption;
-            public string hiddenId;
-            public string hiddenValue;
-            public string checkboxName;
-            public string checkboxChecked;
+            public string idHidden;
+            public string checkboxInput;
             public string groupCaption;
-            public string expiresName;
-            public string expiresValue;
+            public string expiresInput;
+            public string relatedButtonList;
         }
         public class GroupRuleEditorModel {
+            public string listCaption;
+            public string helpText;
             public List<GroupRuleEditorRowModel> rowList;
         }
     }

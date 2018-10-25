@@ -46,7 +46,7 @@ namespace Contensive.Addons.AdminSite {
                     + "<td class=\"ccAdminEditCaption\">&nbsp;</td>"
                     + "<td class=\"ccAdminEditField\" colspan=2>" + SpanClassAdminNormal + "[<a href=?cid=" + CdefController.getContentId(core, "Topics") + " target=_blank>Manage Topics</a>]</span></td>"
                     + "</tr>";
-                s = AdminUIController.editTableOpen + s + AdminUIController.editTableClose;
+                s = AdminUIController.editTable( s );
                 s = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), "Email Rules", "Send email to people in these groups", s);
             } catch (Exception ex) {
                 LogController.handleError(core, ex);

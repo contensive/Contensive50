@@ -2817,26 +2817,22 @@ namespace Contensive.Addons.AdminSite {
                     // Get the form
                     //
                     if (!BlockForm) {
-                        Content.Add(AdminUIController.editTableOpen);
+                        string tableBody = "";
                         //
                         FieldValue = "<select size=\"1\" name=\"ParentContentID\" ID=\"\"><option value=\"\">Select One</option>";
                         FieldValue = FieldValue + GetContentChildTool_Options(0, ParentContentID);
                         FieldValue = FieldValue + "</select>";
-                        //FieldValue = core.htmldoc.main_GetFormInputSelect2("ParentContentID", CStr(ParentContentID), "Content", "(AllowContentChildTool<>0)")
-
-                        Content.Add(AdminUIController.getEditRowLegacy(core, FieldValue, "Parent Content Name", "", false, false, ""));
+                        tableBody += AdminUIController.getEditRowLegacy(core, FieldValue, "Parent Content Name", "", false, false, "");
                         //
                         FieldValue = HtmlController.inputText(core, "ChildContentName", ChildContentName, 1, 40);
-                        Content.Add(AdminUIController.getEditRowLegacy(core, FieldValue, "New Child Content Name", "", false, false, ""));
+                        tableBody += AdminUIController.getEditRowLegacy(core, FieldValue, "New Child Content Name", "", false, false, "");
                         //
-                        FieldValue = core.html.inputRadio("NewGroup", false.ToString(), NewGroup.ToString()) + core.html.selectFromContent("GroupID", GroupID, "Groups", "", "", "", ref IsEmptyList) + "(Select a current group)"
+                        FieldValue = ""
+                            + core.html.inputRadio("NewGroup", false.ToString(), NewGroup.ToString()) + core.html.selectFromContent("GroupID", GroupID, "Groups", "", "", "", ref IsEmptyList) + "(Select a current group)"
                             + "<br>" + core.html.inputRadio("NewGroup", true.ToString(), NewGroup.ToString()) + HtmlController.inputText(core, "NewGroupName", NewGroupName) + "(Create a new group)";
-                        Content.Add(AdminUIController.getEditRowLegacy(core, FieldValue, "Content Manager Group", "", false, false, ""));
-                        //            '
-                        //            FieldValue = core.main_GetFormInputCheckBox2("AddAdminMenuEntry", AddAdminMenuEntry) & "(Add Navigator Entry under Manager Site Content &gt; Advanced)"
-                        //            Call Content.Add(adminUIController.GetEditRow(core, FieldValue, "Add Menu Entry", "", False, False, ""))
+                        tableBody += AdminUIController.getEditRowLegacy(core, FieldValue, "Content Manager Group", "", false, false, "");
                         //
-                        Content.Add(AdminUIController.editTableClose);
+                        Content.Add(AdminUIController.editTable(tableBody));
                         Content.Add("</td></tr>" + kmaEndTable);
                         //
                         ButtonList = ButtonOK + "," + ButtonCancel;
@@ -2930,7 +2926,7 @@ namespace Contensive.Addons.AdminSite {
                     Content.Add(AdminUIController.getFormBodyAdminOnly());
                 } else {
                     //
-                    Content.Add(AdminUIController.editTableOpen);
+                    string tableBody = "";
                     //
                     // Set defaults
                     //
@@ -2963,7 +2959,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // ----- Status
                     //
-                    Content.Add(HtmlController.tableRowStart() + "<td colspan=\"3\" class=\"ccPanel3D ccAdminEditSubHeader\"><b>Status</b>" + tableCellEnd + kmaEndTableRow);
+                    tableBody += HtmlController.tableRowStart() + "<td colspan=\"3\" class=\"ccPanel3D ccAdminEditSubHeader\"><b>Status</b>" + tableCellEnd + kmaEndTableRow;
                     //
                     // ----- Visits Found
                     //
@@ -2974,7 +2970,7 @@ namespace Contensive.Addons.AdminSite {
                         PagesTotal = core.db.csGetInteger(CSServers, "Result");
                     }
                     core.db.csClose(ref CSServers);
-                    Content.Add(AdminUIController.getEditRowLegacy(core, SpanClassAdminNormal + PagesTotal, "Visits Found", "", false, false, ""));
+                    tableBody += AdminUIController.getEditRowLegacy(core, SpanClassAdminNormal + PagesTotal, "Visits Found", "", false, false, "");
                     //
                     // ----- Oldest Visit
                     //
@@ -2992,7 +2988,7 @@ namespace Contensive.Addons.AdminSite {
                         }
                     }
                     core.db.csClose(ref CSServers);
-                    Content.Add(AdminUIController.getEditRowLegacy(core, SpanClassAdminNormal + Copy + " (" + AgeInDays + " days)", "Oldest Visit", "", false, false, ""));
+                    tableBody += (AdminUIController.getEditRowLegacy(core, SpanClassAdminNormal + Copy + " (" + AgeInDays + " days)", "Oldest Visit", "", false, false, ""));
                     //
                     // ----- Viewings Found
                     //
@@ -3003,23 +2999,23 @@ namespace Contensive.Addons.AdminSite {
                         PagesTotal = core.db.csGetInteger(CSServers, "Result");
                     }
                     core.db.csClose(ref CSServers);
-                    Content.Add(AdminUIController.getEditRowLegacy(core, SpanClassAdminNormal + PagesTotal, "Viewings Found", "", false, false, ""));
+                    tableBody += (AdminUIController.getEditRowLegacy(core, SpanClassAdminNormal + PagesTotal, "Viewings Found", "", false, false, ""));
                     //
-                    Content.Add(HtmlController.tableRowStart() + "<td colspan=\"3\" class=\"ccPanel3D ccAdminEditSubHeader\"><b>Options</b>" + tableCellEnd + kmaEndTableRow);
+                    tableBody += (HtmlController.tableRowStart() + "<td colspan=\"3\" class=\"ccPanel3D ccAdminEditSubHeader\"><b>Options</b>" + tableCellEnd + kmaEndTableRow);
                     //
                     Caption = "Archive Age";
                     Copy = HtmlController.inputText(core, "ArchiveRecordAgeDays", ArchiveRecordAgeDays.ToString(), -1, 20) + "&nbsp;Number of days to keep visit records. 0 disables housekeeping.";
-                    Content.Add(AdminUIController.getEditRowLegacy(core, Copy, Caption));
+                    tableBody += (AdminUIController.getEditRowLegacy(core, Copy, Caption));
                     //
                     Caption = "Housekeeping Time";
                     Copy = HtmlController.inputText(core, "ArchiveTimeOfDay", ArchiveTimeOfDay, -1, 20) + "&nbsp;The time of day when record deleting should start.";
-                    Content.Add(AdminUIController.getEditRowLegacy(core, Copy, Caption));
+                    tableBody += (AdminUIController.getEditRowLegacy(core, Copy, Caption));
                     //
                     Caption = "Purge Content Files";
                     Copy = HtmlController.checkbox("ArchiveAllowFileClean", ArchiveAllowFileClean) + "&nbsp;Delete Contensive content files with no associated database record.";
-                    Content.Add(AdminUIController.getEditRowLegacy(core, Copy, Caption));
+                    tableBody += (AdminUIController.getEditRowLegacy(core, Copy, Caption));
                     //
-                    Content.Add(AdminUIController.editTableClose);
+                    Content.Add(AdminUIController.editTable(tableBody));
                     Content.Add(HtmlController.inputHidden(rnAdminSourceForm, AdminformHousekeepingControl));
                     ButtonList = ButtonCancel + ",Refresh," + ButtonSave + "," + ButtonOK;
                 }
@@ -3118,7 +3114,7 @@ namespace Contensive.Addons.AdminSite {
                     ButtonList = ButtonCancel;
                     Content.Add(AdminUIController.getFormBodyAdminOnly());
                 } else {
-                    Content.Add(AdminUIController.editTableOpen);
+                    string tableBody = "";
                     //
                     // Set defaults
                     //
@@ -3149,7 +3145,7 @@ namespace Contensive.Addons.AdminSite {
 
                     Copy = HtmlController.checkbox("AllowAutoLogin", AllowAutoLogin);
                     Copy += "<div>When checked, returning users are automatically logged-in, without requiring a username or password. This is very convenient, but creates a high security risk. Each time you login, you will be given the option to not allow Auto-Login from that computer.</div>";
-                    Content.Add(AdminUIController.getEditRowLegacy(core, Copy, "Allow Auto Login", "", false, false, ""));
+                    tableBody += (AdminUIController.getEditRowLegacy(core, Copy, "Allow Auto Login", "", false, false, ""));
                     //
                     // Buttons
                     //
@@ -3157,7 +3153,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // Close Tables
                     //
-                    Content.Add(AdminUIController.editTableClose);
+                    Content.Add(AdminUIController.editTable(tableBody));
                     Content.Add(HtmlController.inputHidden(rnAdminSourceForm, AdminFormBuilderCollection));
                 }
                 //
