@@ -17,7 +17,14 @@ namespace Contensive.Processor.Controllers {
     /// not IDisposable - not contained classes that need to be disposed
     /// </summary>
     public class AppBuilderController {
-        // 
+        //
+        //====================================================================================================
+        /// <summary>
+        /// verify the current database matches the requirements for this build. Manager SiteProperty("BuildVersion")
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="isNewBuild"></param>
+        /// <param name="repair"></param>
         public static void upgrade(CoreController core, bool isNewBuild, bool repair) {
             try {
                 //
@@ -25,10 +32,7 @@ namespace Contensive.Processor.Controllers {
                 string logPrefix = "***** upgrade[" + core.appConfig.name + "]";
                 var installedCollections = new List<string>();
                 //
-                if (core.doc.upgradeInProgress) {
-                    // leftover from 4.1
-                } else {
-                    core.doc.upgradeInProgress = true;
+                {
                     string DataBuildVersion = core.siteProperties.dataBuildVersion;
                     List<string> nonCriticalErrorList = new List<string>();
                     //
@@ -52,7 +56,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // verify current database meets minimum field requirements (before installing base collection)
                     LogController.logInfo(core, logPrefix + ", verify existing database fields meet requirements");
-                    VerifySqlfieldCompatibility(core,  logPrefix);
+                    verifySqlfieldCompatibility(core,  logPrefix);
                     //
                     // -- verify base collection
                     LogController.logInfo(core, logPrefix + ", install base collection");
@@ -146,12 +150,12 @@ namespace Contensive.Processor.Controllers {
                     LogController.logInfo(core, logPrefix + ", verify records required");
                     //
                     //  menus are created in ccBase.xml, this just checks for dups
-                    VerifyAdminMenus(core, DataBuildVersion);
+                    verifyAdminMenus(core, DataBuildVersion);
                     verifyLanguageRecords(core);
                     verifyCountries(core);
                     verifyStates(core);
-                    VerifyLibraryFolders(core);
-                    VerifyLibraryFileTypes(core);
+                    verifyLibraryFolders(core);
+                    verifyLibraryFileTypes(core);
                     verifyDefaultGroups(core);
                     //
                     //---------------------------------------------------------------------
@@ -461,14 +465,37 @@ namespace Contensive.Processor.Controllers {
                     //
                     core.cache.invalidateAll();
                     LogController.logInfo(core, logPrefix + ", Upgrade Complete");
-                    core.doc.upgradeInProgress = false;
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
             }
         }
-        private static void VerifyAdminMenus(CoreController core, string DataBuildVersion) {
+        //
+        //====================================================================================================
+        /// <summary>
+        /// when breaking changes are required for data, update them here
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="DataBuildVersion"></param>
+        private static void Upgrade_Conversion(CoreController core, string DataBuildVersion, string logPrefix) {
+            try {
+                //
+                // -- Roll the style sheet cache if it is setup
+                core.siteProperties.setProperty("StylesheetSerialNumber", (-1).ToString());
+                //
+                // -- Reload
+                core.cache.invalidateAll();
+                core.doc.clearMetaData();
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+                throw;
+            }
+        }
+        //
+        //====================================================================================================
+        //
+        private static void verifyAdminMenus(CoreController core, string DataBuildVersion) {
             try {
                 DataTable dt = null;
                 //
@@ -506,7 +533,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="sqlName"></param>
         /// <param name="sqlValue"></param>
         /// <param name="inActive"></param>
-        private static void VerifyRecord(CoreController core, string contentName, string name, string sqlName = "", string sqlValue = "") {
+        private static void verifyRecord(CoreController core, string contentName, string name, string sqlName = "", string sqlValue = "") {
             try {
                 var cdef = CDefModel.create(core, contentName);
                 DataTable dt = core.db.executeQuery("SELECT ID FROM " + cdef.tableName + " WHERE NAME=" + core.db.encodeSQLText(name) + ";");
@@ -532,7 +559,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="core"></param>
         /// <param name="DataBuildVersion"></param>
-        private static void VerifySqlfieldCompatibility(CoreController core, string logPrefix) {
+        private static void verifySqlfieldCompatibility(CoreController core, string logPrefix) {
             try {
                 //
                 // verify Db field schema for fields handled internally (fix datatime2(0) problem -- need at least 3 digits for precision)
@@ -588,27 +615,6 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// when breaking changes are required for data, update them here
-        /// </summary>
-        /// <param name="core"></param>
-        /// <param name="DataBuildVersion"></param>
-        private static void Upgrade_Conversion(CoreController core, string DataBuildVersion, string logPrefix ) {
-            try {
-                //
-                // -- Roll the style sheet cache if it is setup
-                core.siteProperties.setProperty("StylesheetSerialNumber", (-1).ToString());
-                //
-                // -- Reload
-                core.cache.invalidateAll();
-                core.doc.clearMetaData();
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-                throw;
-            }
-        }
-        //
-        //====================================================================================================
-        /// <summary>
         /// verify the basic languages are populated
         /// </summary>
         /// <param name="core"></param>
@@ -617,10 +623,10 @@ namespace Contensive.Processor.Controllers {
                 //
                 appendUpgradeLogAddStep(core, core.appConfig.name, "VerifyLanguageRecords", "Verify Language Records.");
                 //
-                VerifyRecord(core, "Languages", "English", "HTTP_Accept_Language", "'en'");
-                VerifyRecord(core, "Languages", "Spanish", "HTTP_Accept_Language", "'es'");
-                VerifyRecord(core, "Languages", "French", "HTTP_Accept_Language", "'fr'");
-                VerifyRecord(core, "Languages", "Any", "HTTP_Accept_Language", "'any'");
+                verifyRecord(core, "Languages", "English", "HTTP_Accept_Language", "'en'");
+                verifyRecord(core, "Languages", "Spanish", "HTTP_Accept_Language", "'es'");
+                verifyRecord(core, "Languages", "French", "HTTP_Accept_Language", "'fr'");
+                verifyRecord(core, "Languages", "Any", "HTTP_Accept_Language", "'any'");
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
@@ -632,7 +638,7 @@ namespace Contensive.Processor.Controllers {
         /// verify the basic library folders
         /// </summary>
         /// <param name="core"></param>
-        private static void VerifyLibraryFolders(CoreController core) {
+        private static void verifyLibraryFolders(CoreController core) {
             try {
                 DataTable dt = null;
                 //
@@ -640,8 +646,8 @@ namespace Contensive.Processor.Controllers {
                 //
                 dt = core.db.executeQuery("select id from cclibraryfiles");
                 if (dt.Rows.Count == 0) {
-                    VerifyRecord(core, "Library Folders", "Images");
-                    VerifyRecord(core, "Library Folders", "Downloads");
+                    verifyRecord(core, "Library Folders", "Images");
+                    verifyRecord(core, "Library Folders", "Downloads");
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -654,81 +660,81 @@ namespace Contensive.Processor.Controllers {
         /// verify library folder types
         /// </summary>
         /// <param name="core"></param>
-        private static void VerifyLibraryFileTypes(CoreController core) {
+        private static void verifyLibraryFileTypes(CoreController core) {
             try {
                 //
                 // Load basic records -- default images are handled in the REsource Library through the /ccLib/config/DefaultValues.txt GetDefaultValue(key) mechanism
                 //
                 if (core.db.getRecordID("Library File Types", "Image") == 0) {
-                    VerifyRecord(core, "Library File Types", "Image", "ExtensionList", "'GIF,JPG,JPE,JPEG,BMP,PNG'");
-                    VerifyRecord(core, "Library File Types", "Image", "IsImage", "1");
-                    VerifyRecord(core, "Library File Types", "Image", "IsVideo", "0");
-                    VerifyRecord(core, "Library File Types", "Image", "IsDownload", "1");
-                    VerifyRecord(core, "Library File Types", "Image", "IsFlash", "0");
+                    verifyRecord(core, "Library File Types", "Image", "ExtensionList", "'GIF,JPG,JPE,JPEG,BMP,PNG'");
+                    verifyRecord(core, "Library File Types", "Image", "IsImage", "1");
+                    verifyRecord(core, "Library File Types", "Image", "IsVideo", "0");
+                    verifyRecord(core, "Library File Types", "Image", "IsDownload", "1");
+                    verifyRecord(core, "Library File Types", "Image", "IsFlash", "0");
                 }
                 //
                 if (core.db.getRecordID("Library File Types", "Video") == 0) {
-                    VerifyRecord(core, "Library File Types", "Video", "ExtensionList", "'ASX,AVI,WMV,MOV,MPG,MPEG,MP4,QT,RM'");
-                    VerifyRecord(core, "Library File Types", "Video", "IsImage", "0");
-                    VerifyRecord(core, "Library File Types", "Video", "IsVideo", "1");
-                    VerifyRecord(core, "Library File Types", "Video", "IsDownload", "1");
-                    VerifyRecord(core, "Library File Types", "Video", "IsFlash", "0");
+                    verifyRecord(core, "Library File Types", "Video", "ExtensionList", "'ASX,AVI,WMV,MOV,MPG,MPEG,MP4,QT,RM'");
+                    verifyRecord(core, "Library File Types", "Video", "IsImage", "0");
+                    verifyRecord(core, "Library File Types", "Video", "IsVideo", "1");
+                    verifyRecord(core, "Library File Types", "Video", "IsDownload", "1");
+                    verifyRecord(core, "Library File Types", "Video", "IsFlash", "0");
                 }
                 //
                 if (core.db.getRecordID("Library File Types", "Audio") == 0) {
-                    VerifyRecord(core, "Library File Types", "Audio", "ExtensionList", "'AIF,AIFF,ASF,CDA,M4A,M4P,MP2,MP3,MPA,WAV,WMA'");
-                    VerifyRecord(core, "Library File Types", "Audio", "IsImage", "0");
-                    VerifyRecord(core, "Library File Types", "Audio", "IsVideo", "0");
-                    VerifyRecord(core, "Library File Types", "Audio", "IsDownload", "1");
-                    VerifyRecord(core, "Library File Types", "Audio", "IsFlash", "0");
+                    verifyRecord(core, "Library File Types", "Audio", "ExtensionList", "'AIF,AIFF,ASF,CDA,M4A,M4P,MP2,MP3,MPA,WAV,WMA'");
+                    verifyRecord(core, "Library File Types", "Audio", "IsImage", "0");
+                    verifyRecord(core, "Library File Types", "Audio", "IsVideo", "0");
+                    verifyRecord(core, "Library File Types", "Audio", "IsDownload", "1");
+                    verifyRecord(core, "Library File Types", "Audio", "IsFlash", "0");
                 }
                 //
                 if (core.db.getRecordID("Library File Types", "Word") == 0) {
-                    VerifyRecord(core, "Library File Types", "Word", "ExtensionList", "'DOC'");
-                    VerifyRecord(core, "Library File Types", "Word", "IsImage", "0");
-                    VerifyRecord(core, "Library File Types", "Word", "IsVideo", "0");
-                    VerifyRecord(core, "Library File Types", "Word", "IsDownload", "1");
-                    VerifyRecord(core, "Library File Types", "Word", "IsFlash", "0");
+                    verifyRecord(core, "Library File Types", "Word", "ExtensionList", "'DOC'");
+                    verifyRecord(core, "Library File Types", "Word", "IsImage", "0");
+                    verifyRecord(core, "Library File Types", "Word", "IsVideo", "0");
+                    verifyRecord(core, "Library File Types", "Word", "IsDownload", "1");
+                    verifyRecord(core, "Library File Types", "Word", "IsFlash", "0");
                 }
                 //
                 if (core.db.getRecordID("Library File Types", "Flash") == 0) {
-                    VerifyRecord(core, "Library File Types", "Flash", "ExtensionList", "'SWF'");
-                    VerifyRecord(core, "Library File Types", "Flash", "IsImage", "0");
-                    VerifyRecord(core, "Library File Types", "Flash", "IsVideo", "0");
-                    VerifyRecord(core, "Library File Types", "Flash", "IsDownload", "1");
-                    VerifyRecord(core, "Library File Types", "Flash", "IsFlash", "1");
+                    verifyRecord(core, "Library File Types", "Flash", "ExtensionList", "'SWF'");
+                    verifyRecord(core, "Library File Types", "Flash", "IsImage", "0");
+                    verifyRecord(core, "Library File Types", "Flash", "IsVideo", "0");
+                    verifyRecord(core, "Library File Types", "Flash", "IsDownload", "1");
+                    verifyRecord(core, "Library File Types", "Flash", "IsFlash", "1");
                 }
                 //
                 if (core.db.getRecordID("Library File Types", "PDF") == 0) {
-                    VerifyRecord(core, "Library File Types", "PDF", "ExtensionList", "'PDF'");
-                    VerifyRecord(core, "Library File Types", "PDF", "IsImage", "0");
-                    VerifyRecord(core, "Library File Types", "PDF", "IsVideo", "0");
-                    VerifyRecord(core, "Library File Types", "PDF", "IsDownload", "1");
-                    VerifyRecord(core, "Library File Types", "PDF", "IsFlash", "0");
+                    verifyRecord(core, "Library File Types", "PDF", "ExtensionList", "'PDF'");
+                    verifyRecord(core, "Library File Types", "PDF", "IsImage", "0");
+                    verifyRecord(core, "Library File Types", "PDF", "IsVideo", "0");
+                    verifyRecord(core, "Library File Types", "PDF", "IsDownload", "1");
+                    verifyRecord(core, "Library File Types", "PDF", "IsFlash", "0");
                 }
                 //
                 if (core.db.getRecordID("Library File Types", "XLS") == 0) {
-                    VerifyRecord(core, "Library File Types", "Excel", "ExtensionList", "'XLS'");
-                    VerifyRecord(core, "Library File Types", "Excel", "IsImage", "0");
-                    VerifyRecord(core, "Library File Types", "Excel", "IsVideo", "0");
-                    VerifyRecord(core, "Library File Types", "Excel", "IsDownload", "1");
-                    VerifyRecord(core, "Library File Types", "Excel", "IsFlash", "0");
+                    verifyRecord(core, "Library File Types", "Excel", "ExtensionList", "'XLS'");
+                    verifyRecord(core, "Library File Types", "Excel", "IsImage", "0");
+                    verifyRecord(core, "Library File Types", "Excel", "IsVideo", "0");
+                    verifyRecord(core, "Library File Types", "Excel", "IsDownload", "1");
+                    verifyRecord(core, "Library File Types", "Excel", "IsFlash", "0");
                 }
                 //
                 if (core.db.getRecordID("Library File Types", "PPT") == 0) {
-                    VerifyRecord(core, "Library File Types", "Power Point", "ExtensionList", "'PPT,PPS'");
-                    VerifyRecord(core, "Library File Types", "Power Point", "IsImage", "0");
-                    VerifyRecord(core, "Library File Types", "Power Point", "IsVideo", "0");
-                    VerifyRecord(core, "Library File Types", "Power Point", "IsDownload", "1");
-                    VerifyRecord(core, "Library File Types", "Power Point", "IsFlash", "0");
+                    verifyRecord(core, "Library File Types", "Power Point", "ExtensionList", "'PPT,PPS'");
+                    verifyRecord(core, "Library File Types", "Power Point", "IsImage", "0");
+                    verifyRecord(core, "Library File Types", "Power Point", "IsVideo", "0");
+                    verifyRecord(core, "Library File Types", "Power Point", "IsDownload", "1");
+                    verifyRecord(core, "Library File Types", "Power Point", "IsFlash", "0");
                 }
                 //
                 if (core.db.getRecordID("Library File Types", "Default") == 0) {
-                    VerifyRecord(core, "Library File Types", "Default", "ExtensionList", "''");
-                    VerifyRecord(core, "Library File Types", "Default", "IsImage", "0");
-                    VerifyRecord(core, "Library File Types", "Default", "IsVideo", "0");
-                    VerifyRecord(core, "Library File Types", "Default", "IsDownload", "1");
-                    VerifyRecord(core, "Library File Types", "Default", "IsFlash", "0");
+                    verifyRecord(core, "Library File Types", "Default", "ExtensionList", "''");
+                    verifyRecord(core, "Library File Types", "Default", "IsImage", "0");
+                    verifyRecord(core, "Library File Types", "Default", "IsVideo", "0");
+                    verifyRecord(core, "Library File Types", "Default", "IsDownload", "1");
+                    verifyRecord(core, "Library File Types", "Default", "IsFlash", "0");
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -1022,13 +1028,13 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //====================================================================================================
-        //  deprecate 
+        //  todo deprecate 
         private static void appendUpgradeLog(CoreController core, string appName, string Method, string Message) {
             LogController.logInfo(core, "app [" + appName + "], Method [" + Method + "], Message [" + Message + "]");
         }
         //
         //====================================================================================================
-        // deprecate
+        // todo deprecate
         private static void appendUpgradeLogAddStep(CoreController core, string appName, string Method, string Message) {
             appendUpgradeLog(core, appName, Method, Message);
         }
@@ -1142,5 +1148,157 @@ namespace Contensive.Processor.Controllers {
             }
             return parentRecordId;
         }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Create an entry in the Sort Methods Table
+        /// </summary>
+        private static void verifySortMethod(CoreController core, string Name, string OrderByCriteria) {
+            try {
+                //
+                DataTable dt = null;
+                SqlFieldListClass sqlList = new SqlFieldListClass();
+                //
+                sqlList.add("name", core.db.encodeSQLText(Name));
+                sqlList.add("CreatedBy", "0");
+                sqlList.add("OrderByClause", core.db.encodeSQLText(OrderByCriteria));
+                sqlList.add("active", SQLTrue);
+                sqlList.add("ContentControlID", CdefController.getContentId(core, "Sort Methods").ToString());
+                //
+                dt = core.db.openTable("Default", "ccSortMethods", "Name=" + core.db.encodeSQLText(Name), "ID", "ID", 1);
+                if (dt.Rows.Count > 0) {
+                    //
+                    // update sort method
+                    //
+                    int recordId = GenericController.encodeInteger(dt.Rows[0]["ID"]);
+                    core.db.updateTableRecord("Default", "ccSortMethods", "ID=" + recordId.ToString(), sqlList, true);
+                    SortMethodModel.invalidateRecordCache(core, recordId);
+                } else {
+                    //
+                    // Create the new sort method
+                    //
+                    core.db.insertTableRecord("Default", "ccSortMethods", sqlList);
+                }
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+                throw;
+            }
+        }
+        //
+        //====================================================================================================
+        //
+        public static void verifySortMethods(CoreController core) {
+            try {
+                //
+                LogController.logInfo(core, "Verify Sort Records");
+                //
+                verifySortMethod(core, "By Name", "Name");
+                verifySortMethod(core, "By Alpha Sort Order Field", "SortOrder");
+                verifySortMethod(core, "By Date", "DateAdded");
+                verifySortMethod(core, "By Date Reverse", "DateAdded Desc");
+                verifySortMethod(core, "By Alpha Sort Order Then Oldest First", "SortOrder,ID");
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+                throw;
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Get a ContentID from the ContentName using just the tables
+        /// </summary>
+        internal static void verifyContentFieldTypes(CoreController core) {
+            try {
+                //
+                int RowsFound = 0;
+                int CID = 0;
+                bool TableBad = false;
+                int RowsNeeded = 0;
+                //
+                // ----- make sure there are enough records
+                //
+                TableBad = false;
+                RowsFound = 0;
+                using (DataTable rs = core.db.executeQuery("Select ID from ccFieldTypes order by id")) {
+                    if (!DbController.isDataTableOk(rs)) {
+                        //
+                        // problem
+                        //
+                        TableBad = true;
+                    } else {
+                        //
+                        // Verify the records that are there
+                        //
+                        RowsFound = 0;
+                        foreach (DataRow dr in rs.Rows) {
+                            RowsFound = RowsFound + 1;
+                            if (RowsFound != GenericController.encodeInteger(dr["ID"])) {
+                                //
+                                // Bad Table
+                                //
+                                TableBad = true;
+                                break;
+                            }
+                        }
+                    }
+
+                }
+                //
+                // ----- Replace table if needed
+                //
+                if (TableBad) {
+                    core.db.deleteTable("Default", "ccFieldTypes");
+                    core.db.createSQLTable("Default", "ccFieldTypes");
+                    RowsFound = 0;
+                }
+                //
+                // ----- Add the number of rows needed
+                //
+                RowsNeeded = fieldTypeIdMax - RowsFound;
+                if (RowsNeeded > 0) {
+                    CID = CdefController.getContentId(core, "Content Field Types");
+                    if (CID <= 0) {
+                        //
+                        // Problem
+                        //
+                        LogController.handleError(core, new ApplicationException("Content Field Types content definition was not found"));
+                    } else {
+                        while (RowsNeeded > 0) {
+                            core.db.executeQuery("Insert into ccFieldTypes (active,contentcontrolid)values(1," + CID + ")");
+                            RowsNeeded = RowsNeeded - 1;
+                        }
+                    }
+                }
+                //
+                // ----- Update the Names of each row
+                //
+                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='Integer' where ID=1;");
+                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='Text' where ID=2;");
+                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='LongText' where ID=3;");
+                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='Boolean' where ID=4;");
+                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='Date' where ID=5;");
+                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='File' where ID=6;");
+                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='Lookup' where ID=7;");
+                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='Redirect' where ID=8;");
+                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='Currency' where ID=9;");
+                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='TextFile' where ID=10;");
+                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='Image' where ID=11;");
+                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='Float' where ID=12;");
+                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='AutoIncrement' where ID=13;");
+                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='ManyToMany' where ID=14;");
+                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='Member Select' where ID=15;");
+                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='CSS File' where ID=16;");
+                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='XML File' where ID=17;");
+                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='Javascript File' where ID=18;");
+                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='Link' where ID=19;");
+                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='Resource Link' where ID=20;");
+                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='HTML' where ID=21;");
+                core.db.executeQuery("Update ccFieldTypes Set active=1,Name='HTML File' where ID=22;");
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+                throw;
+            }
+        }
+        //
     }
 }

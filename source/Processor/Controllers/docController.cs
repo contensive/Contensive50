@@ -192,9 +192,6 @@ namespace Contensive.Processor.Controllers {
         public bool continueProcessing { get; set; } = false; // when false, routines should not add to the output and immediately exit
         //
         // -- todo
-        public bool upgradeInProgress { get; set; }
-        //
-        // -- todo
         internal List<int> addonIdListRunInThisDoc { get; set; } = new List<int>();
         /// <summary>
         /// If ContentId in this list, they are not a content manager
