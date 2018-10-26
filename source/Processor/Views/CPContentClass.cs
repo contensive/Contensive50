@@ -298,7 +298,7 @@ namespace Contensive.Processor {
             field.ManyToManyRulePrimaryField = "";
             field.ManyToManyRuleSecondaryField = "";
             field.memberSelectGroupId_set( core, 0 );
-            field.nameLc = FieldName.ToLower();
+            field.nameLc = FieldName.ToLowerInvariant();
             field.password = false;
             field.readOnly = false;
             field.redirectContentID = 0;

@@ -223,7 +223,7 @@ namespace Contensive.Processor.Controllers {
                             } else {
                                 //FileInfo[] logFiles = fileSystem.getFileList(logPath);
                                 //foreach (FileInfo fileInfo in logFiles) {
-                                //    if (fileInfo.Name.ToLower() == FilenameNoExt.ToLower() + ".log") {
+                                //    if (fileInfo.Name.ToLowerInvariant() == FilenameNoExt.ToLowerInvariant() + ".log") {
                                 //        FileSize = (int)fileInfo.Length;
                                 //        break;
                                 //    }

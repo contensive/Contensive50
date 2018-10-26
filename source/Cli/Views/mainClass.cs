@@ -42,7 +42,7 @@ namespace Contensive.CLI {
                         // -- set programfiles path if empty
                         if (String.IsNullOrEmpty(cpServer.core.serverConfig.programFilesPath)) {
                             string executePath = System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath);
-                            if (executePath.ToLower().IndexOf("\\git\\") == 0) {
+                            if (executePath.ToLowerInvariant().IndexOf("\\git\\") == 0) {
                                 //  -- save if not in developer execution path
                                 cpServer.core.serverConfig.programFilesPath = executePath;
                             } else {
@@ -57,7 +57,7 @@ namespace Contensive.CLI {
                             string argument = args[argPtr];
                             bool exitArgumentProcessing = false;
                             bool repair = false;
-                            switch (argument.ToLower()) {
+                            switch (argument.ToLowerInvariant()) {
                                 case "--flushcache":
                                     if (!string.IsNullOrEmpty(appName)) {
                                         //
@@ -102,7 +102,7 @@ namespace Contensive.CLI {
                                         CollectionController.getRemoteCollectionStoreList(cpServer.core, ref collectionList);
                                         string collectionGuid = "";
                                         foreach (var collection in collectionList) {
-                                            if (collection.name.ToLower() == collectionName.ToLower()) {
+                                            if (collection.name.ToLowerInvariant() == collectionName.ToLowerInvariant()) {
                                                 collectionGuid = collection.guid;
                                                 break;
                                             }
@@ -252,7 +252,7 @@ namespace Contensive.CLI {
                                     // -- manage the task scheduler
                                     if (argPtr != (args.Length + 1)) {
                                         argPtr++;
-                                        if (args[argPtr].ToLower() == "run") {
+                                        if (args[argPtr].ToLowerInvariant() == "run") {
                                             //
                                             // run the taskscheduler in the console
                                             Console.WriteLine("Beginning command line taskScheduler. Hit any key to exit");
@@ -275,7 +275,7 @@ namespace Contensive.CLI {
                                     // -- manager the task runner
                                     if (argPtr != (args.Length + 1)) {
                                         argPtr++;
-                                        if (args[argPtr].ToLower() == "run") {
+                                        if (args[argPtr].ToLowerInvariant() == "run") {
                                             //
                                             // -- run the taskrunner in the console
                                             Console.WriteLine("Beginning command line taskRunner. Hit any key to exit");
@@ -299,7 +299,7 @@ namespace Contensive.CLI {
                                     // -- turn on, off or run both services together
                                     if (argPtr != (args.Length + 1)) {
                                         argPtr++;
-                                        if (args[argPtr].ToLower() == "run") {
+                                        if (args[argPtr].ToLowerInvariant() == "run") {
                                             //
                                             // run the tasks in the console
                                             //
@@ -331,7 +331,7 @@ namespace Contensive.CLI {
                                     // -- logging
                                     if (argPtr != (args.Length + 1)) {
                                         argPtr++;
-                                        cpServer.core.serverConfig.enableLogging = GenericController.encodeBoolean(args[argPtr].ToLower());
+                                        cpServer.core.serverConfig.enableLogging = GenericController.encodeBoolean(args[argPtr].ToLowerInvariant());
                                         cpServer.core.serverConfig.saveObject(cpServer.core);
                                         Console.WriteLine("enableLogging set " + cpServer.core.serverConfig.enableLogging.ToString());
                                     }

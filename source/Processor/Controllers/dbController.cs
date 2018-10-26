@@ -646,7 +646,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 Models.Domain.TableSchemaModel tableSchema = Models.Domain.TableSchemaModel.getTableSchema(core, TableName, DataSourceName);
                 if (tableSchema != null) {
-                    returnOK = (null != tableSchema.columns.Find(x => x.COLUMN_NAME.ToLower() == FieldName.ToLower()));
+                    returnOK = (null != tableSchema.columns.Find(x => x.COLUMN_NAME.ToLowerInvariant() == FieldName.ToLowerInvariant()));
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -880,7 +880,7 @@ namespace Contensive.Processor.Controllers {
                 if (!(string.IsNullOrEmpty(TableName) && string.IsNullOrEmpty(IndexName) & string.IsNullOrEmpty(FieldNames))) {
                     ts = Models.Domain.TableSchemaModel.getTableSchema(core, TableName, DataSourceName);
                     if (ts != null) {
-                        if (null == ts.indexes.Find(x => x.index_name.ToLower() == IndexName.ToLower())) {
+                        if (null == ts.indexes.Find(x => x.index_name.ToLowerInvariant() == IndexName.ToLowerInvariant())) {
                             executeQuery("CREATE INDEX [" + IndexName + "] ON [" + TableName + "]( " + FieldNames + " );", DataSourceName);
                             if (clearMetaCache) {
                                 core.cache.invalidateAll();
@@ -1063,7 +1063,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 ts = Models.Domain.TableSchemaModel.getTableSchema(core, TableName, DataSourceName);
                 if (ts != null) {
-                    if (null != ts.indexes.Find(x => x.index_name.ToLower() == IndexName.ToLower())) {
+                    if (null != ts.indexes.Find(x => x.index_name.ToLowerInvariant() == IndexName.ToLowerInvariant())) {
                         DataSourceType = getDataSourceType(DataSourceName);
                         switch (DataSourceType) {
                             case constants.DataSourceTypeODBCAccess:
@@ -1308,7 +1308,7 @@ namespace Contensive.Processor.Controllers {
                         if (!string.IsNullOrEmpty(sqlOrderBy)) {
                             string[] SortFields = sqlOrderBy.Split(',');
                             for (int ptr = 0; ptr < SortFields.GetUpperBound(0) + 1; ptr++) {
-                                string SortField = SortFields[ptr].ToLower();
+                                string SortField = SortFields[ptr].ToLowerInvariant();
                                 SortField = GenericController.vbReplace(SortField, "asc", "", 1, 99, 1);
                                 SortField = GenericController.vbReplace(SortField, "desc", "", 1, 99, 1);
                                 SortField = SortField.Trim(' ');
@@ -1442,7 +1442,7 @@ namespace Contensive.Processor.Controllers {
                         //if (!string.IsNullOrEmpty(sqlOrderBy)) {
                         //    string[] SortFields = sqlOrderBy.Split(',');
                         //    for (int ptr = 0; ptr < SortFields.GetUpperBound(0) + 1; ptr++) {
-                        //        string SortField = SortFields[ptr].ToLower();
+                        //        string SortField = SortFields[ptr].ToLowerInvariant();
                         //        SortField = GenericController.vbReplace(SortField, "asc", "", 1, 99, 1);
                         //        SortField = GenericController.vbReplace(SortField, "desc", "", 1, 99, 1);
                         //        SortField = SortField.Trim(' ');
@@ -1567,8 +1567,8 @@ namespace Contensive.Processor.Controllers {
                         string fieldName = null;
                         Models.Domain.CDefFieldModel field = null;
                         foreach (var selectedFieldName in dataSetStore[CSPointer].CDef.selectList) {
-                            if (dataSetStore[CSPointer].CDef.fields.ContainsKey(selectedFieldName.ToLower())) {
-                                field = dataSetStore[CSPointer].CDef.fields[selectedFieldName.ToLower()];
+                            if (dataSetStore[CSPointer].CDef.fields.ContainsKey(selectedFieldName.ToLowerInvariant())) {
+                                field = dataSetStore[CSPointer].CDef.fields[selectedFieldName.ToLowerInvariant()];
                                 fieldName = field.nameLc;
                                 string Filename = null;
                                 switch (field.fieldTypeId) {
@@ -1821,8 +1821,8 @@ namespace Contensive.Processor.Controllers {
                     if (contentSet.writeCache.Count > 0) {
                         //
                         // ----- something has been set in buffer, check it first
-                        if (contentSet.writeCache.ContainsKey(fieldNameTrim.ToLower())) {
-                            returnValue = contentSet.writeCache[fieldNameTrim.ToLower()];
+                        if (contentSet.writeCache.ContainsKey(fieldNameTrim.ToLowerInvariant())) {
+                            returnValue = contentSet.writeCache[fieldNameTrim.ToLowerInvariant()];
                             fieldFound = true;
                         }
                     }
@@ -1837,7 +1837,7 @@ namespace Contensive.Processor.Controllers {
                         } else if (contentSet.dt == null) {
                             throw new ApplicationException("Cannot read from a dataset because the data is not valid.");
                         } else {
-                            if (!contentSet.dt.Columns.Contains(fieldNameTrim.ToLower())) {
+                            if (!contentSet.dt.Columns.Contains(fieldNameTrim.ToLowerInvariant())) {
                                 if (contentSet.writeable) {
                                     var dtFieldList = new List<string>();
                                     foreach (DataColumn column in contentSet.dt.Columns) dtFieldList.Add(column.ColumnName);
@@ -1846,7 +1846,7 @@ namespace Contensive.Processor.Controllers {
                                     throw new ApplicationException("Field [" + fieldNameTrim + "] was not found in sql [" + contentSet.Source + "]");
                                 }
                             } else {
-                                returnValue = GenericController.encodeText(contentSet.dt.Rows[contentSet.readCacheRowPtr][fieldNameTrim.ToLower()]);
+                                returnValue = GenericController.encodeText(contentSet.dt.Rows[contentSet.readCacheRowPtr][fieldNameTrim.ToLowerInvariant()]);
                             }
                         }
                     }
@@ -1919,7 +1919,7 @@ namespace Contensive.Processor.Controllers {
                 if (csOk(CSPointer)) {
                     if (dataSetStore[CSPointer].writeable) {
                         if (!string.IsNullOrEmpty(dataSetStore[CSPointer].CDef.name)) {
-                            returnFieldTypeid = dataSetStore[CSPointer].CDef.fields[FieldName.ToLower()].fieldTypeId;
+                            returnFieldTypeid = dataSetStore[CSPointer].CDef.fields[FieldName.ToLowerInvariant()].fieldTypeId;
                         }
                     }
                 }
@@ -1943,7 +1943,7 @@ namespace Contensive.Processor.Controllers {
                 if (csOk(CSPointer)) {
                     if (dataSetStore[CSPointer].writeable) {
                         if (!string.IsNullOrEmpty(dataSetStore[CSPointer].CDef.name)) {
-                            returnResult = dataSetStore[CSPointer].CDef.fields[FieldName.ToLower()].caption;
+                            returnResult = dataSetStore[CSPointer].CDef.fields[FieldName.ToLowerInvariant()].caption;
                             if (string.IsNullOrEmpty(returnResult)) {
                                 returnResult = FieldName;
                             }
@@ -2100,7 +2100,7 @@ namespace Contensive.Processor.Controllers {
                             } else if (tempVar.writeable) {
                                 //
                                 // -- get from cdef
-                                fieldTypeId = tempVar.CDef.fields[FieldName.ToLower()].fieldTypeId;
+                                fieldTypeId = tempVar.CDef.fields[FieldName.ToLowerInvariant()].fieldTypeId;
                             } else {
                                 //
                                 // -- else assume text
@@ -2182,13 +2182,13 @@ namespace Contensive.Processor.Controllers {
                         throw new ApplicationException("Cannot set fields for a dataset based on a query.");
                     } else if (contentSet.CDef.fields == null) {
                         throw new ApplicationException("The dataset contains no fields.");
-                    } else if (!contentSet.CDef.fields.ContainsKey(FieldName.ToLower())) {
-                        throw new ApplicationException("The dataset does not contain the field specified [" + FieldName.ToLower() + "].");
+                    } else if (!contentSet.CDef.fields.ContainsKey(FieldName.ToLowerInvariant())) {
+                        throw new ApplicationException("The dataset does not contain the field specified [" + FieldName.ToLowerInvariant() + "].");
                     } else {
-                        if (contentSet.writeCache.ContainsKey(FieldName.ToLower())) {
-                            contentSet.writeCache[FieldName.ToLower()] = filename;
+                        if (contentSet.writeCache.ContainsKey(FieldName.ToLowerInvariant())) {
+                            contentSet.writeCache[FieldName.ToLowerInvariant()] = filename;
                         } else {
-                            contentSet.writeCache.Add(FieldName.ToLower(), filename);
+                            contentSet.writeCache.Add(FieldName.ToLowerInvariant(), filename);
                         }
                     }
                 }
@@ -2724,7 +2724,7 @@ namespace Contensive.Processor.Controllers {
                         try {
                             fieldValue = GenericController.encodeText(csGetValue(CSPointer, FieldName));
                         } catch (Exception ex) {
-                            throw new ApplicationException("Error [" + ex.Message + "] reading field [" + FieldName.ToLower() + "] In source [" + tempVar.Source + "");
+                            throw new ApplicationException("Error [" + ex.Message + "] reading field [" + FieldName.ToLowerInvariant() + "] In source [" + tempVar.Source + "");
                         }
                     } else {
                         //
@@ -2732,14 +2732,14 @@ namespace Contensive.Processor.Controllers {
                         //
                         //ContentName = .ContentName
                         Models.Domain.CDefFieldModel field = null;
-                        if (!tempVar.CDef.fields.ContainsKey(FieldName.ToLower())) {
+                        if (!tempVar.CDef.fields.ContainsKey(FieldName.ToLowerInvariant())) {
                             try {
                                 fieldValue = GenericController.encodeText(csGetValue(CSPointer, FieldName));
                             } catch (Exception ex) {
-                                throw new ApplicationException("Error [" + ex.Message + "] reading field [" + FieldName.ToLower() + "] In content [" + tempVar.CDef.name + "] With custom field list [" + tempVar.SelectTableFieldList + "");
+                                throw new ApplicationException("Error [" + ex.Message + "] reading field [" + FieldName.ToLowerInvariant() + "] In content [" + tempVar.CDef.name + "] With custom field list [" + tempVar.SelectTableFieldList + "");
                             }
                         } else {
-                            field = tempVar.CDef.fields[FieldName.ToLower()];
+                            field = tempVar.CDef.fields[FieldName.ToLowerInvariant()];
                             fieldTypeId = field.fieldTypeId;
                             if (fieldTypeId == fieldTypeIdManyToMany) {
                                 //
@@ -2932,7 +2932,7 @@ namespace Contensive.Processor.Controllers {
                         throw new ApplicationException("Cannot update a contentset created from a sql query.");
                     } else {
                         ContentName = dataSet.ContentName;
-                        FieldNameLc = FieldName.Trim(' ').ToLower();
+                        FieldNameLc = FieldName.Trim(' ').ToLowerInvariant();
                         if (FieldValue == null) {
                             FieldValue = "";
                         }
@@ -3205,7 +3205,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 //recordInactive = (ucaseFieldName == "ACTIVE" && (!GenericController.encodeBoolean(writeCacheValue)));
                                 FieldFoundCount += 1;
-                                Models.Domain.CDefFieldModel field = contentSet.CDef.fields[fieldName.ToLower()];
+                                Models.Domain.CDefFieldModel field = contentSet.CDef.fields[fieldName.ToLowerInvariant()];
                                 string SQLSetPair = "";
                                 bool FieldReadOnly = field.readOnly;
                                 bool FieldAdminAuthorable = ((!field.readOnly) && (!field.notEditable) && (field.authorable));
@@ -3617,7 +3617,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         //iOriginalFilename = genericController.encodeEmptyText(OriginalFilename, "")
                         //
-                        fieldTypeId = CDef.fields[FieldName.ToLower()].fieldTypeId;
+                        fieldTypeId = CDef.fields[FieldName.ToLowerInvariant()].fieldTypeId;
                         //
                         if (string.IsNullOrEmpty(OriginalFilename)) {
                             returnResult = FileController.getVirtualRecordUnixPathFilename(TableName, FieldName, RecordID, fieldTypeId);

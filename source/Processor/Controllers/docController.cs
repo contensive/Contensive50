@@ -257,7 +257,7 @@ namespace Contensive.Processor.Controllers {
                 //if (_contentNameIdDictionary == null) {
                 //    _contentNameIdDictionary = new Dictionary<string, int>();
                 //    foreach (KeyValuePair<int, ContentModel> kvp in contentIdDict) {
-                //        string key = kvp.Value.name.Trim().ToLower();
+                //        string key = kvp.Value.name.Trim().ToLowerInvariant();
                 //        if (!string.IsNullOrEmpty(key)) {
                 //            if (!_contentNameIdDictionary.ContainsKey(key)) {
                 //                _contentNameIdDictionary.Add(key, kvp.Value.id);

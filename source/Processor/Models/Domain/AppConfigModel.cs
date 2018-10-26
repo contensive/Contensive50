@@ -135,7 +135,7 @@ namespace Contensive.Processor.Models.Domain {
             AppConfigModel returnModel = null;
             try {
                 if (!string.IsNullOrEmpty(appName)) {
-                    if (!serverConfig.apps.ContainsKey(appName.ToLower())) {
+                    if (!serverConfig.apps.ContainsKey(appName.ToLowerInvariant())) {
                         //
                         // -- application not configured
                         returnModel = null;
@@ -143,7 +143,7 @@ namespace Contensive.Processor.Models.Domain {
                     } else {
                         //
                         // -- return config object from serverConfig
-                        returnModel = serverConfig.apps[appName.ToLower()];
+                        returnModel = serverConfig.apps[appName.ToLowerInvariant()];
                     }
                 }
             } catch (Exception ex) {
@@ -161,10 +161,10 @@ namespace Contensive.Processor.Models.Domain {
         public void saveObject(CoreController core) {
             try {
                 if (!string.IsNullOrEmpty(name)) {
-                    if (!core.serverConfig.apps.ContainsKey(name.ToLower())) {
+                    if (!core.serverConfig.apps.ContainsKey(name.ToLowerInvariant())) {
                         //
                         // -- application not configured yet
-                        core.serverConfig.apps.Add(name.ToLower(), this);
+                        core.serverConfig.apps.Add(name.ToLowerInvariant(), this);
                     }
                     core.serverConfig.saveObject(core);
                 }

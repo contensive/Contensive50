@@ -285,9 +285,9 @@ namespace Contensive.Processor.Models.Db {
                     foreach (PropertyInfo modelProperty in result.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
                         string propertyName = modelProperty.Name;
                         string propertyValue = "";
-                        if (cdef.fields.ContainsKey(propertyName.ToLower())) {
-                            propertyValue = cdef.fields[propertyName.ToLower()].defaultValue;
-                            switch (propertyName.ToLower()) {
+                        if (cdef.fields.ContainsKey(propertyName.ToLowerInvariant())) {
+                            propertyValue = cdef.fields[propertyName.ToLowerInvariant()].defaultValue;
+                            switch (propertyName.ToLowerInvariant()) {
                                 case "specialcasefield":
                                     break;
                                 default:
@@ -598,7 +598,7 @@ namespace Contensive.Processor.Models.Db {
                     foreach (PropertyInfo modelProperty in modelInstance.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
                         string propertyName = modelProperty.Name;
                         string propertyValue = row[propertyName].ToString();
-                        switch (propertyName.ToLower()) {
+                        switch (propertyName.ToLowerInvariant()) {
                             case "specialcasefield":
                                 break;
                             default:
@@ -723,7 +723,7 @@ namespace Contensive.Processor.Models.Db {
                     string datasourceName = derivedDataSourceName(instanceType);
                     var sqlPairs = new SqlFieldListClass();
                     foreach (PropertyInfo instanceProperty in this.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
-                        switch (instanceProperty.Name.ToLower()) {
+                        switch (instanceProperty.Name.ToLowerInvariant()) {
                             case "id":
                                 //id = cs.getInteger("id");
                                 break;
@@ -836,7 +836,7 @@ namespace Contensive.Processor.Models.Db {
                                                 //
                                                 // -- save content
                                                 if (string.IsNullOrEmpty(filename)) {
-                                                    filename = FileController.getVirtualRecordUnixPathFilename(tableName, instanceProperty.Name.ToLower(), id, fieldTypeId);
+                                                    filename = FileController.getVirtualRecordUnixPathFilename(tableName, instanceProperty.Name.ToLowerInvariant(), id, fieldTypeId);
                                                 }
                                                 core.cdnFiles.saveFile(filename, content);
                                                 sqlPairs.add(instanceProperty.Name, core.db.encodeSQLText(filename) );

@@ -122,19 +122,19 @@ namespace Contensive.Processor.Controllers {
             try {
                 //
                 // -- method 2 - if name/id dictionary doesnt have it, load the one record
-                if (core.doc.contentNameIdDictionary.ContainsKey(contentName.ToLower())) {
-                    returnId = core.doc.contentNameIdDictionary[contentName.ToLower()];
+                if (core.doc.contentNameIdDictionary.ContainsKey(contentName.ToLowerInvariant())) {
+                    returnId = core.doc.contentNameIdDictionary[contentName.ToLowerInvariant()];
                 } else {
                     ContentModel content = ContentModel.createByUniqueName(core, contentName);
                     if (content != null) {
-                        core.doc.contentNameIdDictionary.Add(contentName.ToLower(), content.id);
+                        core.doc.contentNameIdDictionary.Add(contentName.ToLowerInvariant(), content.id);
                         returnId = content.id;
                     }
                 }
                 //
                 // -- method-1, on first request, load all content records
-                //if (core.doc.contentNameIdDictionary.ContainsKey(contentName.ToLower())) {
-                //    returnId = core.doc.contentNameIdDictionary[contentName.ToLower()];
+                //if (core.doc.contentNameIdDictionary.ContainsKey(contentName.ToLowerInvariant())) {
+                //    returnId = core.doc.contentNameIdDictionary[contentName.ToLowerInvariant()];
                 //}
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
@@ -436,7 +436,7 @@ namespace Contensive.Processor.Controllers {
                     // get contentid of content
                     //
                     int ContentIDofContent = 0;
-                    if (cdef.name.ToLower() == "content") {
+                    if (cdef.name.ToLowerInvariant() == "content") {
                         ContentIDofContent = returnContentId;
                     } else {
                         SQL = "select ID from ccContent where (name='content') order by id;";
@@ -982,7 +982,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 cdef = CDefModel.create(core, ContentName);
                 if (cdef != null) {
-                    returnOk = cdef.fields.ContainsKey(FieldName.ToLower());
+                    returnOk = cdef.fields.ContainsKey(FieldName.ToLowerInvariant());
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
@@ -1087,7 +1087,7 @@ namespace Contensive.Processor.Controllers {
                 } else {
                     foreach (KeyValuePair<string, Models.Domain.CDefFieldModel> keyValuePair in Contentdefinition.fields) {
                         Models.Domain.CDefFieldModel field = keyValuePair.Value;
-                        if (FieldName.ToLower() == field.nameLc) {
+                        if (FieldName.ToLowerInvariant() == field.nameLc) {
                             switch (PropertyName.ToUpper()) {
                                 case "FIELDTYPE":
                                 case "TYPE":

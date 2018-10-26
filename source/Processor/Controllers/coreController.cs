@@ -583,7 +583,7 @@ namespace Contensive.Processor.Controllers {
                         if (string.IsNullOrEmpty(normalizedRoute)) {
                             //
                             // -- no override or argument, use the url as the route
-                            normalizedRoute = GenericController.normalizeRoute(webServer.requestPathPage.ToLower());
+                            normalizedRoute = GenericController.normalizeRoute(webServer.requestPathPage.ToLowerInvariant());
                         }
                     }
                     //

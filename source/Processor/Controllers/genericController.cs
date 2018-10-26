@@ -879,7 +879,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="Delimiter"></param>
         /// <returns></returns>
         public static bool isInDelimitedString(string stringToSearch, string find, string Delimiter) {
-            return ((Delimiter + stringToSearch + Delimiter).ToLower().IndexOf((Delimiter + find + Delimiter).ToLower()) >= 0);
+            return ((Delimiter + stringToSearch + Delimiter).ToLowerInvariant().IndexOf((Delimiter + find + Delimiter).ToLowerInvariant()) >= 0);
         }
         //========================================================================
         /// <summary>
@@ -1493,7 +1493,7 @@ namespace Contensive.Processor.Controllers {
             } else if (Expression.IsNumeric()) {
                 tempEncodeBoolean = (encodeText(Expression) != "0");
             } else if (Expression is string) {
-                switch (Expression.ToString().ToLower().Trim()) {
+                switch (Expression.ToString().ToLowerInvariant().Trim()) {
                     case "on":
                     case "yes":
                     case "true":
@@ -1785,7 +1785,7 @@ namespace Contensive.Processor.Controllers {
         public static List<string> convertDataTableColumntoItemList(DataTable dt) {
             List<string> returnString = new List<string>();
             foreach (DataRow dr in dt.Rows) {
-                returnString.Add(dr[0].ToString().ToLower());
+                returnString.Add(dr[0].ToString().ToLowerInvariant());
             }
             return returnString;
         }
@@ -1832,7 +1832,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="route"></param>
         /// <returns></returns>
         public static string normalizeRoute(string route) {
-            string normalizedRoute = route.ToLower().Trim();
+            string normalizedRoute = route.ToLowerInvariant().Trim();
             try {
                 if (string.IsNullOrEmpty(normalizedRoute)) {
                     normalizedRoute = "";
@@ -2006,7 +2006,7 @@ namespace Contensive.Processor.Controllers {
             if (string.IsNullOrEmpty(source)) {
                 return "";
             } else {
-                return source.ToLower();
+                return source.ToLowerInvariant();
             }
         }
         //
@@ -2115,7 +2115,7 @@ namespace Contensive.Processor.Controllers {
         // main_encodeCookieName, replace invalid cookie characters with %hex
         //
         public static string encodeCookieName(string Source) {
-            return encodeURL(Source).ToLower();
+            return encodeURL(Source).ToLowerInvariant();
         }
         //
         // ====================================================================================================
@@ -2500,7 +2500,7 @@ namespace Contensive.Processor.Controllers {
             if ((source1 == null) || (source2 == null)) {
                 return false;
             } else {
-                return (source1.ToLower() == source2.ToLower());
+                return (source1.ToLowerInvariant() == source2.ToLowerInvariant());
             }
         }
 

@@ -109,9 +109,9 @@ namespace Contensive.Addons.AdminSite {
                 Stream.Add(GetForm_EditFormStart(core,adminData, AdminFormEdit));
                 bool IsLandingPageParent = false;
                 int TemplateIDForStyles = 0;
-                bool IsTemplateTable = (adminData.adminContent.tableName.ToLower() == Processor.Models.Db.PageTemplateModel.contentTableName);
-                bool IsPageContentTable = (adminData.adminContent.tableName.ToLower() == Processor.Models.Db.PageContentModel.contentTableName);
-                bool IsEmailTable = (adminData.adminContent.tableName.ToLower() == Processor.Models.Db.EmailModel.contentTableName);
+                bool IsTemplateTable = (adminData.adminContent.tableName.ToLowerInvariant() == Processor.Models.Db.PageTemplateModel.contentTableName);
+                bool IsPageContentTable = (adminData.adminContent.tableName.ToLowerInvariant() == Processor.Models.Db.PageContentModel.contentTableName);
+                bool IsEmailTable = (adminData.adminContent.tableName.ToLowerInvariant() == Processor.Models.Db.EmailModel.contentTableName);
                 int emailIdForStyles = IsEmailTable ? adminData.editRecord.id : 0;
                 bool IsLandingPage = false;
                 bool IsRootPage = false;
@@ -246,11 +246,11 @@ namespace Contensive.Addons.AdminSite {
                 string styleOptionList = "";
                 string editorAddonListJSON = core.html.getWysiwygAddonList(ContentType);
                 string styleList = "";
-                string adminContentTableNameLower = adminData.adminContent.tableName.ToLower();
+                string adminContentTableNameLower = adminData.adminContent.tableName.ToLowerInvariant();
                 //
                 LogController.logTrace(core, "getFormEdit, adminInfo.editRecord.contentControlId [" + adminData.editRecord.contentControlId + "]");
                 //
-                if (adminContentTableNameLower == PersonModel.contentTableName.ToLower()) {
+                if (adminContentTableNameLower == PersonModel.contentTableName.ToLowerInvariant()) {
                     //
                     // -- people
                     if (!(core.session.isAuthenticatedAdmin(core))) {
@@ -280,7 +280,7 @@ namespace Contensive.Addons.AdminSite {
                         if (adminData.allowAdminTabs) Stream.Add(adminMenu.menuComboTab.GetTabs(core));
                         Stream.Add(EditSectionButtonBar);
                     }
-                } else if (adminContentTableNameLower == EmailModel.contentTableName.ToLower()) {
+                } else if (adminContentTableNameLower == EmailModel.contentTableName.ToLowerInvariant()) {
                     //
                     LogController.logTrace(core, "getFormEdit, treat as email, adminContentTableNameLower [" + adminContentTableNameLower + "]");
                     //
@@ -395,7 +395,7 @@ namespace Contensive.Addons.AdminSite {
                         if (adminData.allowAdminTabs) Stream.Add(adminMenu.menuComboTab.GetTabs(core));
                         Stream.Add(EditSectionButtonBar);
                     }
-                } else if (adminData.adminContent.tableName.ToLower() == ContentModel.contentTableName.ToLower()) {
+                } else if (adminData.adminContent.tableName.ToLowerInvariant() == ContentModel.contentTableName.ToLowerInvariant()) {
                     if (!(core.session.isAuthenticatedAdmin(core))) {
                         //
                         // Must be admin
@@ -428,7 +428,7 @@ namespace Contensive.Addons.AdminSite {
                         Stream.Add(EditSectionButtonBar);
                     }
                     //
-                } else if (adminContentTableNameLower == PageContentModel.contentTableName.ToLower()) {
+                } else if (adminContentTableNameLower == PageContentModel.contentTableName.ToLowerInvariant()) {
                     //
                     // Page Content
                     //
@@ -457,7 +457,7 @@ namespace Contensive.Addons.AdminSite {
                         Stream.Add(adminMenu.menuComboTab.GetTabs(core));
                     }
                     Stream.Add(EditSectionButtonBar);
-                    //else if (adminContentTableNameLower == sectionModel.contentTableName.ToLower()) {
+                    //else if (adminContentTableNameLower == sectionModel.contentTableName.ToLowerInvariant()) {
                     //    '
                     //    ' Site Sections
                     //    '
@@ -491,7 +491,7 @@ namespace Contensive.Addons.AdminSite {
                     //    End If
                     //    Call Stream.Add(EditSectionButtonBar)
 
-                    //} else if (adminContentTableNameLower == libraryFoldersModel.contentTableName.ToLower()) {
+                    //} else if (adminContentTableNameLower == libraryFoldersModel.contentTableName.ToLowerInvariant()) {
                     //    //
                     //    // Library Folders
                     //    //
@@ -508,7 +508,7 @@ namespace Contensive.Addons.AdminSite {
                     //    Stream.Add(EditSectionButtonBar);
                     //
                     //ORIGINAL LINE: Case genericController.vbUCase("ccGroups")
-                    //} else if (adminContentTableNameLower == groupModel.contentTableName.ToLower()) {
+                    //} else if (adminContentTableNameLower == groupModel.contentTableName.ToLowerInvariant()) {
                     //    //
                     //    // Groups
                     //    //
@@ -536,7 +536,7 @@ namespace Contensive.Addons.AdminSite {
                     //        Stream.Add(adminMenu.menuComboTab.GetTabs(core));
                     //    }
                     //    Stream.Add(EditSectionButtonBar);
-                    //} else if (adminContentTableNameLower == layoutModel.contentTableName.ToLower()) {
+                    //} else if (adminContentTableNameLower == layoutModel.contentTableName.ToLowerInvariant()) {
                     //    //
                     //    // LAYOUTS
                     //    string EditSectionButtonBar = adminUIController.getButtonBarForEdit(core, new editButtonBarInfoClass() {
@@ -709,7 +709,7 @@ namespace Contensive.Addons.AdminSite {
                     Dictionary<string, CDefFieldModel> sortingFields = new Dictionary<string, CDefFieldModel>();
                     foreach (var keyValuePair in adminData.adminContent.fields) {
                         CDefFieldModel field = keyValuePair.Value;
-                        if (field.editTabName.ToLower() == EditTab.ToLower()) {
+                        if (field.editTabName.ToLowerInvariant() == EditTab.ToLowerInvariant()) {
                             if (AdminDataModel.IsVisibleUserField(core, field.adminOnly, field.developerOnly, field.active, field.authorable, field.nameLc, adminData.adminContent.tableName)) {
                                 AlphaSort = GenericController.getIntegerString(field.editSortPriority, 10) + "-" + GenericController.getIntegerString(field.id, 10);
                                 sortingFields.Add(AlphaSort, field);
@@ -734,8 +734,8 @@ namespace Contensive.Addons.AdminSite {
                         if (field.uniqueName) {
                             fieldCaption = "&nbsp;**" + fieldCaption;
                         } else {
-                            if (field.nameLc.ToLower() == "email") {
-                                if ((adminData.adminContent.tableName.ToLower() == "ccmembers") && ((core.siteProperties.getBoolean("allowemaillogin", false)))) {
+                            if (field.nameLc.ToLowerInvariant() == "email") {
+                                if ((adminData.adminContent.tableName.ToLowerInvariant() == "ccmembers") && ((core.siteProperties.getBoolean("allowemaillogin", false)))) {
                                     fieldCaption = "&nbsp;***" + fieldCaption;
                                     needUniqueEmailMessage = true;
                                 }
@@ -1633,15 +1633,15 @@ namespace Contensive.Addons.AdminSite {
                 FormFieldList = ",";
                 foreach (KeyValuePair<string, CDefFieldModel> keyValuePair in adminData.adminContent.fields) {
                     CDefFieldModel field = keyValuePair.Value;
-                    if ((field.authorable) && (field.active) && (!TabsFound.Contains(field.editTabName.ToLower()))) {
-                        TabsFound.Add(field.editTabName.ToLower());
+                    if ((field.authorable) && (field.active) && (!TabsFound.Contains(field.editTabName.ToLowerInvariant()))) {
+                        TabsFound.Add(field.editTabName.ToLowerInvariant());
                         fieldNameLc = field.nameLc;
                         editTabCaption = field.editTabName;
                         if (string.IsNullOrEmpty(editTabCaption)) {
                             editTabCaption = "Details";
                         }
                         NewFormFieldList = "";
-                        if ((!adminData.allowAdminTabs) || (!allowAjaxTabs) || (editTabCaption.ToLower() == "details")) {
+                        if ((!adminData.allowAdminTabs) || (!allowAjaxTabs) || (editTabCaption.ToLowerInvariant() == "details")) {
                             //
                             // Live Tab (non-tab mode, non-ajax mode, or details tab
                             //

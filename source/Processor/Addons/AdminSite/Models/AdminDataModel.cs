@@ -327,7 +327,7 @@ namespace Contensive.Addons.AdminSite {
                 bool HasEditRights = false;
                 //
                 tempIsVisibleUserField = false;
-                if ((TableName.ToLower() == "ccpagecontent") && (Name.ToLower() == "linkalias")) {
+                if ((TableName.ToLowerInvariant() == "ccpagecontent") && (Name.ToLowerInvariant() == "linkalias")) {
                     //
                     // ccpagecontent.linkalias is a control field that is not in control tab
                     //
@@ -412,10 +412,10 @@ namespace Contensive.Addons.AdminSite {
         /// <returns></returns>
         public string getWherePairValue(string FieldName) {
             try {
-                FieldName = FieldName.ToLower();
+                FieldName = FieldName.ToLowerInvariant();
                 if (WherePairCount > 0) {
                     for (int WhereCount = 0; WhereCount < WherePairCount; WhereCount++) {
-                        if (FieldName == WherePair[0, WhereCount].ToLower()) {
+                        if (FieldName == WherePair[0, WhereCount].ToLowerInvariant()) {
                             return WherePair[1, WhereCount];
                         }
                     }
@@ -1185,7 +1185,7 @@ namespace Contensive.Addons.AdminSite {
                 var FormFieldLcListToBeLoaded = new List<string> { };
                 string formFieldList = core.docProperties.getText("FormFieldList");
                 if (!string.IsNullOrWhiteSpace(formFieldList)) {
-                    FormFieldLcListToBeLoaded.AddRange(formFieldList.ToLower().Split(','));
+                    FormFieldLcListToBeLoaded.AddRange(formFieldList.ToLowerInvariant().Split(','));
                     // -- remove possible front and end spaces
                     if (FormFieldLcListToBeLoaded.Contains("")) {
                         FormFieldLcListToBeLoaded.Remove("");
@@ -1199,7 +1199,7 @@ namespace Contensive.Addons.AdminSite {
                 var FormEmptyFieldLcList = new List<string> { };
                 string emptyFieldList = core.docProperties.getText("FormEmptyFieldList");
                 if (!string.IsNullOrWhiteSpace(emptyFieldList)) {
-                    FormEmptyFieldLcList.AddRange(emptyFieldList.ToLower().Split(','));
+                    FormEmptyFieldLcList.AddRange(emptyFieldList.ToLowerInvariant().Split(','));
                     // -- remove possible front and end spaces
                     if (FormEmptyFieldLcList.Contains("")) {
                         FormEmptyFieldLcList.Remove("");
@@ -1485,7 +1485,7 @@ namespace Contensive.Addons.AdminSite {
                                         // ----- Link field - if it starts with 'www.', add the http:// automatically
                                         //
                                         ResponseFieldValueText = GenericController.encodeText(ResponseFieldValueText);
-                                        if (ResponseFieldValueText.ToLower().Left(4) == "www.") {
+                                        if (ResponseFieldValueText.ToLowerInvariant().Left(4) == "www.") {
                                             ResponseFieldValueText = "http//" + ResponseFieldValueText;
                                         }
                                         break;
@@ -1528,7 +1528,7 @@ namespace Contensive.Addons.AdminSite {
                                                 //   then cannot fixgure out how to remove it
                                                 //
                                                 ResponseFieldValueText = ActiveContentController.processWysiwygResponseForSave(core, ResponseFieldValueText);
-                                                if (string.IsNullOrEmpty(ResponseFieldValueText.ToLower().Replace(' '.ToString(), "").Replace("&nbsp;", ""))) {
+                                                if (string.IsNullOrEmpty(ResponseFieldValueText.ToLowerInvariant().Replace(' '.ToString(), "").Replace("&nbsp;", ""))) {
                                                     ResponseFieldValueText = "";
                                                 }
                                             }

@@ -156,8 +156,8 @@ namespace Contensive.Processor.Models.Db {
         public static Dictionary<string,DomainModel> createDictionary(CoreController core, string sqlCriteria) {
             var result = new Dictionary<string, DomainModel> { };
             foreach (var domain in createList(core, sqlCriteria)) {
-                if (!result.ContainsKey(domain.name.ToLower())) {
-                    result.Add(domain.name.ToLower(), domain);
+                if (!result.ContainsKey(domain.name.ToLowerInvariant())) {
+                    result.Add(domain.name.ToLowerInvariant(), domain);
                 }
             }
             return result;

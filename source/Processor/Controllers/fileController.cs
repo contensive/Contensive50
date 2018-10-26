@@ -766,7 +766,7 @@ namespace Contensive.Processor.Controllers {
                 string filename = "";
                 // no, cannot change case here. paths should be lcase before the call, file case should be preserved.
                 splitUnixPathFilename(unixAbsPathFilename, ref path, ref filename);
-                //splitUnixPathFilename(unixAbsPathFilename.ToLower(), ref pathLowercase, ref filenameLowercase);
+                //splitUnixPathFilename(unixAbsPathFilename.ToLowerInvariant(), ref pathLowercase, ref filenameLowercase);
                 string s3Key = convertToDosSlash(path);
                 Amazon.S3.IO.S3DirectoryInfo s3DirectoryInfo = new Amazon.S3.IO.S3DirectoryInfo(s3Client, core.serverConfig.awsBucketName, s3Key);
                 return s3DirectoryInfo.GetFiles(filename).Any();
@@ -1206,7 +1206,7 @@ namespace Contensive.Processor.Controllers {
             // -- convert to dos slash and lowercase()
             // no, should not lowercase the filenames, just the path. An uploaded image to S3 must match the link saved for it so any case change must happen before call to fileController.
             string returnPathFilename = pathFilename.Replace("/", "\\");
-            //string returnPath = path.Replace("/", "\\").ToLower();
+            //string returnPath = path.Replace("/", "\\").ToLowerInvariant();
             //
             // -- remove accidental double slashes
             while (returnPathFilename.IndexOf("\\\\") >= 0) {
@@ -1255,7 +1255,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="path"></param>
         /// <returns></returns>
         public bool isinLocalAbsDosPath(string path) {
-            return (normalizeDosPath(path).ToLower().IndexOf(localAbsRootPath.ToLower()) == 0);
+            return (normalizeDosPath(path).ToLowerInvariant().IndexOf(localAbsRootPath.ToLowerInvariant()) == 0);
         }
         //
         //========================================================================
@@ -1271,10 +1271,10 @@ namespace Contensive.Processor.Controllers {
             bool success = false;
             returnFilename = "";
             try {
-                string key = htmlTagName.ToLower();
+                string key = htmlTagName.ToLowerInvariant();
                 if (core.docProperties.containsKey(key)) {
                     var docProperty = core.docProperties.getProperty(key);
-                    if ((docProperty.IsFile) && (docProperty.Name.ToLower() == key)) {
+                    if ((docProperty.IsFile) && (docProperty.Name.ToLowerInvariant() == key)) {
                         string dosPathFilename = FileController.normalizeDosPath(path);
                         returnFilename = encodeDosFilename(docProperty.Value);
                         dosPathFilename += returnFilename;
@@ -1308,7 +1308,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static string getVirtualTableFieldUnixPath(string tableName, string fieldName) {
             string result = tableName + "/" + fieldName + "/";
-            return result.ToLower().Replace(" ", "_").Replace(".", "_");
+            return result.ToLowerInvariant().Replace(" ", "_").Replace(".", "_");
         }
         //
         //========================================================================
@@ -1397,7 +1397,7 @@ namespace Contensive.Processor.Controllers {
                         string localDosPathFilename = GenericController.convertToDosSlash(pathFilename);
                         // no, cannot change the case here
                         string remoteUnixPathFilenameLowercase = GenericController.convertToUnixSlash(joinPath(remotePathPrefix, pathFilename));
-                        //string remoteUnixPathFilenameLowercase = genericController.convertToUnixSlash(joinPath(remotePathPrefix, pathFilename)).ToLower();
+                        //string remoteUnixPathFilenameLowercase = genericController.convertToUnixSlash(joinPath(remotePathPrefix, pathFilename)).ToLowerInvariant();
                         verifyPath_remote(getPath(pathFilename));
                         //
                         // -- Setup request for putting an object in S3.
@@ -1530,8 +1530,8 @@ namespace Contensive.Processor.Controllers {
             try {
                 string path = "";
                 splitDosPathFilename(pathFilename, ref path, ref filename);
-                filename = filename.ToLower();
-                FileDetail resultFile = getFileList(path).Find(x => x.Name.ToLower() == filename);
+                filename = filename.ToLowerInvariant();
+                FileDetail resultFile = getFileList(path).Find(x => x.Name.ToLowerInvariant() == filename);
                 if (resultFile != null) {
                     filename = resultFile.Name;
                 }

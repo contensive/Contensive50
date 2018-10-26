@@ -281,7 +281,7 @@ namespace Contensive.Addons.AdminSite {
                                         }
                                     }
                                 }
-                                string ButtonFace = adminData.adminContent.fields[FieldName.ToLower()].caption;
+                                string ButtonFace = adminData.adminContent.fields[FieldName.ToLowerInvariant()].caption;
                                 ButtonFace = GenericController.vbReplace(ButtonFace, " ", "&nbsp;");
                                 string SortTitle = "Sort A-Z";
                                 //
@@ -352,7 +352,7 @@ namespace Contensive.Addons.AdminSite {
                                     //
                                     // --- field columns
                                     foreach (var column in IndexConfig.columns) {
-                                        string columnNameLc = column.Name.ToLower();
+                                        string columnNameLc = column.Name.ToLowerInvariant();
                                         if (FieldUsedInColumns.ContainsKey(columnNameLc)) {
                                             if (FieldUsedInColumns[columnNameLc]) {
                                                 DataTable_DataRows += ("\r\n<td valign=\"middle\" " + RowColor + " align=\"left\">" + SpanClassAdminNormal);
@@ -564,7 +564,7 @@ namespace Contensive.Addons.AdminSite {
             //
             // add groups to caption
             //
-            if ((content.tableName.ToLower() == "ccmembers") && (IndexConfig.GroupListCnt > 0)) {
+            if ((content.tableName.ToLowerInvariant() == "ccmembers") && (IndexConfig.GroupListCnt > 0)) {
                 string GroupList = "";
                 for (int Ptr = 0; Ptr < IndexConfig.GroupListCnt; Ptr++) {
                     if (IndexConfig.GroupList[Ptr] != "") {
@@ -705,9 +705,9 @@ namespace Contensive.Addons.AdminSite {
                                 ColumnCnt = core.docProperties.getInteger("ColumnCnt");
                                 if (ColumnCnt > 0) {
                                     for (ColumnPtr = 0; ColumnPtr < ColumnCnt; ColumnPtr++) {
-                                        FindName = core.docProperties.getText("FindName" + ColumnPtr).ToLower();
+                                        FindName = core.docProperties.getText("FindName" + ColumnPtr).ToLowerInvariant();
                                         if (!string.IsNullOrEmpty(FindName)) {
-                                            if (adminData.adminContent.fields.ContainsKey(FindName.ToLower())) {
+                                            if (adminData.adminContent.fields.ContainsKey(FindName.ToLowerInvariant())) {
                                                 FindValue = encodeText(core.docProperties.getText("FindValue" + ColumnPtr)).Trim(' ');
                                                 if (string.IsNullOrEmpty(FindValue)) {
                                                     //
@@ -721,7 +721,7 @@ namespace Contensive.Addons.AdminSite {
                                                     if (IndexConfig.FindWords.ContainsKey(FindName)) {
                                                         IndexConfig.FindWords[FindName].Value = FindValue;
                                                     } else {
-                                                        CDefFieldModel field = adminData.adminContent.fields[FindName.ToLower()];
+                                                        CDefFieldModel field = adminData.adminContent.fields[FindName.ToLowerInvariant()];
                                                         var findWord = new IndexConfigClass.IndexConfigFindWordClass {
                                                             Name = FindName,
                                                             Value = FindValue
@@ -815,7 +815,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // Add Groups
                     //
-                    VarText = core.docProperties.getText("IndexFilterAddGroup").ToLower();
+                    VarText = core.docProperties.getText("IndexFilterAddGroup").ToLowerInvariant();
                     if (!string.IsNullOrEmpty(VarText)) {
                         if (IndexConfig.GroupListCnt > 0) {
                             for (Ptr = 0; Ptr < IndexConfig.GroupListCnt; Ptr++) {
@@ -834,7 +834,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // Remove Groups
                     //
-                    VarText = core.docProperties.getText("IndexFilterRemoveGroup").ToLower();
+                    VarText = core.docProperties.getText("IndexFilterRemoveGroup").ToLowerInvariant();
                     if (!string.IsNullOrEmpty(VarText)) {
                         if (IndexConfig.GroupListCnt > 0) {
                             for (Ptr = 0; Ptr < IndexConfig.GroupListCnt; Ptr++) {
@@ -849,7 +849,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // Remove FindWords
                     //
-                    VarText = core.docProperties.getText("IndexFilterRemoveFind").ToLower();
+                    VarText = core.docProperties.getText("IndexFilterRemoveFind").ToLowerInvariant();
                     if (!string.IsNullOrEmpty(VarText)) {
                         if (IndexConfig.FindWords.ContainsKey(VarText)) {
                             IndexConfig.FindWords.Remove(VarText);
@@ -928,7 +928,7 @@ namespace Contensive.Addons.AdminSite {
                     } else {
                         //
                         // SortField
-                        string setSortField = core.docProperties.getText("SetSortField").ToLower();
+                        string setSortField = core.docProperties.getText("SetSortField").ToLowerInvariant();
                         if (!string.IsNullOrEmpty(setSortField)) {
                             bool sortFound = IndexConfig.Sorts.ContainsKey(setSortField);
                             int sortDirection = core.docProperties.getInteger("SetSortDirection");
@@ -1060,7 +1060,7 @@ namespace Contensive.Addons.AdminSite {
                             //
                             // test sorts
                             //
-                            if (IndexConfig.Sorts.ContainsKey(field.nameLc.ToLower())) {
+                            if (IndexConfig.Sorts.ContainsKey(field.nameLc.ToLowerInvariant())) {
                                 IncludedInLeftJoin = true;
                             }
                         }
@@ -1097,7 +1097,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 DateTime rightNow = DateTime.Now;
                 string sqlRightNow = core.db.encodeSQLDate(rightNow);
-                if (adminData.adminContent.tableName.ToLower() == "ccmembers") {
+                if (adminData.adminContent.tableName.ToLowerInvariant() == "ccmembers") {
                     if (IndexConfig.GroupListCnt > 0) {
                         for (Ptr = 0; Ptr < IndexConfig.GroupListCnt; Ptr++) {
                             GroupName = IndexConfig.GroupList[Ptr];
@@ -1829,7 +1829,7 @@ namespace Contensive.Addons.AdminSite {
                 int Pos = 0;
                 int lookupTableCnt = 0;
                 //
-                var tempVar = adminData.adminContent.fields[fieldName.ToLower()];
+                var tempVar = adminData.adminContent.fields[fieldName.ToLowerInvariant()];
                 lookupTableCnt = tempVar.id; // workaround for universally creating the left join tablename for each field
                 switch (tempVar.fieldTypeId) {
                     //Case FieldTypeImage

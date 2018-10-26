@@ -756,7 +756,7 @@ namespace Contensive.Processor.Controllers {
                 if (core.doc.continueProcessing) {
                     //
                     // -- setup domain
-                    string domainTest = core.webServer.requestDomain.Trim().ToLower().Replace("..", ".");
+                    string domainTest = core.webServer.requestDomain.Trim().ToLowerInvariant().Replace("..", ".");
                     core.doc.domain = null;
                     if (!string.IsNullOrEmpty(domainTest)) {
                         int posDot = 0;
@@ -843,7 +843,7 @@ namespace Contensive.Processor.Controllers {
 
                     //        foreach (string key in core.docProperties.getKeyList()) {
                     //            docPropertiesClass docProperty = core.docProperties.getProperty(key);
-                    //            if (key.ToLower() != "contensiveuserform") {
+                    //            if (key.ToLowerInvariant() != "contensiveuserform") {
                     //                Copy += docProperty.Name + "=" + docProperty.Value + "\r\n";
                     //            }
                     //        }
@@ -1238,7 +1238,7 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                     bool SecureLink_Required = SecureLink_Template_Required || SecureLink_Page_Required;
-                    bool SecureLink_CurrentURL = (core.webServer.requestUrl.ToLower().Left( 8) == "https://");
+                    bool SecureLink_CurrentURL = (core.webServer.requestUrl.ToLowerInvariant().Left( 8) == "https://");
                     if (SecureLink_CurrentURL && (!SecureLink_Required)) {
                         //
                         // -- redirect to non-secure

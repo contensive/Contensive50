@@ -665,7 +665,7 @@ namespace Contensive.Addons.Tools {
                                             Processor.Models.Domain.CDefFieldModel field = CDef.fields[adminColumn.Name];
                                             FieldName = adminColumn.Name;
                                             CS1 = core.db.csOpenRecord("Content Fields", field.id);
-                                            if ((CDef.fields[FieldName.ToLower()].id == TargetFieldID) && (columnPtr < CDef.adminColumns.Count)) {
+                                            if ((CDef.fields[FieldName.ToLowerInvariant()].id == TargetFieldID) && (columnPtr < CDef.adminColumns.Count)) {
                                                 core.db.csSet(CS1, "IndexColumn", (columnPtr + 1) * 10);
                                                 //
                                                 MoveNextColumn = true;
@@ -734,7 +734,7 @@ namespace Contensive.Addons.Tools {
                                     //    If CDef.adminColumns.Count > 1 Then
                                     //        For ColumnPointer = 0 To CDef.adminColumns.Count - 1
                                     //            FieldName = CDef.adminColumns(ColumnPointer).Name
-                                    //            fieldId = CDef.fields[FieldName.ToLower()].Id
+                                    //            fieldId = CDef.fields[FieldName.ToLowerInvariant()].Id
                                     //            CSPointer = core.main_OpenCSContentRecord("Content Fields", fieldId)
                                     //            If fieldId = TargetFieldID Then
                                     //                Call core.app.SetCS(CSPointer, "IndexSortPriority", 0)
@@ -757,7 +757,7 @@ namespace Contensive.Addons.Tools {
                                     //    If CDef.adminColumns.Count > 1 Then
                                     //        For ColumnPointer = 0 To CDef.adminColumns.Count - 1
                                     //            FieldName = CDef.adminColumns(ColumnPointer).Name
-                                    //            fieldId = CDef.fields[FieldName.ToLower()].Id
+                                    //            fieldId = CDef.fields[FieldName.ToLowerInvariant()].Id
                                     //            CSPointer = core.main_OpenCSContentRecord("Content Fields", fieldId)
                                     //            If fieldId = TargetFieldID Then
                                     //                Call core.app.SetCS(CSPointer, "IndexSortPriority", 0)
@@ -785,7 +785,7 @@ namespace Contensive.Addons.Tools {
                                     //        ColumnWidthIncrease = ColumnWidthTotal * 0.1
                                     //        For ColumnPointer = 0 To CDef.adminColumns.Count - 1
                                     //            FieldName = CDef.adminColumns(ColumnPointer).Name
-                                    //            fieldId = CDef.fields[FieldName.ToLower()].Id
+                                    //            fieldId = CDef.fields[FieldName.ToLowerInvariant()].Id
                                     //            If fieldId <> TargetFieldID Then
                                     //                ColumnWidthBalance = ColumnWidthBalance + CDef.adminColumns(ColumnPointer).Width
                                     //            End If
@@ -796,7 +796,7 @@ namespace Contensive.Addons.Tools {
                                     //        If ColumnWidthBalance > 0 Then
                                     //            For ColumnPointer = 0 To CDef.adminColumns.Count - 1
                                     //                FieldName = CDef.adminColumns(ColumnPointer).Name
-                                    //                fieldId = CDef.fields[FieldName.ToLower()].Id
+                                    //                fieldId = CDef.fields[FieldName.ToLowerInvariant()].Id
                                     //                CSPointer = core.main_OpenCSContentRecord("Content Fields", fieldId)
                                     //                If fieldId = TargetFieldID Then
                                     //                    '
@@ -831,7 +831,7 @@ namespace Contensive.Addons.Tools {
                                     //        ColumnWidthIncrease = -(ColumnWidthTotal * 0.1)
                                     //        For ColumnPointer = 0 To CDef.adminColumns.Count - 1
                                     //            FieldName = CDef.adminColumns(ColumnPointer).Name
-                                    //            fieldId = CDef.fields[FieldName.ToLower()].Id
+                                    //            fieldId = CDef.fields[FieldName.ToLowerInvariant()].Id
                                     //            If fieldId = TargetFieldID Then
                                     //                FieldWidth = CDef.adminColumns(ColumnPointer).Width
                                     //                If (FieldWidth + ColumnWidthIncrease) < 10 Then
@@ -847,7 +847,7 @@ namespace Contensive.Addons.Tools {
                                     //        If (ColumnWidthBalance > 0) And (ColumnWidthIncrease <> 0) Then
                                     //            For ColumnPointer = 0 To CDef.adminColumns.Count - 1
                                     //                FieldName = CDef.adminColumns(ColumnPointer).Name
-                                    //                fieldId = CDef.fields[FieldName.ToLower()].Id
+                                    //                fieldId = CDef.fields[FieldName.ToLowerInvariant()].Id
                                     //                CSPointer = core.main_OpenCSContentRecord("Content Fields", fieldId)
                                     //                If fieldId = TargetFieldID Then
                                     //                    '
@@ -941,7 +941,7 @@ namespace Contensive.Addons.Tools {
                                 //
                                 ColumnWidth = encodeInteger(100 * (kvp.Value.Width / (double)ColumnWidthTotal));
                                 FieldName = kvp.Value.Name;
-                                var tempVar = CDef.fields[FieldName.ToLower()];
+                                var tempVar = CDef.fields[FieldName.ToLowerInvariant()];
                                 fieldId = tempVar.id;
                                 Caption = tempVar.caption;
                                 if (tempVar.inherited) {

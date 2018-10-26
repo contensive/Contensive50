@@ -443,7 +443,7 @@ namespace Contensive.Processor.Models.Domain {
                             propertyCache[0, propertyCacheCnt] = Name;
                             propertyCache[1, propertyCacheCnt] = GenericController.encodeText(dr[1]);
                             propertyCache[2, propertyCacheCnt] = GenericController.encodeInteger(dr[2]).ToString();
-                            propertyCache_nameIndex.setPtr(Name.ToLower(), propertyCacheCnt);
+                            propertyCache_nameIndex.setPtr(Name.ToLowerInvariant(), propertyCacheCnt);
                             propertyCacheCnt += 1;
                         }
                         propertyCacheCnt = dt.Rows.Count;

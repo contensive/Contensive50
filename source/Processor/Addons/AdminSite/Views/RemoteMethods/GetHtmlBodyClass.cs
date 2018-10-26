@@ -189,14 +189,14 @@ namespace Contensive.Addons.AdminSite {
                     //-------------------------------------------------------------------------------
                     //
                     if (adminData.AdminSourceForm == AdminFormEdit) {
-                        if ((!(core.doc.debug_iUserError != "")) && ((adminData.requestButton == ButtonOK) || (adminData.requestButton == ButtonCancel) || (adminData.requestButton == ButtonDelete))) {
+                        if ( string.IsNullOrEmpty(core.doc.debug_iUserError) && (adminData.requestButton.Equals(ButtonOK) || adminData.requestButton.Equals(ButtonCancel) || adminData.requestButton.Equals(ButtonDelete))) {
                             string EditReferer = core.docProperties.getText("EditReferer");
                             string CurrentLink = GenericController.modifyLinkQuery(core.webServer.requestUrl, "editreferer", "", false);
                             CurrentLink = GenericController.vbLCase(CurrentLink);
                             //
                             // check if this editreferer includes cid=thisone and id=thisone -- if so, go to index form for this cid
                             //
-                            if ((!string.IsNullOrEmpty(EditReferer)) && (EditReferer.ToLower() != CurrentLink)) {
+                            if ((!string.IsNullOrEmpty(EditReferer)) && (EditReferer.ToLowerInvariant() != CurrentLink)) {
                                 //
                                 // return to the page it came from
                                 //
@@ -324,7 +324,7 @@ namespace Contensive.Addons.AdminSite {
                         } else if (adminData.AdminForm == AdminFormQuickStats) {
                             adminBody = (FormQuickStats.GetForm_QuickStats(core));
                         } else if (adminData.AdminForm == AdminFormIndex) {
-                            adminBody = FormIndex.get( core, adminData, (adminData.adminContent.tableName.ToLower() == "ccemail"));
+                            adminBody = FormIndex.get( core, adminData, (adminData.adminContent.tableName.ToLowerInvariant() == "ccemail"));
                         } else if (adminData.AdminForm == AdminFormEdit) {
                             adminBody = FormEdit.get(core, adminData);
                         } else if (adminData.AdminForm == AdminFormClose) {
@@ -363,7 +363,7 @@ namespace Contensive.Addons.AdminSite {
                         //
                         // execute an addon
                         //
-                        if ((AddonGuid == addonGuidAddonManager) || (AddonName.ToLower() == "add-on manager") || (AddonName.ToLower() == "addon manager")) {
+                        if ((AddonGuid == addonGuidAddonManager) || (AddonName.ToLowerInvariant() == "add-on manager") || (AddonName.ToLowerInvariant() == "addon manager")) {
                             //
                             // Special case, call the routine that provides a backup
                             //
@@ -1634,16 +1634,16 @@ namespace Contensive.Addons.AdminSite {
                                 tableName = CdefController.getContentTablename(core, editRecord.contentControlId_Name);
                             }
                             //todo  NOTE: The following VB 'Select Case' included either a non-ordinal switch expression or non-ordinal, range-type, or non-constant 'Case' expressions and was converted to C# 'if-else' logic:
-                            //							Select Case tableName.ToLower()
-                            var tempVar = tableName.ToLower();
-                            //ORIGINAL LINE: Case linkAliasModel.contentTableName.ToLower()
-                            if (tempVar == LinkAliasModel.contentTableName.ToLower()) {
+                            //							Select Case tableName.ToLowerInvariant()
+                            var tempVar = tableName.ToLowerInvariant();
+                            //ORIGINAL LINE: Case linkAliasModel.contentTableName.ToLowerInvariant()
+                            if (tempVar == LinkAliasModel.contentTableName.ToLowerInvariant()) {
                                 //
                                 LinkAliasModel.invalidateRecordCache(core, editRecord.id);
                                 //Models.Complex.routeDictionaryModel.invalidateCache(core)
                             }
-                            //ORIGINAL LINE: Case addonModel.contentTableName.ToLower()
-                            else if (tempVar == AddonModel.contentTableName.ToLower()) {
+                            //ORIGINAL LINE: Case addonModel.contentTableName.ToLowerInvariant()
+                            else if (tempVar == AddonModel.contentTableName.ToLowerInvariant()) {
                                 //
                                 AddonModel.invalidateRecordCache(core, editRecord.id);
                                 //Models.Complex.routeDictionaryModel.invalidateCache(core)
@@ -2198,7 +2198,7 @@ namespace Contensive.Addons.AdminSite {
                             // Site Properties
                             //
                             SaveEditRecord(adminData);
-                            if (editRecord.nameLc.ToLower() == "allowlinkalias") {
+                            if (editRecord.nameLc.ToLowerInvariant() == "allowlinkalias") {
                                 if (core.siteProperties.getBoolean("AllowLinkAlias")) {
                                     TurnOnLinkAlias(UseContentWatchLink);
                                 }
@@ -2363,7 +2363,7 @@ namespace Contensive.Addons.AdminSite {
                                 foreach (KeyValuePair<string, Contensive.Processor.Models.Domain.CDefFieldModel> keyValuePair in adminData.adminContent.fields) {
                                     CDefFieldModel field = keyValuePair.Value;
                                     if (GenericController.vbLCase(field.nameLc) == "email") {
-                                        if ((adminData.adminContent.tableName.ToLower() == "ccmembers") && (GenericController.encodeBoolean(core.siteProperties.getBoolean("allowemaillogin", false)))) {
+                                        if ((adminData.adminContent.tableName.ToLowerInvariant() == "ccmembers") && (GenericController.encodeBoolean(core.siteProperties.getBoolean("allowemaillogin", false)))) {
                                             editRecord.fieldsLc[field.nameLc].value = "";
                                         }
                                     }

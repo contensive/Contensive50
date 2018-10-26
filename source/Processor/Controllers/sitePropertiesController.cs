@@ -298,7 +298,7 @@ namespace Contensive.Processor.Controllers {
                     throw new ApplicationException("Cannot set site property before Db is ready.");
                 } else {
                     if (!string.IsNullOrEmpty(propertyName.Trim())) {
-                        if (propertyName.ToLower().Equals("adminurl")) {
+                        if (propertyName.ToLowerInvariant().Equals("adminurl")) {
                             //
                             // -- intercept adminUrl for compatibility, always use admin route instead
                         } else {
@@ -315,7 +315,7 @@ namespace Contensive.Processor.Controllers {
                             }
                             //
                             // -- set simple lazy cache
-                            string cacheName = "siteproperty" + propertyName.Trim().ToLower();
+                            string cacheName = "siteproperty" + propertyName.Trim().ToLowerInvariant();
                             if (nameValueDict.ContainsKey(cacheName)) {
                                 nameValueDict.Remove(cacheName);
                             }
@@ -411,7 +411,7 @@ namespace Contensive.Processor.Controllers {
                     // -- if not ready, return default 
                     returnString = DefaultValue;
                 } else {
-                    string cacheName = PropertyName.Trim().ToLower();
+                    string cacheName = PropertyName.Trim().ToLowerInvariant();
                     if (cacheName.Equals("adminurl")) {
                         returnString = "/" + core.appConfig.adminRoute;
                     } else {
@@ -589,7 +589,7 @@ namespace Contensive.Processor.Controllers {
                         //CsController cs = new CsController(core);
                         //if (cs.openSQL("select name,FieldValue from ccsetup where (active>0) order by id")) {
                         //    do {
-                        //        string name = cs.getText("name").Trim().ToLower();
+                        //        string name = cs.getText("name").Trim().ToLowerInvariant();
                         //        if (!string.IsNullOrEmpty(name)) {
                         //            if (!_nameValueDict.ContainsKey(name)) {
                         //                _nameValueDict.Add(name, cs.getText("FieldValue"));

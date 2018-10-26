@@ -340,14 +340,14 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         //
         [TestMethod()]
         public void vbLCase_test() {
-            Assert.AreEqual("AbCdEfG".ToLower(), vbLCase("AbCdEfG"));
-            Assert.AreEqual("ABCDEFG".ToLower(), vbLCase("ABCDEFG"));
-            Assert.AreEqual("abcdefg".ToLower(), vbLCase("abcdefg"));
+            Assert.AreEqual("AbCdEfG".ToLowerInvariant(), vbLCase("AbCdEfG"));
+            Assert.AreEqual("ABCDEFG".ToLowerInvariant(), vbLCase("ABCDEFG"));
+            Assert.AreEqual("abcdefg".ToLowerInvariant(), vbLCase("abcdefg"));
         }
         //
         [TestMethod()]
         public void vbLeft_test() {
-            Assert.AreEqual("AbCdEfG".ToLower(), vbLCase("AbCdEfG"));
+            Assert.AreEqual("AbCdEfG".ToLowerInvariant(), vbLCase("AbCdEfG"));
         }
     }
     //

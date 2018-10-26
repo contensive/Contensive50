@@ -41,11 +41,11 @@ namespace Contensive.Processor.Models.Domain {
         public static TableSchemaModel getTableSchema(CoreController core, string TableName, string DataSourceName) {
             TableSchemaModel tableSchema = null;
             try {
-                if ((!string.IsNullOrEmpty(DataSourceName)) && (DataSourceName != "-1") && (DataSourceName.ToLower() != "default")) {
+                if ((!string.IsNullOrEmpty(DataSourceName)) && (DataSourceName != "-1") && (DataSourceName.ToLowerInvariant() != "default")) {
                     throw new NotImplementedException("alternate datasources not supported yet");
                 } else {
                     if (!string.IsNullOrEmpty(TableName)) {
-                        string lowerTablename = TableName.ToLower();
+                        string lowerTablename = TableName.ToLowerInvariant();
                         bool isInCache = false;
                         if ((core.doc.tableSchemaDictionary) == null) {
                             core.doc.tableSchemaDictionary = new Dictionary<string, Models.Domain.TableSchemaModel>();
@@ -77,8 +77,8 @@ namespace Contensive.Processor.Models.Domain {
                                 if (dt.Rows.Count > 0) {
                                     foreach (DataRow row in dt.Rows) {
                                         tableSchema.columns.Add(new ColumnSchemaModel() {
-                                            COLUMN_NAME = GenericController.encodeText(row["COLUMN_NAME"]).ToLower(),
-                                            DATA_TYPE = GenericController.encodeText(row["DATA_TYPE"]).ToLower(),
+                                            COLUMN_NAME = GenericController.encodeText(row["COLUMN_NAME"]).ToLowerInvariant(),
+                                            DATA_TYPE = GenericController.encodeText(row["DATA_TYPE"]).ToLowerInvariant(),
                                             CHARACTER_MAXIMUM_LENGTH = GenericController.encodeInteger(row["CHARACTER_MAXIMUM_LENGTH"]),
                                             DATETIME_PRECISION = GenericController.encodeInteger(row["DATETIME_PRECISION"])
                                         });
@@ -90,9 +90,9 @@ namespace Contensive.Processor.Models.Domain {
                                 dt = core.db.getIndexSchemaData(TableName);
                                 if (dt.Rows.Count > 0) {
                                     foreach (DataRow row in dt.Rows) {
-                                        string index_keys = GenericController.encodeText(row["index_keys"]).ToLower();
+                                        string index_keys = GenericController.encodeText(row["index_keys"]).ToLowerInvariant();
                                         tableSchema.indexes.Add(new IndexSchemaModel() {
-                                            index_name = GenericController.encodeText(row["INDEX_NAME"]).ToLower(),
+                                            index_name = GenericController.encodeText(row["INDEX_NAME"]).ToLowerInvariant(),
                                             index_keys = index_keys,
                                             indexKeyList = index_keys.Split(',').Select(s => s.Trim()).ToList()
                                         });

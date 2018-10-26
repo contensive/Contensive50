@@ -222,7 +222,7 @@ namespace Contensive.Processor.Controllers {
                         task.dateStarted = DateTime.Now;
                         task.save(cp.core);
                         cmdDetailClass cmdDetail = cp.core.json.Deserialize<cmdDetailClass>(task.cmdDetail);
-                        switch ((task.command.ToLower())) {
+                        switch ((task.command.ToLowerInvariant())) {
                             case taskQueueCommandEnumModule.runAddon:
                                 cp.core.addon.execute(AddonModel.create(cp.core, cmdDetail.addonId), new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
                                     backgroundProcess = true,

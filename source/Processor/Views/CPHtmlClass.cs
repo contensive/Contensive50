@@ -97,7 +97,7 @@ namespace Contensive.Processor {
         // ====================================================================================================
         //Inherits BaseClasses.CPHtmlBaseClass.CheckBox 
         public override string Form(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "", string ActionQueryString = "", string Method = "post") {
-            if (Method.ToLower() == "get") {
+            if (Method.ToLowerInvariant() == "get") {
                 return HtmlController.form(core, InnerHtml, ActionQueryString, HtmlName, HtmlId, Method);
             } else {
                 return HtmlController.formMultipart(core, InnerHtml, ActionQueryString, HtmlName, HtmlClass, HtmlId);

@@ -167,7 +167,7 @@ namespace Contensive.Processor.Models.Db {
             CsController cs = new CsController(core);
             if (cs.openSQL("select name,FieldValue from ccsetup where (active>0) order by id")) {
                 do {
-                    string name = cs.getText("name").Trim().ToLower();
+                    string name = cs.getText("name").Trim().ToLowerInvariant();
                     if (!string.IsNullOrEmpty(name)) {
                         if (!result.ContainsKey(name)) {
                             result.Add(name, cs.getText("FieldValue"));

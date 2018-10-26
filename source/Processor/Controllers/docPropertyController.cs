@@ -191,7 +191,7 @@ namespace Contensive.Processor.Controllers {
             string returnResult = "";
             try {
                 if (!string.IsNullOrEmpty(sourceKey)) {
-                    returnResult = sourceKey.ToLower();
+                    returnResult = sourceKey.ToLowerInvariant();
                     if (core.webServer.requestSpaceAsUnderscore) {
                         returnResult = GenericController.vbReplace(returnResult, " ", "_");
                     }

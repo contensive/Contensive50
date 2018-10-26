@@ -132,13 +132,13 @@ namespace Contensive.Processor.Models.Domain {
         //    try {
         //        returnModel = getObject(core);
         //        if (!string.IsNullOrEmpty(appName)) {
-        //            if (!returnModel.apps.ContainsKey(appName.ToLower())) {
+        //            if (!returnModel.apps.ContainsKey(appName.ToLowerInvariant())) {
         //                //
         //                // -- application not configured
         //                returnModel.appConfig = null;
         //                throw new Exception("application [" + appName + "] was not found in this server group.");
         //            } else {
-        //                returnModel.appConfig = returnModel.apps[appName.ToLower()];
+        //                returnModel.appConfig = returnModel.apps[appName.ToLowerInvariant()];
         //                //
         //                // -- no, leave the status setup with the last status saved -- there is not status that describes how it is running, because there is not server. This is the status of the configuration, OK or building
         //                // -- build is set when the app is created, and OK is set at the end of upgrade

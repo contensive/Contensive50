@@ -218,7 +218,7 @@ namespace Contensive.Processor.Controllers {
                 serverManager = new ServerManager();
                 appPoolColl = serverManager.ApplicationPools;
                 foreach (ApplicationPool appPool in appPoolColl) {
-                    if (appPool.Name.ToLower() == appName.ToLower()) {
+                    if (appPool.Name.ToLowerInvariant() == appName.ToLowerInvariant()) {
                         if (appPool.Start() == ObjectState.Started) {
                             appPool.Recycle();
                         }
@@ -398,8 +398,8 @@ namespace Contensive.Processor.Controllers {
                     //
                     // verify app config domainlist is in the domainlist cache
                     foreach (string domain in core.appConfig.domainList) {
-                        if (!core.domainDictionary.ContainsKey(domain.ToLower())) {
-                            LogController.logTrace(core, "adding domain record because configList domain not found [" + domain.ToLower() + "]");
+                        if (!core.domainDictionary.ContainsKey(domain.ToLowerInvariant())) {
+                            LogController.logTrace(core, "adding domain record because configList domain not found [" + domain.ToLowerInvariant() + "]");
                             var newDomain = DomainModel.addEmpty(core);
                             newDomain.name = domain;
                             newDomain.rootPageId = 0;
@@ -411,14 +411,14 @@ namespace Contensive.Processor.Controllers {
                             newDomain.pageNotFoundPageId = 0;
                             newDomain.forwardDomainId = 0;
                             newDomain.defaultRouteId = core.siteProperties.getInteger("");
-                            core.domainDictionary.Add(domain.ToLower(), newDomain);
+                            core.domainDictionary.Add(domain.ToLowerInvariant(), newDomain);
                             updateDomainCache = true;
                         }
                     }
                     //
                     // -- verify request domain
-                    if (!core.domainDictionary.ContainsKey(requestDomain.ToLower())) {
-                        LogController.logTrace(core, "adding domain record because requestDomain [" + requestDomain.ToLower() + "] not found");
+                    if (!core.domainDictionary.ContainsKey(requestDomain.ToLowerInvariant())) {
+                        LogController.logTrace(core, "adding domain record because requestDomain [" + requestDomain.ToLowerInvariant() + "] not found");
                         var newDomain = DomainModel.addEmpty( core );
                         newDomain.name = requestDomain;
                         newDomain.rootPageId = 0;
@@ -430,7 +430,7 @@ namespace Contensive.Processor.Controllers {
                         newDomain.pageNotFoundPageId = 0;
                         newDomain.forwardDomainId = 0;
                         newDomain.save(core);
-                        core.domainDictionary.Add(requestDomain.ToLower(), newDomain);
+                        core.domainDictionary.Add(requestDomain.ToLowerInvariant(), newDomain);
                         updateDomainCache = true;
                     }
                     if (updateDomainCache) {
@@ -442,7 +442,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // domain found
                     //
-                    core.domain = core.domainDictionary[requestDomain.ToLower()];
+                    core.domain = core.domainDictionary[requestDomain.ToLowerInvariant()];
                     if (core.domain.id == 0) {
                         //
                         // this is a default domain or a new domain -- add to the domain table
@@ -491,7 +491,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         string forwardDomain = core.db.getRecordName("domains", core.domain.forwardDomainId);
                         if (!string.IsNullOrEmpty(forwardDomain)) {
-                            int pos = requestUrlSource.ToLower().IndexOf( requestDomain.ToLower() );
+                            int pos = requestUrlSource.ToLowerInvariant().IndexOf( requestDomain.ToLowerInvariant() );
                             if (pos > 0) {
                                 core.domain.forwardUrl = requestUrlSource.ToString().Left( pos) + forwardDomain + requestUrlSource.ToString().Substring((pos + requestDomain.Length));
                                 redirect(core.domain.forwardUrl, "Forwarding to [" + core.domain.forwardUrl + "] because the current domain [" + requestDomain + "] is in the domain content set to forward to this replacement domain", false, false);
@@ -503,8 +503,8 @@ namespace Contensive.Processor.Controllers {
                     // -- add default CORS headers to approved domains
                     Uri originUri = httpContext.Request.UrlReferrer;
                     if ( originUri != null ) {
-                        if( core.domainDictionary.ContainsKey(originUri.Host.ToLower())) {
-                            if ( core.domainDictionary[originUri.Host.ToLower()].allowCORS ) {
+                        if( core.domainDictionary.ContainsKey(originUri.Host.ToLowerInvariant())) {
+                            if ( core.domainDictionary[originUri.Host.ToLowerInvariant()].allowCORS ) {
                                 httpContext.Response.AddHeader("Access-Control-Allow-Credentials", "true");
                                 httpContext.Response.AddHeader("Access-Control-Allow-Methods", "POST,GET,OPTIONS");
                                 httpContext.Response.AddHeader("Access-Control-Headers", "Content-Type,soapaction,X-Requested-With");
@@ -551,7 +551,7 @@ namespace Contensive.Processor.Controllers {
                         requestUrl = requestUrl + "?" + requestQueryString;
                     }
                     //
-                    if (requestDomain.ToLower() != GenericController.vbLCase(requestDomain)) {
+                    if (requestDomain.ToLowerInvariant() != GenericController.vbLCase(requestDomain)) {
                         string Copy = "Redirecting to domain [" + requestDomain + "] because this site is configured to run on the current domain [" + requestDomain + "]";
                         if (requestQueryString != "") {
                             redirect(requestProtocol + requestDomain + requestPath + requestPage + "?" + requestQueryString, Copy, false, false);
@@ -738,13 +738,13 @@ namespace Contensive.Processor.Controllers {
                     redirectCycles = core.docProperties.getInteger(rnRedirectCycleFlag);
                     //
                     // convert link to a long link on this domain
-                    if (NonEncodedLink.Left( 4).ToLower() == "http") {
+                    if (NonEncodedLink.Left( 4).ToLowerInvariant() == "http") {
                         FullLink = NonEncodedLink;
                     } else {
-                        if (NonEncodedLink.Left( 1).ToLower() == "/") {
+                        if (NonEncodedLink.Left( 1).ToLowerInvariant() == "/") {
                             //
                             // -- root relative - url starts with path, let it go
-                        } else if (NonEncodedLink.Left( 1).ToLower() == "?") {
+                        } else if (NonEncodedLink.Left( 1).ToLowerInvariant() == "?") {
                             //
                             // -- starts with qs, fix issue where iis consideres this on the physical page, not the link-alias vitrual route
                             NonEncodedLink = requestPathPage + NonEncodedLink;
@@ -912,7 +912,7 @@ namespace Contensive.Processor.Controllers {
                     // -- verify the site exists
                     foreach (Site siteWithinLoop in iisManager.Sites) {
                         site = siteWithinLoop;
-                        if (siteWithinLoop.Name.ToLower() == appName.ToLower()) {
+                        if (siteWithinLoop.Name.ToLowerInvariant() == appName.ToLowerInvariant()) {
                             found = true;
                             break;
                         }
@@ -986,7 +986,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 bool found = false;
                 foreach ( Application iisApp in site.Applications) {
-                    if (iisApp.ApplicationPoolName.ToLower() == appName.ToLower()) {
+                    if (iisApp.ApplicationPoolName.ToLowerInvariant() == appName.ToLowerInvariant()) {
                         foreach (VirtualDirectory virtualDirectory in iisApp.VirtualDirectories) {
                             if (virtualDirectory.Path == virtualFolder) {
                                 found = true;
@@ -1002,7 +1002,7 @@ namespace Contensive.Processor.Controllers {
                                     newDirectoryPath += "/" + newDirectoryFolderName;
                                     bool directoryFound = false;
                                     foreach (VirtualDirectory currentDirectory in iisApp.VirtualDirectories) {
-                                        if (currentDirectory.Path.ToLower() == newDirectoryPath.ToLower()) {
+                                        if (currentDirectory.Path.ToLowerInvariant() == newDirectoryPath.ToLowerInvariant()) {
                                             directoryFound = true;
                                             break;
                                         }

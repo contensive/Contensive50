@@ -431,7 +431,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <returns></returns>
         public int CompareTo(object obj) {
             Models.Domain.CDefFieldModel c = (Models.Domain.CDefFieldModel)obj;
-            return string.Compare(this.nameLc.ToLower(), c.nameLc.ToLower());
+            return string.Compare(this.nameLc.ToLowerInvariant(), c.nameLc.ToLowerInvariant());
         }
     }
 }

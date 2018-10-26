@@ -49,15 +49,15 @@ namespace Contensive.Processor.Controllers {
                     foreach (var dstKeyValuePair in dstCollection.cdef) {
                         Models.Domain.CDefModel dstWorkingCdef = dstKeyValuePair.Value;
                         string contentName = dstWorkingCdef.name;
-                        if (dstCollection.cdef[contentName.ToLower()].isBaseContent) {
+                        if (dstCollection.cdef[contentName.ToLowerInvariant()].isBaseContent) {
                             //
                             // this application collection Cdef is marked base, verify it is in the base collection
                             //
-                            if (!srcCollection.cdef.ContainsKey(contentName.ToLower())) {
+                            if (!srcCollection.cdef.ContainsKey(contentName.ToLowerInvariant())) {
                                 //
                                 // cdef in dst is marked base, but it is not in the src collection, reset the cdef.isBaseContent and all field.isbasefield
                                 //
-                                var tempVar = dstCollection.cdef[contentName.ToLower()];
+                                var tempVar = dstCollection.cdef[contentName.ToLowerInvariant()];
                                 tempVar.isBaseContent = false;
                                 tempVar.dataChanged = true;
                                 foreach (var dstFieldKeyValuePair in tempVar.fields) {
@@ -92,15 +92,15 @@ namespace Contensive.Processor.Controllers {
                     //
                     updateDst = false;
                     Models.Domain.CDefModel dstCdef = null;
-                    if (!dstCollection.cdef.ContainsKey(srcName.ToLower())) {
+                    if (!dstCollection.cdef.ContainsKey(srcName.ToLowerInvariant())) {
                         //
                         // add src to dst
                         //
                         dstCdef = new Models.Domain.CDefModel();
-                        dstCollection.cdef.Add(srcName.ToLower(), dstCdef);
+                        dstCollection.cdef.Add(srcName.ToLowerInvariant(), dstCdef);
                         updateDst = true;
                     } else {
-                        dstCdef = dstCollection.cdef[srcName.ToLower()];
+                        dstCdef = dstCollection.cdef[srcName.ToLowerInvariant()];
                         dstName = srcName;
                         //
                         // found a match between Src and Dst
@@ -180,21 +180,21 @@ namespace Contensive.Processor.Controllers {
                         Models.Domain.CDefFieldModel srcCdefField = srcFieldKeyValuePair.Value;
                         SrcFieldName = srcCdefField.nameLc;
                         updateDst = false;
-                        if (!dstCollection.cdef.ContainsKey(srcName.ToLower())) {
+                        if (!dstCollection.cdef.ContainsKey(srcName.ToLowerInvariant())) {
                             //
                             // should have been the collection
                             //
                             throw (new ApplicationException("ERROR - cannot update destination content because it was not found after being added."));
                         } else {
-                            dstCdef = dstCollection.cdef[srcName.ToLower()];
+                            dstCdef = dstCollection.cdef[srcName.ToLowerInvariant()];
                             bool HelpChanged = false;
                             Models.Domain.CDefFieldModel dstCdefField = null;
-                            if (dstCdef.fields.ContainsKey(SrcFieldName.ToLower())) {
+                            if (dstCdef.fields.ContainsKey(SrcFieldName.ToLowerInvariant())) {
                                 //
                                 // Src field was found in Dst fields
                                 //
 
-                                dstCdefField = dstCdef.fields[SrcFieldName.ToLower()];
+                                dstCdefField = dstCdef.fields[SrcFieldName.ToLowerInvariant()];
                                 updateDst = false;
                                 if (dstCdefField.isBaseField == srcCdefField.isBaseField) {
                                     updateDst |= (srcCdefField.active != dstCdefField.active);
@@ -248,8 +248,8 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // field was not found in dst, add it and populate
                                 //
-                                dstCdef.fields.Add(SrcFieldName.ToLower(), new Models.Domain.CDefFieldModel());
-                                dstCdefField = dstCdef.fields[SrcFieldName.ToLower()];
+                                dstCdef.fields.Add(SrcFieldName.ToLowerInvariant(), new Models.Domain.CDefFieldModel());
+                                dstCdefField = dstCdef.fields[SrcFieldName.ToLowerInvariant()];
                                 updateDst = true;
                                 HelpChanged = true;
                             }
@@ -318,7 +318,7 @@ namespace Contensive.Processor.Controllers {
                 // -------------------------------------------------------------------------------------------------
                 //
                 foreach (MiniCollectionModel.miniCollectionSQLIndexModel srcSqlIndex in srcCollection.sqlIndexes) {
-                    string srcName = (srcSqlIndex.DataSourceName + "-" + srcSqlIndex.TableName + "-" + srcSqlIndex.IndexName).ToLower();
+                    string srcName = (srcSqlIndex.DataSourceName + "-" + srcSqlIndex.TableName + "-" + srcSqlIndex.IndexName).ToLowerInvariant();
                     updateDst = false;
                     //
                     // Search for this name in the Dst
@@ -326,7 +326,7 @@ namespace Contensive.Processor.Controllers {
                     bool indexChanged = false;
                     MiniCollectionModel.miniCollectionSQLIndexModel indexToUpdate = new MiniCollectionModel.miniCollectionSQLIndexModel() { };
                     foreach (MiniCollectionModel.miniCollectionSQLIndexModel dstSqlIndex in dstCollection.sqlIndexes) {
-                        dstName = (dstSqlIndex.DataSourceName + "-" + dstSqlIndex.TableName + "-" + dstSqlIndex.IndexName).ToLower();
+                        dstName = (dstSqlIndex.DataSourceName + "-" + dstSqlIndex.TableName + "-" + dstSqlIndex.IndexName).ToLowerInvariant();
                         if (textMatch(dstName, srcName)) {
                             //
                             // found a match between Src and Dst
@@ -358,9 +358,9 @@ namespace Contensive.Processor.Controllers {
                 //
                 string DataBuildVersion = core.siteProperties.dataBuildVersion;
                 foreach (var srcKvp in srcCollection.menus) {
-                    string srcKey = srcKvp.Key.ToLower() ;
+                    string srcKey = srcKvp.Key.ToLowerInvariant() ;
                     MiniCollectionModel.miniCollectionMenuModel srcMenu = srcKvp.Value;
-                    string srcName = srcMenu.Name.ToLower();
+                    string srcName = srcMenu.Name.ToLowerInvariant();
                     string srcGuid = srcMenu.Guid;
                     string SrcParentName = GenericController.vbLCase(srcMenu.ParentName);
                     string SrcNameSpace = GenericController.vbLCase(srcMenu.menuNameSpace);
@@ -373,7 +373,7 @@ namespace Contensive.Processor.Controllers {
                     string DstKey = null;
                     bool DstIsNavigator = false;
                     foreach (var dstKvp in dstCollection.menus) {
-                        string dstKey = dstKvp.Key.ToLower();
+                        string dstKey = dstKvp.Key.ToLowerInvariant();
                         MiniCollectionModel.miniCollectionMenuModel dstMenu = dstKvp.Value;
                         string dstGuid = dstMenu.Guid;
                         if (dstGuid == srcGuid) {
@@ -392,7 +392,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // no match found on guid, try name and ( either namespace or parentname )
                         foreach (var dstKvp in dstCollection.menus) {
-                            string dstKey = dstKvp.Key.ToLower();
+                            string dstKey = dstKvp.Key.ToLowerInvariant();
                             MiniCollectionModel.miniCollectionMenuModel dstMenu = dstKvp.Value;
                             dstName = GenericController.vbLCase(dstMenu.Name);
                             if ((srcName == dstName) && (SrcIsNavigator == DstIsNavigator)) {
@@ -838,7 +838,7 @@ namespace Contensive.Processor.Controllers {
                 if (string.IsNullOrEmpty(return_ErrorMessage)) {
                     //
                     // continue if no errors
-                    if (Doc.DocumentElement.Name.ToLower() != GenericController.vbLCase(DownloadFileRootNode)) {
+                    if (Doc.DocumentElement.Name.ToLowerInvariant() != GenericController.vbLCase(DownloadFileRootNode)) {
                         return_ErrorMessage = "The collection file from the server was not valid for collection [" + CollectionGuid + "]";
                         tempDownloadCollectionFiles = false;
                         LogController.logInfo(core, errorPrefix + "The response has a basename [" + Doc.DocumentElement.Name + "] but [" + DownloadFileRootNode + "] was expected.");
@@ -1100,7 +1100,7 @@ namespace Contensive.Processor.Controllers {
                                                 // -- Search for Collection Updates Needed
                                                 foreach (var localTestCollection in localCollectionStoreList) {
                                                     localCollectionUpToDate = false;
-                                                    LocalGuid = localTestCollection.guid.ToLower();
+                                                    LocalGuid = localTestCollection.guid.ToLowerInvariant();
                                                     LocalLastChangeDate = localTestCollection.lastChangeDate;
                                                     //
                                                     // go through each collection on the Library and find the local collection guid
@@ -1329,7 +1329,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     string tmpInstallPath = "tmpInstallCollection" + GenericController.getGUIDString() + "\\";
                     core.privateFiles.copyFile(collectionPathFilename, tmpInstallPath + collectionFilename);
-                    if (collectionFilename.ToLower().Substring(collectionFilename.Length - 4) == ".zip") {
+                    if (collectionFilename.ToLowerInvariant().Substring(collectionFilename.Length - 4) == ".zip") {
                         core.privateFiles.UnzipFile(tmpInstallPath + collectionFilename);
                         core.privateFiles.deleteFile(tmpInstallPath + collectionFilename);
                     }
@@ -1402,7 +1402,7 @@ namespace Contensive.Processor.Controllers {
                                                 //
                                                 CollectionGuid = Collectionname;
                                             }
-                                            CollectionGuid = CollectionGuid.ToLower();
+                                            CollectionGuid = CollectionGuid.ToLowerInvariant();
                                             CollectionVersionFolderName = GetCollectionPath(core, CollectionGuid);
                                             string CollectionFolderName = "";
                                             if (!string.IsNullOrEmpty(CollectionVersionFolderName)) {
@@ -1424,7 +1424,7 @@ namespace Contensive.Processor.Controllers {
                                                 CollectionFolderName = GenericController.vbReplace(CollectionFolderName, "-", "");
                                                 CollectionFolderName = GenericController.vbReplace(CollectionFolderName, " ", "");
                                                 CollectionFolderName = Collectionname + "_" + CollectionFolderName;
-                                                CollectionFolderName = CollectionFolderName.ToLower();
+                                                CollectionFolderName = CollectionFolderName.ToLowerInvariant();
                                             }
                                             string CollectionFolder = core.addon.getPrivateFilesAddonPath() + CollectionFolderName + "\\";
                                             core.privateFiles.verifyPath(CollectionFolder);
@@ -1697,9 +1697,9 @@ namespace Contensive.Processor.Controllers {
                         // collect list of DLL files and add them to the exec files if they were missed
                         List<string> assembliesInZip = new List<string>();
                         foreach (FileDetail file in srcFileInfoArray) {
-                            if (file.Extension.ToLower() == "dll") {
-                                if (!assembliesInZip.Contains(file.Name.ToLower())) {
-                                    assembliesInZip.Add(file.Name.ToLower());
+                            if (file.Extension.ToLowerInvariant() == "dll") {
+                                if (!assembliesInZip.Contains(file.Name.ToLowerInvariant())) {
+                                    assembliesInZip.Add(file.Name.ToLowerInvariant());
                                 }
                             }
                         }
@@ -1726,7 +1726,7 @@ namespace Contensive.Processor.Controllers {
                                     loadOK = false;
                                 }
                                 if (loadOK) {
-                                    if ((Doc.DocumentElement.Name.ToLower() == GenericController.vbLCase(CollectionFileRootNode)) || (Doc.DocumentElement.Name.ToLower() == GenericController.vbLCase(CollectionFileRootNodeOld))) {
+                                    if ((Doc.DocumentElement.Name.ToLowerInvariant() == GenericController.vbLCase(CollectionFileRootNode)) || (Doc.DocumentElement.Name.ToLowerInvariant() == GenericController.vbLCase(CollectionFileRootNodeOld))) {
                                         //
                                         //------------------------------------------------------------------------------------------------------
                                         // Collection File - import from sub so it can be re-entrant
@@ -1754,7 +1754,7 @@ namespace Contensive.Processor.Controllers {
                                             if (string.IsNullOrEmpty(FileGuid)) {
                                                 FileGuid = Collectionname;
                                             }
-                                            if (CollectionGuid.ToLower() != GenericController.vbLCase(FileGuid)) {
+                                            if (CollectionGuid.ToLowerInvariant() != GenericController.vbLCase(FileGuid)) {
                                                 //
                                                 //
                                                 //
@@ -1784,7 +1784,7 @@ namespace Contensive.Processor.Controllers {
                                                 string ContentFileList = "";
                                                 string ExecFileList = "";
                                                 foreach (XmlNode CDefSection in Doc.DocumentElement.ChildNodes) {
-                                                    switch (CDefSection.Name.ToLower()) {
+                                                    switch (CDefSection.Name.ToLowerInvariant()) {
                                                         case "resource":
                                                             //
                                                             // set wwwfilelist, contentfilelist, execfilelist
@@ -1823,7 +1823,7 @@ namespace Contensive.Processor.Controllers {
                                                             string dstDosPath = FileController.normalizeDosPath(dstPath);
                                                             //
                                                             // -- 
-                                                            switch (resourceType.ToLower()) {
+                                                            switch (resourceType.ToLowerInvariant()) {
                                                                 case "www":
                                                                     wwwFileList += "\r\n" + dstDosPath + filename;
                                                                     LogController.logInfo(core, "install collection [" + Collectionname + "], GUID [" + CollectionGuid + "], pass 1, copying file to www, src [" + CollectionVersionFolder + SrcPath + "], dst [" + core.appConfig.localWwwPath + dstDosPath + "].");
@@ -1844,8 +1844,8 @@ namespace Contensive.Processor.Controllers {
                                                                     }
                                                                     break;
                                                                 default:
-                                                                    if (assembliesInZip.Contains(filename.ToLower())) {
-                                                                        assembliesInZip.Remove(filename.ToLower());
+                                                                    if (assembliesInZip.Contains(filename.ToLowerInvariant())) {
+                                                                        assembliesInZip.Remove(filename.ToLowerInvariant());
                                                                     }
                                                                     ExecFileList = ExecFileList + "\r\n" + filename;
                                                                     break;
@@ -1950,7 +1950,7 @@ namespace Contensive.Processor.Controllers {
                                                     //
                                                     string CollectionHelpLink = "";
                                                     foreach (XmlNode CDefSection in Doc.DocumentElement.ChildNodes) {
-                                                        if (CDefSection.Name.ToLower() == "helplink") {
+                                                        if (CDefSection.Name.ToLowerInvariant() == "helplink") {
                                                             //
                                                             // only save the first
                                                             CollectionHelpLink = CDefSection.InnerText;
@@ -2031,7 +2031,7 @@ namespace Contensive.Processor.Controllers {
                                                         //
                                                         // -- Use the upgrade code to import this part
                                                         CollectionWrapper = "<" + CollectionFileRootNode + ">" + CollectionWrapper + "</" + CollectionFileRootNode + ">";
-                                                        bool isBaseCollection = (baseCollectionGuid.ToLower() == CollectionGuid.ToLower());
+                                                        bool isBaseCollection = (baseCollectionGuid.ToLowerInvariant() == CollectionGuid.ToLowerInvariant());
                                                         installCollectionFromLocalRepo_BuildDbFromXmlData(core, CollectionWrapper, IsNewBuild, repair, isBaseCollection, ref nonCriticalErrorList, logPrefix, ref installedCollections);
                                                         //
                                                         // -- Process nodes to save Collection data
@@ -2383,13 +2383,13 @@ namespace Contensive.Processor.Controllers {
                                                     //
                                                     LogController.logInfo(core, "install collection [" + Collectionname + "], pass 6");
                                                     foreach (XmlNode collectionNode in Doc.DocumentElement.ChildNodes) {
-                                                        switch (collectionNode.Name.ToLower()) {
+                                                        switch (collectionNode.Name.ToLowerInvariant()) {
                                                             case "addon":
                                                             case "add-on":
                                                                 //
                                                                 // Add-on Node, do part 1, verify the addon in the table with name and guid
                                                                 string addonName =XmlController.GetXMLAttribute(core, IsFound, collectionNode, "name", collectionNode.Name);
-                                                                if (addonName.ToLower()=="_oninstall") {
+                                                                if (addonName.ToLowerInvariant()=="_oninstall") {
                                                                     onInstallAddonGuid =XmlController.GetXMLAttribute(core, IsFound, collectionNode, "guid", collectionNode.Name);
                                                                 }
                                                                 installCollectionFromLocalRepo_addonNode_Phase2(core, collectionNode, "ccguid", core.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage);
@@ -2417,7 +2417,7 @@ namespace Contensive.Processor.Controllers {
                                                         switch (GenericController.vbLCase(CDefSection.Name)) {
                                                             case "data":
                                                                 foreach (XmlNode ContentNode in CDefSection.ChildNodes) {
-                                                                    if (ContentNode.Name.ToLower() == "record") {
+                                                                    if (ContentNode.Name.ToLowerInvariant() == "record") {
                                                                         string ContentName =XmlController.GetXMLAttribute(core, IsFound, ContentNode, "content", "");
                                                                         if (string.IsNullOrEmpty(ContentName)) {
                                                                             LogController.logInfo(core, "install collection file contains a data.record node with a blank content attribute.");
@@ -2438,9 +2438,9 @@ namespace Contensive.Processor.Controllers {
                                                                                     //
                                                                                     // Update the record
                                                                                     foreach (XmlNode FieldNode in ContentNode.ChildNodes) {
-                                                                                        if (FieldNode.Name.ToLower() == "field") {
+                                                                                        if (FieldNode.Name.ToLowerInvariant() == "field") {
                                                                                             bool IsFieldFound = false;
-                                                                                            string FieldName =XmlController.GetXMLAttribute(core, IsFound, FieldNode, "name", "").ToLower();
+                                                                                            string FieldName =XmlController.GetXMLAttribute(core, IsFound, FieldNode, "name", "").ToLowerInvariant();
                                                                                             int fieldTypeId = -1;
                                                                                             int FieldLookupContentID = -1;
                                                                                             foreach (var keyValuePair in CDef.fields) {
@@ -2723,7 +2723,7 @@ namespace Contensive.Processor.Controllers {
                                     }
                                     break;
                             }
-                            if (CollectionGuid.ToLower() == LocalGuid.ToLower()) {
+                            if (CollectionGuid.ToLowerInvariant() == LocalGuid.ToLowerInvariant()) {
                                 return_CollectionPath = collectionPath;
                                 return_LastChagnedate = lastChangeDate;
                                 return_CollectionName = localName;
@@ -3117,7 +3117,7 @@ namespace Contensive.Processor.Controllers {
                                         ScriptingLanguage = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "language", "");
                                         //
                                         // -- todo - need to look this up correctly
-                                        if ( ScriptingLanguage.ToLower()=="jscript") {
+                                        if ( ScriptingLanguage.ToLowerInvariant()=="jscript") {
                                             scriptinglanguageid = (int)AddonController.ScriptLanguages.Javascript;
                                         } else {
                                             scriptinglanguageid = (int)AddonController.ScriptLanguages.VBScript;
@@ -3743,7 +3743,7 @@ namespace Contensive.Processor.Controllers {
                         LogController.logError(core, "UpgradeCDef_LoadDataToCollection Error reading xml archive, ex=[" + ex.ToString() + "]");
                         throw new Exception("Error in UpgradeCDef_LoadDataToCollection, during doc.loadXml()", ex);
                     }
-                    if ((srcXmlDom.DocumentElement.Name.ToLower() != CollectionFileRootNode) && (srcXmlDom.DocumentElement.Name.ToLower() != "contensivecdef")) {
+                    if ((srcXmlDom.DocumentElement.Name.ToLowerInvariant() != CollectionFileRootNode) && (srcXmlDom.DocumentElement.Name.ToLowerInvariant() != "contensivecdef")) {
                         //
                         // -- root node must be collection (or legacy contensivecdef)
                         LogController.handleError( core,new ApplicationException("the archive file has a syntax error. Application name must be the first node."));
@@ -3824,13 +3824,13 @@ namespace Contensive.Processor.Controllers {
                                             //
                                             // ----- Add CDef if not already there
                                             //
-                                            if (!result.cdef.ContainsKey(ContentName.ToLower())) {
-                                                result.cdef.Add(ContentName.ToLower(), new Models.Domain.CDefModel());
+                                            if (!result.cdef.ContainsKey(ContentName.ToLowerInvariant())) {
+                                                result.cdef.Add(ContentName.ToLowerInvariant(), new Models.Domain.CDefModel());
                                             }
                                             //
                                             // Get CDef attributes
                                             //
-                                            Models.Domain.CDefModel targetCdef = result.cdef[ContentName.ToLower()];
+                                            Models.Domain.CDefModel targetCdef = result.cdef[ContentName.ToLowerInvariant()];
                                             string activeDefaultText = "1";
                                             if (!(DefaultCDef.active)) {
                                                 activeDefaultText = "0";
@@ -3859,7 +3859,7 @@ namespace Contensive.Processor.Controllers {
                                             targetCdef.tableName =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "ContentTableName", DefaultCDef.tableName);
                                             targetCdef.dataSourceId = 0;
                                             targetCdef.defaultSortMethod =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "DefaultSortMethod", DefaultCDef.defaultSortMethod);
-                                            if ((targetCdef.defaultSortMethod == "") || (targetCdef.defaultSortMethod.ToLower() == "name")) {
+                                            if ((targetCdef.defaultSortMethod == "") || (targetCdef.defaultSortMethod.ToLowerInvariant() == "name")) {
                                                 targetCdef.defaultSortMethod = "By Name";
                                             } else if (GenericController.vbLCase(targetCdef.defaultSortMethod) == "sortorder") {
                                                 targetCdef.defaultSortMethod = "By Alpha Sort Order Field";
@@ -3890,7 +3890,7 @@ namespace Contensive.Processor.Controllers {
                                                 //
                                                 if (textMatch(CDefChildNode.Name, "field")) {
                                                     FieldName =XmlController.GetXMLAttribute(core, Found, CDefChildNode, "Name", "");
-                                                    if (FieldName.ToLower() == "middlename") {
+                                                    if (FieldName.ToLowerInvariant() == "middlename") {
                                                         //FieldName = FieldName;
                                                     }
                                                     //
@@ -3902,11 +3902,11 @@ namespace Contensive.Processor.Controllers {
                                                         DefaultCDefField = new Models.Domain.CDefFieldModel();
                                                     }
                                                     //
-                                                    if (!(result.cdef[ContentName.ToLower()].fields.ContainsKey(FieldName.ToLower()))) {
-                                                        result.cdef[ContentName.ToLower()].fields.Add(FieldName.ToLower(), new Models.Domain.CDefFieldModel());
+                                                    if (!(result.cdef[ContentName.ToLowerInvariant()].fields.ContainsKey(FieldName.ToLowerInvariant()))) {
+                                                        result.cdef[ContentName.ToLowerInvariant()].fields.Add(FieldName.ToLowerInvariant(), new Models.Domain.CDefFieldModel());
                                                     }
-                                                    var cdefField = result.cdef[ContentName.ToLower()].fields[FieldName.ToLower()];
-                                                    cdefField.nameLc = FieldName.ToLower();
+                                                    var cdefField = result.cdef[ContentName.ToLowerInvariant()].fields[FieldName.ToLowerInvariant()];
+                                                    cdefField.nameLc = FieldName.ToLowerInvariant();
                                                     ActiveText = "0";
                                                     if (DefaultCDefField.active) {
                                                         ActiveText = "1";
@@ -4068,11 +4068,11 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     Name =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "Name", "");
                                     MiniCollectionModel.miniCollectionAddOnModel addon;
-                                    if (result.addOns.ContainsKey(Name.ToLower())) {
-                                        addon = result.addOns[Name.ToLower()];
+                                    if (result.addOns.ContainsKey(Name.ToLowerInvariant())) {
+                                        addon = result.addOns[Name.ToLowerInvariant()];
                                     } else {
                                         addon = new MiniCollectionModel.miniCollectionAddOnModel();
-                                        result.addOns.Add(Name.ToLower(), addon);
+                                        result.addOns.Add(Name.ToLowerInvariant(), addon);
                                     }
                                     addon.dataChanged = setAllDataChanged;
                                     addon.Link =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "Link", "");
@@ -4256,10 +4256,10 @@ namespace Contensive.Processor.Controllers {
                 foreach (var keypairvalue in Collection.cdef) {
                     if (keypairvalue.Value.dataChanged) {
                         LogController.logInfo(core, "adding cdef name [" + keypairvalue.Value.name + "]");
-                        if (!installedContentList.Contains(keypairvalue.Value.name.ToLower())) {
+                        if (!installedContentList.Contains(keypairvalue.Value.name.ToLowerInvariant())) {
                             SQL = "Insert into ccContent (name,ccguid,active,createkey)values(" + core.db.encodeSQLText(keypairvalue.Value.name) + "," + core.db.encodeSQLText(keypairvalue.Value.guid) + ",1,0);";
                             core.db.executeQuery(SQL);
-                            installedContentList.Add(keypairvalue.Value.name.ToLower());
+                            installedContentList.Add(keypairvalue.Value.name.ToLowerInvariant());
                         }
                     }
                 }
@@ -4280,7 +4280,7 @@ namespace Contensive.Processor.Controllers {
                 //----------------------------------------------------------------------------------------------------------------------
                 //
                 foreach (var keypairvalue in Collection.cdef) {
-                    if (keypairvalue.Value.name.ToLower() == "content") {
+                    if (keypairvalue.Value.name.ToLowerInvariant() == "content") {
                         installCollection_BuildDbFromCollection_UpdateDbFromCDef(core, keypairvalue.Value, BuildVersion);
                         break;
                     }
@@ -4301,7 +4301,7 @@ namespace Contensive.Processor.Controllers {
                             if (fieldChanged) break;
                         }
                     }
-                    if ((fieldChanged | cdef.dataChanged) && (cdef.name.ToLower() != "content")) {
+                    if ((fieldChanged | cdef.dataChanged) && (cdef.name.ToLowerInvariant() != "content")) {
                         installCollection_BuildDbFromCollection_UpdateDbFromCDef(core, cdef, BuildVersion);
                     }
                 }
@@ -4319,7 +4319,7 @@ namespace Contensive.Processor.Controllers {
                     foreach (var fieldKeyValuePair in workingCdef.fields) {
                         Models.Domain.CDefFieldModel workingField = fieldKeyValuePair.Value;
                         //string FieldName = field.nameLc;
-                        //var field2 = Collection.cdef[ContentName.ToLower()].fields[((string)null).ToLower()];
+                        //var field2 = Collection.cdef[ContentName.ToLowerInvariant()].fields[((string)null).ToLowerInvariant()];
                         if (workingField.HelpChanged) {
                             int fieldId = 0;
                             SQL = "select f.id from ccfields f left join cccontent c on c.id=f.contentid where (f.name=" + core.db.encodeSQLText(workingField.nameLc) + ")and(c.name=" + core.db.encodeSQLText(workingCdef.name) + ") order by f.id";
@@ -4649,13 +4649,13 @@ namespace Contensive.Processor.Controllers {
                                             var collection = new CollectionStoreClass();
                                             localCollectionStoreList.Add(collection);
                                             foreach (XmlNode CollectionNode in LocalListNode.ChildNodes) {
-                                                if (CollectionNode.Name.ToLower() == "name") {
+                                                if (CollectionNode.Name.ToLowerInvariant() == "name") {
                                                     collection.name = CollectionNode.InnerText;
-                                                } else if (CollectionNode.Name.ToLower() == "guid") {
+                                                } else if (CollectionNode.Name.ToLowerInvariant() == "guid") {
                                                     collection.guid = CollectionNode.InnerText;
-                                                } else if (CollectionNode.Name.ToLower() == "path") {
+                                                } else if (CollectionNode.Name.ToLowerInvariant() == "path") {
                                                     collection.path = CollectionNode.InnerText;
-                                                } else if (CollectionNode.Name.ToLower() == "lastchangedate") {
+                                                } else if (CollectionNode.Name.ToLowerInvariant() == "lastchangedate") {
                                                     collection.lastChangeDate = GenericController.encodeDate( CollectionNode.InnerText );
                                                 }
                                             }

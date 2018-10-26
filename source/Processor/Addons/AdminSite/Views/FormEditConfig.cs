@@ -19,7 +19,6 @@ namespace Contensive.Addons.AdminSite {
         public static string getForm_EditConfig(CoreController core) {
             string result = null;
             try {
-                string[] DefaultFeatures = InnovaEditorFeatureList.Split(',');
                 string Description = "This tool is used to configure the wysiwyg content editor for different uses. Check the Administrator column if you want administrators to have access to this feature when editing a page. Check the Content Manager column to allow non-admins to have access to this feature. Check the Public column if you want those on the public site to have access to the feature when the editor is used for public forms.";
                 string Button = core.docProperties.getText(RequestNameButton);
                 if (Button == ButtonCancel) {

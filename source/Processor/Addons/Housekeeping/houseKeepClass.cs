@@ -1668,7 +1668,7 @@ namespace Contensive.Addons.Housekeeping {
                 URL = "http://support.contensive.com/GetUpdates?iv=" + core.codeVersion();
                 loadOK = true;
                 Doc.Load(URL);
-                if ((Doc.DocumentElement.Name.ToLower() == GenericController.vbLCase("ContensiveUpdate")) && (Doc.DocumentElement.ChildNodes.Count != 0)) {
+                if ((Doc.DocumentElement.Name.ToLowerInvariant() == GenericController.vbLCase("ContensiveUpdate")) && (Doc.DocumentElement.ChildNodes.Count != 0)) {
                     foreach (XmlNode CDefSection in Doc.DocumentElement.ChildNodes) {
                         Copy = CDefSection.InnerText;
                         switch (GenericController.vbLCase(CDefSection.Name)) {

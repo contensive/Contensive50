@@ -99,8 +99,8 @@ namespace Contensive.MonitorService {
                 //
                 errors = new string[1];
                 //
-                ClearAppErrors = (RequestPath.ToLower().Substring(0, 6) == "/reset");
-                DisplayStatusMethod = ClearAppErrors || (RequestPath.ToLower().Substring(0, monitorConfig.StatusMethod.Length + 1) == "/" + GenericController.vbLCase(monitorConfig.StatusMethod));
+                ClearAppErrors = (RequestPath.ToLowerInvariant().Substring(0, 6) == "/reset");
+                DisplayStatusMethod = ClearAppErrors || (RequestPath.ToLowerInvariant().Substring(0, monitorConfig.StatusMethod.Length + 1) == "/" + GenericController.vbLCase(monitorConfig.StatusMethod));
                 logMessage = "GetStatusPage hit, RequestPath=" + RequestPath + ", from " + remoteHost;
                 if (!(DisplayStatusMethod || ClearAppErrors)) {
                     //

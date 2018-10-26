@@ -55,8 +55,8 @@ namespace Contensive.Processor {
         public override void Clear(string ContentNameList) {
             if (!string.IsNullOrEmpty(ContentNameList)) {
                 List<string> tableNameList = new List<string>();
-                foreach (var contentName in new List<string>(ContentNameList.ToLower().Split(','))) {
-                    string tableName = CdefController.getContentTablename(core, contentName).ToLower();
+                foreach (var contentName in new List<string>(ContentNameList.ToLowerInvariant().Split(','))) {
+                    string tableName = CdefController.getContentTablename(core, contentName).ToLowerInvariant();
                     if (!tableNameList.Contains(tableName)) {
                         tableNameList.Add(tableName);
                         core.cache.invalidateAllKeysInTable(tableName);

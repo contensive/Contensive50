@@ -68,7 +68,7 @@ namespace Contensive.Addons.AdminSite {
                 }
                 ////
                 //// ----- If Page Content , check if this is the default PageNotFound page
-                //if (adminContext.adminContent.contentTableName.ToLower() == "ccpagecontent") {
+                //if (adminContext.adminContent.contentTableName.ToLowerInvariant() == "ccpagecontent") {
                 //    //
                 //    // Landing Page
                 //    {

@@ -107,7 +107,7 @@ namespace Contensive.Addons.AdminSite {
                         // Make sure all fields are not-inherited, if not, create new fields
                         //
                         foreach (var column in IndexConfig.columns) {
-                            CDefFieldModel field = adminContent.fields[column.Name.ToLower()];
+                            CDefFieldModel field = adminContent.fields[column.Name.ToLowerInvariant()];
                             if (field.inherited) {
                                 SourceContentID = field.contentId;
                                 SourceName = field.nameLc;
@@ -164,7 +164,7 @@ namespace Contensive.Addons.AdminSite {
                                     int columnWidthTotal = 0;
                                     var dstColumns = new List<IndexConfigClass.IndexConfigColumnClass>() { };
                                     foreach (var column in IndexConfig.columns) {
-                                        if (column.Name != TargetFieldName.ToLower()) {
+                                        if (column.Name != TargetFieldName.ToLowerInvariant()) {
                                             dstColumns.Add(column);
                                             columnWidthTotal += column.Width;
                                         }
@@ -174,10 +174,10 @@ namespace Contensive.Addons.AdminSite {
                                     break;
                                 }
                             case ToolsActionMoveFieldLeft: {
-                                    if(IndexConfig.columns.First().Name != TargetFieldName.ToLower()) {
+                                    if(IndexConfig.columns.First().Name != TargetFieldName.ToLowerInvariant()) {
                                         int listIndex = 0;
                                         foreach (var column in IndexConfig.columns) {
-                                            if (column.Name == TargetFieldName.ToLower()) {
+                                            if (column.Name == TargetFieldName.ToLowerInvariant()) {
                                                 break;
                                             }
                                             listIndex += 1;
@@ -188,10 +188,10 @@ namespace Contensive.Addons.AdminSite {
                                     break;
                                 }
                             case ToolsActionMoveFieldRight: {
-                                    if (IndexConfig.columns.Last().Name != TargetFieldName.ToLower()) {
+                                    if (IndexConfig.columns.Last().Name != TargetFieldName.ToLowerInvariant()) {
                                         int listIndex = 0;
                                         foreach (var column in IndexConfig.columns) {
-                                            if (column.Name == TargetFieldName.ToLower()) {
+                                            if (column.Name == TargetFieldName.ToLowerInvariant()) {
                                                 break;
                                             }
                                             listIndex += 1;
@@ -203,7 +203,7 @@ namespace Contensive.Addons.AdminSite {
                                 }
                             case ToolsActionExpand: {
                                     foreach (var column in IndexConfig.columns) {
-                                        if (column.Name == TargetFieldName.ToLower()) {
+                                        if (column.Name == TargetFieldName.ToLowerInvariant()) {
                                             column.Width = Convert.ToInt32(Convert.ToDouble(column.Width) * 1.1);
                                         } else {
                                             column.Width = Convert.ToInt32(Convert.ToDouble(column.Width) * 0.9);
@@ -214,7 +214,7 @@ namespace Contensive.Addons.AdminSite {
                                 }
                             case ToolsActionContract: {
                                     foreach (var column in IndexConfig.columns) {
-                                        if (column.Name != TargetFieldName.ToLower()) {
+                                        if (column.Name != TargetFieldName.ToLowerInvariant()) {
                                             column.Width = Convert.ToInt32(Convert.ToDouble(column.Width) * 1.1);
                                         } else {
                                             column.Width = Convert.ToInt32(Convert.ToDouble(column.Width) * 0.9);
@@ -307,7 +307,7 @@ namespace Contensive.Addons.AdminSite {
                                 // print column headers - anchored so they sort columns
                                 //
                                 ColumnWidth = encodeInteger(100 * (column.Width / (double)ColumnWidthTotal));
-                                CDefFieldModel field = adminContent.fields[column.Name.ToLower()];
+                                CDefFieldModel field = adminContent.fields[column.Name.ToLowerInvariant()];
                                 fieldId = field.id;
                                 Caption = field.caption;
                                 if (field.inherited) {
@@ -325,7 +325,7 @@ namespace Contensive.Addons.AdminSite {
                                 // print column headers - anchored so they sort columns
                                 //
                                 ColumnWidth = encodeInteger(100 * (column.Width / (double)ColumnWidthTotal));
-                                CDefFieldModel field = adminContent.fields[column.Name.ToLower()];
+                                CDefFieldModel field = adminContent.fields[column.Name.ToLowerInvariant()];
                                 fieldId = field.id;
                                 Caption = field.caption;
                                 if (field.inherited) {

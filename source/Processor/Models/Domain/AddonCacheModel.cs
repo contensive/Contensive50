@@ -60,14 +60,14 @@ namespace Contensive.Processor.Models.Domain {
                     addon.ccguid = GenericController.getGUID();
                     addon.save(core);
                 }
-                if (!dictGuidId.ContainsKey(addon.ccguid.ToLower())) {
-                    dictGuidId.Add(addon.ccguid.ToLower(), addon.id);
+                if (!dictGuidId.ContainsKey(addon.ccguid.ToLowerInvariant())) {
+                    dictGuidId.Add(addon.ccguid.ToLowerInvariant(), addon.id);
                     if (string.IsNullOrEmpty(addon.name.Trim())) {
                         addon.name = "addon " + addon.id.ToString();
                         addon.save(core);
                     }
-                    if (!dictNameId.ContainsKey(addon.name.ToLower())) {
-                        dictNameId.Add(addon.name.ToLower(), addon.id);
+                    if (!dictNameId.ContainsKey(addon.name.ToLowerInvariant())) {
+                        dictNameId.Add(addon.name.ToLowerInvariant(), addon.id);
                     }
                 }
             }
@@ -87,8 +87,8 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="guid"></param>
         /// <returns></returns>
         public AddonModel getAddonByGuid(string guid) {
-            if (this.dictGuidId.ContainsKey(guid.ToLower())) {
-                return getAddonById(this.dictGuidId[guid.ToLower()]);
+            if (this.dictGuidId.ContainsKey(guid.ToLowerInvariant())) {
+                return getAddonById(this.dictGuidId[guid.ToLowerInvariant()]);
             }
             return null;
         }
@@ -100,8 +100,8 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="name"></param>
         /// <returns></returns>
         public AddonModel getAddonByName(string name) {
-            if (this.dictNameId.ContainsKey(name.ToLower())) {
-                return getAddonById(this.dictNameId[name.ToLower()]);
+            if (this.dictNameId.ContainsKey(name.ToLowerInvariant())) {
+                return getAddonById(this.dictNameId[name.ToLowerInvariant()]);
             }
             return null;
         }

@@ -84,7 +84,7 @@ namespace Contensive.Processor.Controllers {
                     string Src = WorkingLinkAlias.Replace('\t', ' ');
                     WorkingLinkAlias = "";
                     for (int srcPtr = 0; srcPtr < Src.Length; srcPtr++) {
-                        string TestChr = Src.Substring(srcPtr, 1).ToLower() ;
+                        string TestChr = Src.Substring(srcPtr, 1).ToLowerInvariant() ;
                         if (!SafeStringLc.Contains(TestChr)) {
                             TestChr = "\t";
                         }
@@ -165,7 +165,7 @@ namespace Contensive.Processor.Controllers {
                                 bool resaveLinkAlias = false;
                                 int CS2 = 0;
                                 int LinkAliasPageID = core.db.csGetInteger(CS, "pageID");
-                                if ((core.db.csGetText(CS, "QueryStringSuffix").ToLower() == QueryStringSuffix.ToLower()) && (PageID == LinkAliasPageID)) {
+                                if ((core.db.csGetText(CS, "QueryStringSuffix").ToLowerInvariant() == QueryStringSuffix.ToLowerInvariant()) && (PageID == LinkAliasPageID)) {
                                     //
                                     // it maches a current entry for this link alias, if the current entry is not the highest number id,
                                     //   remove it and add this one

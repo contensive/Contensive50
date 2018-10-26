@@ -85,7 +85,7 @@ namespace Contensive.Processor.Controllers {
         public objectClass getObject<objectClass>(string key) {
             objectClass result = default(objectClass);
             try {
-                key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
+                key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
                 if (!(string.IsNullOrEmpty(key))) {
                     //
                     // -- read cacheWrapper
@@ -171,7 +171,7 @@ namespace Contensive.Processor.Controllers {
         private CacheWrapperClass getWrappedContent(string key) {
             CacheWrapperClass result = null;
             try {
-                key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
+                key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
                 if (string.IsNullOrEmpty(key)) {
                     throw new ArgumentException("key cannot be blank");
                 } else {
@@ -184,7 +184,7 @@ namespace Contensive.Processor.Controllers {
                         } catch (Exception ex) {
                             //
                             // --client does not throw its own errors, so try to differentiate by message
-                            if (ex.Message.ToLower().IndexOf("unable to load type") >= 0) {
+                            if (ex.Message.ToLowerInvariant().IndexOf("unable to load type") >= 0) {
                                 //
                                 // -- trying to deserialize an object and this code does not have a matching class, clear cache and return empty
                                 cacheClient.Remove(serverKey);
@@ -263,7 +263,7 @@ namespace Contensive.Processor.Controllers {
         /// <remarks></remarks>
         public void setObject(string key, object content, DateTime invalidationDate, List<string> dependentKeyList) {
             try {
-                key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
+                key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
                 CacheWrapperClass wrappedContent = new CacheWrapperClass {
                     content = content,
                     saveDate = DateTime.Now,
@@ -354,8 +354,8 @@ namespace Contensive.Processor.Controllers {
         /// <remarks></remarks>
         public void setPtr(string keyPtr, string key) {
             try {
-                keyPtr = Regex.Replace(keyPtr, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
-                key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
+                keyPtr = Regex.Replace(keyPtr, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
+                key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
                 CacheWrapperClass cacheWrapper = new CacheWrapperClass {
                     saveDate = DateTime.Now,
                     invalidationDate = DateTime.Now.AddDays(invalidationDaysDefault),
@@ -374,7 +374,7 @@ namespace Contensive.Processor.Controllers {
         /// <remarks></remarks>
         public void invalidateAll() {
             try {
-                string key = Regex.Replace(cacheNameGlobalInvalidationDate, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
+                string key = Regex.Replace(cacheNameGlobalInvalidationDate, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
                 setWrappedObject(key, new CacheWrapperClass { saveDate = DateTime.Now });
                 _globalInvalidationDate = null;
             } catch (Exception ex) {
@@ -392,7 +392,7 @@ namespace Contensive.Processor.Controllers {
         public void invalidate(string key, int recursionLimit = 5) {
             try {
                 if ((recursionLimit>0) && (!string.IsNullOrWhiteSpace(key.Trim()))) {
-                    key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
+                    key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
                     // if key is a ptr, we need to invalidate the real key
                     CacheWrapperClass wrapper = getWrappedContent(key);
                     if (wrapper == null) {
@@ -451,7 +451,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="dbTableName"></param>
         public void invalidateAllKeysInTable(string dbTableName) {
             try {
-                string key = Regex.Replace(dbTableName, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
+                string key = Regex.Replace(dbTableName, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
                 invalidate(key);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -485,7 +485,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         private string convertKeyToServerKey(string key) {
             string result = core.appConfig.name + "-" + core.codeVersion() + "-" + key;
-            result = Regex.Replace(result, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
+            result = Regex.Replace(result, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
             return result;
         }
         /// <summary>
@@ -496,7 +496,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static string getCacheKey_forDbTable( string tableName ) {
             string key = "dbtable/" + tableName + "/";
-            key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
+            key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
             return key;
         }
         /// <summary>
@@ -510,7 +510,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static string getCacheKey_forDbRecord(int recordId, string tableName, string dataSourceName = "default") {
             string key = "dbrecord/" + dataSourceName + "/" + tableName + "/id/" + recordId.ToString() + "/";
-            key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
+            key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
             return key;
         }
         /// <summary>
@@ -524,7 +524,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static string getCachePtr_forDbRecord_guid(string guid, string tableName, string dataSourceName = "default") {
             string key = "dbptr/" + dataSourceName + "/" + tableName + "/ccguid/" + guid + "/";
-            key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
+            key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
             return key;
         }
         /// <summary>
@@ -539,7 +539,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static string getCachePtr_forDbRecord_uniqueName(string name, string tableName, string dataSourceName = "default") {
             string key = "dbptr/" + dataSourceName + "/" + tableName + "/name/" + name + "/";
-            key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
+            key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
             return key;
         }
         //
@@ -552,7 +552,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static string getCacheKey_forObject(string objectName, string objectUniqueIdentifier = "") {
             string key = "obj/" + objectName + "/" + objectUniqueIdentifier;
-            key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLower().Replace(" ", "_");
+            key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
             return key;
         }
         //

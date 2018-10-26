@@ -84,7 +84,7 @@ namespace Contensive.Addons.AdminSite {
                                         string Line = ConfigListLines[Ptr];
                                         string[] LineSplit = Line.Split('\t');
                                         if (LineSplit.GetUpperBound(0) > 0) {
-                                            string fieldName = LineSplit[0].Trim().ToLower();
+                                            string fieldName = LineSplit[0].Trim().ToLowerInvariant();
                                             if (!string.IsNullOrWhiteSpace(fieldName)) {
                                                 if (adminData.adminContent.fields.ContainsKey(fieldName)) {
                                                     returnIndexConfig.columns.Add(new IndexConfigColumnClass() {
@@ -105,7 +105,7 @@ namespace Contensive.Addons.AdminSite {
                                     while (!string.IsNullOrEmpty(ConfigListLines[Ptr])) {
                                         string[] LineSplit = ConfigListLines[Ptr].Split('\t');
                                         if (LineSplit.GetUpperBound(0) == 1) {
-                                            string fieldName = LineSplit[0].Trim().ToLower();
+                                            string fieldName = LineSplit[0].Trim().ToLowerInvariant();
                                             if (!string.IsNullOrWhiteSpace(fieldName)) {
                                                 returnIndexConfig.Sorts.Add(fieldName, new IndexConfigSortClass {
                                                     fieldName = fieldName,
@@ -246,7 +246,7 @@ namespace Contensive.Addons.AdminSite {
                 //    If .Columns.Count > 0 Then
                 //        For Ptr = 0 To .Columns.Count - 1
                 //            With .Columns[Ptr]
-                //                If genericController.vbLCase(.Name) = field.Name.ToLower() Then
+                //                If genericController.vbLCase(.Name) = field.Name.ToLowerInvariant() Then
                 //                    .FieldId = SrcPtr
                 //                    Exit For
                 //                End If

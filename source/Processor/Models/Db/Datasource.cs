@@ -120,7 +120,7 @@ namespace Contensive.Processor.Models.Db {
                     do {
                         DataSourceModel instance = create(core, cs.getInteger("id"));
                         if (instance != null) {
-                            result.Add(instance.name.ToLower(), instance);
+                            result.Add(instance.name.ToLowerInvariant(), instance);
                         }
                     } while (true);
                 }
@@ -129,7 +129,7 @@ namespace Contensive.Processor.Models.Db {
                 //        var tmpList = new List<string>();
                 //        DataSourceModel instance = create(core, cs.getInteger("id"), ref tmpList);
                 //        if (instance != null) {
-                //            result.Add(instance.name.ToLower(), instance);
+                //            result.Add(instance.name.ToLowerInvariant(), instance);
                 //        }
                 //    } while (true);
                 //}
@@ -180,7 +180,7 @@ namespace Contensive.Processor.Models.Db {
         /// <returns></returns>
         public static string normalizeDataSourceName(string DataSourceName) {
             if (!string.IsNullOrEmpty(DataSourceName)) {
-                return DataSourceName.Trim().ToLower();
+                return DataSourceName.Trim().ToLowerInvariant();
             }
             return string.Empty;
         }
@@ -211,12 +211,12 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static DataSourceModel createByUniqueName(CoreController core, string recordName) {
-            return (string.IsNullOrWhiteSpace(recordName)|(recordName.ToLower()=="default")) ? getDefaultDatasource(core) : createByUniqueName<DataSourceModel>(core, recordName );
+            return (string.IsNullOrWhiteSpace(recordName)|(recordName.ToLowerInvariant()=="default")) ? getDefaultDatasource(core) : createByUniqueName<DataSourceModel>(core, recordName );
         }
         //
         //====================================================================================================
         public static DataSourceModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return (string.IsNullOrWhiteSpace(recordName) || (recordName.ToLower() == "default")) ? getDefaultDatasource(core) : createByUniqueName<DataSourceModel>(core, recordName, ref callersCacheNameList);
+            return (string.IsNullOrWhiteSpace(recordName) || (recordName.ToLowerInvariant() == "default")) ? getDefaultDatasource(core) : createByUniqueName<DataSourceModel>(core, recordName, ref callersCacheNameList);
             //return createByName<DataSourceModel>(core, recordName, ref callersCacheNameList);
         }
         //

@@ -541,7 +541,7 @@ namespace Contensive.Processor.Controllers {
                     var tableSchema = Models.Domain.TableSchemaModel.getTableSchema(core, table.name, "");
                     if (tableSchema != null) {
                         foreach (Models.Domain.TableSchemaModel.ColumnSchemaModel column in tableSchema.columns) {
-                            if ((column.DATA_TYPE.ToLower() == "datetime2") && (column.DATETIME_PRECISION < 3)) {
+                            if ((column.DATA_TYPE.ToLowerInvariant() == "datetime2") && (column.DATETIME_PRECISION < 3)) {
                                 //
                                 LogController.logInfo(core, logPrefix + ", verifySqlFieldCompatibility, conversion required, table [" + table.name + "], field [" + column.COLUMN_NAME + "], reason [datetime precision too low (" + column.DATETIME_PRECISION.ToString() + ")]");
                                 //

@@ -424,8 +424,8 @@ namespace Contensive.Processor.Controllers {
                                                                 resultSessionContext.visit.bot = true;
                                                                 resultSessionContext.visit_isBadBot = false;
                                                             } else {
-                                                                resultSessionContext.visit_isBadBot = (Args[3].ToLower() == "b");
-                                                                resultSessionContext.visit.bot = resultSessionContext.visit_isBadBot || (Args[3].ToLower() == "r");
+                                                                resultSessionContext.visit_isBadBot = (Args[3].ToLowerInvariant() == "b");
+                                                                resultSessionContext.visit.bot = resultSessionContext.visit_isBadBot || (Args[3].ToLowerInvariant() == "r");
                                                             }
                                                         }
                                                     }
@@ -482,7 +482,7 @@ namespace Contensive.Processor.Controllers {
                                 // if a user record has not been created, do not automatically create it.
                                 // lazy create a user if/when it is needed
                                 string DefaultMemberName = resultSessionContext.visit.name;
-                                if (DefaultMemberName.Left(5).ToLower() == "visit") {
+                                if (DefaultMemberName.Left(5).ToLowerInvariant() == "visit") {
                                     DefaultMemberName = CdefController.getContentFieldProperty(core, "people", "name", "default");
                                 }
                                 resultSessionContext.user = new PersonModel {
@@ -1354,7 +1354,7 @@ namespace Contensive.Processor.Controllers {
                     if (string.IsNullOrEmpty(cacheTestName)) {
                         cacheTestName = "iseditingall";
                     }
-                    cacheTestName = cacheTestName.ToLower();
+                    cacheTestName = cacheTestName.ToLowerInvariant();
                     if (core.doc.contentIsEditingList.Contains(cacheTestName)) {
                         //
                         // -- 

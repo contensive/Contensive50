@@ -512,7 +512,7 @@ namespace Contensive.Processor.Controllers {
                             //   { "text name": "my text" }
                             //
                             object cmdDictionaryOrCollection = core.json.Deserialize<object>(cmdArg);
-                            string cmdDictionaryOrCollectionTypeName = cmdDictionaryOrCollection.GetType().FullName.ToLower();
+                            string cmdDictionaryOrCollectionTypeName = cmdDictionaryOrCollection.GetType().FullName.ToLowerInvariant();
                             if (cmdDictionaryOrCollectionTypeName.Left(37) != "system.collections.generic.dictionary") {
                                 throw new ApplicationException("Error parsing JSON command argument list, expected a single command, command list [" + cmdSrc + "]");
                             } else {
@@ -556,7 +556,7 @@ namespace Contensive.Processor.Controllers {
                         //   D - { "command" : { "name" : "The Name"} }
                         //   E - { "command" : { "name" : "The Name" , "secondArgument" : "secondValue" } }
                         //
-                        string cmdTypeName = cmd.GetType().FullName.ToLower();
+                        string cmdTypeName = cmd.GetType().FullName.ToLowerInvariant();
                         string cmdText = "";
                         if (cmdTypeName == "system.string") {
                             //
@@ -575,7 +575,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                             } else {
                                 string cmdDefKey = cmdDef.Keys.First();
-                                string cmdDefValueTypeName = cmdDef[cmdDefKey].GetType().FullName.ToLower();
+                                string cmdDefValueTypeName = cmdDef[cmdDefKey].GetType().FullName.ToLowerInvariant();
                                 //
                                 // command is the key for these cases
                                 //
@@ -618,7 +618,7 @@ namespace Contensive.Processor.Controllers {
                                     CmdAccumulator = "";
                                     string ArgName = "";
                                     foreach (KeyValuePair<string, object> kvp in cmdArgDef) {
-                                        switch (kvp.Key.ToLower()) {
+                                        switch (kvp.Key.ToLowerInvariant()) {
                                             case "name":
                                             case "default":
                                                 ArgName = (string)kvp.Value;
@@ -642,7 +642,7 @@ namespace Contensive.Processor.Controllers {
                                     CmdAccumulator = "";
                                     string ArgName = "";
                                     foreach (KeyValuePair<string, object> kvp in cmdArgDef) {
-                                        switch (kvp.Key.ToLower()) {
+                                        switch (kvp.Key.ToLowerInvariant()) {
                                             case "name":
                                             case "default":
                                                 ArgName = (string)kvp.Value;
@@ -666,7 +666,7 @@ namespace Contensive.Processor.Controllers {
                                     CmdAccumulator = "";
                                     string ArgName = "";
                                     foreach (KeyValuePair<string, object> kvp in cmdArgDef) {
-                                        switch (kvp.Key.ToLower()) {
+                                        switch (kvp.Key.ToLowerInvariant()) {
                                             case "name":
                                             case "default":
                                                 ArgName = (string)kvp.Value;
@@ -695,7 +695,7 @@ namespace Contensive.Processor.Controllers {
                                     CmdAccumulator = "";
                                     string ArgName = "";
                                     foreach (KeyValuePair<string, object> kvp in cmdArgDef) {
-                                        switch (kvp.Key.ToLower()) {
+                                        switch (kvp.Key.ToLowerInvariant()) {
                                             case "name":
                                             case "default":
                                                 ArgName = (string)kvp.Value;
@@ -865,7 +865,7 @@ namespace Contensive.Processor.Controllers {
                                     //ArgGuid = ""
                                     Dictionary<string, string> addonArgDict = new Dictionary<string, string>();
                                     foreach (KeyValuePair<string, object> kvp in cmdArgDef) {
-                                        switch (kvp.Key.ToLower()) {
+                                        switch (kvp.Key.ToLowerInvariant()) {
                                             case "addon":
                                                 addonName = kvp.Value.ToString();
                                                 //Case "instanceid"
@@ -912,7 +912,7 @@ namespace Contensive.Processor.Controllers {
                                     //ArgGuid = ""
                                     Dictionary<string, string> addonArgDict = new Dictionary<string, string>();
                                     foreach (KeyValuePair<string, object> kvp in cmdArgDef) {
-                                        switch (encodeInteger(kvp.Key.ToLower())) {
+                                        switch (encodeInteger(kvp.Key.ToLowerInvariant())) {
                                             //Case "instanceid"
                                             //    ArgInstanceId = kvp.Value.ToString()
                                             //Case "guid"
@@ -949,7 +949,7 @@ namespace Contensive.Processor.Controllers {
                                     //ArgInstanceId = ""
                                     //ArgGuid = ""
                                     //For Each kvp As KeyValuePair(Of String, Object) In cmdArgDef
-                                    //    Select Case kvp.Key.ToLower()
+                                    //    Select Case kvp.Key.ToLowerInvariant()
                                     //        Case "instanceid"
                                     //            ArgInstanceId = kvp.Value.ToString()
                                     //        Case "guid"

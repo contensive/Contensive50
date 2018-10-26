@@ -323,7 +323,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // valid login account for this email not found
                             //
-                            if (encodeText(vbMid(workingEmail, atPtr + 1)).ToLower() == "contensive.com") {
+                            if (encodeText(vbMid(workingEmail, atPtr + 1)).ToLowerInvariant() == "contensive.com") {
                                 //
                                 // look for expired account to renew
                                 //

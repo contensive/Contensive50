@@ -216,7 +216,7 @@ namespace Contensive.Processor.Controllers {
                             string ContainerCssID = "";
                             string ContainerCssClass = "";
                             foreach (var kvp in executeContext.instanceArguments) {
-                                switch (kvp.Key.ToLower()) {
+                                switch (kvp.Key.ToLowerInvariant()) {
                                     case "wrapper":
                                         executeContext.wrapperID = GenericController.encodeInteger(kvp.Value);
                                         break;
@@ -401,10 +401,10 @@ namespace Contensive.Processor.Controllers {
                                 // Do replacements from Option String and Pick out WrapperID, and AsAjax
                                 //-----------------------------------------------------------------
                                 //
-                                string testString = (addon.copy + addon.copyText + addon.pageTitle + addon.metaDescription + addon.metaKeywordList + addon.otherHeadTags + addon.formXML).ToLower();
+                                string testString = (addon.copy + addon.copyText + addon.pageTitle + addon.metaDescription + addon.metaKeywordList + addon.otherHeadTags + addon.formXML).ToLowerInvariant();
                                 if (!string.IsNullOrWhiteSpace(testString)) {
                                     foreach (var key in core.docProperties.getKeyList()) {
-                                        if (testString.Contains(("$" + key + "$").ToLower())) {
+                                        if (testString.Contains(("$" + key + "$").ToLowerInvariant())) {
                                             string ReplaceSource = "$" + key + "$";
                                             string ReplaceValue = core.docProperties.getText(key);
                                             addon.copy = addon.copy.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
@@ -1688,7 +1688,7 @@ namespace Contensive.Processor.Controllers {
                                                 if (addonType.BaseType.FullName != null) {
                                                     //
                                                     // -- assembly has a baseType fullname
-                                                    if ((addonType.BaseType.FullName.ToLower() == "addonbaseclass") || (addonType.BaseType.FullName.ToLower() == "contensive.baseclasses.addonbaseclass")) {
+                                                    if ((addonType.BaseType.FullName.ToLowerInvariant() == "addonbaseclass") || (addonType.BaseType.FullName.ToLowerInvariant() == "contensive.baseclasses.addonbaseclass")) {
                                                         //
                                                         // -- valid addon assembly
                                                         isAddonAssembly = true;
@@ -1733,7 +1733,7 @@ namespace Contensive.Processor.Controllers {
                                                     //
                                                     // Error in the addon
                                                     //
-                                                    string detailedErrorMessage = "There was an error in the addon [" + addon.name + "]. It could not be executed because there was an error in the addon assembly [" + TestFilePathname + "], in class [" + addonType.FullName.Trim().ToLower() + "]. The error was [" + Ex.ToString() + "]";
+                                                    string detailedErrorMessage = "There was an error in the addon [" + addon.name + "]. It could not be executed because there was an error in the addon assembly [" + TestFilePathname + "], in class [" + addonType.FullName.Trim().ToLowerInvariant() + "]. The error was [" + Ex.ToString() + "]";
                                                     LogController.handleError(core, Ex, detailedErrorMessage);
                                                     //Throw New ApplicationException(detailedErrorMessage)
                                                 }

@@ -689,9 +689,9 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 // ----- select values
-                string CurrentValueLower = CurrentValue.ToLower();
+                string CurrentValueLower = CurrentValue.ToLowerInvariant();
                 foreach (NameValueClass nameValue in lookupList) {
-                    string selected = (nameValue.value.ToLower() == CurrentValueLower) ? " selected" : "";
+                    string selected = (nameValue.value.ToLowerInvariant() == CurrentValueLower) ? " selected" : "";
                     FastString.Add("<option value=\"" + nameValue.value + "\" " + selected + ">" + nameValue.name + "</option>");
                 }
                 FastString.Add("</select>");
@@ -3141,7 +3141,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- favicon
                 string VirtualFilename = core.siteProperties.getText("faviconfilename");
-                switch (Path.GetExtension(VirtualFilename).ToLower()) {
+                switch (Path.GetExtension(VirtualFilename).ToLowerInvariant()) {
                     case ".ico":
                         headList.Add("\r\n<link rel=\"icon\" type=\"image/vnd.microsoft.icon\" href=\"" + GenericController.getCdnFileLink(core, VirtualFilename) + "\" >");
                         break;

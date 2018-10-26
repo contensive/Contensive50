@@ -61,7 +61,7 @@ Public Class ConfigurationClass
             appConfig.enabled = True
             appConfig.localPrivatePath = ConfigurationManager.AppSettings("ContensivePrivateFilesPath")
             appConfig.privateKey = ConfigurationManager.AppSettings("ContensivePrivateKey")
-            serverConfig.apps.Add(appConfig.name.ToLower(), appConfig)
+            serverConfig.apps.Add(appConfig.name.ToLowerInvariant(), appConfig)
         Catch ex As Exception
             Logger.appendProgramDataLog(ex.ToString)
         End Try

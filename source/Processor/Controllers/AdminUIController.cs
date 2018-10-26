@@ -571,7 +571,7 @@ namespace Contensive.Processor {
                 }
                 //
                 if (!string.IsNullOrEmpty(Width)) {
-                    WidthTest = GenericController.encodeInteger(Width.ToLower().Replace("px", ""));
+                    WidthTest = GenericController.encodeInteger(Width.ToLowerInvariant().Replace("px", ""));
                     if (WidthTest != 0) {
                         Style = Style + "width:" + WidthTest + "px;";
                         Copy += "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"" + WidthTest + "\" height=1 border=0>";
@@ -1044,7 +1044,7 @@ namespace Contensive.Processor {
                 // editor needs a starting p tag to setup correctly
                 fieldValue = HTMLEditorDefaultCopyNoCr;
             }
-            result += core.html.getFormInputHTML(fieldName.ToLower(), fieldValue, "500", "", readONly, true, editorAddonListJSON, styleList, styleOptionList);
+            result += core.html.getFormInputHTML(fieldName.ToLowerInvariant(), fieldValue, "500", "", readONly, true, editorAddonListJSON, styleList, styleOptionList);
             result = "<div style=\"width:95%\">" + result + "</div>";
             return result;
         }
@@ -1162,7 +1162,7 @@ namespace Contensive.Processor {
                 //
                 // ----- Lookup ReadOnly
                 result += (HtmlController.inputHidden(htmlName, GenericController.encodeText(defaultValue)));
-                NameValueClass nameValue = lookupList.Find(x => x.name.ToLower() == htmlName.ToLower());
+                NameValueClass nameValue = lookupList.Find(x => x.name.ToLowerInvariant() == htmlName.ToLowerInvariant());
                 if (nameValue == null) {
                     result += "none";
                 } else {

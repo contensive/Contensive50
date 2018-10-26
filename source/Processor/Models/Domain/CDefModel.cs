@@ -383,7 +383,7 @@ namespace Contensive.Processor.Models.Domain {
                                         Models.Domain.CDefFieldModel childField = new Models.Domain.CDefFieldModel();
                                         childField = (Models.Domain.CDefFieldModel)parentField.Clone();
                                         childField.inherited = true;
-                                        result.fields.Add(childField.nameLc.ToLower(), childField);
+                                        result.fields.Add(childField.nameLc.ToLowerInvariant(), childField);
                                         if (!((parentField.fieldTypeId == fieldTypeIdManyToMany) || (parentField.fieldTypeId == fieldTypeIdRedirect))) {
                                             if (!result.selectList.Contains(parentField.nameLc)) {
                                                 result.selectList.Add(parentField.nameLc);
@@ -468,7 +468,7 @@ namespace Contensive.Processor.Models.Domain {
                                         foreach (DataRow fieldRow in dtFields.Rows) {
                                             string fieldName = GenericController.encodeText(fieldRow[13]);
                                             int fieldId = GenericController.encodeInteger(fieldRow[12]);
-                                            string fieldNameLower = fieldName.ToLower();
+                                            string fieldNameLower = fieldName.ToLowerInvariant();
                                             bool skipDuplicateField = false;
                                             if (usedFields.Contains(fieldNameLower)) {
                                                 //

@@ -453,7 +453,7 @@ namespace Contensive.Processor.Controllers {
                                             //        break;
                                             //    }
                                             //case ACTypeOrganization: {
-                                            //        string fieldName = KmaHTML.ElementAttribute(ElementPointer, "FIELD").ToLower();
+                                            //        string fieldName = KmaHTML.ElementAttribute(ElementPointer, "FIELD").ToLowerInvariant();
                                             //        if (string.IsNullOrWhiteSpace(fieldName)) {
                                             //            fieldName = "name";
                                             //        }
@@ -818,7 +818,7 @@ namespace Contensive.Processor.Controllers {
                                                 string ImageSrcOriginal = DHTML.ElementAttribute(ElementPointer, "src");
                                                 string VirtualFilePathBad = core.appConfig.name + "/files/";
                                                 string serverFilePath = "/" + VirtualFilePathBad;
-                                                if (ImageSrcOriginal.ToLower().Left(VirtualFilePathBad.Length) == GenericController.vbLCase(VirtualFilePathBad)) {
+                                                if (ImageSrcOriginal.ToLowerInvariant().Left(VirtualFilePathBad.Length) == GenericController.vbLCase(VirtualFilePathBad)) {
                                                     //
                                                     // if the image is from the virtual file path, but the editor did not include the root path, add it
                                                     //
@@ -1758,7 +1758,7 @@ namespace Contensive.Processor.Controllers {
                                 string FieldName = TableSplit[1];
                                 int RecordID = GenericController.encodeInteger(TableSplit[2]);
                                 string FilenameSegment = TableSplit[3];
-                                if ((TableName.ToLower() == "cclibraryfiles") && (FieldName.ToLower() == "filename") && (RecordID != 0)) {
+                                if ((TableName.ToLowerInvariant() == "cclibraryfiles") && (FieldName.ToLowerInvariant() == "filename") && (RecordID != 0)) {
                                     LibraryFilesModel file = LibraryFilesModel.create(core, RecordID);
                                     if (file != null) {
                                         FieldName = "filename";

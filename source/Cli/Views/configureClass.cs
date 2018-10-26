@@ -34,20 +34,20 @@ namespace Contensive.CLI {
                     Console.WriteLine("\n\nIs this instance a production server? Non-production server instances may disable or mock some services, like ecommerce billing or email notifications.");
                     prompt = "Production Server (y/n)?";
                     if (cp.core.serverConfig.productionEnvironment) { defaultValue = "y"; } else { defaultValue = "n"; }
-                    cp.core.serverConfig.productionEnvironment = Equals(cliController.promptForReply(prompt, defaultValue).ToLower(), "y");
+                    cp.core.serverConfig.productionEnvironment = Equals(cliController.promptForReply(prompt, defaultValue).ToLowerInvariant(), "y");
                     //
                     // -- enable logging
                     Console.WriteLine("\n\nWith logging disabled, the server log at c:\\ProgramData\\Contensive\\Logs only includes Error and Fatal level entries. With logging enabled, these logs are verbose and can be large.");
                     prompt = "Enable Logging (y/n)?";
                     if (cp.core.serverConfig.enableLogging) { defaultValue = "y"; } else { defaultValue = "n"; }
-                    cp.core.serverConfig.enableLogging = Equals(cliController.promptForReply(prompt, defaultValue).ToLower(), "y");
+                    cp.core.serverConfig.enableLogging = Equals(cliController.promptForReply(prompt, defaultValue).ToLowerInvariant(), "y");
                     //
                     // -- local or multiserver mode
                     Console.WriteLine("\n\nLocal or Remote File System");
                     Console.WriteLine("Local File System stores content files on the webserver. Remote File System store content in an Amazon AWS S3 bucket, using the webserver to cache files for read and write.");
                     prompt = "Local File System (y/n)?";
                     if (cp.core.serverConfig.isLocalFileSystem) { defaultValue = "y"; } else { defaultValue = "n"; }
-                    cp.core.serverConfig.isLocalFileSystem = Equals(cliController.promptForReply(prompt, defaultValue).ToLower(), "y");
+                    cp.core.serverConfig.isLocalFileSystem = Equals(cliController.promptForReply(prompt, defaultValue).ToLowerInvariant(), "y");
                     //
                     // -- local file location
                     Console.WriteLine("\n\nConfigure Local File System");
@@ -65,10 +65,10 @@ namespace Contensive.CLI {
                         }
                         regionList = regionList.Substring(1);
                         do {
-                            string selectedRegion = cliController.promptForReply("Enter the AWS bucket region (" + regionList + ")", cp.core.serverConfig.awsBucketRegionName).ToLower();
+                            string selectedRegion = cliController.promptForReply("Enter the AWS bucket region (" + regionList + ")", cp.core.serverConfig.awsBucketRegionName).ToLowerInvariant();
                             cp.core.serverConfig.awsBucketRegionName = "";
                             foreach (var region in RegionEndpoint.EnumerableAllRegions) {
-                                if (selectedRegion==region.SystemName.ToLower()) {
+                                if (selectedRegion==region.SystemName.ToLowerInvariant()) {
                                     cp.core.serverConfig.awsBucketRegionName = region.SystemName;
                                     break;
                                 }
@@ -121,7 +121,7 @@ namespace Contensive.CLI {
                         Console.WriteLine("\n\nThe server requires a caching service. You can choose either the systems local cache or an AWS Elasticache (memCacheD).");
                         Console.Write("Use (l)ocal cache or (m)emcached server?");
                         if (!String.IsNullOrEmpty(cp.core.serverConfig.awsElastiCacheConfigurationEndpoint)) { Console.Write("(m)"); } else { Console.Write("(l)"); };
-                        reply = Console.ReadLine().ToLower();
+                        reply = Console.ReadLine().ToLowerInvariant();
                         if (String.IsNullOrEmpty(reply)) reply = "l";
                     } while ((reply != "l") && (reply != "m"));
                     if ((reply == "l")) {
