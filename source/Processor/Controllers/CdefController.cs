@@ -582,7 +582,7 @@ namespace Contensive.Processor.Controllers {
                             // if the new guid does no match te old guid
                             //
                             sqlList.add("ccGuid", core.db.encodeSQLText(cdef.guid));
-                        } else if ((!string.IsNullOrEmpty(cdef.guid)) & (contentGuid != GenericController.vbLCase(cdef.guid))) {
+                        } else if ((!string.IsNullOrEmpty(cdef.guid)) && (contentGuid != GenericController.vbLCase(cdef.guid))) {
                             //
                             // installing content definition with matching name, but different guid -- this is an error that needs to be fixed
                             //

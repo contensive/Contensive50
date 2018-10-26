@@ -245,7 +245,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // ----- check if admin record is present
                 //
-                if ((editRecord.id != 0) & (adminContent.allowContentTracking)) {
+                if ((editRecord.id != 0) && (adminContent.allowContentTracking)) {
                     //
                     // ----- Open the content watch record for this content record
                     //
@@ -278,7 +278,7 @@ namespace Contensive.Addons.AdminSite {
                 int RecordID = 0;
                 //
                 ContentWatchListIDCount = 0;
-                if ((core.docProperties.getText("WhatsNewResponse") != "") & (adminContent.allowContentTracking)) {
+                if ((core.docProperties.getText("WhatsNewResponse") != "") && (adminContent.allowContentTracking)) {
                     //
                     // ----- set single fields
                     //
@@ -472,7 +472,7 @@ namespace Contensive.Addons.AdminSite {
                     Loaded = false
                 };
                 requestedRecordId = core.docProperties.getInteger("id");
-                if ((UserAllowContentEdit) & (requestedRecordId != 0) && (adminContent.id > 0)) {
+                if ((UserAllowContentEdit) && (requestedRecordId != 0) && (adminContent.id > 0)) {
                     //
                     // set adminContext.content to the content definition of the requested record
                     //
@@ -481,7 +481,7 @@ namespace Contensive.Addons.AdminSite {
                         editRecord.id = requestedRecordId;
                         int recordContentId = core.db.csGetInteger(CS, "ContentControlID");
                         //adminContent.id = core.db.csGetInteger(CS, "ContentControlID");
-                        if ((recordContentId > 0) & (recordContentId != adminContent.id)) {
+                        if ((recordContentId > 0) && (recordContentId != adminContent.id)) {
                             adminContent = CDefModel.create(core, recordContentId);
                         }
                     }
@@ -1231,7 +1231,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // If there are any form fields that were no loaded, flag the error now
                     //
-                    if (AllowAdminFieldCheck(core) & (FormFieldLcListToBeLoaded.Count > 0)) {
+                    if (AllowAdminFieldCheck(core) && (FormFieldLcListToBeLoaded.Count > 0)) {
                         Processor.Controllers.ErrorController.addUserError(core, "There has been an Error reading the response from your browser. Please Try your change again. If this Error occurs again, please report this problem To your site administrator. The following fields where Not found [" + string.Join(",", FormFieldLcListToBeLoaded) + "].");
                         throw (new ApplicationException("Unexpected exception")); // core.handleLegacyError2("AdminClass", "LoadEditResponse", core.appConfig.name & ", There were fields In the fieldlist sent out To the browser that did Not Return, [" & Mid(FormFieldListToBeLoaded, 2, Len(FormFieldListToBeLoaded) - 2) & "]")
                     } else {
@@ -1387,17 +1387,17 @@ namespace Contensive.Addons.AdminSite {
                                 // (many to many is handled during save)
                                 //
                                 ResponseFieldValueIsOKToSave = false;
-                            } else if ((field.adminOnly) & (!core.session.isAuthenticatedAdmin(core))) {
+                            } else if ((field.adminOnly) && (!core.session.isAuthenticatedAdmin(core))) {
                                 //
                                 // non-admin and admin only field, leave current value
                                 //
                                 ResponseFieldValueIsOKToSave = false;
-                            } else if ((field.developerOnly) & (!core.session.isAuthenticatedDeveloper(core))) {
+                            } else if ((field.developerOnly) && (!core.session.isAuthenticatedDeveloper(core))) {
                                 //
                                 // non-developer and developer only field, leave current value
                                 //
                                 ResponseFieldValueIsOKToSave = false;
-                            } else if ((field.readOnly) | (field.notEditable & (editRecord.id != 0))) {
+                            } else if ((field.readOnly) || (field.notEditable & (editRecord.id != 0))) {
                                 //
                                 // read only field, leave current
                                 //

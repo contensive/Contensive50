@@ -189,7 +189,7 @@ namespace Contensive.Processor {
                 if (cs != -1) {
                     core.db.csClose(ref cs);
                 }
-                if (((string.IsNullOrEmpty(sql)) || (sql.ToLower() == "default")) & (!string.IsNullOrEmpty(DataSourcename)) & (DataSourcename.ToLower() != "default")) {
+                if (((string.IsNullOrEmpty(sql)) || (sql.ToLower() == "default")) && (!string.IsNullOrEmpty(DataSourcename)) && (DataSourcename.ToLower() != "default")) {
                     cs = core.db.csOpenSql(sql, DataSourcename, PageSize, PageNumber);
                 } else {
                     cs = core.db.csOpenSql(sql, DataSourcename, PageSize, PageNumber);
@@ -210,7 +210,7 @@ namespace Contensive.Processor {
                 if (cs != -1) {
                     core.db.csClose(ref cs);
                 }
-                if (((string.IsNullOrEmpty(sql)) || (sql.ToLower() == "default")) & (!string.IsNullOrEmpty(DataSourcename)) & (DataSourcename.ToLower() != "default")) {
+                if (((string.IsNullOrEmpty(sql)) || (sql.ToLower() == "default")) && (!string.IsNullOrEmpty(DataSourcename)) && (DataSourcename.ToLower() != "default")) {
                     cs = core.db.csOpenSql(sql, DataSourcename, PageSize, PageNumber);
                 } else {
                     cs = core.db.csOpenSql(sql, DataSourcename, PageSize, PageNumber);

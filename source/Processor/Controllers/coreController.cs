@@ -1125,7 +1125,7 @@ namespace Contensive.Processor.Controllers {
                     // -- server mode, there is no application
                     session = SessionController.create(this, false);
                 } else if (appConfig.appStatus != AppConfigModel.AppStatusEnum.ok) {
-                    //} else if ((appConfig.appMode != appConfigModel.appModeEnum.normal) | (appConfig.appStatus != appConfigModel.appStatusEnum.OK)) {
+                    //} else if ((appConfig.appMode != appConfigModel.appModeEnum.normal) || (appConfig.appStatus != appConfigModel.appStatusEnum.OK)) {
                     //
                     // -- application is not ready, might be error, or in maintainence mode
                     session = SessionController.create(this, false);

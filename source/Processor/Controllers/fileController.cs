@@ -459,7 +459,7 @@ namespace Contensive.Processor.Controllers {
                         // todo - rewrite using lowlevel + transfer, not file io
                         // https://aws.amazon.com/blogs/developer/the-three-different-apis-for-amazon-s3/
                         string unixPathName = joinPath(remotePathPrefix , path).Trim();
-                        if ((unixPathName.Length > 1) & (unixPathName.Substring(0, 1) == "\\")) {
+                        if ((unixPathName.Length > 1) && (unixPathName.Substring(0, 1) == "\\")) {
                             unixPathName = unixPathName.Substring(1);
                         }
                         if (!string.IsNullOrEmpty(unixPathName)) {
@@ -1085,7 +1085,7 @@ namespace Contensive.Processor.Controllers {
         public void saveHttpRequestToFile(string Link, string pathFilename) {
             try {
                 pathFilename = normalizeDosPathFilename(pathFilename);
-                if ((!string.IsNullOrEmpty(pathFilename)) & (!string.IsNullOrEmpty(Link))) {
+                if ((!string.IsNullOrEmpty(pathFilename)) && (!string.IsNullOrEmpty(Link))) {
                     string URLLink = GenericController.vbReplace(Link, " ", "%20");
                     HttpRequestController HTTP = new HttpRequestController();
                     HTTP.timeout = 600;
@@ -1212,7 +1212,7 @@ namespace Contensive.Processor.Controllers {
             while (returnPathFilename.IndexOf("\\\\") >= 0) {
                 returnPathFilename = returnPathFilename.Replace("\\\\", "\\");
             }
-            if (string.IsNullOrEmpty(returnPathFilename) | (returnPathFilename == "\\")) {
+            if (string.IsNullOrEmpty(returnPathFilename) || (returnPathFilename == "\\")) {
                 //
                 // -- return empty if result is empty or just a slash
                 return string.Empty;

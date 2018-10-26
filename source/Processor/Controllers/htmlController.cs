@@ -17,6 +17,7 @@ using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 using System.Net;
+using System.Text;
 
 namespace Contensive.Processor.Controllers {
     /// <summary>
@@ -43,7 +44,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 //
                 // -- content extras like tool panel
-                if (core.session.isAuthenticatedContentManager(core) & (core.session.user.AllowToolsPanel)) {
+                if (core.session.isAuthenticatedContentManager(core) && (core.session.user.AllowToolsPanel)) {
                     if (AllowTools) {
                         result.Add(core.html.getToolsPanel());
                     }
@@ -987,7 +988,7 @@ namespace Contensive.Processor.Controllers {
                 core.doc.formInputTextCnt += 1;
                 core.doc.inputDateCnt = core.doc.inputDateCnt + 1;
                 string attrList = " type=\"date\"  name=\"" + HtmlController.encodeHtml(htmlName) + "\"";
-                if ((htmlValue != null) & (htmlValue > DateTime.MinValue)) attrList += " value=\"" + String.Format("{0:s}", htmlValue) + "\"";
+                if ((htmlValue != null) && (htmlValue > DateTime.MinValue)) attrList += " value=\"" + String.Format("{0:s}", htmlValue) + "\"";
                 attrList += (string.IsNullOrEmpty(htmlId)) ? "" : " id=\"" + htmlId + "\"";
                 attrList += (string.IsNullOrEmpty(htmlClass)) ? "" : " class=\"" + htmlClass + "\"";
                 attrList += (!readOnly) ? "" : " readonly";
@@ -1022,7 +1023,7 @@ namespace Contensive.Processor.Controllers {
                 core.doc.formInputTextCnt += 1;
                 core.doc.inputDateCnt = core.doc.inputDateCnt + 1;
                 string attrList = " type=date name=\"" + HtmlController.encodeHtml(htmlName) + "\"";
-                if ((htmlValue!=null) & (htmlValue > DateTime.MinValue)) attrList += " value=\"" + encodeDate( htmlValue ).ToString("yyyy-MM-dd") + "\"";              
+                if ((htmlValue!=null) && (htmlValue > DateTime.MinValue)) attrList += " value=\"" + encodeDate( htmlValue ).ToString("yyyy-MM-dd") + "\"";              
                 attrList += (string.IsNullOrEmpty(htmlId)) ? "" : " id=\"" + htmlId + "\"";
                 attrList += (string.IsNullOrEmpty(htmlClass)) ? "" : " class=\"" + htmlClass + "\"";
                 attrList += (!readOnly) ? "" : " readonly";
@@ -1550,7 +1551,7 @@ namespace Contensive.Processor.Controllers {
                                 //ObjectProgramID2 = ObjectProgramID2;
                             } else {
                                 string addonName = encodeText(core.db.csGet(CSAddons, "name")).Trim(' ');
-                                if (!string.IsNullOrEmpty(addonName) & (addonName != LastAddonName)) {
+                                if (!string.IsNullOrEmpty(addonName) && (addonName != LastAddonName)) {
                                     //
                                     // Icon (fieldtyperesourcelink)
                                     //
@@ -2421,7 +2422,7 @@ namespace Contensive.Processor.Controllers {
                     int main_MemberShipCount = 0;
                     int main_MemberShipSize = 0;
                     returnHtml = "";
-                    if ((!string.IsNullOrEmpty(SecondaryTablename)) & (!string.IsNullOrEmpty(rulesTablename))) {
+                    if ((!string.IsNullOrEmpty(SecondaryTablename)) && (!string.IsNullOrEmpty(rulesTablename))) {
                         string OldFolderVar = "OldFolder" + core.doc.checkListCnt;
                         string javaScriptRequired = "";
                         javaScriptRequired += "var " + OldFolderVar + ";";
@@ -3302,9 +3303,13 @@ namespace Contensive.Processor.Controllers {
             }
         }
         //
+        public void addScriptLinkSrc(string scriptLinkSrc, string addedByMessage) => addScriptLinkSrc(scriptLinkSrc, addedByMessage, false, 0);
+        //
+        public void addScriptLinkSrc(string scriptLinkSrc, string addedByMessage, bool forceHead) => addScriptLinkSrc(scriptLinkSrc, addedByMessage, forceHead, 0);
+       //
         //=========================================================================================================
         //
-        public void addTitle(string pageTitle, string addedByMessage = "") {
+        public void addTitle(string pageTitle, string addedByMessage) {
             try {
                 if (!string.IsNullOrEmpty(pageTitle.Trim())) {
                     core.doc.htmlMetaContent_TitleList.Add(new htmlMetaClass() {
@@ -3317,9 +3322,11 @@ namespace Contensive.Processor.Controllers {
             }
         }
         //
+        public void addTitle(string pageTitle) => addTitle(pageTitle, "");
+        //
         //=========================================================================================================
         //
-        public void addMetaDescription(string MetaDescription, string addedByMessage = "") {
+        public void addMetaDescription(string MetaDescription, string addedByMessage) {
             try {
                 if (!string.IsNullOrEmpty(MetaDescription.Trim())) {
                     core.doc.htmlMetaContent_Description.Add(new htmlMetaClass() {
@@ -3331,6 +3338,8 @@ namespace Contensive.Processor.Controllers {
                 LogController.handleError( core,ex);
             }
         }
+        //
+        public void addMetaDescription(string MetaDescription) => addMetaDescription(MetaDescription, "");
         //
         //=========================================================================================================
         //
@@ -3352,9 +3361,9 @@ namespace Contensive.Processor.Controllers {
         //
         //=========================================================================================================
         //
-        public void addMetaKeywordList(string MetaKeywordList, string addedByMessage = "") {
+        public void addMetaKeywordList(string metaKeywordList, string addedByMessage) {
             try {
-                foreach (string keyword in MetaKeywordList.Split(',')) {
+                foreach (string keyword in metaKeywordList.Split(',')) {
                     if (!string.IsNullOrEmpty(keyword)) {
                         core.doc.htmlMetaContent_KeyWordList.Add(new htmlMetaClass() {
                             addedByMessage = addedByMessage,
@@ -3367,20 +3376,24 @@ namespace Contensive.Processor.Controllers {
             }
         }
         //
+        public void addMetaKeywordList(string MetaKeywordList) => addMetaKeywordList(MetaKeywordList, "");
+        //
         //=========================================================================================================
         //
-        public void addHeadTag(string HeadTag, string addedByMessage = "") {
+        public void addHeadTag(string headTag, string addedByMessage) {
             try {
-                if (!string.IsNullOrWhiteSpace(HeadTag)) {
+                if (!string.IsNullOrWhiteSpace(headTag)) {
                     core.doc.htmlMetaContent_OtherTags.Add(new htmlMetaClass() {
                         addedByMessage = addedByMessage,
-                        content = HeadTag
+                        content = headTag
                     });
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
             }
         }
+        //
+        public void addHeadTag(string headTag) => addHeadTag(headTag, "");
         //
         //============================================================================
         //
@@ -3460,34 +3473,12 @@ namespace Contensive.Processor.Controllers {
         /// <param name="rulesPrimaryFieldname"></param>
         /// <param name="rulesSecondaryFieldName"></param>
         public void processCheckList(string tagName, string primaryContentName, string primaryRecordID, string secondaryContentName, string rulesContentName, string rulesPrimaryFieldname, string rulesSecondaryFieldName) {
-            //
-            string rulesTablename = null;
-            string SQL = null;
-            DataTable currentRules = null;
-            int currentRulesCnt = 0;
-            bool RuleFound = false;
-            int RuleId = 0;
-            int Ptr = 0;
-            int TestRecordIDLast = 0;
-            int TestRecordID = 0;
-            string dupRuleIdList = null;
-            int GroupCnt = 0;
-            int GroupPtr = 0;
-            int SecondaryRecordID = 0;
-            bool RuleNeeded = false;
-            int CSRule = 0;
+            int GroupCnt = core.docProperties.getInteger(tagName + ".RowCount");
             bool RuleContentChanged = false;
-            bool SupportRuleCopy = false;
-            string RuleCopy = null;
-            //
-            // --- create Rule records for all selected
-            //
-            GroupCnt = core.docProperties.getInteger(tagName + ".RowCount");
             if (GroupCnt > 0) {
                 //
                 // Test if RuleCopy is supported
-                //
-                SupportRuleCopy = CdefController.isContentFieldSupported(core, rulesContentName, "RuleCopy");
+                bool SupportRuleCopy = CdefController.isContentFieldSupported(core, rulesContentName, "RuleCopy");
                 if (SupportRuleCopy) {
                     SupportRuleCopy = SupportRuleCopy && CdefController.isContentFieldSupported(core, secondaryContentName, "AllowRuleCopy");
                     if (SupportRuleCopy) {
@@ -3496,47 +3487,36 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 // Go through each checkbox and check for a rule
-                //
-                //
-                // try
-                //
-                currentRulesCnt = 0;
-                dupRuleIdList = "";
-                rulesTablename = CdefController.getContentTablename(core, rulesContentName);
-                SQL = "select " + rulesSecondaryFieldName + ",id from " + rulesTablename + " where (" + rulesPrimaryFieldname + "=" + primaryRecordID + ")and(active<>0) order by " + rulesSecondaryFieldName;
-                currentRulesCnt = 0;
-                currentRules = core.db.executeQuery(SQL);
-                currentRulesCnt = currentRules.Rows.Count;
-                for (GroupPtr = 0; GroupPtr < GroupCnt; GroupPtr++) {
+                string dupRuleIdList = "";
+                string rulesTablename = CdefController.getContentTablename(core, rulesContentName);
+                string SQL = "select " + rulesSecondaryFieldName + ",id from " + rulesTablename + " where (" + rulesPrimaryFieldname + "=" + primaryRecordID + ")and(active<>0) order by " + rulesSecondaryFieldName;
+                DataTable currentRules = core.db.executeQuery(SQL);
+                int currentRulesCnt = currentRules.Rows.Count; 
+                for (int GroupPtr = 0; GroupPtr < GroupCnt; GroupPtr++) {
                     //
                     // ----- Read Response
-                    //
-                    SecondaryRecordID = core.docProperties.getInteger(tagName + "." + GroupPtr + ".ID");
-                    RuleCopy = core.docProperties.getText(tagName + "." + GroupPtr + ".RuleCopy");
-                    RuleNeeded = core.docProperties.getBoolean(tagName + "." + GroupPtr);
+                    int SecondaryRecordID = core.docProperties.getInteger(tagName + "." + GroupPtr + ".ID");
+                    string RuleCopy = core.docProperties.getText(tagName + "." + GroupPtr + ".RuleCopy");
+                    bool RuleNeeded = core.docProperties.getBoolean(tagName + "." + GroupPtr);
                     //
                     // ----- Update Record
-                    //
-                    RuleFound = false;
-                    RuleId = 0;
-                    TestRecordIDLast = 0;
-                    for (Ptr = 0; Ptr < currentRulesCnt; Ptr++) {
-                        TestRecordID = GenericController.encodeInteger(currentRules.Rows[Ptr][0]);
+                    bool RuleFound = false;
+                    int RuleId = 0;
+                    int TestRecordIDLast = 0;
+                    for (int Ptr = 0; Ptr < currentRulesCnt; Ptr++) {
+                        int TestRecordID = GenericController.encodeInteger(currentRules.Rows[Ptr][0]);
                         if (TestRecordID == 0) {
                             //
                             // skip
-                            //
                         } else if (TestRecordID == SecondaryRecordID) {
                             //
                             // hit
-                            //
                             RuleFound = true;
                             RuleId = GenericController.encodeInteger(currentRules.Rows[Ptr][1]);
                             break;
                         } else if (TestRecordID == TestRecordIDLast) {
                             //
                             // dup
-                            //
                             dupRuleIdList = dupRuleIdList + "," + GenericController.encodeInteger(currentRules.Rows[Ptr][1]);
                             currentRules.Rows[Ptr][0] = 0;
                         }
@@ -3545,14 +3525,12 @@ namespace Contensive.Processor.Controllers {
                     if (SupportRuleCopy && RuleNeeded && (RuleFound)) {
                         //
                         // Record exists and is needed, update the rule copy
-                        //
                         SQL = "update " + rulesTablename + " set rulecopy=" + core.db.encodeSQLText(RuleCopy) + " where id=" + RuleId;
                         core.db.executeQuery(SQL);
                     } else if (RuleNeeded && (!RuleFound)) {
                         //
-                        // No record exists, and one is needed
-                        //
-                        CSRule = core.db.csInsertRecord(rulesContentName);
+                        // No record exists, and one is needed                        //
+                        int CSRule = core.db.csInsertRecord(rulesContentName);
                         if (core.db.csOk(CSRule)) {
                             core.db.csSet(CSRule, "Active", RuleNeeded);
                             core.db.csSet(CSRule, rulesPrimaryFieldname, primaryRecordID);
@@ -3566,7 +3544,6 @@ namespace Contensive.Processor.Controllers {
                     } else if ((!RuleNeeded) && RuleFound) {
                         //
                         // Record exists and it is not needed
-                        //
                         SQL = "delete from " + rulesTablename + " where id=" + RuleId;
                         core.db.executeQuery(SQL);
                         RuleContentChanged = true;
@@ -3574,7 +3551,6 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 // delete dups
-                //
                 if (!string.IsNullOrEmpty(dupRuleIdList)) {
                     SQL = "delete from " + rulesTablename + " where id in (" + dupRuleIdList.Substring(1) + ")";
                     core.db.executeQuery(SQL);
@@ -3587,6 +3563,12 @@ namespace Contensive.Processor.Controllers {
             }
         }
         //
+        public static string genericBlockTag(string TagName, string InnerHtml) => genericBlockTag(TagName, InnerHtml, "", "", "");
+        //
+        public static string genericBlockTag(string TagName, string InnerHtml, string HtmlClass) => genericBlockTag(TagName, InnerHtml, HtmlClass, "", "");
+        //
+        public static string genericBlockTag(string TagName, string InnerHtml, string HtmlClass, string HtmlId) => genericBlockTag(TagName, InnerHtml, HtmlClass, HtmlId, "");
+        //
         //====================================================================================================
         /// <summary>
         /// create an html block tag like div
@@ -3597,54 +3579,70 @@ namespace Contensive.Processor.Controllers {
         /// <param name="HtmlClass"></param>
         /// <param name="HtmlId"></param>
         /// <returns></returns>
-        public static string genericBlockTag(string TagName, string InnerHtml, string HtmlClass = "", string HtmlId = "", string HtmlName = "") {
-            string s = "";
-            //
-            if (!string.IsNullOrEmpty(HtmlName)) {
-                s += " name=\"" + HtmlName + "\"";
-            }
-            if (!string.IsNullOrEmpty(HtmlClass)) {
-                s += " class=\"" + HtmlClass + "\"";
-            }
-            if (!string.IsNullOrEmpty(HtmlId)) {
-                s += " id=\"" + HtmlId + "\"";
-            }
-            return "<" + TagName.Trim() + s + ">" + InnerHtml + "</" + TagName.Trim() + ">";
+        public static string genericBlockTag(string TagName, string InnerHtml, string HtmlClass, string HtmlId, string HtmlName) {
+            var result = new StringBuilder("<");
+            result.Append(TagName.Trim());
+            result.Append(!string.IsNullOrEmpty(HtmlName) ? " name=\"" + HtmlName + "\"" : "");
+            result.Append(!string.IsNullOrEmpty(HtmlClass) ? " class=\"" + HtmlClass + "\"" : "");
+            result.Append(!string.IsNullOrEmpty(HtmlId) ? " id=\"" + HtmlId + "\"" : "");
+            result.Append(">");
+            result.Append(InnerHtml);
+            result.Append("</");
+            result.Append(TagName.Trim());
+            result.Append(">");
+            return result.ToString();
         }
         //
-        //====================================================================================================
-        /// <summary>
-        /// html div tag
-        /// </summary>
-        /// <param name="innerHtml"></param>
-        /// <param name="htmlName"></param>
-        /// <param name="htmlClass"></param>
-        /// <param name="htmlId"></param>
-        /// <returns></returns>
-        public static string div(string innerHtml, string htmlClass = "", string htmlId = "") {
-            return genericBlockTag("div", innerHtml, htmlClass, htmlId, "");
-        }
-        public static string p(string innerHtml, string htmlClass = "", string htmlId = "") {
-            return genericBlockTag("p", innerHtml, htmlClass, htmlId, "");
-        }
-        public static string h1(string innerHtml, string htmlClass = "", string htmlId = "") {
-            return genericBlockTag("h1", innerHtml, htmlClass, htmlId, "");
-        }
-        public static string h2(string innerHtml, string htmlClass = "", string htmlId = "") {
-            return genericBlockTag("h2", innerHtml, htmlClass, htmlId, "");
-        }
-        public static string h3(string innerHtml, string htmlClass = "", string htmlId = "") {
-            return genericBlockTag("h3", innerHtml, htmlClass, htmlId, "");
-        }
-        public static string h4(string innerHtml, string htmlClass = "", string htmlId = "") {
-            return genericBlockTag("h4", innerHtml, htmlClass, htmlId, "");
-        }
-        public static string h5(string innerHtml, string htmlClass = "", string htmlId = "") {
-            return genericBlockTag("h5", innerHtml, htmlClass, htmlId, "");
-        }
-        public static string h6(string innerHtml, string htmlClass = "", string htmlId = "") {
-            return genericBlockTag("h6", innerHtml, htmlClass, htmlId, "");
-        }
+        public static string div(string innerHtml) => genericBlockTag("div", innerHtml, "", "", "");
+        //
+        public static string div(string innerHtml, string htmlName) => genericBlockTag("div", innerHtml, htmlName, "", "");
+        //
+        public static string div(string innerHtml, string htmlName, string htmlClass) => genericBlockTag("div", innerHtml, htmlName, htmlClass, "");
+        //
+        public static string div(string innerHtml, string htmlName, string htmlClass, string htmlId) => genericBlockTag("div", innerHtml, htmlName, htmlClass, htmlId);
+        //
+        public static string p(string innerHtml) => genericBlockTag("p", innerHtml, "", "", "");
+        //
+        public static string p(string innerHtml, string htmlClass) => genericBlockTag("p", innerHtml, htmlClass, "", "");
+        //
+        public static string p(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("p", innerHtml, htmlClass, htmlId, "");
+        //
+        public static string h1(string innerHtml) => genericBlockTag("h1", innerHtml, "", "", "");
+        //
+        public static string h1(string innerHtml, string htmlClass) => genericBlockTag("h1", innerHtml, htmlClass, "", "");
+        //
+        public static string h1(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("h1", innerHtml, htmlClass, htmlId, "");
+        //
+        public static string h2(string innerHtml) => genericBlockTag("h2", "", "", "", "");
+        //
+        public static string h2(string innerHtml, string htmlClass) => genericBlockTag("h2", innerHtml, htmlClass, "", "");
+        //
+        public static string h2(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("h2", innerHtml, htmlClass, htmlId, "");
+        //
+        public static string h3(string innerHtml) => genericBlockTag("h3", innerHtml, "", "", "");
+        //
+        public static string h3(string innerHtml, string htmlClass) => genericBlockTag("h3", innerHtml, htmlClass, "", "");
+        //
+        public static string h3(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("h3", innerHtml, htmlClass, htmlId, "");
+        //
+        public static string h4(string innerHtml) => genericBlockTag("h4", innerHtml, "", "", "");
+        //
+        public static string h4(string innerHtml, string htmlClass) => genericBlockTag("h4", innerHtml, htmlClass, "", "");
+        //
+        public static string h4(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("h4", innerHtml, htmlClass, htmlId, "");
+        //
+        public static string h5(string innerHtml) => genericBlockTag("h5", innerHtml, "", "", "");
+        //
+        public static string h5(string innerHtml, string htmlClass) => genericBlockTag("h5", innerHtml, htmlClass, "", "");
+        //
+        public static string h5(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("h5", innerHtml, htmlClass, htmlId, "");
+        //
+        public static string h6(string innerHtml) => genericBlockTag("h6", innerHtml, "", "", "");
+        //
+        public static string h6(string innerHtml, string htmlClass) => genericBlockTag("h6", innerHtml, htmlClass, "", "");
+        //
+        public static string h6(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("h6", innerHtml, htmlClass, htmlId, "");
+        //
         public static string label(string innerHtml, string forHtmlId = "", string htmlClass = "", string htmlId = "") {
             string s = "";
             if (!string.IsNullOrEmpty(forHtmlId)) {

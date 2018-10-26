@@ -1061,7 +1061,7 @@ namespace Contensive.Processor.Controllers {
                         foreach ( var collectionStore in localCollectionStoreList ) {
                             GuidList = GuidList + "," + collectionStore.guid;
                             packageSize += 1;
-                            if (( packageSize>=10 ) | ( collectionStore == localCollectionStoreList.Last())) {
+                            if (( packageSize>=10 ) || ( collectionStore == localCollectionStoreList.Last())) {
                                 packageNumber += 1;
                                 //
                                 // -- send package of 10, or the last set
@@ -1143,7 +1143,7 @@ namespace Contensive.Processor.Controllers {
                                                                     }
                                                                 }
                                                                 if (!string.IsNullOrEmpty(LibGUID)) {
-                                                                    if ((!string.IsNullOrEmpty(LibGUID)) & (LibGUID == LocalGuid) & ((string.IsNullOrEmpty(LibContensiveVersion)) || (string.CompareOrdinal(LibContensiveVersion, core.codeVersion()) <= 0))) {
+                                                                    if ((!string.IsNullOrEmpty(LibGUID)) && (LibGUID == LocalGuid) && ((string.IsNullOrEmpty(LibContensiveVersion)) || (string.CompareOrdinal(LibContensiveVersion, core.codeVersion()) <= 0))) {
                                                                         LogController.logInfo(core, "verify collection [" + LibGUID + "]");
                                                                         //
                                                                         // LibCollection matches the LocalCollection - process the upgrade
@@ -1368,7 +1368,7 @@ namespace Contensive.Processor.Controllers {
                                 if (loadOk) {
                                     //hint = hint & ",400"
                                     string CollectionFileBaseName = GenericController.vbLCase(CollectionFile.DocumentElement.Name);
-                                    if ((CollectionFileBaseName != "contensivecdef") & (CollectionFileBaseName != CollectionFileRootNode) & (CollectionFileBaseName != GenericController.vbLCase(CollectionFileRootNodeOld))) {
+                                    if ((CollectionFileBaseName != "contensivecdef") && (CollectionFileBaseName != CollectionFileRootNode) && (CollectionFileBaseName != GenericController.vbLCase(CollectionFileRootNodeOld))) {
                                         //
                                         // Not a problem, this is just not a collection file
                                         //
@@ -2426,7 +2426,7 @@ namespace Contensive.Processor.Controllers {
                                                                         } else {
                                                                             string ContentRecordGuid =XmlController.GetXMLAttribute(core, IsFound, ContentNode, "guid", "");
                                                                             string ContentRecordName =XmlController.GetXMLAttribute(core, IsFound, ContentNode, "name", "");
-                                                                            if ((!string.IsNullOrEmpty(ContentRecordGuid)) | (!string.IsNullOrEmpty(ContentRecordName))) {
+                                                                            if ((!string.IsNullOrEmpty(ContentRecordGuid)) || (!string.IsNullOrEmpty(ContentRecordName))) {
                                                                                 Models.Domain.CDefModel CDef = Models.Domain.CDefModel.create(core, ContentName);
                                                                                 int cs = -1;
                                                                                 if (!string.IsNullOrEmpty(ContentRecordGuid)) {
@@ -3743,7 +3743,7 @@ namespace Contensive.Processor.Controllers {
                         LogController.logError(core, "UpgradeCDef_LoadDataToCollection Error reading xml archive, ex=[" + ex.ToString() + "]");
                         throw new Exception("Error in UpgradeCDef_LoadDataToCollection, during doc.loadXml()", ex);
                     }
-                    if ((srcXmlDom.DocumentElement.Name.ToLower() != CollectionFileRootNode) & (srcXmlDom.DocumentElement.Name.ToLower() != "contensivecdef")) {
+                    if ((srcXmlDom.DocumentElement.Name.ToLower() != CollectionFileRootNode) && (srcXmlDom.DocumentElement.Name.ToLower() != "contensivecdef")) {
                         //
                         // -- root node must be collection (or legacy contensivecdef)
                         LogController.handleError( core,new ApplicationException("the archive file has a syntax error. Application name must be the first node."));
@@ -4301,7 +4301,7 @@ namespace Contensive.Processor.Controllers {
                             if (fieldChanged) break;
                         }
                     }
-                    if ((fieldChanged | cdef.dataChanged) & (cdef.name.ToLower() != "content")) {
+                    if ((fieldChanged | cdef.dataChanged) && (cdef.name.ToLower() != "content")) {
                         installCollection_BuildDbFromCollection_UpdateDbFromCDef(core, cdef, BuildVersion);
                     }
                 }
@@ -4524,7 +4524,7 @@ namespace Contensive.Processor.Controllers {
                             if (fieldHelpList.Count == 0) {
                                 //
                                 // -- no current field help record, if adding help, create record
-                                if ( (!string.IsNullOrWhiteSpace(field.helpDefault)) | (!string.IsNullOrWhiteSpace(field.helpCustom)) ) {
+                                if ( (!string.IsNullOrWhiteSpace(field.helpDefault)) || (!string.IsNullOrWhiteSpace(field.helpCustom)) ) {
                                     fieldHelp = ContentFieldHelpModel.addEmpty(core);
                                     fieldHelp.helpDefault = field.helpDefault;
                                     fieldHelp.helpCustom = field.helpCustom;

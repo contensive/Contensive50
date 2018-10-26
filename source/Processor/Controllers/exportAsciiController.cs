@@ -85,7 +85,7 @@ namespace Contensive.Processor.Controllers {
                                 while (!string.IsNullOrEmpty(FieldNameVariant)) {
                                     FieldName = GenericController.encodeText(FieldNameVariant);
                                     UcaseFieldName = GenericController.vbUCase(FieldName);
-                                    if ((UcaseFieldName != "USERNAME") & (UcaseFieldName != "PASSWORD")) {
+                                    if ((UcaseFieldName != "USERNAME") && (UcaseFieldName != "PASSWORD")) {
                                         sb.Append(Delimiter + "\"" + FieldName + "\"");
                                     }
                                     FieldNameVariant = core.db.csGetNextFieldName(CSPointer);
@@ -105,7 +105,7 @@ namespace Contensive.Processor.Controllers {
                                     while (!string.IsNullOrEmpty(FieldNameVariant)) {
                                         FieldName = GenericController.encodeText(FieldNameVariant);
                                         UcaseFieldName = GenericController.vbUCase(FieldName);
-                                        if ((UcaseFieldName != "USERNAME") & (UcaseFieldName != "PASSWORD")) {
+                                        if ((UcaseFieldName != "USERNAME") && (UcaseFieldName != "PASSWORD")) {
                                             Copy = core.db.csGet(CSPointer, FieldName);
                                             if (!string.IsNullOrEmpty(Copy)) {
                                                 Copy = GenericController.vbReplace(Copy, "\"", "'");

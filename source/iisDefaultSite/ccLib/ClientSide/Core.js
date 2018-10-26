@@ -612,20 +612,6 @@ function removeClassNameAfter(el, name) {
 function getPageOffsetLeft(el) {
 	var offset = jQuery(el).position();
 	return offset.left;
-//   var x, p, pos, offset;
-//   p = el.offsetParent;
-//   x = el.offsetLeft;
-//   pos = '';
-//   while (p !=null){
-//       if (typeof($) != "undefined") { pos = jQuery(p).css('position') }
-//       if((pos=='absolute')||(pos=='relative')) {
-//           p=null;
-//       }else{
-//           x+=p.offsetLeft;
-//           p=p.offsetParent;
-//       }
-//   }
-//   return x;
 }
 //
 //----------
@@ -633,22 +619,6 @@ function getPageOffsetLeft(el) {
 function getPageOffsetTop(el) {
 	var offset = jQuery(el).position();
 	return offset.top;
-//   var y, p, pos;
-//   p = el.offsetParent;
-//   y = el.offsetTop;
-//   pos = '';
-//   //msg = ''+y;
-//   while (p !=null){
-//       if (typeof($) != "undefined") { pos = jQuery(p).css('position') }
-//       if((pos=='absolute')||(pos=='relative')) {
-//       //if((p.style.position=='absolute')||(p.style.position=='relative')) {
-//           p=null;
-//       }else{
-//           y+=p.offsetTop;
-//           p=p.offsetParent;
-//       }
-//   }
-//   return y;
 }
 //
 //----------

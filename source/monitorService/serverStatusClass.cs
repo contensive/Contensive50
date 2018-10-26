@@ -223,7 +223,7 @@ namespace Contensive.MonitorService {
                         Content = Content + StatusLine(0, "");
                         Content = Content + StatusLine(0, "Alarms Log Check");
                         LogFileStruct = cpCore.appRootFiles.getFileList(cpCore.serverConfig.programFilesPath + "\\logs\\alarms");
-                        if (LogFileStruct.Count() == 0) {
+                        if (!LogFileStruct.Any()) {
                             Content = Content + StatusLine(1, "No alarm logs.");
                         } else {
                             Array.Resize(ref errors, ErrorCount + 1);

@@ -571,7 +571,7 @@ namespace Contensive.Processor.Models.Domain {
                                                 field.HelpChanged = false;
                                                 result.fields.Add(fieldNameLower, field);
                                                 //REFACTOR
-                                                if ((field.fieldTypeId != fieldTypeIdManyToMany) & (field.fieldTypeId != fieldTypeIdRedirect) && (!result.selectList.Contains(fieldNameLower))) {
+                                                if ((field.fieldTypeId != fieldTypeIdManyToMany) && (field.fieldTypeId != fieldTypeIdRedirect) && (!result.selectList.Contains(fieldNameLower))) {
                                                     //
                                                     // add only fields that can be selected
                                                     result.selectList.Add(fieldNameLower);

@@ -145,7 +145,7 @@ namespace Contensive.Addons.AdminSite {
                 //body.Add("<td class=\"ccAdminEditField\">" + SpanClassAdminNormal + "[<a href=?cid=" + CdefController.getContentId(core, "Groups") + " target=_blank>Manage Groups</a>]</span></td>");
                 //body.Add("</tr>");
 
-                result = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), "Group Membership", "This person is a member of these groups", body.Text );
+                result = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), "Group Membership", "", body.Text );
                 adminData.EditSectionPanelCount = adminData.EditSectionPanelCount + 1;
             } catch (Exception ex) {
                 LogController.handleError(core, ex);

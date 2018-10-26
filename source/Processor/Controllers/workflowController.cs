@@ -1017,7 +1017,7 @@ namespace Contensive.Processor.Controllers {
                 string StringBuffer = null;
                 string EditLockKey2 = null;
                 //
-                if ((!string.IsNullOrEmpty(ContentName)) & (RecordID != 0)) {
+                if ((!string.IsNullOrEmpty(ContentName)) && (RecordID != 0)) {
                     EditLockKey2 = GenericController.vbUCase(ContentName + "," + RecordID.ToString());
                     StringBuffer = core.siteProperties.getText("EditLockTimeout", "5");
                     EditLockTimeoutMinutes = encodeNumber(StringBuffer);
@@ -1101,7 +1101,7 @@ namespace Contensive.Processor.Controllers {
                 string EditLockKey2 = null;
                 DateTime DateNow = default(DateTime);
                 //
-                if ((!string.IsNullOrEmpty(ContentName)) & (RecordID != 0) && (EditLockCount > 0)) {
+                if ((!string.IsNullOrEmpty(ContentName)) && (RecordID != 0) && (EditLockCount > 0)) {
                     EditLockKey2 = GenericController.vbUCase(ContentName + "," + RecordID.ToString());
                     DateNow = DateTime.Now;
                     for (SourcePointer = 0; SourcePointer < EditLockCount; SourcePointer++) {

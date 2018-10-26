@@ -150,7 +150,7 @@ namespace Contensive.Processor {
         /// <param name="addonNameOrGuid"></param>
         /// <param name="addonContext"></param>
         /// <returns></returns>
-        public string executeAddon(string addonNameOrGuid, Contensive.BaseClasses.CPUtilsBaseClass.addonContext addonContext = Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple) {
+        public string executeAddon(string addonNameOrGuid, CPUtilsBaseClass.addonContext addonContext = CPUtilsBaseClass.addonContext.ContextSimple) {
             string result = "";
             try {
                 if (GenericController.isGuid(addonNameOrGuid)) {
@@ -293,7 +293,7 @@ namespace Contensive.Processor {
         //
         //=========================================================================================================
         //
-        public override CPFileSystemBaseClass cdnFiles {
+        public override CPFileSystemBaseClass CdnFiles {
             get {
                 if (_cdnFiles == null) {
                     _cdnFiles = new CPFileSystemClass(core, core.cdnFiles);
@@ -384,7 +384,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         /// <summary>
-        /// Legacy method that provides access the current application server. AS of v5, access is limited to that provided by privatefiles, wwwRoot, temp and appFiles
+        /// Legacy method that provides access the current application server. AS of v5, access is limited to that provided by privatefiles, wwwRoot, temp and cdnFiles
         /// </summary>
         [Obsolete()] public override CPFileBaseClass File {
             get {
@@ -438,7 +438,7 @@ namespace Contensive.Processor {
         /// <summary>
         /// Access to private files for the application. Private files are not available online.
         /// </summary>
-        public override CPFileSystemBaseClass privateFiles {
+        public override CPFileSystemBaseClass PrivateFiles {
             get {
                 if (_privateFiles == null) {
                     _privateFiles = new CPFileSystemClass(core, core.privateFiles);
@@ -536,7 +536,7 @@ namespace Contensive.Processor {
         /// <summary>
         /// A file object with access to the domain's primary web root files. This is typically where design files are stored, like styles sheets, js, etc.
         /// </summary>
-        public override CPFileSystemBaseClass wwwFiles {
+        public override CPFileSystemBaseClass WwwFiles {
             get {
                 if (_appRootFiles == null) {
                     _appRootFiles = new CPFileSystemClass(core, core.appRootFiles);

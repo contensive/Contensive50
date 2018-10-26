@@ -97,9 +97,9 @@ namespace Contensive.Processor.Controllers {
                 //}
                 //
                 // Test early if this needs to run at all
-                bool ProcessACTags = (((EncodeNonCachableTags || encodeACResourceLibraryImages || encodeForWysiwygEditor)) & (result.IndexOf("<AC ", System.StringComparison.OrdinalIgnoreCase) != -1));
-                bool ProcessAnchorTags = (!string.IsNullOrEmpty(AnchorQuery)) & (result.IndexOf("<A ", System.StringComparison.OrdinalIgnoreCase) != -1);
-                if ((!string.IsNullOrEmpty(result)) & (ProcessAnchorTags || ProcessACTags)) {
+                bool ProcessACTags = (((EncodeNonCachableTags || encodeACResourceLibraryImages || encodeForWysiwygEditor)) && (result.IndexOf("<AC ", System.StringComparison.OrdinalIgnoreCase) != -1));
+                bool ProcessAnchorTags = (!string.IsNullOrEmpty(AnchorQuery)) && (result.IndexOf("<A ", System.StringComparison.OrdinalIgnoreCase) != -1);
+                if ((!string.IsNullOrEmpty(result)) && (ProcessAnchorTags || ProcessACTags)) {
                     //
                     // ----- Load the Active Elements
                     //
@@ -135,7 +135,7 @@ namespace Contensive.Processor.Controllers {
                                             // however, leave this one because it is needed to make current forms work.
                                             //
                                             // 20180914 - contensiveuserform deprecated (has not been used forever, so not needed)
-                                            //if ((Copy.IndexOf("contensiveuserform=1", System.StringComparison.OrdinalIgnoreCase) != -1) | (Copy.IndexOf("contensiveuserform=\"1\"", System.StringComparison.OrdinalIgnoreCase) != -1)) {
+                                            //if ((Copy.IndexOf("contensiveuserform=1", System.StringComparison.OrdinalIgnoreCase) != -1) || (Copy.IndexOf("contensiveuserform=\"1\"", System.StringComparison.OrdinalIgnoreCase) != -1)) {
                                             //    //
                                             //    // if it has "contensiveuserform=1" in the form tag, remove it from the form and add the hidden that makes it work
                                             //    //
@@ -578,7 +578,7 @@ namespace Contensive.Processor.Controllers {
                                             //            //
                                             //            //Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as a feedback form, sent to this record's primary contact."" id=""AC," & ACType & """ src=""/ccLib/images/ACFeedBack.GIF"">"
                                             //        } else if (EncodeNonCachableTags) {
-                                            //            if ((moreInfoPeopleId != 0) & (!string.IsNullOrEmpty(ContextContentName)) & (ContextRecordID != 0)) {
+                                            //            if ((moreInfoPeopleId != 0) && (!string.IsNullOrEmpty(ContextContentName)) && (ContextRecordID != 0)) {
                                             //                Copy = FeedbackFormNotSupportedComment;
                                             //            }
                                             //        }
@@ -1964,7 +1964,7 @@ namespace Contensive.Processor.Controllers {
                                                                 // problem - in the case where the recordfilename = img-100x200, the imagefilenamenoext is img
                                                                 //
                                                                 //hint = hint & ",140"
-                                                                if ((RecordFilenameNoExt != ImageFilenameNoExt) | (RecordFilenameExt != ImageFilenameExt)) {
+                                                                if ((RecordFilenameNoExt != ImageFilenameNoExt) || (RecordFilenameExt != ImageFilenameExt)) {
                                                                     //
                                                                     // There has been a change
                                                                     //

@@ -171,7 +171,7 @@ namespace Contensive.Processor.Controllers {
                             }
                         }
                         bool AllowOnNewVisitEvent = false;
-                        if ((trackVisits) || (!string.IsNullOrEmpty(visitCookie)) | (memberLinkLoginID != 0) | (memberLinkRecognizeID != 0)) {
+                        if ((trackVisits) || (!string.IsNullOrEmpty(visitCookie)) || (memberLinkLoginID != 0) || (memberLinkRecognizeID != 0)) {
                             //
                             // -- Visit Tracking
                             //

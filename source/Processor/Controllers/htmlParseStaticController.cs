@@ -405,7 +405,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     workingKeys = workingKey.Split(' ');
                     SegmentStart = 1;
-                    while ((!string.IsNullOrEmpty(layout)) & (SegmentStart != 0) && (Ptr <= workingKeys.GetUpperBound(0))) {
+                    while ((!string.IsNullOrEmpty(layout)) && (SegmentStart != 0) && (Ptr <= workingKeys.GetUpperBound(0))) {
                         SegmentStart = getTagStartPos(null, layout, SegmentStart, workingKeys[Ptr]);
                         Ptr = Ptr + 1;
                     }

@@ -189,14 +189,14 @@ namespace Contensive.Addons.AdminSite {
                     //-------------------------------------------------------------------------------
                     //
                     if (adminData.AdminSourceForm == AdminFormEdit) {
-                        if ((!(core.doc.debug_iUserError != "")) & ((adminData.requestButton == ButtonOK) || (adminData.requestButton == ButtonCancel) || (adminData.requestButton == ButtonDelete))) {
+                        if ((!(core.doc.debug_iUserError != "")) && ((adminData.requestButton == ButtonOK) || (adminData.requestButton == ButtonCancel) || (adminData.requestButton == ButtonDelete))) {
                             string EditReferer = core.docProperties.getText("EditReferer");
                             string CurrentLink = GenericController.modifyLinkQuery(core.webServer.requestUrl, "editreferer", "", false);
                             CurrentLink = GenericController.vbLCase(CurrentLink);
                             //
                             // check if this editreferer includes cid=thisone and id=thisone -- if so, go to index form for this cid
                             //
-                            if ((!string.IsNullOrEmpty(EditReferer)) & (EditReferer.ToLower() != CurrentLink)) {
+                            if ((!string.IsNullOrEmpty(EditReferer)) && (EditReferer.ToLower() != CurrentLink)) {
                                 //
                                 // return to the page it came from
                                 //
@@ -355,11 +355,11 @@ namespace Contensive.Addons.AdminSite {
                         } else if (adminData.AdminForm == AdminFormLegacyAddonManager) {
                             adminBody = AddonController.getAddonManager(core);
                         } else if (adminData.AdminForm == AdminFormEditorConfig) {
-                            adminBody = FormEditConfig.GetForm_EditConfig(core);
+                            adminBody = FormEditConfig.getForm_EditConfig(core);
                         } else {
                             adminBody = "<p>The form requested is not supported</p>";
                         }
-                    } else if ((addonId != 0) | (!string.IsNullOrEmpty(AddonGuid)) | (!string.IsNullOrEmpty(AddonName))) {
+                    } else if ((addonId != 0) || (!string.IsNullOrEmpty(AddonGuid)) || (!string.IsNullOrEmpty(AddonName))) {
                         //
                         // execute an addon
                         //
@@ -1458,7 +1458,7 @@ namespace Contensive.Addons.AdminSite {
                             //
                             // ----- Put the field in the SQL to be saved
                             //
-                            if (AdminDataModel.IsVisibleUserField(core, field.adminOnly, field.developerOnly, field.active, field.authorable, field.nameLc, adminData.adminContent.tableName) & (NewRecord || (!field.readOnly)) & (NewRecord || (!field.notEditable))) {
+                            if (AdminDataModel.IsVisibleUserField(core, field.adminOnly, field.developerOnly, field.active, field.authorable, field.nameLc, adminData.adminContent.tableName) && (NewRecord || (!field.readOnly)) && (NewRecord || (!field.notEditable))) {
                                 //
                                 // ----- save the value by field type
                                 //
@@ -3176,7 +3176,7 @@ namespace Contensive.Addons.AdminSite {
             string SubList = "";
             foreach (var kvp in IndexConfig.FindWords) {
                 IndexConfigClass.IndexConfigFindWordClass findWord = kvp.Value;
-                if ((!string.IsNullOrEmpty(findWord.Name)) & (findWord.MatchOption != FindWordMatchEnum.MatchIgnore)) {
+                if ((!string.IsNullOrEmpty(findWord.Name)) && (findWord.MatchOption != FindWordMatchEnum.MatchIgnore)) {
                     SubList = SubList + "\r\n" + findWord.Name + "\t" + findWord.Value + "\t" + (int)findWord.MatchOption;
                 }
             }

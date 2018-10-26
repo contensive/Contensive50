@@ -118,7 +118,7 @@ namespace Contensive.Addons.AdminSite {
                 // ----- EID (Encoded ID)
                 {
                     if (GenericController.vbUCase(adminData.adminContent.tableName) == GenericController.vbUCase("ccMembers")) {
-                        bool AllowEID = (core.siteProperties.getBoolean("AllowLinkLogin", true)) | (core.siteProperties.getBoolean("AllowLinkRecognize", true));
+                        bool AllowEID = (core.siteProperties.getBoolean("AllowLinkLogin", true)) || (core.siteProperties.getBoolean("AllowLinkRecognize", true));
                         string fieldHelp = "";
                         string fieldEditor = "";
                         if (!AllowEID) {
@@ -208,7 +208,7 @@ namespace Contensive.Addons.AdminSite {
                                 while (core.db.csOk(CSPointer)) {
                                     int ChildCID = core.db.csGetInteger(CSPointer, "ID");
                                     if (CdefController.isWithinContent(core, ChildCID, LimitContentSelectToThisID)) {
-                                        if ((core.session.isAuthenticatedAdmin(core)) | (core.session.isAuthenticatedContentManager(core, CdefController.getContentNameByID(core, ChildCID)))) {
+                                        if ((core.session.isAuthenticatedAdmin(core)) || (core.session.isAuthenticatedContentManager(core, CdefController.getContentNameByID(core, ChildCID)))) {
                                             CIDList = CIDList + "," + ChildCID;
                                         }
                                     }

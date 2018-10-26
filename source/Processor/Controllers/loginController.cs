@@ -485,7 +485,7 @@ namespace Contensive.Processor.Controllers {
                             if (!core.db.csOk(CS)) {
                                 LogController.handleError( core,new Exception("Could not open the current members account to set the username and password."));
                             } else {
-                                if ((core.db.csGetText(CS, "username") != "") | (core.db.csGetText(CS, "password") != "") | (core.db.csGetBoolean(CS, "admin")) | (core.db.csGetBoolean(CS, "developer"))) {
+                                if ((core.db.csGetText(CS, "username") != "") || (core.db.csGetText(CS, "password") != "") || (core.db.csGetBoolean(CS, "admin")) || (core.db.csGetBoolean(CS, "developer"))) {
                                     //
                                     // if the current account can be logged into, you can not join 'into' it
                                     //

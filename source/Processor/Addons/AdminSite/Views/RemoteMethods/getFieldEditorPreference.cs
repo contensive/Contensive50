@@ -68,7 +68,7 @@ namespace Contensive.Addons.AdminSite {
                 if (dt.Rows.Count > 0) {
                     foreach (DataRow rsDr in dt.Rows) {
                         int addonId = GenericController.encodeInteger(rsDr["addonid"]);
-                        if ((addonId != 0) & (addonId != addonDefaultEditorId)) {
+                        if ((addonId != 0) && (addonId != addonDefaultEditorId)) {
                             result += "\r\n\t<div class=\"radioCon\">" + core.html.inputRadio(radioGroupName, GenericController.encodeText(addonId), currentEditorAddonId.ToString()) + "&nbsp;Use " + GenericController.encodeText(rsDr["addonName"]) + "</div>";
                         }
 

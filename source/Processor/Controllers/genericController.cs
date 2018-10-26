@@ -1309,7 +1309,7 @@ namespace Contensive.Processor.Controllers {
             iAnchorTag = AnchorTag;
             iAnchorText = AnchorText;
             UcaseAnchorText = vbUCase(iAnchorText);
-            if ((!string.IsNullOrEmpty(iAnchorTag)) & (!string.IsNullOrEmpty(iAnchorText))) {
+            if ((!string.IsNullOrEmpty(iAnchorTag)) && (!string.IsNullOrEmpty(iAnchorText))) {
                 LinkPosition = UcaseAnchorText.LastIndexOf("<LINK>") + 1;
                 if (LinkPosition == 0) {
                     tempGetLinkedText = iAnchorTag + iAnchorText + "</A>";
@@ -2145,7 +2145,7 @@ namespace Contensive.Processor.Controllers {
             int PairPointer = 0;
             string[] PairSplit = null;
             //
-            if ((!string.IsNullOrEmpty(NameValueString)) & (!string.IsNullOrEmpty(Name))) {
+            if ((!string.IsNullOrEmpty(NameValueString)) && (!string.IsNullOrEmpty(Name))) {
                 while (GenericController.vbInstr(1, NameValueStringWorking, " =") != 0) {
                     NameValueStringWorking = GenericController.vbReplace(NameValueStringWorking, " =", "=");
                 }
@@ -2219,7 +2219,7 @@ namespace Contensive.Processor.Controllers {
             iAnchorTag = GenericController.encodeText(AnchorTag);
             iAnchorText = GenericController.encodeText(AnchorText);
             UcaseAnchorText = GenericController.vbUCase(iAnchorText);
-            if ((!string.IsNullOrEmpty(iAnchorTag)) & (!string.IsNullOrEmpty(iAnchorText))) {
+            if ((!string.IsNullOrEmpty(iAnchorTag)) && (!string.IsNullOrEmpty(iAnchorText))) {
                 LinkPosition = UcaseAnchorText.LastIndexOf("<LINK>") + 1;
                 if (LinkPosition == 0) {
                     result = iAnchorTag + iAnchorText + "</a>";

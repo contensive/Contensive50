@@ -41,7 +41,7 @@ namespace Contensive.Processor.Models.Domain {
         public static TableSchemaModel getTableSchema(CoreController core, string TableName, string DataSourceName) {
             TableSchemaModel tableSchema = null;
             try {
-                if ((!string.IsNullOrEmpty(DataSourceName)) & (DataSourceName != "-1") & (DataSourceName.ToLower() != "default")) {
+                if ((!string.IsNullOrEmpty(DataSourceName)) && (DataSourceName != "-1") && (DataSourceName.ToLower() != "default")) {
                     throw new NotImplementedException("alternate datasources not supported yet");
                 } else {
                     if (!string.IsNullOrEmpty(TableName)) {

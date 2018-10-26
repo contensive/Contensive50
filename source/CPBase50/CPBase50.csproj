@@ -80,8 +80,6 @@
     <None Include="archive\CPBase.snk" />
     <None Include="archive\cpbase3.snk" />
     <None Include="archive\cpBase4.snk" />
-    <None Include="contensive.clib.5.0.1.nupkg" />
-    <None Include="contensive.clib.nuspec" />
     <None Include="CPBase2.snk" />
     <None Include="obj\Debug\DesignTimeResolveAssemblyReferencesInput.cache" />
   </ItemGroup>
@@ -94,7 +92,6 @@
     <Content Include="bin\DevDefaultApp\CPBase.pdb" />
     <Content Include="bin\DevDefaultApp\CPBase.xml" />
     <Content Include="CPBase.csproj" />
-    <Content Include="CPBase.csproj.user" />
     <Content Include="readme.txt" />
     <Content Include="ReadMeNuget.txt" />
   </ItemGroup>

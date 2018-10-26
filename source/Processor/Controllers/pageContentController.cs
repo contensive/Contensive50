@@ -728,7 +728,7 @@ namespace Contensive.Processor.Controllers {
                     ChildRecordParentID = core.db.csGetInteger(CS, "ParentID");
                 }
                 core.db.csClose(ref CS);
-                if ((ChildRecordParentID != 0) & (!GenericController.isInDelimitedString(History, ChildRecordID.ToString(), ","))) {
+                if ((ChildRecordParentID != 0) && (!GenericController.isInDelimitedString(History, ChildRecordID.ToString(), ","))) {
                     result = (ParentRecordID == ChildRecordParentID);
                     if (!result) {
                         result = main_IsChildRecord_Recurse(core, DataSourceName, TableName, ChildRecordParentID, ParentRecordID, History + "," + ChildRecordID.ToString());
@@ -937,7 +937,7 @@ namespace Contensive.Processor.Controllers {
                     int ClipParentContentID = core.docProperties.getInteger(RequestNamePasteParentContentID);
                     int ClipParentRecordID = core.docProperties.getInteger(RequestNamePasteParentRecordID);
                     string ClipParentFieldList = core.docProperties.getText(RequestNamePasteFieldList);
-                    if ((ClipParentContentID != 0) & (ClipParentRecordID != 0)) {
+                    if ((ClipParentContentID != 0) && (ClipParentRecordID != 0)) {
                         //
                         // Request for a paste, clear the cliboard
                         //
@@ -1936,7 +1936,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // Page Hit Notification
                         //
-                        if ((!core.session.visit.excludeFromAnalytics) & (core.doc.pageController.page.contactMemberID != 0) && (core.webServer.requestBrowser.IndexOf("kmahttp", System.StringComparison.OrdinalIgnoreCase)  == -1)) {
+                        if ((!core.session.visit.excludeFromAnalytics) && (core.doc.pageController.page.contactMemberID != 0) && (core.webServer.requestBrowser.IndexOf("kmahttp", System.StringComparison.OrdinalIgnoreCase)  == -1)) {
                             PersonModel person = PersonModel.create(core, core.doc.pageController.page.contactMemberID);
                             if ( person != null ) {
                                 if (core.doc.pageController.page.allowHitNotification) {
@@ -2213,7 +2213,7 @@ namespace Contensive.Processor.Controllers {
                 ////
                 //if (true) {
                 //    string IconRow = "";
-                //    if ((!core.session.visit.Bot) & (core.doc.pageController.page.AllowPrinterVersion | core.doc.pageController.page.AllowEmailPage)) {
+                //    if ((!core.session.visit.Bot) && (core.doc.pageController.page.AllowPrinterVersion | core.doc.pageController.page.AllowEmailPage)) {
                 //        //
                 //        // not a bot, and either print or email allowed
                 //        //
@@ -2614,7 +2614,7 @@ namespace Contensive.Processor.Controllers {
                         blockContentComposite = !core.doc.bypassContentBlock(childPage.contentControlID, childPage.id);
                     }
                     string LinkedText = GenericController.csv_GetLinkedText("<a href=\"" + HtmlController.encodeHtml(link) + "\">", pageMenuHeadline);
-                    if ((string.IsNullOrEmpty(UcaseRequestedListName)) && (childPage.parentListName != "") & (!isAuthoring)) {
+                    if ((string.IsNullOrEmpty(UcaseRequestedListName)) && (childPage.parentListName != "") && (!isAuthoring)) {
                         //
                         // ----- Requested orphan list, and this record is in a named list, and not editing, do not display
                         //
@@ -2632,7 +2632,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // ----- Requested orphan List, Not AllowChildListDisplay, not Authoring, do not display
                         //
-                    } else if ((!string.IsNullOrEmpty(UcaseRequestedListName)) & (UcaseRequestedListName != GenericController.vbUCase(childPage.parentListName))) {
+                    } else if ((!string.IsNullOrEmpty(UcaseRequestedListName)) && (UcaseRequestedListName != GenericController.vbUCase(childPage.parentListName))) {
                         //
                         // ----- requested named list and wrong RequestedListName, do not display
                         //
@@ -2700,7 +2700,7 @@ namespace Contensive.Processor.Controllers {
                         // include overview
                         // if AllowBrief is false, BriefFilename is not loaded
                         //
-                        if ((childPage.briefFilename != "") & (childPage.allowBrief)) {
+                        if ((childPage.briefFilename != "") && (childPage.allowBrief)) {
                             string Brief = encodeText(core.cdnFiles.readFileText(childPage.briefFilename)).Trim(' ');
                             if (!string.IsNullOrEmpty(Brief)) {
                                 activeList = activeList + "<div class=\"ccListCopy\">" + Brief + "</div>";
@@ -2733,7 +2733,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // ----- if non-orphan list, authoring and none found, print none message
                 //
-                if ((!string.IsNullOrEmpty(UcaseRequestedListName)) & (ChildListCount == 0) & isAuthoring) {
+                if ((!string.IsNullOrEmpty(UcaseRequestedListName)) && (ChildListCount == 0) & isAuthoring) {
                     result = "[Child Page List with no pages]</p><p>" + result;
                 }
             } catch (Exception ex) {

@@ -234,7 +234,7 @@ namespace Contensive.Processor.Controllers {
                             }
                             //
                             // Preprocess arguments into OptionsForCPVars, and set generic instance values wrapperid and asajax
-                            if (addon.inFrame & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) {
+                            if (addon.inFrame & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) && (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) {
                                 //
                                 // -- inframe execution, deliver iframe with link back to remote method
                                 result = "TBD - inframe";
@@ -257,7 +257,7 @@ namespace Contensive.Processor.Controllers {
                                 //        & cr & "// Safari and Opera need a kick-start." _
                                 //        & cr & "var e=document.getElementById('" & FrameID & "');if(e){var iSource=e.src;e.src='';e.src = iSource;}" _
                                 //        & cr & "</script>"
-                            } else if (addon.asAjax & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) {
+                            } else if (addon.asAjax & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) && (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) {
                                 //
                                 // -- asajax execution, deliver div with ajax callback
                                 //
@@ -605,7 +605,7 @@ namespace Contensive.Processor.Controllers {
                             } else {
                                 //
                                 // -- Return all other types, Enable Edit Wrapper for Page Content edit mode
-                                bool IncludeEditWrapper = (!addon.blockEditTools) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextEditor) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextEmail) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextSimple) & (!executeContext.isIncludeAddon);
+                                bool IncludeEditWrapper = (!addon.blockEditTools) && (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextEditor) && (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextEmail) && (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) && (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) && (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextSimple) && (!executeContext.isIncludeAddon);
                                 if (IncludeEditWrapper) {
                                     IncludeEditWrapper = IncludeEditWrapper && (allowAdvanceEditor && ((executeContext.addonType == CPUtilsBaseClass.addonContext.ContextAdmin) || core.session.isEditing(executeContext.hostRecord.contentName)));
                                     if (IncludeEditWrapper) {
@@ -631,7 +631,7 @@ namespace Contensive.Processor.Controllers {
                                 }
                                 //
                                 // -- Add Comment wrapper, to help debugging except email, remote methods and admin (empty is used to detect no result)
-                                if (true && (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextAdmin) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextEmail) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextSimple)) {
+                                if (true && (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextAdmin) && (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextEmail) && (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) && (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) && (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextSimple)) {
                                     if (core.visitProperty.getBoolean("AllowDebugging")) {
                                         string AddonCommentName = GenericController.vbReplace(addon.name, "-->", "..>");
                                         if (addon.isInline) {
@@ -643,7 +643,7 @@ namespace Contensive.Processor.Controllers {
                                 }
                                 //
                                 // -- Add Design Wrapper
-                                if ((!string.IsNullOrEmpty(result)) & (!addon.isInline) && (executeContext.wrapperID > 0)) {
+                                if ((!string.IsNullOrEmpty(result)) && (!addon.isInline) && (executeContext.wrapperID > 0)) {
                                     result = addWrapperToResult(result, executeContext.wrapperID, "for Add-on " + addon.name);
                                 }
                                 // -- restore the parent's instanceId

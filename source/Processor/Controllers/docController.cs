@@ -553,7 +553,7 @@ namespace Contensive.Processor.Controllers {
             Button = core.docProperties.getText("Button");
             iIsAdmin = core.session.isAuthenticatedAdmin(core);
             //
-            if ((!string.IsNullOrEmpty(Button)) & (RecordID != 0) & (PageContentModel.contentName != "") & (core.session.isAuthenticatedContentManager(core, PageContentModel.contentName))) {
+            if ((!string.IsNullOrEmpty(Button)) && (RecordID != 0) && (PageContentModel.contentName != "") && (core.session.isAuthenticatedContentManager(core, PageContentModel.contentName))) {
                 // main_WorkflowSupport = core.siteProperties.allowWorkflowAuthoring And core.workflow.isWorkflowAuthoringCompatible(pageContentModel.contentName)
                 string SubmittedMemberName = "";
                 string ApprovedMemberName = "";
@@ -694,7 +694,7 @@ namespace Contensive.Processor.Controllers {
                 //    Call core.workflow.main_SubmitEdit(pageContentModel.contentName, RecordID)
                 //    Call sendPublishSubmitNotice(pageContentModel.contentName, RecordID, "")
                 //End If
-                if ((!(core.doc.debug_iUserError != "")) & ((Button == ButtonOK) || (Button == ButtonCancel))) {
+                if ((!(core.doc.debug_iUserError != "")) && ((Button == ButtonOK) || (Button == ButtonCancel))) {
                     //
                     // ----- Turn off Quick Editor if not save or add child
                     //
@@ -869,7 +869,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     AllowCancel = true;
                     allowSave = true;
-                    if ((CDef.allowDelete) & (!IsDeleted) & (RecordID != 0)) {
+                    if ((CDef.allowDelete) && (!IsDeleted) && (RecordID != 0)) {
                         AllowDelete = true;
                     }
                     if ((CDef.allowAdd) && (!IsInserted)) {
@@ -1704,7 +1704,7 @@ namespace Contensive.Processor.Controllers {
             //
             iContentID = GenericController.encodeInteger(ContentID);
             iRecordID = GenericController.encodeInteger(RecordID);
-            if ((iContentID != 0) & (iRecordID != 0)) {
+            if ((iContentID != 0) && (iRecordID != 0)) {
                 //
                 // main_Get ID, Description, Title
                 //

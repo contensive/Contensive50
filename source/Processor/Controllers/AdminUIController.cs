@@ -10,6 +10,7 @@ using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.constants;
 using Contensive.Processor.Models.Domain;
+using System.Text;
 //
 namespace Contensive.Processor {
     //
@@ -456,32 +457,27 @@ namespace Contensive.Processor {
         }
         //
         //====================================================================================================
-        // GetEditPanel, An edit panel is a section of an admin page, under a subhead. When in tab mode, the subhead is blocked, and the panel is assumed to go in its own tab windows
-        //
+        // 
+        /// <summary>
+        /// GetEditPanel, An edit panel is a section of an admin page, under a subhead. When in tab mode, the subhead is blocked, and the panel is assumed to go in its own tab windows
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="AllowHeading"></param>
+        /// <param name="PanelHeading"></param>
+        /// <param name="PanelDescription"></param>
+        /// <param name="PanelBody"></param>
+        /// <returns></returns>
         public static string getEditPanel(CoreController core, bool AllowHeading, string PanelHeading, string PanelDescription, string PanelBody) {
-            string result = "";
+            var result = new StringBuilder();
             try {
-                StringBuilderLegacyController FastString = new StringBuilderLegacyController();
-                //
-                result += "<div class=\"ccPanel3DReverse ccAdminEditBody\">";
-                //
-                // ----- Subhead
-                //
-                if (AllowHeading && (!string.IsNullOrEmpty(PanelHeading))) {
-                    result += "<h3 class=\"p-2 ccAdminEditHeading\">" + PanelHeading + "</h3>";
-                }
-                //
-                // ----- Description
-                //
-                if (!string.IsNullOrEmpty(PanelDescription)) {
-                    result += "<p class=\"p-2 ccAdminEditDescription\">" + PanelDescription + "</p>";
-                }
-                //
-                result += PanelBody + "</div>";
+                result.Append("<div class=\"ccPanel3DReverse ccAdminEditBody\">");
+                result.Append((AllowHeading && (!string.IsNullOrEmpty(PanelHeading))) ? "<h3 class=\"p-2 ccAdminEditHeading\">" + PanelHeading + "</h3>" : "");
+                result.Append((!string.IsNullOrEmpty(PanelDescription)) ? "<p class=\"p-2 ccAdminEditDescription\">" + PanelDescription + "</p>" : "");
+                result.Append(PanelBody + "</div>");
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
             }
-            return result;
+            return result.ToString();
         }
         //
         //====================================================================================================
@@ -496,31 +492,6 @@ namespace Contensive.Processor {
                     + "</tr>"
                 + "</table>"; 
         }
-        ////
-        ////====================================================================================================
-        //// Edit Table Open
-        //[Obsolete("use editTable",true)]
-        //public static string editTableOpen {
-        //    get {
-        //        return "<table border=0 cellpadding=3 cellspacing=0 width=\"100%\">";
-        //    }
-        //}
-        ////
-        ////====================================================================================================
-        //// Edit Table Close
-        //[Obsolete("", true)]
-        //public static string editTableClose {
-        //    get {
-        //        string tempEditTableClose = null;
-        //        tempEditTableClose = "<tr>"
-        //            + "<td width=20%><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"100%\" height=1 ></td>"
-        //            + "<td width=80%><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"100%\" height=1 ></td>"
-        //            + "</tr>"
-        //            + "</table>";
-        //        return tempEditTableClose;
-        //    }
-
-        //}
         //
         //====================================================================================================
         private static string getReport_Cell(CoreController core, string Copy, string Align, int Columns, int RowPointer) {
@@ -845,7 +816,7 @@ namespace Contensive.Processor {
         // ====================================================================================================
         //
         public static string getFormBodyAdminOnly() {
-            return "<div class=\"ccError\" style=\"margin:10px;padding:10px;background-color:white;\">This page requires administrator permissions.</div>";
+            return HtmlController.div("This page requires administrator permissions.", "ccError").Replace(">", " style=\"margin:10px;padding:10px;background-color:white;\">");
         }
         //
         // ====================================================================================================
@@ -995,7 +966,7 @@ namespace Contensive.Processor {
                         }
                     }
                     result += "<br>Last Modified:" + ModifiedCopy;
-                    if ((headerInfo.recordLockExpiresDate == null) | (headerInfo.recordLockExpiresDate < DateTime.Now)) {
+                    if ((headerInfo.recordLockExpiresDate == null) || (headerInfo.recordLockExpiresDate < DateTime.Now)) {
                         //
                         // Add Edit Locking to right panel
                         PersonModel personLock = PersonModel.create(core, headerInfo.recordLockById);
@@ -1703,7 +1674,7 @@ namespace Contensive.Processor {
                                             }
 
 
-                                            if ((ParentID != 0) & (!PageContentController.isChildRecord(core, iContentName, ParentID, ClipChildRecordID))) {
+                                            if ((ParentID != 0) && (!PageContentController.isChildRecord(core, iContentName, ParentID, ClipChildRecordID))) {
                                                 //
                                                 // Can not paste as child of itself
                                                 //

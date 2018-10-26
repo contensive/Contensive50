@@ -418,7 +418,7 @@ namespace Contensive.Addons.Tools {
                     //
                     Stream.Add(SpanClassAdminSmall);
                     Stream.Add("<P>Creating content [" + ContentName + "] on table [" + TableName + "] on Datasource [" + datasource.name + "].</P>");
-                    if ((!string.IsNullOrEmpty(ContentName)) & (!string.IsNullOrEmpty(TableName)) & (!string.IsNullOrEmpty(datasource.name))) {
+                    if ((!string.IsNullOrEmpty(ContentName)) && (!string.IsNullOrEmpty(TableName)) && (!string.IsNullOrEmpty(datasource.name))) {
                         core.db.createSQLTable(datasource.name, TableName);
                         core.db.createContentFromSQLTable(datasource, TableName, ContentName);
                         core.cache.invalidateAll();
@@ -1119,7 +1119,7 @@ namespace Contensive.Addons.Tools {
                 //
                 iDiagActionCount = core.docProperties.getInteger("DiagActionCount");
                 Button = core.docProperties.getText("Button");
-                if ((iDiagActionCount != 0) & ((Button == ButtonFix) || (Button == ButtonFixAndRun))) {
+                if ((iDiagActionCount != 0) && ((Button == ButtonFix) || (Button == ButtonFixAndRun))) {
                     //
                     //-----------------------------------------------------------------------------------------------
                     // ----- Perform actions from previous Diagnostic
@@ -1281,7 +1281,7 @@ namespace Contensive.Addons.Tools {
                                         DiagActions[1].Command = DiagActionSetFieldNotRequired.ToString() + "," + ContentName + "," + FieldName;
                                         Stream.Add(GetDiagError(DiagProblem, DiagActions));
                                     }
-                                    if ((!string.IsNullOrEmpty(FieldName)) & (fieldType != fieldTypeIdRedirect) & (fieldType != fieldTypeIdManyToMany)) {
+                                    if ((!string.IsNullOrEmpty(FieldName)) && (fieldType != fieldTypeIdRedirect) && (fieldType != fieldTypeIdManyToMany)) {
                                         SQL = "SELECT " + FieldName + " FROM " + TableName + " WHERE ID=0;";
                                         CSTest = core.db.csOpenSql( SQL, DataSourceName);
                                         if (CSTest == -1) {
@@ -1355,7 +1355,7 @@ namespace Contensive.Addons.Tools {
                                                         RedirectContentID = core.db.csGetInteger(CSFields, "RedirectContentID");
                                                         ErrorCount = core.doc.errorCount;
                                                         bitBucket = Local_GetContentNameByID(RedirectContentID);
-                                                        if (IsNull(bitBucket) | (ErrorCount != core.doc.errorCount)) {
+                                                        if (IsNull(bitBucket) || (ErrorCount != core.doc.errorCount)) {
                                                             DiagProblem = "PROBLEM: Content Field [" + ContentName + "].[" + FieldName + "] is a Redirection type, but the ContentID [" + RedirectContentID + "] is not valid.";
                                                             if (string.IsNullOrEmpty(FieldName)) {
                                                                 DiagProblem = DiagProblem + " Also, the field has no name attribute so these diagnostics can not automatically mark the field inactive.";
@@ -2428,7 +2428,7 @@ namespace Contensive.Addons.Tools {
                 }
                 core.db.csClose(ref CS);
                 //
-                if ((TableID != 0) & (TableID == core.docProperties.getInteger("previoustableid")) & (!string.IsNullOrEmpty(Button))) {
+                if ((TableID != 0) && (TableID == core.docProperties.getInteger("previoustableid")) && (!string.IsNullOrEmpty(Button))) {
                     //
                     // Drop Indexes
                     //

@@ -3041,7 +3041,7 @@ namespace Contensive.Processor.Controllers {
                                                     }
                                                 }
                                             }
-                                            if ((!string.IsNullOrEmpty(pathFilenameOriginal)) & (pathFilenameOriginal != PathFilename)) {
+                                            if ((!string.IsNullOrEmpty(pathFilenameOriginal)) && (pathFilenameOriginal != PathFilename)) {
                                                 pathFilenameOriginal = GenericController.convertCdnUrlToCdnPathFilename(pathFilenameOriginal);
                                                 core.cdnFiles.deleteFile(pathFilenameOriginal);
                                             }
@@ -3208,7 +3208,7 @@ namespace Contensive.Processor.Controllers {
                                 Models.Domain.CDefFieldModel field = contentSet.CDef.fields[fieldName.ToLower()];
                                 string SQLSetPair = "";
                                 bool FieldReadOnly = field.readOnly;
-                                bool FieldAdminAuthorable = ((!field.readOnly) & (!field.notEditable) & (field.authorable));
+                                bool FieldAdminAuthorable = ((!field.readOnly) && (!field.notEditable) && (field.authorable));
                                 //
                                 // ----- Set SQLSetPair to the name=value pair for the SQL statement
                                 //
@@ -4645,7 +4645,7 @@ namespace Contensive.Processor.Controllers {
             int DataSourceType;
             //
             DataSourceType = getDataSourceType(DataSourceName);
-            if ((DataSourceType != DataSourceTypeODBCSQLServer) & (DataSourceType != DataSourceTypeODBCAccess)) {
+            if ((DataSourceType != DataSourceTypeODBCSQLServer) && (DataSourceType != DataSourceTypeODBCAccess)) {
                 //
                 // If not SQL server, just delete them
                 //
@@ -4673,7 +4673,7 @@ namespace Contensive.Processor.Controllers {
                 if (dt.Rows.Count > 0) {
                     CurrentCount = GenericController.encodeInteger(dt.Rows[0][0]);
                 }
-                while ((CurrentCount != 0) & (PreviousCount != CurrentCount) && (LoopCount < iChunkCount)) {
+                while ((CurrentCount != 0) && (PreviousCount != CurrentCount) && (LoopCount < iChunkCount)) {
                     if (getDataSourceType(DataSourceName) == DataSourceTypeODBCMySQL) {
                         SQL = "delete from " + TableName + " where id in (select ID from " + TableName + " where " + Criteria + " limit " + iChunkSize + ")";
                     } else {

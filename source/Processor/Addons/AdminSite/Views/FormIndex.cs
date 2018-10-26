@@ -1523,7 +1523,7 @@ namespace Contensive.Addons.AdminSite {
                 // Remove filters
                 //-------------------------------------------------------------------------------------
                 //
-                if ((IndexConfig.SubCDefID > 0) || (IndexConfig.GroupListCnt != 0) | (IndexConfig.FindWords.Count != 0) | IndexConfig.ActiveOnly | IndexConfig.LastEditedByMe | IndexConfig.LastEditedToday | IndexConfig.LastEditedPast7Days | IndexConfig.LastEditedPast30Days) {
+                if ((IndexConfig.SubCDefID > 0) || (IndexConfig.GroupListCnt != 0) || (IndexConfig.FindWords.Count != 0) | IndexConfig.ActiveOnly | IndexConfig.LastEditedByMe | IndexConfig.LastEditedToday | IndexConfig.LastEditedPast7Days | IndexConfig.LastEditedPast30Days) {
                     //
                     // Remove Filters
                     //

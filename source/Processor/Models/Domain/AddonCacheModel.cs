@@ -76,7 +76,7 @@ namespace Contensive.Processor.Models.Domain {
             if ((addon.onNewVisitEvent) && (!onNewVisitIdList.Contains(addon.id)))onNewVisitIdList.Add(addon.id);
             if ((addon.onPageEndEvent) && (!OnPageEndIdList.Contains(addon.id))) OnPageEndIdList.Add(addon.id);
             if ((addon.onPageStartEvent) && (!OnPageStartIdList.Contains(addon.id))) OnPageStartIdList.Add(addon.id);
-            if ((addon.remoteMethod) & (!remoteMethodIdList.Contains(addon.id))) remoteMethodIdList.Add(addon.id);
+            if ((addon.remoteMethod) && (!remoteMethodIdList.Contains(addon.id))) remoteMethodIdList.Add(addon.id);
             if (!string.IsNullOrWhiteSpace(addon.robotsTxt)) robotsTxt += "\r\n" + addon.robotsTxt;
         }
         //

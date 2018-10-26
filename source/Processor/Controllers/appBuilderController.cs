@@ -105,7 +105,7 @@ namespace Contensive.Processor.Controllers {
                             LogController.logInfo(core, logPrefix + ", error creating site managers group");
                         }
                     }
-                    if ((root != null) & (group != null)) {
+                    if ((root != null) && (group != null)) {
                         //
                         // -- verify root is in site managers
                         var memberRuleList = MemberRuleModel.createList(core, "(groupid=" + group.id.ToString() + ")and(MemberID=" + root.id.ToString() + ")");
@@ -541,7 +541,7 @@ namespace Contensive.Processor.Controllers {
                     var tableSchema = Models.Domain.TableSchemaModel.getTableSchema(core, table.name, "");
                     if (tableSchema != null) {
                         foreach (Models.Domain.TableSchemaModel.ColumnSchemaModel column in tableSchema.columns) {
-                            if ((column.DATA_TYPE.ToLower() == "datetime2") & (column.DATETIME_PRECISION < 3)) {
+                            if ((column.DATA_TYPE.ToLower() == "datetime2") && (column.DATETIME_PRECISION < 3)) {
                                 //
                                 LogController.logInfo(core, logPrefix + ", verifySqlFieldCompatibility, conversion required, table [" + table.name + "], field [" + column.COLUMN_NAME + "], reason [datetime precision too low (" + column.DATETIME_PRECISION.ToString() + ")]");
                                 //

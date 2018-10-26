@@ -1633,7 +1633,7 @@ namespace Contensive.Addons.AdminSite {
                 FormFieldList = ",";
                 foreach (KeyValuePair<string, CDefFieldModel> keyValuePair in adminData.adminContent.fields) {
                     CDefFieldModel field = keyValuePair.Value;
-                    if ((field.authorable) & (field.active) && (!TabsFound.Contains(field.editTabName.ToLower()))) {
+                    if ((field.authorable) && (field.active) && (!TabsFound.Contains(field.editTabName.ToLower()))) {
                         TabsFound.Add(field.editTabName.ToLower());
                         fieldNameLc = field.nameLc;
                         editTabCaption = field.editTabName;
@@ -1641,7 +1641,7 @@ namespace Contensive.Addons.AdminSite {
                             editTabCaption = "Details";
                         }
                         NewFormFieldList = "";
-                        if ((!adminData.allowAdminTabs) | (!allowAjaxTabs) || (editTabCaption.ToLower() == "details")) {
+                        if ((!adminData.allowAdminTabs) || (!allowAjaxTabs) || (editTabCaption.ToLower() == "details")) {
                             //
                             // Live Tab (non-tab mode, non-ajax mode, or details tab
                             //

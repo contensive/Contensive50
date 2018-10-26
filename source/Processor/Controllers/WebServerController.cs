@@ -485,7 +485,7 @@ namespace Contensive.Processor.Controllers {
                         }
                         redirect(core.domain.forwardUrl, "Forwarding to [" + core.domain.forwardUrl + "] because the current domain [" + requestDomain + "] is in the domain content set to forward to this URL", false, false);
                         return core.doc.continueProcessing;
-                    } else if ((core.domain.typeId == 3) && (core.domain.forwardDomainId != 0) & (core.domain.forwardDomainId != core.domain.id)) {
+                    } else if ((core.domain.typeId == 3) && (core.domain.forwardDomainId != 0) && (core.domain.forwardDomainId != core.domain.id)) {
                         //
                         // forward to a replacement domain
                         //

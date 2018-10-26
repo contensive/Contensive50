@@ -20,7 +20,7 @@ namespace Contensive.Addons.AdminSite {
         //
         //====================================================================================================
         /// <summary>
-        /// getFieldEditorPreference remote method
+        /// GetAjaxDefaultAddonOptionStringClass remote method
         /// </summary>
         /// <param name="cp"></param>
         /// <returns></returns>

@@ -34,7 +34,7 @@ namespace Contensive.BaseClasses
                     if (string.IsNullOrEmpty(_extension)) {
                         if (!string.IsNullOrEmpty(Name)) {
                             int pos = Name.LastIndexOf(".");
-                            if ((pos >= 0) & (pos < Name.Length)) {
+                            if ((pos >= 0) && (pos < Name.Length)) {
                                 _extension = Name.Substring(pos);
                             }
                         }

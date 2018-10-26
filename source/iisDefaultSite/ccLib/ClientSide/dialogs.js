@@ -99,32 +99,10 @@ function fixDialog(p_bEnableContextMenu){
 
 	// fix document stuff
 	attachEvent("onload", function(){
-	
-		// fix form submissions and link openings
-		// insert base tag with target (should be faster & work on dynamically created links)
 		var oHead = document.getElementsByTagName("HEAD")[0];
 		var oBase= document.createElement("BASE");
 		oBase.target = window.name;
 		oHead.insertAdjacentElement('AfterBegin', oBase);
-		//alert(oHead.outerHTML);
-		
-
-/*		//	old form/link fix
-
-		// fix form submission (don't open new window)
-		var colForms = document.forms;
-		for(var f=0; f<colForms.length; f++){
-			if(!colForms[f].target || colForms[f].target==null || colForms[f].target==''){colForms[f].target = window.name;}
-		}
-		
-		// fix link opening (don't open new window)
-		var colLinks = document.links;
-		for(var l=0; l<colLinks.length; l++){
-			if(!colLinks[l].target || colLinks[l].target==null || colLinks[l].target==''){colLinks[l].target = window.name;}
-		}
-*/
-
-
 		// fix U accelerator
 		var colUtags = document.all.tags("U");
 		for(var u=0; u<colUtags.length; u++){
@@ -132,20 +110,17 @@ function fixDialog(p_bEnableContextMenu){
 				colUtags[u].style.textDecoration = 'none';
 			}
 		}
-
 	});
-
-
-	// fix keyboard stuff
+// fix keyboard stuff
 	document.attachEvent("onkeydown", function(){
-//		alert(event.keyCode);
-		switch(event.keyCode){
-			case 27: {	// enable ESC to close dialog
-				close();
-				break;
-			}
-
-			case 18: {	// alt, recreating accelerator
+        switch (event.keyCode) {
+            // enable ESC to close dialog
+            case 27: {
+                close();
+                break;
+            }
+            // alt, recreating accelerator                
+			case 18: {	
 				if(event.repeat){break}	// ignore if key is held down
 				var colUtags = document.all.tags("U");
 				for(var u=0; u<colUtags.length; u++){

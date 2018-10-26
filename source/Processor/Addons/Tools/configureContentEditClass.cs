@@ -127,7 +127,7 @@ namespace Contensive.Addons.Tools {
                                                     //
                                                     string SQL = null;
                                                     //
-                                                    if ((!string.IsNullOrEmpty(formFieldName)) & (formFieldTypeId != 0) & ((cdefFieldKvp.Value.nameLc == "") || (cdefFieldKvp.Value.fieldTypeId == 0))) {
+                                                    if ((!string.IsNullOrEmpty(formFieldName)) && (formFieldTypeId != 0) && ((cdefFieldKvp.Value.nameLc == "") || (cdefFieldKvp.Value.fieldTypeId == 0))) {
                                                         //
                                                         // Create Db field, Field is good but was not before
                                                         //
@@ -333,7 +333,7 @@ Stream.Add(core.html.getPanelTop());
                             //
                             // If Field has name and type, it is locked and can not be changed
                             //
-                            bool FieldLocked = (fieldsort.field.nameLc != "") & (fieldsort.field.fieldTypeId != 0);
+                            bool FieldLocked = (fieldsort.field.nameLc != "") && (fieldsort.field.fieldTypeId != 0);
                             //
                             // put the menu into the current menu format
                             //
