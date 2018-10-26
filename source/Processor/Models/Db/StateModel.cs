@@ -10,6 +10,7 @@ namespace Contensive.Processor.Models.Db {
         public const string contentName = "states";           
         public const string contentTableName = "ccstates";     
         public const string contentDataSource = "default";
+        public const bool nameFieldIsUnique = true;
         //
         //====================================================================================================
         // -- instance properties

@@ -135,8 +135,8 @@
   <ItemGroup>
     <Content Include="ClearScriptV8-32.dll" />
     <Content Include="contensiveBase\arrowUpDown.png" />
-    <Content Include="contensiveBase\base.js" />
-    <Content Include="contensiveBase\base.css" />
+    <Content Include="contensiveBase\admin.js" />
+    <Content Include="contensiveBase\admin.css" />
     <Content Include="ccLib\ClientSide\AdminMenu.js" />
     <Content Include="ccLib\ClientSide\ccDynamicTab-display.js" />
     <Content Include="ccLib\ClientSide\ccDynamicTab-positioned.js" />
@@ -576,19 +576,6 @@
     <Content Include="ccLib\images\vline.gif" />
     <Content Include="ccLib\images\vline11.GIF" />
     <Content Include="ccLib\images\White.GIF" />
-    <Content Include="ccLib\mktree\AnchorPosition.js" />
-    <Content Include="ccLib\mktree\box.gif" />
-    <Content Include="ccLib\mktree\bullet.gif" />
-    <Content Include="ccLib\mktree\CalendarPopup.js" />
-    <Content Include="ccLib\mktree\CalendarPopupCompact.js" />
-    <Content Include="ccLib\mktree\date.js" />
-    <Content Include="ccLib\mktree\minus.gif" />
-    <Content Include="ccLib\mktree\mktree.css" />
-    <Content Include="ccLib\mktree\mktree.js" />
-    <Content Include="ccLib\mktree\mktreeCompact.js" />
-    <Content Include="ccLib\mktree\plus.gif" />
-    <Content Include="ccLib\mktree\pointer.gif" />
-    <Content Include="ccLib\mktree\PopupWindow.js" />
     <Content Include="ccLib\Popup\ActiveEditorACProperties.htm" />
     <Content Include="ccLib\Popup\ActiveEditorACPropertiesOld.htm" />
     <Content Include="ccLib\Popup\ActiveEditorAFProperties.htm" />
@@ -625,6 +612,7 @@
     </Content>
     <Content Include="Licenses\clearscript-license.txt" />
     <Content Include="Licenses\v8-license.txt" />
+    <Content Include="contensiveBase\pageManager.css" />
     <Content Include="quickEditor\styles.css" />
     <Content Include="v8-base-ia32.dll" />
     <Content Include="v8-ia32.dll" />

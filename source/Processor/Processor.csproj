@@ -215,7 +215,6 @@
     <Compile Include="Controllers\MenuFlyoutController.cs" />
     <Compile Include="Controllers\MenuLiveTabController.cs" />
     <Compile Include="Controllers\MenuTabController.cs" />
-    <Compile Include="Controllers\MenuTreeController.cs" />
     <Compile Include="Controllers\PageContentController.cs" />
     <Compile Include="Controllers\RemoteQueryController.cs" />
     <Compile Include="Controllers\SecurityController.cs" />
