@@ -300,56 +300,13 @@ namespace Contensive.Processor.Controllers {
                             // 4.1.575 - 8/28 - put this code behind the DbOnly check, makes DbOnly beuild MUCH faster
                             //
                             string ErrorMessage = "";
-                            bool IISResetRequired = false;
-                            //RegisterList = ""
                             LogController.logInfo(core, logPrefix + ", upgrading All Local Collections to new server build.");
-                            string tmpString = "";
-                            bool UpgradeOK = CollectionController.upgradeLocalCollectionRepoFromRemoteCollectionRepo(core, ref ErrorMessage, ref tmpString, ref  IISResetRequired, isNewBuild, repair, ref  nonCriticalErrorList, logPrefix, ref installedCollections);
+                            bool UpgradeOK = CollectionController.upgradeLocalCollectionRepoFromRemoteCollectionRepo(core, ref ErrorMessage, isNewBuild, repair, ref  nonCriticalErrorList, logPrefix, ref installedCollections);
                             if (!string.IsNullOrEmpty(ErrorMessage)) {
                                 throw (new ApplicationException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, " & ErrorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                             } else if (!UpgradeOK) {
                                 throw (new ApplicationException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, NotOK was returned without an error message", "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                             }
-                            //
-                            //---------------------------------------------------------------------
-                            // ----- Upgrade collections added during upgrade process
-                            //---------------------------------------------------------------------
-                            //
-                            //Call appendUpgradeLog(core, "Installing Add-on Collections gathered during upgrade")
-                            //If InstallCollectionList = "" Then
-                            //    Call appendUpgradeLog(core.app.config.name, MethodName, "No Add-on collections added during upgrade")
-                            //Else
-                            //    ErrorMessage = ""
-                            //    Guids = Split(InstallCollectionList, ",")
-                            //    For Ptr = 0 To UBound(Guids)
-                            //        ErrorMessage = ""
-                            //        Guid = Guids[Ptr]
-                            //        If Guid <> "" Then
-                            //            saveLogFolder = classLogFolder
-                            //            Call addonInstall.GetCollectionConfig(Guid, CollectionPath, LastChangeDate, "")
-                            //            classLogFolder = saveLogFolder
-                            //            If CollectionPath <> "" Then
-                            //                '
-                            //                ' This collection is installed locally, install from local collections
-                            //                '
-                            //                saveLogFolder = classLogFolder
-                            //                Call addonInstall.installCollectionFromLocalRepo(Me, IISResetRequired, Guid, core.version, ErrorMessage, "", "", isNewBuild)
-                            //                classLogFolder = saveLogFolder
-                            //                'Call AddonInstall.UpgradeAppFromLocalCollection( Me, ParentNavigatorID, IISResetRequired, Guid, getcodeversion, ErrorMessage, RegisterList, "")
-                            //            Else
-                            //                '
-                            //                ' This is a new collection, install to the server and force it on this site
-                            //                '
-                            //                saveLogFolder = classLogFolder
-                            //                addonInstallOk = addonInstall.installCollectionFromRemoteRepo(Guid, DataBuildVersion, IISResetRequired, "", ErrorMessage, "", isNewBuild)
-                            //                classLogFolder = saveLogFolder
-                            //                If Not addonInstallOk Then
-                            //                   throw (New ApplicationException("Unexpected exception"))'core.handleLegacyError3(core.app.config.name, "Error upgrading Addon Collection [" & Guid & "], " & ErrorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
-                            //                End If
-                            //            End If
-                            //        End If
-                            //    Next
-                            //End If
                             //
                             //---------------------------------------------------------------------
                             // ----- Upgrade all collection for this app (in case collections were installed before the upgrade

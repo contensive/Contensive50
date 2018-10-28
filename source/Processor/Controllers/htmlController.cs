@@ -819,7 +819,7 @@ namespace Contensive.Processor.Controllers {
                 //If Not (true) Then Exit Function
                 //
                 temphtml_GetAdminHintWrapper = "";
-                if ((core.session.isEditing("") | core.session.isAuthenticatedAdmin(core))) {
+                if ((core.session.isEditing("") || core.session.isAuthenticatedAdmin(core))) {
                     //temphtml_GetAdminHintWrapper = temphtml_GetAdminHintWrapper + html_GetLegacySiteStyles();
                     temphtml_GetAdminHintWrapper = temphtml_GetAdminHintWrapper + "<table border=0 width=\"100%\" cellspacing=0 cellpadding=0><tr><td class=\"ccHintWrapper\">"
                             + "<table border=0 width=\"100%\" cellspacing=0 cellpadding=0><tr><td class=\"ccHintWrapperContent\">"

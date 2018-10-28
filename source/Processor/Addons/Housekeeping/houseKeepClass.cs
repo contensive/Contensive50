@@ -80,7 +80,7 @@ namespace Contensive.Addons.Housekeeping {
                     bool ignoreRefactorBoolean = false;
                     List<string> nonCriticalErrorList = new List<string>();
                     string logPrefix = "Housekeep";
-                    if (!CollectionController.upgradeLocalCollectionRepoFromRemoteCollectionRepo(core, ref ErrorMessage, ref ignoreRefactorText, ref ignoreRefactorBoolean, false, false, ref nonCriticalErrorList, logPrefix, ref installedCollections )) {
+                    if (!CollectionController.upgradeLocalCollectionRepoFromRemoteCollectionRepo(core, ref ErrorMessage, false, false, ref nonCriticalErrorList, logPrefix, ref installedCollections )) {
                         if (string.IsNullOrEmpty(ErrorMessage)) {
                             ErrorMessage = "No detailed error message was returned from UpgradeAllLocalCollectionsFromLib2 although it returned 'not ok' status.";
                         }

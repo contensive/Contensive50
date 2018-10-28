@@ -1428,58 +1428,6 @@ namespace Contensive.Processor {
             RemoteFormatJsonNameArray = 2,
             RemoteFormatJsonNameValue = 3
         }
-        //Private Enum GoogleVisualizationStatusEnum
-        //    OK = 1
-        //    warning = 2
-        //    ErrorStatus = 3
-        //End Enum
-        //
-        //Private Structure GoogleVisualizationType
-        //    Dim version As String
-        //    Dim reqid As String
-        //    Dim status As GoogleVisualizationStatusEnum
-        //    Dim warnings() As String
-        //    Dim errors() As String
-        //    Dim sig As String
-        //    Dim table As GoogleDataType
-        //End Structure        '
-        //
-        //
-        //[System.Runtime.InteropServices.DllImport("advapi32.dll", EntryPoint = "RegCloseKey&", ExactSpelling = true, CharSet = System.Runtime.InteropServices.CharSet.Ansi, SetLastError = true)]
-        //public static extern object RegCloseKey&(long hKey);
-        //[System.Runtime.InteropServices.DllImport("advapi32.dll", EntryPoint = "RegOpenKeyExA&", ExactSpelling = true, CharSet = System.Runtime.InteropServices.CharSet.Ansi, SetLastError = true)]
-        //public static extern object RegOpenKeyExA&(long hKey, string lpszSubKey, long dwOptions, long samDesired, long lpHKey);
-        //[System.Runtime.InteropServices.DllImport("advapi32.dll", EntryPoint = "RegQueryValueExA&", ExactSpelling = true, CharSet = System.Runtime.InteropServices.CharSet.Ansi, SetLastError = true)]
-        //public static extern object RegQueryValueExA&(long hKey, string lpszValueName, long lpdwRes, long lpdwType, string lpDataBuff, long nSize);
-        //[System.Runtime.InteropServices.DllImport("advapi32.dll", EntryPoint = "RegQueryValueExA", ExactSpelling = true, CharSet = System.Runtime.InteropServices.CharSet.Ansi, SetLastError = true)]
-        //public static extern object RegQueryValueEx&(long hKey, string lpszValueName, long lpdwRes, long lpdwType, long lpDataBuff, long nSize);
-
-        //internal const uint HKEY_CLASSES_ROOT = unchecked((int)0x80000000);
-        //internal const uint HKEY_CURRENT_USER = unchecked((int)0x80000001);
-        //internal const uint HKEY_LOCAL_MACHINE = unchecked((int)0x80000002);
-        //internal const uint HKEY_USERS = unchecked((int)0x80000003);
-
-        //internal const int ERROR_SUCCESS = 0L;
-        //internal const int REG_SZ = 1L; // Unicode nul terminated string
-        //internal const int REG_DWORD = 4L; // 32-bit number
-
-        //internal const int KEY_QUERY_VALUE = 0x1L;
-        //internal const int KEY_SET_VALUE = 0x2L;
-        //internal const int KEY_CREATE_SUB_KEY = 0x4L;
-        //internal const int KEY_ENUMERATE_SUB_KEYS = 0x8L;
-        //internal const int KEY_NOTIFY = 0x10L;
-        //internal const int KEY_CREATE_LINK = 0x20L;
-        //internal const int READ_CONTROL = 0x20000;
-        //internal const int WRITE_DAC = 0x40000;
-        //internal const int WRITE_OWNER = 0x80000;
-        //internal const int SYNCHRONIZE = 0x100000;
-        //internal const int STANDARD_RIGHTS_REQUIRED = 0xF0000;
-        //internal const int STANDARD_RIGHTS_READ = READ_CONTROL;
-        //internal const int STANDARD_RIGHTS_WRITE = READ_CONTROL;
-        //internal const int STANDARD_RIGHTS_EXECUTE = READ_CONTROL;
-        //internal const int KEY_READ = STANDARD_RIGHTS_READ | KEY_QUERY_VALUE | KEY_ENUMERATE_SUB_KEYS | KEY_NOTIFY;
-        //internal const int KEY_WRITE = STANDARD_RIGHTS_WRITE | KEY_SET_VALUE | KEY_CREATE_SUB_KEY;
-        //internal const int KEY_EXECUTE = KEY_READ;
         internal const int maxLongValue = 2147483647;
         //
         // link forward cache
@@ -1489,8 +1437,6 @@ namespace Contensive.Processor {
         internal const string cookieNameVisit = "visit";
         internal const string main_cookieNameVisitor = "visitor";
         internal const string html_quickEdit_fpo = "<quickeditor>";
-        //
-        //Public Const sqlAddonStyles  As String  = "select addonid,styleid from ccSharedStylesAddonRules where (active<>0) order by id"
         //
         internal const string cacheNameAddonStyleRules = "addon styles";
         //

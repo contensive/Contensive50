@@ -522,7 +522,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // -- count the page hit
                             LogController.logTrace(core, "SessionController.create(), attempt visit count update");
-                            resultSessionContext.visit.excludeFromAnalytics |= resultSessionContext.visit.bot | resultSessionContext.user.ExcludeFromAnalytics | resultSessionContext.user.Admin | resultSessionContext.user.Developer;
+                            resultSessionContext.visit.excludeFromAnalytics |= resultSessionContext.visit.bot || resultSessionContext.user.ExcludeFromAnalytics || resultSessionContext.user.Admin || resultSessionContext.user.Developer;
                             if (!core.webServer.pageExcludeFromAnalytics) {
                                 resultSessionContext.visit.pageVisits += 1;
                                 visit_changes = true;
@@ -583,7 +583,7 @@ namespace Contensive.Processor.Controllers {
         public bool isAuthenticatedAdmin(CoreController core) {
             bool result = false;
             try {
-                result = visit.visitAuthenticated & (user.Admin | user.Developer);
+                result = visit.visitAuthenticated & (user.Admin || user.Developer);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
@@ -600,7 +600,7 @@ namespace Contensive.Processor.Controllers {
         public bool isAuthenticatedDeveloper(CoreController core) {
             bool result = false;
             try {
-                result = visit.visitAuthenticated & (user.Admin | user.Developer);
+                result = visit.visitAuthenticated & (user.Admin || user.Developer);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
@@ -1130,7 +1130,7 @@ namespace Contensive.Processor.Controllers {
                         sessionContext.visit.memberNew = false;
                     }
                     sessionContext.user.LastVisit = core.doc.profileStartTime;
-                    sessionContext.visit.excludeFromAnalytics = sessionContext.visit.excludeFromAnalytics | sessionContext.visit.bot | sessionContext.user.ExcludeFromAnalytics | sessionContext.user.Admin | sessionContext.user.Developer;
+                    sessionContext.visit.excludeFromAnalytics = sessionContext.visit.excludeFromAnalytics || sessionContext.visit.bot || sessionContext.user.ExcludeFromAnalytics || sessionContext.user.Admin || sessionContext.user.Developer;
                     sessionContext.visit.save(core);
                     sessionContext.visitor.save(core);
                     sessionContext.user.save(core);
@@ -1364,7 +1364,7 @@ namespace Contensive.Processor.Controllers {
                         // -- 
                         return false;
                     } else {
-                        if (core.visitProperty.getBoolean("AllowEditing") | core.visitProperty.getBoolean("AllowAdvancedEditor")) {
+                        if (core.visitProperty.getBoolean("AllowEditing") || core.visitProperty.getBoolean("AllowAdvancedEditor")) {
                             if (!string.IsNullOrEmpty(contentNameOrId)) {
                                 if (contentNameOrId.IsNumeric()) {
                                     contentNameOrId = CdefController.getContentNameByID(core, encodeInteger(contentNameOrId));

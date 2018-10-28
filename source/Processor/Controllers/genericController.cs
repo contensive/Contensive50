@@ -1532,7 +1532,7 @@ namespace Contensive.Processor.Controllers {
                 NextCR = vbInstr(1, Body, "\r");
                 NextLF = vbInstr(1, Body, "\n");
 
-                if (NextCR != 0 | NextLF != 0) {
+                if ((NextCR != 0) || (NextLF != 0)) {
                     if (NextCR != 0) {
                         if (NextLF != 0) {
                             if (NextCR < NextLF) {

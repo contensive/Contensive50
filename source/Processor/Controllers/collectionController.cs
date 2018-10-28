@@ -30,621 +30,17 @@ namespace Contensive.Processor.Controllers {
     /// </summary>
     public class CollectionController {
         //
+        //
         //====================================================================================================
         /// <summary>
-        /// Overlay a Src CDef on to the current one (Dst). Any Src CDEf entries found in Src are added to Dst.
-        /// if SrcIsUserCDef is true, then the Src is overlayed on the Dst if there are any changes -- and .CDefChanged flag set
+        /// download a collection from the collection library to a path
         /// </summary>
-        private static bool addMiniCollectionSrcToDst(CoreController core, ref CDefMiniCollectionModel dstCollection, CDefMiniCollectionModel srcCollection) {
-            bool returnOk = true;
-            try {
-                string SrcFieldName = null;
-                bool updateDst = false;
-                Models.Domain.CDefModel srcCdef = null;
-                //
-                // If the Src is the BaseCollection, the Dst must be the Application Collectio
-                //   in this case, reset any BaseContent or BaseField attributes in the application that are not in the base
-                //
-                if (srcCollection.isBaseCollection) {
-                    foreach (var dstKeyValuePair in dstCollection.cdef) {
-                        Models.Domain.CDefModel dstWorkingCdef = dstKeyValuePair.Value;
-                        string contentName = dstWorkingCdef.name;
-                        if (dstCollection.cdef[contentName.ToLowerInvariant()].isBaseContent) {
-                            //
-                            // this application collection Cdef is marked base, verify it is in the base collection
-                            //
-                            if (!srcCollection.cdef.ContainsKey(contentName.ToLowerInvariant())) {
-                                //
-                                // cdef in dst is marked base, but it is not in the src collection, reset the cdef.isBaseContent and all field.isbasefield
-                                //
-                                var tempVar = dstCollection.cdef[contentName.ToLowerInvariant()];
-                                tempVar.isBaseContent = false;
-                                tempVar.dataChanged = true;
-                                foreach (var dstFieldKeyValuePair in tempVar.fields) {
-                                    Models.Domain.CDefFieldModel field = dstFieldKeyValuePair.Value;
-                                    if (field.isBaseField) {
-                                        field.isBaseField = false;
-                                        //field.Changed = True
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                //
-                //
-                // -------------------------------------------------------------------------------------------------
-                // Go through all CollectionSrc and find the CollectionDst match
-                //   if it is an exact match, do nothing
-                //   if the cdef does not match, set cdefext[Ptr].CDefChanged true
-                //   if any field does not match, set cdefext...field...CDefChanged
-                //   if the is no CollectionDst for the CollectionSrc, add it and set okToUpdateDstFromSrc
-                // -------------------------------------------------------------------------------------------------
-                //
-                LogController.logInfo(core, "Application: " + core.appConfig.name + ", UpgradeCDef_AddSrcToDst");
-                string dstName = null;
-                //
-                foreach (var srcKeyValuePair in srcCollection.cdef) {
-                    srcCdef = srcKeyValuePair.Value;
-                    string srcName = srcCdef.name;
-                    //
-                    // Search for this cdef in the Dst
-                    //
-                    updateDst = false;
-                    Models.Domain.CDefModel dstCdef = null;
-                    if (!dstCollection.cdef.ContainsKey(srcName.ToLowerInvariant())) {
-                        //
-                        // add src to dst
-                        //
-                        dstCdef = new Models.Domain.CDefModel();
-                        dstCollection.cdef.Add(srcName.ToLowerInvariant(), dstCdef);
-                        updateDst = true;
-                    } else {
-                        dstCdef = dstCollection.cdef[srcName.ToLowerInvariant()];
-                        dstName = srcName;
-                        //
-                        // found a match between Src and Dst
-                        //
-                        if (dstCdef.isBaseContent == srcCdef.isBaseContent) {
-                            //
-                            // Allow changes to user cdef only from user cdef, changes to base only from base
-                            updateDst |= (dstCdef.activeOnly != srcCdef.activeOnly);
-                            updateDst |= (dstCdef.adminOnly != srcCdef.adminOnly);
-                            updateDst |= (dstCdef.developerOnly != srcCdef.developerOnly);
-                            updateDst |= (dstCdef.allowAdd != srcCdef.allowAdd);
-                            updateDst |= (dstCdef.allowCalendarEvents != srcCdef.allowCalendarEvents);
-                            updateDst |= (dstCdef.allowContentTracking != srcCdef.allowContentTracking);
-                            updateDst |= (dstCdef.allowDelete != srcCdef.allowDelete);
-                            updateDst |= (dstCdef.allowTopicRules != srcCdef.allowTopicRules);
-                            updateDst |= !textMatch(dstCdef.dataSourceName, srcCdef.dataSourceName);
-                            updateDst |= !textMatch(dstCdef.tableName, srcCdef.tableName);
-                            updateDst |= !textMatch(dstCdef.defaultSortMethod, srcCdef.defaultSortMethod);
-                            updateDst |= !textMatch(dstCdef.dropDownFieldList, srcCdef.dropDownFieldList);
-                            updateDst |= !textMatch(dstCdef.editorGroupName, srcCdef.editorGroupName);
-                            updateDst |= (dstCdef.active != srcCdef.active);
-                            updateDst |= (dstCdef.allowContentChildTool != srcCdef.allowContentChildTool);
-                            updateDst |= (dstCdef.parentID != srcCdef.parentID);
-                            updateDst |= !textMatch(dstCdef.iconLink, srcCdef.iconLink);
-                            updateDst |= (dstCdef.iconHeight != srcCdef.iconHeight);
-                            updateDst |= (dstCdef.iconWidth != srcCdef.iconWidth);
-                            updateDst |= (dstCdef.iconSprites != srcCdef.iconSprites);
-                            updateDst |= !textMatch(dstCdef.installedByCollectionGuid, srcCdef.installedByCollectionGuid);
-                            updateDst |= !textMatch(dstCdef.guid, srcCdef.guid);
-                            updateDst |= (dstCdef.isBaseContent != srcCdef.isBaseContent);
-                        }
-                    }
-                    if (updateDst) {
-                        //
-                        // update the Dst with the Src
-                        dstCdef.active = srcCdef.active;
-                        dstCdef.activeOnly = srcCdef.activeOnly;
-                        dstCdef.adminOnly = srcCdef.adminOnly;
-                        dstCdef.aliasID = srcCdef.aliasID;
-                        dstCdef.aliasName = srcCdef.aliasName;
-                        dstCdef.allowAdd = srcCdef.allowAdd;
-                        dstCdef.allowCalendarEvents = srcCdef.allowCalendarEvents;
-                        dstCdef.allowContentChildTool = srcCdef.allowContentChildTool;
-                        dstCdef.allowContentTracking = srcCdef.allowContentTracking;
-                        dstCdef.allowDelete = srcCdef.allowDelete;
-                        dstCdef.allowTopicRules = srcCdef.allowTopicRules;
-                        dstCdef.guid = srcCdef.guid;
-                        dstCdef.legacyContentControlCriteria = srcCdef.legacyContentControlCriteria;
-                        dstCdef.dataSourceName = srcCdef.dataSourceName;
-                        dstCdef.tableName = srcCdef.tableName;
-                        dstCdef.dataSourceId = srcCdef.dataSourceId;
-                        dstCdef.defaultSortMethod = srcCdef.defaultSortMethod;
-                        dstCdef.developerOnly = srcCdef.developerOnly;
-                        dstCdef.dropDownFieldList = srcCdef.dropDownFieldList;
-                        dstCdef.editorGroupName = srcCdef.editorGroupName;
-                        dstCdef.iconHeight = srcCdef.iconHeight;
-                        dstCdef.iconLink = srcCdef.iconLink;
-                        dstCdef.iconSprites = srcCdef.iconSprites;
-                        dstCdef.iconWidth = srcCdef.iconWidth;
-                        dstCdef.installedByCollectionGuid = srcCdef.installedByCollectionGuid;
-                        dstCdef.isBaseContent = srcCdef.isBaseContent;
-                        dstCdef.isModifiedSinceInstalled = srcCdef.isModifiedSinceInstalled;
-                        dstCdef.name = srcCdef.name;
-                        dstCdef.parentID = srcCdef.parentID;
-                        dstCdef.parentName = srcCdef.parentName;
-                        dstCdef.selectCommaList = srcCdef.selectCommaList;
-                        dstCdef.whereClause = srcCdef.whereClause;
-                        dstCdef.includesAFieldChange = true;
-                        dstCdef.dataChanged = true;
-                    }
-                    //
-                    // Now check each of the field records for an addition, or a change
-                    // DstPtr is still set to the Dst CDef
-                    //
-                    //Call AppendClassLogFile(core.app.config.name,"UpgradeCDef_AddSrcToDst", "CollectionSrc.CDef[SrcPtr].fields.count=" & CollectionSrc.CDef[SrcPtr].fields.count)
-                    foreach (var srcFieldKeyValuePair in srcCdef.fields) {
-                        Models.Domain.CDefFieldModel srcCdefField = srcFieldKeyValuePair.Value;
-                        SrcFieldName = srcCdefField.nameLc;
-                        updateDst = false;
-                        if (!dstCollection.cdef.ContainsKey(srcName.ToLowerInvariant())) {
-                            //
-                            // should have been the collection
-                            //
-                            throw (new ApplicationException("ERROR - cannot update destination content because it was not found after being added."));
-                        } else {
-                            dstCdef = dstCollection.cdef[srcName.ToLowerInvariant()];
-                            bool HelpChanged = false;
-                            Models.Domain.CDefFieldModel dstCdefField = null;
-                            if (dstCdef.fields.ContainsKey(SrcFieldName.ToLowerInvariant())) {
-                                //
-                                // Src field was found in Dst fields
-                                //
-
-                                dstCdefField = dstCdef.fields[SrcFieldName.ToLowerInvariant()];
-                                updateDst = false;
-                                if (dstCdefField.isBaseField == srcCdefField.isBaseField) {
-                                    updateDst |= (srcCdefField.active != dstCdefField.active);
-                                    updateDst |= (srcCdefField.adminOnly != dstCdefField.adminOnly);
-                                    updateDst |= (srcCdefField.authorable != dstCdefField.authorable);
-                                    updateDst |= !textMatch(srcCdefField.caption, dstCdefField.caption);
-                                    updateDst |= (srcCdefField.contentId != dstCdefField.contentId);
-                                    updateDst |= (srcCdefField.developerOnly != dstCdefField.developerOnly);
-                                    updateDst |= (srcCdefField.editSortPriority != dstCdefField.editSortPriority);
-                                    updateDst |= !textMatch(srcCdefField.editTabName, dstCdefField.editTabName);
-                                    updateDst |= (srcCdefField.fieldTypeId != dstCdefField.fieldTypeId);
-                                    updateDst |= (srcCdefField.htmlContent != dstCdefField.htmlContent);
-                                    updateDst |= (srcCdefField.indexColumn != dstCdefField.indexColumn);
-                                    updateDst |= (srcCdefField.indexSortDirection != dstCdefField.indexSortDirection);
-                                    updateDst |= (encodeInteger(srcCdefField.indexSortOrder) != GenericController.encodeInteger(dstCdefField.indexSortOrder));
-                                    updateDst |= !textMatch(srcCdefField.indexWidth, dstCdefField.indexWidth);
-                                    updateDst |= (srcCdefField.lookupContentID != dstCdefField.lookupContentID);
-                                    updateDst |= !textMatch(srcCdefField.lookupList, dstCdefField.lookupList);
-                                    updateDst |= (srcCdefField.manyToManyContentID != dstCdefField.manyToManyContentID);
-                                    updateDst |= (srcCdefField.manyToManyRuleContentID != dstCdefField.manyToManyRuleContentID);
-                                    updateDst |= !textMatch(srcCdefField.ManyToManyRulePrimaryField, dstCdefField.ManyToManyRulePrimaryField);
-                                    updateDst |= !textMatch(srcCdefField.ManyToManyRuleSecondaryField, dstCdefField.ManyToManyRuleSecondaryField);
-                                    updateDst |= (srcCdefField.memberSelectGroupId_get(core) != dstCdefField.memberSelectGroupId_get(core));
-                                    updateDst |= (srcCdefField.notEditable != dstCdefField.notEditable);
-                                    updateDst |= (srcCdefField.password != dstCdefField.password);
-                                    updateDst |= (srcCdefField.readOnly != dstCdefField.readOnly);
-                                    updateDst |= (srcCdefField.redirectContentID != dstCdefField.redirectContentID);
-                                    updateDst |= !textMatch(srcCdefField.redirectID, dstCdefField.redirectID);
-                                    updateDst |= !textMatch(srcCdefField.redirectPath, dstCdefField.redirectPath);
-                                    updateDst |= (srcCdefField.required != dstCdefField.required);
-                                    updateDst |= (srcCdefField.RSSDescriptionField != dstCdefField.RSSDescriptionField);
-                                    updateDst |= (srcCdefField.RSSTitleField != dstCdefField.RSSTitleField);
-                                    updateDst |= (srcCdefField.Scramble != dstCdefField.Scramble);
-                                    updateDst |= (srcCdefField.textBuffered != dstCdefField.textBuffered);
-                                    updateDst |= (GenericController.encodeText(srcCdefField.defaultValue) != GenericController.encodeText(dstCdefField.defaultValue));
-                                    updateDst |= (srcCdefField.uniqueName != dstCdefField.uniqueName);
-                                    updateDst |= (srcCdefField.isBaseField != dstCdefField.isBaseField);
-                                    updateDst |= !textMatch(srcCdefField.get_lookupContentName(core), dstCdefField.get_lookupContentName(core));
-                                    updateDst |= !textMatch(srcCdefField.get_lookupContentName(core), dstCdefField.get_lookupContentName(core));
-                                    updateDst |= !textMatch(srcCdefField.get_manyToManyRuleContentName(core), dstCdefField.get_manyToManyRuleContentName(core));
-                                    updateDst |= !textMatch(srcCdefField.get_redirectContentName(core), dstCdefField.get_redirectContentName(core));
-                                    updateDst |= !textMatch(srcCdefField.installedByCollectionGuid, dstCdefField.installedByCollectionGuid);
-                                }
-                                //
-                                // Check Help fields, track changed independantly so frequent help changes will not force timely cdef loads
-                                //
-                                bool HelpCustomChanged = !textMatch(srcCdefField.helpCustom, srcCdefField.helpCustom);
-                                bool HelpDefaultChanged = !textMatch(srcCdefField.helpDefault, srcCdefField.helpDefault);
-                                HelpChanged = HelpDefaultChanged || HelpCustomChanged;
-                            } else {
-                                //
-                                // field was not found in dst, add it and populate
-                                //
-                                dstCdef.fields.Add(SrcFieldName.ToLowerInvariant(), new Models.Domain.CDefFieldModel());
-                                dstCdefField = dstCdef.fields[SrcFieldName.ToLowerInvariant()];
-                                updateDst = true;
-                                HelpChanged = true;
-                            }
-                            //
-                            // If okToUpdateDstFromSrc, update the Dst record with the Src record
-                            //
-                            if (updateDst) {
-                                //
-                                // Update Fields
-                                //
-                                dstCdefField.active = srcCdefField.active;
-                                dstCdefField.adminOnly = srcCdefField.adminOnly;
-                                dstCdefField.authorable = srcCdefField.authorable;
-                                dstCdefField.caption = srcCdefField.caption;
-                                dstCdefField.contentId = srcCdefField.contentId;
-                                dstCdefField.defaultValue = srcCdefField.defaultValue;
-                                dstCdefField.developerOnly = srcCdefField.developerOnly;
-                                dstCdefField.editSortPriority = srcCdefField.editSortPriority;
-                                dstCdefField.editTabName = srcCdefField.editTabName;
-                                dstCdefField.fieldTypeId = srcCdefField.fieldTypeId;
-                                dstCdefField.htmlContent = srcCdefField.htmlContent;
-                                dstCdefField.indexColumn = srcCdefField.indexColumn;
-                                dstCdefField.indexSortDirection = srcCdefField.indexSortDirection;
-                                dstCdefField.indexSortOrder = srcCdefField.indexSortOrder;
-                                dstCdefField.indexWidth = srcCdefField.indexWidth;
-                                dstCdefField.lookupContentID = srcCdefField.lookupContentID;
-                                dstCdefField.lookupList = srcCdefField.lookupList;
-                                dstCdefField.manyToManyContentID = srcCdefField.manyToManyContentID;
-                                dstCdefField.manyToManyRuleContentID = srcCdefField.manyToManyRuleContentID;
-                                dstCdefField.ManyToManyRulePrimaryField = srcCdefField.ManyToManyRulePrimaryField;
-                                dstCdefField.ManyToManyRuleSecondaryField = srcCdefField.ManyToManyRuleSecondaryField;
-                                dstCdefField.memberSelectGroupId_set(core, srcCdefField.memberSelectGroupId_get(core));
-                                dstCdefField.nameLc = srcCdefField.nameLc;
-                                dstCdefField.notEditable = srcCdefField.notEditable;
-                                dstCdefField.password = srcCdefField.password;
-                                dstCdefField.readOnly = srcCdefField.readOnly;
-                                dstCdefField.redirectContentID = srcCdefField.redirectContentID;
-                                dstCdefField.redirectID = srcCdefField.redirectID;
-                                dstCdefField.redirectPath = srcCdefField.redirectPath;
-                                dstCdefField.required = srcCdefField.required;
-                                dstCdefField.RSSDescriptionField = srcCdefField.RSSDescriptionField;
-                                dstCdefField.RSSTitleField = srcCdefField.RSSTitleField;
-                                dstCdefField.Scramble = srcCdefField.Scramble;
-                                dstCdefField.textBuffered = srcCdefField.textBuffered;
-                                dstCdefField.uniqueName = srcCdefField.uniqueName;
-                                dstCdefField.isBaseField = srcCdefField.isBaseField;
-                                dstCdefField.set_lookupContentName(core, srcCdefField.get_lookupContentName(core));
-                                dstCdefField.set_manyToManyContentName(core, srcCdefField.get_manyToManyContentName(core));
-                                dstCdefField.set_manyToManyRuleContentName(core, srcCdefField.get_manyToManyRuleContentName(core));
-                                dstCdefField.set_redirectContentName(core, srcCdefField.get_redirectContentName(core));
-                                dstCdefField.installedByCollectionGuid = srcCdefField.installedByCollectionGuid;
-                                dstCdefField.dataChanged = true;
-                                dstCdef.includesAFieldChange = true;
-                            }
-                            if (HelpChanged) {
-                                dstCdefField.helpCustom = srcCdefField.helpCustom;
-                                dstCdefField.helpDefault = srcCdefField.helpDefault;
-                                dstCdefField.HelpChanged = true;
-                            }
-                        }
-                    }
-                }
-                //
-                // -------------------------------------------------------------------------------------------------
-                // Check SQL Indexes
-                // -------------------------------------------------------------------------------------------------
-                //
-                foreach (CDefMiniCollectionModel.miniCollectionSQLIndexModel srcSqlIndex in srcCollection.sqlIndexes) {
-                    string srcName = (srcSqlIndex.DataSourceName + "-" + srcSqlIndex.TableName + "-" + srcSqlIndex.IndexName).ToLowerInvariant();
-                    updateDst = false;
-                    //
-                    // Search for this name in the Dst
-                    bool indexFound = false;
-                    bool indexChanged = false;
-                    CDefMiniCollectionModel.miniCollectionSQLIndexModel indexToUpdate = new CDefMiniCollectionModel.miniCollectionSQLIndexModel() { };
-                    foreach (CDefMiniCollectionModel.miniCollectionSQLIndexModel dstSqlIndex in dstCollection.sqlIndexes) {
-                        dstName = (dstSqlIndex.DataSourceName + "-" + dstSqlIndex.TableName + "-" + dstSqlIndex.IndexName).ToLowerInvariant();
-                        if (textMatch(dstName, srcName)) {
-                            //
-                            // found a match between Src and Dst
-                            indexFound = true;
-                            indexToUpdate = dstSqlIndex;
-                            indexChanged = !textMatch(dstSqlIndex.FieldNameList, srcSqlIndex.FieldNameList);
-                            break;
-                        }
-                    }
-                    if (!indexFound) {
-                        //
-                        // add src to dst
-                        dstCollection.sqlIndexes.Add(srcSqlIndex);
-                    } else if (indexChanged && (indexToUpdate != null )) {
-                        //
-                        // update dst to src
-
-                        indexToUpdate.dataChanged = true;
-                        indexToUpdate.DataSourceName = srcSqlIndex.DataSourceName;
-                        indexToUpdate.FieldNameList = srcSqlIndex.FieldNameList;
-                        indexToUpdate.IndexName = srcSqlIndex.IndexName;
-                        indexToUpdate.TableName = srcSqlIndex.TableName;
-                    }
-                }
-                //
-                //-------------------------------------------------------------------------------------------------
-                // Check menus
-                //-------------------------------------------------------------------------------------------------
-                //
-                string DataBuildVersion = core.siteProperties.dataBuildVersion;
-                foreach (var srcKvp in srcCollection.menus) {
-                    string srcKey = srcKvp.Key.ToLowerInvariant() ;
-                    CDefMiniCollectionModel.miniCollectionMenuModel srcMenu = srcKvp.Value;
-                    string srcName = srcMenu.Name.ToLowerInvariant();
-                    string srcGuid = srcMenu.Guid;
-                    string SrcParentName = GenericController.vbLCase(srcMenu.ParentName);
-                    string SrcNameSpace = GenericController.vbLCase(srcMenu.menuNameSpace);
-                    bool SrcIsNavigator = srcMenu.IsNavigator;
-                    updateDst = false;
-                    //
-                    // Search for match using guid
-                    CDefMiniCollectionModel.miniCollectionMenuModel dstMenuMatch = new CDefMiniCollectionModel.miniCollectionMenuModel() { } ;
-                    bool IsMatch = false;
-                    string DstKey = null;
-                    bool DstIsNavigator = false;
-                    foreach (var dstKvp in dstCollection.menus) {
-                        string dstKey = dstKvp.Key.ToLowerInvariant();
-                        CDefMiniCollectionModel.miniCollectionMenuModel dstMenu = dstKvp.Value;
-                        string dstGuid = dstMenu.Guid;
-                        if (dstGuid == srcGuid) {
-                            DstIsNavigator = dstMenu.IsNavigator;
-                            DstKey = GenericController.vbLCase(dstMenu.Key);
-                            string SrcKey = null;
-                            IsMatch = (DstKey == SrcKey) && (SrcIsNavigator == DstIsNavigator);
-                            if (IsMatch) {
-                                dstMenuMatch = dstMenu;
-                                break;
-                            }
-
-                        }
-                    }
-                    if (!IsMatch) {
-                        //
-                        // no match found on guid, try name and ( either namespace or parentname )
-                        foreach (var dstKvp in dstCollection.menus) {
-                            string dstKey = dstKvp.Key.ToLowerInvariant();
-                            CDefMiniCollectionModel.miniCollectionMenuModel dstMenu = dstKvp.Value;
-                            dstName = GenericController.vbLCase(dstMenu.Name);
-                            if ((srcName == dstName) && (SrcIsNavigator == DstIsNavigator)) {
-                                if (SrcIsNavigator) {
-                                    //
-                                    // Navigator - check namespace if Dst.guid is blank (builder to new version of menu)
-                                    IsMatch = (SrcNameSpace == GenericController.vbLCase(dstMenu.menuNameSpace)) && (dstMenu.Guid == "");
-                                } else {
-                                    //
-                                    // AdminMenu - check parentname
-                                    IsMatch = (SrcParentName == GenericController.vbLCase(dstMenu.ParentName));
-                                }
-                                if (IsMatch) {
-                                    dstMenuMatch = dstMenu;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    if(IsMatch) {
-                        updateDst |= (dstMenuMatch.Active != srcMenu.Active);
-                        updateDst |= (dstMenuMatch.AdminOnly != srcMenu.AdminOnly);
-                        updateDst |= !textMatch(dstMenuMatch.ContentName, srcMenu.ContentName);
-                        updateDst |= (dstMenuMatch.DeveloperOnly != srcMenu.DeveloperOnly);
-                        updateDst |= !textMatch(dstMenuMatch.LinkPage, srcMenu.LinkPage);
-                        updateDst |= !textMatch(dstMenuMatch.Name, srcMenu.Name);
-                        updateDst |= (dstMenuMatch.NewWindow != srcMenu.NewWindow);
-                        updateDst |= !textMatch(dstMenuMatch.SortOrder, srcMenu.SortOrder);
-                        updateDst |= !textMatch(dstMenuMatch.AddonName, srcMenu.AddonName);
-                        updateDst |= !textMatch(dstMenuMatch.NavIconType, srcMenu.NavIconType);
-                        updateDst |= !textMatch(dstMenuMatch.NavIconTitle, srcMenu.NavIconTitle);
-                        updateDst |= !textMatch(dstMenuMatch.menuNameSpace, srcMenu.menuNameSpace);
-                        updateDst |= !textMatch(dstMenuMatch.Guid, srcMenu.Guid);
-                        dstCollection.menus.Remove(DstKey);
-                    }
-                    dstCollection.menus.Add(srcKey, srcMenu);
-                }
-                //
-                //-------------------------------------------------------------------------------------------------
-                // Check addons -- yes, this should be done.
-                //-------------------------------------------------------------------------------------------------
-                //
-                //If False Then
-                //    '
-                //    ' remove this for now -- later add ImportCollections to track the collections (not addons)
-                //    '
-                //    '
-                //    '
-                //    For SrcPtr = 0 To srcCollection.AddOnCnt - 1
-                //        SrcContentName = genericController.vbLCase(srcCollection.AddOns[SrcPtr].Name)
-                //        okToUpdateDstFromSrc = False
-                //        '
-                //        ' Search for this name in the Dst
-                //        '
-                //        For DstPtr = 0 To dstCollection.AddOnCnt - 1
-                //            DstName = genericController.vbLCase(dstCollection.AddOns[dstPtr].Name)
-                //            If DstName = SrcContentName Then
-                //                '
-                //                ' found a match between Src and Dst
-                //                '
-                //                If SrcIsUserCDef Then
-                //                    '
-                //                    ' test for cdef attribute changes
-                //                    '
-                //                    With dstCollection.AddOns[dstPtr]
-                //                        okToUpdateDstFromSrc = okToUpdateDstFromSrc Or Not TextMatch(core,.ArgumentList, srcCollection.AddOns[SrcPtr].ArgumentList)
-                //                        okToUpdateDstFromSrc = okToUpdateDstFromSrc Or Not TextMatch(core,.Copy, srcCollection.AddOns[SrcPtr].Copy)
-                //                        okToUpdateDstFromSrc = okToUpdateDstFromSrc Or Not TextMatch(core,.Link, srcCollection.AddOns[SrcPtr].Link)
-                //                        okToUpdateDstFromSrc = okToUpdateDstFromSrc Or Not TextMatch(core,.Name, srcCollection.AddOns[SrcPtr].Name)
-                //                        okToUpdateDstFromSrc = okToUpdateDstFromSrc Or Not TextMatch(core,.ObjectProgramID, srcCollection.AddOns[SrcPtr].ObjectProgramID)
-                //                        okToUpdateDstFromSrc = okToUpdateDstFromSrc Or Not TextMatch(core,.SortOrder, srcCollection.AddOns[SrcPtr].SortOrder)
-                //                    End With
-                //                End If
-                //                Exit For
-                //            End If
-                //        Next
-                //        If DstPtr = dstCollection.AddOnCnt Then
-                //            '
-                //            ' CDef was not found, add it
-                //            '
-                //            Array.Resize( ref asdf,asdf) // redim preserve  dstCollection.AddOns(dstCollection.AddOnCnt)
-                //            dstCollection.AddOnCnt = DstPtr + 1
-                //            okToUpdateDstFromSrc = True
-                //        End If
-                //        If okToUpdateDstFromSrc Then
-                //            With dstCollection.AddOns[dstPtr]
-                //                '
-                //                ' It okToUpdateDstFromSrc, update the Dst with the Src
-                //                '
-                //                .CDefChanged = True
-                //                .ArgumentList = srcCollection.AddOns[SrcPtr].ArgumentList
-                //                .Copy = srcCollection.AddOns[SrcPtr].Copy
-                //                .Link = srcCollection.AddOns[SrcPtr].Link
-                //                .Name = srcCollection.AddOns[SrcPtr].Name
-                //                .ObjectProgramID = srcCollection.AddOns[SrcPtr].ObjectProgramID
-                //                .SortOrder = srcCollection.AddOns[SrcPtr].SortOrder
-                //            End With
-                //        End If
-                //    Next
-                //End If
-                //
-                //-------------------------------------------------------------------------------------------------
-                // Check styles
-                //-------------------------------------------------------------------------------------------------
-                //
-                int srcStylePtr = 0;
-                int dstStylePtr = 0;
-                for (srcStylePtr = 0; srcStylePtr < srcCollection.styleCnt; srcStylePtr++) {
-                    string srcName = GenericController.vbLCase(srcCollection.styles[srcStylePtr].Name);
-                    updateDst = false;
-                    //
-                    // Search for this name in the Dst
-                    //
-                    for (dstStylePtr = 0; dstStylePtr < dstCollection.styleCnt; dstStylePtr++) {
-                        dstName = GenericController.vbLCase(dstCollection.styles[dstStylePtr].Name);
-                        if (dstName == srcName) {
-                            //
-                            // found a match between Src and Dst
-                            updateDst |= !textMatch(dstCollection.styles[dstStylePtr].Copy, srcCollection.styles[srcStylePtr].Copy);
-                            break;
-                        }
-                    }
-                    if (dstStylePtr == dstCollection.styleCnt) {
-                        //
-                        // CDef was not found, add it
-                        //
-                        Array.Resize(ref dstCollection.styles, dstCollection.styleCnt);
-                        dstCollection.styleCnt = dstStylePtr + 1;
-                        updateDst = true;
-                    }
-                    if (updateDst) {
-                        var tempVar6 = dstCollection.styles[dstStylePtr];
-                        //
-                        // It okToUpdateDstFromSrc, update the Dst with the Src
-                        //
-                        tempVar6.dataChanged = true;
-                        tempVar6.Copy = srcCollection.styles[srcStylePtr].Copy;
-                        tempVar6.Name = srcCollection.styles[srcStylePtr].Name;
-                    }
-                }
-                //
-                //-------------------------------------------------------------------------------------------------
-                // Add Collections
-                //-------------------------------------------------------------------------------------------------
-                //
-                foreach( var import in srcCollection.collectionImports) {
-                    dstCollection.collectionImports.Add(import);
-                }
-                //
-                //-------------------------------------------------------------------------------------------------
-                // Page Templates
-                //-------------------------------------------------------------------------------------------------
-                //
-                //
-                //-------------------------------------------------------------------------------------------------
-                // Page Content
-                //-------------------------------------------------------------------------------------------------
-                //
-                //
-                //-------------------------------------------------------------------------------------------------
-                // Copy Content
-                //-------------------------------------------------------------------------------------------------
-                //
-                //
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-                throw;
-            }
-            return returnOk;
-        }
-        //
-        //====================================================================================================
-        //
-        private static CDefMiniCollectionModel installCollection_GetApplicationMiniCollection(CoreController core, bool isNewBuild, string logPrefix, ref List<string> installedCollections) {
-            CDefMiniCollectionModel returnColl = new CDefMiniCollectionModel();
-            try {
-                //
-                string ExportFilename = null;
-                string ExportPathPage = null;
-                string CollectionData = null;
-                //
-                if (!isNewBuild) {
-                    //
-                    // if this is not an empty database, get the application collection, else return empty
-                    //
-                    ExportFilename = "cdef_export_" + encodeText(GenericController.GetRandomInteger(core)) + ".xml";
-                    ExportPathPage = "tmp\\" + ExportFilename;
-                    exportApplicationCDefXml(core, ExportPathPage, true);
-                    CollectionData = core.privateFiles.readFileText(ExportPathPage);
-                    core.privateFiles.deleteFile(ExportPathPage);
-                    returnColl = CDefMiniCollectionModel.installCDefMiniCollection_LoadXml(core, CollectionData, false, false, isNewBuild, new CDefMiniCollectionModel(), logPrefix, ref installedCollections);
-                }
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-                throw;
-            }
-            return returnColl;
-        }
-       //
-        //====================================================================================================
-        //
-        internal static string GetMenuNameSpace(CoreController core, Dictionary<string,CDefMiniCollectionModel.miniCollectionMenuModel> menus, CDefMiniCollectionModel.miniCollectionMenuModel menu, string UsedIDList) {
-            string returnAttr = "";
-            try {
-                string ParentName = null;
-                int Ptr = 0;
-                string Prefix = null;
-                string LCaseParentName = null;
-
-                //
-                ParentName = menu.ParentName;
-                if (!string.IsNullOrEmpty(ParentName)) {
-                    LCaseParentName = GenericController.vbLCase(ParentName);
-                    foreach ( var kvp in menus) {
-                        CDefMiniCollectionModel.miniCollectionMenuModel testMenu = kvp.Value;
-                        if (GenericController.vbInstr(1, "," + UsedIDList + ",", "," + Ptr.ToString() + ",") == 0) {
-                            if (LCaseParentName == GenericController.vbLCase(testMenu.Name) && (menu.IsNavigator == testMenu.IsNavigator)) {
-                                Prefix = GetMenuNameSpace(core, menus, testMenu, UsedIDList + "," + menu.Guid);
-                                if (string.IsNullOrEmpty(Prefix)) {
-                                    returnAttr = ParentName;
-                                } else {
-                                    returnAttr = Prefix + "." + ParentName;
-                                }
-                                break;
-                            }
-                        }
-
-                    }
-                }
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-                throw;
-            }
-            return returnAttr;
-        }
-        //
-        //====================================================================================================
-        //
-        public static void exportApplicationCDefXml(CoreController core, string privateFilesPathFilename, bool IncludeBaseFields) {
-            try {
-                CollectionXmlController XML = new CollectionXmlController(core);
-                string Content = XML.getApplicationCollectionXml(IncludeBaseFields);
-                core.privateFiles.saveFile(privateFilesPathFilename, Content);
-                XML = null;
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-                throw;
-            }
-        }
-        //
-        //====================================================================================================
-        //
+        /// <param name="core"></param>
+        /// <param name="workingPath"></param>
+        /// <param name="CollectionGuid"></param>
+        /// <param name="return_CollectionLastChangeDate"></param>
+        /// <param name="return_ErrorMessage"></param>
+        /// <returns></returns>
         private static bool downloadCollectionFiles(CoreController core, string workingPath, string CollectionGuid, ref DateTime return_CollectionLastChangeDate, ref string return_ErrorMessage) {
             bool tempDownloadCollectionFiles = false;
             tempDownloadCollectionFiles = false;
@@ -725,8 +121,9 @@ namespace Contensive.Processor.Controllers {
                                                     Collectionname = CDefInterfaces.InnerText;
                                                     break;
                                                 case "help":
-                                                    //CollectionHelp = CDefInterfaces.innerText
-                                                    core.privateFiles.saveFile(workingPath + "Collection.hlp", CDefInterfaces.InnerText);
+                                                    if (!string.IsNullOrWhiteSpace(CDefInterfaces.InnerText)) {
+                                                        core.privateFiles.saveFile(workingPath + "Collection.hlp", CDefInterfaces.InnerText);
+                                                    }
                                                     break;
                                                 case "guid":
                                                     CollectionGuid = CDefInterfaces.InnerText;
@@ -807,8 +204,20 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //====================================================================================================
-        //
-        public static bool installCollectionFromRemoteRepo(CoreController core, string collectionGuid, ref string return_ErrorMessage, string ImportFromCollectionsGuidList, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> installedCollections) {
+        /// <summary>
+        /// install a collection given its guid. Will download if needed.
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="collectionGuid"></param>
+        /// <param name="return_ErrorMessage"></param>
+        /// <param name="ImportFromCollectionsGuidList"></param>
+        /// <param name="IsNewBuild"></param>
+        /// <param name="repair"></param>
+        /// <param name="nonCriticalErrorList"></param>
+        /// <param name="logPrefix"></param>
+        /// <param name="blockCollectionList"></param>
+        /// <returns></returns>
+        public static bool installCollectionFromRemoteRepo(CoreController core, string collectionGuid, ref string return_ErrorMessage, string ImportFromCollectionsGuidList, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> blockCollectionList) {
             bool UpgradeOK = true;
             try {
                 if (string.IsNullOrWhiteSpace(collectionGuid)) {
@@ -853,7 +262,7 @@ namespace Contensive.Processor.Controllers {
                     // Upgrade the server from the collection files
                     //
                     if (UpgradeOK) {
-                        UpgradeOK = installCollectionFromLocalRepo(core, collectionGuid, core.siteProperties.dataBuildVersion, ref return_ErrorMessage, ImportFromCollectionsGuidList, IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollections);
+                        UpgradeOK = installCollectionFromLocalRepo(core, collectionGuid, core.siteProperties.dataBuildVersion, ref return_ErrorMessage, ImportFromCollectionsGuidList, IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref blockCollectionList);
                         if (!UpgradeOK) {
                             //UpgradeOK = UpgradeOK;
                         }
@@ -867,16 +276,10 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //====================================================================================================
-        public static bool installCollectionFromRemoteRepo(CoreController core, string CollectionGuid, ref string return_ErrorMessage, string ImportFromCollectionsGuidList, bool IsNewBuild, bool repair, string logPrefix, ref List<string> installedCollections) {
-            var tmpList = new List<string> { };
-            return installCollectionFromRemoteRepo(core, CollectionGuid, ref return_ErrorMessage,ImportFromCollectionsGuidList, IsNewBuild, repair, ref tmpList, logPrefix, ref installedCollections);
-        }
-        //
-        //====================================================================================================
         /// <summary>
         /// Upgrades all collections, registers and resets the server if needed
         /// </summary>
-        public static bool upgradeLocalCollectionRepoFromRemoteCollectionRepo(CoreController core, ref string return_ErrorMessage, ref string return_RegisterList, ref bool return_IISResetRequired, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> installedCollections) {
+        public static bool upgradeLocalCollectionRepoFromRemoteCollectionRepo(CoreController core, ref string return_ErrorMessage, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> blockCollectionList) {
             bool returnOk = true;
             try {
                 bool localCollectionUpToDate = false;
@@ -1028,7 +431,7 @@ namespace Contensive.Processor.Controllers {
                                                                             // Upgrade the apps from the collection files, do not install on any apps
                                                                             //
                                                                             if (returnOk) {
-                                                                                returnOk = installCollectionFromLocalRepo(core, LibGUID, core.siteProperties.dataBuildVersion, ref return_ErrorMessage, "", IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollections);
+                                                                                returnOk = installCollectionFromLocalRepo(core, LibGUID, core.siteProperties.dataBuildVersion, ref return_ErrorMessage, "", IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref blockCollectionList);
                                                                             }
                                                                             //
                                                                             // make sure this issue is logged and clear the flag to let other local collections install
@@ -1063,51 +466,6 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                 };
-                //collectionServerXml = getLocalCollectionStoreListXml(core);
-                //if (!string.IsNullOrEmpty(collectionServerXml)) {
-                //    LocalCollections = new XmlDocument();
-                //    try {
-                //        LocalCollections.LoadXml(collectionServerXml);
-                //    } catch (Exception) {
-                //        Copy = "Error loading privateFiles\\addons\\Collections.xml";
-                //        logController.appendLogInstall(core, Copy);
-                //        return_ErrorMessage = return_ErrorMessage + "<P>" + Copy + "</P>";
-                //        returnOk = false;
-                //    }
-                //    if (returnOk) {
-                //        if (genericController.vbLCase(LocalCollections.DocumentElement.Name) != genericController.vbLCase(CollectionListRootNode)) {
-                //            Copy = "The addons\\Collections.xml has an invalid root node, [" + LocalCollections.DocumentElement.Name + "] was received and [" + CollectionListRootNode + "] was expected.";
-                //            logController.appendLogInstall(core, Copy);
-                //            return_ErrorMessage = return_ErrorMessage + "<P>" + Copy + "</P>";
-                //            returnOk = false;
-                //        } else {
-                //            //
-                //            // Get a list of the collection guids on this server
-                //            //
-
-                //            GuidCnt = 0;
-                //            if (genericController.vbLCase(LocalCollections.DocumentElement.Name) == "collectionlist") {
-                //                foreach (XmlNode LocalListNode in LocalCollections.DocumentElement.ChildNodes) {
-                //                    switch (genericController.vbLCase(LocalListNode.Name)) {
-                //                        case "collection":
-                //                            foreach (XmlNode CollectionNode in LocalListNode.ChildNodes) {
-                //                                if (genericController.vbLCase(CollectionNode.Name) == "guid") {
-                //                                    Array.Resize(ref GuidArray, GuidCnt + 1);
-                //                                    GuidArray[GuidCnt] = CollectionNode.InnerText;
-                //                                    GuidCnt = GuidCnt + 1;
-                //                                    break;
-                //                                }
-                //                            }
-                //                            break;
-                //                    }
-                //                }
-                //            }
-
-
-
-                //        }
-                //    }
-                //}
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
@@ -1522,15 +880,18 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Upgrade Application from a local collection
         /// </summary>
-        public static bool installCollectionFromLocalRepo(CoreController core, string CollectionGuid, string ignore_BuildVersion, ref string return_ErrorMessage, string ImportFromCollectionsGuidList, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> installedCollections) {
-            bool result = true;
+        public static bool installCollectionFromLocalRepo(CoreController core, string CollectionGuid, string ignore_BuildVersion, ref string return_ErrorMessage, string ImportFromCollectionsGuidList, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> blockCollectionList) {
+            bool result = false;
             try {
+                //
+                LogController.logInfo(core, "installCollectionFromLocalRep [" + CollectionGuid + "]");
+                //
                 string CollectionVersionFolderName = "";
                 DateTime CollectionLastChangeDate = default(DateTime);
                 string tempVar = "";
                 getCollectionConfig(core, CollectionGuid, ref CollectionVersionFolderName, ref CollectionLastChangeDate, ref tempVar);
                 if (string.IsNullOrEmpty(CollectionVersionFolderName)) {
-                    result = false;
+                    LogController.logInfo(core, "installCollectionFromLocalRep [" + CollectionGuid + "], collection folder not found.");
                     return_ErrorMessage = return_ErrorMessage + "<P>The collection was not installed from the local collections because the folder containing the Add-on's resources could not be found. It may not be installed locally.</P>";
                 } else {
                     //
@@ -1539,7 +900,7 @@ namespace Contensive.Processor.Controllers {
                     string CollectionVersionFolder = core.addon.getPrivateFilesAddonPath() + CollectionVersionFolderName + "\\";
                     List<FileDetail> srcFileInfoArray = core.privateFiles.getFileList(CollectionVersionFolder);
                     if (srcFileInfoArray.Count == 0) {
-                        result = false;
+                        LogController.logInfo(core, "installCollectionFromLocalRep [" + CollectionGuid + "], collection folder is empty.");
                         return_ErrorMessage = return_ErrorMessage + "<P>The collection was not installed because the folder containing the Add-on's resources was empty.</P>";
                     } else {
                         //
@@ -1548,12 +909,14 @@ namespace Contensive.Processor.Controllers {
                         foreach (FileDetail file in srcFileInfoArray) {
                             if (file.Extension.ToLowerInvariant() == "dll") {
                                 if (!assembliesInZip.Contains(file.Name.ToLowerInvariant())) {
+                                    LogController.logInfo(core, "installCollectionFromLocalRep [" + CollectionGuid + "], adding DLL from folder[" + file.Name.ToLowerInvariant() + "].");
                                     assembliesInZip.Add(file.Name.ToLowerInvariant());
                                 }
                             }
                         }
                         //
                         // -- Process the other files
+                        LogController.logInfo(core, "installCollectionFromLocalRep [" + CollectionGuid + "], process xml files.");
                         bool CollectionblockNavigatorNode_fileValueOK = false;
                         foreach (FileDetail file in srcFileInfoArray) {
                             if (file.Extension == ".xml") {
@@ -1569,9 +932,7 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     // error - Need a way to reach the user that submitted the file
                                     //
-                                    LogController.logInfo(core, "There was an error reading the Meta data file [" + core.privateFiles.localAbsRootPath + CollectionVersionFolder + file.Name + "].");
-                                    result = false;
-                                    return_ErrorMessage = return_ErrorMessage + "<P>The collection was not installed because the xml collection file has an error</P>";
+                                    LogController.logInfo(core, "installCollectionFromLocalRep, skipping xml file, not valid collection metadata, [" + core.privateFiles.localAbsRootPath + CollectionVersionFolder + file.Name + "].");
                                     loadOK = false;
                                 }
                                 if (loadOK) {
@@ -1588,8 +949,7 @@ namespace Contensive.Processor.Controllers {
                                             // ----- Error condition -- it must have a collection name
                                             //
                                             //Call AppendAddonLog("UpgradeAppFromLocalCollection, collection has no name")
-                                            LogController.logInfo(core, "UpgradeAppFromLocalCollection, collection has no name");
-                                            result = false;
+                                            LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], collection has no name");
                                             return_ErrorMessage = return_ErrorMessage + "<P>The collection was not installed because the collection name in the xml collection file is blank</P>";
                                         } else {
                                             bool CollectionSystem_fileValueOK = false;
@@ -1607,8 +967,7 @@ namespace Contensive.Processor.Controllers {
                                                 //
                                                 //
                                                 //
-                                                result = false;
-                                                LogController.logInfo(core, "Local Collection file contains a different GUID for [" + Collectionname + "] then Collections.xml");
+                                                LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], Collection file contains incorrect GUID, correct GUID [" + CollectionGuid.ToLowerInvariant() + "], incorrect GUID in file [" + GenericController.vbLCase(FileGuid) + "]");
                                                 return_ErrorMessage = return_ErrorMessage + "<P>The collection was not installed because the unique number identifying the collection, called the guid, does not match the collection requested.</P>";
                                             } else {
                                                 if (string.IsNullOrEmpty(CollectionGuid)) {
@@ -1620,14 +979,13 @@ namespace Contensive.Processor.Controllers {
                                                 string onInstallAddonGuid = "";
                                                 //
                                                 //-------------------------------------------------------------------------------
-                                                LogController.logInfo(core, "installCollection [" + Collectionname + "], stage-1, save resourses and process collection dependencies");
+                                                LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], stage-1, save resourses and process collection dependencies");
                                                 // Go through all collection nodes
                                                 // Process ImportCollection Nodes - so includeaddon nodes will work
                                                 // these must be processes regardless of the state of this collection in this app
                                                 // Get Resource file list
                                                 //-------------------------------------------------------------------------------
                                                 //
-                                                //CollectionAddOnCnt = 0
                                                 string wwwFileList = "";
                                                 string ContentFileList = "";
                                                 string ExecFileList = "";
@@ -1641,7 +999,7 @@ namespace Contensive.Processor.Controllers {
                                                                 string resourcePath = XmlController.GetXMLAttribute(core, IsFound, CDefSection, "path", "");
                                                                 string filename = XmlController.GetXMLAttribute(core, IsFound, CDefSection, "name", "");
                                                                 //
-                                                                LogController.logInfo(core, "install collection [" + Collectionname + "], pass 1, resource found, name [" + filename + "], type [" + resourceType + "], path [" + resourcePath + "]");
+                                                                LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], resource found, name [" + filename + "], type [" + resourceType + "], path [" + resourcePath + "]");
                                                                 //
                                                                 filename = GenericController.convertToDosSlash(filename);
                                                                 string SrcPath = "";
@@ -1674,20 +1032,20 @@ namespace Contensive.Processor.Controllers {
                                                                 switch (resourceType.ToLowerInvariant()) {
                                                                     case "www":
                                                                         wwwFileList += "\r\n" + dstDosPath + filename;
-                                                                        LogController.logInfo(core, "install collection [" + Collectionname + "], GUID [" + CollectionGuid + "], pass 1, copying file to www, src [" + CollectionVersionFolder + SrcPath + "], dst [" + core.appConfig.localWwwPath + dstDosPath + "].");
+                                                                        LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], GUID [" + CollectionGuid + "], pass 1, copying file to www, src [" + CollectionVersionFolder + SrcPath + "], dst [" + core.appConfig.localWwwPath + dstDosPath + "].");
                                                                         core.privateFiles.copyFile(CollectionVersionFolder + SrcPath + filename, dstDosPath + filename, core.appRootFiles);
                                                                         if (GenericController.vbLCase(filename.Substring(filename.Length - 4)) == ".zip") {
-                                                                            LogController.logInfo(core, "install collection [" + Collectionname + "], GUID [" + CollectionGuid + "], pass 1, unzipping www file [" + core.appConfig.localWwwPath + dstDosPath + filename + "].");
+                                                                            LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], GUID [" + CollectionGuid + "], pass 1, unzipping www file [" + core.appConfig.localWwwPath + dstDosPath + filename + "].");
                                                                             core.appRootFiles.UnzipFile(dstDosPath + filename);
                                                                         }
                                                                         break;
                                                                     case "file":
                                                                     case "content":
                                                                         ContentFileList += "\r\n" + dstDosPath + filename;
-                                                                        LogController.logInfo(core, "install collection [" + Collectionname + "], GUID [" + CollectionGuid + "], pass 1, copying file to content, src [" + CollectionVersionFolder + SrcPath + "], dst [" + dstDosPath + "].");
+                                                                        LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], GUID [" + CollectionGuid + "], pass 1, copying file to content, src [" + CollectionVersionFolder + SrcPath + "], dst [" + dstDosPath + "].");
                                                                         core.privateFiles.copyFile(CollectionVersionFolder + SrcPath + filename, dstDosPath + filename, core.cdnFiles);
                                                                         if (GenericController.vbLCase(filename.Substring(filename.Length - 4)) == ".zip") {
-                                                                            LogController.logInfo(core, "install collection [" + Collectionname + "], GUID [" + CollectionGuid + "], pass 1, unzipping content file [" + dstDosPath + filename + "].");
+                                                                            LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], GUID [" + CollectionGuid + "], pass 1, unzipping content file [" + dstDosPath + filename + "].");
                                                                             core.cdnFiles.UnzipFile(dstDosPath + filename);
                                                                         }
                                                                         break;
@@ -1715,10 +1073,9 @@ namespace Contensive.Processor.Controllers {
                                                                     //
                                                                     // circular import detected, this collection is already imported
                                                                     //
-                                                                    LogController.logInfo(core, "Circular import detected. This collection attempts to import a collection that had previously been imported. A collection can not import itself. The collection is [" + Collectionname + "], GUID [" + CollectionGuid + "], pass 1. The collection to be imported is [" + ChildCollectionName + "], GUID [" + ChildCollectionGUID + "]");
+                                                                    LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], Circular import detected. This collection attempts to import a collection that had previously been imported. A collection can not import itself. The collection is [" + Collectionname + "], GUID [" + CollectionGuid + "], pass 1. The collection to be imported is [" + ChildCollectionName + "], GUID [" + ChildCollectionGUID + "]");
                                                                 } else {
-                                                                    LogController.logInfo(core, "install collection [" + Collectionname + "], pass 1, import collection found, name [" + ChildCollectionName + "], guid [" + ChildCollectionGUID + "]");
-                                                                    installCollectionFromRemoteRepo(core, ChildCollectionGUID, ref return_ErrorMessage, ImportFromCollectionsGuidList, IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollections);
+                                                                    installCollectionFromRemoteRepo(core, ChildCollectionGUID, ref return_ErrorMessage, ImportFromCollectionsGuidList, IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref blockCollectionList);
                                                                     //if (true) {
                                                                     //    installCollectionFromRemoteRepo(core, ChildCollectionGUID, ref return_ErrorMessage, ImportFromCollectionsGuidList, IsNewBuild, ref nonCriticalErrorList);
                                                                     //} else {
@@ -1757,7 +1114,7 @@ namespace Contensive.Processor.Controllers {
                                                 }
                                                 //
                                                 //-------------------------------------------------------------------------------
-                                                LogController.logInfo(core, "installCollection [" + Collectionname + "], stage-2, determine if this collection is already installed");
+                                                LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], stage-2, determine if this collection is already installed");
                                                 //-------------------------------------------------------------------------------
                                                 //
                                                 bool OKToInstall = false;
@@ -1767,16 +1124,16 @@ namespace Contensive.Processor.Controllers {
                                                     // Upgrade addon
                                                     //
                                                     if (CollectionLastChangeDate == DateTime.MinValue) {
-                                                        LogController.logInfo(core, "collection [" + Collectionname + "], GUID [" + CollectionGuid + "], App has the collection, but the new version has no lastchangedate, so it will upgrade to this unknown (manual) version.");
+                                                        LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], GUID [" + CollectionGuid + "], App has the collection, but the new version has no lastchangedate, so it will upgrade to this unknown (manual) version.");
                                                         OKToInstall = true;
                                                     } else if (collection.lastChangeDate < CollectionLastChangeDate) {
-                                                        LogController.logInfo(core, "install collection [" + Collectionname + "], GUID [" + CollectionGuid + "], App has an older version of collection. It will be upgraded.");
+                                                        LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], GUID [" + CollectionGuid + "], App has an older version of collection. It will be upgraded.");
                                                         OKToInstall = true;
                                                     } else if(repair) {
-                                                        LogController.logInfo(core, "install collection [" + Collectionname + "], GUID [" + CollectionGuid + "], App has an up-to-date version of collection, but the repair option is true so it will be reinstalled.");
+                                                        LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], GUID [" + CollectionGuid + "], App has an up-to-date version of collection, but the repair option is true so it will be reinstalled.");
                                                         OKToInstall = true;
                                                     } else {
-                                                        LogController.logInfo(core, "install collection [" + Collectionname + "], GUID [" + CollectionGuid + "], App has an up-to-date version of collection. It will not be upgraded, but all imports in the new version will be checked.");
+                                                        LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], GUID [" + CollectionGuid + "], App has an up-to-date version of collection. It will not be upgraded, but all imports in the new version will be checked.");
                                                         OKToInstall = false;
                                                     }
                                                 } else {
@@ -1784,7 +1141,7 @@ namespace Contensive.Processor.Controllers {
                                                     // Install new on this application
                                                     //
                                                     collection = AddonCollectionModel.addEmpty(core);
-                                                    LogController.logInfo(core, "install collection [" + Collectionname + "], GUID [" + CollectionGuid + "], App does not have this collection so it will be installed.");
+                                                    LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], GUID [" + CollectionGuid + "], App does not have this collection so it will be installed.");
                                                     OKToInstall = true;
                                                 }
                                                 string DataRecordList = "";
@@ -1796,7 +1153,7 @@ namespace Contensive.Processor.Controllers {
                                                 } else {
                                                     //
                                                     //-------------------------------------------------------------------------------
-                                                    LogController.logInfo(core, "installCollection [" + Collectionname + "], stage-3, prepare to import full collection");
+                                                    LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], stage-3, prepare to import full collection");
                                                     //-------------------------------------------------------------------------------
                                                     //
                                                     {
@@ -1843,12 +1200,11 @@ namespace Contensive.Processor.Controllers {
                                                     }
                                                     //
                                                     //-------------------------------------------------------------------------------
-                                                    LogController.logInfo(core, "installCollection [" + Collectionname + "], stage-4, isolate and process schema-relatednodes (cdef,index,etc)");
+                                                    LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], stage-4, isolate and process schema-relatednodes (cdef,index,etc)");
                                                     //-------------------------------------------------------------------------------
                                                     //
                                                     {
-                                                        string CollectionWrapper = "";
-                                                        LogController.logInfo(core, "install collection [" + Collectionname + "], pass 2");
+                                                        string CDefMiniCollection = "";
                                                         foreach (XmlNode CDefSection in Doc.DocumentElement.ChildNodes) {
                                                             switch (GenericController.vbLCase(CDefSection.Name)) {
                                                                 case "contensivecdef":
@@ -1856,7 +1212,7 @@ namespace Contensive.Processor.Controllers {
                                                                     // old cdef xection -- take the inner
                                                                     //
                                                                     foreach (XmlNode ChildNode in CDefSection.ChildNodes) {
-                                                                        CollectionWrapper += "\r\n" + ChildNode.OuterXml;
+                                                                        CDefMiniCollection += "\r\n" + ChildNode.OuterXml;
                                                                     }
                                                                     break;
                                                                 case "cdef":
@@ -1869,27 +1225,29 @@ namespace Contensive.Processor.Controllers {
                                                                 case "navigatorentry":
                                                                     //
                                                                     // handled by Upgrade class
-                                                                    CollectionWrapper += CDefSection.OuterXml;
+                                                                    CDefMiniCollection += CDefSection.OuterXml;
                                                                     break;
                                                             }
                                                         }
-                                                        if (!string.IsNullOrEmpty(CollectionWrapper)) {
+                                                        //
+                                                        // -- install CdefMiniCollection
+                                                        if (!string.IsNullOrEmpty(CDefMiniCollection)) {
                                                             //
                                                             // -- Use the upgrade code to import this part
-                                                            CollectionWrapper = "<" + CollectionFileRootNode + ">" + CollectionWrapper + "</" + CollectionFileRootNode + ">";
+                                                            CDefMiniCollection = "<" + CollectionFileRootNode + ">" + CDefMiniCollection + "</" + CollectionFileRootNode + ">";
                                                             bool isBaseCollection = (baseCollectionGuid.ToLowerInvariant() == CollectionGuid.ToLowerInvariant());
-                                                            installCollectionFromLocalRepo_BuildDbFromXmlData(core, CollectionWrapper, IsNewBuild, repair, isBaseCollection, ref nonCriticalErrorList, logPrefix, ref installedCollections);
+                                                            CDefMiniCollectionModel.installCDefMiniCollectionFromXml(false, core, CDefMiniCollection, IsNewBuild, repair, isBaseCollection, ref nonCriticalErrorList, logPrefix, ref blockCollectionList);
                                                             //
                                                             // -- Process nodes to save Collection data
                                                             XmlDocument NavDoc = new XmlDocument();
                                                             loadOK = true;
                                                             try {
-                                                                NavDoc.LoadXml(CollectionWrapper);
+                                                                NavDoc.LoadXml(CDefMiniCollection);
                                                             } catch (Exception) {
                                                                 //
                                                                 // error - Need a way to reach the user that submitted the file
                                                                 //
-                                                                LogController.logInfo(core, "Creating navigator entries, there was an error parsing the portion of the collection that contains cdef. Navigator entry creation was aborted. [There was an error reading the Meta data file.]");
+                                                                LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], creating navigator entries, there was an error parsing the portion of the collection that contains cdef. Navigator entry creation was aborted. [There was an error reading the Meta data file.]");
                                                                 result = false;
                                                                 return_ErrorMessage = return_ErrorMessage + "<P>The collection was not installed because the xml collection file has an error.</P>";
                                                                 loadOK = false;
@@ -1919,11 +1277,10 @@ namespace Contensive.Processor.Controllers {
                                                     }
                                                     //
                                                     //-------------------------------------------------------------------------------
-                                                    LogController.logInfo(core, "installCollection [" + Collectionname + "], stage-5, create data records from data nodes, ignore fields");
+                                                    LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], stage-5, create data records from data nodes, ignore fields");
                                                     //-------------------------------------------------------------------------------
                                                     //
                                                     {
-                                                        LogController.logInfo(core, "install collection [" + Collectionname + "], pass 3");
                                                         foreach (XmlNode CDefSection in Doc.DocumentElement.ChildNodes) {
                                                             switch (GenericController.vbLCase(CDefSection.Name)) {
                                                                 case "data": {
@@ -1938,14 +1295,14 @@ namespace Contensive.Processor.Controllers {
                                                                                 //
                                                                                 string ContentName = XmlController.GetXMLAttribute(core, IsFound, ContentNode, "content", "");
                                                                                 if (string.IsNullOrEmpty(ContentName)) {
-                                                                                    LogController.logInfo(core, "install collection file contains a data.record node with a blank content attribute.");
+                                                                                    LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], install collection file contains a data.record node with a blank content attribute.");
                                                                                     result = false;
                                                                                     return_ErrorMessage = return_ErrorMessage + "<P>Collection file contains a data.record node with a blank content attribute.</P>";
                                                                                 } else {
                                                                                     string ContentRecordGuid = XmlController.GetXMLAttribute(core, IsFound, ContentNode, "guid", "");
                                                                                     string ContentRecordName = XmlController.GetXMLAttribute(core, IsFound, ContentNode, "name", "");
                                                                                     if ((string.IsNullOrEmpty(ContentRecordGuid)) && (string.IsNullOrEmpty(ContentRecordName))) {
-                                                                                        LogController.logInfo(core, "install collection file contains a data record node with neither guid nor name. It must have either a name or a guid attribute. The content is [" + ContentName + "]");
+                                                                                        LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], install collection file contains a data record node with neither guid nor name. It must have either a name or a guid attribute. The content is [" + ContentName + "]");
                                                                                         result = false;
                                                                                         return_ErrorMessage = return_ErrorMessage + "<P>The collection was not installed because the Collection file contains a data record node with neither name nor guid. This is not allowed. The content is [" + ContentName + "].</P>";
                                                                                     } else {
@@ -2004,7 +1361,7 @@ namespace Contensive.Processor.Controllers {
                                                     }
                                                     //
                                                     //-------------------------------------------------------------------------------
-                                                    LogController.logInfo(core, "installCollection [" + Collectionname + "], stage-6, install addon nodes, set importcollection relationships");
+                                                    LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], stage-6, install addon nodes, set importcollection relationships");
                                                     //-------------------------------------------------------------------------------
                                                     //
                                                     foreach (XmlNode CDefSection in Doc.DocumentElement.ChildNodes) {
@@ -2217,7 +1574,7 @@ namespace Contensive.Processor.Controllers {
                                                     }
                                                     //
                                                     //-------------------------------------------------------------------------------
-                                                    LogController.logInfo(core, "installCollection [" + Collectionname + "], stage-7, set addon dependency relationships");
+                                                    LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], stage-7, set addon dependency relationships");
                                                     //-------------------------------------------------------------------------------
                                                     //
                                                     foreach (XmlNode collectionNode in Doc.DocumentElement.ChildNodes) {
@@ -2247,7 +1604,7 @@ namespace Contensive.Processor.Controllers {
                                                     }
                                                     //
                                                     //-------------------------------------------------------------------------------
-                                                    LogController.logInfo(core, "installCollection [" + Collectionname + "], stage-8, process data nodes, set record fields");
+                                                    LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], stage-8, process data nodes, set record fields");
                                                     //-------------------------------------------------------------------------------
                                                     //
                                                     foreach (XmlNode CDefSection in Doc.DocumentElement.ChildNodes) {
@@ -2257,7 +1614,7 @@ namespace Contensive.Processor.Controllers {
                                                                     if (ContentNode.Name.ToLowerInvariant() == "record") {
                                                                         string ContentName =XmlController.GetXMLAttribute(core, IsFound, ContentNode, "content", "");
                                                                         if (string.IsNullOrEmpty(ContentName)) {
-                                                                            LogController.logInfo(core, "install collection file contains a data.record node with a blank content attribute.");
+                                                                            LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], install collection file contains a data.record node with a blank content attribute.");
                                                                             result = false;
                                                                             return_ErrorMessage = return_ErrorMessage + "<P>Collection file contains a data.record node with a blank content attribute.</P>";
                                                                         } else {
@@ -2368,12 +1725,13 @@ namespace Contensive.Processor.Controllers {
                                                         core.addon.execute(addon, executeContext);
                                                     }
                                                 }
+                                                //
+                                                LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], upgrade complete, flush cache");
+                                                //
+                                                // -- import complete, flush caches
+                                                core.cache.invalidateAll();
+                                                result = true; ;
                                             }
-                                            //
-                                            LogController.logInfo(core, "install collection [" + Collectionname + "], upgrade complete, flush cache");
-                                            //
-                                            // -- import complete, flush caches
-                                            core.cache.invalidateAll();
                                         }
                                     }
                                 }
@@ -2579,13 +1937,13 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Installs Addons in a source folder
         /// </summary>
-        public static bool installCollectionsFromPrivateFolder(CoreController core, string privateFolder, ref string return_ErrorMessage, ref List<string> return_CollectionGUIDList, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> installedCollections) {
+        public static bool installCollectionsFromPrivateFolder(CoreController core, string installPrivatePath, ref string return_ErrorMessage, ref List<string> return_CollectionGUIDList, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> blockCollectionList) {
             bool returnSuccess = false;
             try {
                 DateTime CollectionLastChangeDate;
                 //
                 CollectionLastChangeDate = DateTime.Now;
-                returnSuccess = buildLocalCollectionReposFromFolder(core, privateFolder, CollectionLastChangeDate, ref return_CollectionGUIDList, ref return_ErrorMessage, false);
+                returnSuccess = buildLocalCollectionReposFromFolder(core, installPrivatePath, CollectionLastChangeDate, ref return_CollectionGUIDList, ref return_ErrorMessage, false);
                 if (!returnSuccess) {
                     //
                     // BuildLocal failed, log it and do not upgrade
@@ -2593,7 +1951,7 @@ namespace Contensive.Processor.Controllers {
                     LogController.logInfo(core, "BuildLocalCollectionFolder returned false with Error Message [" + return_ErrorMessage + "], exiting without calling UpgradeAllAppsFromLocalCollection");
                 } else {
                     foreach (string collectionGuid in return_CollectionGUIDList) {
-                        if (!installCollectionFromLocalRepo(core, collectionGuid, core.siteProperties.dataBuildVersion, ref return_ErrorMessage, "", IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollections)) {
+                        if (!installCollectionFromLocalRepo(core, collectionGuid, core.siteProperties.dataBuildVersion, ref return_ErrorMessage, "", IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref blockCollectionList)) {
                             LogController.logInfo(core, "UpgradeAllAppsFromLocalCollection returned false with Error Message [" + return_ErrorMessage + "].");
                             break;
                         }
@@ -2613,7 +1971,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Installs Addons in a source file
         /// </summary>
-        public static bool installCollectionsFromPrivateFile(CoreController core, string pathFilename, ref string return_ErrorMessage, ref string return_CollectionGUID, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> installedCollections) {
+        public static bool installCollectionsFromPrivateFile(CoreController core, string pathFilename, ref string return_ErrorMessage, ref string return_CollectionGUID, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> blockCollectionList) {
             bool returnSuccess = false;
             try {
                 DateTime CollectionLastChangeDate;
@@ -2626,7 +1984,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     LogController.logInfo(core, "BuildLocalCollectionFolder returned false with Error Message [" + return_ErrorMessage + "], exiting without calling UpgradeAllAppsFromLocalCollection");
                 } else {
-                    returnSuccess = installCollectionFromLocalRepo(core, return_CollectionGUID, core.siteProperties.dataBuildVersion, ref return_ErrorMessage, "", IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollections);
+                    returnSuccess = installCollectionFromLocalRepo(core, return_CollectionGUID, core.siteProperties.dataBuildVersion, ref return_ErrorMessage, "", IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref blockCollectionList);
                     if (!returnSuccess) {
                         //
                         // Upgrade all apps failed
@@ -3477,7 +2835,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Import CDef on top of current configuration and the base configuration
         /// </summary>
-        public static void installBaseCollection(CoreController core, bool isNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> installedCollections) {
+        public static void installBaseCollection(CoreController core, bool isNewBuild, bool isRepairMode, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> blockCollectionList) {
             try {
                 //
                 // -- new build
@@ -3487,105 +2845,25 @@ namespace Contensive.Processor.Controllers {
                 if (string.IsNullOrEmpty(baseCollectionXml)) {
                     //
                     // -- base collection notfound
-                    throw new ApplicationException("Cannot load aoBase5.xml [" + core.programFiles.localAbsRootPath + "aoBase5.xml]");
+                    throw new ApplicationException("Cannot load [" + core.programFiles.localAbsRootPath + "aoBase5.xml]");
                 } else {
-                    LogController.logInfo(core, "Verify base collection -- new build");
-                    CDefMiniCollectionModel baseCollection = CDefMiniCollectionModel.installCDefMiniCollection_LoadXml(core, baseCollectionXml, true, true, isNewBuild, new CDefMiniCollectionModel(), logPrefix, ref installedCollections);
-                    CDefMiniCollectionModel.installCDefMiniCollection_BuildDb(core, baseCollection, core.siteProperties.dataBuildVersion, isNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollections);
+                    {
+                        //
+                        // -- Special Case - must install base collection cdef first because it builds the system that the system needs to do everything else
+                        LogController.logInfo(core, "installBaseCollection, install CDef first to verify system requirements");
+                        CDefMiniCollectionModel.installCDefMiniCollectionFromXml(true, core, baseCollectionXml, isNewBuild, true, isRepairMode, ref nonCriticalErrorList, logPrefix, ref blockCollectionList);
+                    }
                     //
                     // now treat as a regular collection and install - to pickup everything else 
-                    string tmpFolderPath = "installBaseCollection" + GenericController.GetRandomInteger(core).ToString() + "\\";
-                    core.privateFiles.createPath(tmpFolderPath);
-                    core.programFiles.copyFile(baseCollectionFilename, tmpFolderPath + baseCollectionFilename, core.privateFiles);
-                    List<string> ignoreList = new List<string>();
-                    string returnErrorMessage = "";
-                    if (!installCollectionsFromPrivateFolder(core, tmpFolderPath, ref returnErrorMessage, ref ignoreList, isNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollections)) {
-                        throw new ApplicationException(returnErrorMessage);
+                    string installPrivatePath = "installBaseCollection" + GenericController.GetRandomInteger(core).ToString() + "\\";
+                    core.privateFiles.createPath(installPrivatePath);
+                    core.programFiles.copyFile(baseCollectionFilename, installPrivatePath + baseCollectionFilename, core.privateFiles);
+                    List<string> installedCollectionGuidList = new List<string>();
+                    string installErrorMessage = "";
+                    if (!installCollectionsFromPrivateFolder(core, installPrivatePath, ref installErrorMessage, ref installedCollectionGuidList, isNewBuild, isRepairMode, ref nonCriticalErrorList, logPrefix, ref blockCollectionList)) {
+                        throw new ApplicationException(installErrorMessage);
                     }
-                    core.privateFiles.deleteFolder(tmpFolderPath);
-                }
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-                throw;
-            }
-        }
-        //
-        //======================================================================================================
-        //
-        public static void installCollectionFromLocalRepo_BuildDbFromXmlData(CoreController core, string XMLText, bool isNewBuild, bool repair, bool isBaseCollection, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> installedCollections) {
-            try {
-                //
-                LogController.logInfo(core, "Application: " + core.appConfig.name);
-                //
-                // ----- Import any CDef files, allowing for changes
-                CDefMiniCollectionModel miniCollectionToAdd = new CDefMiniCollectionModel();
-                CDefMiniCollectionModel miniCollectionWorking = installCollection_GetApplicationMiniCollection(core, isNewBuild, logPrefix, ref installedCollections);
-                miniCollectionToAdd = CDefMiniCollectionModel.installCDefMiniCollection_LoadXml(core, XMLText, isBaseCollection, false, isNewBuild, miniCollectionWorking, logPrefix, ref installedCollections);
-                addMiniCollectionSrcToDst(core, ref miniCollectionWorking, miniCollectionToAdd);
-                CDefMiniCollectionModel.installCDefMiniCollection_BuildDb(core, miniCollectionWorking, core.siteProperties.dataBuildVersion, isNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollections );
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-                throw;
-            }
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Update a table from a collection cdef node
-        /// </summary>
-        internal static void installCollection_BuildDbFromCollection_UpdateDbFromCDef(CoreController core, Models.Domain.CDefModel cdef, string BuildVersion) {
-            try {
-                //
-                LogController.logInfo(core, "Update db cdef [" + cdef.name + "]");
-                //
-                // -- get contentid and protect content with IsBaseContent true
-                { 
-                    if (cdef.dataChanged) {
-                        //
-                        // -- update definition (use SingleRecord as an update flag)
-                        var datasource = DataSourceModel.createByUniqueName(core, cdef.dataSourceName);
-                        CdefController.verifyContent_returnId(core, cdef);
-                    }
-                    //
-                    // -- update Content Field Records and Content Field Help records
-                    CDefModel cdefFieldHelp = CDefModel.create(core, ContentFieldHelpModel.contentName);
-                    foreach (var nameValuePair in cdef.fields) {
-                        CDefFieldModel field = nameValuePair.Value;
-                        int fieldId = 0;
-                        if (field.dataChanged) {
-                            fieldId = CdefController.verifyContentField_returnID(core, cdef.name, field);
-                        }
-                        //
-                        // -- update content field help records
-                        if (field.HelpChanged) {
-                            //int FieldHelpID = 0;
-                            ContentFieldHelpModel fieldHelp = null;
-                            var fieldHelpList = ContentFieldHelpModel.createList(core, "fieldid=" + fieldId);
-                            if (fieldHelpList.Count == 0) {
-                                //
-                                // -- no current field help record, if adding help, create record
-                                if ( (!string.IsNullOrWhiteSpace(field.helpDefault)) || (!string.IsNullOrWhiteSpace(field.helpCustom)) ) {
-                                    fieldHelp = ContentFieldHelpModel.addEmpty(core);
-                                    fieldHelp.helpDefault = field.helpDefault;
-                                    fieldHelp.helpCustom = field.helpCustom;
-                                    fieldHelp.save(core);
-
-                                }
-                            } else {
-                                //
-                                // -- if help changed, save it
-                                fieldHelp = fieldHelpList.First();
-                                if ((!fieldHelp.helpCustom.Equals(field.helpCustom))| !fieldHelp.helpDefault.Equals(field.helpDefault)) {
-                                    fieldHelp.helpDefault = field.helpDefault;
-                                    fieldHelp.helpCustom = field.helpCustom;
-                                    fieldHelp.save(core);
-                                }
-                            }
-                        }
-                    }
-                    //
-                    // -- save changes
-                    //content.save(core, true);
+                    core.privateFiles.deleteFolder(installPrivatePath);
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);

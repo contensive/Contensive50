@@ -341,7 +341,7 @@ namespace Contensive.Addons.AdminSite {
                         }
                         //
                         string EditSectionButtonBar = AdminUIController.getButtonBarForEdit(core, new EditButtonBarInfoClass() {
-                            allowActivate = !EmailSubmitted & ((LastSendTestDate != DateTime.MinValue) | AllowEmailSendWithoutTest),
+                            allowActivate = !EmailSubmitted & ((LastSendTestDate != DateTime.MinValue) || AllowEmailSendWithoutTest),
                             allowDeactivate = EmailSubmitted,
                             allowAdd = allowAdd && adminData.adminContent.allowAdd & adminData.editRecord.AllowInsert,
                             allowCancel = adminData.editRecord.AllowCancel,
@@ -380,16 +380,16 @@ namespace Contensive.Addons.AdminSite {
                             allowMarkReviewed = false,
                             allowRefresh = AllowRefresh,
                             allowSave = !EmailSubmitted & (allowSave && adminData.editRecord.AllowSave),
-                            allowSend = !EmailSubmitted & ((LastSendTestDate != DateTime.MinValue) | AllowEmailSendWithoutTest),
+                            allowSend = !EmailSubmitted & ((LastSendTestDate != DateTime.MinValue) || AllowEmailSendWithoutTest),
                             allowSendTest = !EmailSubmitted,
                             hasChildRecords = false,
                             isPageContent = false
                         });
                         Stream.Add(EditSectionButtonBar);
                         Stream.Add(AdminUIController.getTitleBar(core, getTitle(core,adminData), titleBarDetails));
-                        Stream.Add(getTabs(core, adminData, adminMenu, adminData.editRecord.Read_Only | EmailSubmitted || EmailSent, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
-                        Stream.Add(addTab(core, adminMenu, "Send&nbsp;To&nbsp;Groups", EmailRuleEditor.get(core, adminData, adminData.editRecord.Read_Only | EmailSubmitted || EmailSent), adminData.allowAdminTabs));
-                        Stream.Add(addTab(core, adminMenu, "Send&nbsp;To&nbsp;Topics", EmailTopicEditor.get(core, adminData, adminData.editRecord.Read_Only | EmailSubmitted || EmailSent), adminData.allowAdminTabs));
+                        Stream.Add(getTabs(core, adminData, adminMenu, adminData.editRecord.Read_Only || EmailSubmitted || EmailSent, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
+                        Stream.Add(addTab(core, adminMenu, "Send&nbsp;To&nbsp;Groups", EmailRuleEditor.get(core, adminData, adminData.editRecord.Read_Only || EmailSubmitted || EmailSent), adminData.allowAdminTabs));
+                        Stream.Add(addTab(core, adminMenu, "Send&nbsp;To&nbsp;Topics", EmailTopicEditor.get(core, adminData, adminData.editRecord.Read_Only || EmailSubmitted || EmailSent), adminData.allowAdminTabs));
                         Stream.Add(addTab(core, adminMenu, "Bounce&nbsp;Control", EmailBounceEditor.get(core, adminData), adminData.allowAdminTabs));
                         Stream.Add(addTab(core, adminMenu, "Control&nbsp;Info", ControlEditor.get(core, adminData), adminData.allowAdminTabs));
                         if (adminData.allowAdminTabs) Stream.Add(adminMenu.menuComboTab.GetTabs(core));
@@ -807,7 +807,7 @@ namespace Contensive.Addons.AdminSite {
                         }
                         //EditorStyleModifier = genericController.vbLCase(core.db.getFieldTypeNameFromFieldTypeId(fieldTypeId));
                         EditorString = "";
-                        editorReadOnly = (record_readOnly || field.readOnly | (editRecord.id != 0 & field.notEditable) || (field_readOnly));
+                        editorReadOnly = (record_readOnly || field.readOnly || (editRecord.id != 0 & field.notEditable) || (field_readOnly));
                         //
                         // Determine the editor: Contensive editor, field type default, or add-on preference
                         //

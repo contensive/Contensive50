@@ -110,7 +110,7 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 Name = core.docProperties.getText("name");
                                 SQL = core.docProperties.getText(SQLFieldName);
-                                if (!string.IsNullOrEmpty(Name) | !string.IsNullOrEmpty(SQL)) {
+                                if (!string.IsNullOrEmpty(Name) || !string.IsNullOrEmpty(SQL)) {
                                     if ((string.IsNullOrEmpty(Name)) || (string.IsNullOrEmpty(SQL))) {
                                         Processor.Controllers.ErrorController.addUserError(core, "A name and SQL Query are required to save a new custom report.");
                                     } else {

@@ -16,7 +16,7 @@ namespace Contensive.MonitorService {
         }
 
         private StatusServerClass serverStatus;
-        private siteCheckClass siteCheck;
+        //private siteCheckClass siteCheck;
         private CPClass cp;
 
         protected override void OnStart(string[] args) {

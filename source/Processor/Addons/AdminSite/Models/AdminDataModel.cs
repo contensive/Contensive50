@@ -1049,7 +1049,7 @@ namespace Contensive.Addons.AdminSite {
                             // 1/21/2007 - added clause if required and null, set to default value
                             //
                             object fieldValue = NullVariant;
-                            if (adminContentcontent.readOnly | adminContentcontent.notEditable) {
+                            if (adminContentcontent.readOnly || adminContentcontent.notEditable) {
                                 //
                                 // 202-31245: quick fix. The CS should handle this instead.
                                 // Workflowauthoring, If read only, use the live record data

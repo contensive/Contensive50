@@ -224,7 +224,7 @@
     <Compile Include="Controllers\TaskRunnerController.cs" />
     <Compile Include="Controllers\TaskSchedulerController.cs" />
     <Compile Include="Controllers\WorkflowController.cs" />
-    <Compile Include="Controllers\CollectionXmlController.cs" />
+    <Compile Include="Controllers\ApplicationCDefMiniCollection.cs" />
     <Compile Include="Controllers\XmlController.cs" />
     <Compile Include="Controllers\QuickEditController.cs" />
     <Compile Include="Controllers\CdefController.cs" />

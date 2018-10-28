@@ -66,7 +66,7 @@ namespace Contensive.Addons.SafeAddonManager {
                 string LocalCollectionXML = null;
                 bool DisplaySystem = false;
                 bool DbUpToDate = false;
-                CollectionXmlController XMLTools = new CollectionXmlController(core);
+                //CollectionXmlController XMLTools = new CollectionXmlController(core);
                 string GuidFieldName = null;
                 List<int> InstalledCollectionIDList = new List<int>();
                 List<string> InstalledCollectionGuidList = new List<string>();

@@ -664,7 +664,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- protocol
                 string linkprotocol = "";
-                if (core.doc.pageController.page.isSecure | core.doc.pageController.template.isSecure) {
+                if (core.doc.pageController.page.isSecure || core.doc.pageController.template.isSecure) {
                     linkprotocol = "https://";
                 } else {
                     linkprotocol = "http://";
@@ -1376,7 +1376,7 @@ namespace Contensive.Processor.Controllers {
                                         ErrorController.addUserError(core, "The field [" + tempVar.Caption + "] must be unique, and the value [" + HtmlController.encodeHtml(FormValue) + "] has already been used.");
                                     }
                                 }
-                                if ((tempVar.REquired | GenericController.encodeBoolean(CdefController.getContentFieldProperty(core, "people", tempVar.PeopleField, "required"))) && string.IsNullOrEmpty(FormValue)) {
+                                if ((tempVar.REquired || GenericController.encodeBoolean(CdefController.getContentFieldProperty(core, "people", tempVar.PeopleField, "required"))) && string.IsNullOrEmpty(FormValue)) {
                                     Success = false;
                                     ErrorController.addUserError(core, "The field [" + HtmlController.encodeHtml(tempVar.Caption) + "] is required.");
                                 } else {
@@ -1617,7 +1617,7 @@ namespace Contensive.Processor.Controllers {
                                 CSPeople = core.db.csOpenRecord("people", core.session.user.id);
                             }
                             Caption = tempVar.Caption;
-                            if (tempVar.REquired | GenericController.encodeBoolean(CdefController.getContentFieldProperty(core, "People", tempVar.PeopleField, "Required"))) {
+                            if (tempVar.REquired || GenericController.encodeBoolean(CdefController.getContentFieldProperty(core, "People", tempVar.PeopleField, "Required"))) {
                                 Caption = "*" + Caption;
                             }
                             if (core.db.csOk(CSPeople)) {
@@ -1692,7 +1692,7 @@ namespace Contensive.Processor.Controllers {
                 string BlockedRecordIDList = "";
                 if ((!string.IsNullOrEmpty(returnHtml)) && (core.doc.redirectLink == "")) {
                     foreach (PageContentModel testPage in core.doc.pageController.pageToRootList) {
-                        if (testPage.blockContent | testPage.blockPage) {
+                        if (testPage.blockContent || testPage.blockPage) {
                             BlockedRecordIDList = BlockedRecordIDList + "," + testPage.id;
                         }
                     }
@@ -1920,7 +1920,7 @@ namespace Contensive.Processor.Controllers {
                         //
                     } else {
                         int pageViewings = core.doc.pageController.page.Viewings;
-                        if (core.session.isEditing(PageContentModel.contentName) | core.visitProperty.getBoolean("AllowWorkflowRendering")) {
+                        if (core.session.isEditing(PageContentModel.contentName) || core.visitProperty.getBoolean("AllowWorkflowRendering")) {
                             //
                             // Link authoring, workflow rendering -> do encoding, but no tracking
                             //
@@ -2213,7 +2213,7 @@ namespace Contensive.Processor.Controllers {
                 ////
                 //if (true) {
                 //    string IconRow = "";
-                //    if ((!core.session.visit.Bot) && (core.doc.pageController.page.AllowPrinterVersion | core.doc.pageController.page.AllowEmailPage)) {
+                //    if ((!core.session.visit.Bot) && (core.doc.pageController.page.AllowPrinterVersion || core.doc.pageController.page.AllowEmailPage)) {
                 //        //
                 //        // not a bot, and either print or email allowed
                 //        //
@@ -2610,7 +2610,7 @@ namespace Contensive.Processor.Controllers {
                         link = GenericController.modifyLinkQuery(archiveLink, rnPageId, encodeText(childPage.id), true);
                     }
                     bool blockContentComposite = false;
-                    if (childPage.blockContent | childPage.blockPage) {
+                    if (childPage.blockContent || childPage.blockPage) {
                         blockContentComposite = !core.doc.bypassContentBlock(childPage.contentControlID, childPage.id);
                     }
                     string LinkedText = GenericController.csv_GetLinkedText("<a href=\"" + HtmlController.encodeHtml(link) + "\">", pageMenuHeadline);

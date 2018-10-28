@@ -480,7 +480,7 @@ namespace Contensive.Processor.Controllers {
             /// <param name="sharedSecret">A password used to generate a key for encryption.</param>
             public static string encryptStringAES(string plainText, string sharedSecret) {
                 string outStr = null;
-                if (string.IsNullOrEmpty(plainText) | string.IsNullOrEmpty(sharedSecret)) {
+                if (string.IsNullOrEmpty(plainText) || string.IsNullOrEmpty(sharedSecret)) {
                     outStr = "";
                 } else {
                     RijndaelManaged aesAlg = null;              // RijndaelManaged object used to encrypt the data.
@@ -525,7 +525,7 @@ namespace Contensive.Processor.Controllers {
             /// <param name="cipherText">The text to decrypt.</param>
             /// <param name="sharedSecret">A password used to generate a key for decryption.</param>
             public static string decryptStringAES(string cipherText, string sharedSecret) {
-                if (string.IsNullOrEmpty(cipherText) | string.IsNullOrEmpty(sharedSecret) | !cipherText.IsBase64String()) {
+                if (string.IsNullOrEmpty(cipherText) || string.IsNullOrEmpty(sharedSecret) || !cipherText.IsBase64String()) {
                     return "";
                 } else {
                     // Declare the RijndaelManaged object

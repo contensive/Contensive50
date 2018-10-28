@@ -568,7 +568,7 @@ namespace Contensive.Processor.Controllers {
                                 }
                                 //
                                 // -- Add Css containers
-                                if (!string.IsNullOrEmpty(ContainerCssID) | !string.IsNullOrEmpty(ContainerCssClass)) {
+                                if (!string.IsNullOrEmpty(ContainerCssID) || !string.IsNullOrEmpty(ContainerCssClass)) {
                                     if (addon.isInline) {
                                         result = "\r<span id=\"" + ContainerCssID + "\" class=\"" + ContainerCssClass + "\" style=\"display:inline;\">" + result + "</span>";
                                     } else {

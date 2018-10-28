@@ -1833,7 +1833,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 int ContentID = 0;
                 //
-                if (!string.IsNullOrEmpty(LinkPage) | LinkCID != 0) {
+                if (!string.IsNullOrEmpty(LinkPage) || (LinkCID != 0)) {
                     tempGetMenuLink = LinkPage;
                     if (!string.IsNullOrEmpty(tempGetMenuLink)) {
                         if (tempGetMenuLink.Left(1) == "?" || tempGetMenuLink.Left(1) == "#") {

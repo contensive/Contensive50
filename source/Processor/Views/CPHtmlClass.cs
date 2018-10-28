@@ -320,7 +320,7 @@ namespace Contensive.Processor {
         public override string adminHint(string innerHtml) {
             string returnString = innerHtml;
             try {
-                if (core.session.isEditingAnything() | core.session.user.Admin) {
+                if (core.session.isEditingAnything() || core.session.user.Admin) {
                     returnString = ""
                         + "<div class=\"ccHintWrapper\">"
                             + "<div  class=\"ccHintWrapperContent\">"
