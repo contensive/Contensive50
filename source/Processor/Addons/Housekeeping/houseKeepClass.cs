@@ -1626,8 +1626,6 @@ namespace Contensive.Addons.Housekeeping {
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
             }
-            //ErrorTrap:
-            //throw new GenericException("Unexpected exception");
         }
         //
         //====================================================================================================

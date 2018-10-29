@@ -1392,13 +1392,13 @@ namespace Contensive.Processor.Controllers {
             try {
                 pathFilename = normalizeDosPathFilename(pathFilename);
                 if (isLocal) {
-                    // not exception, can be used regardless of isLocal //throw new GenericException("copyLocalToRemote is not valid in a local File system [" + localAbsRootPath + "]");
+                    // not exception, if this method is called and the object is local, this should not be an error, but it should not execute all the code
                 } else {
                     if (fileExists_local(pathFilename)) {
                         string localDosPathFilename = GenericController.convertToDosSlash(pathFilename);
-                        // no, cannot change the case here
+                        //
+                        // -- no, cannot change the case here
                         string remoteUnixPathFilenameLowercase = GenericController.convertToUnixSlash(joinPath(remotePathPrefix, pathFilename));
-                        //string remoteUnixPathFilenameLowercase = genericController.convertToUnixSlash(joinPath(remotePathPrefix, pathFilename)).ToLowerInvariant();
                         verifyPath_remote(getPath(pathFilename));
                         //
                         // -- Setup request for putting an object in S3.
