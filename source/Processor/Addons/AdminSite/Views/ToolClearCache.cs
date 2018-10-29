@@ -1,10 +1,7 @@
-﻿using Contensive.Processor;
-using Contensive.Processor.Controllers;
+﻿
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Contensive.Processor;
+using Contensive.Processor.Controllers;
 
 namespace Contensive.Addons.AdminSite {
     class ToolClearCache {
