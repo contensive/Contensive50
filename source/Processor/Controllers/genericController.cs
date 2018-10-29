@@ -17,6 +17,7 @@ using System.Net;
 using System.Text;
 using Contensive.Processor.Models.Domain;
 using System.Web;
+using Contensive.Processor.Exceptions;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -195,7 +196,7 @@ namespace Contensive.Processor.Controllers {
                     tempmodifyLinkQuery = tempmodifyLinkQuery + "?" + QueryString;
                 }
             } catch (Exception ex) {
-                throw new ApplicationException("Exception in modifyLinkQuery", ex);
+                throw new GenericException("Exception in modifyLinkQuery", ex);
             }
             //
             return tempmodifyLinkQuery;
@@ -497,7 +498,7 @@ namespace Contensive.Processor.Controllers {
                 result = result.Replace(" src=/?", " src=" + urlProtocolDomainSlash + "?");
                 result = result.Replace(" src=/", " src=" + urlProtocolDomainSlash);
             } catch (Exception) {
-                throw new ApplicationException("Error in ConvertLinksToAbsolute");
+                throw new GenericException("Error in ConvertLinksToAbsolute");
             }
             return result;
         }
@@ -1849,7 +1850,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                throw new ApplicationException("Unexpected exception in normalizeRoute(route=[" + route + "])", ex);
+                throw new GenericException("Unexpected exception in normalizeRoute(route=[" + route + "])", ex);
             }
             return normalizedRoute;
         }
@@ -1900,7 +1901,7 @@ namespace Contensive.Processor.Controllers {
                     //        source = ""
                 }
             } catch (Exception ex) {
-                throw new ApplicationException("Exception in isGuid", ex);
+                throw new GenericException("Exception in isGuid", ex);
             }
             return returnValue;
         }

@@ -17,6 +17,7 @@ using static Contensive.Processor.Constants;
 //using Microsoft.Web.Administration;
 using Contensive.Processor.Models.Domain;
 using Microsoft.Web.Administration;
+using Contensive.Processor.Exceptions;
 //
 namespace Contensive.Processor.Controllers {
     /// <summary>
@@ -763,7 +764,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // Link is not valid
                         //
-                        LogController.handleError( core,new ApplicationException("Redirect was called with a blank Link. Redirect Reason [" + RedirectReason + "]"));
+                        LogController.handleError( core,new GenericException("Redirect was called with a blank Link. Redirect Reason [" + RedirectReason + "]"));
                         return string.Empty;
                         //
                         // changed to main_ServerLinksource because if a redirect is caused by a link forward, and the host page for the iis 404 is
@@ -774,7 +775,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // Loop redirect error, throw trap and block redirect to prevent loop
                         //
-                        LogController.handleError( core,new ApplicationException("Redirect was called to the same URL, main_ServerLink is [" + requestUrl + "], main_ServerLinkSource is [" + requestUrlSource + "]. This redirect is only allowed if either the form or querystring has change to prevent cyclic redirects. Redirect Reason [" + RedirectReason + "]"));
+                        LogController.handleError( core,new GenericException("Redirect was called to the same URL, main_ServerLink is [" + requestUrl + "], main_ServerLinkSource is [" + requestUrlSource + "]. This redirect is only allowed if either the form or querystring has change to prevent cyclic redirects. Redirect Reason [" + RedirectReason + "]"));
                         return string.Empty;
                     } else if (IsPageNotFound) {
                         //

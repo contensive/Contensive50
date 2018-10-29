@@ -14,6 +14,7 @@ using Contensive.Processor.Controllers;
 using Contensive.Processor.Models.Domain;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
+using Contensive.Processor.Exceptions;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -295,7 +296,7 @@ namespace Contensive.Processor.Controllers {
                 if (dbNotReady) {
                     //
                     // -- cannot set property
-                    throw new ApplicationException("Cannot set site property before Db is ready.");
+                    throw new GenericException("Cannot set site property before Db is ready.");
                 } else {
                     if (!string.IsNullOrEmpty(propertyName.Trim())) {
                         if (propertyName.ToLowerInvariant().Equals("adminurl")) {
@@ -581,7 +582,7 @@ namespace Contensive.Processor.Controllers {
         internal Dictionary<string, string> nameValueDict {
             get {
                 if (dbNotReady) {
-                    throw new ApplicationException("Cannot access site property collection if database is not ready.");
+                    throw new GenericException("Cannot access site property collection if database is not ready.");
                 } else {
                     if (_nameValueDict == null) {
                         _nameValueDict = SitePropertyModel.getNameValueDict(core);

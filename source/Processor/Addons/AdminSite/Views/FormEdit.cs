@@ -16,6 +16,7 @@ using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
 using Contensive.Addons.Tools;
 using static Contensive.Processor.AdminUIController;
+using Contensive.Processor.Exceptions;
 //
 namespace Contensive.Addons.AdminSite {
     public class FormEdit {
@@ -702,7 +703,7 @@ namespace Contensive.Addons.AdminSite {
                 if (adminData.adminContent.fields.Count <= 0) {
                     //
                     // There are no visible fiels, return empty
-                    LogController.handleError(core, new ApplicationException("There is no metadata for this field."));
+                    LogController.handleError(core, new GenericException("There is no metadata for this field."));
                 } else {
                     //
                     // ----- Build an index to sort the fields by EditSortOrder
@@ -956,7 +957,7 @@ namespace Contensive.Addons.AdminSite {
                                         } else {
                                             //
                                             // -- log exception but dont throw
-                                            LogController.handleWarn(core, new ApplicationException("Field [" + adminData.adminContent.name + "." + field.nameLc + "] is a Lookup field, but no LookupContent or LookupList has been configured"));
+                                            LogController.handleWarn(core, new GenericException("Field [" + adminData.adminContent.name + "." + field.nameLc + "] is a Lookup field, but no LookupContent or LookupList has been configured"));
                                             EditorString += "[Selection not configured]";
                                         }
                                         break;
@@ -1146,7 +1147,7 @@ namespace Contensive.Addons.AdminSite {
                                         } else {
                                             //
                                             // -- log exception but dont throw
-                                            LogController.handleWarn(core, new ApplicationException("Field [" + adminData.adminContent.name + "." + field.nameLc + "] is a Lookup field, but no LookupContent or LookupList has been configured"));
+                                            LogController.handleWarn(core, new GenericException("Field [" + adminData.adminContent.name + "." + field.nameLc + "] is a Lookup field, but no LookupContent or LookupList has been configured"));
                                             EditorString += "[Selection not configured]";
                                         }
                                         break;

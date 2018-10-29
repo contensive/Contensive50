@@ -16,6 +16,7 @@ using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
 using Contensive.Addons.Tools;
 using static Contensive.Processor.AdminUIController;
+using Contensive.Processor.Exceptions;
 //
 namespace Contensive.Addons.AdminSite {
     public class GetHtmlBodyClass : Contensive.BaseClasses.AddonBaseClass {
@@ -146,7 +147,7 @@ namespace Contensive.Addons.AdminSite {
                     adminData.ContentWatchLoaded = false;
                     //
                     if (string.Compare(core.siteProperties.dataBuildVersion, cp.Version) < 0) {
-                        LogController.handleWarn(core, new ApplicationException("Application code version (" + cp.Version + ") is newer than Db version (" + core.siteProperties.dataBuildVersion + "). Upgrade site code."));
+                        LogController.handleWarn(core, new GenericException("Application code version (" + cp.Version + ") is newer than Db version (" + core.siteProperties.dataBuildVersion + "). Upgrade site code."));
                     }
                     //
                     //// Get Requests, initialize adminContext.content and editRecord objects 
@@ -768,7 +769,7 @@ namespace Contensive.Addons.AdminSite {
                                         } else {
                                             CS = core.db.csOpenRecord("Group Email", adminData.editRecord.id);
                                             if (!core.db.csOk(CS)) {
-                                                //throw new ApplicationException("Unexpected exception"); // //throw new ApplicationException("Unexpected exception")' core.handleLegacyError23("Email ID [" &  adminContext.editRecord.id & "] could not be found in Group Email.")
+                                                //throw new GenericException("Unexpected exception"); // //throw new GenericException("Unexpected exception")' core.handleLegacyError23("Email ID [" &  adminContext.editRecord.id & "] could not be found in Group Email.")
                                             } else if (core.db.csGet(CS, "FromAddress") == "") {
                                                 Processor.Controllers.ErrorController.addUserError(core, "A 'From Address' is required before sending an email.");
                                             } else if (core.db.csGet(CS, "Subject") == "") {
@@ -802,7 +803,7 @@ namespace Contensive.Addons.AdminSite {
                                         } else {
                                             CS = core.db.csOpenRecord("Conditional Email", adminData.editRecord.id);
                                             if (!core.db.csOk(CS)) {
-                                                //throw new ApplicationException("Unexpected exception"); // //throw new ApplicationException("Unexpected exception")' core.handleLegacyError23("Email ID [" & editRecord.id & "] could not be opened.")
+                                                //throw new GenericException("Unexpected exception"); // //throw new GenericException("Unexpected exception")' core.handleLegacyError23("Email ID [" & editRecord.id & "] could not be opened.")
                                             } else {
                                                 core.db.csSet(CS, "submitted", false);
                                             }
@@ -829,7 +830,7 @@ namespace Contensive.Addons.AdminSite {
                                         } else {
                                             CS = core.db.csOpenRecord("Conditional Email", adminData.editRecord.id);
                                             if (!core.db.csOk(CS)) {
-                                                //throw new ApplicationException("Unexpected exception"); // //throw new ApplicationException("Unexpected exception")' core.handleLegacyError23("Email ID [" & editRecord.id & "] could not be opened.")
+                                                //throw new GenericException("Unexpected exception"); // //throw new GenericException("Unexpected exception")' core.handleLegacyError23("Email ID [" & editRecord.id & "] could not be opened.")
                                             } else if (core.db.csGetInteger(CS, "ConditionID") == 0) {
                                                 Processor.Controllers.ErrorController.addUserError(core, "A condition must be set.");
                                             } else {
@@ -1219,7 +1220,7 @@ namespace Contensive.Addons.AdminSite {
                         core.db.csSet(CSContentWatch, "clicks", 0);
                     }
                     if (!core.db.csOk(CSContentWatch)) {
-                        LogController.handleError(core, new ApplicationException("SaveContentTracking, can Not create New record"));
+                        LogController.handleError(core, new GenericException("SaveContentTracking, can Not create New record"));
                     } else {
                         ContentWatchID = core.db.csGetInteger(CSContentWatch, "ID");
                         core.db.csSet(CSContentWatch, "LinkLabel", adminData.ContentWatchLinkLabel);
@@ -1352,12 +1353,12 @@ namespace Contensive.Addons.AdminSite {
                             //
                             // Could not insert record
                             //
-                            LogController.handleError(core, new ApplicationException("A new record could not be inserted for content [" + adminData.adminContent.name + "]. Verify the Database table and field DateAdded, CreateKey, and ID."));
+                            LogController.handleError(core, new GenericException("A new record could not be inserted for content [" + adminData.adminContent.name + "]. Verify the Database table and field DateAdded, CreateKey, and ID."));
                         } else {
                             //
                             // Could not locate record you requested
                             //
-                            LogController.handleError(core, new ApplicationException("The record you requested (ID=" + editRecord.id + ") could not be found for content [" + adminData.adminContent.name + "]"));
+                            LogController.handleError(core, new GenericException("The record you requested (ID=" + editRecord.id + ") could not be found for content [" + adminData.adminContent.name + "]"));
                         }
                     } else {
                         //

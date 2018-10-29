@@ -17,6 +17,7 @@ using static Contensive.Processor.Constants;
 // todo -- this should use the filesystem objects, not system.io
 using System.IO;
 using System.Net;
+using Contensive.Processor.Exceptions;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -249,7 +250,7 @@ namespace Contensive.Processor.Controllers {
                 try {
                     returnString = http.UserAgent;
                 } catch  {
-                    throw new ApplicationException("Error in UserAgent Property, get Method");
+                    throw new GenericException("Error in UserAgent Property, get Method");
                 }
                 return returnString;
             }
@@ -257,7 +258,7 @@ namespace Contensive.Processor.Controllers {
                 try {
                     http.UserAgent = value;
                 } catch {
-                    throw new ApplicationException("Error in UserAgent Property, set Method");
+                    throw new GenericException("Error in UserAgent Property, set Method");
                 }
             }
         }
@@ -272,7 +273,7 @@ namespace Contensive.Processor.Controllers {
                 try {
                     returnTimeout = encodeInteger(http.Timeout / 1000);
                 } catch {
-                    throw new ApplicationException("Error in Timeout Property, get Method");
+                    throw new GenericException("Error in Timeout Property, get Method");
                 }
                 return returnTimeout;
             }
@@ -283,7 +284,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     http.Timeout = value * 1000;
                 } catch {
-                    throw new ApplicationException("Error in Timeout Property, set Method");
+                    throw new GenericException("Error in Timeout Property, set Method");
                 }
             }
         }
@@ -304,7 +305,7 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                 } catch {
-                    throw new ApplicationException("Error in requestHeader Property, get Method");
+                    throw new GenericException("Error in requestHeader Property, get Method");
                 }
                 return returnString;
             }
@@ -330,7 +331,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 } catch {
                     throw;
-                    //Throw New ApplicationException("Error in responseHeader Property, get Method")
+                    //Throw new GenericException("Error in responseHeader Property, get Method")
                 }
                 return returnString;
             }
@@ -348,7 +349,7 @@ namespace Contensive.Processor.Controllers {
                 try {
                     returnString = privateSocketResponse;
                 } catch {
-                    throw new ApplicationException("Error in SocketResponse Property, get Method");
+                    throw new GenericException("Error in SocketResponse Property, get Method");
                 }
                 return returnString;
             }
@@ -366,7 +367,7 @@ namespace Contensive.Processor.Controllers {
         //        Try
         //            returnString = privateResponseLength
         //        Catch ex As Exception
-        //            Throw New ApplicationException("Error in ResponseLength Property, get Method")
+        //            Throw new GenericException("Error in ResponseLength Property, get Method")
         //        End Try
         //        Return returnString
         //    End Get

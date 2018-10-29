@@ -13,6 +13,7 @@ using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
+using Contensive.Processor.Exceptions;
 //
 namespace Contensive.Processor {
     public class CPSiteClass : BaseClasses.CPSiteBaseClass, IDisposable {
@@ -254,7 +255,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override void ErrorReport(string Message) {
-            LogController.handleException(core, new ApplicationException("Unexpected exception"), LogController.logLevel.Error, Message, 2);
+            LogController.handleException(core, new GenericException("Unexpected exception"), LogController.logLevel.Error, Message, 2);
         }
         //
         //====================================================================================================
@@ -269,7 +270,7 @@ namespace Contensive.Processor {
             try {
                 var ExportCSVAddon = Models.Db.AddonModel.create(core, addonGuidExportCSV);
                 if (ExportCSVAddon == null) {
-                    LogController.handleError( core,new ApplicationException("ExportCSV addon not found. Task could not be added to task queue."));
+                    LogController.handleError( core,new GenericException("ExportCSV addon not found. Task could not be added to task queue."));
                 } else {
                     var docProperties = new Dictionary<string, string>();
                     docProperties.Add("sql", SQL);

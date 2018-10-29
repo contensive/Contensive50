@@ -735,7 +735,7 @@ namespace Contensive.Processor.Controllers {
                 LogController.handleError( core,ex);
             }
             //ErrorTrap:
-            ////throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError13("IsContentBlocked")
+            ////throw new GenericException("Unexpected exception"); // Call core.handleLegacyError13("IsContentBlocked")
             return tempbypassContentBlock;
         }
         //
@@ -1013,7 +1013,7 @@ namespace Contensive.Processor.Controllers {
                 LogController.handleError( core,ex);
             }
             //ErrorTrap:
-            ////throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError18(MethodName)
+            ////throw new GenericException("Unexpected exception"); // Call core.handleLegacyError18(MethodName)
                                                                     //
         }
         //
@@ -1047,7 +1047,7 @@ namespace Contensive.Processor.Controllers {
                 LogController.handleError( core,ex);
             }
             //ErrorTrap:
-            ////throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError18(MethodName)
+            ////throw new GenericException("Unexpected exception"); // Call core.handleLegacyError18(MethodName)
                                                                     //
         }
         //
@@ -1098,7 +1098,7 @@ namespace Contensive.Processor.Controllers {
                 LogController.handleError( core,ex);
             }
             //ErrorTrap:
-            ////throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError18("main_GetContentWatchLinkByKey")
+            ////throw new GenericException("Unexpected exception"); // Call core.handleLegacyError18("main_GetContentWatchLinkByKey")
             return tempgetContentWatchLinkByKey;
         }
         //
@@ -1166,7 +1166,7 @@ namespace Contensive.Processor.Controllers {
                 LogController.handleError( core,ex);
             }
             //ErrorTrap:
-            ////throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError13("main_GetPageDynamicLink_GetTemplateID")
+            ////throw new GenericException("Unexpected exception"); // Call core.handleLegacyError13("main_GetPageDynamicLink_GetTemplateID")
             return tempmain_GetPageDynamicLink_GetTemplateID;
         }
         //

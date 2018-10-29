@@ -16,6 +16,7 @@ using static Contensive.Processor.Constants;
 //
 using System.IO;
 using static Contensive.BaseClasses.CPFileSystemBaseClass;
+using Contensive.Processor.Exceptions;
 //
 namespace Contensive.Processor {
     //
@@ -112,7 +113,7 @@ namespace Contensive.Processor {
             } else if (core.cdnFiles.isinLocalAbsDosPath(folderPath)) {
                 core.cdnFiles.createPath(folderPath);
             } else {
-                throw (new ApplicationException("Application cannot access this path [" + folderPath + "]"));
+                throw (new GenericException("Application cannot access this path [" + folderPath + "]"));
             }
         }
         //
@@ -130,7 +131,7 @@ namespace Contensive.Processor {
             } else if (core.cdnFiles.isinLocalAbsDosPath(pathFilename)) {
                 core.cdnFiles.deleteFile(pathFilename);
             } else {
-                throw (new ApplicationException("Application cannot access this path [" + pathFilename + "]"));
+                throw (new GenericException("Application cannot access this path [" + pathFilename + "]"));
             }
         }
         //
@@ -159,7 +160,7 @@ namespace Contensive.Processor {
             } else if (core.cdnFiles.isinLocalAbsDosPath(pathFilename)) {
                 return core.cdnFiles.readFileText(pathFilename);
             } else {
-                throw (new ApplicationException("Application cannot access this path [" + pathFilename + "]"));
+                throw (new GenericException("Application cannot access this path [" + pathFilename + "]"));
             }
         }
         //
@@ -189,7 +190,7 @@ namespace Contensive.Processor {
             } else if (core.cdnFiles.isinLocalAbsDosPath(pathFilename)) {
                 core.cdnFiles.saveFile(pathFilename, fileContent);
             } else {
-                throw (new ApplicationException("Application cannot access this path [" + pathFilename + "]"));
+                throw (new GenericException("Application cannot access this path [" + pathFilename + "]"));
             }
         }
         //
@@ -220,7 +221,7 @@ namespace Contensive.Processor {
             } else if (core.cdnFiles.isinLocalAbsDosPath(pathFileName)) {
                 result = core.cdnFiles.fileExists(pathFileName);
             } else {
-                throw (new ApplicationException("Application cannot access this path [" + pathFileName + "]"));
+                throw (new GenericException("Application cannot access this path [" + pathFileName + "]"));
             }
             return result;
         }
@@ -241,7 +242,7 @@ namespace Contensive.Processor {
             } else if (core.cdnFiles.isinLocalAbsDosPath(pathFolderName)) {
                 result = core.cdnFiles.pathExists(pathFolderName);
             } else {
-                throw (new ApplicationException("Application cannot access this path [" + pathFolderName + "]"));
+                throw (new GenericException("Application cannot access this path [" + pathFolderName + "]"));
             }
             return result;
         }
@@ -267,7 +268,7 @@ namespace Contensive.Processor {
                 List<FileDetail> fi = core.cdnFiles.getFileList(pathFolderName);
                 result = core.cdnFiles.convertFileInfoArrayToParseString(fi);
             } else {
-                throw (new ApplicationException("Application cannot access this path [" + pathFolderName + "]"));
+                throw (new GenericException("Application cannot access this path [" + pathFolderName + "]"));
             }
             return result;
         }
@@ -291,7 +292,7 @@ namespace Contensive.Processor {
                 List<FolderDetail> fi = core.cdnFiles.getFolderList(pathFolderName);
                 result = core.cdnFiles.convertDirectoryInfoArrayToParseString(fi);
             } else {
-                throw (new ApplicationException("Application cannot access this path [" + pathFolderName + "]"));
+                throw (new GenericException("Application cannot access this path [" + pathFolderName + "]"));
             }
             return result;
         }
@@ -310,7 +311,7 @@ namespace Contensive.Processor {
             } else if (core.cdnFiles.isinLocalAbsDosPath(pathFolderName)) {
                 core.appRootFiles.deleteFolder(pathFolderName);
             } else {
-                throw (new ApplicationException("Application cannot access this path [" + pathFolderName + "]"));
+                throw (new GenericException("Application cannot access this path [" + pathFolderName + "]"));
             }
         }
         #region  IDisposable Support 

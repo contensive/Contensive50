@@ -34,7 +34,7 @@ namespace Contensive.Addons.Primitives {
                 int TrapID = 0;
                 int CS = core.db.csInsertRecord("Trap Log");
                 if (!core.db.csOk(CS)) {
-                    //throw new ApplicationException("Unexpected exception"); // todo - remove this - handleLegacyError10(ignoreInteger, "dll", "Error during Status. Called InsertCSRecord to insert 'Trap Log' test, record set was not OK.", "Init", False, True)
+                    //throw new GenericException("Unexpected exception"); // todo - remove this - handleLegacyError10(ignoreInteger, "dll", "Error during Status. Called InsertCSRecord to insert 'Trap Log' test, record set was not OK.", "Init", False, True)
                 } else {
                     InsertTestOK = true;
                     TrapID = core.db.csGetInteger(CS, "ID");
@@ -42,7 +42,7 @@ namespace Contensive.Addons.Primitives {
                 core.db.csClose(ref CS);
                 if (InsertTestOK) {
                     if (TrapID == 0) {
-                        //throw new ApplicationException("Unexpected exception"); // todo - remove this - handleLegacyError10(ignoreInteger, "dll", "Error during Status. Called InsertCSRecord to insert 'Trap Log' test, record set was OK, but ID=0.", "Init", False, True)
+                        //throw new GenericException("Unexpected exception"); // todo - remove this - handleLegacyError10(ignoreInteger, "dll", "Error during Status. Called InsertCSRecord to insert 'Trap Log' test, record set was OK, but ID=0.", "Init", False, True)
                     } else {
                         core.db.deleteContentRecord("Trap Log", TrapID);
                     }

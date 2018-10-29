@@ -17,6 +17,7 @@ using static Contensive.Processor.Constants;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
+using Contensive.Processor.Exceptions;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -179,7 +180,7 @@ namespace Contensive.Processor.Controllers {
                 }
             } catch (Exception) {
                 //
-                throw new ApplicationException("Error during ipDaemon.startListening");
+                throw new GenericException("Error during ipDaemon.startListening");
             }
         }
         //
@@ -203,7 +204,7 @@ namespace Contensive.Processor.Controllers {
                     cmdListenThread.Abort();
                 }
             } catch (Exception) {
-                throw new ApplicationException("Error during ipDaemon.stopListening");
+                throw new GenericException("Error during ipDaemon.stopListening");
             }
         }
     }

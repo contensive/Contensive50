@@ -4,6 +4,7 @@ using System.Linq;
 using System.Collections.Generic;
 using Contensive.Processor.Models.Db;
 using static Contensive.Processor.Constants;
+using Contensive.Processor.Exceptions;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -324,7 +325,7 @@ namespace Contensive.Processor.Controllers {
                     email.subject = emailName;
                     email.fromAddress = core.siteProperties.getText("EmailAdmin", "webmaster@" + core.appConfig.domainList[0]);
                     email.save(core);
-                    LogController.handleError( core,new ApplicationException("No system email was found with the name [" + emailName + "]. A new email blank was created but not sent."));
+                    LogController.handleError( core,new GenericException("No system email was found with the name [" + emailName + "]. A new email blank was created but not sent."));
                 } else {
                     //
                     // --- collect values needed for send

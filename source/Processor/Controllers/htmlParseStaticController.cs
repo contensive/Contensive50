@@ -16,6 +16,7 @@ using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
+using Contensive.Processor.Exceptions;
 
 namespace Contensive.Processor.Controllers {
     /// <summary>
@@ -530,7 +531,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     //
                     if (LoopPtr >= 10000) {
-                        LogController.handleError( core,new ApplicationException("Tag limit of 10000 tags per block reached."));
+                        LogController.handleError( core,new GenericException("Tag limit of 10000 tags per block reached."));
                     }
                 }
                 //

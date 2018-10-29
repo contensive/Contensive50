@@ -13,6 +13,7 @@ using Contensive.Processor.Controllers;
 using Contensive.Processor.Models.Domain;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
+using Contensive.Processor.Exceptions;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -219,7 +220,7 @@ namespace Contensive.Processor.Controllers {
                         if (!core.dataSourceDictionary.ContainsKey(normalizedDataSourceName)) {
                             //
                             // -- not found, this is a hard error
-                            throw new ApplicationException("Datasource [" + normalizedDataSourceName + "] was not found.");
+                            throw new GenericException("Datasource [" + normalizedDataSourceName + "] was not found.");
                         } else {
                             //
                             // -- found in local cache
@@ -284,7 +285,7 @@ namespace Contensive.Processor.Controllers {
                     if (!core.dataSourceDictionary.ContainsKey(normalizedDataSourceName)) {
                         //
                         // -- not found, this is a hard error
-                        throw new ApplicationException("Datasource [" + normalizedDataSourceName + "] was not found.");
+                        throw new GenericException("Datasource [" + normalizedDataSourceName + "] was not found.");
                     } else {
                         //
                         // -- found in local cache
@@ -338,11 +339,11 @@ namespace Contensive.Processor.Controllers {
                 } else if (core.serverConfig == null) {
                     //
                     // -- server config fail
-                    LogController.handleError( core,new ApplicationException("Cannot execute Sql in dbController without an application"));
+                    LogController.handleError( core,new GenericException("Cannot execute Sql in dbController without an application"));
                 } else if (core.appConfig == null) {
                     //
                     // -- server config fail
-                    LogController.handleError( core,new ApplicationException("Cannot execute Sql in dbController without an application"));
+                    LogController.handleError( core,new GenericException("Cannot execute Sql in dbController without an application"));
                 } else {
                     string connString = getConnectionStringADONET(core.appConfig.name, dataSourceName);
                     //returnData = executeSql_noErrorHandling(sql, getConnectionStringADONET(core.appConfig.name, dataSourceName), startRecord, maxRecords, recordsAffected)
@@ -367,7 +368,7 @@ namespace Contensive.Processor.Controllers {
                     saveTransactionLog(sql, sw.ElapsedMilliseconds, "query");
                 }
             } catch (Exception ex) {
-                ApplicationException newEx = new ApplicationException("Exception [" + ex.Message + "] executing sql [" + sql + "], datasource [" + dataSourceName + "], startRecord [" + startRecord + "], maxRecords [" + maxRecords + "]", ex);
+                ApplicationException newEx = new GenericException("Exception [" + ex.Message + "] executing sql [" + sql + "], datasource [" + dataSourceName + "], startRecord [" + startRecord + "], maxRecords [" + maxRecords + "]", ex);
                 LogController.handleError( core,newEx);
             }
             return returnData;
@@ -404,7 +405,7 @@ namespace Contensive.Processor.Controllers {
         //            dbVerified = true;
         //        }
         //    } catch (Exception ex) {
-        //        ApplicationException newEx = new ApplicationException("Exception [" + ex.Message + "] executing sql [" + sql + "], datasource [" + dataSourceName + "], startRecord [" + startRecord + "], maxRecords [" + maxRecords + "]", ex);
+        //        ApplicationException newEx = new GenericException("Exception [" + ex.Message + "] executing sql [" + sql + "], datasource [" + dataSourceName + "], startRecord [" + startRecord + "], maxRecords [" + maxRecords + "]", ex);
         //        logController.handleError( core,newEx);
         //        throw newEx;
         //    }
@@ -1039,7 +1040,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // Invalid field type
                         //
-                        throw new ApplicationException("Can Not proceed because the field being created has an invalid FieldType [" + fieldType + "]");
+                        throw new GenericException("Can Not proceed because the field being created has an invalid FieldType [" + fieldType + "]");
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -1297,9 +1298,9 @@ namespace Contensive.Processor.Controllers {
                 } else {
                     CDefModel CDef = CDefModel.create(core, ContentName);
                     if (CDef == null) {
-                        throw (new ApplicationException("No content found For [" + ContentName + "]"));
+                        throw (new GenericException("No content found For [" + ContentName + "]"));
                     } else if (CDef.id <= 0) {
-                        throw (new ApplicationException("No content found For [" + ContentName + "]"));
+                        throw (new GenericException("No content found For [" + ContentName + "]"));
                     } else {
                         sqlOrderBy = GenericController.encodeEmpty(sqlOrderBy, CDef.defaultSortMethod);
                         sqlSelectFieldList = GenericController.encodeEmpty(sqlSelectFieldList, CDef.selectCommaList);
@@ -1313,7 +1314,7 @@ namespace Contensive.Processor.Controllers {
                                 SortField = GenericController.vbReplace(SortField, "desc", "", 1, 99, 1);
                                 SortField = SortField.Trim(' ');
                                 if (!CDef.selectList.Contains(SortField)) {
-                                    throw (new ApplicationException("The field [" + SortField + "] was used in sqlOrderBy for content [" + ContentName + "], but the content does not include this field."));
+                                    throw (new GenericException("The field [" + SortField + "] was used in sqlOrderBy for content [" + ContentName + "], but the content does not include this field."));
                                 }
                             }
                         }
@@ -1431,9 +1432,9 @@ namespace Contensive.Processor.Controllers {
                 } else {
                     CDefModel CDef = CDefModel.create(core, ContentName);
                     if (CDef == null) {
-                        throw (new ApplicationException("No content found For [" + ContentName + "]"));
+                        throw (new GenericException("No content found For [" + ContentName + "]"));
                     } else if (CDef.id <= 0) {
-                        throw (new ApplicationException("No content found For [" + ContentName + "]"));
+                        throw (new GenericException("No content found For [" + ContentName + "]"));
                     } else {
                         //sqlOrderBy = GenericController.encodeEmpty(sqlOrderBy, CDef.defaultSortMethod);
                         //sqlSelectFieldList = GenericController.encodeEmpty(sqlSelectFieldList, CDef.selectCommaList);
@@ -1447,7 +1448,7 @@ namespace Contensive.Processor.Controllers {
                         //        SortField = GenericController.vbReplace(SortField, "desc", "", 1, 99, 1);
                         //        SortField = SortField.Trim(' ');
                         //        if (!CDef.selectList.Contains(SortField)) {
-                        //            throw (new ApplicationException("The field [" + SortField + "] was used in sqlOrderBy for content [" + ContentName + "], but the content does not include this field."));
+                        //            throw (new GenericException("The field [" + SortField + "] was used in sqlOrderBy for content [" + ContentName + "], but the content does not include this field."));
                         //        }
                         //    }
                         //}
@@ -1757,11 +1758,11 @@ namespace Contensive.Processor.Controllers {
                 //
                 if (!csOk(CSPointer)) {
                     //
-                    throw new ApplicationException("Dataset is not valid.");
+                    throw new GenericException("Dataset is not valid.");
                 } else if(!dataSetStore[CSPointer].readable) {
                     //
                     // -- if not readable, cannot move rows
-                    throw new ApplicationException("Cannot move to next row because dataset is not readable.");
+                    throw new GenericException("Cannot move to next row because dataset is not readable.");
                 } else {
                     csSave(CSPointer, AsyncSave);
                     dataSetStore[CSPointer].writeCache = new Dictionary<string, string>();
@@ -1814,7 +1815,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 string fieldNameTrim = FieldName.Trim();
                 if (!csOk(CSPointer)) {
-                    throw new ApplicationException("Attempt To GetValue fieldname[" + fieldNameTrim + "], but the dataset Is empty Or does not point To a valid row");
+                    throw new GenericException("Attempt To GetValue fieldname[" + fieldNameTrim + "], but the dataset Is empty Or does not point To a valid row");
                 } else {
                     var contentSet = dataSetStore[CSPointer];
                     bool fieldFound = false;
@@ -1833,17 +1834,17 @@ namespace Contensive.Processor.Controllers {
                             //
                             // -- reading from write-only returns default value, because save there is legacy code that detects change bycomparing value to read cache
                             returnValue = "";
-                            //throw new ApplicationException("Cannot read from a dataset opened write-only.");
+                            //throw new GenericException("Cannot read from a dataset opened write-only.");
                         } else if (contentSet.dt == null) {
-                            throw new ApplicationException("Cannot read from a dataset because the data is not valid.");
+                            throw new GenericException("Cannot read from a dataset because the data is not valid.");
                         } else {
                             if (!contentSet.dt.Columns.Contains(fieldNameTrim.ToLowerInvariant())) {
                                 if (contentSet.writeable) {
                                     var dtFieldList = new List<string>();
                                     foreach (DataColumn column in contentSet.dt.Columns) dtFieldList.Add(column.ColumnName);
-                                    throw new ApplicationException("Field [" + fieldNameTrim + "] was not found in [" + contentSet.ContentName + "] with selected fields [" + String.Join(",", dtFieldList.ToArray()) + "]");
+                                    throw new GenericException("Field [" + fieldNameTrim + "] was not found in [" + contentSet.ContentName + "] with selected fields [" + String.Join(",", dtFieldList.ToArray()) + "]");
                                 } else {
-                                    throw new ApplicationException("Field [" + fieldNameTrim + "] was not found in sql [" + contentSet.Source + "]");
+                                    throw new GenericException("Field [" + fieldNameTrim + "] was not found in sql [" + contentSet.Source + "]");
                                 }
                             } else {
                                 returnValue = GenericController.encodeText(contentSet.dt.Rows[contentSet.readCacheRowPtr][fieldNameTrim.ToLowerInvariant()]);
@@ -1869,7 +1870,7 @@ namespace Contensive.Processor.Controllers {
             string returnFieldName = "";
             try {
                 if (!csOk(CSPointer)) {
-                    throw new ApplicationException("data set is not valid");
+                    throw new GenericException("data set is not valid");
                 } else {
                     dataSetStore[CSPointer].fieldPointer = 0;
                     returnFieldName = csGetNextFieldName(CSPointer);
@@ -1891,7 +1892,7 @@ namespace Contensive.Processor.Controllers {
             string returnFieldName = "";
             try {
                 if (!csOk(CSPointer)) {
-                    throw new ApplicationException("data set is not valid");
+                    throw new GenericException("data set is not valid");
                 } else {
                     var tempVar = dataSetStore[CSPointer];
                     while ((string.IsNullOrEmpty(returnFieldName)) && (tempVar.fieldPointer < tempVar.resultColumnCount)) {
@@ -2085,7 +2086,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // no Contentname given
                             //
-                            throw new ApplicationException("Can Not create a filename because no ContentName was given, And the csv_ContentSet Is SQL-based.");
+                            throw new GenericException("Can Not create a filename because no ContentName was given, And the csv_ContentSet Is SQL-based.");
                         }
                         //
                         // ----- Create filename
@@ -2177,13 +2178,13 @@ namespace Contensive.Processor.Controllers {
                 } else {
                     var contentSet = dataSetStore[CSPointer];
                     if (!contentSet.writeable) {
-                        throw new ApplicationException("Cannot set fields for a dataset based on a query.");
+                        throw new GenericException("Cannot set fields for a dataset based on a query.");
                     } else if (contentSet.CDef == null) {
-                        throw new ApplicationException("Cannot set fields for a dataset based on a query.");
+                        throw new GenericException("Cannot set fields for a dataset based on a query.");
                     } else if (contentSet.CDef.fields == null) {
-                        throw new ApplicationException("The dataset contains no fields.");
+                        throw new GenericException("The dataset contains no fields.");
                     } else if (!contentSet.CDef.fields.ContainsKey(FieldName.ToLowerInvariant())) {
-                        throw new ApplicationException("The dataset does not contain the field specified [" + FieldName.ToLowerInvariant() + "].");
+                        throw new GenericException("The dataset does not contain the field specified [" + FieldName.ToLowerInvariant() + "].");
                     } else {
                         if (contentSet.writeCache.ContainsKey(FieldName.ToLowerInvariant())) {
                             contentSet.writeCache[FieldName.ToLowerInvariant()] = filename;
@@ -2219,7 +2220,7 @@ namespace Contensive.Processor.Controllers {
                 } else {
                     var tempVar = dataSetStore[CSPointer];
                     if (!tempVar.writeable) {
-                        throw new ApplicationException("Cannot save this dataset because it is read-only.");
+                        throw new GenericException("Cannot save this dataset because it is read-only.");
                     } else {
                         string OldFilename = csGetText(CSPointer, FieldName);
                         string Filename = csGetFieldFilename(CSPointer, FieldName, "", ContentName, Constants.fieldTypeIdFileText);
@@ -2285,7 +2286,7 @@ namespace Contensive.Processor.Controllers {
                 int CS = csInsertRecord(ContentName, MemberID);
                 if (!csOk(CS)) {
                     csClose(ref CS);
-                    throw new ApplicationException("could not insert record in content [" + ContentName + "]");
+                    throw new GenericException("could not insert record in content [" + ContentName + "]");
                 } else {
                     result = csGetInteger(CS, "ID");
                 }
@@ -2398,9 +2399,9 @@ namespace Contensive.Processor.Controllers {
                 } else {
                     CDef = Models.Domain.CDefModel.create(core, ContentName);
                     if (CDef == null) {
-                        throw new ApplicationException("content [" + ContentName + "] could Not be found.");
+                        throw new GenericException("content [" + ContentName + "] could Not be found.");
                     } else if (CDef.id <= 0) {
-                        throw new ApplicationException("content [" + ContentName + "] could Not be found.");
+                        throw new GenericException("content [" + ContentName + "] could Not be found.");
                     } else {
                         if (MemberID == -1) {
                             MemberID = core.session.user.id;
@@ -2724,7 +2725,7 @@ namespace Contensive.Processor.Controllers {
                         try {
                             fieldValue = GenericController.encodeText(csGetValue(CSPointer, FieldName));
                         } catch (Exception ex) {
-                            throw new ApplicationException("Error [" + ex.Message + "] reading field [" + FieldName.ToLowerInvariant() + "] In source [" + tempVar.Source + "");
+                            throw new GenericException("Error [" + ex.Message + "] reading field [" + FieldName.ToLowerInvariant() + "] In source [" + tempVar.Source + "");
                         }
                     } else {
                         //
@@ -2736,7 +2737,7 @@ namespace Contensive.Processor.Controllers {
                             try {
                                 fieldValue = GenericController.encodeText(csGetValue(CSPointer, FieldName));
                             } catch (Exception ex) {
-                                throw new ApplicationException("Error [" + ex.Message + "] reading field [" + FieldName.ToLowerInvariant() + "] In content [" + tempVar.CDef.name + "] With custom field list [" + tempVar.SelectTableFieldList + "");
+                                throw new GenericException("Error [" + ex.Message + "] reading field [" + FieldName.ToLowerInvariant() + "] In content [" + tempVar.CDef.name + "] With custom field list [" + tempVar.SelectTableFieldList + "");
                             }
                         } else {
                             field = tempVar.CDef.fields[FieldName.ToLowerInvariant()];
@@ -2890,7 +2891,7 @@ namespace Contensive.Processor.Controllers {
                                             //
                                             // Unknown field type
                                             //
-                                            throw new ApplicationException("Can Not use field [" + FieldName + "] because the FieldType [" + fieldTypeId + "] Is invalid.");
+                                            throw new GenericException("Can Not use field [" + FieldName + "] because the FieldType [" + fieldTypeId + "] Is invalid.");
                                     }
                                 }
                             }
@@ -2929,7 +2930,7 @@ namespace Contensive.Processor.Controllers {
                 } else {
                     var dataSet = dataSetStore[CSPointer];
                     if (!dataSet.writeable) {
-                        throw new ApplicationException("Cannot update a contentset created from a sql query.");
+                        throw new GenericException("Cannot update a contentset created from a sql query.");
                     } else {
                         ContentName = dataSet.ContentName;
                         FieldNameLc = FieldName.Trim(' ').ToLowerInvariant();
@@ -3064,7 +3065,7 @@ namespace Contensive.Processor.Controllers {
                                         if (GenericController.encodeText(FieldValue) != csGetText(CSPointer, FieldNameLc)) {
                                             SetNeeded = true;
                                             if (FieldValue.Length > 255) {
-                                                LogController.handleError( core,new ApplicationException("Text length too long saving field [" + FieldName + "], length [" + FieldValue.Length + "], but max for Text field is 255. Save will be attempted"));
+                                                LogController.handleError( core,new GenericException("Text length too long saving field [" + FieldName + "], length [" + FieldValue.Length + "], but max for Text field is 255. Save will be attempted"));
                                             }
                                         }
                                         break;
@@ -3076,7 +3077,7 @@ namespace Contensive.Processor.Controllers {
                                         if (GenericController.encodeText(FieldValue) != csGetText(CSPointer, FieldNameLc)) {
                                             SetNeeded = true;
                                             if (FieldValue.Length > 65535) {
-                                                LogController.handleError( core,new ApplicationException("Text length too long saving field [" + FieldName + "], length [" + FieldValue.Length + "], but max for LongText and Html is 65535. Save will be attempted"));
+                                                LogController.handleError( core,new GenericException("Text length too long saving field [" + FieldName + "], length [" + FieldValue.Length + "], but max for LongText and Html is 65535. Save will be attempted"));
                                             }
                                         }
                                         break;
@@ -3265,7 +3266,7 @@ namespace Contensive.Processor.Controllers {
                                         //
                                         // Invalid fieldtype
                                         //
-                                        throw new ApplicationException("Can Not save this record because the field [" + field.nameLc + "] has an invalid field type Id [" + field.fieldTypeId + "]");
+                                        throw new GenericException("Can Not save this record because the field [" + field.nameLc + "] has an invalid field type Id [" + field.fieldTypeId + "]");
                                 }
                                 if (!string.IsNullOrEmpty(SQLSetPair)) {
                                     //
@@ -3340,7 +3341,7 @@ namespace Contensive.Processor.Controllers {
                                 if (dt.Rows.Count > 0) {
                                     LogController.logWarn(core, "Can not save record to content [" + contentSet.CDef.name + "] because it would create a non-unique record for one or more of the following field(s) [" + UniqueViolationFieldList + "]");
                                     return;
-                                    //throw new ApplicationException(("Can not save record to content [" + contentSet.CDef.name + "] because it would create a non-unique record for one or more of the following field(s) [" + UniqueViolationFieldList + "]"));
+                                    //throw new GenericException(("Can not save record to content [" + contentSet.CDef.name + "] because it would create a non-unique record for one or more of the following field(s) [" + UniqueViolationFieldList + "]"));
                                 }
                             }
                         }
@@ -3473,7 +3474,7 @@ namespace Contensive.Processor.Controllers {
                         returnResult = encodeSQLText(GenericController.encodeText(expression));
                         break;
                     default:
-                        LogController.handleError( core,new ApplicationException("Unknown Field Type [" + fieldType + ""));
+                        LogController.handleError( core,new GenericException("Unknown Field Type [" + fieldType + ""));
                         returnResult = encodeSQLText(GenericController.encodeText(expression));
                         break;
                 }
@@ -3608,7 +3609,7 @@ namespace Contensive.Processor.Controllers {
                 } else {
                     CDef = Models.Domain.CDefModel.create(core, ContentName);
                     if (CDef.id == 0) {
-                        throw new ApplicationException("contentname [" + ContentName + "] is not a valid content");
+                        throw new GenericException("contentname [" + ContentName + "] is not a valid content");
                     } else {
                         TableName = CDef.tableName;
                         if (string.IsNullOrEmpty(TableName)) {
@@ -3714,7 +3715,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 DataTable dt = executeQuery("select ContentTableID from ccContent where name=" + encodeSQLText(ContentName));
                 if (!DbController.isDataTableOk(dt)) {
-                    throw new ApplicationException("Content [" + ContentName + "] was not found in ccContent table");
+                    throw new GenericException("Content [" + ContentName + "] was not found in ccContent table");
                 } else {
                     returnResult = GenericController.encodeInteger(dt.Rows[0]["ContentTableID"]);
                 }
@@ -3737,9 +3738,9 @@ namespace Contensive.Processor.Controllers {
         public void deleteTableRecord(int recordId, string tableName, string dataSourceName = "") {
             try {
                 if (string.IsNullOrEmpty(tableName.Trim())) {
-                    throw new ApplicationException("tablename cannot be blank");
+                    throw new GenericException("tablename cannot be blank");
                 } else if (recordId <= 0) {
-                    throw new ApplicationException("record id is not valid [" + recordId + "]");
+                    throw new GenericException("record id is not valid [" + recordId + "]");
                 } else {
                     executeNonQuery("delete from " + tableName + " where id=" + recordId, dataSourceName);
                 }
@@ -3757,9 +3758,9 @@ namespace Contensive.Processor.Controllers {
         public void deleteTableRecord(string guid, string tableName, string dataSourceName = "") {
             try {
                 if (string.IsNullOrEmpty(tableName.Trim())) {
-                    throw new ApplicationException("tablename cannot be blank");
+                    throw new GenericException("tablename cannot be blank");
                 } else if (!isGuid( guid )) {
-                    throw new ApplicationException("Guid is not valid [" + guid + "]");
+                    throw new GenericException("Guid is not valid [" + guid + "]");
                 } else {
                     executeNonQuery("delete from " + tableName + " where ccguid=" + encodeSQLText(guid) , dataSourceName);
                 }
@@ -3791,7 +3792,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 if ((ContentID <= 0) || (RecordID <= 0)) {
                     //
-                    throw new ApplicationException("ContentID [" + ContentID + "] or RecordID [" + RecordID + "] where blank");
+                    throw new GenericException("ContentID [" + ContentID + "] or RecordID [" + RecordID + "] where blank");
                 } else {
                     ContentRecordKey = ContentID.ToString() + "." + RecordID.ToString();
                     Criteria = "(ContentRecordKey=" + encodeSQLText(ContentRecordKey) + ")";
@@ -4296,7 +4297,7 @@ namespace Contensive.Processor.Controllers {
                 string SQL = "";
                 int ContentID = 0;
                 if (dt.Rows.Count == 0) {
-                    throw new ApplicationException("Could Not add a record To table [" + TableName + "].");
+                    throw new GenericException("Could Not add a record To table [" + TableName + "].");
                 } else {
                     //
                     //----------------------------------------------------------------
@@ -4317,7 +4318,7 @@ namespace Contensive.Processor.Controllers {
                         SQL = "Select ID from ccContent where name=" + core.db.encodeSQLText(ContentName);
                         dt = core.db.executeQuery(SQL);
                         if (dt.Rows.Count == 0) {
-                            throw new ApplicationException("Content Definition [" + ContentName + "] could Not be selected by name after it was inserted");
+                            throw new GenericException("Content Definition [" + ContentName + "] could Not be selected by name after it was inserted");
                         } else {
                             ContentID = GenericController.encodeInteger(dt.Rows[0]["ID"]);
                             core.db.executeQuery("update ccContent Set CreateKey=0 where id=" + ContentID);
@@ -4692,12 +4693,12 @@ namespace Contensive.Processor.Controllers {
                     //
                     // records did not delete
                     //
-                    LogController.handleError( core,new ApplicationException("Error deleting record chunks. No records were deleted and the process was not complete."));
+                    LogController.handleError( core,new GenericException("Error deleting record chunks. No records were deleted and the process was not complete."));
                 } else if (LoopCount >= iChunkCount) {
                     //
                     // records did not delete
                     //
-                    LogController.handleError( core,new ApplicationException("Error deleting record chunks. The maximum chunk count was exceeded while deleting records."));
+                    LogController.handleError( core,new GenericException("Error deleting record chunks. The maximum chunk count was exceeded while deleting records."));
                 }
             }
         }
@@ -4840,7 +4841,7 @@ namespace Contensive.Processor.Controllers {
                 }
             } catch (Exception ex) {
                 // shared method, rethrow error
-                throw new ApplicationException("Exception in encodeSqlTableName(" + sourceName + ")", ex);
+                throw new GenericException("Exception in encodeSqlTableName(" + sourceName + ")", ex);
             }
             return returnName;
         }
@@ -4916,10 +4917,10 @@ namespace Contensive.Processor.Controllers {
             //
             iCSPointer = GenericController.encodeInteger(CSPointer);
             if (iCSPointer == -1) {
-                throw (new ApplicationException("csGetRecordEditLink called with invalid iCSPointer")); // handleLegacyError14(MethodName, "")
+                throw (new GenericException("csGetRecordEditLink called with invalid iCSPointer")); // handleLegacyError14(MethodName, "")
             } else {
                 if (!core.db.csOk(iCSPointer)) {
-                    throw (new ApplicationException("csGetRecordEditLink called with Not main_CSOK")); // handleLegacyError14(MethodName, "")
+                    throw (new GenericException("csGetRecordEditLink called with Not main_CSOK")); // handleLegacyError14(MethodName, "")
                 } else {
                     //
                     // Print an edit link for the records Content (may not be iCSPointer content)
@@ -4943,9 +4944,9 @@ namespace Contensive.Processor.Controllers {
             string Filename = null;
             string Path = null;
             if (!core.db.csOk(CSPointer)) {
-                throw new ApplicationException("ContentSetPointer is invalid, empty, or end-of-file");
+                throw new GenericException("ContentSetPointer is invalid, empty, or end-of-file");
             } else if (string.IsNullOrEmpty(FieldName.Trim(' '))) {
-                throw new ApplicationException("FieldName is invalid or blank");
+                throw new GenericException("FieldName is invalid or blank");
             } else {
                 LocalRequestName = RequestName;
                 if (string.IsNullOrEmpty(LocalRequestName)) {

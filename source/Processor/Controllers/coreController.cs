@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using static Contensive.Processor.Constants;
 using System.Diagnostics;
 using System.Linq;
+using Contensive.Processor.Exceptions;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -789,7 +790,7 @@ namespace Contensive.Processor.Controllers {
                                     // -- admin site
                                     AddonModel addon = AddonModel.create(this, addonGuidAdminSite);
                                     if (addon == null) {
-                                        LogController.handleError( this,new ApplicationException("The admin site addon could not be found by guid [" + addonGuidAdminSite + "]."));
+                                        LogController.handleError( this,new GenericException("The admin site addon could not be found by guid [" + addonGuidAdminSite + "]."));
                                         return "The default admin site addon could not be found. Please run an upgrade on this application to restore default services (command line> cc -a appName -r )";
                                     } else {
                                         return this.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() {
@@ -803,7 +804,7 @@ namespace Contensive.Processor.Controllers {
                                     // -- remote method
                                     AddonModel addon = addonCache.getAddonById(route.remoteMethodAddonId);
                                     if (addon == null) {
-                                        LogController.handleError( this,new ApplicationException("The addon for remoteMethodAddonId [" + route.remoteMethodAddonId + "] could not be opened."));
+                                        LogController.handleError( this,new GenericException("The addon for remoteMethodAddonId [" + route.remoteMethodAddonId + "] could not be opened."));
                                         return "";
                                     } else { 
                                         CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
@@ -913,7 +914,7 @@ namespace Contensive.Processor.Controllers {
         public string executeRoute_ProcessAjaxData() {
             string result = "";
             try {
-                LogController.handleError( this,new ApplicationException("executeRoute_ProcessAjaxData deprecated"));
+                LogController.handleError( this,new GenericException("executeRoute_ProcessAjaxData deprecated"));
                 //string RemoteKey = docProperties.getText("key");
                 //string EncodedArgs = docProperties.getText("args");
                 //int PageSize = docProperties.getInteger("pagesize");
@@ -1067,7 +1068,7 @@ namespace Contensive.Processor.Controllers {
                 //                                string FieldName = genericController.DecodeResponseVariable(SetPairs[Ptr].Left( Pos - 1));
                 //                                if (!Models.Complex.cdefModel.isContentFieldSupported(this, ContentName, FieldName)) {
                 //                                    string errorMessage = "result, QueryTypeUpdateContent, key [" + RemoteKey + "], bad field [" + FieldName + "] skipped";
-                //                                    throw (new ApplicationException(errorMessage));
+                //                                    throw (new GenericException(errorMessage));
                 //                                } else {
                 //                                    db.csSet(CS, FieldName, FieldValue);
                 //                                }

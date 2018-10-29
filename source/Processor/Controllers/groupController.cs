@@ -13,6 +13,7 @@ using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
+using Contensive.Processor.Exceptions;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -90,7 +91,7 @@ namespace Contensive.Processor.Controllers {
                 string groupGuid = null;
                 //
                 if (string.IsNullOrEmpty(GroupNameOrGuid)) {
-                    throw (new ApplicationException("A group cannot be added with a blank name"));
+                    throw (new GenericException("A group cannot be added with a blank name"));
                 } else {
                     cs.open("Groups", sqlCriteria, "", false, "id");
                     IsAlreadyThere = cs.ok();
@@ -98,7 +99,7 @@ namespace Contensive.Processor.Controllers {
                     if (!IsAlreadyThere) {
                         cs.insert("Groups");
                         if (!cs.ok()) {
-                            throw (new ApplicationException("There was an error inserting a new group record"));
+                            throw (new GenericException("There was an error inserting a new group record"));
                         } else {
                             returnGroupId = cs.getInteger("id");
                             if (GenericController.isGuid(GroupNameOrGuid)) {
@@ -120,7 +121,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                throw new ApplicationException("Unexpected error in cp.group.add()", ex);
+                throw new GenericException("Unexpected error in cp.group.add()", ex);
             }
             return returnGroupId;
         }
@@ -136,7 +137,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 if (true) {
                     if (groupId < 1) {
-                        throw (new ApplicationException("Could not find or create the group with id [" + groupId + "]"));
+                        throw (new GenericException("Could not find or create the group with id [" + groupId + "]"));
                     } else {
                         if (userid == 0) {
                             userid = core.session.user.id;
@@ -149,7 +150,7 @@ namespace Contensive.Processor.Controllers {
                             }
                             if (!cs.ok()) {
                                 groupName = core.db.getRecordName("groups", groupId);
-                                throw (new ApplicationException("Could not find or create the Member Rule to add this member [" + userid + "] to the Group [" + groupId + ", " + groupName + "]"));
+                                throw (new GenericException("Could not find or create the Member Rule to add this member [" + userid + "] to the Group [" + groupId + ", " + groupName + "]"));
                             } else {
                                 cs.setField("active", "1");
                                 cs.setField("memberid", userid.ToString());
@@ -185,7 +186,7 @@ namespace Contensive.Processor.Controllers {
                         GroupID = core.db.getRecordID("groups", groupNameOrGuid);
                     }
                     if (GroupID < 1) {
-                        throw (new ApplicationException("Could not find or create the group [" + groupNameOrGuid + "]"));
+                        throw (new GenericException("Could not find or create the group [" + groupNameOrGuid + "]"));
                     } else {
                         if (userid == 0) {
                             userid = core.session.user.id;
@@ -197,7 +198,7 @@ namespace Contensive.Processor.Controllers {
                                 cs.insert("Member Rules");
                             }
                             if (!cs.ok()) {
-                                throw (new ApplicationException("Could not find or create the Member Rule to add this member [" + userid + "] to the Group [" + GroupID + ", " + groupNameOrGuid + "]"));
+                                throw (new GenericException("Could not find or create the Member Rule to add this member [" + userid + "] to the Group [" + GroupID + ", " + groupNameOrGuid + "]"));
                             } else {
                                 cs.setField("active", "1");
                                 cs.setField("memberid", userid.ToString());
@@ -324,7 +325,7 @@ namespace Contensive.Processor.Controllers {
                     GroupID = group_Add(core, GroupName, GroupName);
                 }
                 if (GroupID < 1) {
-                    throw (new ApplicationException("main_AddGroupMember could not find or add Group [" + GroupName + "]")); // handleLegacyError14(MethodName, "")
+                    throw (new GenericException("main_AddGroupMember could not find or add Group [" + GroupName + "]")); // handleLegacyError14(MethodName, "")
                 } else {
                     CS = core.db.csOpen("Member Rules", "(MemberID=" + core.db.encodeSQLNumber(NewMemberID) + ")and(GroupID=" + core.db.encodeSQLNumber(GroupID) + ")", "", false);
                     if (!core.db.csOk(CS)) {
@@ -332,7 +333,7 @@ namespace Contensive.Processor.Controllers {
                         CS = core.db.csInsertRecord("Member Rules");
                     }
                     if (!core.db.csOk(CS)) {
-                        throw (new ApplicationException("main_AddGroupMember could not add this member to the Group [" + GroupName + "]")); // handleLegacyError14(MethodName, "")
+                        throw (new GenericException("main_AddGroupMember could not add this member to the Group [" + GroupName + "]")); // handleLegacyError14(MethodName, "")
                     } else {
                         core.db.csSet(CS, "active", true);
                         core.db.csSet(CS, "memberid", NewMemberID);
@@ -363,7 +364,7 @@ namespace Contensive.Processor.Controllers {
                 GroupID = group_GetGroupID(core, iGroupName);
                 if (GroupID < 1) {
                 } else if (NewMemberID < 1) {
-                    throw (new ApplicationException("Member ID is invalid")); // handleLegacyError14(MethodName, "")
+                    throw (new GenericException("Member ID is invalid")); // handleLegacyError14(MethodName, "")
                 } else {
                     core.db.deleteContentRecords("Member Rules", "(MemberID=" + core.db.encodeSQLNumber(NewMemberID) + ")AND(groupid=" + core.db.encodeSQLNumber(GroupID) + ")");
                 }

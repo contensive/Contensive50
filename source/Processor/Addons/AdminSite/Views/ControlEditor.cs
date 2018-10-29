@@ -16,6 +16,7 @@ using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
 using Contensive.Addons.Tools;
 using static Contensive.Processor.AdminUIController;
+using Contensive.Processor.Exceptions;
 //
 namespace Contensive.Addons.AdminSite {
     public class ControlEditor {
@@ -39,12 +40,12 @@ namespace Contensive.Addons.AdminSite {
                     // Content not found or not loaded
                     if (adminData.adminContent.id == 0) {
                         //
-                        LogController.handleError(core, new ApplicationException("No content definition was specified for this page"));
+                        LogController.handleError(core, new GenericException("No content definition was specified for this page"));
                         return HtmlController.p("No content was specified.");
                     } else {
                         //
                         // Content Definition was not specified
-                        LogController.handleError(core, new ApplicationException( "The content definition specified for this page [" + adminData.adminContent.id + "] was not found"));
+                        LogController.handleError(core, new GenericException( "The content definition specified for this page [" + adminData.adminContent.id + "] was not found"));
                         return HtmlController.p("No content was specified.");
                     }
                 }

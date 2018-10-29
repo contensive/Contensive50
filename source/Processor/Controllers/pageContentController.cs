@@ -15,6 +15,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 //
 using Contensive.BaseClasses;
+using Contensive.Processor.Exceptions;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -319,7 +320,7 @@ namespace Contensive.Processor.Controllers {
                 if (domain == null) {
                     //
                     // -- domain is not valid
-                    LogController.handleError( core,new ApplicationException("Page could not be determined because the domain was not recognized."));
+                    LogController.handleError( core,new GenericException("Page could not be determined because the domain was not recognized."));
                 } else {
                     //
                     // -- attempt requested page
@@ -446,7 +447,7 @@ namespace Contensive.Processor.Controllers {
                 if (domain == null) {
                     //
                     // -- domain not available
-                    LogController.handleError( core,new ApplicationException("Landing page could not be determined because the domain was not recognized."));
+                    LogController.handleError( core,new GenericException("Landing page could not be determined because the domain was not recognized."));
                 } else {
                     //
                     // -- attempt domain landing page

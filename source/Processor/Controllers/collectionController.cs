@@ -11,6 +11,7 @@ using System.Threading;
 using Contensive.Processor.Models.Domain;
 using System.Linq;
 using static Contensive.BaseClasses.CPFileSystemBaseClass;
+using Contensive.Processor.Exceptions;
 
 namespace Contensive.Processor.Controllers {
     // todo: rework how adds are installed, this change can be done after weave launch
@@ -2564,7 +2565,7 @@ namespace Contensive.Processor.Controllers {
                                             //
                                             // Bad field name - need to report it somehow
                                             //
-                                            LogController.handleError(core, new ApplicationException("bad field found [" + FieldName + "], in addon node [" + addonName + "], of collection [" + core.db.getRecordName("add-on collections", CollectionID) + "]"));
+                                            LogController.handleError(core, new GenericException("bad field found [" + FieldName + "], in addon node [" + addonName + "], of collection [" + core.db.getRecordName("add-on collections", CollectionID) + "]"));
                                         } else {
                                             core.db.csSet(CS, FieldName, FieldValue);
                                         }
@@ -2828,7 +2829,7 @@ namespace Contensive.Processor.Controllers {
                 if (string.IsNullOrEmpty(baseCollectionXml)) {
                     //
                     // -- base collection notfound
-                    throw new ApplicationException("Cannot load [" + core.programFiles.localAbsRootPath + "aoBase5.xml]");
+                    throw new GenericException("Cannot load [" + core.programFiles.localAbsRootPath + "aoBase5.xml]");
                 } else {
                     {
                         //
@@ -2844,7 +2845,7 @@ namespace Contensive.Processor.Controllers {
                     List<string> installedCollectionGuidList = new List<string>();
                     string installErrorMessage = "";
                     if (!installCollectionsFromPrivateFolder(core, installPrivatePath, ref installErrorMessage, ref installedCollectionGuidList, isNewBuild, isRepairMode, ref nonCriticalErrorList, logPrefix, ref blockCollectionList, false)) {
-                        throw new ApplicationException(installErrorMessage);
+                        throw new GenericException(installErrorMessage);
                     }
                     core.privateFiles.deleteFolder(installPrivatePath);
                 }

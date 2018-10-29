@@ -14,6 +14,7 @@ using System.IO;
 using System.Data;
 using Contensive.Processor.Models.Domain;
 using System.Linq;
+using Contensive.Processor.Exceptions;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -129,7 +130,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // -- addons with activeX components are deprecated
                         string addonDescription = getAddonDescription(core, addon);
-                        throw new ApplicationException("Addon is no longer supported because it contains an active-X component, add-on " + addonDescription + ".");
+                        throw new GenericException("Addon is no longer supported because it contains an active-X component, add-on " + addonDescription + ".");
                     } else {
                         //
                         // -- check for addon recursion beyond limit (addonRecursionLimit)
@@ -139,7 +140,7 @@ namespace Contensive.Processor.Controllers {
                         if (blockRecursion) {
                             //
                             // -- cannot call an addon within an addon
-                            throw new ApplicationException("Addon recursion limit exceeded. An addon [#" + addon.id + ", " + addon.name + "] cannot be called by itself more than " + addonRecursionLimit + " times.");
+                            throw new GenericException("Addon recursion limit exceeded. An addon [#" + addon.id + ", " + addon.name + "] cannot be called by itself more than " + addonRecursionLimit + " times.");
                         } else {
                             //
                             // -- track recursion and continue
@@ -157,7 +158,7 @@ namespace Contensive.Processor.Controllers {
                             // -- run included add-ons before their parent
                             foreach (var dependentAddon in core.addonCache.getDependsOnList(addon.id)) {
                                 if (dependentAddon == null) {
-                                    LogController.handleError(core, new ApplicationException("Addon not found. An included addon of [" + addon.name + "] was not found. The included addon may have been deleted. Recreate or reinstall the missing addon, then reinstall [" + addon.name + "] or manually correct the included addon selection."));
+                                    LogController.handleError(core, new GenericException("Addon not found. An included addon of [" + addon.name + "] was not found. The included addon may have been deleted. Recreate or reinstall the missing addon, then reinstall [" + addon.name + "] or manually correct the included addon selection."));
                                 } else {
                                     executeContext.errorContextMessage = "adding dependent addon [" + dependentAddon.name + "] for addon [" + addon.name + "] called within context [" + executeContext.errorContextMessage + "]";
                                     result += executeDependency(dependentAddon, executeContext);
@@ -167,7 +168,7 @@ namespace Contensive.Processor.Controllers {
                             //foreach ( int includedAddonID in addonIncludeRuleList) {
                             //    AddonModel dependentAddon = AddonModel.create(core, includedAddonID);
                             //    if (dependentAddon == null) {
-                            //        LogController.handleError(core, new ApplicationException("Addon not found. An included addon of [" + addon.name + "] was not found. The included addon may have been deleted. Recreate or reinstall the missing addon, then reinstall [" + addon.name + "] or manually correct the included addon selection."));
+                            //        LogController.handleError(core, new GenericException("Addon not found. An included addon of [" + addon.name + "] was not found. The included addon may have been deleted. Recreate or reinstall the missing addon, then reinstall [" + addon.name + "] or manually correct the included addon selection."));
                             //    } else {
                             //        executeContext.errorContextMessage = "adding dependent addon [" + dependentAddon.name + "] for addon [" + addon.name + "] called within context [" + executeContext.errorContextMessage + "]";
                             //        result += executeDependency(dependentAddon, executeContext);
@@ -180,7 +181,7 @@ namespace Contensive.Processor.Controllers {
                             //        if (addonRule.includedAddonID > 0) {
                             //            AddonModel dependentAddon = AddonModel.create(core, addonRule.includedAddonID);
                             //            if (dependentAddon == null) {
-                            //                LogController.handleError(core, new ApplicationException("Addon not found. An included addon of [" + addon.name + "] was not found. The included addon may have been deleted. Recreate or reinstall the missing addon, then reinstall [" + addon.name + "] or manually correct the included addon selection."));
+                            //                LogController.handleError(core, new GenericException("Addon not found. An included addon of [" + addon.name + "] was not found. The included addon may have been deleted. Recreate or reinstall the missing addon, then reinstall [" + addon.name + "] or manually correct the included addon selection."));
                             //            } else {
                             //                executeContext.errorContextMessage = "adding dependent addon [" + dependentAddon.name + "] for addon [" + addon.name + "] called within context [" + addonContextMessage + "]";
                             //                result += executeDependency(dependentAddon, executeContext);
@@ -466,7 +467,7 @@ namespace Contensive.Processor.Controllers {
                                         }
                                     } catch (Exception ex) {
                                         string addonDescription = getAddonDescription(core, addon);
-                                        throw new ApplicationException("There was an error executing the script component of Add-on " + addonDescription + ". The details of this error follow.</p><p>" + ex.InnerException.Message + "");
+                                        throw new GenericException("There was an error executing the script component of Add-on " + addonDescription + ". The details of this error follow.</p><p>" + ex.InnerException.Message + "");
                                     }
                                 }
                                 //
@@ -1475,7 +1476,7 @@ namespace Contensive.Processor.Controllers {
                 } catch (Exception ex) {
                     string addonDescription = getAddonDescription(core, addon);
                     string errorMessage = "Error executing addon script, " + addonDescription;
-                    throw new ApplicationException(errorMessage, ex);
+                    throw new GenericException(errorMessage, ex);
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
@@ -1554,7 +1555,7 @@ namespace Contensive.Processor.Controllers {
                 } catch (Exception ex) {
                     string addonDescription = getAddonDescription(core, addon);
                     string errorMessage = "Error executing addon script, " + addonDescription;
-                    throw new ApplicationException(errorMessage, ex);
+                    throw new GenericException(errorMessage, ex);
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
@@ -1614,22 +1615,22 @@ namespace Contensive.Processor.Controllers {
                         // -- try addon folder
                         // -- purpose is to have a repository where addons can be stored for now web and non-web apps, and allow permissions to be installed with online upload
                         if (addonCollection == null) {
-                            throw new ApplicationException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "]. The collection path was not checked because the addon has no collection set.");
+                            throw new GenericException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "]. The collection path was not checked because the addon has no collection set.");
                         } else if (string.IsNullOrEmpty(addonCollection.ccguid)) {
-                            throw new ApplicationException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "]. The collection path was not checked because the addon collection [" + addonCollection.name + "] has no guid.");
+                            throw new GenericException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "]. The collection path was not checked because the addon collection [" + addonCollection.name + "] has no guid.");
                         } else {
                             string AddonVersionPath = "";
                             var tmpDate = new DateTime();
                             string tmpName = "";
                             CollectionController.getCollectionConfig(core, addonCollection.ccguid, ref AddonVersionPath, ref tmpDate, ref tmpName);
                             if (string.IsNullOrEmpty(AddonVersionPath)) {
-                                throw new ApplicationException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "]. The collection path was not checked because the collection [" + addonCollection.name + "] was not found in the \\private\\addons\\Collections.xml file. Try re-installing the collection");
+                                throw new GenericException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "]. The collection path was not checked because the collection [" + addonCollection.name + "] was not found in the \\private\\addons\\Collections.xml file. Try re-installing the collection");
                             } else {
                                 string AddonPath = core.privateFiles.joinPath(getPrivateFilesAddonPath(), AddonVersionPath);
                                 string appAddonPath = core.privateFiles.joinPath(core.privateFiles.localAbsRootPath, AddonPath);
                                 result = execute_assembly_byFilePath(addon, appAddonPath, false, ref AddonFound);
                                 if (!AddonFound) {
-                                    throw new ApplicationException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "] or collection path [" + appAddonPath + "].");
+                                    throw new GenericException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "] or collection path [" + appAddonPath + "].");
                                 }
                             }
                         }
@@ -1735,11 +1736,11 @@ namespace Contensive.Processor.Controllers {
                                                     //
                                                     string detailedErrorMessage = "There was an error in the addon [" + addon.name + "]. It could not be executed because there was an error in the addon assembly [" + TestFilePathname + "], in class [" + addonType.FullName.Trim().ToLowerInvariant() + "]. The error was [" + Ex.ToString() + "]";
                                                     LogController.handleError(core, Ex, detailedErrorMessage);
-                                                    //Throw New ApplicationException(detailedErrorMessage)
+                                                    //Throw new GenericException(detailedErrorMessage)
                                                 }
                                             } catch (Exception Ex) {
                                                 string detailedErrorMessage = addon.name + " could not be executed because there was an error creating an object from the assembly, DLL [" + addonType.FullName + "]. The error was [" + Ex.ToString() + "]";
-                                                throw new ApplicationException(detailedErrorMessage);
+                                                throw new GenericException(detailedErrorMessage);
                                             }
                                             //
                                             // -- addon was found, no need to look for more
@@ -1763,7 +1764,7 @@ namespace Contensive.Processor.Controllers {
                                         LogController.logDebug(core, "Assembly exception, [" + TestFilePathname + "], adding to assemblySkipList, ex [" + ex.Message + "]");
                                         core.assemblySkipList.Add(TestFilePathname);
                                         string detailedErrorMessage = "While locating assembly for addon [" + addon.name + "], there was an error loading types for assembly [" + TestFilePathname + "]. This assembly was skipped and should be removed from the folder [" + fullPath + "]";
-                                        throw new ApplicationException(detailedErrorMessage);
+                                        throw new GenericException(detailedErrorMessage);
                                     }
                                 }
                             } catch (System.Reflection.ReflectionTypeLoadException ex) {
@@ -1773,7 +1774,7 @@ namespace Contensive.Processor.Controllers {
                                 foreach (Exception exLoader in ex.LoaderExceptions) {
                                     detailedErrorMessage += "\r\n--LoaderExceptions: " + exLoader.Message;
                                 }
-                                throw new ApplicationException(detailedErrorMessage);
+                                throw new GenericException(detailedErrorMessage);
                             } catch (Exception ex) {
                                 //
                                 // ignore these errors
@@ -1781,7 +1782,7 @@ namespace Contensive.Processor.Controllers {
                                 LogController.logDebug(core, "Assembly Exception-2, [" + TestFilePathname + "], adding to assemblySkipList, ex [" + ex.Message + "]");
                                 core.assemblySkipList.Add(TestFilePathname);
                                 string detailedErrorMessage = "A non-load exception occured while loading the addon [" + addon.name + "], DLL [" + TestFilePathname + "]. The error was [" + ex.ToString() + "].";
-                                LogController.handleError(core, new ApplicationException(detailedErrorMessage));
+                                LogController.handleError(core, new GenericException(detailedErrorMessage));
                             }
                         }
                     }
@@ -2100,7 +2101,7 @@ namespace Contensive.Processor.Controllers {
                 LogController.handleError(core, ex);
             }
             //ErrorTrap:
-            //throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError18("addon_execute_GetInstanceBubble")
+            //throw new GenericException("Unexpected exception"); // Call core.handleLegacyError18("addon_execute_GetInstanceBubble")
             return tempgetInstanceBubble;
         }
         //
@@ -2337,7 +2338,7 @@ namespace Contensive.Processor.Controllers {
                 LogController.handleError(core, ex);
             }
             //ErrorTrap:
-            //throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError18("addon_execute_GetHTMLViewerBubble")
+            //throw new GenericException("Unexpected exception"); // Call core.handleLegacyError18("addon_execute_GetHTMLViewerBubble")
             return tempgetHTMLViewerBubble;
         }
         //

@@ -12,6 +12,7 @@ using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
+using Contensive.Processor.Exceptions;
 //
 
 namespace Contensive.Processor.Controllers {
@@ -144,7 +145,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                ApplicationException newEx = new ApplicationException("Exception [" + ex.Message + "] executing master sql [" + sql + "]", ex);
+                ApplicationException newEx = new GenericException("Exception [" + ex.Message + "] executing master sql [" + sql + "]", ex);
                 LogController.handleError( core,newEx);
             }
             return returnData;

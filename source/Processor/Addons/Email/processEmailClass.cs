@@ -7,6 +7,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
 using Contensive.BaseClasses;
+using Contensive.Processor.Exceptions;
 //
 namespace Contensive.Addons.Email {
     public class ProcessEmailClass  : AddonBaseClass{
@@ -145,7 +146,7 @@ namespace Contensive.Addons.Email {
                 LogController.handleError( core,ex);
             }
             //ErrorTrap:
-            throw (new ApplicationException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "ProcessEmail_GroupEmail", Err.Number, Err.Source, Err.Description, True, True, "")
+            throw (new GenericException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "ProcessEmail_GroupEmail", Err.Number, Err.Source, Err.Description, True, True, "")
                                                                       //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
             //Microsoft.VisualBasic.Information.Err().Clear();
         }
@@ -499,7 +500,7 @@ namespace Contensive.Addons.Email {
                 }
                 //Call core.app.closeCS(CSLog)
             } catch (Exception) {
-                throw (new ApplicationException("Unexpected exception")); 
+                throw (new GenericException("Unexpected exception")); 
             } finally {
                 core.db.csClose(ref CSPeople);
                 core.db.csClose(ref CSLog);

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Constants;
 using System.Data;
+using Contensive.Processor.Exceptions;
 //
 namespace Contensive.Processor.Models.Db {
     //
@@ -199,7 +200,7 @@ namespace Contensive.Processor.Models.Db {
         private static string derivedContentName(Type derivedType) {
             FieldInfo fieldInfo = derivedType.GetField("contentName");
             if (fieldInfo == null) {
-                throw new ApplicationException("Class [" + derivedType.Name + "] must declare constant [contentName].");
+                throw new GenericException("Class [" + derivedType.Name + "] must declare constant [contentName].");
             } else {
                 return fieldInfo.GetRawConstantValue().ToString();
             }
@@ -214,7 +215,7 @@ namespace Contensive.Processor.Models.Db {
         private static string derivedTableName(Type derivedType) {
             FieldInfo fieldInfo = derivedType.GetField("contentTableName");
             if (fieldInfo == null) {
-                throw new ApplicationException("Class [" + derivedType.Name + "] must declare constant [contentTableName].");
+                throw new GenericException("Class [" + derivedType.Name + "] must declare constant [contentTableName].");
             } else {
                 return fieldInfo.GetRawConstantValue().ToString();
             }
@@ -229,7 +230,7 @@ namespace Contensive.Processor.Models.Db {
         private static string derivedDataSourceName(Type derivedType) {
             FieldInfo fieldInfo = derivedType.GetField("contentDataSource");
             if (fieldInfo == null) {
-                throw new ApplicationException("Class [" + derivedType.Name + "] must declare public constant [contentDataSource].");
+                throw new GenericException("Class [" + derivedType.Name + "] must declare public constant [contentDataSource].");
             } else {
                 return fieldInfo.GetRawConstantValue().ToString();
             }
@@ -244,7 +245,7 @@ namespace Contensive.Processor.Models.Db {
         private static bool derivedNameFieldIsUnique(Type derivedType) {
             FieldInfo fieldInfo = derivedType.GetField("nameFieldIsUnique");
             if (fieldInfo == null) {
-                throw new ApplicationException("Class [" + derivedType.Name + "] must declare public constant [nameFieldIsUnique].");
+                throw new GenericException("Class [" + derivedType.Name + "] must declare public constant [nameFieldIsUnique].");
             } else {
                 return (bool)fieldInfo.GetRawConstantValue();
             }
@@ -370,11 +371,11 @@ namespace Contensive.Processor.Models.Db {
                 if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    LogController.handleError(core, new ApplicationException("Cannot use data models without a valid server configuration."));
+                    LogController.handleError(core, new GenericException("Cannot use data models without a valid server configuration."));
                 } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    LogController.handleError(core, new ApplicationException("Cannot use data models without a valid application configuration."));
+                    LogController.handleError(core, new GenericException("Cannot use data models without a valid application configuration."));
                 } else {
                     Type instanceType = typeof(T);
                     result = create<T>(core, core.db.insertTableRecordGetId(derivedDataSourceName(instanceType), derivedTableName(instanceType), core.session.user.id));
@@ -411,11 +412,11 @@ namespace Contensive.Processor.Models.Db {
                 if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
+                    LogController.handleError( core,new GenericException("Cannot use data models without a valid server configuration."));
                 } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
+                    LogController.handleError( core,new GenericException("Cannot use data models without a valid application configuration."));
                 } else {
                     if (recordId > 0) {
                         result = readRecordCache<T>(core, recordId);
@@ -492,11 +493,11 @@ namespace Contensive.Processor.Models.Db {
                 if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
+                    LogController.handleError( core,new GenericException("Cannot use data models without a valid server configuration."));
                 } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
+                    LogController.handleError( core,new GenericException("Cannot use data models without a valid application configuration."));
                 } else {
                     if (!string.IsNullOrEmpty(recordGuid)) {
                         Type instanceType = typeof(T);
@@ -548,11 +549,11 @@ namespace Contensive.Processor.Models.Db {
                 if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
+                    LogController.handleError( core,new GenericException("Cannot use data models without a valid server configuration."));
                 } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
+                    LogController.handleError( core,new GenericException("Cannot use data models without a valid application configuration."));
                 } else {
                     if (!string.IsNullOrEmpty(recordName)) {
                         Type instanceType = typeof(T);
@@ -711,11 +712,11 @@ namespace Contensive.Processor.Models.Db {
                 if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
+                    LogController.handleError( core,new GenericException("Cannot use data models without a valid server configuration."));
                 } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
+                    LogController.handleError( core,new GenericException("Cannot use data models without a valid application configuration."));
                 } else {
                     //CsController cs = new CsController(core);
                     Type instanceType = this.GetType();
@@ -890,11 +891,11 @@ namespace Contensive.Processor.Models.Db {
                 if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
+                    LogController.handleError( core,new GenericException("Cannot use data models without a valid server configuration."));
                 } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
+                    LogController.handleError( core,new GenericException("Cannot use data models without a valid application configuration."));
                 } else {
                     if (recordId > 0) {
                         Type instanceType = typeof(T);
@@ -921,11 +922,11 @@ namespace Contensive.Processor.Models.Db {
                 if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
+                    LogController.handleError( core,new GenericException("Cannot use data models without a valid server configuration."));
                 } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
+                    LogController.handleError( core,new GenericException("Cannot use data models without a valid application configuration."));
                 } else {
                     if (!string.IsNullOrEmpty(ccguid)) {
                         Type instanceType = typeof(T);
@@ -980,11 +981,11 @@ namespace Contensive.Processor.Models.Db {
                 if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
+                    LogController.handleError( core,new GenericException("Cannot use data models without a valid server configuration."));
                 } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
+                    LogController.handleError( core,new GenericException("Cannot use data models without a valid application configuration."));
                 } else {
                     using (var dt = core.db.executeQuery(getSelectSql<T>(core, null, sqlCriteria, sqlOrderBy))) {
                         T instance = default(T);
@@ -1014,11 +1015,11 @@ namespace Contensive.Processor.Models.Db {
                 if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid server configuration."));
+                    LogController.handleError( core,new GenericException("Cannot use data models without a valid server configuration."));
                 } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    LogController.handleError( core,new ApplicationException("Cannot use data models without a valid application configuration."));
+                    LogController.handleError( core,new GenericException("Cannot use data models without a valid application configuration."));
                 } else {
                     object instanceType = typeof(T);
                     core.cache.invalidateDbRecord( recordId, derivedTableName((Type)instanceType));
@@ -1039,11 +1040,11 @@ namespace Contensive.Processor.Models.Db {
                 if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    LogController.handleError(core, new ApplicationException("Cannot use data models without a valid server configuration."));
+                    LogController.handleError(core, new GenericException("Cannot use data models without a valid server configuration."));
                 } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    LogController.handleError(core, new ApplicationException("Cannot use data models without a valid application configuration."));
+                    LogController.handleError(core, new GenericException("Cannot use data models without a valid application configuration."));
                 } else {
                     object instanceType = typeof(T);
                     core.cache.invalidateAllKeysInTable(derivedTableName((Type)instanceType));
@@ -1126,11 +1127,11 @@ namespace Contensive.Processor.Models.Db {
                 if (core.serverConfig == null) {
                     //
                     // -- cannot use models without an application
-                    LogController.handleError(core, new ApplicationException("Cannot use data models without a valid server configuration."));
+                    LogController.handleError(core, new GenericException("Cannot use data models without a valid server configuration."));
                 } else if (core.appConfig == null) {
                     //
                     // -- cannot use models without an application
-                    LogController.handleError(core, new ApplicationException("Cannot use data models without a valid application configuration."));
+                    LogController.handleError(core, new GenericException("Cannot use data models without a valid application configuration."));
                 } else {
                     Type instanceType = typeof(T);
                     instance = (T)Activator.CreateInstance(instanceType);

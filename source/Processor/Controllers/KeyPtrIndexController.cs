@@ -92,7 +92,7 @@
 //                        load();
 //                    }
 //                    if (!dataStore.loaded) {
-//                        throw new ApplicationException("datastore could not be loaded");
+//                        throw new GenericException("datastore could not be loaded");
 //                    } else {
 //                        returnPtr = dataStore.keyPtrIndex.getPtr(key);
 //                    }
@@ -115,7 +115,7 @@
 //                    load();
 //                }
 //                if (!dataStore.loaded) {
-//                    throw new ApplicationException("datastore could not be loaded");
+//                    throw new GenericException("datastore could not be loaded");
 //                } else {
 //                    returnPtr = dataStore.keyPtrIndex.getNextPtr();
 //                }
@@ -142,7 +142,7 @@
 //                        load();
 //                    }
 //                    if (!dataStore.loaded) {
-//                        throw new ApplicationException("datastore could not be loaded");
+//                        throw new GenericException("datastore could not be loaded");
 //                    } else {
 //                        returnPtr = dataStore.keyPtrIndex.getPtr(key);
 //                    }
@@ -169,7 +169,7 @@
 //                        load();
 //                    }
 //                    if (!dataStore.loaded) {
-//                        throw new ApplicationException("datastore could not be loaded");
+//                        throw new GenericException("datastore could not be loaded");
 //                    } else {
 //                        returnValue = dataStore.dataList[ptr];
 //                    }
@@ -234,7 +234,7 @@
 //                    dataStore.loaded = true;
 //                }
 //            } catch (Exception ex) {
-//                throw new ApplicationException("Exception in cacheKeyPtrClass.load", ex);
+//                throw new GenericException("Exception in cacheKeyPtrClass.load", ex);
 //            }
 //        }
 //        //
@@ -249,7 +249,7 @@
 //                    core.cache.setObject(cacheName, dataStore, cacheInvalidationTagCommaList);
 //                }
 //            } catch (Exception ex) {
-//                throw new ApplicationException("Exception in cacheKeyPtrClass.save", ex);
+//                throw new GenericException("Exception in cacheKeyPtrClass.save", ex);
 //            }
 //        }
 //    }

@@ -16,6 +16,7 @@ using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
 using Contensive.Addons.Tools;
 using static Contensive.Processor.AdminUIController;
+using Contensive.Processor.Exceptions;
 //
 namespace Contensive.Addons.AdminSite {
     public class FormIndexExport {
@@ -162,7 +163,7 @@ namespace Contensive.Addons.AdminSite {
                                     case 1:
                                         var ExportCSVAddon = Processor.Models.Db.AddonModel.create(core, addonGuidExportCSV);
                                         if (ExportCSVAddon == null) {
-                                            LogController.handleError(core, new ApplicationException("ExportCSV addon not found. Task could not be added to task queue."));
+                                            LogController.handleError(core, new GenericException("ExportCSV addon not found. Task could not be added to task queue."));
                                         } else {
                                             var docProperties = new Dictionary<string, string> {
                                                 { "sql", SQL },
@@ -180,7 +181,7 @@ namespace Contensive.Addons.AdminSite {
                                     default:
                                         var ExportXMLAddon = Processor.Models.Db.AddonModel.create(core, addonGuidExportXML);
                                         if (ExportXMLAddon == null) {
-                                            LogController.handleError(core, new ApplicationException(message: "ExportXML addon not found. Task could not be added to task queue."));
+                                            LogController.handleError(core, new GenericException(message: "ExportXML addon not found. Task could not be added to task queue."));
                                         } else {
                                             var docProperties = new Dictionary<string, string> {
                                                 { "sql", SQL },

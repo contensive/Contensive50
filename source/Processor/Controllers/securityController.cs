@@ -4,6 +4,7 @@ using System.Text;
 using System.Security.Cryptography;
 using System.IO;
 using static Contensive.Processor.Controllers.GenericController;
+using Contensive.Processor.Exceptions;
 //
 namespace Contensive.Processor.Controllers {
     public class SecurityController {
@@ -571,12 +572,12 @@ namespace Contensive.Processor.Controllers {
             private static byte[] ReadByteArray(Stream s) {
                 byte[] rawLength = new byte[sizeof(int)];
                 if (s.Read(rawLength, 0, rawLength.Length) != rawLength.Length) {
-                    throw new SystemException("Stream did not contain properly formatted byte array");
+                    throw new GenericException("Stream did not contain properly formatted byte array");
                 }
 
                 byte[] buffer = new byte[BitConverter.ToInt32(rawLength, 0)];
                 if (s.Read(buffer, 0, buffer.Length) != buffer.Length) {
-                    throw new SystemException("Did not read byte array properly");
+                    throw new GenericException("Did not read byte array properly");
                 }
 
                 return buffer;

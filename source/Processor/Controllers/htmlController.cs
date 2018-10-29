@@ -834,7 +834,7 @@ namespace Contensive.Processor.Controllers {
                 LogController.handleError( core,ex);
             }
             //ErrorTrap:
-            //throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError18("main_GetAdminHintWrapper")
+            //throw new GenericException("Unexpected exception"); // Call core.handleLegacyError18("main_GetAdminHintWrapper")
             return temphtml_GetAdminHintWrapper;
         }
         //
@@ -1083,7 +1083,7 @@ namespace Contensive.Processor.Controllers {
                 LogController.handleError( core,ex);
             }
             //ErrorTrap:
-            //throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError18(MethodName)
+            //throw new GenericException("Unexpected exception"); // Call core.handleLegacyError18(MethodName)
             //
             return temphtml_GetFormInputRadioBox;
         }

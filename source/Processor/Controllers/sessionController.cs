@@ -8,6 +8,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.BaseClasses;
 using Contensive.Processor.Models.Domain;
+using Contensive.Processor.Exceptions;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -132,7 +133,7 @@ namespace Contensive.Processor.Controllers {
                 if (core.serverConfig == null) {
                     //
                     // -- application error if no server config
-                    LogController.handleError( core,new ApplicationException("authorization context cannot be created without a server configuration."));
+                    LogController.handleError( core,new GenericException("authorization context cannot be created without a server configuration."));
                 } else {
                     //
                     if (core.appConfig == null) {

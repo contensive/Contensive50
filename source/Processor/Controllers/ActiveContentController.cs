@@ -4,6 +4,7 @@ using Contensive.BaseClasses;
 using Contensive.Processor.Models.Db;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
+using Contensive.Processor.Exceptions;
 
 namespace Contensive.Processor.Controllers {
     /// <summary>
@@ -84,16 +85,16 @@ namespace Contensive.Processor.Controllers {
                 //{
                 //    int Pos = genericController.vbInstr(1, workingContent, "<?contensive", 1);
                 //    if (Pos > 0) {
-                //        throw new ApplicationException("Structured xml data commands are no longer supported");
+                //        throw new GenericException("Structured xml data commands are no longer supported");
                 //    }
                 //}
                 //
                 // -- start-end gtroup - deprecated
                 //if (workingContent.IndexOf("<!-- STARTGROUPACCESS ") > 0) {
-                //    throw new ApplicationException("Structured xml data commands are no longer supported");
+                //    throw new GenericException("Structured xml data commands are no longer supported");
                 //}
                 //if (workingContent.IndexOf("<!-- ENDGROUPACCESS ") > 0) {
-                //    throw new ApplicationException("Structured xml data commands are no longer supported");
+                //    throw new GenericException("Structured xml data commands are no longer supported");
                 //}
                 //
                 // Test early if this needs to run at all
@@ -1293,7 +1294,7 @@ namespace Contensive.Processor.Controllers {
                                                                                                         //
                                                                                                         // image load failed, use raw filename
                                                                                                         //
-                                                                                                        throw (new ApplicationException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "Error while loading image to resize, [" & RecordVirtualFilename & "]", "dll", "coreClass", "DecodeAciveContent", Err.Number, Err.Source, Err.Description, False, True, "")
+                                                                                                        throw (new GenericException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "Error while loading image to resize, [" & RecordVirtualFilename & "]", "dll", "coreClass", "DecodeAciveContent", Err.Number, Err.Source, Err.Description, False, True, "")
                                                                                                     } else {
                                                                                                         //
                                                                                                         //

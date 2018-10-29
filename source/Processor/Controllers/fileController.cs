@@ -14,6 +14,7 @@ using static Contensive.Processor.Constants;
 using Amazon.Runtime;
 using System.Linq;
 using static Contensive.BaseClasses.CPFileSystemBaseClass;
+using Contensive.Processor.Exceptions;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -866,7 +867,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 srcPathFilename = normalizeDosPathFilename(srcPathFilename);
                 if (string.IsNullOrEmpty(srcPathFilename)) {
-                    throw new ApplicationException("Invalid source file");
+                    throw new GenericException("Invalid source file");
                 } else {
                     if (!isLocal) {
                         // todo remote file case
@@ -879,11 +880,11 @@ namespace Contensive.Processor.Controllers {
                             sourceFullPath = srcPathFilename.Left(Pos);
                         }
                         if (string.IsNullOrEmpty(dstFilename)) {
-                            throw new ApplicationException("Invalid destination file []");
+                            throw new GenericException("Invalid destination file []");
                         } else if (dstFilename.IndexOf("\\") != -1) {
-                            throw new ApplicationException("Invalid '\\' character in destination filename [" + dstFilename + "]");
+                            throw new GenericException("Invalid '\\' character in destination filename [" + dstFilename + "]");
                         } else if (dstFilename.IndexOf("/") != -1) {
-                            throw new ApplicationException("Invalid '/' character in destination filename [" + dstFilename + "]");
+                            throw new GenericException("Invalid '/' character in destination filename [" + dstFilename + "]");
                         } else if (!fileExists(srcPathFilename)) {
                             //
                             // not an error, to minimize file use, empty files are not created, so missing files are just empty
@@ -1184,7 +1185,7 @@ namespace Contensive.Processor.Controllers {
                 } else if (isinLocalAbsDosPath(normalizedPathFilename)) {
                     result = normalizedPathFilename;
                 } else if (normalizedPathFilename.IndexOf(":\\") >= 0) {
-                    throw new ApplicationException("Attempt to access an invalid path [" + normalizedPathFilename + "] that is not within the allowed path [" + localAbsRootPath + "].");
+                    throw new GenericException("Attempt to access an invalid path [" + normalizedPathFilename + "] that is not within the allowed path [" + localAbsRootPath + "].");
                 } else {
                     result = joinPath(localAbsRootPath, normalizedPathFilename);
                 }
@@ -1391,7 +1392,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 pathFilename = normalizeDosPathFilename(pathFilename);
                 if (isLocal) {
-                    // not exception, can be used regardless of isLocal //throw new ApplicationException("copyLocalToRemote is not valid in a local File system [" + localAbsRootPath + "]");
+                    // not exception, can be used regardless of isLocal //throw new GenericException("copyLocalToRemote is not valid in a local File system [" + localAbsRootPath + "]");
                 } else {
                     if (fileExists_local(pathFilename)) {
                         string localDosPathFilename = GenericController.convertToDosSlash(pathFilename);

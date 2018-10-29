@@ -47,12 +47,12 @@ namespace Contensive.BaseClasses
         /// argument details for file and folder methods
         /// </summary>
         public class FolderDetail {
-            public string Name;
-            public int Attributes;
-            public DateTime DateCreated;
-            public DateTime DateLastAccessed;
-            public DateTime DateLastModified;
-            public string Type;
+            public string Name { get; set; }
+            public int Attributes { get; set; }
+            public DateTime DateCreated { get; set; }
+            public DateTime DateLastAccessed { get; set; }
+            public DateTime DateLastModified { get; set; }
+            public string Type { get; set; }
         }
         //
         public abstract void append(string Filename, string FileContent);

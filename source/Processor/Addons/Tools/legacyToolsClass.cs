@@ -15,6 +15,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 //
 using System.Threading;
+using Contensive.Processor.Exceptions;
 //
 namespace Contensive.Addons.Tools {
     public class legacyToolsClass {
@@ -1514,7 +1515,7 @@ namespace Contensive.Addons.Tools {
                 //
                 CSPointer = core.db.csOpen("Content Fields", "(ContentID=" + ContentID + ")", "IndexColumn");
                 if (!core.db.csOk(CSPointer)) {
-                    throw (new ApplicationException("Unexpected exception")); // Call handleLegacyClassErrors2("NormalizeIndexColumns", "Could not read Content Field Definitions")
+                    throw (new GenericException("Unexpected exception")); // Call handleLegacyClassErrors2("NormalizeIndexColumns", "Could not read Content Field Definitions")
                 } else {
                     //
                     // Adjust IndexSortOrder to be 0 based, count by 1
@@ -1577,7 +1578,7 @@ namespace Contensive.Addons.Tools {
                 //
                 CSPointer = core.db.csOpen("Content Fields", "(ContentID=" + ContentID + ")", "IndexSortPriority, IndexColumn");
                 if (!core.db.csOk(CSPointer)) {
-                    throw (new ApplicationException("Unexpected exception")); // Call handleLegacyClassErrors2("NormalizeIndexColumns", "Error reading Content Field Definitions")
+                    throw (new GenericException("Unexpected exception")); // Call handleLegacyClassErrors2("NormalizeIndexColumns", "Error reading Content Field Definitions")
                 } else {
                     //
                     // Go through all fields, clear Sort Priority if it does not appear
@@ -3173,7 +3174,7 @@ namespace Contensive.Addons.Tools {
         //                End With
         //            End If
         //            Call core.db.cs_Close(CSContent)
-        //            throw (New ApplicationException("Unexpected exception"))'  Call handleLegacyClassErrors1("ImportTemplates", "ErrorTrap")
+        //            throw (new GenericException("Unexpected exception"))'  Call handleLegacyClassErrors1("ImportTemplates", "ErrorTrap")
         //        End Function
         //        '
         //        '=================================================================================
@@ -3268,7 +3269,7 @@ namespace Contensive.Addons.Tools {
         //            '
         //            ' ----- Error Trap
         //            '
-        //            throw (New ApplicationException("Unexpected exception"))'  Call handleLegacyClassErrors1("GetDbCDef_SetAdminColumns", "ErrorTrap")
+        //            throw (new GenericException("Unexpected exception"))'  Call handleLegacyClassErrors1("GetDbCDef_SetAdminColumns", "ErrorTrap")
         //        End Sub
         //
         //=============================================================================
@@ -3506,7 +3507,7 @@ namespace Contensive.Addons.Tools {
         // <param name="ignore0"></param>
         // <remarks></remarks>
         //Private Sub handleLegacyClassErrors1(ByVal MethodName As String, Optional ByVal ignore0 As String = "")
-        //   throw (New ApplicationException("Unexpected exception"))'core.handleLegacyError("Tools", MethodName, Err.Number, Err.Source, Err.Description, True, False)
+        //   throw (new GenericException("Unexpected exception"))'core.handleLegacyError("Tools", MethodName, Err.Number, Err.Source, Err.Description, True, False)
         //End Sub
         //
         //====================================================================================================
@@ -3517,7 +3518,7 @@ namespace Contensive.Addons.Tools {
         // <param name="ErrDescription"></param>
         // <remarks></remarks>
         //Private Sub handleLegacyClassErrors2(ByVal MethodName As String, ByVal ErrDescription As String)
-        //    fixme-- logController.handleException( core,New ApplicationException("")) ' -----ignoreInteger, "App.EXEName", ErrDescription)
+        //    fixme-- logController.handleException( core,new GenericException("")) ' -----ignoreInteger, "App.EXEName", ErrDescription)
         //End Sub
 
 

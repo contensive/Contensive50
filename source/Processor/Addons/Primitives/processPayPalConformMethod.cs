@@ -68,7 +68,7 @@
 //                    //
 //                    string Recipient = core.siteProperties.getText("EmailOrderNotifyAddress", core.siteProperties.emailAdmin);
 //                    if (genericController.vbInstr(genericController.encodeText(Recipient), "@") == 0) {
-//                        //throw new ApplicationException("Unexpected exception"); // todo - remove this - handleLegacyError12("Init", "PayPal confirmation Order Process Notification email was not sent because EmailOrderNotifyAddress SiteProperty is not valid")
+//                        //throw new GenericException("Unexpected exception"); // todo - remove this - handleLegacyError12("Init", "PayPal confirmation Order Process Notification email was not sent because EmailOrderNotifyAddress SiteProperty is not valid")
 //                    } else {
 //                        string Sender = core.siteProperties.getText("EmailOrderFromAddress");
 //                        string subject = core.webServer.requestDomain + " Online Order Pending, #" + ConfirmOrderID;

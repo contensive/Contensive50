@@ -13,6 +13,7 @@ using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
+using Contensive.Processor.Exceptions;
 //
 namespace Contensive.Processor.Models.Domain {
     //
@@ -253,7 +254,7 @@ namespace Contensive.Processor.Models.Domain {
                 if (string.IsNullOrEmpty(srcCollecionXml)) {
                     //
                     // -- empty collection is an error
-                    throw (new ApplicationException("UpgradeCDef_LoadDataToCollection, srcCollectionXml is blank or null"));
+                    throw (new GenericException("UpgradeCDef_LoadDataToCollection, srcCollectionXml is blank or null"));
                 } else {
                     try {
                         srcXmlDom.LoadXml(srcCollecionXml);
@@ -266,7 +267,7 @@ namespace Contensive.Processor.Models.Domain {
                     if ((srcXmlDom.DocumentElement.Name.ToLowerInvariant() != CollectionFileRootNode) && (srcXmlDom.DocumentElement.Name.ToLowerInvariant() != "contensivecdef")) {
                         //
                         // -- root node must be collection (or legacy contensivecdef)
-                        LogController.handleError(core, new ApplicationException("the archive file has a syntax error. Application name must be the first node."));
+                        LogController.handleError(core, new GenericException("the archive file has a syntax error. Application name must be the first node."));
                     } else {
                         result.isBaseCollection = IsccBaseFile;
                         //
@@ -308,7 +309,7 @@ namespace Contensive.Processor.Models.Domain {
                                     ContentName = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "name", "");
                                     contentNameLc = GenericController.vbLCase(ContentName);
                                     if (string.IsNullOrEmpty(ContentName)) {
-                                        throw (new ApplicationException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "collection file contains a CDEF node with no name attribute. This is not allowed.", "dll", "builderClass", "UpgradeCDef_LoadDataToCollection", 0, "", "", False, True, "")
+                                        throw (new GenericException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "collection file contains a CDEF node with no name attribute. This is not allowed.", "dll", "builderClass", "UpgradeCDef_LoadDataToCollection", 0, "", "", False, True, "")
                                     } else {
                                         //
                                         // setup a cdef from the application collection to use as a default for missing attributes (for inherited cdef)
@@ -849,7 +850,7 @@ namespace Contensive.Processor.Models.Domain {
                             }
                             rs.Dispose();
                             if (fieldId == 0) {
-                                throw (new ApplicationException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "Can not update help field for content [" & ContentName & "], field [" & FieldName & "] because the field was not found in the Db.", "dll", "builderClass", "UpgradeCDef_BuildDbFromCollection", 0, "", "", False, True, "")
+                                throw (new GenericException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "Can not update help field for content [" & ContentName & "], field [" & FieldName & "] because the field was not found in the Db.", "dll", "builderClass", "UpgradeCDef_BuildDbFromCollection", 0, "", "", False, True, "")
                             } else {
                                 SQL = "select id from ccfieldhelp where fieldid=" + fieldId + " order by id";
                                 rs = core.db.executeQuery(SQL);
@@ -928,7 +929,7 @@ namespace Contensive.Processor.Models.Domain {
                 //        //
                 //        bool addonInstallOk = CollectionController.installCollectionFromRemoteRepo(core, import.Guid, ref errorMessage, "", isNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollections);
                 //        if (!addonInstallOk) {
-                //            throw (new ApplicationException("Failure to install addon collection from remote repository. Collection [" + import.Guid + "] was referenced in collection [" + Collection.name + "]")); //core.handleLegacyError3(core.appConfig.name, "Error upgrading Addon Collection [" & Guid & "], " & errorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
+                //            throw (new GenericException("Failure to install addon collection from remote repository. Collection [" + import.Guid + "] was referenced in collection [" + Collection.name + "]")); //core.handleLegacyError3(core.appConfig.name, "Error upgrading Addon Collection [" & Guid & "], " & errorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                 //        }
                 //    }
                 //}
@@ -1165,7 +1166,7 @@ namespace Contensive.Processor.Models.Domain {
                             //
                             // should have been the collection
                             //
-                            throw (new ApplicationException("ERROR - cannot update destination content because it was not found after being added."));
+                            throw (new GenericException("ERROR - cannot update destination content because it was not found after being added."));
                         } else {
                             dstCdef = dstCollection.cdef[srcName.ToLowerInvariant()];
                             bool HelpChanged = false;

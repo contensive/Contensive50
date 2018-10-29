@@ -6,6 +6,7 @@ using Contensive.Processor.Models.Db;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using System.Runtime.Caching;
+using Contensive.Processor.Exceptions;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -645,7 +646,7 @@ namespace Contensive.Processor.Controllers {
             } catch (Exception ex) {
                 //
                 // -- client does not throw its own errors, so try to differentiate by message
-                throw (new ApplicationException("Exception initializing remote cache, will continue with cache disabled.", ex));
+                throw (new GenericException("Exception initializing remote cache, will continue with cache disabled.", ex));
             }
         }
         //

@@ -8,6 +8,7 @@ using static Contensive.Processor.Constants;
 using System.Data;
 using System.Linq;
 using Contensive.Processor.Models.Domain;
+using Contensive.Processor.Exceptions;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -303,9 +304,9 @@ namespace Contensive.Processor.Controllers {
                             LogController.logInfo(core, logPrefix + ", upgrading All Local Collections to new server build.");
                             bool UpgradeOK = CollectionController.upgradeLocalCollectionRepoFromRemoteCollectionRepo(core, ref ErrorMessage, isNewBuild, repair, ref  nonCriticalErrorList, logPrefix, ref installedCollections);
                             if (!string.IsNullOrEmpty(ErrorMessage)) {
-                                throw (new ApplicationException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, " & ErrorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
+                                throw (new GenericException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, " & ErrorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                             } else if (!UpgradeOK) {
-                                throw (new ApplicationException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, NotOK was returned without an error message", "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
+                                throw (new GenericException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, NotOK was returned without an error message", "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
                             }
                             //
                             //---------------------------------------------------------------------
@@ -321,7 +322,7 @@ namespace Contensive.Processor.Controllers {
                                 Doc.LoadXml(CollectionController.getLocalCollectionStoreListXml(core));
                                 if (true) {
                                     if (GenericController.vbLCase(Doc.DocumentElement.Name) != GenericController.vbLCase(CollectionListRootNode)) {
-                                        throw (new ApplicationException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "Error loading Collection config file. The Collections.xml file has an invalid root node, [" & Doc.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected.", "dll", "builderClass", "Upgrade", 0, "", "", False, True, "")
+                                        throw (new GenericException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "Error loading Collection config file. The Collections.xml file has an invalid root node, [" & Doc.DocumentElement.Name & "] was received and [" & CollectionListRootNode & "] was expected.", "dll", "builderClass", "Upgrade", 0, "", "", False, True, "")
                                     } else {
                                         if (GenericController.vbLCase(Doc.DocumentElement.Name) == "collectionlist") {
                                             //
@@ -1218,7 +1219,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // Problem
                         //
-                        LogController.handleError(core, new ApplicationException("Content Field Types content definition was not found"));
+                        LogController.handleError(core, new GenericException("Content Field Types content definition was not found"));
                     } else {
                         while (RowsNeeded > 0) {
                             core.db.executeQuery("Insert into ccFieldTypes (active,contentcontrolid)values(1," + CID + ")");

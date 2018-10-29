@@ -13,6 +13,7 @@ using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
+using Contensive.Processor.Exceptions;
 //
 namespace Contensive.Addons.SafeAddonManager {
     public class AddonManagerClass {
@@ -984,7 +985,7 @@ namespace Contensive.Addons.SafeAddonManager {
         //===========================================================================
         //
         private void HandleClassTrapError(string MethodName, string Context = "context unknown") {
-            throw new ApplicationException("Unexpected exception in method [" + MethodName + "], cause [" + Context + "]");
+            throw new GenericException("Unexpected exception in method [" + MethodName + "], cause [" + Context + "]");
         }
         //
         //

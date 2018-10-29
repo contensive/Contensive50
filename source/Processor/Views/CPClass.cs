@@ -16,6 +16,7 @@ using static Contensive.Processor.Constants;
 //
 using Contensive.BaseClasses;
 using Contensive.Processor.Models.Domain;
+using Contensive.Processor.Exceptions;
 //
 namespace Contensive.Processor {
     public class CPClass : CPBaseClass, IDisposable {
@@ -158,7 +159,7 @@ namespace Contensive.Processor {
                     // -- call by guid
                     AddonModel addon = Models.Db.AddonModel.create(core, addonNameOrGuid);
                     if ( addon == null ) {
-                        throw new ApplicationException("Addon [" + addonNameOrGuid + "] could not be found.");
+                        throw new GenericException("Addon [" + addonNameOrGuid + "] could not be found.");
                     } else {
                         result = core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext {
                             addonType = addonContext,
@@ -179,7 +180,7 @@ namespace Contensive.Processor {
                         // -- compatibility - call by id
                         result = executeAddon(GenericController.encodeInteger(addonNameOrGuid), addonContext);
                     } else {
-                        throw new ApplicationException("Addon [" + addonNameOrGuid + "] could not be found.");
+                        throw new GenericException("Addon [" + addonNameOrGuid + "] could not be found.");
                     }
                 }
                 //result = core.addon.execute_legacy4(addonNameOrGuid, core.docProperties.getLegacyOptionStringFromVar(), addonContext, Nothing)
@@ -201,7 +202,7 @@ namespace Contensive.Processor {
             try {
                 AddonModel addon = AddonModel.create(core, addonId);
                 if ( addon == null) {
-                    throw new ApplicationException("Addon [#" + addonId.ToString() + "] could not be found.");
+                    throw new GenericException("Addon [#" + addonId.ToString() + "] could not be found.");
                 } else {
                     result = core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext {
                         addonType = addonContext,

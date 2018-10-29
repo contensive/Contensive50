@@ -13,6 +13,7 @@ using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
+using Contensive.Processor.Exceptions;
 //
 namespace Contensive.Addons.PageManager {
     public class saveChildPageListDraggableClass : Contensive.BaseClasses.AddonBaseClass {
@@ -84,7 +85,7 @@ namespace Contensive.Addons.PageManager {
                                     if (childPageId == 0) {
                                         //
                                         // -- invalid child page
-                                        cp.Site.ErrorReport(new ApplicationException("child page id is invalid from remote request [" + pageCommaList + "]"));
+                                        cp.Site.ErrorReport(new GenericException("child page id is invalid from remote request [" + pageCommaList + "]"));
                                     } else {
                                         string SortOrder = (100000 + (pagePtr * 10)).ToString();
                                        PageContentModel childPage = PageContentModel.create(core, childPageId);

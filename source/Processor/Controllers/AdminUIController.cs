@@ -11,6 +11,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
 using System.Text;
+using Contensive.Processor.Exceptions;
 //
 namespace Contensive.Processor {
     //
@@ -1556,15 +1557,15 @@ namespace Contensive.Processor {
                 ContentCaption += " record";
                 if (!string.IsNullOrEmpty(RecordName)) ContentCaption += ", named '" + RecordName + "'";
                 if (string.IsNullOrEmpty(contentName)) {
-                    throw (new ApplicationException("ContentName [" + contentName + "] is invalid"));
+                    throw (new GenericException("ContentName [" + contentName + "] is invalid"));
                 } else {
                     if (recordID < 1) {
-                        throw (new ApplicationException("RecordID [" + recordID + "] is invalid"));
+                        throw (new GenericException("RecordID [" + recordID + "] is invalid"));
                     } else {
                         if (IsEditing) {
                             var cdef = Models.Domain.CDefModel.create(core, contentName);
                             if ( cdef==null) {
-                                throw new ApplicationException("getRecordEditLink called with contentName [" + contentName + "], but no content found with this name.");
+                                throw new GenericException("getRecordEditLink called with contentName [" + contentName + "], but no content found with this name.");
                             } else {
                                 result += AdminUIController.getIconEditAdminLink(core, cdef, recordID);
                                 if (allowCut) {
@@ -1620,7 +1621,7 @@ namespace Contensive.Processor {
                     iAllowPaste = GenericController.encodeBoolean(AllowPaste);
 
                     if (string.IsNullOrEmpty(iContentName)) {
-                        throw (new ApplicationException("Method called with blank ContentName")); // handleLegacyError14(MethodName, "")
+                        throw (new GenericException("Method called with blank ContentName")); // handleLegacyError14(MethodName, "")
                     } else {
                         iContentID = CdefController.getContentId(core, iContentName);
                         csChildContent = core.db.csOpen("Content", "ParentID=" + iContentID, "", true, 0, false, false, "id");
@@ -1754,10 +1755,10 @@ namespace Contensive.Processor {
             Link = "";
             MyContentNameList = ContentNameList;
             if (string.IsNullOrEmpty(ContentName)) {
-                throw (new ApplicationException("main_GetRecordAddLink, ContentName is empty")); // handleLegacyError14(MethodName, "")
+                throw (new GenericException("main_GetRecordAddLink, ContentName is empty")); // handleLegacyError14(MethodName, "")
             } else {
                 if (MyContentNameList.IndexOf("," + GenericController.vbUCase(ContentName) + ",") + 1 >= 0) {
-                    throw (new ApplicationException("result , Content Child [" + ContentName + "] is one of its own parents")); // handleLegacyError14(MethodName, "")
+                    throw (new GenericException("result , Content Child [" + ContentName + "] is one of its own parents")); // handleLegacyError14(MethodName, "")
                 } else {
                     MyContentNameList = MyContentNameList + "," + GenericController.vbUCase(ContentName) + ",";
                     //

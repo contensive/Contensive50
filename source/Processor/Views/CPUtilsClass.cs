@@ -15,6 +15,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 //
 using Contensive.BaseClasses;
+using Contensive.Processor.Exceptions;
 //
 namespace Contensive.Processor {
     //
@@ -64,7 +65,7 @@ namespace Contensive.Processor {
         /// <remarks></remarks>
         public override void Upgrade(bool isNewApp) {
             try {
-                throw new ApplicationException("Installation upgrade through the cp interface is deprecated. Please use the command line tool.");
+                throw new GenericException("Installation upgrade through the cp interface is deprecated. Please use the command line tool.");
                 // Controllers.appBuilderController.upgrade(CP.core, isNewApp)
             } catch (Exception ex) {
                 LogController.handleError(CP.core,ex);

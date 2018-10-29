@@ -17,6 +17,7 @@ using static Contensive.Processor.Constants;
 //
 using System.IO;
 using static Contensive.BaseClasses.CPFileSystemBaseClass;
+using Contensive.Processor.Exceptions;
 //
 namespace Contensive.Addons.Housekeeping {
     /// <summary>
@@ -1626,7 +1627,7 @@ namespace Contensive.Addons.Housekeeping {
                 LogController.handleError( core,ex);
             }
             //ErrorTrap:
-            //throw new ApplicationException("Unexpected exception");
+            //throw new GenericException("Unexpected exception");
         }
         //
         //====================================================================================================
@@ -1735,7 +1736,7 @@ namespace Contensive.Addons.Housekeeping {
                 int BotPageViews = 0;
                 string SQL = null;
                 if (string.CompareOrdinal(BuildVersion, core.codeVersion()) < 0) {
-                    LogController.handleError( core,new ApplicationException("Can not summarize analytics until this site's data needs been upgraded."));
+                    LogController.handleError( core,new GenericException("Can not summarize analytics until this site's data needs been upgraded."));
                 } else {
                     hint = 1;
                     PeriodStart = StartTimeDate;
@@ -2148,7 +2149,7 @@ namespace Contensive.Addons.Housekeeping {
                 //
                 logHousekeeping(core, "Exiting RegisterAddonFolder");
             } catch (Exception ex) {
-                throw new ApplicationException("Unexpected Exception", ex);
+                throw new GenericException("Unexpected Exception", ex);
             }
         }
         //

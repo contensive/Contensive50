@@ -297,7 +297,7 @@ namespace Contensive.Processor.Controllers {
         //                'RSLive = appservices.core.db.executeSql(LiveDataSourceName, "SELECT " & FieldList & " FROM " & LiveTableName & " WHERE ID=" & encodeSQLNumber(LiveRecordID) & ";")
         //                If RSLive.Rows.Count <= 0 Then
         //                    '
-        //                    Throw (New ApplicationException("During record publishing, there was an error opening the live record, [ID=" & LiveRecordID & "] in table [" & LiveTableName & "] on datasource [" & LiveDataSourceName & " ]"))
+        //                    Throw (new GenericException("During record publishing, there was an error opening the live record, [ID=" & LiveRecordID & "] in table [" & LiveTableName & "] on datasource [" & LiveDataSourceName & " ]"))
         //                Else
         //                    If True Then
         //                        LiveRecordID = genericController.EncodeInteger(core.db.getDataRowColumnName(RSLive.Rows[0], "ID"))
@@ -309,7 +309,7 @@ namespace Contensive.Processor.Controllers {
         //                        'RSEdit = appservices.core.db.executeSql(EditDataSourceName, "SELECT " & FieldList & " FROM " & EditTableName & " WHERE (EditSourceID=" & encodeSQLNumber(LiveRecordID) & ")and(EditArchive=0) Order By ID DESC;")
         //                        If RSEdit.Rows.Count <= 0 Then
         //                            '
-        //                            Throw (New ApplicationException("During record publishing, there was an error opening the edit record [EditSourceID=" & LiveRecordID & "] in table [" & EditTableName & "] on datasource [" & EditDataSourceName & " ]"))
+        //                            Throw (new GenericException("During record publishing, there was an error opening the edit record [EditSourceID=" & LiveRecordID & "] in table [" & EditTableName & "] on datasource [" & EditDataSourceName & " ]"))
         //                        Else
         //                            If True Then
         //                                EditRecordID = genericController.EncodeInteger(core.db.getDataRowColumnName(RSEdit.Rows[0], "ID"))
@@ -324,7 +324,7 @@ namespace Contensive.Processor.Controllers {
         //                                    NewEditRecordID = core.db.insertTableRecordGetId(EditDataSourceName, EditTableName, SystemMemberID)
         //                                    If NewEditRecordID < 1 Then
         //                                        '
-        //                                        Throw (New ApplicationException("During record publishing, a new edit record could not be create, table [" & EditTableName & "] on datasource [" & EditDataSourceName & " ]"))
+        //                                        Throw (new GenericException("During record publishing, a new edit record could not be create, table [" & EditTableName & "] on datasource [" & EditDataSourceName & " ]"))
         //                                    End If
         //                                End If
         //                                If True Then
@@ -591,11 +591,11 @@ namespace Contensive.Processor.Controllers {
         //                RSLive = core.db.executeSql("SELECT * FROM " & LiveTableName & " WHERE ID=" & core.db.encodeSQLNumber(LiveRecordID) & ";", LiveDataSourceName)
         //                If (RSLive Is Nothing) Then
         //                    '
-        //                    Throw (New ApplicationException("During record publishing, there was an error opening the live record, [ID=" & LiveRecordID & "] in table [" & LiveTableName & "] on datasource [" & LiveDataSourceName & " ]"))
+        //                    Throw (new GenericException("During record publishing, there was an error opening the live record, [ID=" & LiveRecordID & "] in table [" & LiveTableName & "] on datasource [" & LiveDataSourceName & " ]"))
         //                Else
         //                    If RSLive.Rows.Count <= 0 Then
         //                        '
-        //                        Throw (New ApplicationException("During record publishing, the live record could not be found, [ID=" & LiveRecordID & "] in table [" & LiveTableName & "] on datasource [" & LiveDataSourceName & " ]"))
+        //                        Throw (new GenericException("During record publishing, the live record could not be found, [ID=" & LiveRecordID & "] in table [" & LiveTableName & "] on datasource [" & LiveDataSourceName & " ]"))
         //                    Else
         //                        LiveRecordID = genericController.EncodeInteger(core.db.getDataRowColumnName(RSLive.Rows[0], "ID"))
         //                        '
@@ -604,11 +604,11 @@ namespace Contensive.Processor.Controllers {
         //                        RSEdit = core.db.executeSql("SELECT * FROM " & EditTableName & " WHERE (EditSourceID=" & core.db.encodeSQLNumber(LiveRecordID) & ")and(EditArchive=0) Order By ID DESC;", EditDataSourceName)
         //                        If (RSEdit Is Nothing) Then
         //                            '
-        //                            Throw (New ApplicationException("During record publishing, there was an error opening the edit record [EditSourceID=" & LiveRecordID & "] in table [" & EditTableName & "] on datasource [" & EditDataSourceName & " ]"))
+        //                            Throw (new GenericException("During record publishing, there was an error opening the edit record [EditSourceID=" & LiveRecordID & "] in table [" & EditTableName & "] on datasource [" & EditDataSourceName & " ]"))
         //                        Else
         //                            If RSEdit.Rows.Count <= 0 Then
         //                                '
-        //                                Throw (New ApplicationException("During record publishing, the edit record could not be found, [EditSourceID=" & LiveRecordID & "] in table [" & EditTableName & "] on datasource [" & EditDataSourceName & " ]"))
+        //                                Throw (new GenericException("During record publishing, the edit record could not be found, [EditSourceID=" & LiveRecordID & "] in table [" & EditTableName & "] on datasource [" & EditDataSourceName & " ]"))
         //                            Else
         //                                EditRecordID = genericController.EncodeInteger(core.db.getDataRowColumnName(RSEdit.Rows[0], "ID"))
         //                                '
@@ -774,7 +774,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // No references to this table
                     //
-                    //throw (new ApplicationException("TableID [" + TableID + "] could not be found in any ccContent.ContentTableID"));
+                    //throw (new GenericException("TableID [" + TableID + "] could not be found in any ccContent.ContentTableID"));
                     result = "(1=0)";
                 } else if (ContentCnt == 1) {
                     //

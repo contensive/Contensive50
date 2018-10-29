@@ -12,6 +12,7 @@ using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
 using System.Data;
 using System.Linq;
+using Contensive.Processor.Exceptions;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -105,7 +106,7 @@ namespace Contensive.Processor.Controllers {
                     result = Contentdefinition.selectCommaList;
                     break;
                 default:
-                    //throw new ApplicationException("Unexpected exception"); // todo - remove this - handleLegacyError14(MethodName, "Content Property [" & genericController.encodeText(PropertyName) & "] was not found in content [" & genericController.encodeText(ContentName) & "]")
+                    //throw new GenericException("Unexpected exception"); // todo - remove this - handleLegacyError14(MethodName, "Content Property [" & genericController.encodeText(PropertyName) & "] was not found in content [" & genericController.encodeText(ContentName) & "]")
                     break;
             }
             return result;
@@ -267,7 +268,7 @@ namespace Contensive.Processor.Controllers {
                     DbController.closeDataTable(rs);
                     //
                     if (ParentContentID == 0) {
-                        throw (new ApplicationException("Can not create Child Content [" + ChildContentName + "] because the Parent Content [" + ParentContentName + "] was not found."));
+                        throw (new GenericException("Can not create Child Content [" + ChildContentName + "] because the Parent Content [" + ParentContentName + "] was not found."));
                     } else {
                         //
                         // ----- create child content record, let the csv_ExecuteSQL reload CDef
@@ -275,15 +276,15 @@ namespace Contensive.Processor.Controllers {
                         dataSourceName = "Default";
                         CSContent = core.db.csOpenContentRecord("Content", ParentContentID);
                         if (!core.db.csOk(CSContent)) {
-                            throw (new ApplicationException("Can not create Child Content [" + ChildContentName + "] because the Parent Content [" + ParentContentName + "] was not found."));
+                            throw (new GenericException("Can not create Child Content [" + ChildContentName + "] because the Parent Content [" + ParentContentName + "] was not found."));
                         } else {
                             SelectFieldList = core.db.csGetSelectFieldList(CSContent);
                             if (string.IsNullOrEmpty(SelectFieldList)) {
-                                throw (new ApplicationException("Can not create Child Content [" + ChildContentName + "] because the Parent Content [" + ParentContentName + "] record has not fields."));
+                                throw (new GenericException("Can not create Child Content [" + ChildContentName + "] because the Parent Content [" + ParentContentName + "] record has not fields."));
                             } else {
                                 CSNew = core.db.csInsertRecord("Content", 0);
                                 if (!core.db.csOk(CSNew)) {
-                                    throw (new ApplicationException("Can not create Child Content [" + ChildContentName + "] because there was an error creating a new record in ccContent."));
+                                    throw (new GenericException("Can not create Child Content [" + ChildContentName + "] because there was an error creating a new record in ccContent."));
                                 } else {
                                     Fields = SelectFieldList.Split(',');
                                     DateNow = DateTime.Now;
@@ -412,9 +413,9 @@ namespace Contensive.Processor.Controllers {
                 LogController.logTrace(core, "addContent, contentName [" + cdef.name + "], tableName [" + cdef.tableName + "]");
                 //
                 if (string.IsNullOrEmpty(cdef.name)) {
-                    throw new ApplicationException("contentName can not be blank");
+                    throw new GenericException("contentName can not be blank");
                 } else if (string.IsNullOrEmpty(cdef.tableName)) {
-                    throw new ApplicationException("Tablename can not be blank");
+                    throw new GenericException("Tablename can not be blank");
                 } else {
                     //
                     core.db.createSQLTable(cdef.dataSourceName, cdef.tableName);
@@ -501,7 +502,7 @@ namespace Contensive.Processor.Controllers {
                             //Else
                             //    DataSourceID = core.db.getDataSourceId(DataSourceName)
                             //    If DataSourceID = -1 Then
-                            //        throw (New ApplicationException("Could not find DataSource [" & DataSourceName & "] for table [" & TableName & "]"))
+                            //        throw (new GenericException("Could not find DataSource [" & DataSourceName & "] for table [" & TableName & "]"))
                             //    End If
                             //End If
                             TableID = core.db.insertTableRecordGetId("Default", "ccTables", SystemMemberID);
@@ -586,7 +587,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // installing content definition with matching name, but different guid -- this is an error that needs to be fixed
                             //
-                            LogController.handleError(core, new ApplicationException("createContent call, content.name match found but content.ccGuid did not, name [" + cdef.name + "], newGuid [" + cdef.guid + "], installedGuid [" + contentGuid + "] "));
+                            LogController.handleError(core, new GenericException("createContent call, content.name match found but content.ccGuid did not, name [" + cdef.name + "], newGuid [" + cdef.guid + "], installedGuid [" + contentGuid + "] "));
                         }
                         core.db.updateTableRecord("Default", "ccContent", "ID=" + returnContentId, sqlList);
                         ContentModel.invalidateRecordCache(core, returnContentId);
@@ -796,20 +797,20 @@ namespace Contensive.Processor.Controllers {
                 var content = ContentModel.createByUniqueName(core, ContentName);
                 if (content == null) {
                     //
-                    throw (new ApplicationException("Could not create field [" + field.nameLc + "] because Content Definition [" + ContentName + "] was not found In ccContent Table."));
+                    throw (new GenericException("Could not create field [" + field.nameLc + "] because Content Definition [" + ContentName + "] was not found In ccContent Table."));
                 } else if (content.contentTableID <= 0) {
                     //
                     // Content Definition not found
-                    throw (new ApplicationException("Could not create field [" + field.nameLc + "] because Content Definition [" + ContentName + "] has no associated Content Table."));
+                    throw (new GenericException("Could not create field [" + field.nameLc + "] because Content Definition [" + ContentName + "] has no associated Content Table."));
                 } else if (field.fieldTypeId <= 0) {
                     //
                     // invalid field type
-                    throw (new ApplicationException("Could Not create Field [" + field.nameLc + "] because the field type [" + field.fieldTypeId + "] Is Not valid."));
+                    throw (new GenericException("Could Not create Field [" + field.nameLc + "] because the field type [" + field.fieldTypeId + "] Is Not valid."));
                 } else {
                     var table = TableModel.create(core, content.contentTableID);
                     if (table == null) {
                         //
-                        throw (new ApplicationException("Could not create field [" + field.nameLc + "] because Content Definition [" + ContentName + "] does not have a valid table."));
+                        throw (new GenericException("Could not create field [" + field.nameLc + "] because Content Definition [" + ContentName + "] does not have a valid table."));
                     } else { 
                         bool RecordIsBaseField = false;
                         var contentFieldList = ContentFieldModel.createList(core, "(ContentID=" + core.db.encodeSQLNumber(content.id) + ")and(name=" + core.db.encodeSQLText(field.nameLc) + ")");
@@ -822,7 +823,7 @@ namespace Contensive.Processor.Controllers {
                         if ((!field.isBaseField) && (RecordIsBaseField)) {
                             //
                             // This update is not allowed
-                            LogController.handleWarn(core, new ApplicationException("Warning, updating non-base field with base field, content [" + ContentName + "], field [" + field.nameLc + "]"));
+                            LogController.handleWarn(core, new GenericException("Warning, updating non-base field with base field, content [" + ContentName + "], field [" + field.nameLc + "]"));
                         }
                         //                    
                         // Get the TableName and DataSourceID
@@ -957,7 +958,7 @@ namespace Contensive.Processor.Controllers {
                             }
                         }
                         if (returnId == 0) {
-                            throw (new ApplicationException("Could Not create Field [" + field.nameLc + "] because insert into ccfields failed."));
+                            throw (new GenericException("Could Not create Field [" + field.nameLc + "] because insert into ccfields failed."));
                         } else {
                             core.db.updateTableRecord("Default", "ccFields", "ID=" + returnId, sqlList);
                             ContentFieldModel.invalidateRecordCache(core, returnId);
@@ -1083,7 +1084,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 CDefModel Contentdefinition = CDefModel.create(core, ContentName);
                 if ((string.IsNullOrEmpty(FieldName)) || (Contentdefinition.fields.Count < 1)) {
-                    throw (new ApplicationException("Content Name [" + GenericController.encodeText(ContentName) + "] or FieldName [" + FieldName + "] was not valid"));
+                    throw (new GenericException("Content Name [" + GenericController.encodeText(ContentName) + "] or FieldName [" + FieldName + "] was not valid"));
                 } else {
                     foreach (KeyValuePair<string, Models.Domain.CDefFieldModel> keyValuePair in Contentdefinition.fields) {
                         Models.Domain.CDefFieldModel field = keyValuePair.Value;

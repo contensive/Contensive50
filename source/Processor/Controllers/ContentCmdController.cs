@@ -13,6 +13,7 @@ using static Contensive.Processor.Constants;
 using System.Linq;
 using System.Data;
 using Contensive.BaseClasses;
+using Contensive.Processor.Exceptions;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -436,7 +437,7 @@ namespace Contensive.Processor.Controllers {
                         //If True Then
                         //End If
                         //If (LCase(TypeName(cmdDictionaryOrCollection)) <> "collection") Then
-                        //    Throw New ApplicationException("Error parsing JSON command list, expected a command list but parser did not return list, command list [" & cmdSrc & "]")
+                        //    Throw new GenericException("Error parsing JSON command list, expected a command list but parser did not return list, command list [" & cmdSrc & "]")
                         //    Exit Function
                         //Else
                         //    '
@@ -464,7 +465,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             int Pos = GenericController.vbInstr(2, cmdText, "\"");
                             if (Pos <= 1) {
-                                throw new ApplicationException("Error parsing content command [" + cmdSrc + "], expected a close quote around position " + Pos);
+                                throw new GenericException("Error parsing content command [" + cmdSrc + "], expected a close quote around position " + Pos);
                             } else {
                                 if (Pos == cmdText.Length) {
                                     //
@@ -476,7 +477,7 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     // syntax error, must be a space between cmd and argument
                                     //
-                                    throw new ApplicationException("Error parsing content command [" + cmdSrc + "], expected a space between command and argument around position " + Pos);
+                                    throw new GenericException("Error parsing content command [" + cmdSrc + "], expected a space between command and argument around position " + Pos);
                                 } else {
                                     cmdArg = (cmdText.Substring(Pos)).Trim(' ');
                                     cmdText = cmdText.Substring(1, Pos - 2);
@@ -501,7 +502,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             int Pos = GenericController.vbInstr(2, cmdArg, "\"");
                             if (Pos <= 1) {
-                                throw new ApplicationException("Error parsing JSON command list, expected a quoted command argument, command list [" + cmdSrc + "]");
+                                throw new GenericException("Error parsing JSON command list, expected a quoted command argument, command list [" + cmdSrc + "]");
                             } else {
                                 cmdArg = cmdArg.Substring(1, Pos - 2);
                             }
@@ -514,7 +515,7 @@ namespace Contensive.Processor.Controllers {
                             object cmdDictionaryOrCollection = core.json.Deserialize<object>(cmdArg);
                             string cmdDictionaryOrCollectionTypeName = cmdDictionaryOrCollection.GetType().FullName.ToLowerInvariant();
                             if (cmdDictionaryOrCollectionTypeName.Left(37) != "system.collections.generic.dictionary") {
-                                throw new ApplicationException("Error parsing JSON command argument list, expected a single command, command list [" + cmdSrc + "]");
+                                throw new GenericException("Error parsing JSON command argument list, expected a single command, command list [" + cmdSrc + "]");
                             } else {
                                 //
                                 // create command array of one command
@@ -593,14 +594,14 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     // syntax error, bad command
                                     //
-                                    throw new ApplicationException("Error parsing JSON command list, , command list [" + cmdSrc + "]");
+                                    throw new GenericException("Error parsing JSON command list, , command list [" + cmdSrc + "]");
                                 }
                             }
                         } else {
                             //
                             // syntax error
                             //
-                            throw new ApplicationException("Error parsing JSON command list, , command list [" + cmdSrc + "]");
+                            throw new GenericException("Error parsing JSON command list, , command list [" + cmdSrc + "]");
                         }
                         //
                         // execute the cmd with cmdArgDef dictionary
@@ -896,7 +897,7 @@ namespace Contensive.Processor.Controllers {
                                         errorContextMessage = "calling Addon [" + addonName + "] during content cmd execution"
                                     };
                                     if (addon == null) {
-                                        LogController.handleError(core, new ApplicationException("Add-on [" + addonName + "] could not be found executing command in content [" + cmdSrc + "]"));
+                                        LogController.handleError(core, new GenericException("Add-on [" + addonName + "] could not be found executing command in content [" + cmdSrc + "]"));
                                     } else {
                                         CmdAccumulator = core.addon.execute(addon, executeContext);
                                     }
