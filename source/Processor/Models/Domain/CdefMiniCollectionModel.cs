@@ -148,16 +148,16 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// List of collections that must be installed before this collection can be installed
         /// </summary>
-        public List<ImportCollectionType> collectionImports = new List<ImportCollectionType>() { };
+        //public List<ImportCollectionType> collectionImports = new List<ImportCollectionType>() { };
         //
         //====================================================================================================
         /// <summary>
         /// Model for imported collections
         /// </summary>
-        public struct ImportCollectionType {
-            public string Name;
-            public string Guid;
-        }
+        //public struct ImportCollectionType {
+        //    public string Name;
+        //    public string Guid;
+        //}
         //
         //====================================================================================================
         /// <summary>
@@ -632,26 +632,26 @@ namespace Contensive.Processor.Models.Domain {
                                     break;
                                 case "getcollection":
                                 case "importcollection":
-                                    if (true) {
-                                        //If Not UpgradeDbOnly Then
-                                        //
-                                        // Import collections are blocked from the BuildDatabase upgrade b/c the resulting Db must be portable
-                                        //
-                                        Collectionname = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "name", "");
-                                        CollectionGuid = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "guid", "");
-                                        if (string.IsNullOrEmpty(CollectionGuid)) {
-                                            CollectionGuid = CDef_NodeWithinLoop.InnerText;
-                                        }
-                                        if (string.IsNullOrEmpty(CollectionGuid)) {
-                                            status = "The collection you selected [" + Collectionname + "] can not be downloaded because it does not include a valid GUID.";
-                                            //core.AppendLog("builderClass.UpgradeCDef_LoadDataToCollection, UserError [" & status & "], The error was [" & Doc.ParseError.reason & "]")
-                                        } else {
-                                            result.collectionImports.Add(new CDefMiniCollectionModel.ImportCollectionType() {
-                                                Name = Collectionname,
-                                                Guid = CollectionGuid
-                                            });
-                                        }
-                                    }
+                                    //if (true) {
+                                    //    //If Not UpgradeDbOnly Then
+                                    //    //
+                                    //    // Import collections are blocked from the BuildDatabase upgrade b/c the resulting Db must be portable
+                                    //    //
+                                    //    Collectionname = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "name", "");
+                                    //    CollectionGuid = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "guid", "");
+                                    //    if (string.IsNullOrEmpty(CollectionGuid)) {
+                                    //        CollectionGuid = CDef_NodeWithinLoop.InnerText;
+                                    //    }
+                                    //    if (string.IsNullOrEmpty(CollectionGuid)) {
+                                    //        status = "The collection you selected [" + Collectionname + "] can not be downloaded because it does not include a valid GUID.";
+                                    //        //core.AppendLog("builderClass.UpgradeCDef_LoadDataToCollection, UserError [" & status & "], The error was [" & Doc.ParseError.reason & "]")
+                                    //    } else {
+                                    //        result.collectionImports.Add(new CDefMiniCollectionModel.ImportCollectionType() {
+                                    //            Name = Collectionname,
+                                    //            Guid = CollectionGuid
+                                    //        });
+                                    //    }
+                                    //}
                                     break;
                                 case "pagetemplate":
                                     //
@@ -1519,9 +1519,9 @@ namespace Contensive.Processor.Models.Domain {
                 // Add Collections
                 //-------------------------------------------------------------------------------------------------
                 //
-                foreach (var import in srcCollection.collectionImports) {
-                    dstCollection.collectionImports.Add(import);
-                }
+                //foreach (var import in srcCollection.collectionImports) {
+                //    dstCollection.collectionImports.Add(import);
+                //}
                 //
                 //-------------------------------------------------------------------------------------------------
                 // Page Templates

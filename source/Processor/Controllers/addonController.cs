@@ -2810,7 +2810,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 if (!AddonStatusOK) {
                     Addons.SafeAddonManager.AddonManagerClass AddonMan = new Addons.SafeAddonManager.AddonManagerClass(core);
-                    result = AddonMan.GetForm_SafeModeAddonManager();
+                    result = AddonMan.getForm_SafeModeAddonManager();
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);

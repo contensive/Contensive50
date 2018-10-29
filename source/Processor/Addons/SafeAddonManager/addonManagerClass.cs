@@ -59,7 +59,7 @@ namespace Contensive.Addons.SafeAddonManager {
         //       Eventually, this should be substituted with a "Addon Manager Addon" - so the interface can be improved with Contensive recompile
         //==========================================================================================================================================
         //
-        public string GetForm_SafeModeAddonManager() {
+        public string getForm_SafeModeAddonManager() {
             string addonManager = "";
             try {
                 var installedCollections = new List<string>();
@@ -520,7 +520,7 @@ namespace Contensive.Addons.SafeAddonManager {
                             //InstallFolder = core.asv.config.physicalFilePath & InstallFolderName & "\"
                             if (core.privateFiles.pathExists(privateFilesInstallPath)) {
                                 string logPrefix = "SafeModeAddonManager";
-                                UpgradeOK = CollectionController.installCollectionsFromPrivateFolder(core, privateFilesInstallPath, ref ErrorMessage, ref InstalledCollectionGuidList, false, true, ref nonCriticalErrorList, logPrefix, ref installedCollections);
+                                UpgradeOK = CollectionController.installCollectionsFromPrivateFolder(core, privateFilesInstallPath, ref ErrorMessage, ref InstalledCollectionGuidList, false, true, ref nonCriticalErrorList, logPrefix, ref installedCollections, true);
                                 if (!UpgradeOK) {
                                     if (string.IsNullOrEmpty(ErrorMessage)) {
                                         ErrorController.addUserError(core, "The Add-on Collection did not install correctly, but no detailed error message was given.");
@@ -989,7 +989,7 @@ namespace Contensive.Addons.SafeAddonManager {
         //
         //
         //
-        public int GetParentIDFromNameSpace(string ContentName, string menuNameSpace) {
+        public int getParentIDFromNameSpace(string ContentName, string menuNameSpace) {
             int tempGetParentIDFromNameSpace = 0;
             try {
                 string ParentNameSpace = null;
@@ -1016,7 +1016,7 @@ namespace Contensive.Addons.SafeAddonManager {
                         }
                         core.db.csClose(ref CS);
                     } else {
-                        ParentID = GetParentIDFromNameSpace(ContentName, ParentNameSpace);
+                        ParentID = getParentIDFromNameSpace(ContentName, ParentNameSpace);
                         CS = core.db.csOpen(ContentName, "(name=" + core.db.encodeSQLText(ParentName) + ")and(parentid=" + ParentID + ")", "ID", false, 0, false, false, "ID");
                         if (core.db.csOk(CS)) {
                             tempGetParentIDFromNameSpace = core.db.csGetInteger(CS, "ID");

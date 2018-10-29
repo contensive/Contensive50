@@ -250,7 +250,7 @@ namespace Contensive.Processor.Controllers {
                             //UpgradeOK = UpgradeOK;
                         } else {
                             List<string> collectionGuidList = new List<string>();
-                            UpgradeOK = buildLocalCollectionReposFromFolder(core, workingPath, CollectionLastChangeDate, ref collectionGuidList, ref return_ErrorMessage, false);
+                            UpgradeOK = buildLocalCollectionReposFromFolder(core, workingPath, CollectionLastChangeDate, ref collectionGuidList, ref return_ErrorMessage);
                             if (!UpgradeOK) {
                                 //UpgradeOK = UpgradeOK;
                             }
@@ -282,21 +282,6 @@ namespace Contensive.Processor.Controllers {
         public static bool upgradeLocalCollectionRepoFromRemoteCollectionRepo(CoreController core, ref string return_ErrorMessage, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> blockCollectionList) {
             bool returnOk = true;
             try {
-                bool localCollectionUpToDate = false;
-                string SupportURL = null;
-                string GuidList = null;
-                DateTime CollectionLastChangeDate = default(DateTime);
-                string workingPath = null;
-                string LocalGuid = null;
-                DateTime LocalLastChangeDate = default(DateTime);
-                string LibName = "";
-                bool LibSystem = false;
-                string LibGUID = null;
-                string LibLastChangeDateStr = null;
-                string LibContensiveVersion = "";
-                DateTime LibLastChangeDate = default(DateTime);
-                XmlDocument LibraryCollections = new XmlDocument();
-                string Copy = null;
                 //
                 //-----------------------------------------------------------------------------------------------
                 //   Load LocalCollections from the Collections.xml file
@@ -310,8 +295,9 @@ namespace Contensive.Processor.Controllers {
                         //
                         int packageSize = 0;
                         int packageNumber = 0;
+                        string GuidList = "";
                         foreach ( var collectionStore in localCollectionStoreList ) {
-                            GuidList = GuidList + "," + collectionStore.guid;
+                            GuidList += "," + collectionStore.guid;
                             packageSize += 1;
                             if (( packageSize>=10 ) || ( collectionStore == localCollectionStoreList.Last())) {
                                 packageNumber += 1;
@@ -320,17 +306,19 @@ namespace Contensive.Processor.Controllers {
                                 if (!string.IsNullOrEmpty(GuidList)) {
                                     LogController.logInfo(core, "Fetch collection details for collections [" + GuidList + "]");
                                     GuidList = GuidList.Substring(1);
+                                    XmlDocument LibraryCollections = new XmlDocument();
                                     //
                                     //-----------------------------------------------------------------------------------------------
                                     //   Load LibraryCollections from the Support Site
                                     //-----------------------------------------------------------------------------------------------
                                     //
                                     LibraryCollections = new XmlDocument();
-                                    SupportURL = "http://support.contensive.com/GetCollectionList?iv=" + core.codeVersion() + "&guidlist=" + encodeRequestVariable(GuidList);
+                                    string SupportURL = "http://support.contensive.com/GetCollectionList?iv=" + core.codeVersion() + "&guidlist=" + encodeRequestVariable(GuidList);
                                     bool loadOK = true;
                                     if ( packageNumber>1 ) {
                                         Thread.Sleep(2000);
                                     }
+                                    string Copy = null;
                                     try {
                                         LibraryCollections.Load(SupportURL);
                                     } catch (Exception) {
@@ -351,8 +339,9 @@ namespace Contensive.Processor.Controllers {
                                                 //
                                                 // -- Search for Collection Updates Needed
                                                 foreach (var localTestCollection in localCollectionStoreList) {
-                                                    localCollectionUpToDate = false;
-                                                    LocalGuid = localTestCollection.guid.ToLowerInvariant();
+                                                    bool localCollectionUpToDate = false;
+                                                    string LocalGuid = localTestCollection.guid.ToLowerInvariant();
+                                                    DateTime LocalLastChangeDate = default(DateTime);
                                                     LocalLastChangeDate = localTestCollection.lastChangeDate;
                                                     //
                                                     // go through each collection on the Library and find the local collection guid
@@ -361,12 +350,18 @@ namespace Contensive.Processor.Controllers {
                                                         if (localCollectionUpToDate) {
                                                             break;
                                                         }
+                                                        string LibName = "";
+                                                        string LibGUID = null;
+                                                        string LibLastChangeDateStr = null;
+                                                        string LibContensiveVersion = "";
+                                                        DateTime LibLastChangeDate = default(DateTime);
                                                         switch (GenericController.vbLCase(LibListNode.Name)) {
                                                             case "collection":
                                                                 LibGUID = "";
                                                                 LibLastChangeDateStr = "";
                                                                 LibLastChangeDate = DateTime.MinValue;
                                                                 foreach (XmlNode CollectionNode in LibListNode.ChildNodes) {
+                                                                    bool LibSystem = false;
                                                                     switch (GenericController.vbLCase(CollectionNode.Name)) {
                                                                         case "name":
                                                                             //
@@ -413,17 +408,18 @@ namespace Contensive.Processor.Controllers {
                                                                             //
                                                                             // LibLastChangeDate <>0, and it is > local lastchangedate
                                                                             //
-                                                                            workingPath = core.addon.getPrivateFilesAddonPath() + "\\temp_" + GenericController.GetRandomInteger(core) + "\\";
+                                                                            string workingPath = core.addon.getPrivateFilesAddonPath() + "\\temp_" + GenericController.GetRandomInteger(core) + "\\";
                                                                             LogController.logInfo(core, "Upgrading Collection [" + LibGUID + "], Library name [" + LibName + "], because LocalChangeDate [" + LocalLastChangeDate + "] < LibraryChangeDate [" + LibLastChangeDate + "]");
                                                                             //
                                                                             // Upgrade Needed
                                                                             //
                                                                             core.privateFiles.createPath(workingPath);
+                                                                            DateTime CollectionLastChangeDate = default(DateTime);
                                                                             //
                                                                             returnOk = downloadCollectionFiles(core, workingPath, LibGUID, ref CollectionLastChangeDate, ref return_ErrorMessage);
                                                                             if (returnOk) {
                                                                                 List<string> listGuidList = new List<string>();
-                                                                                returnOk = buildLocalCollectionReposFromFolder(core, workingPath, CollectionLastChangeDate, ref listGuidList, ref return_ErrorMessage, false);
+                                                                                returnOk = buildLocalCollectionReposFromFolder(core, workingPath, CollectionLastChangeDate, ref listGuidList, ref return_ErrorMessage);
                                                                             }
                                                                             //
                                                                             core.privateFiles.deleteFolder(workingPath);
@@ -477,7 +473,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Upgrade a collection from the files in a working folder
         /// </summary>
-        public static bool buildLocalCollectionReposFromFolder(CoreController core, string sourcePrivateFolderPath, DateTime CollectionLastChangeDate, ref List<string> return_CollectionGUIDList, ref string return_ErrorMessage, bool allowLogging) {
+        public static bool buildLocalCollectionReposFromFolder(CoreController core, string sourcePrivateFolderPath, DateTime CollectionLastChangeDate, ref List<string> return_CollectionGUIDList, ref string return_ErrorMessage) {
             bool success = false;
             try {
                 if (core.privateFiles.pathExists(sourcePrivateFolderPath)) {
@@ -486,7 +482,7 @@ namespace Contensive.Processor.Controllers {
                     foreach (CPFileSystemClass.FileDetail file in SrcFileNamelist) {
                         if ((file.Extension == ".zip") || (file.Extension == ".xml")) {
                             string collectionGuid = "";
-                            success = buildLocalCollectionRepoFromFile(core, sourcePrivateFolderPath + file.Name, CollectionLastChangeDate, ref collectionGuid, ref return_ErrorMessage, allowLogging);
+                            success = buildLocalCollectionRepoFromFile(core, sourcePrivateFolderPath + file.Name, CollectionLastChangeDate, ref collectionGuid, ref return_ErrorMessage);
                             return_CollectionGUIDList.Add(collectionGuid);
                         }
                     }
@@ -500,21 +496,12 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static bool buildLocalCollectionRepoFromFile(CoreController core, string collectionPathFilename, DateTime CollectionLastChangeDate, ref string return_CollectionGUID, ref string return_ErrorMessage, bool allowLogging) {
+        public static bool buildLocalCollectionRepoFromFile(CoreController core, string collectionPathFilename, DateTime CollectionLastChangeDate, ref string return_CollectionGUID, ref string return_ErrorMessage) {
             bool tempBuildLocalCollectionRepoFromFile = false;
             bool result = true;
             try {
-                //XmlDocument Doc = new XmlDocument();
-                //collectionXmlController XMLTools = new collectionXmlController(core);
-                //
-                // process all xml files in this workingfolder
-                //
-                if (allowLogging) {
-                    LogController.logInfo(core, "BuildLocalCollectionFolder(), Enter");
-                }
                 string collectionPath = "";
                 string collectionFilename = "";
-                //
                 core.privateFiles.splitDosPathFilename(collectionPathFilename, ref collectionPath, ref collectionFilename);
                 string CollectionVersionFolderName = "";
                 string Collectionname = "";
@@ -522,12 +509,8 @@ namespace Contensive.Processor.Controllers {
                 if (!core.privateFiles.pathExists(collectionPath)) {
                     //
                     // The working folder is not there
-                    //
                     result = false;
                     return_ErrorMessage = "<p>There was a problem with the installation. The installation folder is not valid.</p>";
-                    if (allowLogging) {
-                        LogController.logInfo(core, "BuildLocalCollectionFolder(), " + return_ErrorMessage);
-                    }
                     LogController.logInfo(core, "BuildLocalCollectionFolder, CheckFileFolder was false for the private folder [" + collectionPath + "]");
                 } else {
                     LogController.logInfo(core, "BuildLocalCollectionFolder, processing files in private folder [" + collectionPath + "]");
@@ -786,7 +769,7 @@ namespace Contensive.Processor.Controllers {
                                                                     // install the downloaded file
                                                                     //
                                                                     List<string> ChildCollectionGUIDList = new List<string>();
-                                                                    StatusOK = buildLocalCollectionReposFromFolder(core, ChildWorkingPath, ChildCollectionLastChangeDate, ref ChildCollectionGUIDList, ref return_ErrorMessage, allowLogging);
+                                                                    StatusOK = buildLocalCollectionReposFromFolder(core, ChildWorkingPath, ChildCollectionLastChangeDate, ref ChildCollectionGUIDList, ref return_ErrorMessage);
                                                                     if (!StatusOK) {
                                                                         LogController.logInfo(core, "BuildLocalCollectionFolder, [" + statusMsg + "], BuildLocalCollectionFolder returned error state, message [" + return_ErrorMessage + "]");
                                                                         if (string.IsNullOrEmpty(return_ErrorMessage)) {
@@ -880,7 +863,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Upgrade Application from a local collection
         /// </summary>
-        public static bool installCollectionFromLocalRepo(CoreController core, string CollectionGuid, string ignore_BuildVersion, ref string return_ErrorMessage, string ImportFromCollectionsGuidList, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> blockCollectionList, bool includeCDefInstall) {
+        public static bool installCollectionFromLocalRepo(CoreController core, string CollectionGuid, string ignore_BuildVersion, ref string return_ErrorMessage, string ImportFromCollectionsGuidList, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> blockCollectionList, bool includeBaseCDefInstall) {
             bool result = false;
             try {
                 //
@@ -1203,8 +1186,8 @@ namespace Contensive.Processor.Controllers {
                                                     LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], stage-4, isolate and process schema-relatednodes (cdef,index,etc)");
                                                     //-------------------------------------------------------------------------------
                                                     //
-                                                    bool includeCDefInstall = true;
-                                                    if (includeCDefInstall) {
+                                                    bool isBaseCollection = (baseCollectionGuid.ToLowerInvariant() == CollectionGuid.ToLowerInvariant());
+                                                    if (!isBaseCollection || includeBaseCDefInstall) {
                                                         string CDefMiniCollection = "";
                                                         foreach (XmlNode CDefSection in Doc.DocumentElement.ChildNodes) {
                                                             switch (GenericController.vbLCase(CDefSection.Name)) {
@@ -1236,7 +1219,6 @@ namespace Contensive.Processor.Controllers {
                                                             //
                                                             // -- Use the upgrade code to import this part
                                                             CDefMiniCollection = "<" + CollectionFileRootNode + ">" + CDefMiniCollection + "</" + CollectionFileRootNode + ">";
-                                                            bool isBaseCollection = (baseCollectionGuid.ToLowerInvariant() == CollectionGuid.ToLowerInvariant());
                                                             CDefMiniCollectionModel.installCDefMiniCollectionFromXml(false, core, CDefMiniCollection, IsNewBuild, repair, isBaseCollection, ref nonCriticalErrorList, logPrefix, ref blockCollectionList);
                                                             //
                                                             // -- Process nodes to save Collection data
@@ -1938,13 +1920,13 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Installs Addons in a source folder
         /// </summary>
-        public static bool installCollectionsFromPrivateFolder(CoreController core, string installPrivatePath, ref string return_ErrorMessage, ref List<string> return_CollectionGUIDList, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> blockCollectionList) {
+        public static bool installCollectionsFromPrivateFolder(CoreController core, string installPrivatePath, ref string return_ErrorMessage, ref List<string> return_CollectionGUIDList, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> blockCollectionList, bool includeBaseCDefInstall) {
             bool returnSuccess = false;
             try {
                 DateTime CollectionLastChangeDate;
                 //
                 CollectionLastChangeDate = DateTime.Now;
-                returnSuccess = buildLocalCollectionReposFromFolder(core, installPrivatePath, CollectionLastChangeDate, ref return_CollectionGUIDList, ref return_ErrorMessage, false);
+                returnSuccess = buildLocalCollectionReposFromFolder(core, installPrivatePath, CollectionLastChangeDate, ref return_CollectionGUIDList, ref return_ErrorMessage);
                 if (!returnSuccess) {
                     //
                     // BuildLocal failed, log it and do not upgrade
@@ -1952,7 +1934,7 @@ namespace Contensive.Processor.Controllers {
                     LogController.logInfo(core, "BuildLocalCollectionFolder returned false with Error Message [" + return_ErrorMessage + "], exiting without calling UpgradeAllAppsFromLocalCollection");
                 } else {
                     foreach (string collectionGuid in return_CollectionGUIDList) {
-                        if (!installCollectionFromLocalRepo(core, collectionGuid, core.siteProperties.dataBuildVersion, ref return_ErrorMessage, "", IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref blockCollectionList, true)) {
+                        if (!installCollectionFromLocalRepo(core, collectionGuid, core.siteProperties.dataBuildVersion, ref return_ErrorMessage, "", IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref blockCollectionList, includeBaseCDefInstall)) {
                             LogController.logInfo(core, "UpgradeAllAppsFromLocalCollection returned false with Error Message [" + return_ErrorMessage + "].");
                             break;
                         }
@@ -1978,7 +1960,7 @@ namespace Contensive.Processor.Controllers {
                 DateTime CollectionLastChangeDate;
                 //
                 CollectionLastChangeDate = DateTime.Now;
-                returnSuccess = buildLocalCollectionRepoFromFile(core, pathFilename, CollectionLastChangeDate, ref return_CollectionGUID, ref return_ErrorMessage, false);
+                returnSuccess = buildLocalCollectionRepoFromFile(core, pathFilename, CollectionLastChangeDate, ref return_CollectionGUID, ref return_ErrorMessage);
                 if (!returnSuccess) {
                     //
                     // BuildLocal failed, log it and do not upgrade
@@ -2861,7 +2843,7 @@ namespace Contensive.Processor.Controllers {
                     core.programFiles.copyFile(baseCollectionFilename, installPrivatePath + baseCollectionFilename, core.privateFiles);
                     List<string> installedCollectionGuidList = new List<string>();
                     string installErrorMessage = "";
-                    if (!installCollectionsFromPrivateFolder(core, installPrivatePath, ref installErrorMessage, ref installedCollectionGuidList, isNewBuild, isRepairMode, ref nonCriticalErrorList, logPrefix, ref blockCollectionList)) {
+                    if (!installCollectionsFromPrivateFolder(core, installPrivatePath, ref installErrorMessage, ref installedCollectionGuidList, isNewBuild, isRepairMode, ref nonCriticalErrorList, logPrefix, ref blockCollectionList, false)) {
                         throw new ApplicationException(installErrorMessage);
                     }
                     core.privateFiles.deleteFolder(installPrivatePath);

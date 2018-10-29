@@ -453,7 +453,7 @@ namespace Contensive.Processor {
             List<string> ignoreList2 = new List<string>();
             string logPrefix = "CPUtilsClass.installCollectionsFromFolder";
             var installedCollections = new List<string>();
-            CollectionController.installCollectionsFromPrivateFolder(CP.core, privateFolder, ref ignoreUserMessage, ref ignoreList1, false, false, ref ignoreList2, logPrefix, ref installedCollections);
+            CollectionController.installCollectionsFromPrivateFolder(CP.core, privateFolder, ref ignoreUserMessage, ref ignoreList1, false, false, ref ignoreList2, logPrefix, ref installedCollections, true);
             return taskId;
         }
         // todo implement taskId return value, create cp.task object to track task status
