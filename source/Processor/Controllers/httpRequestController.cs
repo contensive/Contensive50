@@ -446,8 +446,8 @@ namespace Contensive.Processor.Controllers {
         }
         //
         ~HttpRequestController() {
-            //todo  NOTE: The base class Finalize method is automatically called from the destructor:
-            //base.Finalize();
+            
+            
             http.Dispose();
         }
         //

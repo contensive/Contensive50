@@ -219,8 +219,8 @@ namespace Contensive.Processor.Controllers {
         ~ExportAsciiController() {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(false);
-            //todo  NOTE: The base class Finalize method is automatically called from the destructor:
-            //base.Finalize();
+            
+            
         }
         //
         //====================================================================================================

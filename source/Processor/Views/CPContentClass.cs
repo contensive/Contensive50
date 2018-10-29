@@ -360,8 +360,8 @@ namespace Contensive.Processor {
         }
         ~CPContentClass() {
             Dispose(false);
-            //todo  NOTE: The base class Finalize method is automatically called from the destructor:
-            //base.Finalize();
+            
+            
         }
         #endregion
     }

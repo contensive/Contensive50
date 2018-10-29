@@ -282,8 +282,8 @@ namespace Contensive.Processor {
         }
         ~CPRequestClass() {
             Dispose(false);
-            //todo  NOTE: The base class Finalize method is automatically called from the destructor:
-            //base.Finalize();
+            
+            
         }
         #endregion
     }

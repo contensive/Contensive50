@@ -5095,8 +5095,8 @@ namespace Contensive.Processor.Controllers {
         }
         ~DbController() {
             Dispose(false);
-            //todo  NOTE: The base class Finalize method is automatically called from the destructor:
-            //base.Finalize();
+            
+            
         }
         #endregion
     }
