@@ -35,7 +35,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                     addonContext: BaseClasses.CPUtilsBaseClass.addonContext.ContextPage
                 );
                 // assert
-                Assert.AreEqual(Contensive.Processor.constants.fpoContentBox,resultString, "The result string was not the content fpo guid [" + resultString + "]");
+                Assert.AreEqual(Contensive.Processor.Constants.fpoContentBox,resultString, "The result string was not the content fpo guid [" + resultString + "]");
             }
         }
 

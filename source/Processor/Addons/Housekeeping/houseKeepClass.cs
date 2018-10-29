@@ -13,7 +13,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 //
 using System.IO;
 using static Contensive.BaseClasses.CPFileSystemBaseClass;
@@ -76,8 +76,6 @@ namespace Contensive.Addons.Housekeeping {
                     // Upgrade Local Collections, and all applications that use them
                     string ErrorMessage = "";
                     logHousekeeping(core, "Updating local collections from library, see Upgrade log for details during this period.");
-                    string ignoreRefactorText = "";
-                    bool ignoreRefactorBoolean = false;
                     List<string> nonCriticalErrorList = new List<string>();
                     string logPrefix = "Housekeep";
                     if (!CollectionController.upgradeLocalCollectionRepoFromRemoteCollectionRepo(core, ref ErrorMessage, false, false, ref nonCriticalErrorList, logPrefix, ref installedCollections )) {
@@ -1675,16 +1673,12 @@ namespace Contensive.Addons.Housekeeping {
                             case "mastervisitnamelist":
                                 //
                                 // Read in the interfaces and save to Add-ons
-                                //
                                 core.privateFiles.saveFile("config\\VisitNameList.txt", Copy);
-                                //Call core.app.privateFiles.SaveFile(getAppPath & "\config\DefaultBotNameList.txt", copy)
                                 break;
                             case "masteremailbouncefilters":
                                 //
                                 // save the updated filters file
-                                //
                                 core.privateFiles.saveFile("config\\EmailBounceFilters.txt", Copy);
-                                //Call core.app.privateFiles.SaveFile(getAppPath & "\cclib\config\Filters.txt", copy)
                                 break;
                             case "mastermobilebrowserlist":
                                 //

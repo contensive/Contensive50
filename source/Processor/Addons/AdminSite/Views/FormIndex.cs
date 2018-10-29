@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
 using Contensive.Addons.Tools;
 using static Contensive.Processor.AdminUIController;
@@ -177,7 +177,7 @@ namespace Contensive.Addons.AdminSite {
                                     + "";
                                 IndexFilterContent = ""
                                     + "\r\n<div class=\"ccContentCon\">"
-                                    + "\r\n<div id=\"IndexFilterContentOpened\" class=\"opened\">" + getForm_IndexFilterContent(core, adminData) + "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"200\" height=\"1\" style=\"clear:both\"></div>"
+                                    + "\r\n<div id=\"IndexFilterContentOpened\" class=\"opened\">" + getForm_IndexFilterContent(core, adminData) + "<img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=\"200\" height=\"1\" style=\"clear:both\"></div>"
                                     + "\r\n<div id=\"IndexFilterContentClosed\" class=\"closed\" style=\"display:none;\">" + adminIndexFilterClosedLabel + "</div>"
                                     + "\r\n</div>";
                                 IndexFilterJS = ""
@@ -204,9 +204,9 @@ namespace Contensive.Addons.AdminSite {
                                     + "";
                                 IndexFilterContent = ""
                                     + "\r\n<div class=\"ccContentCon\">"
-                                    + "\r\n<div id=\"IndexFilterContentOpened\" class=\"opened\" style=\"display:none;\"><div style=\"text-align:center;\"><img src=\"/ccLib/images/ajax-loader-small.gif\" width=16 height=16></div></div>"
+                                    + "\r\n<div id=\"IndexFilterContentOpened\" class=\"opened\" style=\"display:none;\"><div style=\"text-align:center;\"><img src=\"/ContensiveBase/images/ajax-loader-small.gif\" width=16 height=16></div></div>"
                                     + "\r\n<div id=\"IndexFilterContentClosed\" class=\"closed\">" + adminIndexFilterClosedLabel + "</div>"
-                                    + "\r\n<div id=\"IndexFilterContentMinWidth\" style=\"display:none;\"><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"200\" height=\"1\" style=\"clear:both\"></div>"
+                                    + "\r\n<div id=\"IndexFilterContentMinWidth\" style=\"display:none;\"><img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=\"200\" height=\"1\" style=\"clear:both\"></div>"
                                     + "\r\n</div>";
                                 string AjaxQS = GenericController.modifyQueryString(core.doc.refreshQueryString, RequestNameAjaxFunction, AjaxOpenIndexFilterGetContent);
                                 IndexFilterJS = ""
@@ -467,7 +467,7 @@ namespace Contensive.Addons.AdminSite {
                             Stream.Add(AdminUIController.getTitleBar(core, titleRow, ""));
                             Stream.Add(formContent);
                             Stream.Add(ButtonBar);
-                            //Stream.Add(core.html.getPanel("<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"1\", height=\"10\" >"));
+                            //Stream.Add(core.html.getPanel("<img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=\"1\", height=\"10\" >"));
                             Stream.Add(HtmlController.inputHidden(rnAdminSourceForm, AdminFormIndex));
                             Stream.Add(HtmlController.inputHidden("cid", adminData.adminContent.id));
                             Stream.Add(HtmlController.inputHidden("indexGoToPage", ""));

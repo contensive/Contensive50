@@ -695,7 +695,7 @@ function SaveFieldPlus(ObjectName) {
 function OpenImagePropertyWindow(EditorObject, ImageObject) {
     console.log("base.OpenImagePropertyWindow");
     DialogObject = ImageObject;
-    showModalDialog("/cclib/Popup/ActiveEditorImageProperties.htm", window, "status:false;dialogWidth:32em;dialogHeight:25em");
+    showModalDialog("/ContensiveBase/Popup/ActiveEditorImageProperties.htm", window, "status:false;dialogWidth:32em;dialogHeight:25em");
 }
 //
 //----------
@@ -703,7 +703,7 @@ function OpenImagePropertyWindow(EditorObject, ImageObject) {
 function OpenACPropertyWindow(EditorObject, ACObject) {
     console.log("base.OpenACPropertyWindow");
     ACPropertyObject = ACObject;
-    showModalDialog("/cclib/Popup/ActiveEditorACProperties.htm", window, "status:false;dialogWidth:18em;dialogHeight:14em");
+    showModalDialog("/ContensiveBase/Popup/ActiveEditorACProperties.htm", window, "status:false;dialogWidth:18em;dialogHeight:14em");
 }
 //
 //----------
@@ -730,7 +730,7 @@ function OpenTablePropertyWindow(EditorObject, TableObject, TableBodyObject) {
     var h = new Object();
     h.win = window;
     h.fieldName = EditorObject;
-    showModalDialog("/cclib/Popup/tablepop.htm", h, "status:false;dialogWidth:315px;dialogHeight:380px;");
+    showModalDialog("/ContensiveBase/Popup/tablepop.htm", h, "status:false;dialogWidth:315px;dialogHeight:380px;");
 }
 //
 //----------
@@ -783,7 +783,7 @@ function OpenAPWithOptionString(addonOptionString, AdminURL) {
     var args = '';
     RawString = new String(globalAddonIconObj.id);
     SplitString = RawString.split(",")
-    Spacer = '<img src=/ccLib/Images/Spacer.gif width=1 height=20>'
+    Spacer = '<img src=/ContensiveBase/Images/Spacer.gif width=1 height=20>'
     s = '';
     s += '<table border=0 cellpadding="5" cellspacing="0" width="100%">';
     PairPointer = 0
@@ -868,7 +868,7 @@ function OpenAPWithOptionString(addonOptionString, AdminURL) {
                         FormInput += '<INPUT Name="' + NameVar + '" Type=Text ID="NV' + PairPointer + '" Value="' + CurrentValue + '" Size=20>';
                         FormInput += '&nbsp;<a href="#" onClick="'
                         FormInput += "window.open('" + AdminURL + "?ccIPage=s033l8dm15&SourceMode=0&LinkObjectName=NV" + PairPointer + "','ResourceSelector','menubar=no,toolbar=no,location=no,status=no,scrollbars=yes,resizable');"
-                        FormInput += 'return false;"><img src="/cclib/images/ResourceLink1616.gif" width=16 height=16 border=0 alt="Link to a resource" title="Link to a resource"></a>'
+                        FormInput += 'return false;"><img src="/ContensiveBase/images/ResourceLink1616.gif" width=16 height=16 border=0 alt="Link to a resource" title="Link to a resource"></a>'
                         break;
                     default:
                         FormInput += '<INPUT ID="NVType' + PairPointer + '" name="' + NameVar + '" Type=Hidden Value="select">';
@@ -911,7 +911,7 @@ function OpenAPWithOptionString(addonOptionString, AdminURL) {
     b.appendChild(obj);
     AFinnerHTML = s;
     args = 'scroll:no;status:false;help:no;dialogWidth:' + (obj.scrollWidth) + 'px;dialogHeight:' + (obj.scrollHeight) + 'px'
-    showModalDialog('/cclib/Popup/AFTest.htm', window, args);
+    showModalDialog('/ContensiveBase/Popup/AFTest.htm', window, args);
 }
 //
 //----------
@@ -1035,7 +1035,7 @@ function InsertActiveContentPlus(ACType, ACSubType, ACArg1, ObjectName) {
     var ParentElementObject;
     var Pointer;
     var ImageObject;
-    ExecCmdPlus('InsertImage', false, '/cclib/images/AC' + ACType + ACSubType + '.gif', ObjectName);
+    ExecCmdPlus('InsertImage', false, '/ContensiveBase/images/AC' + ACType + ACSubType + '.gif', ObjectName);
     SelectionObject = document.selection;
     SelectionObjectType = SelectionObject.type;
     if (SelectionObjectType != "Control") {
@@ -1120,7 +1120,7 @@ function tableDialog(ObjectName) {
     var rtTblAlign = null;
     var rtTblWidth = null;
     tableDialogEditor = ObjectName;
-    showModalDialog("/ccLib/popup/tablepop.htm", window, "status:false;dialogWidth:275px;");
+    showModalDialog("/ContensiveBase/popup/tablepop.htm", window, "status:false;dialogWidth:275px;");
 }
 //
 //----------
@@ -1132,7 +1132,7 @@ function tdDialog(tabIndex, fieldName) {
     h.win = window;
     h.tab = tabIndex;
     h.fieldName = fieldName;
-    showModalDialog("/ccLib/popup/tdpopup.htm", h, "scroll:off;status:false;dialogWidth:274px;dialogHeight:400px;");
+    showModalDialog("/ContensiveBase/popup/tdpopup.htm", h, "scroll:off;status:false;dialogWidth:274px;dialogHeight:400px;");
 }
 //
 //----------
@@ -2689,9 +2689,9 @@ function cjSetSpinner(destinationID, message, destinationHeight) {
     }
     if (el1) {
         if (message) {
-            el1.innerHTML = '<div style="text-align: center;"><img src="/ccLib/images/ajax-loader-big.gif" /><p>' + message + '</p></div>';
+            el1.innerHTML = '<div style="text-align: center;"><img src="/ContensiveBase/images/ajax-loader-big.gif" /><p>' + message + '</p></div>';
         } else {
-            el1.innerHTML = '<div style="text-align: center;"><img src="/ccLib/images/ajax-loader-big.gif" /></div>';
+            el1.innerHTML = '<div style="text-align: center;"><img src="/ContensiveBase/images/ajax-loader-big.gif" /></div>';
         }
         if (destinationHeight) {
             el1.style.height = destinationHeight;

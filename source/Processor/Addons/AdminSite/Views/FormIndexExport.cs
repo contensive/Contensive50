@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
 using Contensive.Addons.Tools;
 using static Contensive.Processor.AdminUIController;
@@ -169,7 +169,7 @@ namespace Contensive.Addons.AdminSite {
                                                 { "ExportName", ExportName },
                                                 { "filename", "Export-" + GenericController.GetRandomInteger(core).ToString() + ".csv" }
                                             };
-                                            var cmdDetail = new cmdDetailClass() {
+                                            var cmdDetail = new CmdDetailClass() {
                                                 addonId = ExportCSVAddon.id,
                                                 addonName = ExportCSVAddon.name,
                                                 args = docProperties
@@ -187,7 +187,7 @@ namespace Contensive.Addons.AdminSite {
                                                 { "ExportName", ExportName },
                                                 { "filename", "Export-" + GenericController.GetRandomInteger(core).ToString() + ".xml" }
                                             };
-                                            var cmdDetail = new cmdDetailClass() {
+                                            var cmdDetail = new CmdDetailClass() {
                                                 addonId = ExportXMLAddon.id,
                                                 addonName = ExportXMLAddon.name,
                                                 args = docProperties

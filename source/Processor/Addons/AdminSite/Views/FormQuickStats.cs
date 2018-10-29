@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
 using Contensive.Addons.Tools;
 using static Contensive.Processor.AdminUIController;
@@ -57,9 +57,9 @@ namespace Contensive.Addons.AdminSite {
                 Stream.Add("<h2>Visits Today</h2>");
                 Stream.Add("<table border=\"0\" cellpadding=\"3\" cellspacing=\"0\" width=\"100%\" style=\"background-color:white;border-top:1px solid #888;\">");
                 //Stream.Add( "<tr"">")
-                //Stream.Add( "<td width=""150""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""140"" height=""1"" ></td>")
-                //Stream.Add( "<td width=""150""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""140"" height=""1"" ></td>")
-                //Stream.Add( "<td width=""100%""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""100%"" height=""1"" ></td>")
+                //Stream.Add( "<td width=""150""><img alt=""space"" src=""/ContensiveBase/images/spacer.gif"" width=""140"" height=""1"" ></td>")
+                //Stream.Add( "<td width=""150""><img alt=""space"" src=""/ContensiveBase/images/spacer.gif"" width=""140"" height=""1"" ></td>")
+                //Stream.Add( "<td width=""100%""><img alt=""space"" src=""/ContensiveBase/images/spacer.gif"" width=""100%"" height=""1"" ></td>")
                 //Stream.Add( "</tr>")
                 //
                 // ----- All Visits Today

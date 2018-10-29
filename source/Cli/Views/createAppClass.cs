@@ -250,7 +250,7 @@ namespace Contensive.CLI {
                     //
                     // -- set the application back to normal mode
                     cp.core.serverConfig.saveObject(cp.core);
-                    cp.core.siteProperties.setProperty(constants.siteproperty_serverPageDefault_name, iisDefaultDoc);
+                    cp.core.siteProperties.setProperty(Constants.siteproperty_serverPageDefault_name, iisDefaultDoc);
                     //
                     Contensive.Processor.Controllers.LogController.logInfo(cp.core, "Upgrade complete.");
                     Contensive.Processor.Controllers.LogController.logInfo(cp.core, "Use IIS Import Application to install either you web application, or the Contensive IISDefault.zip application.");

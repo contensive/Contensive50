@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -24,7 +24,7 @@ namespace Contensive.Processor.Controllers {
         //
         private CoreController core;
         //
-        private Dictionary<string, docPropertiesClass> docPropertiesDict = new Dictionary<string, docPropertiesClass>();
+        private Dictionary<string, DocPropertiesClass> docPropertiesDict = new Dictionary<string, DocPropertiesClass>();
         //
         public DocPropertyController(CoreController core) : base() {
             this.core = core;
@@ -58,7 +58,7 @@ namespace Contensive.Processor.Controllers {
         //
         public void setProperty(string key, string value, bool isForm) {
             try {
-                docPropertiesClass prop = new docPropertiesClass();
+                DocPropertiesClass prop = new DocPropertiesClass();
                 prop.NameValue = key;
                 prop.FileSize = 0;
                 prop.fileType = "";
@@ -76,7 +76,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public void setProperty(string key, docPropertiesClass value) {
+        public void setProperty(string key, DocPropertiesClass value) {
             string propKey = encodeDocPropertyKey(key);
             if (!string.IsNullOrEmpty(propKey)) {
                 if (docPropertiesDict.ContainsKey(propKey)) {
@@ -96,7 +96,7 @@ namespace Contensive.Processor.Controllers {
         //
         public List<string> getKeyList() {
             List<string> keyList = new List<string>();
-            foreach (KeyValuePair<string, docPropertiesClass> kvp in docPropertiesDict) {
+            foreach (KeyValuePair<string, DocPropertiesClass> kvp in docPropertiesDict) {
                 keyList.Add(kvp.Key);
             }
             return keyList;
@@ -170,7 +170,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public docPropertiesClass getProperty(string RequestName) {
+        public DocPropertiesClass getProperty(string RequestName) {
             try {
                 string Key = encodeDocPropertyKey(RequestName);
                 if (!string.IsNullOrEmpty(Key)) {
@@ -182,7 +182,7 @@ namespace Contensive.Processor.Controllers {
                 LogController.handleError( core,ex);
                 throw;
             }
-            return new docPropertiesClass();
+            return new DocPropertiesClass();
         }
         //
         //====================================================================================================
@@ -226,7 +226,7 @@ namespace Contensive.Processor.Controllers {
                 ampSplitCount = ampSplit.GetUpperBound(0) + 1;
                 for (Ptr = 0; Ptr < ampSplitCount; Ptr++) {
                     string nameValuePair = ampSplit[Ptr];
-                    docPropertiesClass docProperty = new docPropertiesClass();
+                    DocPropertiesClass docProperty = new DocPropertiesClass();
                     if (!string.IsNullOrEmpty(nameValuePair)) {
                         if (GenericController.vbInstr(1, nameValuePair, "=") != 0) {
                             ValuePair = nameValuePair.Split('=');

@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 
 namespace Contensive.Processor {
-    public static class constants {
+    public static class Constants {
         //
         // -- data layers, 
         //      - only allow calls from top to bottom
@@ -14,6 +14,7 @@ namespace Contensive.Processor {
         //
         //      CdefModel: the model for content definitions, and methods to create them
         //
+        //      ? CDef domain model, should it's 'control' methods just be methods in the model?
         //      CdefController: static methods for all things ContentDefinition (cdef)
         //          - getContentId, getCdef, etc.
         //
@@ -1860,7 +1861,7 @@ namespace Contensive.Processor {
         }
         //
         // -- metaDescription
-        public struct htmlMetaClass {
+        public struct HtmlMetaClass {
             public string content; // the description, title, etc.
             public string addedByMessage; // message used during debug to show where the asset came from
         }
@@ -1869,11 +1870,11 @@ namespace Contensive.Processor {
         internal const string taskCommandBuildCsv = "buildcsv";
         internal const string taskCommandBuildXml = "buildxml";
     }
-    public static class taskQueueCommandEnumModule {
+    public static class TaskQueueCommandEnumModule {
         internal const string runAddon = "runaddon";
     }
 
-    public class cmdDetailClass {
+    public class CmdDetailClass {
         public int addonId;
         public string addonName;
         public Dictionary<string, string> args;
@@ -1891,7 +1892,7 @@ namespace Contensive.Processor {
     //
     //====================================================================================================
     //
-    public class docPropertiesClass {
+    public class DocPropertiesClass {
         public string Name;
         public string Value;
         public string NameValue;
@@ -1905,7 +1906,7 @@ namespace Contensive.Processor {
     //
     // SF Resize Algorithms
     //
-    public enum imageResizeAlgorithms {
+    public enum ImageResizeAlgorithms {
         Box = 0,
         Triangle = 1,
         Hermite = 2,

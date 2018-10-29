@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
 //
 namespace Contensive.Processor.Controllers {
@@ -169,11 +169,11 @@ namespace Contensive.Processor.Controllers {
                                         coreApp.db.csSave(CS);
                                         //
                                         // -- add task to queue for runner
-                                        cmdDetailClass cmdDetail = new cmdDetailClass();
+                                        CmdDetailClass cmdDetail = new CmdDetailClass();
                                         cmdDetail.addonId = coreApp.db.csGetInteger(CS, "ID");
                                         cmdDetail.addonName = addonName;
                                         cmdDetail.args = GenericController.convertAddonArgumentstoDocPropertiesList(coreApp, coreApp.db.csGetText(CS, "argumentlist"));
-                                        addTaskToQueue(coreApp, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
+                                        addTaskToQueue(coreApp, TaskQueueCommandEnumModule.runAddon, cmdDetail, false);
                                     } else if (coreApp.db.csGetDate(CS, "ProcessNextRun") == DateTime.MinValue) {
                                         //
                                         LogController.logTrace(coreApp, "scheduleTasks, addon [" + addonName + "], setup next run, ProcessInterval set but no processNextRun, set processNextRun [" + nextRun + "]");
@@ -207,7 +207,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="cmdDetail"></param>
         /// <param name="BlockDuplicates"></param>
         /// <returns></returns>
-        static public bool addTaskToQueue(CoreController cpSiteCore, string command, cmdDetailClass cmdDetail, bool BlockDuplicates) {
+        static public bool addTaskToQueue(CoreController cpSiteCore, string command, CmdDetailClass cmdDetail, bool BlockDuplicates) {
             bool returnTaskAdded = true;
             try {
                 string cmdDetailJson = cpSiteCore.json.Serialize(cmdDetail);

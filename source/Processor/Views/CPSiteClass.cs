@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor {
     public class CPSiteClass : BaseClasses.CPSiteBaseClass, IDisposable {
@@ -275,7 +275,7 @@ namespace Contensive.Processor {
                     docProperties.Add("sql", SQL);
                     docProperties.Add("ExportName", ExportName);
                     docProperties.Add("filename", Filename);
-                    var cmdDetail = new cmdDetailClass() {
+                    var cmdDetail = new CmdDetailClass() {
                         addonId = ExportCSVAddon.id,
                         addonName = ExportCSVAddon.name,
                         args = docProperties

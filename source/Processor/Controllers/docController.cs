@@ -5,7 +5,7 @@ using System.Linq;
 using System.Collections.Generic;
 using Contensive.Processor.Models.Db;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 using Contensive.BaseClasses;
 //
 namespace Contensive.Processor.Controllers {
@@ -48,19 +48,19 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// head meta tag list (convert to list object)
         /// </summary>
-        public List<htmlMetaClass> htmlMetaContent_OtherTags { get; set; } = new List<htmlMetaClass>();
+        public List<HtmlMetaClass> htmlMetaContent_OtherTags { get; set; } = new List<HtmlMetaClass>();
         /// <summary>
         /// html title elements
         /// </summary>
-        public List<htmlMetaClass> htmlMetaContent_TitleList { get; set; } = new List<htmlMetaClass>();
+        public List<HtmlMetaClass> htmlMetaContent_TitleList { get; set; } = new List<HtmlMetaClass>();
         /// <summary>
         /// html meta description
         /// </summary>
-        public List<htmlMetaClass> htmlMetaContent_Description { get; set; } = new List<htmlMetaClass>();
+        public List<HtmlMetaClass> htmlMetaContent_Description { get; set; } = new List<HtmlMetaClass>();
         /// <summary>
         /// html meta keywords
         /// </summary>
-        public List<htmlMetaClass> htmlMetaContent_KeyWordList { get; set; } = new List<htmlMetaClass>();
+        public List<HtmlMetaClass> htmlMetaContent_KeyWordList { get; set; } = new List<HtmlMetaClass>();
         /// <summary>
         /// current domain for website documents. For all others this is the primary domain for the application.
         /// </summary>
@@ -1295,7 +1295,7 @@ namespace Contensive.Processor.Controllers {
                         Copy = ""
                         + "\r\n<table border=\"0\" cellpadding=\"2\" cellspacing=\"0\" width=\"100%\">"
                         + "\r\n{{REPEATSTART}}<tr><td align=right style=\"height:22px;\">{{CAPTION}}&nbsp;</td><td align=left>{{FIELD}}</td></tr>{{REPEATEND}}"
-                        + "\r\n<tr><td align=right><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=135 height=1></td><td width=\"100%\">&nbsp;</td></tr>"
+                        + "\r\n<tr><td align=right><img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=135 height=1></td><td width=\"100%\">&nbsp;</td></tr>"
                         + "\r\n<tr><td colspan=2>&nbsp;<br>" + core.html.getPanelButtons(ButtonRegister, "Button") + "</td></tr>"
                         + "\r\n</table>";
                         core.db.csSet(CS, "Body", Copy);

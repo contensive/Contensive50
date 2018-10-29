@@ -3,7 +3,7 @@ using System;
 using Contensive.BaseClasses;
 using Contensive.Processor.Models.Db;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 
 namespace Contensive.Processor.Controllers {
     /// <summary>
@@ -446,7 +446,7 @@ namespace Contensive.Processor.Controllers {
                                             //            string IconIDControlString = "AC," + ACTypeDate;
                                             //            Copy = AddonController.getAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "Current Date", "Renders as [Current Date]", ACInstanceID, 0);
                                             //            //Copy = IconImg;
-                                            //            //Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as the current date"" ID=""AC," & ACTypeDate & """ src=""/ccLib/images/ACDate.GIF"">"
+                                            //            //Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as the current date"" ID=""AC," & ACTypeDate & """ src=""/ContensiveBase/images/ACDate.GIF"">"
                                             //        } else if (EncodeNonCachableTags) {
                                             //            Copy = DateTime.Now.ToString();
                                             //        }
@@ -558,7 +558,7 @@ namespace Contensive.Processor.Controllers {
                                             //            Copy = AddonController.getAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "Contact Information Line", "Renders as [Contact Information Line]", ACInstanceID, 0);
                                             //            //Copy = IconImg;
                                             //            //
-                                            //            //Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as a line of text with contact information for this record's primary contact"" id=""AC," & ACType & """ src=""/ccLib/images/ACContact.GIF"">"
+                                            //            //Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as a line of text with contact information for this record's primary contact"" id=""AC," & ACType & """ src=""/ContensiveBase/images/ACContact.GIF"">"
                                             //        } else if (EncodeCachableTags) {
                                             //            if (moreInfoPeopleId != 0) {
                                             //                Copy = pageContentController.getMoreInfoHtml(core, moreInfoPeopleId);
@@ -576,7 +576,7 @@ namespace Contensive.Processor.Controllers {
                                             //            Copy = AddonController.getAddonIconImg(AdminURL, 0, 0, 0, false, IconIDControlString, "", serverFilePath, "Feedback Form", "Renders as [Feedback Form]", ACInstanceID, 0);
                                             //            //Copy = IconImg;
                                             //            //
-                                            //            //Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as a feedback form, sent to this record's primary contact."" id=""AC," & ACType & """ src=""/ccLib/images/ACFeedBack.GIF"">"
+                                            //            //Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Add-on"" title=""Rendered as a feedback form, sent to this record's primary contact."" id=""AC," & ACType & """ src=""/ContensiveBase/images/ACFeedBack.GIF"">"
                                             //        } else if (EncodeNonCachableTags) {
                                             //            if ((moreInfoPeopleId != 0) && (!string.IsNullOrEmpty(ContextContentName)) && (ContextRecordID != 0)) {
                                             //                Copy = FeedbackFormNotSupportedComment;
@@ -670,10 +670,10 @@ namespace Contensive.Processor.Controllers {
                                             //            //
                                             //            // Encoding the edit icons for the active editor form
                                             //            string IconIDControlString = "AC," + ACTypeDownload + ",," + ACAttrRecordID;
-                                            //            Copy = AddonController.getAddonIconImg(AdminURL, 16, 16, 0, true, IconIDControlString, "/ccLib/images/IconDownload3.gif", serverFilePath, "Download Icon with a link to a resource", "Renders as [Download Icon with a link to a resource]", ACInstanceID, 0);
+                                            //            Copy = AddonController.getAddonIconImg(AdminURL, 16, 16, 0, true, IconIDControlString, "/ContensiveBase/images/IconDownload3.gif", serverFilePath, "Download Icon with a link to a resource", "Renders as [Download Icon with a link to a resource]", ACInstanceID, 0);
                                             //            //Copy = IconImg;
                                             //            //
-                                            //            //Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Renders as a download icon"" id=""AC," & ACTypeDownload & ",," & ACAttrRecordID & """ src=""/ccLib/images/IconDownload3.GIF"">"
+                                            //            //Copy = "<img ACInstanceID=""" & ACInstanceID & """ alt=""Renders as a download icon"" id=""AC," & ACTypeDownload & ",," & ACAttrRecordID & """ src=""/ContensiveBase/images/IconDownload3.GIF"">"
                                             //        } else if (encodeACResourceLibraryImages) {
                                             //            //
                                             //            libraryFilesModel file = libraryFilesModel.create(core, ACAttrRecordID);
@@ -681,7 +681,7 @@ namespace Contensive.Processor.Controllers {
                                             //                if (string.IsNullOrEmpty(ACAttrAlt)) {
                                             //                    ACAttrAlt = genericController.encodeText(file.altText);
                                             //                }
-                                            //                Copy = "<a href=\"" + protocolHost + "/" + core.siteProperties.serverPageDefault + "?" + RequestNameDownloadID + "=" + ACAttrRecordID + "\" target=\"_blank\"><img src=\"" + protocolHost + "/ccLib/images/IconDownload3.gif\" width=\"16\" height=\"16\" border=\"0\" alt=\"" + ACAttrAlt + "\"></a>";
+                                            //                Copy = "<a href=\"" + protocolHost + "/" + core.siteProperties.serverPageDefault + "?" + RequestNameDownloadID + "=" + ACAttrRecordID + "\" target=\"_blank\"><img src=\"" + protocolHost + "/ContensiveBase/images/IconDownload3.gif\" width=\"16\" height=\"16\" border=\"0\" alt=\"" + ACAttrAlt + "\"></a>";
                                             //            }
                                             //        }
                                             //        break;
@@ -695,7 +695,7 @@ namespace Contensive.Processor.Controllers {
                                                     if (encodeForWysiwygEditor) {
                                                         //
                                                         string IconIDControlString = "AC," + ACType + "," + NotUsedID + "," + ACName + "," + AddonOptionStringHTMLEncoded;
-                                                        Copy = AddonController.getAddonIconImg(AdminURL, 52, 64, 0, false, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", serverFilePath, "Template Page Content", "Renders as the Template Page Content", ACInstanceID, 0);
+                                                        Copy = AddonController.getAddonIconImg(AdminURL, 52, 64, 0, false, IconIDControlString, "/ContensiveBase/images/ACTemplateContentIcon.gif", serverFilePath, "Template Page Content", "Renders as the Template Page Content", ACInstanceID, 0);
                                                         //Copy = IconImg;
                                                     } else if (EncodeNonCachableTags) {
                                                         //
@@ -714,10 +714,10 @@ namespace Contensive.Processor.Controllers {
                                                 //        if (encodeForWysiwygEditor) {
                                                 //            //
                                                 //            string IconIDControlString = "AC," + ACType + "," + NotUsedID + "," + ACName + "," + AddonOptionStringHTMLEncoded;
-                                                //            Copy = AddonController.getAddonIconImg(AdminURL, 52, 52, 0, false, IconIDControlString, "/ccLib/images/ACTemplateTextIcon.gif", serverFilePath, "Template Text", "Renders as a Template Text Box", ACInstanceID, 0);
+                                                //            Copy = AddonController.getAddonIconImg(AdminURL, 52, 52, 0, false, IconIDControlString, "/ContensiveBase/images/ACTemplateTextIcon.gif", serverFilePath, "Template Text", "Renders as a Template Text Box", ACInstanceID, 0);
                                                 //            //Copy = IconImg;
                                                 //            //
-                                                //            //Copy = "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as Template Text"" id=""AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded & """ src=""/ccLib/images/ACTemplateTextIcon.gif"" WIDTH=52 HEIGHT=52>"
+                                                //            //Copy = "<img ACInstanceID=""" & ACInstanceID & """ onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as Template Text"" id=""AC," & ACType & "," & NotUsedID & "," & ACName & "," & AddonOptionStringHTMLEncoded & """ src=""/ContensiveBase/images/ACTemplateTextIcon.gif"" WIDTH=52 HEIGHT=52>"
                                                 //        } else if (EncodeNonCachableTags) {
                                                 //            //
                                                 //            // Add in the Content Page
@@ -739,7 +739,7 @@ namespace Contensive.Processor.Controllers {
                                                 //        if (encodeForWysiwygEditor) {
                                                 //            //
                                                 //            string IconIDControlString = "AC," + ACType + "," + NotUsedID + "," + ACName + "," + AddonOptionStringHTMLEncoded;
-                                                //            Copy = AddonController.getAddonIconImg(AdminURL, 109, 10, 0, true, IconIDControlString, "/ccLib/images/ACWatchList.gif", serverFilePath, "Watch List", "Renders as the Watch List [" + ACName + "]", ACInstanceID, 0);
+                                                //            Copy = AddonController.getAddonIconImg(AdminURL, 109, 10, 0, true, IconIDControlString, "/ContensiveBase/images/ACWatchList.gif", serverFilePath, "Watch List", "Renders as the Watch List [" + ACName + "]", ACInstanceID, 0);
                                                 //            //Copy = IconImg;
                                                 //        } else if (EncodeNonCachableTags) {
                                                 //            Copy = "{{" + ACTypeWatchList + "?" + addonOptionString + "}}";

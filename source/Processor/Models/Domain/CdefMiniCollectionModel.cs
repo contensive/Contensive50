@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Models.Domain {
     //
@@ -907,29 +907,31 @@ namespace Contensive.Processor.Models.Domain {
                 //----------------------------------------------------------------------------------------------------------------------
                 LogController.logInfo(core, "CDef Load, Upgrade collections added during upgrade process");
                 //----------------------------------------------------------------------------------------------------------------------
-                //
-                LogController.logInfo(core, "Installing Add-on Collections gathered during upgrade");
-                foreach (var import in Collection.collectionImports) {
-                    string CollectionPath = "";
-                    DateTime lastChangeDate = new DateTime();
-                    string emptyString = "";
-                    CollectionController.getCollectionConfig(core, import.Guid, ref CollectionPath, ref lastChangeDate, ref emptyString);
-                    string errorMessage = "";
-                    if (!string.IsNullOrEmpty(CollectionPath)) {
-                        //
-                        // This collection is installed locally, install from local collections
-                        //
-                        CollectionController.installCollectionFromLocalRepo(core, import.Guid, core.codeVersion(), ref errorMessage, "", isNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollections);
-                    } else {
-                        //
-                        // This is a new collection, install to the server and force it on this site
-                        //
-                        bool addonInstallOk = CollectionController.installCollectionFromRemoteRepo(core, import.Guid, ref errorMessage, "", isNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollections);
-                        if (!addonInstallOk) {
-                            throw (new ApplicationException("Failure to install addon collection from remote repository. Collection [" + import.Guid + "] was referenced in collection [" + Collection.name + "]")); //core.handleLegacyError3(core.appConfig.name, "Error upgrading Addon Collection [" & Guid & "], " & errorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
-                        }
-                    }
-                }
+                //\//
+                // 
+                // 20181028 - cdef upgrades shuld not include addon upgrdes
+                //LogController.logInfo(core, "Installing Add-on Collections gathered during upgrade");
+                //foreach (var import in Collection.collectionImports) {
+                //    string CollectionPath = "";
+                //    DateTime lastChangeDate = new DateTime();
+                //    string emptyString = "";
+                //    CollectionController.getCollectionConfig(core, import.Guid, ref CollectionPath, ref lastChangeDate, ref emptyString);
+                //    string errorMessage = "";
+                //    if (!string.IsNullOrEmpty(CollectionPath)) {
+                //        //
+                //        // This collection is installed locally, install from local collections
+                //        //
+                //        CollectionController.installCollectionFromLocalRepo(core, import.Guid, core.codeVersion(), ref errorMessage, "", isNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollections);
+                //    } else {
+                //        //
+                //        // This is a new collection, install to the server and force it on this site
+                //        //
+                //        bool addonInstallOk = CollectionController.installCollectionFromRemoteRepo(core, import.Guid, ref errorMessage, "", isNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollections);
+                //        if (!addonInstallOk) {
+                //            throw (new ApplicationException("Failure to install addon collection from remote repository. Collection [" + import.Guid + "] was referenced in collection [" + Collection.name + "]")); //core.handleLegacyError3(core.appConfig.name, "Error upgrading Addon Collection [" & Guid & "], " & errorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
+                //        }
+                //    }
+                //}
                 //
                 //----------------------------------------------------------------------------------------------------------------------
                 LogController.logInfo(core, "CDef Load, stage 9: Verify Styles");

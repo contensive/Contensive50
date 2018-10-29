@@ -3,13 +3,23 @@
 
 <head>
 <title>Active Content Properties</title>
-<link rel="stylesheet" href="/ccLib/Config/styles.css" type="text/css">
+<link rel="stylesheet" href="/ContensiveBase/Config/styles.css" type="text/css">
 <SCRIPT language="javascript" type="text/javascript">
 var RawString;
+var ImageObject;
 
 function LoadForm() {
-    var callerWindowObj = dialogArguments;
-    RawString = new String( callerWindowObj.ACPropertyObject.id );
+   var callerWindowObj = dialogArguments;
+    ImageObject = callerWindowObj.DialogObject;
+    document.all['ImagePropertyWidth'].value = SourceObject.width;
+    document.all['ImagePropertyAlign'].value = SourceObject.align;
+    document.all['ImagePropertyHeight'].value = SourceObject.height;
+    document.all['ImagePropertyAlt'].value = SourceObject.alt;
+    document.all['ImagePropertyBorder'].value = SourceObject.border;
+    document.all['ImagePropertyHSpace'].value = SourceObject.hspace;
+    document.all['ImagePropertyVSpace'].value = SourceObject.vspace;
+    document.all['ImagePropertyLoop'].value = SourceObject.loop;
+    document.all['ImagePropertySrc'].value = SourceObject.src;
     }
 function SaveForm() {
     var callerWindowObj = dialogArguments;
@@ -24,6 +34,35 @@ function SaveForm() {
         }
     callerWindowObj.ACPropertyObject.id = RawString;
     }
+function LoadForm() {
+    var callerWindowObj = dialogArguments;
+    SourceObject = callerWindowObj.ImagePropertyObject;
+    //WindowOpener = window.opener;
+    //SourceObject = WindowOpener.ImagePropertyObject;
+    document.all['ImagePropertyWidth'].value = SourceObject.width;
+    //document.all['ImagePropertyWidth'].value = SourceObject.width;
+    document.all['ImagePropertyAlign'].value = SourceObject.align;
+    document.all['ImagePropertyHeight'].value = SourceObject.height;
+    document.all['ImagePropertyAlt'].value = SourceObject.alt;
+    document.all['ImagePropertyBorder'].value = SourceObject.border;
+    document.all['ImagePropertyHSpace'].value = SourceObject.hspace;
+    document.all['ImagePropertyVSpace'].value = SourceObject.vspace;
+    document.all['ImagePropertyLoop'].value = SourceObject.loop;
+    document.all['ImagePropertySrc'].value = SourceObject.src;
+    }
+function SaveForm() {
+    SourceObject.width=document.all['ImagePropertyWidth'].value;
+    SourceObject.align=document.all['ImagePropertyAlign'].value;
+    SourceObject.height=document.all['ImagePropertyHeight'].value;
+    SourceObject.alt=document.all['ImagePropertyAlt'].value;
+    SourceObject.border=document.all['ImagePropertyBorder'].value;
+    SourceObject.hspace=document.all['ImagePropertyHSpace'].value;
+    SourceObject.vspace=document.all['ImagePropertyVSpace'].value;
+    SourceObject.loop=document.all['ImagePropertyLoop'].value;
+    SourceObject.src=document.all['ImagePropertySrc'].value;
+    }
+
+
 LoadForm(); 
 </SCRIPT>
 </head>
@@ -31,9 +70,9 @@ LoadForm();
 <body class="ccPanel"  topmargin="0" leftmargin="0" marginwidth="0" marginheight="0">
 <TABLE border="0" cellpadding="0" cellspacing="0" width="100%" class="ccPanel"
 ><TR
-><TD colspan="3" class="ccPanelhilite"><IMG alt="" src="/ccLib/Images/spacer.gif" height="1" width="100%" /></TD
+><TD colspan="3" class="ccPanelhilite"><IMG alt="" src="/ContensiveBase/Images/spacer.gif" height="1" width="100%" /></TD
 ></TR><TR
-><TD width="1" height="1" class="ccPanelhilite"><IMG alt="" src="/ccLib/Images/spacer.gif" height="1" width="1" /></TD
+><TD width="1" height="1" class="ccPanelhilite"><IMG alt="" src="/ContensiveBase/Images/spacer.gif" height="1" width="1" /></TD
 ><TD width="100%" valign="top" align="left"
 ><TABLE border="0" cellpadding="5" cellspacing="0" width="100%" class="ccPanel"
 ><TR
@@ -52,7 +91,7 @@ var SplitString;
 var Value;
 
 SplitString = RawString.split(",")
-Spacer='<td width="5"><img src="/ccLib/Images/Spacer.gif" width="1" height="20"></td>'
+Spacer='<td width="5"><img src="/ContensiveBase/Images/Spacer.gif" width="1" height="20"></td>'
 
 Value=''
 if ( SplitString[0] ){

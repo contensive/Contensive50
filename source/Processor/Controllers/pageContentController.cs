@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 //
 using Contensive.BaseClasses;
 //
@@ -1954,7 +1954,7 @@ namespace Contensive.Processor.Controllers {
                                     Body = Body + "<p><b>Page Hit Notification.</b></p>";
                                     Body = Body + "<p>This email was sent to you by the Contensive Server as a notification of the following content viewing details.</p>";
                                     Body = Body + HtmlController.tableStart(4, 1, 1);
-                                    Body = Body + "<tr><td align=\"right\" width=\"150\" Class=\"ccPanelHeader\">Description<br><img alt=\"image\" src=\"http://" + core.webServer.requestDomain + "/ccLib/images/spacer.gif\" width=\"150\" height=\"1\"></td><td align=\"left\" width=\"100%\" Class=\"ccPanelHeader\">Value</td></tr>";
+                                    Body = Body + "<tr><td align=\"right\" width=\"150\" Class=\"ccPanelHeader\">Description<br><img alt=\"image\" src=\"http://" + core.webServer.requestDomain + "/ContensiveBase/images/spacer.gif\" width=\"150\" height=\"1\"></td><td align=\"left\" width=\"100%\" Class=\"ccPanelHeader\">Value</td></tr>";
                                     Body = Body + get2ColumnTableRow("Domain", core.webServer.requestDomain, true);
                                     Body = Body + get2ColumnTableRow("Link", core.webServer.requestUrl, false);
                                     Body = Body + get2ColumnTableRow("Page Name", PageName, true);
@@ -2223,7 +2223,7 @@ namespace Contensive.Processor.Controllers {
                 //            QueryString = genericController.modifyQueryString(QueryString, RequestNameHardCodedPage, HardCodedPagePrinterVersion, true);
                 //            string Caption = core.siteProperties.getText("PagePrinterVersionCaption", "Printer Version");
                 //            Caption = genericController.vbReplace(Caption, " ", "&nbsp;");
-                //            IconRow = IconRow + "\r&nbsp;&nbsp;<a href=\"" + htmlController.encodeHtml(core.webServer.requestPage + "?" + QueryString) + "\" target=\"_blank\"><img alt=\"image\" src=\"/ccLib/images/IconSmallPrinter.gif\" width=\"13\" height=\"13\" border=\"0\" align=\"absmiddle\"></a>&nbsp<a href=\"" + htmlController.encodeHtml(core.webServer.requestPage + "?" + QueryString) + "\" target=\"_blank\" style=\"text-decoration:none! important;font-family:sanserif,verdana,helvetica;font-size:11px;\">" + Caption + "</a>";
+                //            IconRow = IconRow + "\r&nbsp;&nbsp;<a href=\"" + htmlController.encodeHtml(core.webServer.requestPage + "?" + QueryString) + "\" target=\"_blank\"><img alt=\"image\" src=\"/ContensiveBase/images/IconSmallPrinter.gif\" width=\"13\" height=\"13\" border=\"0\" align=\"absmiddle\"></a>&nbsp<a href=\"" + htmlController.encodeHtml(core.webServer.requestPage + "?" + QueryString) + "\" target=\"_blank\" style=\"text-decoration:none! important;font-family:sanserif,verdana,helvetica;font-size:11px;\">" + Caption + "</a>";
                 //        }
                 //        if (core.doc.pageController.page.AllowEmailPage) {
                 //            string QueryString = core.doc.refreshQueryString;
@@ -2233,7 +2233,7 @@ namespace Contensive.Processor.Controllers {
                 //            string EmailBody = core.webServer.requestProtocol + core.webServer.requestDomain + core.webServer.requestPathPage + QueryString;
                 //            string Caption = core.siteProperties.getText("PageAllowEmailCaption", "Email This Page");
                 //            Caption = genericController.vbReplace(Caption, " ", "&nbsp;");
-                //            IconRow = IconRow + "\r&nbsp;&nbsp;<a HREF=\"mailto:?SUBJECT=You might be interested in this&amp;BODY=" + EmailBody + "\"><img alt=\"image\" src=\"/ccLib/images/IconSmallEmail.gif\" width=\"13\" height=\"13\" border=\"0\" align=\"absmiddle\"></a>&nbsp;<a HREF=\"mailto:?SUBJECT=You might be interested in this&amp;BODY=" + EmailBody + "\" style=\"text-decoration:none! important;font-family:sanserif,verdana,helvetica;font-size:11px;\">" + Caption + "</a>";
+                //            IconRow = IconRow + "\r&nbsp;&nbsp;<a HREF=\"mailto:?SUBJECT=You might be interested in this&amp;BODY=" + EmailBody + "\"><img alt=\"image\" src=\"/ContensiveBase/images/IconSmallEmail.gif\" width=\"13\" height=\"13\" border=\"0\" align=\"absmiddle\"></a>&nbsp;<a HREF=\"mailto:?SUBJECT=You might be interested in this&amp;BODY=" + EmailBody + "\" style=\"text-decoration:none! important;font-family:sanserif,verdana,helvetica;font-size:11px;\">" + Caption + "</a>";
                 //        }
                 //    }
                 //    if (!string.IsNullOrEmpty(IconRow)) {

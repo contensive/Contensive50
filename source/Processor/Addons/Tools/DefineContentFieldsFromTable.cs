@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 //
 namespace Contensive.Addons.Tools {
     //
@@ -75,8 +75,8 @@ namespace Contensive.Addons.Tools {
                 Stream.Add("</tr>");
                 //
                 Stream.Add("<tr>");
-                Stream.Add("<td width=\"150\"><IMG alt=\"\" src=\"/ccLib/Images/spacer.gif\" width=\"150\" height=\"1\"></td>");
-                Stream.Add("<td width=\"99%\"><IMG alt=\"\" src=\"/ccLib/Images/spacer.gif\" width=\"100%\" height=\"1\"></td>");
+                Stream.Add("<td width=\"150\"><IMG alt=\"\" src=\"/ContensiveBase/Images/spacer.gif\" width=\"150\" height=\"1\"></td>");
+                Stream.Add("<td width=\"99%\"><IMG alt=\"\" src=\"/ContensiveBase/Images/spacer.gif\" width=\"100%\" height=\"1\"></td>");
                 Stream.Add("</tr>");
                 Stream.Add("</TABLE>");
                 Stream.Add("</form>");

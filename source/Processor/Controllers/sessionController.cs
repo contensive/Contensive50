@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using Contensive.Processor.Models.Db;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 using Contensive.BaseClasses;
 using Contensive.Processor.Models.Domain;
 //
@@ -559,7 +559,7 @@ namespace Contensive.Processor.Controllers {
                         LogController.logTrace(core, "SessionController.create(), write visit cookie");
                         visitCookie = SecurityController.encodeToken( core,resultSessionContext.visit.id, core.doc.profileStartTime);
                         // -- very trial-error fix - W4S site does not send cookies from ajax calls right after changing from requestAppRootPath to appRootPath
-                        core.webServer.addResponseCookie(appNameCookiePrefix + constants.cookieNameVisit, visitCookie, default(DateTime), "", @"/", false);
+                        core.webServer.addResponseCookie(appNameCookiePrefix + Constants.cookieNameVisit, visitCookie, default(DateTime), "", @"/", false);
                         //core.webServer.addResponseCookie(appNameCookiePrefix + constants.cookieNameVisit, visitCookie, default(DateTime), "", appRootPath, false);
                     }
                 }

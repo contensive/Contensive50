@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
 using Contensive.Addons.Tools;
 using static Contensive.Processor.AdminUIController;
@@ -377,8 +377,8 @@ namespace Contensive.Addons.AdminSite {
                     }
                 }
                 returnForm = returnForm + HtmlController.tableRowStart();
-                returnForm = returnForm + HtmlController.tableCellStart("120", 1, RowEven, "right") + "<img src=/ccLib/images/spacer.gif width=120 height=1></td>";
-                returnForm = returnForm + HtmlController.tableCellStart("99%", 1, RowEven, "left") + "<img src=/ccLib/images/spacer.gif width=1 height=1></td>";
+                returnForm = returnForm + HtmlController.tableCellStart("120", 1, RowEven, "right") + "<img src=/ContensiveBase/images/spacer.gif width=120 height=1></td>";
+                returnForm = returnForm + HtmlController.tableCellStart("99%", 1, RowEven, "left") + "<img src=/ContensiveBase/images/spacer.gif width=1 height=1></td>";
                 returnForm = returnForm + kmaEndTableRow;
                 returnForm = returnForm + "</table>";
                 Content = returnForm;

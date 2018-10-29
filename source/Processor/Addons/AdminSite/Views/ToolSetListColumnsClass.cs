@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
 using Contensive.Addons.Tools;
 using static Contensive.Processor.AdminUIController;
@@ -270,17 +270,17 @@ namespace Contensive.Addons.AdminSite {
                     Stream.Add("</tr></table>");
                     //
                     Stream.Add("<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"99%\"><tr>");
-                    Stream.Add("<td width=\"9%\"><nobr><img src=\"/ccLib/images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><img src=\"/ccLib/images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><img src=\"/ccLib/images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><img src=\"/ccLib/images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><img src=\"/ccLib/images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><img src=\"/ccLib/images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><img src=\"/ccLib/images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><img src=\"/ccLib/images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><img src=\"/ccLib/images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><img src=\"/ccLib/images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
-                    Stream.Add("<td width=\"9%\"><nobr><img src=\"/ccLib/images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
+                    Stream.Add("<td width=\"9%\"><nobr><img src=\"/ContensiveBase/images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
+                    Stream.Add("<td width=\"9%\"><nobr><img src=\"/ContensiveBase/images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
+                    Stream.Add("<td width=\"9%\"><nobr><img src=\"/ContensiveBase/images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
+                    Stream.Add("<td width=\"9%\"><nobr><img src=\"/ContensiveBase/images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
+                    Stream.Add("<td width=\"9%\"><nobr><img src=\"/ContensiveBase/images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
+                    Stream.Add("<td width=\"9%\"><nobr><img src=\"/ContensiveBase/images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
+                    Stream.Add("<td width=\"9%\"><nobr><img src=\"/ContensiveBase/images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
+                    Stream.Add("<td width=\"9%\"><nobr><img src=\"/ContensiveBase/images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
+                    Stream.Add("<td width=\"9%\"><nobr><img src=\"/ContensiveBase/images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
+                    Stream.Add("<td width=\"9%\"><nobr><img src=\"/ContensiveBase/images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
+                    Stream.Add("<td width=\"9%\"><nobr><img src=\"/ContensiveBase/images/black.gif\" width=\"1\" height=\"10\" ><img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=\"100%\" height=\"10\" ></nobr></td>");
                     Stream.Add("</tr></table>");
                     //
                     // print the column headers
@@ -337,7 +337,7 @@ namespace Contensive.Addons.AdminSite {
                                 string link = "?" + core.doc.refreshQueryString + "&FieldName=" + HtmlController.encodeHtml(field.nameLc) + "&fi=" + fieldId + "&dtcn=" + ColumnPtr + "&" + RequestNameAdminSubForm + "=" + AdminFormIndex_SubFormSetColumns; 
                                 //string AStart = "<a href=\"?" + core.doc.refreshQueryString + "&FieldName=" + htmlController.encodeHtml(field.nameLc) + "&fi=" + fieldId + "&dtcn=" + ColumnPtr + "&" + RequestNameAdminSubForm + "=" + AdminFormIndex_SubFormSetColumns;
                                 Stream.Add("<td width=\"" + ColumnWidth + "%\" valign=\"top\" align=\"left\">");
-                                //Stream.Add("<img src=\"/ccLib/images/black.GIF\" width=\"100%\" height=\"1\" >");
+                                //Stream.Add("<img src=\"/ContensiveBase/images/black.GIF\" width=\"100%\" height=\"1\" >");
                                 Stream.Add(HtmlController.div(AdminUIController.getIconDeleteLink(link + "&dta=" + ToolsActionRemoveField),"text-center"));
                                 Stream.Add(HtmlController.div(AdminUIController.getIconArrowRightLink(link + "&dta=" + ToolsActionMoveFieldRight), "text-center"));
                                 Stream.Add(HtmlController.div(AdminUIController.getIconArrowLeftLink(link + "&dta=" + ToolsActionMoveFieldLeft), "text-center"));

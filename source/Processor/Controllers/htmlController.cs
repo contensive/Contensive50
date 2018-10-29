@@ -15,7 +15,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 using System.Net;
 using System.Text;
 
@@ -160,7 +160,7 @@ namespace Contensive.Processor.Controllers {
                 return_IsEmptyList = true;
                 //
                 CurrentValueText = CurrentValue.ToString();
-                foreach (constants.CacheInputSelectClass inputSelect in core.doc.inputSelectCache) {
+                foreach (Constants.CacheInputSelectClass inputSelect in core.doc.inputSelectCache) {
                     if ((inputSelect.ContentName == ContentName) && (inputSelect.Criteria == LcaseCriteria) && (inputSelect.CurrentValue == CurrentValueText)) {
                         SelectRaw = inputSelect.SelectRaw;
                         return_IsEmptyList = false;
@@ -398,7 +398,7 @@ namespace Contensive.Processor.Controllers {
                     // Save the SelectRaw
                     //
                     if (!return_IsEmptyList) {
-                        core.doc.inputSelectCache.Add(new constants.CacheInputSelectClass() {
+                        core.doc.inputSelectCache.Add(new Constants.CacheInputSelectClass() {
                             ContentName = ContentName,
                             Criteria = Criteria,
                             CurrentValue = CurrentValue.ToString(),
@@ -435,7 +435,7 @@ namespace Contensive.Processor.Controllers {
                 string sqlCriteria = "";
                 //
                 string SelectRaw = "";
-                foreach (constants.CacheInputSelectClass cacheInputSelect in core.doc.inputSelectCache) {
+                foreach (Constants.CacheInputSelectClass cacheInputSelect in core.doc.inputSelectCache) {
                     if ((cacheInputSelect.ContentName == "Group:" + GroupID) && (cacheInputSelect.Criteria == sqlCriteria) && (GenericController.encodeInteger(cacheInputSelect.CurrentValue) == currentValue)) {
                         SelectRaw = cacheInputSelect.SelectRaw;
                         break;
@@ -640,7 +640,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // Save the SelectRaw
                     //
-                    core.doc.inputSelectCache.Add(new constants.CacheInputSelectClass() {
+                    core.doc.inputSelectCache.Add(new Constants.CacheInputSelectClass() {
                         ContentName = "Group:" + GroupID,
                         Criteria = sqlCriteria,
                         CurrentValue = currentValue.ToString(),
@@ -793,7 +793,7 @@ namespace Contensive.Processor.Controllers {
                         result += "<a href=\"" + HtmlController.encodeHtml(Link) + "\" >";
                     }
                     IconFilename = core.siteProperties.LoginIconFilename;
-                    if (GenericController.vbLCase(IconFilename.Left(7)) != "/ccLib/") {
+                    if (GenericController.vbLCase(IconFilename.Left(7)) != "/ContensiveBase/") {
                         IconFilename = GenericController.getCdnFileLink(core, IconFilename);
                     }
                     result += "<img alt=\"Login\" src=\"" + IconFilename + "\" border=\"0\" >";
@@ -1472,18 +1472,18 @@ namespace Contensive.Processor.Controllers {
                             //   Need a more consistant solution later
                             //
                             IconIDControlString = "AC," + ACTypeTemplateContent + ",0,Template Content,";
-                            IconImg = AddonController.getAddonIconImg("/" + core.appConfig.adminRoute, 52, 64, 0, false, IconIDControlString, "/ccLib/images/ACTemplateContentIcon.gif", core.appConfig.cdnFileUrl, "Content Box", "Renders as the content for a template", "", 0);
+                            IconImg = AddonController.getAddonIconImg("/" + core.appConfig.adminRoute, 52, 64, 0, false, IconIDControlString, "/ContensiveBase/images/ACTemplateContentIcon.gif", core.appConfig.cdnFileUrl, "Content Box", "Renders as the content for a template", "", 0);
                             IconImg = GenericController.EncodeJavascriptStringSingleQuote(IconImg);
                             Items[ItemsCnt] = "['Content Box','" + IconImg + "']";
-                            //Items(ItemsCnt) = "['Template Content','<img onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Content"" id=""AC," & ACTypeTemplateContent & ",0,Template Content,"" src=""/ccLib/images/ACTemplateContentIcon.gif"" WIDTH=52 HEIGHT=64>']"
+                            //Items(ItemsCnt) = "['Template Content','<img onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Content"" id=""AC," & ACTypeTemplateContent & ",0,Template Content,"" src=""/ContensiveBase/images/ACTemplateContentIcon.gif"" WIDTH=52 HEIGHT=64>']"
                             Index.setPtr("Content Box", ItemsCnt);
                             ItemsCnt += 1;
                             //
                             IconIDControlString = "AC," + ACTypeTemplateText + ",0,Template Text,Name=Default";
-                            IconImg = AddonController.getAddonIconImg("/" + core.appConfig.adminRoute, 52, 52, 0, false, IconIDControlString, "/ccLib/images/ACTemplateTextIcon.gif", core.appConfig.cdnFileUrl, "Template Text", "Renders as a template text block", "", 0);
+                            IconImg = AddonController.getAddonIconImg("/" + core.appConfig.adminRoute, 52, 52, 0, false, IconIDControlString, "/ContensiveBase/images/ACTemplateTextIcon.gif", core.appConfig.cdnFileUrl, "Template Text", "Renders as a template text block", "", 0);
                             IconImg = GenericController.EncodeJavascriptStringSingleQuote(IconImg);
                             Items[ItemsCnt] = "['Template Text','" + IconImg + "']";
-                            //Items(ItemsCnt) = "['Template Text','<img onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Text"" id=""AC," & ACTypeTemplateText & ",0,Template Text,Name=Default"" src=""/ccLib/images/ACTemplateTextIcon.gif"" WIDTH=52 HEIGHT=52>']"
+                            //Items(ItemsCnt) = "['Template Text','<img onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the Template Text"" id=""AC," & ACTypeTemplateText & ",0,Template Text,Name=Default"" src=""/ContensiveBase/images/ACTemplateTextIcon.gif"" WIDTH=52 HEIGHT=52>']"
                             Index.setPtr("Template Text", ItemsCnt);
                             ItemsCnt += 1;
                         }
@@ -1504,7 +1504,7 @@ namespace Contensive.Processor.Controllers {
                                     IconImg = GenericController.EncodeJavascriptStringSingleQuote(IconImg);
                                     FieldCaption = GenericController.EncodeJavascriptStringSingleQuote(FieldCaption);
                                     Items[ItemsCnt] = "['" + FieldCaption + "','" + IconImg + "']";
-                                    //Items(ItemsCnt) = "['" & FieldCaption & "','<img onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the " & FieldCaption & """ id=""AC,WATCHLIST,0," & FieldName & ",ListName=" & FieldName & "&SortField=[DateAdded|Link|LinkLabel|Clicks|WhatsNewDateExpires]&SortDirection=Z-A[A-Z|Z-A]"" src=""/ccLib/images/ACWatchList.GIF"">']"
+                                    //Items(ItemsCnt) = "['" & FieldCaption & "','<img onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the " & FieldCaption & """ id=""AC,WATCHLIST,0," & FieldName & ",ListName=" & FieldName & "&SortField=[DateAdded|Link|LinkLabel|Clicks|WhatsNewDateExpires]&SortDirection=Z-A[A-Z|Z-A]"" src=""/ContensiveBase/images/ACWatchList.GIF"">']"
                                     Index.setPtr(FieldCaption, ItemsCnt);
                                     ItemsCnt += 1;
                                     if (ItemsCnt >= ItemsSize) {
@@ -3025,8 +3025,8 @@ namespace Contensive.Processor.Controllers {
                         //
                         DebugPanel += "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">"
                             + cr2 + "<tr>"
-                            + cr3 + "<td width=\"100\" class=\"ccPanel\"><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"100\" height=\"1\" ></td>"
-                            + cr3 + "<td width=\"100%\" class=\"ccPanel\"><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"1\" height=\"1\" ></td>"
+                            + cr3 + "<td width=\"100\" class=\"ccPanel\"><img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=\"100\" height=\"1\" ></td>"
+                            + cr3 + "<td width=\"100%\" class=\"ccPanel\"><img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=\"1\" height=\"1\" ></td>"
                             + cr2 + "</tr>";
                         DebugPanel += "</table>";
                         //
@@ -3312,7 +3312,7 @@ namespace Contensive.Processor.Controllers {
         public void addTitle(string pageTitle, string addedByMessage) {
             try {
                 if (!string.IsNullOrEmpty(pageTitle.Trim())) {
-                    core.doc.htmlMetaContent_TitleList.Add(new htmlMetaClass() {
+                    core.doc.htmlMetaContent_TitleList.Add(new HtmlMetaClass() {
                         addedByMessage = addedByMessage,
                         content = pageTitle
                     });
@@ -3329,7 +3329,7 @@ namespace Contensive.Processor.Controllers {
         public void addMetaDescription(string MetaDescription, string addedByMessage) {
             try {
                 if (!string.IsNullOrEmpty(MetaDescription.Trim())) {
-                    core.doc.htmlMetaContent_Description.Add(new htmlMetaClass() {
+                    core.doc.htmlMetaContent_Description.Add(new HtmlMetaClass() {
                         addedByMessage = addedByMessage,
                         content = MetaDescription
                     });
@@ -3365,7 +3365,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 foreach (string keyword in metaKeywordList.Split(',')) {
                     if (!string.IsNullOrEmpty(keyword)) {
-                        core.doc.htmlMetaContent_KeyWordList.Add(new htmlMetaClass() {
+                        core.doc.htmlMetaContent_KeyWordList.Add(new HtmlMetaClass() {
                             addedByMessage = addedByMessage,
                             content = keyword
                         });
@@ -3383,7 +3383,7 @@ namespace Contensive.Processor.Controllers {
         public void addHeadTag(string headTag, string addedByMessage) {
             try {
                 if (!string.IsNullOrWhiteSpace(headTag)) {
-                    core.doc.htmlMetaContent_OtherTags.Add(new htmlMetaClass() {
+                    core.doc.htmlMetaContent_OtherTags.Add(new HtmlMetaClass() {
                         addedByMessage = addedByMessage,
                         content = headTag
                     });

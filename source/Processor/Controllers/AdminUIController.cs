@@ -8,7 +8,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
 using System.Text;
 //
@@ -487,8 +487,8 @@ namespace Contensive.Processor {
                 + "<table border=0 cellpadding=3 cellspacing=0 width=\"100%\">" 
                     + innerHtml
                     + "<tr>"
-                        + "<td width=20%><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"100%\" height=1 ></td>"
-                        + "<td width=80%><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"100%\" height=1 ></td>"
+                        + "<td width=20%><img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=\"100%\" height=1 ></td>"
+                        + "<td width=80%><img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=\"100%\" height=1 ></td>"
                     + "</tr>"
                 + "</table>"; 
         }
@@ -561,12 +561,12 @@ namespace Contensive.Processor {
                     case SortingStateEnum.SortableSetza:
                         QS = GenericController.modifyQueryString(RefreshQueryString, "ColSort", ((int)SortingStateEnum.SortableSetAZ).ToString(), true);
                         QS = GenericController.modifyQueryString(QS, "ColPtr", ColumnPtr.ToString(), true);
-                        Copy = "<a href=\"?" + QS + "\" title=\"Sort A-Z\" class=\"ccAdminListCaption\">" + Copy + "<img src=\"/ccLib/images/arrowup.gif\" width=8 height=8 border=0></a>";
+                        Copy = "<a href=\"?" + QS + "\" title=\"Sort A-Z\" class=\"ccAdminListCaption\">" + Copy + "<img src=\"/ContensiveBase/images/arrowup.gif\" width=8 height=8 border=0></a>";
                         break;
                     case SortingStateEnum.SortableSetAZ:
                         QS = GenericController.modifyQueryString(RefreshQueryString, "ColSort", ((int)SortingStateEnum.SortableSetza).ToString(), true);
                         QS = GenericController.modifyQueryString(QS, "ColPtr", ColumnPtr.ToString(), true);
-                        Copy = "<a href=\"?" + QS + "\" title=\"Sort Z-A\" class=\"ccAdminListCaption\">" + Copy + "<img src=\"/ccLib/images/arrowdown.gif\" width=8 height=8 border=0></a>";
+                        Copy = "<a href=\"?" + QS + "\" title=\"Sort Z-A\" class=\"ccAdminListCaption\">" + Copy + "<img src=\"/ContensiveBase/images/arrowdown.gif\" width=8 height=8 border=0></a>";
                         break;
                 }
                 //
@@ -574,8 +574,8 @@ namespace Contensive.Processor {
                     WidthTest = GenericController.encodeInteger(Width.ToLowerInvariant().Replace("px", ""));
                     if (WidthTest != 0) {
                         Style = Style + "width:" + WidthTest + "px;";
-                        Copy += "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"" + WidthTest + "\" height=1 border=0>";
-                        //Copy = Copy & "<br><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""" & WidthTest & """ height=1 border=0>"
+                        Copy += "<img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=\"" + WidthTest + "\" height=1 border=0>";
+                        //Copy = Copy & "<br><img alt=""space"" src=""/ContensiveBase/images/spacer.gif"" width=""" & WidthTest & """ height=1 border=0>"
                     } else {
                         Style = Style + "width:" + Width + ";";
                     }
@@ -1420,7 +1420,7 @@ namespace Contensive.Processor {
             //    if (string.IsNullOrEmpty(Copy)) {
             //        Copy = "&nbsp;";
             //    }
-            //    tempGetEditRow = "<tr><td class=\"ccEditCaptionCon\"><nobr>" + Copy + "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=1 height=15 >";
+            //    tempGetEditRow = "<tr><td class=\"ccEditCaptionCon\"><nobr>" + Copy + "<img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=1 height=15 >";
             //    tempGetEditRow = tempGetEditRow + "</nobr></td>";
             //    //
             //    // Right Side
@@ -1570,7 +1570,7 @@ namespace Contensive.Processor {
                                 if (allowCut) {
                                     int ContentID = 0;
                                     string WorkingLink = GenericController.modifyLinkQuery(core.webServer.requestPage + "?" + core.doc.refreshQueryString, RequestNameCut, GenericController.encodeText(ContentID) + "." + GenericController.encodeText(recordID), true);
-                                    result += "<a class=\"ccRecordCutLink\" TabIndex=\"-1\" href=\"" + HtmlController.encodeHtml(WorkingLink) + "\"><img src=\"/ccLib/images/Contentcut.gif\" border=\"0\" alt=\"Cut this " + ContentCaption + " to clipboard\" title=\"Cut this " + ContentCaption + " to clipboard\" align=\"absmiddle\"></a>";
+                                    result += "<a class=\"ccRecordCutLink\" TabIndex=\"-1\" href=\"" + HtmlController.encodeHtml(WorkingLink) + "\"><img src=\"/ContensiveBase/images/Contentcut.gif\" border=\"0\" alt=\"Cut this " + ContentCaption + " to clipboard\" title=\"Cut this " + ContentCaption + " to clipboard\" align=\"absmiddle\"></a>";
                                 }
                                 result = "<span class=\"ccRecordLinkCon\" style=\"white-space:nowrap;\">" + result + "</span>";
                             }
@@ -1636,7 +1636,7 @@ namespace Contensive.Processor {
                                 + " TabIndex=-1"
                                 + " href=\"" + HtmlController.encodeHtml(Link) + "\"";
                             tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + "><img"
-                                + " src=\"/ccLib/images/IconContentAdd.gif\""
+                                + " src=\"/ContensiveBase/images/IconContentAdd.gif\""
                                 + " border=\"0\""
                                 + " alt=\"Add record\""
                                 + " title=\"Add record\""
@@ -1645,7 +1645,7 @@ namespace Contensive.Processor {
                         } else {
                             //
                             MenuName = GenericController.GetRandomInteger(core).ToString();
-                            core.menuFlyout.menu_AddEntry(MenuName, "", "/ccLib/images/IconContentAdd.gif", "", "", "", "stylesheet", "stylesheethover");
+                            core.menuFlyout.menu_AddEntry(MenuName, "", "/ContensiveBase/images/IconContentAdd.gif", "", "", "", "stylesheet", "stylesheethover");
                             LowestRequiredMenuName = getRecordAddLink_AddMenuEntry(core, iContentName, iPresetNameValueList, "", MenuName, MenuName);
                         }
                         //
@@ -1683,7 +1683,7 @@ namespace Contensive.Processor {
                                                 PasteLink = GenericController.modifyLinkQuery(PasteLink, RequestNamePasteParentContentID, iContentID.ToString(), true);
                                                 PasteLink = GenericController.modifyLinkQuery(PasteLink, RequestNamePasteParentRecordID, ParentID.ToString(), true);
                                                 PasteLink = GenericController.modifyLinkQuery(PasteLink, RequestNamePasteFieldList, iPresetNameValueList, true);
-                                                tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + "<a class=\"ccRecordCutLink\" TabIndex=\"-1\" href=\"" + HtmlController.encodeHtml(PasteLink) + "\"><img src=\"/ccLib/images/ContentPaste.gif\" border=\"0\" alt=\"Paste record in clipboard here\" title=\"Paste record in clipboard here\" align=\"absmiddle\"></a>";
+                                                tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + "<a class=\"ccRecordCutLink\" TabIndex=\"-1\" href=\"" + HtmlController.encodeHtml(PasteLink) + "\"><img src=\"/ContensiveBase/images/ContentPaste.gif\" border=\"0\" alt=\"Paste record in clipboard here\" title=\"Paste record in clipboard here\" align=\"absmiddle\"></a>";
                                             }
                                         }
                                     }
@@ -1697,14 +1697,14 @@ namespace Contensive.Processor {
                             tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + core.menuFlyout.getMenu(LowestRequiredMenuName, 0);
                             tempmain_GetRecordAddLink2 = GenericController.vbReplace(tempmain_GetRecordAddLink2, "class=\"ccFlyoutButton\" ", "", 1, 99, 1);
                             if (!string.IsNullOrEmpty(PasteLink)) {
-                                tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + "<a TabIndex=-1 href=\"" + HtmlController.encodeHtml(PasteLink) + "\"><img src=\"/ccLib/images/ContentPaste.gif\" border=\"0\" alt=\"Paste content from clipboard\" align=\"absmiddle\"></a>";
+                                tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + "<a TabIndex=-1 href=\"" + HtmlController.encodeHtml(PasteLink) + "\"><img src=\"/ContensiveBase/images/ContentPaste.gif\" border=\"0\" alt=\"Paste content from clipboard\" align=\"absmiddle\"></a>";
                             }
                         }
                         //
                         // Help link if enabled
                         //
                         string helpLink = "";
-                        //helpLink = main_GetHelpLink(6, "Adding " & iContentName, "Turn on Edit icons by checking 'Edit' in the tools panel, and click apply.<br><br><img src=""/ccLib/images/IconContentAdd.gif"" " & IconWidthHeight & " style=""vertical-align:middle""> Add-Content icon<br><br>Add-Content icons appear in your content. Click them to add content.")
+                        //helpLink = main_GetHelpLink(6, "Adding " & iContentName, "Turn on Edit icons by checking 'Edit' in the tools panel, and click apply.<br><br><img src=""/ContensiveBase/images/IconContentAdd.gif"" " & IconWidthHeight & " style=""vertical-align:middle""> Add-Content icon<br><br>Add-Content icons appear in your content. Click them to add content.")
                         tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + helpLink;
                         if (!string.IsNullOrEmpty(tempmain_GetRecordAddLink2)) {
                             tempmain_GetRecordAddLink2 = ""

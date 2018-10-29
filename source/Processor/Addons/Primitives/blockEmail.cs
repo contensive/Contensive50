@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 //
 namespace Contensive.Addons.Primitives {
     public class blockEmailClass : Contensive.BaseClasses.AddonBaseClass {
@@ -54,7 +54,7 @@ namespace Contensive.Addons.Primitives {
                                     };
                                 }
                             }
-                            return core.webServer.redirect(core.webServer.requestProtocol + core.webServer.requestDomain + "/ccLib/popup/EmailBlocked.htm", "Group Email Spam Block hit. Redirecting to EmailBlocked page.");
+                            return core.webServer.redirect(core.webServer.requestProtocol + core.webServer.requestDomain + "/ContensiveBase/popup/EmailBlocked.htm", "Group Email Spam Block hit. Redirecting to EmailBlocked page.");
                         }
                     }
                 }

@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 using System.Net;
 using System.Text;
 using Contensive.Processor.Models.Domain;
@@ -457,7 +457,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="Height"></param>
         /// <returns></returns>
         public static string nop2(int Width, int Height) {
-            return "<!-- removed spacer -->"; // "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"" + Width + "\" height=\"" + Height + "\" border=\"0\">";
+            return "<!-- removed spacer -->"; // "<img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=\"" + Width + "\" height=\"" + Height + "\" border=\"0\">";
         }
         //
         //========================================================================================================

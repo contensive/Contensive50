@@ -4,7 +4,7 @@ using System.Xml;
 using System.Collections.Generic;
 using Contensive.Processor.Models.Db;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 using System.Data;
 using System.Linq;
 using Contensive.Processor.Models.Domain;
@@ -272,7 +272,7 @@ namespace Contensive.Processor.Controllers {
                         domain.save(core);
                         //
                         landingPage.TemplateID = defaultTemplate.id;
-                        landingPage.copyfilename.content = constants.defaultLandingPageHtml;
+                        landingPage.copyfilename.content = Constants.defaultLandingPageHtml;
                         landingPage.save(core);
                         //
                         if (core.siteProperties.getInteger("LandingPageID", landingPage.id) == 0) {
@@ -400,7 +400,7 @@ namespace Contensive.Processor.Controllers {
                                                         } else {
                                                             if (upgradeCollection) {
                                                                 LogController.logInfo(core, logPrefix + ", upgrading collection");
-                                                                CollectionController.installCollectionFromLocalRepo(core, CollectionGuid, core.codeVersion(), ref ErrorMessage, "", isNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollections );
+                                                                CollectionController.installCollectionFromLocalRepo(core, CollectionGuid, core.codeVersion(), ref ErrorMessage, "", isNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref installedCollections, true);
                                                             }
                                                         }
                                                     }
@@ -620,7 +620,7 @@ namespace Contensive.Processor.Controllers {
         private static void verifyLibraryFileTypes(CoreController core) {
             try {
                 //
-                // Load basic records -- default images are handled in the REsource Library through the /ccLib/config/DefaultValues.txt GetDefaultValue(key) mechanism
+                // Load basic records -- default images are handled in the REsource Library through the /ContensiveBase/config/DefaultValues.txt GetDefaultValue(key) mechanism
                 //
                 if (core.db.getRecordID("Library File Types", "Image") == 0) {
                     verifyRecord(core, "Library File Types", "Image", "ExtensionList", "'GIF,JPG,JPE,JPEG,BMP,PNG'");
@@ -839,7 +839,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 appendUpgradeLogAddStep(core, core.appConfig.name, "VerifyCountries", "Verify Countries");
                 //
-                string list = core.appRootFiles.readFileText("cclib\\config\\isoCountryList.txt");
+                string list = core.appRootFiles.readFileText("cclib\\config\\DefaultCountryList.txt");
                 string[] rows  = GenericController.stringSplit(list, "\r\n");
                 foreach( var row in rows) {
                     if (!string.IsNullOrEmpty(row)) {

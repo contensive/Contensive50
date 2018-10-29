@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 //
 //using Microsoft.Web.Administration;
 using Contensive.Processor.Models.Domain;
@@ -286,7 +286,7 @@ namespace Contensive.Processor.Controllers {
                     System.Web.HttpPostedFile file = iisContext.Request.Files[formName];
                     if (file != null) {
                         if ((file.ContentLength > 0) && (!string.IsNullOrEmpty(file.FileName))) {
-                            docPropertiesClass prop = new docPropertiesClass {
+                            DocPropertiesClass prop = new DocPropertiesClass {
                                 Name = formName,
                                 Value = file.FileName,
                                 NameValue = encodeRequestVariable(formName) + "=" + encodeRequestVariable(file.FileName),

@@ -191,7 +191,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                     string contentName = Contensive.Processor.Models.Db.AddonModel.contentName;
                     string fieldName = "testField" + Guid.NewGuid().ToString().Replace("{", "").Replace("}", "").Replace("-", "");
                     if (!cp.Content.IsField(contentName, fieldName)) {
-                        cp.Content.AddContentField(contentName, fieldName, constants.fieldTypeIdCurrency);
+                        cp.Content.AddContentField(contentName, fieldName, Constants.fieldTypeIdCurrency);
                     }
                     double testValue = ((Double)GenericController.GetRandomInteger(cp.core)) / 100.0;
                     CPCSBaseClass cs = cp.CSNew();

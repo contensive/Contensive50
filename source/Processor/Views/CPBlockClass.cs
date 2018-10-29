@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor {
     public class CPBlockClass : BaseClasses.CPBlockBaseClass, IDisposable {
@@ -133,7 +133,7 @@ namespace Contensive.Processor {
                         headTags = HtmlParseStaticController.getTagInnerHTML(accum, "head", false);
                         if (!string.IsNullOrEmpty(headTags)) {
                             foreach (string asset in stringSplit( headTags, "\r\n" )) {
-                                core.doc.htmlMetaContent_OtherTags.Add(new htmlMetaClass() {
+                                core.doc.htmlMetaContent_OtherTags.Add(new HtmlMetaClass() {
                                     addedByMessage = "block.importFile",
                                     content = asset
                                 });

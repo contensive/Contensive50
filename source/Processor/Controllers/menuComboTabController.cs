@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Controllers {
     public class MenuComboTabController {
@@ -90,7 +90,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     TabWrapperID = "TabWrapper" + GenericController.GetRandomInteger(core);
                     TabBlank = GetTabBlank();
-                    result += "<script language=\"JavaScript\" src=\"/ccLib/clientside/ccDynamicTab.js\" type=\"text/javascript\"></script>\r\n";
+                    result += "<script language=\"JavaScript\" src=\"/ContensiveBase/clientside/ccDynamicTab.js\" type=\"text/javascript\"></script>\r\n";
                     result += "<table border=0 cellspacing=0 cellpadding=0 width=\"100%\"><tr>";
                     for (TabPtr = 0; TabPtr < TabsCnt; TabPtr++) {
                         TabStyle = Tabs[TabPtr].ContainerClass;
@@ -120,8 +120,8 @@ namespace Contensive.Processor.Controllers {
                             //
                             result = GenericController.vbReplace(result, "Replace-HotSpot", "<a href=# Class=\"" + TabLinkStyle + "\" name=tabLink onClick=\"if(document.getElementById('unloaded_" + LiveBodyID + "')){GetURLAjax('" + TabAjaxLink + "','','" + LiveBodyID + "','','')};switchLiveTab2('" + LiveBodyID + "', this,'" + TabID + "','" + TabStyle + "','" + TabWrapperID + "');return false;\">" + Tabs[TabPtr].Caption + "</a>");
                             result = GenericController.vbReplace(result, "Replace-StyleHit", TabStyle);
-                            TabBody = TabBody + "<div id=\"" + LiveBodyID + "\" class=\"" + TabBodyStyle + "\" style=\"display:none;text-align:center\"><div id=\"unloaded_" + LiveBodyID + "\"  style=\"text-align:center;padding-top:50px;\"><img src=\"/ccLib/images/ajax-loader-big.gif\" border=0 width=32 height=32></div></div>";
-                            //TabBody = TabBody & "<div onload=""alert('" & LiveBodyID & " onload');"" id=""" & LiveBodyID & """ class=""" & TabBodyStyle & """ style=""display:none;text-align:center""><div id=""unloaded_" & LiveBodyID & """  style=""text-align:center;padding-top:50px;""><img src=""/ccLib/images/ajax-loader-big.gif"" border=0 width=32 height=32></div></div>"
+                            TabBody = TabBody + "<div id=\"" + LiveBodyID + "\" class=\"" + TabBodyStyle + "\" style=\"display:none;text-align:center\"><div id=\"unloaded_" + LiveBodyID + "\"  style=\"text-align:center;padding-top:50px;\"><img src=\"/ContensiveBase/images/ajax-loader-big.gif\" border=0 width=32 height=32></div></div>";
+                            //TabBody = TabBody & "<div onload=""alert('" & LiveBodyID & " onload');"" id=""" & LiveBodyID & """ class=""" & TabBodyStyle & """ style=""display:none;text-align:center""><div id=""unloaded_" & LiveBodyID & """  style=""text-align:center;padding-top:50px;""><img src=""/ContensiveBase/images/ajax-loader-big.gif"" border=0 width=32 height=32></div></div>"
                         } else if (!string.IsNullOrEmpty(TabLink)) {
                             //
                             // Link back to server tab
@@ -180,9 +180,9 @@ namespace Contensive.Processor.Controllers {
                     + "\r\n</tr>";
                 //result = result _
                 //    & vbCrLf & "<tr>" _
-                //    & vbCrLf & "<td id=Replace-TabIDR00 colspan=2 class="""" height=1 width=2><img src=""/ccLib/images/spacer.gif"" width=2 height=1></td>" _
+                //    & vbCrLf & "<td id=Replace-TabIDR00 colspan=2 class="""" height=1 width=2><img src=""/ContensiveBase/images/spacer.gif"" width=2 height=1></td>" _
                 //    & vbCrLf & "<td id=Replace-TabIDR01 colspan=1 class=""Replace-StyleEdge"" height=1></td>" _
-                //    & vbCrLf & "<td id=Replace-TabIDR02 colspan=3 class="""" height=1 width=3><img src=""/ccLib/images/spacer.gif"" width=3 height=1></td>" _
+                //    & vbCrLf & "<td id=Replace-TabIDR02 colspan=3 class="""" height=1 width=3><img src=""/ContensiveBase/images/spacer.gif"" width=3 height=1></td>" _
                 //    & vbCrLf & "</tr>"
                 result += "\r\n<tr>"
                 + "\r\n<td id=Replace-TabIDR10 colspan=1 class=\"\" height=1 width=1></td>"

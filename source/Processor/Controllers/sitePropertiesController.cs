@@ -13,7 +13,7 @@ using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using Contensive.Processor.Models.Domain;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -154,7 +154,7 @@ namespace Contensive.Processor.Controllers {
         //
         public string LoginIconFilename {
             get {
-                return textPropertyBase("LoginIconFilename", "/ccLib/images/ccLibLogin.GIF", ref _LoginIconFilename);
+                return textPropertyBase("LoginIconFilename", "/ContensiveBase/images/ccLibLogin.GIF", ref _LoginIconFilename);
             }
         }
         private string _LoginIconFilename = null;

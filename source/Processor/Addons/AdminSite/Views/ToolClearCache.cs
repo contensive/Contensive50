@@ -23,8 +23,8 @@ namespace Contensive.Addons.AdminSite {
                 string Description = null;
                 string ButtonList = null;
                 //
-                Button = core.docProperties.getText(Processor.constants.RequestNameButton);
-                if (Button == Processor.constants.ButtonCancel) {
+                Button = core.docProperties.getText(Processor.Constants.RequestNameButton);
+                if (Button == Processor.Constants.ButtonCancel) {
                     //
                     // Cancel just exits with no content
                     //
@@ -33,22 +33,22 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // Not Admin Error
                     //
-                    ButtonList = Processor.constants.ButtonCancel;
+                    ButtonList = Processor.Constants.ButtonCancel;
                     Content.Add(AdminUIController.getFormBodyAdminOnly());
                 } else {
                     //
                     // Process Requests
                     //
                     switch (Button) {
-                        case Processor.constants.ButtonApply:
-                        case Processor.constants.ButtonOK:
+                        case Processor.Constants.ButtonApply:
+                        case Processor.Constants.ButtonOK:
                             //
                             // Clear the cache
                             //
                             core.cache.invalidateAll();
                             break;
                     }
-                    if (Button == Processor.constants.ButtonOK) {
+                    if (Button == Processor.Constants.ButtonOK) {
                         //
                         // Exit on OK or cancel
                         //
@@ -57,12 +57,12 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // Buttons
                     //
-                    ButtonList = Processor.constants.ButtonCancel + "," + Processor.constants.ButtonApply + "," + Processor.constants.ButtonOK;
+                    ButtonList = Processor.Constants.ButtonCancel + "," + Processor.Constants.ButtonApply + "," + Processor.Constants.ButtonOK;
                     //
                     // Close Tables
                     //
                     Content.Add(AdminUIController.editTable("<p>Click OK or Apply to invalidate all local and remote cache data.</p>"));
-                    Content.Add(HtmlController.inputHidden(Processor.constants.rnAdminSourceForm, Processor.constants.AdminFormClearCache));
+                    Content.Add(HtmlController.inputHidden(Processor.Constants.rnAdminSourceForm, Processor.Constants.AdminFormClearCache));
                 }
                 //
                 Description = "Hit Apply or OK to clear all current content caches";

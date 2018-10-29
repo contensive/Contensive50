@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
 using Contensive.Addons.Tools;
 using static Contensive.Processor.AdminUIController;
@@ -67,7 +67,7 @@ namespace Contensive.Addons.AdminSite {
                         + "\r\nurl source:" + core.webServer.requestUrlSource + "\r\n----------"
                         + "\r\nform post:";
                 foreach (string key in core.docProperties.getKeyList()) {
-                    docPropertiesClass docProperty = core.docProperties.getProperty(key);
+                    DocPropertiesClass docProperty = core.docProperties.getProperty(key);
                     if (docProperty.IsForm) {
                         logContent += "\r\n" + docProperty.NameValue;
                     }
@@ -1714,7 +1714,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // --- Rule to separate content
                 //
-                //Stream.Add("\r<div style=\"border-top:1px solid white;border-bottom:1px solid black;height:2px\"><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=1 height=1></div>");
+                //Stream.Add("\r<div style=\"border-top:1px solid white;border-bottom:1px solid black;height:2px\"><img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=1 height=1></div>");
                 //
                 // --- Content Definition
                 adminData.adminFooter = "";
@@ -1726,9 +1726,9 @@ namespace Contensive.Addons.AdminSite {
                 });
                 //
                 // -- shortterm fix - make navigator changes, long term pull it into project
-                string src = "<img title=\"Open Navigator\" alt=\"Open Navigator\" src=\"/cclib/images/OpenRightRev1313.gif\" width=13 height=13 border=0 style=\"text-align:right;\">";
+                string src = "<img title=\"Open Navigator\" alt=\"Open Navigator\" src=\"/ContensiveBase/images/OpenRightRev1313.gif\" width=13 height=13 border=0 style=\"text-align:right;\">";
                 AdminNavFull = AdminNavFull.Replace(src, iconOpen);
-                src = "<img alt=\"Close Navigator\" title=\"Close Navigator\" src=\"/cclib/images/ClosexRev1313.gif\" width=13 height=13 border=0>";
+                src = "<img alt=\"Close Navigator\" title=\"Close Navigator\" src=\"/ContensiveBase/images/ClosexRev1313.gif\" width=13 height=13 border=0>";
                 AdminNavFull = AdminNavFull.Replace(src, iconClose);
                 Stream.Add("<table border=0 cellpadding=0 cellspacing=0><tr>\r<td class=\"ccToolsCon\" valign=top>" + GenericController.nop(AdminNavFull) + "\r</td>\r<td id=\"desktop\" class=\"ccContentCon\" valign=top>");
                 adminData.adminFooter = adminData.adminFooter + "</td></tr></table>";
@@ -2503,8 +2503,8 @@ namespace Contensive.Addons.AdminSite {
                                     if (ButtonCnt > 0) {
                                         tempGetMenuTopMode = tempGetMenuTopMode + "<td class=\"ccFlyoutDelimiter\">|</td>";
                                     }
-                                    //GetMenuTopMode = GetMenuTopMode & "<td width=""1"" class=""ccPanelShadow""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""1"" height=""1"" ></td>"
-                                    //GetMenuTopMode = GetMenuTopMode & "<td width=""1"" class=""ccPanelHilite""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""1"" height=""1"" ></td>"
+                                    //GetMenuTopMode = GetMenuTopMode & "<td width=""1"" class=""ccPanelShadow""><img alt=""space"" src=""/ContensiveBase/images/spacer.gif"" width=""1"" height=""1"" ></td>"
+                                    //GetMenuTopMode = GetMenuTopMode & "<td width=""1"" class=""ccPanelHilite""><img alt=""space"" src=""/ContensiveBase/images/spacer.gif"" width=""1"" height=""1"" ></td>"
                                     //
                                     // --- Add New GetMenuTopMode Button and leave the column open
                                     //

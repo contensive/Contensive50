@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
 using Contensive.Addons.Tools;
 using static Contensive.Processor.AdminUIController;
@@ -205,7 +205,7 @@ namespace Contensive.Addons.AdminSite {
                     ColWidth = new string[ColumnCnt + 1];
                     Cells = new string[PageSize + 1, ColumnCnt + 1];
                     //
-                    ColCaption[ColumnPtr] = "Select<br><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=10 height=1>";
+                    ColCaption[ColumnPtr] = "Select<br><img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=10 height=1>";
                     ColAlign[ColumnPtr] = "center";
                     ColWidth[ColumnPtr] = "10";
                     ColumnPtr = ColumnPtr + 1;
@@ -215,17 +215,17 @@ namespace Contensive.Addons.AdminSite {
                     ColWidth[ColumnPtr] = "100%";
                     ColumnPtr = ColumnPtr + 1;
                     //
-                    ColCaption[ColumnPtr] = "For<br><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=100 height=1>";
+                    ColCaption[ColumnPtr] = "For<br><img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=100 height=1>";
                     ColAlign[ColumnPtr] = "left";
                     ColWidth[ColumnPtr] = "100";
                     ColumnPtr = ColumnPtr + 1;
                     //
-                    ColCaption[ColumnPtr] = "Requested<br><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=150 height=1>";
+                    ColCaption[ColumnPtr] = "Requested<br><img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=150 height=1>";
                     ColAlign[ColumnPtr] = "left";
                     ColWidth[ColumnPtr] = "150";
                     ColumnPtr = ColumnPtr + 1;
                     //
-                    ColCaption[ColumnPtr] = "File<br><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=100 height=1>";
+                    ColCaption[ColumnPtr] = "File<br><img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=100 height=1>";
                     ColAlign[ColumnPtr] = "Left";
                     ColWidth[ColumnPtr] = "100";
                     ColumnPtr = ColumnPtr + 1;
@@ -254,7 +254,7 @@ namespace Contensive.Addons.AdminSite {
                             if (DateCompleted == DateTime.MinValue) {
                                 RemoteKey = RemoteQueryController.main_GetRemoteQueryKey(core, "select DateCompleted,filename,resultMessage from cctasks where id=" + RecordID, "default", 1);
                                 Cell = "";
-                                Cell = Cell + "\r\n<div id=\"pending" + RowPointer + "\">Pending <img src=\"/ccLib/images/ajax-loader-small.gif\" width=16 height=16></div>";
+                                Cell = Cell + "\r\n<div id=\"pending" + RowPointer + "\">Pending <img src=\"/ContensiveBase/images/ajax-loader-small.gif\" width=16 height=16></div>";
                                 //
                                 Cell = Cell + "\r\n<script>";
                                 Cell = Cell + "\r\nfunction statusHandler" + RowPointer + "(results) {";
@@ -314,7 +314,7 @@ namespace Contensive.Addons.AdminSite {
                     //        '
                     //        Call Tab1.Add("" _
                     //            & "<tr>" _
-                    //            & "<td width=""120""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""120"" height=""1""></td>" _
+                    //            & "<td width=""120""><img alt=""space"" src=""/ContensiveBase/images/spacer.gif"" width=""120"" height=""1""></td>" _
                     //            & "<td width=""100%"">&nbsp;</td>" _
                     //            & "</tr>" _
                     //            & "</table>")

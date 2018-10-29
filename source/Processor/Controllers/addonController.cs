@@ -8,7 +8,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 using Contensive.BaseClasses;
 using System.IO;
 using System.Data;
@@ -283,9 +283,9 @@ namespace Contensive.Processor.Controllers {
                                 //    ' -- exception made here. AsAjax is not used often, and this can create a QS too long
                                 //    '& "&HostForm=" & EncodeRequestVariable(core.webServer.requestFormString) _
                                 //    If IsInline Then
-                                //        returnVal = cr & "<div ID=" & AsAjaxID & " Class=""ccAddonAjaxCon"" style=""display:inline;""><img src=""/ccLib/images/ajax-loader-small.gif"" width=""16"" height=""16""></div>"
+                                //        returnVal = cr & "<div ID=" & AsAjaxID & " Class=""ccAddonAjaxCon"" style=""display:inline;""><img src=""/ContensiveBase/images/ajax-loader-small.gif"" width=""16"" height=""16""></div>"
                                 //    Else
-                                //        returnVal = cr & "<div ID=" & AsAjaxID & " Class=""ccAddonAjaxCon""><img src=""/ccLib/images/ajax-loader-small.gif"" width=""16"" height=""16""></div>"
+                                //        returnVal = cr & "<div ID=" & AsAjaxID & " Class=""ccAddonAjaxCon""><img src=""/ContensiveBase/images/ajax-loader-small.gif"" width=""16"" height=""16""></div>"
                                 //    End If
                                 //    returnVal = returnVal _
                                 //& cr & "<script Language=""javaScript"" type=""text/javascript"">" _
@@ -616,7 +616,7 @@ namespace Contensive.Processor.Controllers {
                                         string HelpIcon = getHelpBubble(addon.id, addon.help, addon.collectionID, ref DialogList);
                                         if (core.visitProperty.getBoolean("AllowAdvancedEditor")) {
                                             string addonArgumentListPassToBubbleEditor = ""; // comes from method in this class the generates it from addon and instance properites - lost it in the shuffle
-                                            string AddonEditIcon = getIconSprite("", 0, "/ccLib/images/tooledit.png", 22, 22, "Edit the " + addon.name + " Add-on", "Edit the " + addon.name + " Add-on", "", true, "");
+                                            string AddonEditIcon = getIconSprite("", 0, "/ContensiveBase/images/tooledit.png", 22, 22, "Edit the " + addon.name + " Add-on", "Edit the " + addon.name + " Add-on", "", true, "");
                                             AddonEditIcon = "<a href=\"/" + core.appConfig.adminRoute + "?cid=" + CdefController.getContentId(core, cnAddons) + "&id=" + addon.id + "&af=4&aa=2&ad=1\" tabindex=\"-1\">" + AddonEditIcon + "</a>";
                                             string InstanceSettingsEditIcon = getInstanceBubble(addon.name, addonArgumentListPassToBubbleEditor, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, executeContext.hostRecord.fieldName, executeContext.instanceGuid, executeContext.addonType, ref DialogList);
                                             string HTMLViewerEditIcon = getHTMLViewerBubble(addon.id, "editWrapper" + core.doc.editWrapperCnt, ref DialogList);
@@ -1820,12 +1820,12 @@ namespace Contensive.Processor.Controllers {
                     //
                     string cmdQueryString = ""
                         + "appname=" + encodeNvaArgument(encodeRequestVariable(core.appConfig.name)) + "&AddonID=" + encodeText(addon.id) + "&OptionString=" + encodeNvaArgument(encodeRequestVariable(OptionString));
-                    cmdDetailClass cmdDetail = new cmdDetailClass {
+                    CmdDetailClass cmdDetail = new CmdDetailClass {
                         addonId = addon.id,
                         addonName = addon.name,
                         args = GenericController.convertAddonArgumentstoDocPropertiesList(core, cmdQueryString)
                     };
-                    TaskSchedulerControllerx.addTaskToQueue(core, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
+                    TaskSchedulerControllerx.addTaskToQueue(core, TaskQueueCommandEnumModule.runAddon, cmdDetail, false);
                     //
                     LogController.logTrace(core, "end: add process to background cmd queue, addon [" + addon.name + "/" + addon.id + "], optionstring [" + OptionString + "]");
                 }
@@ -2007,8 +2007,8 @@ namespace Contensive.Processor.Controllers {
                                         //                                FieldValueText = genericController.encodeText(FieldValueVariant)
                                         //                                EditorString = "" _
                                         //                                    & core.main_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, 80, FormFieldLCaseName) _
-                                        //                                    & "&nbsp;<a href=""#"" onClick=""OpenResourceLinkWindow( '" & FormFieldLCaseName & "' ) ;return false;""><img src=""/ccLib/images/ResourceLink1616.gif"" width=16 height=16 border=0 alt=""Link to a resource"" title=""Link to a resource""></a>" _
-                                        //                                    & "&nbsp;<a href=""#"" onClick=""OpenSiteExplorerWindow( '" & FormFieldLCaseName & "' ) ;return false;""><img src=""/ccLib/images/PageLink1616.gif"" width=16 height=16 border=0 alt=""Link to a page"" title=""Link to a page""></a>"
+                                        //                                    & "&nbsp;<a href=""#"" onClick=""OpenResourceLinkWindow( '" & FormFieldLCaseName & "' ) ;return false;""><img src=""/ContensiveBase/images/ResourceLink1616.gif"" width=16 height=16 border=0 alt=""Link to a resource"" title=""Link to a resource""></a>" _
+                                        //                                    & "&nbsp;<a href=""#"" onClick=""OpenSiteExplorerWindow( '" & FormFieldLCaseName & "' ) ;return false;""><img src=""/ContensiveBase/images/PageLink1616.gif"" width=16 height=16 border=0 alt=""Link to a page"" title=""Link to a page""></a>"
                                         //                                s.Add( "<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal & EditorString & "</span></nobr></td>")
                                         //                            Case FieldTypeResourceLink
                                         //                                '
@@ -2018,7 +2018,7 @@ namespace Contensive.Processor.Controllers {
                                         //                                FieldValueText = genericController.encodeText(FieldValueVariant)
                                         //                                EditorString = "" _
                                         //                                    & core.main_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, 80, FormFieldLCaseName) _
-                                        //                                    & "&nbsp;<a href=""#"" onClick=""OpenResourceLinkWindow( '" & FormFieldLCaseName & "' ) ;return false;""><img src=""/ccLib/images/ResourceLink1616.gif"" width=16 height=16 border=0 alt=""Link to a resource"" title=""Link to a resource""></a>"
+                                        //                                    & "&nbsp;<a href=""#"" onClick=""OpenResourceLinkWindow( '" & FormFieldLCaseName & "' ) ;return false;""><img src=""/ContensiveBase/images/ResourceLink1616.gif"" width=16 height=16 border=0 alt=""Link to a resource"" title=""Link to a resource""></a>"
                                         //                                'EditorString = core.main_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, 80)
                                         //                                s.Add( "<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal & EditorString & "</span></nobr></td>")
                                         case "resourcelink":
@@ -2027,7 +2027,7 @@ namespace Contensive.Processor.Controllers {
                                             //
                                             OptionDefault = GenericController.decodeNvaArgument(OptionDefault);
                                             FormInput = ""
-                                                + HtmlController.inputText(core, OptionName, OptionDefault, 1, 20) + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + OptionName + "' ) ;return false;\"><img src=\"/ccLib/images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>";
+                                                + HtmlController.inputText(core, OptionName, OptionDefault, 1, 20) + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + OptionName + "' ) ;return false;\"><img src=\"/ContensiveBase/images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>";
                                             //EditorString = core.main_GetFormInputText2(FormFieldLCaseName, FieldValueText, 1, 80)
                                             break;
                                         case "checkbox":
@@ -2081,7 +2081,7 @@ namespace Contensive.Processor.Controllers {
                             + "</div>";
                         tempgetInstanceBubble = ""
                             + "&nbsp;<a href=\"#\" tabindex=-1 target=\"_blank\"" + BubbleJS + ">"
-                            + getIconSprite("", 0, "/ccLib/images/toolsettings.png", 22, 22, "Edit options used just for this instance of the " + AddonName + " Add-on", "Edit options used just for this instance of the " + AddonName + " Add-on", "", true, "") + "</a>"
+                            + getIconSprite("", 0, "/ContensiveBase/images/toolsettings.png", 22, 22, "Edit options used just for this instance of the " + AddonName + " Add-on", "Edit options used just for this instance of the " + AddonName + " Add-on", "", true, "") + "</a>"
                             + ""
                             + "";
                         core.doc.helpCodes.Add(new DocController.HelpStuff() {
@@ -2168,7 +2168,7 @@ namespace Contensive.Processor.Controllers {
                         return_DialogList = return_DialogList + Dialog;
                         result = ""
                             + "&nbsp;<a href=\"#\" tabindex=-1 target=\"_blank\"" + BubbleJS + ">"
-                            + getIconSprite("", 0, "/ccLib/images/toolstyles.png", 22, 22, "Edit " + addon.name + " Stylesheets", "Edit " + addon.name + " Stylesheets", "", true, "") + "</a>";
+                            + getIconSprite("", 0, "/ContensiveBase/images/toolstyles.png", 22, 22, "Edit " + addon.name + " Stylesheets", "Edit " + addon.name + " Stylesheets", "", true, "") + "</a>";
                         core.doc.helpCodes.Add(new DocController.HelpStuff {
                             caption = addon.name,
                             code = LocalCode
@@ -2259,7 +2259,7 @@ namespace Contensive.Processor.Controllers {
                     core.doc.helpDialogCnt = core.doc.helpDialogCnt + 1;
                     result = ""
                         + "&nbsp;<a href=\"#\" tabindex=-1 tarGet=\"_blank\"" + BubbleJS + " >"
-                        + getIconSprite("", 0, "/ccLib/images/toolhelp.png", 22, 22, "View help resources for this Add-on", "View help resources for this Add-on", "", true, "") + "</a>";
+                        + getIconSprite("", 0, "/ContensiveBase/images/toolhelp.png", 22, 22, "View help resources for this Add-on", "View help resources for this Add-on", "", true, "") + "</a>";
                 }
             }
             return result;
@@ -2328,7 +2328,7 @@ namespace Contensive.Processor.Controllers {
                         core.doc.helpDialogCnt = core.doc.helpDialogCnt + 1;
                         tempgetHTMLViewerBubble = ""
                             + "&nbsp;<a href=\"#\" tabindex=-1 target=\"_blank\"" + BubbleJS + " >"
-                            + getIconSprite("", 0, "/ccLib/images/toolhtml.png", 22, 22, "View the source HTML produced by this Add-on", "View the source HTML produced by this Add-on", "", true, "") + "</A>";
+                            + getIconSprite("", 0, "/ContensiveBase/images/toolhtml.png", 22, 22, "View the source HTML produced by this Add-on", "View the source HTML produced by this Add-on", "", true, "") + "</A>";
                     }
                 }
                 //
@@ -2938,12 +2938,12 @@ namespace Contensive.Processor.Controllers {
                     // No icon given, use the default
                     //
                     if (IconIsInline) {
-                        IconFilename = "/ccLib/images/IconAddonInlineDefault.png";
+                        IconFilename = "/ContensiveBase/images/IconAddonInlineDefault.png";
                         IconWidth = 62;
                         IconHeight = 17;
                         IconSprites = 0;
                     } else {
-                        IconFilename = "/ccLib/images/IconAddonBlockDefault.png";
+                        IconFilename = "/ContensiveBase/images/IconAddonBlockDefault.png";
                         IconWidth = 57;
                         IconHeight = 59;
                         IconSprites = 4;
@@ -3031,7 +3031,7 @@ namespace Contensive.Processor.Controllers {
                     + " onDblClick=\"" + onDblClick + "\""
                     + " alt=\"" + IconAlt + "\""
                     + " title=\"" + IconTitle + "\""
-                    + " src=\"/ccLib/images/spacer.gif\"";
+                    + " src=\"/ContensiveBase/images/spacer.gif\"";
                 string ImgStyle = "background:url(" + IconSrc + ") " + (-1 * SpriteColumn * IconWidth) + "px 0px no-repeat;";
                 ImgStyle += "width:" + IconWidth + "px;";
                 ImgStyle = ImgStyle + "height:" + IconHeight + "px;";

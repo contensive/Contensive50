@@ -12,7 +12,7 @@ using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using Contensive.Processor.Models.Domain;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -968,42 +968,42 @@ namespace Contensive.Processor.Controllers {
             string returnType = "";
             try {
                 switch (fieldType) {
-                    case constants._fieldTypeIdBoolean:
+                    case Constants._fieldTypeIdBoolean:
                         returnType = "Int NULL";
                         break;
-                    case constants._fieldTypeIdCurrency:
+                    case Constants._fieldTypeIdCurrency:
                         returnType = "Float NULL";
                         break;
-                    case constants._fieldTypeIdDate:
+                    case Constants._fieldTypeIdDate:
                         // 20180416 - ms recommends using new, higher precision. Code requires 3 digits so 7 is more than enough
                         returnType = "DateTime2(7) NULL";
                         break;
-                    case constants._fieldTypeIdFloat:
+                    case Constants._fieldTypeIdFloat:
                         returnType = "Float NULL";
                         break;
-                    case constants._fieldTypeIdInteger:
+                    case Constants._fieldTypeIdInteger:
                         returnType = "Int NULL";
                         break;
-                    case constants._fieldTypeIdLookup:
-                    case constants._fieldTypeIdMemberSelect:
+                    case Constants._fieldTypeIdLookup:
+                    case Constants._fieldTypeIdMemberSelect:
                         returnType = "Int NULL";
                         break;
-                    case constants._fieldTypeIdManyToMany:
-                    case constants._fieldTypeIdRedirect:
-                    case constants._fieldTypeIdFileImage:
-                    case constants._fieldTypeIdLink:
-                    case constants._fieldTypeIdResourceLink:
-                    case constants._fieldTypeIdText:
-                    case constants._fieldTypeIdFile:
-                    case constants._fieldTypeIdFileText:
-                    case constants._fieldTypeIdFileJavascript:
-                    case constants._fieldTypeIdFileXML:
-                    case constants._fieldTypeIdFileCSS:
-                    case constants._fieldTypeIdFileHTML:
+                    case Constants._fieldTypeIdManyToMany:
+                    case Constants._fieldTypeIdRedirect:
+                    case Constants._fieldTypeIdFileImage:
+                    case Constants._fieldTypeIdLink:
+                    case Constants._fieldTypeIdResourceLink:
+                    case Constants._fieldTypeIdText:
+                    case Constants._fieldTypeIdFile:
+                    case Constants._fieldTypeIdFileText:
+                    case Constants._fieldTypeIdFileJavascript:
+                    case Constants._fieldTypeIdFileXML:
+                    case Constants._fieldTypeIdFileCSS:
+                    case Constants._fieldTypeIdFileHTML:
                         returnType = "VarChar(255) NULL";
                         break;
-                    case constants._fieldTypeIdLongText:
-                    case constants._fieldTypeIdHTML:
+                    case Constants._fieldTypeIdLongText:
+                    case Constants._fieldTypeIdHTML:
                         //
                         // ----- Longtext, depends on datasource
                         //
@@ -1019,7 +1019,7 @@ namespace Contensive.Processor.Controllers {
                         //        csv_returnType = "VarChar(65535)"
                         //End Select
                         break;
-                    case constants._fieldTypeIdAutoIdIncrement:
+                    case Constants._fieldTypeIdAutoIdIncrement:
                         //
                         // ----- autoincrement type, depends on datasource
                         //
@@ -1066,10 +1066,10 @@ namespace Contensive.Processor.Controllers {
                     if (null != ts.indexes.Find(x => x.index_name.ToLowerInvariant() == IndexName.ToLowerInvariant())) {
                         DataSourceType = getDataSourceType(DataSourceName);
                         switch (DataSourceType) {
-                            case constants.DataSourceTypeODBCAccess:
+                            case Constants.DataSourceTypeODBCAccess:
                                 sql = "DROP INDEX " + IndexName + " On " + TableName + ";";
                                 break;
-                            case constants.DataSourceTypeODBCMySQL:
+                            case Constants.DataSourceTypeODBCMySQL:
                                 throw new NotImplementedException("mysql");
                             default:
                                 sql = "DROP INDEX [" + TableName + "].[" + IndexName + "];";
@@ -1116,7 +1116,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         //
         public int getDataSourceType(string DataSourceName) {
-            return constants.DataSourceTypeODBCSQLServer;
+            return Constants.DataSourceTypeODBCSQLServer;
         }
         //
         //========================================================================
@@ -1131,37 +1131,37 @@ namespace Contensive.Processor.Controllers {
                 switch (ADOFieldType) {
 
                     case 2:
-                        returnType = constants.fieldTypeIdFloat;
+                        returnType = Constants.fieldTypeIdFloat;
                         break;
                     case 3:
-                        returnType = constants.fieldTypeIdInteger;
+                        returnType = Constants.fieldTypeIdInteger;
                         break;
                     case 4:
-                        returnType = constants.fieldTypeIdFloat;
+                        returnType = Constants.fieldTypeIdFloat;
                         break;
                     case 5:
-                        returnType = constants.fieldTypeIdFloat;
+                        returnType = Constants.fieldTypeIdFloat;
                         break;
                     case 6:
-                        returnType = constants.fieldTypeIdInteger;
+                        returnType = Constants.fieldTypeIdInteger;
                         break;
                     case 11:
-                        returnType = constants.fieldTypeIdBoolean;
+                        returnType = Constants.fieldTypeIdBoolean;
                         break;
                     case 135:
-                        returnType = constants.fieldTypeIdDate;
+                        returnType = Constants.fieldTypeIdDate;
                         break;
                     case 200:
-                        returnType = constants.fieldTypeIdText;
+                        returnType = Constants.fieldTypeIdText;
                         break;
                     case 201:
-                        returnType = constants.fieldTypeIdLongText;
+                        returnType = Constants.fieldTypeIdLongText;
                         break;
                     case 202:
-                        returnType = constants.fieldTypeIdText;
+                        returnType = Constants.fieldTypeIdText;
                         break;
                     default:
-                        returnType = constants.fieldTypeIdText;
+                        returnType = Constants.fieldTypeIdText;
                         break;
                 }
             } catch (Exception ex) {
@@ -1181,88 +1181,88 @@ namespace Contensive.Processor.Controllers {
             int returnTypeId = 0;
             try {
                 switch (GenericController.vbLCase(FieldTypeName)) {
-                    case constants.FieldTypeNameLcaseBoolean:
-                        returnTypeId = constants.fieldTypeIdBoolean;
+                    case Constants.FieldTypeNameLcaseBoolean:
+                        returnTypeId = Constants.fieldTypeIdBoolean;
                         break;
-                    case constants.FieldTypeNameLcaseCurrency:
-                        returnTypeId = constants.fieldTypeIdCurrency;
+                    case Constants.FieldTypeNameLcaseCurrency:
+                        returnTypeId = Constants.fieldTypeIdCurrency;
                         break;
-                    case constants.FieldTypeNameLcaseDate:
-                        returnTypeId = constants.fieldTypeIdDate;
+                    case Constants.FieldTypeNameLcaseDate:
+                        returnTypeId = Constants.fieldTypeIdDate;
                         break;
-                    case constants.FieldTypeNameLcaseFile:
-                        returnTypeId = constants.fieldTypeIdFile;
+                    case Constants.FieldTypeNameLcaseFile:
+                        returnTypeId = Constants.fieldTypeIdFile;
                         break;
-                    case constants.FieldTypeNameLcaseFloat:
-                        returnTypeId = constants.fieldTypeIdFloat;
+                    case Constants.FieldTypeNameLcaseFloat:
+                        returnTypeId = Constants.fieldTypeIdFloat;
                         break;
-                    case constants.FieldTypeNameLcaseImage:
-                        returnTypeId = constants.fieldTypeIdFileImage;
+                    case Constants.FieldTypeNameLcaseImage:
+                        returnTypeId = Constants.fieldTypeIdFileImage;
                         break;
-                    case constants.FieldTypeNameLcaseLink:
-                        returnTypeId = constants.fieldTypeIdLink;
+                    case Constants.FieldTypeNameLcaseLink:
+                        returnTypeId = Constants.fieldTypeIdLink;
                         break;
-                    case constants.FieldTypeNameLcaseResourceLink:
+                    case Constants.FieldTypeNameLcaseResourceLink:
                     case "resource link":
-                        returnTypeId = constants.fieldTypeIdResourceLink;
+                        returnTypeId = Constants.fieldTypeIdResourceLink;
                         break;
-                    case constants.FieldTypeNameLcaseInteger:
-                        returnTypeId = constants.fieldTypeIdInteger;
+                    case Constants.FieldTypeNameLcaseInteger:
+                        returnTypeId = Constants.fieldTypeIdInteger;
                         break;
-                    case constants.FieldTypeNameLcaseLongText:
+                    case Constants.FieldTypeNameLcaseLongText:
                     case "Long text":
-                        returnTypeId = constants.fieldTypeIdLongText;
+                        returnTypeId = Constants.fieldTypeIdLongText;
                         break;
-                    case constants.FieldTypeNameLcaseLookup:
+                    case Constants.FieldTypeNameLcaseLookup:
                     case "lookuplist":
                     case "lookup list":
-                        returnTypeId = constants.fieldTypeIdLookup;
+                        returnTypeId = Constants.fieldTypeIdLookup;
                         break;
-                    case constants.FieldTypeNameLcaseMemberSelect:
-                        returnTypeId = constants.fieldTypeIdMemberSelect;
+                    case Constants.FieldTypeNameLcaseMemberSelect:
+                        returnTypeId = Constants.fieldTypeIdMemberSelect;
                         break;
-                    case constants.FieldTypeNameLcaseRedirect:
-                        returnTypeId = constants.fieldTypeIdRedirect;
+                    case Constants.FieldTypeNameLcaseRedirect:
+                        returnTypeId = Constants.fieldTypeIdRedirect;
                         break;
-                    case constants.FieldTypeNameLcaseManyToMany:
-                        returnTypeId = constants.fieldTypeIdManyToMany;
+                    case Constants.FieldTypeNameLcaseManyToMany:
+                        returnTypeId = Constants.fieldTypeIdManyToMany;
                         break;
-                    case constants.FieldTypeNameLcaseTextFile:
+                    case Constants.FieldTypeNameLcaseTextFile:
                     case "text file":
-                        returnTypeId = constants.fieldTypeIdFileText;
+                        returnTypeId = Constants.fieldTypeIdFileText;
                         break;
-                    case constants.FieldTypeNameLcaseCSSFile:
+                    case Constants.FieldTypeNameLcaseCSSFile:
                     case "css file":
-                        returnTypeId = constants.fieldTypeIdFileCSS;
+                        returnTypeId = Constants.fieldTypeIdFileCSS;
                         break;
-                    case constants.FieldTypeNameLcaseXMLFile:
+                    case Constants.FieldTypeNameLcaseXMLFile:
                     case "xml file":
-                        returnTypeId = constants.fieldTypeIdFileXML;
+                        returnTypeId = Constants.fieldTypeIdFileXML;
                         break;
-                    case constants.FieldTypeNameLcaseJavascriptFile:
+                    case Constants.FieldTypeNameLcaseJavascriptFile:
                     case "javascript file":
                     case "js file":
                     case "jsfile":
-                        returnTypeId = constants.fieldTypeIdFileJavascript;
+                        returnTypeId = Constants.fieldTypeIdFileJavascript;
                         break;
-                    case constants.FieldTypeNameLcaseText:
-                        returnTypeId = constants.fieldTypeIdText;
+                    case Constants.FieldTypeNameLcaseText:
+                        returnTypeId = Constants.fieldTypeIdText;
                         break;
                     case "autoincrement":
-                        returnTypeId = constants.fieldTypeIdAutoIdIncrement;
+                        returnTypeId = Constants.fieldTypeIdAutoIdIncrement;
                         break;
-                    case constants.FieldTypeNameLcaseHTML:
-                        returnTypeId = constants.fieldTypeIdHTML;
+                    case Constants.FieldTypeNameLcaseHTML:
+                        returnTypeId = Constants.fieldTypeIdHTML;
                         break;
-                    case constants.FieldTypeNameLcaseHTMLFile:
+                    case Constants.FieldTypeNameLcaseHTMLFile:
                     case "html file":
-                        returnTypeId = constants.fieldTypeIdFileHTML;
+                        returnTypeId = Constants.fieldTypeIdFileHTML;
                         break;
                     default:
                         //
                         // Bad field type is a text field
                         //
-                        returnTypeId = constants.fieldTypeIdText;
+                        returnTypeId = Constants.fieldTypeIdText;
                         break;
                 }
             } catch (Exception ex) {
@@ -1388,7 +1388,7 @@ namespace Contensive.Processor.Controllers {
                                 contentSet.PageNumber = 1;
                             }
                             if (contentSet.PageSize < 0) {
-                                contentSet.PageSize = constants.maxLongValue;
+                                contentSet.PageSize = Constants.maxLongValue;
                             } else if (contentSet.PageSize == 0) {
                                 contentSet.PageSize = pageSizeDefault;
                             }
@@ -1572,11 +1572,11 @@ namespace Contensive.Processor.Controllers {
                                 fieldName = field.nameLc;
                                 string Filename = null;
                                 switch (field.fieldTypeId) {
-                                    case constants._fieldTypeIdFile:
-                                    case constants._fieldTypeIdFileImage:
-                                    case constants._fieldTypeIdFileCSS:
-                                    case constants._fieldTypeIdFileJavascript:
-                                    case constants._fieldTypeIdFileXML:
+                                    case Constants._fieldTypeIdFile:
+                                    case Constants._fieldTypeIdFileImage:
+                                    case Constants._fieldTypeIdFileCSS:
+                                    case Constants._fieldTypeIdFileJavascript:
+                                    case Constants._fieldTypeIdFileXML:
                                         //
                                         // public content files
                                         //
@@ -1586,8 +1586,8 @@ namespace Contensive.Processor.Controllers {
                                             //Call core.cdnFiles.deleteFile(core.cdnFiles.joinPath(core.appConfig.cdnFilesNetprefix, Filename))
                                         }
                                         break;
-                                    case constants._fieldTypeIdFileText:
-                                    case constants._fieldTypeIdFileHTML:
+                                    case Constants._fieldTypeIdFileText:
+                                    case Constants._fieldTypeIdFileHTML:
                                         //
                                         // private files
                                         //
@@ -2093,9 +2093,9 @@ namespace Contensive.Processor.Controllers {
                         if (fieldTypeId == 0) {
                             if (string.IsNullOrEmpty(ContentName)) {
                                 if (string.IsNullOrEmpty(OriginalFilename)) {
-                                    fieldTypeId = constants.fieldTypeIdText;
+                                    fieldTypeId = Constants.fieldTypeIdText;
                                 } else {
-                                    fieldTypeId = constants.fieldTypeIdFile;
+                                    fieldTypeId = Constants.fieldTypeIdFile;
                                 }
                             } else if (tempVar.writeable) {
                                 //
@@ -2105,9 +2105,9 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // -- else assume text
                                 if (string.IsNullOrEmpty(OriginalFilename)) {
-                                    fieldTypeId = constants.fieldTypeIdText;
+                                    fieldTypeId = Constants.fieldTypeIdText;
                                 } else {
-                                    fieldTypeId = constants.fieldTypeIdFile;
+                                    fieldTypeId = Constants.fieldTypeIdFile;
                                 }
                             }
                         }
@@ -2222,7 +2222,7 @@ namespace Contensive.Processor.Controllers {
                         throw new ApplicationException("Cannot save this dataset because it is read-only.");
                     } else {
                         string OldFilename = csGetText(CSPointer, FieldName);
-                        string Filename = csGetFieldFilename(CSPointer, FieldName, "", ContentName, constants.fieldTypeIdFileText);
+                        string Filename = csGetFieldFilename(CSPointer, FieldName, "", ContentName, Constants.fieldTypeIdFileText);
                         if (OldFilename != Filename) {
                             //
                             // Filename changed, mark record changed
@@ -2430,32 +2430,32 @@ namespace Contensive.Processor.Controllers {
                                             // General case
                                             //
                                             switch (field.fieldTypeId) {
-                                                case constants._fieldTypeIdAutoIdIncrement:
+                                                case Constants._fieldTypeIdAutoIdIncrement:
                                                     //
                                                     // cannot insert an autoincremnt
                                                     //
                                                     break;
-                                                case constants._fieldTypeIdRedirect:
-                                                case constants._fieldTypeIdManyToMany:
+                                                case Constants._fieldTypeIdRedirect:
+                                                case Constants._fieldTypeIdManyToMany:
                                                     //
                                                     // ignore these fields, they have no associated DB field
                                                     //
                                                     break;
-                                                case constants._fieldTypeIdBoolean:
+                                                case Constants._fieldTypeIdBoolean:
                                                     sqlList.add(FieldName, encodeSQLBoolean(GenericController.encodeBoolean(field.defaultValue)));
                                                     break;
-                                                case constants._fieldTypeIdCurrency:
-                                                case constants._fieldTypeIdFloat:
+                                                case Constants._fieldTypeIdCurrency:
+                                                case Constants._fieldTypeIdFloat:
                                                     sqlList.add(FieldName, encodeSQLNumber(GenericController.encodeNumber(field.defaultValue)));
                                                     break;
-                                                case constants._fieldTypeIdInteger:
-                                                case constants._fieldTypeIdMemberSelect:
+                                                case Constants._fieldTypeIdInteger:
+                                                case Constants._fieldTypeIdMemberSelect:
                                                     sqlList.add(FieldName, encodeSQLNumber(GenericController.encodeInteger(field.defaultValue)));
                                                     break;
-                                                case constants._fieldTypeIdDate:
+                                                case Constants._fieldTypeIdDate:
                                                     sqlList.add(FieldName, encodeSQLDate(GenericController.encodeDate(field.defaultValue)));
                                                     break;
-                                                case constants._fieldTypeIdLookup:
+                                                case Constants._fieldTypeIdLookup:
                                                     //
                                                     // refactor --
                                                     // This is a problem - the defaults should come in as the ID values, not the names
@@ -2615,14 +2615,14 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 int sourceFieldTypeId = csGetFieldTypeId(CSSource, FieldName);
                                 switch (sourceFieldTypeId) {
-                                    case constants._fieldTypeIdRedirect:
-                                    case constants._fieldTypeIdManyToMany:
+                                    case Constants._fieldTypeIdRedirect:
+                                    case Constants._fieldTypeIdManyToMany:
                                         break;
-                                    case constants._fieldTypeIdFile:
-                                    case constants._fieldTypeIdFileImage:
-                                    case constants._fieldTypeIdFileCSS:
-                                    case constants._fieldTypeIdFileXML:
-                                    case constants._fieldTypeIdFileJavascript:
+                                    case Constants._fieldTypeIdFile:
+                                    case Constants._fieldTypeIdFileImage:
+                                    case Constants._fieldTypeIdFileCSS:
+                                    case Constants._fieldTypeIdFileXML:
+                                    case Constants._fieldTypeIdFileJavascript:
                                         //
                                         // ----- cdn file
                                         //
@@ -2633,8 +2633,8 @@ namespace Contensive.Processor.Controllers {
                                             core.cdnFiles.copyFile(SourceFilename, DestFilename);
                                         }
                                         break;
-                                    case constants._fieldTypeIdFileText:
-                                    case constants._fieldTypeIdFileHTML:
+                                    case Constants._fieldTypeIdFileText:
+                                    case Constants._fieldTypeIdFileHTML:
                                         //
                                         // ----- private file
                                         //

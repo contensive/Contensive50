@@ -3,7 +3,7 @@ using System;
 using Contensive.Processor;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 //
 namespace Contensive.Addons.AdminSite {
     public class FormEditConfig {

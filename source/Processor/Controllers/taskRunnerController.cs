@@ -12,7 +12,7 @@ using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
+using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
 //
 namespace Contensive.Processor.Controllers {
@@ -221,9 +221,9 @@ namespace Contensive.Processor.Controllers {
                         //tasksRemaining = true;
                         task.dateStarted = DateTime.Now;
                         task.save(cp.core);
-                        cmdDetailClass cmdDetail = cp.core.json.Deserialize<cmdDetailClass>(task.cmdDetail);
+                        CmdDetailClass cmdDetail = cp.core.json.Deserialize<CmdDetailClass>(task.cmdDetail);
                         switch ((task.command.ToLowerInvariant())) {
-                            case taskQueueCommandEnumModule.runAddon:
+                            case TaskQueueCommandEnumModule.runAddon:
                                 cp.core.addon.execute(AddonModel.create(cp.core, cmdDetail.addonId), new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
                                     backgroundProcess = true,
                                     addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple,
