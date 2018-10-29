@@ -5,4 +5,4 @@
     var script = document.createElement("script");
     script.src = "/contensiveBase/admin.js";
     document.head.appendChild(script);
-})();
+}());
