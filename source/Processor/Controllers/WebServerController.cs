@@ -939,6 +939,11 @@ namespace Contensive.Processor.Controllers {
                         verifyWebsite_VirtualDirectory(core, site, appName, cdnFilesPrefix, core.appConfig.localFilesPath);
                     }
                     //
+                    // -- create temp cclib virtual folder pointed to contensiveBase.
+                    core.appRootFiles.deleteFolder("cclib");
+                    core.appRootFiles.createPath("ContensiveBase");
+                    verifyWebsite_VirtualDirectory(core, site, appName, "cclib", phyPath + @"ContensiveBase");
+                    //
                     // -- commit any changes
                     iisManager.CommitChanges();
                 }

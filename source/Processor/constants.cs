@@ -46,7 +46,6 @@ namespace Contensive.Processor {
         internal const string iconPlus = "<i alt=\"add\" title=\"add\" class=\"fa fa-plus-circle\"></i>";
         internal const string iconClose = "<i alt=\"close\" title=\"close\" class=\"fa fa-remove\"></i>";
         internal const string iconEdit = "<i alt=\"edit\" title=\"edit\" class=\"fa fa-edit\"></i>";
-        //internal const string iconEdit = "<i alt=\"edit\" title=\"edit\" class=\"fa fa-edit\" style=\"color: #080;background-color: #fff\" valign=absmiddle></i>";
         internal const string iconOpen = "<i alt=\"open\" title=\"open\" class=\"fa fa-angle-double-right\">";
         internal const string iconRefresh = "<i alt=\"refresh\" title=\"refresh\" class=\"fa fa-refresh\">";
         //
@@ -79,10 +78,7 @@ namespace Contensive.Processor {
         internal const string adminIndexFilterClosedLabel = "<div style=\"font-size:9px;text-align:center;\">&nbsp;<br>F<br>i<br>l<br>t<br>e<br>r<br>s</div>";
         //
         internal const string IconWidthHeight = " width=21 height=22 ";
-        //
         internal const string baseCollectionGuid = "{7C6601A7-9D52-40A3-9570-774D0D43D758}"; // part of software dist - base cdef plus addons with classes in in core library, plus depenancy on coreCollection
-        // 20180816, no, core is v.41
-        // internal const string CoreCollectionGuid = "{8DAABAE6-8E45-4CEE-A42C-B02D180E799B}"; // contains core Contensive objects, loaded from Library
         internal const string ApplicationCollectionGuid = "{C58A76E2-248B-4DE8-BF9C-849A960F79C6}"; // exported from application during upgrade
         internal const string AdminNavigatorGuid = "{5168964F-B6D2-4E9F-A5A8-BB1CF908A2C9}";
         //
@@ -111,7 +107,6 @@ namespace Contensive.Processor {
         internal const string addonGuidStructuredDataProcessor = "{65D58FE9-8B76-4490-A2BE-C863B372A6A4}";
         internal const string addonGuidjQueryFancyBox = "{24C2DBCF-3D84-44B6-A5F7-C2DE7EFCCE3D}";
         internal const string addonGuidSiteStructureGuid = "{8CDD7960-0FCA-4042-B5D8-3A65BE487AC4}";
-        //Public Const addonGuidLoginDefaultPage   As String  = "{288a7ee1-9d93-4058-bcd9-c9cd29d25ec8}"
         // -- Login Page displays the currently selected login form addon
         internal const string addonGuidLoginPage = "{288a7ee1-9d93-4058-bcd9-c9cd29d25ec8}";
         // -- Login Form, this is the addonGuid of the default login form. Login Page calls the addon
@@ -167,12 +162,6 @@ namespace Contensive.Processor {
         internal const string BlockTextStartMarker = "<!-- BLOCKTEXTSTART -->";
         internal const string BlockTextEndMarker = "<!-- BLOCKTEXTEND -->";
         //
-        //Private Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Integer)
-        //Private Declare Function GetExitCodeProcess Lib "kernel32" (ByVal hProcess As Integer, ByVal lpExitCode As Integer) As Integer
-        //Private Declare Function timeGetTime Lib "winmm.dll" () As Integer
-        //Private Declare Function OpenProcess Lib "kernel32" (ByVal dwDesiredAccess As Integer, ByVal bInheritHandle As Integer, ByVal dwProcessId As Integer) As Integer
-        //Private Declare Function CloseHandle Lib "kernel32" (ByVal hObject As Integer) As Integer
-        //
         internal const string InstallFolderName = "Install";
         internal const string DownloadFileRootNode = "collectiondownload";
         internal const string CollectionFileRootNode = "collection";
@@ -185,154 +174,37 @@ namespace Contensive.Processor {
         //
         internal const string defaultLandingPageHtml = "";
         internal const string defaultTemplateName = "Default";
-        //Public Const defaultTemplateHtml As String = "{% {""addon"":{""addon"":""menu pages"",""name"":""Default""}} %}{% ""Content Box"" %}"
         internal const string defaultTemplateHomeFilename = "ContensiveBase\\TemplateHomeDefault.html";
-        //
-        //
         //
         internal const int ignoreInteger = 0;
         internal const string ignoreString = "";
         //
-        // ----- Errors Specific to the Contensive Objects
-        //
-        //Public Const ignoreInteger = KmaObjectError + 1
-        //Public Const KmaccErrorServiceStopped = KmaObjectError + 2
-        //
         internal const string UserErrorHeadline = "<h3 class=\"ccError\">There was an issue.</h3>";
         //
-        // ----- Errors connecting to server
-        //
-        //Public Const ccError_InvalidAppName = 100
-        //Public Const ccError_ErrorAddingApp = 101
-        //Public Const ccError_ErrorDeletingApp = 102
-        //Public Const ccError_InvalidFieldName = 103     ' Invalid parameter name
-        //Public Const ignoreString = 104
-        //Public Const ignoreString = 105
-        //Public Const ccError_NotConnected = 106             ' Attempt to execute a command without a connection
-        //
-        //
-        //
-        //Public Const ccStatusCode_Base = ignoreInteger
-        //Public Const ccStatusCode_ControllerCreateFailed = ccStatusCode_Base + 1
-        //Public Const ccStatusCode_ControllerInProcess = ccStatusCode_Base + 2
-        //Public Const ccStatusCode_ControllerStartedWithoutService = ccStatusCode_Base + 3
-        //
-        // ----- Previous errors, can be replaced
-        //
-        //Public Const KmaError_UnderlyingObject_Msg  As String  = "An error occurred in an underlying routine."
-        //Public Const KmaccErrorServiceStopped_Msg  As String  = "The Contensive CSv Service is not running."
-        //Public Const KmaError_BadObject_Msg  As String  = "Server Object is not valid."
-        //Public Const ignoreString  As String  = "Server is busy with internal builder."
-        //
-        //Public Const KmaError_InvalidArgument_Msg  As String  = "Invalid Argument"
-        //Public Const KmaError_UnderlyingObject_Msg  As String  = "An error occurred in an underlying routine."
-        //Public Const KmaccErrorServiceStopped_Msg  As String  = "The Contensive CSv Service is not running."
-        //Public Const KmaError_BadObject_Msg  As String  = "Server Object is not valid."
-        //Public Const ignoreString  As String  = "Server is busy with internal builder."
-        //Public Const KmaError_InvalidArgument_Msg  As String  = "Invalid Argument"
-        //
-        //-----------------------------------------------------------------------
-        //   GetApplicationList indexes
-        //-----------------------------------------------------------------------
-        //
-        //internal const int AppList_Name = 0;
-        ////
-        //internal const int AppList_Status = 1;
-        ////
-        //internal const int AppList_ConnectionsActive = 2;
-        ////
-        //internal const int AppList_ConnectionString = 3;
-        ////
-        //internal const int AppList_DataBuildVersion = 4;
-        ////
-        //internal const int AppList_LicenseKey = 5;
-        ////
-        //internal const int AppList_RootPath = 6;
-        ////
-        //internal const int AppList_PhysicalFilePath = 7;
-        ////
-        //internal const int AppList_DomainName = 8;
-        ////
-        //internal const int AppList_DefaultPage = 9;
-        ////
-        //internal const int AppList_AllowSiteMonitor = 10;
-        ////
-        //internal const int AppList_HitCounter = 11;
-        ////
-        //internal const int AppList_ErrorCount = 12;
-        ////
-        //internal const int AppList_DateStarted = 13;
-        ////
-        //internal const int AppList_AutoStart = 14;
-        ////
-        //internal const int AppList_Progress = 15;
-        ////
-        //internal const int AppList_PhysicalWWWPath = 16;
-        ////
-        //internal const int AppListCount = 17;
-        //
-        //-----------------------------------------------------------------------
         //   System MemberID - when the system does an update, it uses this member
-        //-----------------------------------------------------------------------
-        //
         internal const int SystemMemberID = 0;
         //
-        //-----------------------------------------------------------------------
         // ----- old (OptionKeys for available Options)
-        //-----------------------------------------------------------------------
-        //
         internal const int OptionKeyProductionLicense = 0;
         internal const int OptionKeyDeveloperLicense = 1;
         //
-        //-----------------------------------------------------------------------
         // ----- LicenseTypes, replaced OptionKeys
-        //-----------------------------------------------------------------------
-        //
         internal const int LicenseTypeInvalid = -1;
         internal const int LicenseTypeProduction = 0;
         internal const int LicenseTypeTrial = 1;
         //
-        //-----------------------------------------------------------------------
         // ----- Active Content Definitions
-        //-----------------------------------------------------------------------
-        //
         internal const string ACTypeAggregateFunction = "AGGREGATEFUNCTION";
         internal const string ACTypeAddon = "ADDON";
         internal const string ACTypeTemplateContent = "CONTENT";
         internal const string ACTypeTemplateText = "TEXT";
         //
-        // deprecate
-        //
-        //internal const string ACTypePersonalization = "PERSONALIZATION";
-        //internal const string ACTypeDate = "DATE";
-        //internal const string ACTypeVisit = "VISIT";
-        //internal const string ACTypeVisitor = "VISITOR";
-        //internal const string ACTypeMember = "MEMBER";
-        //internal const string ACTypeOrganization = "ORGANIZATION";
-        //internal const string ACTypeChildList = "CHILDLIST";
-        //internal const string ACTypeContact = "CONTACT";
-        //internal const string ACTypeFeedback = "FEEDBACK";
-        //internal const string ACTypeLanguage = "LANGUAGE";
-        //internal const string ACTypeImage = "IMAGE";
-        //internal const string ACTypeDownload = "DOWNLOAD";
-        //internal const string ACTypeEnd = "END";
-        //Public Const ACTypeDynamicMenu  As String  = "DYNAMICMENU"
-        //internal const string ACTypeWatchList = "WATCHLIST";
-        //internal const string ACTypeRSSLink = "RSSLINK";
-        //internal const string ACTypeDynamicForm = "DYNAMICFORM";
-        //
-        //internal const string ACTagEnd = "<ac type=\"" + ACTypeEnd + "\">";
-        //
         // ----- PropertyType Definitions
-        //
         internal const int PropertyTypeMember = 0;
         internal const int PropertyTypeVisit = 1;
         internal const int PropertyTypeVisitor = 2;
         //
-        //-----------------------------------------------------------------------
         // ----- Port Assignments
-        //-----------------------------------------------------------------------
-        //
         internal const int WinsockPortWebOut = 4000;
         internal const int WinsockPortServerFromWeb = 4001;
         internal const int WinsockPortServerToClient = 4002;
@@ -439,8 +311,6 @@ namespace Contensive.Processor {
         internal const string LegacyInterceptPageSNImageUpload = "ka983lm039";
         internal const string LegacyInterceptPageSNMyProfile = "k09ddk9105";
         internal const string LegacyInterceptPageSNLogin = "6ge42an09a";
-        // deprecated 20180701
-        //internal const string LegacyInterceptPageSNPrinterVersion = "l6d09a10sP";
         internal const string LegacyInterceptPageSNUploadEditor = "k0hxp2aiOZ";
         //
         //-----------------------------------------------------------------------
@@ -453,7 +323,6 @@ namespace Contensive.Processor {
         //   These name=value pairs go in the QueryString argument of the javascript cj.ajax.qs() function
         //-----------------------------------------------------------------------
         //
-        //Public Const RequestNameOpenSettingPage As String = "settingpageid"
         internal const string RequestNameAjaxFunction = "ajaxfn";
         internal const string RequestNameAjaxFastFunction = "ajaxfastfn";
         //
@@ -477,21 +346,6 @@ namespace Contensive.Processor {
         internal const string ajaxGetFieldEditorPreferenceForm = "ajaxgetfieldeditorpreference";
         //
         //-----------------------------------------------------------------------
-        //
-        // no - for now just use ajaxfn in the cj.ajax.qs call
-        //   this is more work, and I do not see why it buys anything new or better
-        //
-        //   Hard-coded addons
-        //       these are internal Contensive functions
-        //       can be called with just /addonname?querystring
-        //       call them with cj.ajax.addon() or cj.ajax.addonCallback()
-        //       are first in the list of checks when a URL rewrite is detected in Init()
-        //       should all be prefixed with 'cc'
-        //-----------------------------------------------------------------------
-        //
-        //Public Const HardcodedAddonGetDefaultAddonOptionString As String = "ccGetDefaultAddonOptionString"
-        //
-        //-----------------------------------------------------------------------
         //   Remote Methods
         //       ?RemoteMethodAddon=string
         //       calls an addon (if marked to run as a remote method)
@@ -512,21 +366,14 @@ namespace Contensive.Processor {
         internal const string HardCodedPageLogin = "login";
         internal const string HardCodedPageLoginDefault = "logindefault";
         internal const string HardCodedPageMyProfile = "myprofile";
-        // deprecated 20180701
-        //internal const string HardCodedPagePrinterVersion = "printerversion";
         internal const string HardCodedPageResourceLibrary = "resourcelibrary";
         internal const string HardCodedPageLogoutLogin = "logoutlogin";
         internal const string HardCodedPageLogout = "logout";
         internal const string HardCodedPageSiteExplorer = "siteexplorer";
-        //Public Const HardCodedPageForceMobile As String = "forcemobile"
-        //Public Const HardCodedPageForceNonMobile As String = "forcenonmobile"
         internal const string HardCodedPageNewOrder = "neworderpage";
         internal const string HardCodedPageStatus = "status";
-        //Public Const HardCodedPageGetJSPage As String = "getjspage"
-        //Public Const HardCodedPageGetJSLogin As String = "getjslogin"
         internal const string HardCodedPageRedirect = "redirect";
         internal const string HardCodedPageExportAscii = "exportascii";
-        //internal const string HardCodedPagePayPalConfirm = "paypalconfirm";
         internal const string HardCodedPageSendPassword = "sendpassword";
         //
         //-----------------------------------------------------------------------
@@ -539,8 +386,6 @@ namespace Contensive.Processor {
         internal const string PageOptionForceMobile = "forcemobile";
         internal const string PageOptionForceNonMobile = "forcenonmobile";
         internal const string PageOptionLogout = "logout";
-        // deprecated 20180701
-        //internal const string PageOptionPrinterVersion = "printerversion";
         //
         // convert to options later
         //
@@ -577,13 +422,7 @@ namespace Contensive.Processor {
         //           Oracle
         //-----------------------------------------------------------------------
         //
-        //Public Const SQLFalse As String = "0"
-        //Public Const SQLTrue As String = "1"
-        //
-        //-----------------------------------------------------------------------
         // ----- Style sheet definitions
-        //-----------------------------------------------------------------------
-        //
         internal const string defaultStyleFilename = "ccDefault.r5.css";
         internal const string StyleSheetStart = "<STYLE TYPE=\"text/css\">";
         internal const string StyleSheetEnd = "</STYLE>";
@@ -619,24 +458,6 @@ namespace Contensive.Processor {
         internal const int AuthoringControlsSubmitted = 2;
         internal const int AuthoringControlsApproved = 3;
         internal const int AuthoringControlsModified = 4;
-        //
-        //-----------------------------------------------------------------------
-        // ----- Panel and header colors
-        //-----------------------------------------------------------------------
-        //
-        //Public Const "ccPanel" As String = "#E0E0E0"    ' The background color of a panel (black copy visible on it)
-        //Public Const "ccPanelHilite" As String = "#F8F8F8"  '
-        //Public Const "ccPanelShadow" As String = "#808080"  '
-        //
-        //Public Const HeaderColorBase As String = "#0320B0"   ' The background color of a panel header (reverse copy visible)
-        //Public Const "ccPanelHeaderHilite" As String = "#8080FF" '
-        //Public Const "ccPanelHeaderShadow" As String = "#000000" '
-        //
-        //-----------------------------------------------------------------------
-        // ----- Field type Definitions
-        //       Field Types are numeric values that describe how to treat values
-        //       stored as ContentFieldDefinitionType (FieldType property of FieldType Type.. ;)
-        //-----------------------------------------------------------------------
         //
         /// <summary>
         /// An long number
@@ -863,16 +684,10 @@ namespace Contensive.Processor {
         internal const string ButtonOK = "     OK     ";
         internal const string ButtonReset = "  Reset  ";
         internal const string ButtonSaveAddNew = " Save + Add ";
-        //Public Const ButtonSaveAddNew As String = " Save > Add "
-        //Public Const ButtonCancel As String = " Cancel "
         internal const string ButtonRestartContensiveApplication = " Restart Contensive Application ";
         internal const string ButtonCancelAll = "  Cancel  ";
         internal const string ButtonFind = "   Find   ";
         internal const string ButtonDelete = "  Delete  ";
-        //internal const string ButtonDeletePerson = " Delete Person ";
-        //internal const string ButtonDeleteRecord = " Delete Record ";
-        //internal const string ButtonDeleteEmail = " Delete Email ";
-        //internal const string ButtonDeletePage = " Delete Page ";
         internal const string ButtonFileChange = "   Upload   ";
         internal const string ButtonFileDelete = "    Delete    ";
         internal const string ButtonClose = "  Close   ";
@@ -890,13 +705,6 @@ namespace Contensive.Processor {
         internal const string ButtonActivate = "  Activate   ";
         internal const string ButtonDeactivate = "  Deactivate   ";
         internal const string ButtonOpenActiveEditor = "Active Edit";
-        //Public Const ButtonPublish As String = " Publish Changes "
-        //Public Const ButtonAbortEdit As String = " Abort Edits "
-        //Public Const ButtonPublishSubmit As String = " Submit for Publishing "
-        //Public Const ButtonPublishApprove As String = " Approve for Publishing "
-        //Public Const ButtonPublishDeny As String = " Deny for Publishing "
-        //Public Const ButtonWorkflowPublishApproved As String = " Publish Approved Records "
-        //Public Const ButtonWorkflowPublishSelected As String = " Publish Selected Records "
         internal const string ButtonSetHTMLEdit = " Edit WYSIWYG ";
         internal const string ButtonSetTextEdit = " Edit HTML ";
         internal const string ButtonRefresh = " Refresh ";
@@ -956,46 +764,7 @@ namespace Contensive.Processor {
         internal const int AdminMenuModeHidden = 0; // menu is hidden
         internal const int AdminMenuModeLeft = 1; // menu on the left
         internal const int AdminMenuModeTop = 2; // menu as dropdowns from the top
-                                                 //
-                                                 // ----- AdminActions - describes the form processing to do
-                                                 //
-                                                 //internal const int AdminActionNop = 0; // do nothing
-                                                 //internal const int AdminActionDelete = 4; // delete record
-                                                 //internal const int AdminActionFind = 5;
-                                                 //internal const int AdminActionDeleteFilex = 6;
-                                                 //internal const int AdminActionUpload = 7;
-                                                 //internal const int AdminActionSaveNormal = 3; // save fields to database
-                                                 //internal const int AdminActionSaveEmail = 8; // save email record (and update EmailGroups) to database
-                                                 //internal const int AdminActionSaveMember = 11;
-                                                 //internal const int AdminActionSaveSystem = 12;
-                                                 //internal const int AdminActionSavePaths = 13; // Save a record that is in the BathBlocking Format
-                                                 //internal const int AdminActionSendEmail = 9;
-                                                 //internal const int AdminActionSendEmailTest = 10;
-                                                 //internal const int AdminActionNext = 14;
-                                                 //internal const int AdminActionPrevious = 15;
-                                                 //internal const int AdminActionFirst = 16;
-                                                 //internal const int AdminActionSaveContent = 17;
-                                                 //internal const int AdminActionSaveField = 18; // Save a single field, fieldname = fn input
-                                                 //internal const int AdminActionPublish = 19; // Publish record live
-                                                 //internal const int AdminActionAbortEdit = 20; // Publish record live
-                                                 //internal const int AdminActionPublishSubmit = 21; // Submit for Workflow Publishing
-                                                 //internal const int AdminActionPublishApprove = 22; // Approve for Workflow Publishing
-                                                 //                                                 //Public Const AdminActionWorkflowPublishApproved = 23    ' Publish what was approved
-                                                 //internal const int AdminActionSetHTMLEdit = 24; // Set Member Property for this field to HTML Edit
-                                                 //internal const int AdminActionSetTextEdit = 25; // Set Member Property for this field to Text Edit
-                                                 //internal const int AdminActionSave = 26; // Save Record
-                                                 //internal const int AdminActionActivateEmail = 27; // Activate a Conditional Email
-                                                 //internal const int AdminActionDeactivateEmail = 28; // Deactivate a conditional email
-                                                 //internal const int AdminActionDuplicate = 29; // Duplicate the (sent email) record
-                                                 //internal const int AdminActionDeleteRows = 30; // Delete from rows of records, row0 is boolean, rowid0 is ID, rowcnt is count
-                                                 //internal const int AdminActionSaveAddNew = 31; // Save Record and add a new record
-                                                 //internal const int AdminActionReloadCDef = 32; // Load Content Definitions
-                                                 //                                             // Public Const AdminActionWorkflowPublishSelected = 33 ' Publish what was selected
-                                                 //internal const int AdminActionMarkReviewed = 34; // Mark the record reviewed without making any changes
-                                                 //internal const int AdminActionEditRefresh = 35; // reload the page just like a save, but do not save
-                                                 //
-                                                 // ----- Adminforms (0-99)
-                                                 //
+        //
         internal const int AdminFormRoot = 0; // intro page
         internal const int AdminFormIndex = 1; // record list page
         internal const int AdminFormHelp = 2; // popup help window
@@ -1173,7 +942,6 @@ namespace Contensive.Processor {
         //
         internal const string RequestNameRunAddon = "addonid";
         internal const string RequestNameEditReferer = "EditReferer";
-        //Public Const RequestNameRefreshBlock As String = "ccFormRefreshBlockSN"
         internal const string RequestNameCatalogOrder = "CatalogOrderID";
         internal const string RequestNameCatalogCategoryID = "CatalogCatID";
         internal const string RequestNameCatalogForm = "CatalogFormID";
@@ -1218,8 +986,6 @@ namespace Contensive.Processor {
         internal const string RequestNameCutClear = "dp29a7dsa6clear";
         //
         internal const string RequestNameRequestBinary = "RequestBinary";
-        // removed -- this was an old method of blocking form input for file uploads
-        //Public Const RequestNameFormBlock As String = "RB"
         internal const string RequestNameJSForm = "RequestJSForm";
         internal const string RequestNameJSProcess = "ProcessJSForm";
         //
@@ -1321,13 +1087,6 @@ namespace Contensive.Processor {
         //
         //
         internal const string TemplateDefaultName = "Default";
-        //Public Const TemplateDefaultBody As String = "<!--" & vbCrLf & "Default Template - edit this Page Template, or select a different template for your page or section" & vbCrLf & "-->{{DYNAMICMENU?MENU=}}<br>{{CONTENT}}"
-        //internal const string TemplateDefaultBody = ""
-        //    + "\r\n\t<!--"
-        //    + "\r\n\tDefault Template - edit this Page Template, or select a different template for your page or section"
-        //    + "\r\n\t-->"
-        //    + "\r\n\t{% {\"addon\":{\"addon\":\"menu\",\"menu\":\"Default\"}} %}"
-        //    + "\r\n\t{% \"content box\" %}";
         internal const string TemplateDefaultBodyTag = "<body class=\"ccBodyWeb\">";
         //
         //=======================================================================
@@ -1420,10 +1179,6 @@ namespace Contensive.Processor {
             public string sig;
             public GoogleDataType table;
         }
-
-        //Public Const ReturnFormatTypeGoogleTable = 1
-        //Public Const ReturnFormatTypeNameValue = 2
-
         public enum RemoteFormatEnum {
             RemoteFormatJsonTable = 1,
             RemoteFormatJsonNameArray = 2,
@@ -1474,112 +1229,17 @@ namespace Contensive.Processor {
         //
         //========================================================================
         //
-        //Declare Function GetTickCount Lib "kernel32" () As Integer
         [System.Runtime.InteropServices.DllImport("kernel32", EntryPoint = "GetCurrentProcessId", ExactSpelling = true, CharSet = System.Runtime.InteropServices.CharSet.Ansi, SetLastError = true)]
         public static extern int getCurrentProcessId();
-        //Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Integer)
         //
         //========================================================================
         //   Declarations for SetPiorityClass
         //========================================================================
         //
-        //Const THREAD_BASE_PRIORITY_IDLE = -15
-        //Const THREAD_BASE_PRIORITY_LOWRT = 15
-        //Const THREAD_BASE_PRIORITY_MIN = -2
-        //Const THREAD_BASE_PRIORITY_MAX = 2
-        //Const THREAD_PRIORITY_LOWEST = THREAD_BASE_PRIORITY_MIN
-        //Const THREAD_PRIORITY_HIGHEST = THREAD_BASE_PRIORITY_MAX
-        //Const THREAD_PRIORITY_BELOW_NORMAL = (THREAD_PRIORITY_LOWEST + 1)
-        //Const THREAD_PRIORITY_ABOVE_NORMAL = (THREAD_PRIORITY_HIGHEST - 1)
-        //Const THREAD_PRIORITY_IDLE = THREAD_BASE_PRIORITY_IDLE
-        //Const THREAD_PRIORITY_NORMAL = 0
-        //Const THREAD_PRIORITY_TIME_CRITICAL = THREAD_BASE_PRIORITY_LOWRT
-        //Const HIGH_PRIORITY_CLASS = &H80
-        //Const IDLE_PRIORITY_CLASS = &H40
-        //Const NORMAL_PRIORITY_CLASS = &H20
-        //Const REALTIME_PRIORITY_CLASS = &H100
-        //
-        //Private Declare Function SetThreadPriority Lib "kernel32" (ByVal hThread As Integer, ByVal nPriority As Integer) As Integer
-        //Private Declare Function SetPriorityClass Lib "kernel32" (ByVal hProcess As Integer, ByVal dwPriorityClass As Integer) As Integer
-        //Private Declare Function GetThreadPriority Lib "kernel32" (ByVal hThread As Integer) As Integer
-        //Private Declare Function GetPriorityClass Lib "kernel32" (ByVal hProcess As Integer) As Integer
-        //Private Declare Function GetCurrentThread Lib "kernel32" () As Integer
-        //Private Declare Function GetCurrentProcess Lib "kernel32" () As Integer
-        //
-
-        //
-        //========================================================================
-        //Converts unsafe characters,
-        //such as spaces, into their
-        //corresponding escape sequences.
-        //========================================================================
-        //
-        //Declare Function UrlEscape Lib "shlwapi" _
-        //   Alias "UrlEscapeA" _
-        //  (ByVal pszURL As String, _
-        //   ByVal pszEscaped As String, _
-        //   ByVal pcchEscaped As Integer, _
-        //   ByVal dwFlags As Integer) As Integer
-        //
-        //Converts escape sequences back into
-        //ordinary characters.
-        //
-        //Declare Function UrlUnescape Lib "shlwapi" _
-        //   Alias "UrlUnescapeA" _
-        //  (ByVal pszURL As String, _
-        //   ByVal pszUnescaped As String, _
-        //   ByVal pcchUnescaped As Integer, _
-        //   ByVal dwFlags As Integer) As Integer
-
-        //
-        //   Error reporting strategy
-        //       Popups are pop-up boxes that tell the user what to do
-        //       Logs are files with error details for developers to use debugging
-        //
-        //       Attended Programs
-        //           - errors that do not effect the operation, resume next
-        //           - all errors trickle up to the user interface level
-        //           - User Errors, like file not found, return "UserError" code and a description
-        //           - Internal Errors, like div-by-0, User should see no detail, log gets everything
-        //           - Dependant Object Errors, codes that return from objects:
-        //               - If UserError, translate ErrSource for raise, but log all original info
-        //               - If InternalError, log info and raise InternalError
-        //               - If you can not tell, call it InternalError
-        //
-        //       UnattendedMode
-        //           The same, except each routine decides when
-        //
-        //       When an error happens in-line (bad condition without a raise)
-        //           Log the error
-        //           Raise the appropriate Code/Description in the current Source
-        //
-        //       When an ErrorTrap occurs
-        //           If ErrSource is not AppTitle, it is a dependantObjectError, log and translate code
-        //           If ErrNumber is not an ObjectError, call it internal error, log and translate code
-        //           Error must be either "InternalError" or "UserError", just raise it again
-        //
-        // old - If an error is raised that is not a KmaCode, it is logged and translated
-        // old - If an error is raised and the soure is not he current "dll", it is logged and translated
-        //
-        //Public Const ignoreInteger = vbObjectError                 ' Base on which Internal errors should start
-        //
-        //Public Const KmaError_UnderlyingObject = vbObjectError + 1     ' An error occurec in an underlying object
-        //Public Const KmaccErrorServiceStopped = vbObjectError + 2       ' The service is not running
-        //Public Const KmaError_BadObject = vbObjectError + 3            ' The Server Pointer is not valid
-        //Public Const KmaError_UpgradeInProgress = vbObjectError + 4    ' page is blocked because an upgrade is in progress
-        //Public Const KmaError_InvalidArgument = vbObjectError + 5      ' and input argument is not valid. Put details at end of description
-        //
-        //Public Const ignoreInteger = ignoreInteger + 16                   ' Generic Error code that passes the description back to the user
-        //Public Const ignoreInteger = ignoreInteger + 17               ' Internal error which the user should not see
-        //Public Const KmaErrorPage = ignoreInteger + 18                   ' Error from the page which called Contensive
-        //
-        //Public Const KmaObjectError = ignoreInteger + 256                ' Internal error which the user should not see
-        //
         internal const string SQLTrue = "1";
         internal const string SQLFalse = "0";
         //
         public static readonly DateTime dateMinValue = new DateTime(1899, 12, 30);
-        //
         //
         internal const string kmaEndTable = "</table >";
         internal const string tableCellEnd = "</td>";
@@ -1591,154 +1251,6 @@ namespace Contensive.Processor {
             contentTypeWebTemplate = 3,
             contentTypeEmailTemplate = 4
         }
-        //
-        // ---------------------------------------------------------------------------------------------------
-        // ----- CDefAdminColumnType
-        // ---------------------------------------------------------------------------------------------------
-        //
-        //Public Structure cdefServices.CDefAdminColumnType
-        //    Public Name As String
-        //    Public FieldPointer As Integer
-        //    Public Width As Integer
-        //    Public SortPriority As Integer
-        //    Public SortDirection As Integer
-        //End Structure
-        //
-        // ---------------------------------------------------------------------------------------------------
-        // ----- CDefFieldType
-        //       class not structure because it has to marshall to vb6
-        // ---------------------------------------------------------------------------------------------------
-        //
-        //Public Structure cdefServices.CDefFieldType
-        //    Public Name As String                      ' The name of the field
-        //    Public ValueVariant As Object             ' The value carried to and from the database
-        //    Public Id As Integer                          ' the ID in the ccContentFields Table that this came from
-        //    Public active As Boolean                   ' if the field is available in the admin area
-        //    Public fieldType As Integer                   ' The type of data the field holds
-        //    Public Caption As String                   ' The caption for displaying the field
-        //    Public ReadOnlyField As Boolean            ' was ReadOnly -- If true, this field can not be written back to the database
-        //    Public NotEditable As Boolean              ' if true, you can only edit new records
-        //    Public LookupContentID As Integer             ' If TYPELOOKUP, (for Db controled sites) this is the content ID of the source table
-        //    Public Required As Boolean                 ' if true, this field must be entered
-        //    Public DefaultValueObject As Object      ' default value on a new record
-        //    Public HelpMessage As String               ' explaination of this field
-        //    Public UniqueName As Boolean               '
-        //    Public TextBuffered As Boolean             ' if true, the input is run through RemoveControlCharacters()
-        //    Public Password As Boolean                 ' for text boxes, sets the password attribute
-        //    Public RedirectContentID As Integer           ' If TYPEREDIRECT, this is new contentID
-        //    Public RedirectID As String                ' If TYPEREDIRECT, this is the field that must match ID of this record
-        //    Public RedirectPath As String              ' New Field, If TYPEREDIRECT, this is the path to the next page (if blank, current page is used)
-        //    Public IndexColumn As Integer                 ' the column desired in the admin index form
-        //    Public IndexWidth As String                ' either number or percentage
-        //    Public IndexSortOrder As String            ' alpha sort on index page
-        //    Public IndexSortDirection As Integer          ' 1 sorts forward, -1 backward
-        //    Public Changed As Boolean                  ' if true, field value needs to be saved to database
-        //    Public AdminOnly As Boolean                ' This field is only available to administrators
-        //    Public DeveloperOnly As Boolean            ' This field is only available to administrators
-        //    Public BlockAccess As Boolean              ' ***** Field Reused to keep binary compatiblity - "IsBaseField" - if true this is a CDefBase field
-        //    '   false - custom field, is not altered during upgrade, Help message comes from the local record
-        //    '   true - upgrade modifies the field definition, help message comes from support.contensive.com
-        //    Public htmlContent As Boolean              ' if true, the HTML editor (active edit) can be used
-        //    Public Authorable As Boolean               ' true if it can be seen in the admin form
-        //    Public Inherited As Boolean                ' if true, this field takes its values from a parent, see ContentID
-        //    Public ContentID As Integer                   ' This is the ID of the Content Def that defines these properties
-        //    Public EditSortPriority As Integer            ' The Admin Edit Sort Order
-        //    Public ManyToManyContentID As Integer         ' Content containing Secondary Records
-        //    Public ManyToManyRuleContentID As Integer     ' Content with rules between Primary and Secondary
-        //    Public ManyToManyRulePrimaryField As String     ' Rule Field Name for Primary Table
-        //    Public ManyToManyRuleSecondaryField As String   ' Rule Field Name for Secondary Table
-        //    '
-        //    ' - new
-        //    '
-        //    Public RSSTitleField As Boolean             ' When creating RSS fields from this content, this is the title
-        //    Public RSSDescriptionField As Boolean       ' When creating RSS fields from this content, this is the description
-        //    Public EditTab As String                   ' Editing group - used for the tabs
-        //    Public Scramble As Boolean                 ' save the field scrambled in the Db
-        //    Public MemberSelectGroupID As Integer         ' If the Type is TypeMemberSelect, this is the group that the member will be selected from
-        //    Public LookupList As String                ' If TYPELOOKUP, and LookupContentID is null, this is a comma separated list of choices
-        //End Structure
-        //
-        // ---------------------------------------------------------------------------------------------------
-        // ----- CDefType
-        //       class not structure because it has to marshall to vb6
-        // ---------------------------------------------------------------------------------------------------
-        //
-        //Public Structure cdefServices.CDefType
-        //    Public Name As String                       ' Name of Content
-        //    Public Id As Integer                           ' index in content table
-        //    Public ContentTableName As String           ' the name of the content table
-        //    Public ContentDataSourceName As String      '
-        //    Public AuthoringTableName As String         ' the name of the authoring table
-        //    Public AuthoringDataSourceName As String    '
-        //    Public AllowAdd As Boolean                  ' Allow adding records
-        //    Public AllowDelete As Boolean               ' Allow deleting records
-        //    Public WhereClause As String                ' Used to filter records in the admin area
-        //    Public ParentID As Integer                  ' 
-        //    Public ChildIDList As String                ' Comma separated list of child content definition IDs
-        //    Public ChildPointerList As String           ' Comma separated list of child content definition Pointers
-        //    Public DefaultSortMethod As String          ' FieldName Direction, ....
-        //    Public ActiveOnly As Boolean                ' When true
-        //    Public AdminOnly As Boolean                 ' Only allow administrators to modify content
-        //    Public DeveloperOnly As Boolean             ' Only allow developers to modify content
-        //    Public AllowWorkflowAuthoring As Boolean    ' if true, treat this content with authoring proceses
-        //    Public DropDownFieldList As String          ' String used to populate select boxes
-        //    Public SelectFieldList As String            ' Field list used in OpenCSContent calls (all active field definitions)
-        //    Public EditorGroupName As String            ' Group of members who administer Workflow Authoring
-        //    '
-        //    ' array of cdefFieldType throws a vb6 error, data or method problem
-        //    ' public property does not work (msn article -- very slow because it marshals he entire array, not a pointer )
-        //    ' public function works to read, but cannot write
-        //    ' possible -- public fields() function for reads
-        //    '   -- public setFields() function for writes
-        //    '
-        //    Public fields as appServices_CdefClass.CDefFieldType()
-        //    Public FieldPointer As Integer                 ' Current Field for FirstField / NextField calls
-        //    Public FieldCount As Integer                   ' The number of fields loaded (from ccFields, or Set calls)
-        //    Public FieldSize As Integer                    ' The number of initialize Field()
-        //    '
-        //    ' same as fields
-        //    '
-        //    Public adminColumns as appServices_CdefClass.CDefAdminColumnType()
-        //    'Public AdminColumnLocal As CDefAdminColumnType()  ' The Admins in this content
-        //    Public AdminColumnPointer As Integer                 ' Current Admin for FirstAdminColumn / NextAdminColumn calls
-        //    Public AdminColumnCount As Integer                   ' The number of AdminColumns loaded (from ccAdminColumns, or Set calls)
-        //    Public AdminColumnSize As Integer                    ' The number of initialize Admin()s
-        //    'AdminColumn As CDefAdminCollClass
-        //    '
-        //    Public ContentControlCriteria As String     ' String created from ParentIDs used to select records
-        //    '
-        //    ' ----- future
-        //    '
-        //    Public AliasName As String                 ' Field Name of the required "name" field
-        //    Public AliasID As String                   ' Field Name of the required "id" field
-        //    '
-        //    ' ----- removed
-        //    '
-        //    Public SingleRecord As Boolean             ' removeme
-        //    '    Type as integer                        ' removeme
-        //    Public TableName As String                 ' removeme
-        //    Public DataSourceID As Integer                ' removeme
-        //    '
-        //    ' ----- new
-        //    '
-        //    Public AllowTopicRules As Boolean          ' For admin edit page
-        //    Public AllowContentTracking As Boolean     ' For admin edit page
-        //    Public AllowCalendarEvents As Boolean      ' For admin edit page
-        //    Public AllowMetaContent As Boolean         ' For admin edit page - Adds the Meta Content Section
-        //    Public TimeStamp As String                 ' string that changes if any record in Content Definition changes, in memory only
-        //End Structure
-
-
-        //Private Type AdminColumnType
-        //    FieldPointer as integer
-        //    FieldWidth as integer
-        //    FieldSortDirection as integer
-        //End Type
-        //
-        //Private Type AdminType
-        //    ColumnCount as integer
-        //    Columns() As AdminColumnType
-        //End Type
         //
         //-----------------------------------------------------------------------
         //   Messages
@@ -1786,17 +1298,10 @@ namespace Contensive.Processor {
                                                 + "<p>This content has been modified and was submitted for publication by the individual shown above. You were sent this notification because you are a member of the Editors Group for the content that has been changed.</p>"
                                                 + "<p>To publish this content immediately, click on the website link above, check off this record in the box to the far left and click the \"Publish Selected Records\" button.</p>"
                                                 + "<p>To edit the record, click the \"edit\" link for this record, make the desired changes and click the \"Publish\" button.</p>";
-        //& "<p>This content has been modified and was submitted for publication by the individual shown above. You were sent this notification because your account on this system is a member of the Editors Group for the content that has been changed.</p>" _
-        //& "<p>To publish this content immediately, click on the website link above and locate this record in the list of modified records presented. his content has been modified and was submitted for publication by the individual shown above. Click the 'Admin Site' link to edit the record, and hit the publish button.</p>" _
-        //& "<p>To approved this record for workflow publishing, locate the record as described above, and hit the 'Approve for Publishing' button.</p>" _
-        //& "<p>To publish all content records approved, go to the Workflow Publishing Screen (on the Administration Menu or the Administration Site) and hit the 'Publish Approved Records' button.</p>"
         internal const string PageNotAvailable_Msg = "This page is not currently available. <br>"
                             + "Please use your back button to return to the previous page. <br>";
         internal const string NewPage_Msg = "";
         //
-        //Public Const htmlDoc_JavaStreamChunk = 100
-        //Public Const htmlDoc_OutStreamStandard = 0
-        //Public Const htmlDoc_OutStreamJavaScript = 1
         internal const string main_BakeHeadDelimiter = "#####MultilineFlag#####";
         internal const int navStruc_Descriptor = 1; // Descriptors:0 = RootPage, 1 = Parent Page, 2 = Current Page, 3 = Child Page
         internal const int navStruc_Descriptor_CurrentPage = 2;
@@ -1898,7 +1403,6 @@ namespace Contensive.Processor {
         public string NameValue;
         public bool IsForm;
         public bool IsFile;
-        //Public FileContent() As Byte
         public string tempfilename;
         public int FileSize;
         public string fileType;
@@ -1916,6 +1420,4 @@ namespace Contensive.Processor {
         Mitchell = 6,
         Stretch = 7
     }
-
-
 }
