@@ -2,10 +2,9 @@
 using System;
 using Contensive.Processor;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
 using Contensive.Processor.Exceptions;
+using static Contensive.Processor.Constants;
 
 namespace Contensive.Addons.AdminSite {
     public class ControlEditor {
@@ -94,7 +93,7 @@ namespace Contensive.Addons.AdminSite {
                         //
                         // add a set button
                         string fieldId = "setGuid" + GenericController.GetRandomInteger(core).ToString();
-                        string buttonCell = HtmlController.div(AdminUIController.getButtonPrimary("Set", "var e=document.getElementById('" + fieldId + "');if(e){e.value='{" + GenericController.getGUIDString() + "}';this.disabled=true;}"), "col-xs-1");
+                        string buttonCell = HtmlController.div(AdminUIController.getButtonPrimary("Set", "var e=document.getElementById('" + fieldId + "');if(e){e.value='" + GenericController.getGUID(true) + "';this.disabled=true;}"), "col-xs-1");
                         string inputCell = HtmlController.div(AdminUIController.getDefaultEditor_Text(core, "ccguid", "", false, fieldId), "col-xs-11");
                         fieldEditor = HtmlController.div(HtmlController.div(buttonCell + inputCell, "row"), "container-fluid");
                     } else {
@@ -255,7 +254,7 @@ namespace Contensive.Addons.AdminSite {
                     if (editRecord.id == 0) {
                         fieldValue = "(available after save)";
                     } else {
-                        if (encodeDateMinValue(editRecord.dateAdded) == DateTime.MinValue) {
+                        if (GenericController.encodeDateMinValue(editRecord.dateAdded) == DateTime.MinValue) {
                             fieldValue = "(not set)";
                         } else {
                             fieldValue = editRecord.dateAdded.ToString();
@@ -300,7 +299,7 @@ namespace Contensive.Addons.AdminSite {
                     if (editRecord.id == 0) {
                         fieldValue = "(available after save)";
                     } else {
-                        if (encodeDateMinValue(editRecord.modifiedDate) == DateTime.MinValue) {
+                        if (GenericController.encodeDateMinValue(editRecord.modifiedDate) == DateTime.MinValue) {
                             fieldValue = "(not set)";
                         } else {
                             fieldValue = editRecord.modifiedDate.ToString();
