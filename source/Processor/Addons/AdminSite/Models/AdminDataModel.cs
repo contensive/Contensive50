@@ -1,20 +1,12 @@
 ﻿
 using System;
-using System.Reflection;
-using System.Xml;
-using System.Diagnostics;
-using System.Linq;
-using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
-using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
-using Contensive.Addons.Tools;
 using static Contensive.Processor.AdminUIController;
 using Contensive.Processor.Exceptions;
 //
@@ -27,19 +19,19 @@ namespace Contensive.Addons.AdminSite {
         /// <summary>
         /// the content being edited
         /// </summary>
-        public CDefModel adminContent = null;
+        public CDefModel adminContent { get; set; }
         /// <summary>
         /// the record being edited
         /// </summary>
-        public EditRecordClass editRecord = null;
+        public EditRecordClass editRecord { get; set; }
         /// <summary>
         /// Value returned from a submit button, process into action/form
         /// </summary>
-        public string requestButton;
+        public string requestButton { get; set; }
         /// <summary>
         /// the next form requested (the get)
         /// </summary>
-        public int AdminForm;
+        public int AdminForm { get; set; }
         /// <summary>
         /// ccGroupRules storage for list of Content that a group can author
         /// </summary>
@@ -59,35 +51,35 @@ namespace Contensive.Addons.AdminSite {
         /// <summary>
         /// Used within Admin site to create fancyBox popups
         /// </summary>
-        public bool includeFancyBox;
+        public bool includeFancyBox { get; set; }
         /// <summary>
         /// 
         /// </summary>
-        public int fancyBoxPtr;
+        public int fancyBoxPtr { get; set; }
         /// <summary>
         /// 
         /// </summary>
-        public string fancyBoxHeadJS;
+        public string fancyBoxHeadJS { get; set; }
         /// <summary>
         /// 
         /// </summary>
-        public int requestedContentId;
+        public int requestedContentId { get; set; }
         /// <summary>
         /// 
         /// </summary>
-        public int requestedRecordId;
+        public int requestedRecordId { get; set; }
         /// <summary>
         /// true if there was an error loading the edit record - use to block the edit form
         /// </summary>
-        public bool BlockEditForm;
+        public bool BlockEditForm { get; set; }
         /// <summary>
         /// The action to be performed before the next form
         /// </summary>
-        public int Admin_Action;
+        public int Admin_Action { get; set; }
         /// <summary>
         /// The form that submitted that the button to process
         /// </summary>
-        public int AdminSourceForm;
+        public int AdminSourceForm { get; set; }
         /// <summary>
         /// for passing where clause values from page to page
         /// </summary>
@@ -95,75 +87,75 @@ namespace Contensive.Addons.AdminSite {
         /// <summary>
         /// the current number of WherePairCount in use
         /// </summary>
-        public int WherePairCount;
+        public int WherePairCount { get; set; }
         /// <summary>
         /// 
         /// </summary>
-        public int RecordTop;
+        public int RecordTop { get; set; }
         /// <summary>
         /// 
         /// </summary>
-        public int RecordsPerPage;
+        public int RecordsPerPage { get; set; }
         /// <summary>
         /// The number of windows open (below this one)
         /// </summary>
-        public int ignore_legacyMenuDepth;
+        public int ignore_legacyMenuDepth { get; set; }
         /// <summary>
         /// String that adds on to the end of the title
         /// </summary>
-        public string TitleExtension;
+        public string TitleExtension { get; set; }
         /// <summary>
         /// Controls the menu mode, set from core.main_MemberAdminMenuModeID
         /// </summary>
-        public int AdminMenuModeID;
+        public int AdminMenuModeID { get; set; }
         /// <summary>
         /// true uses tab system
         /// </summary>
-        public bool allowAdminTabs;
+        public bool allowAdminTabs { get; set; }
         /// <summary>
         /// this is a hidden on the edit form. The popup editor preferences sets this hidden and submits
         /// </summary>
-        public string fieldEditorPreference;
+        public string fieldEditorPreference { get; set; }
         /// <summary>
         /// flag set that shows the rest are valid
         /// </summary>
-        public bool ContentWatchLoaded;
+        public bool ContentWatchLoaded { get; set; }
         /// <summary>
         /// 
         /// </summary>
-        public int ContentWatchRecordID;
+        public int ContentWatchRecordID { get; set; }
         /// <summary>
         /// 
         /// </summary>
-        public string ContentWatchLink;
+        public string ContentWatchLink { get; set; }
         /// <summary>
         /// 
         /// </summary>
-        public int ContentWatchClicks;
+        public int ContentWatchClicks { get; set; }
         /// <summary>
         /// 
         /// </summary>
-        public string ContentWatchLinkLabel;
+        public string ContentWatchLinkLabel { get; set; }
         /// <summary>
         /// 
         /// </summary>
-        public DateTime ContentWatchExpires;
+        public DateTime ContentWatchExpires { get; set; }
         /// <summary>
         /// list of all ContentWatchLists for this Content, read from response, then later saved to Rules
         /// </summary>
-        public int[] ContentWatchListID;
+        public int[] ContentWatchListID { get; set; }
         /// <summary>
         /// size of ContentWatchListID() array
         /// </summary>
-        public int ContentWatchListIDSize;
+        public int ContentWatchListIDSize { get; set; }
         /// <summary>
         /// number of valid entries in ContentWatchListID()
         /// </summary>
-        public int ContentWatchListIDCount;
+        public int ContentWatchListIDCount { get; set; }
         /// <summary>
         /// Count of Buttons in use
         /// </summary>
-        public int ButtonObjectCount;
+        public int ButtonObjectCount { get; set; }
         /// <summary>
         /// 
         /// </summary>
@@ -171,23 +163,23 @@ namespace Contensive.Addons.AdminSite {
         /// <summary>
         /// Collected string of Javascript functions to print at end
         /// </summary>
-        public string JavaScriptString;
+        public string JavaScriptString { get; set; }
         /// <summary>
         /// the HTML needed to complete the Admin Form after contents
         /// </summary>
-        public string adminFooter;
+        public string adminFooter { get; set; }
         /// <summary>
         /// 
         /// </summary>
-        public bool UserAllowContentEdit;
+        public bool UserAllowContentEdit { get; set; }
         /// <summary>
         /// used to generate labels for form input
         /// </summary>
-        public int FormInputCount;
+        public int FormInputCount { get; set; }
         /// <summary>
         /// 
         /// </summary>
-        public int EditSectionPanelCount;
+        public int EditSectionPanelCount { get; set; }
         /// <summary>
         /// 
         /// </summary>
