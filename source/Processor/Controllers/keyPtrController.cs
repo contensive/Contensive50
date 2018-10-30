@@ -16,7 +16,7 @@ using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Controllers {
     //
-    [Serializable()]
+    [Serializable]
     public class KeyPtrController {
         //
         // new serializable and deserialize
@@ -41,7 +41,7 @@ namespace Contensive.Processor.Controllers {
         //
         private const int KeyPointerArrayChunk = 1000;
         //
-        [Serializable()]
+        [Serializable]
         public class storageClass {
             //
             public int ArraySize;

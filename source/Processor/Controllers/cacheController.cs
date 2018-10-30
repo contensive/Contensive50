@@ -561,7 +561,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// cache data wrapper to include tags and save datetime
         /// </summary>
-        [Serializable()]
+        [Serializable]
         public class CacheWrapperClass {
             //
             // if populated, all other properties are ignored and the primary tag b

@@ -23,7 +23,7 @@ namespace Contensive.Processor.Models.Domain {
     /// - shared getObject( cp, id ) - returns loaded model
     /// - saveObject( cp ) - saves instance properties, returns the record id
     /// </summary>
-    [Serializable()]
+    [Serializable]
     public class AppConfigModel {
         /// <summary>
         /// name for the app. Must be unique within the server group. Difficulate to change later.

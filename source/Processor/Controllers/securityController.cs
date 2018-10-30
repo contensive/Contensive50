@@ -100,21 +100,39 @@ namespace Contensive.Processor.Controllers {
         /// <param name="sourceToEncrypt"></param>
         /// <param name="cipher">Select the cipher. Des is older, Aes is newer and more secure. The selection is provided </param>
         /// <returns></returns>
-        public static string twoWayEncrypt(CoreController core, string sourceToEncrypt, TwoWayCiphers cipher = TwoWayCiphers.des) {
-            if (cipher == TwoWayCiphers.aes) {
-                return Crypto.encryptStringAES( sourceToEncrypt, core.appConfig.privateKey);
-            } else {
-                return encryptDes(core, sourceToEncrypt);
+        public static string twoWayEncrypt(CoreController core, string sourceToEncrypt, TwoWayCiphers cipher = TwoWayCiphers.aes) {
+            try {
+                if (cipher == TwoWayCiphers.aes) {
+                    return Crypto.encryptStringAES(sourceToEncrypt, core.appConfig.privateKey);
+                } else {
+                    return encryptDes(core, sourceToEncrypt);
+                }
+            } catch (Exception) {
+                //
+                // -- crypto errors should just return a blank response
+                return string.Empty;
             }
         }
         //
         //====================================================================================================
-        //
-        public static string twoWayDecrypt(CoreController core, string sourceToDecrypt, TwoWayCiphers cipher = TwoWayCiphers.des) {
-            if (cipher == TwoWayCiphers.aes) {
-                return Crypto.decryptStringAES(sourceToDecrypt, core.appConfig.privateKey);
-            } else {
-                return decryptDes(core, sourceToDecrypt);
+        /// <summary>
+        /// decrypt a token encrypted with twoWayEncrypt
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="sourceToDecrypt"></param>
+        /// <param name="cipher"></param>
+        /// <returns></returns>
+        public static string twoWayDecrypt(CoreController core, string sourceToDecrypt, TwoWayCiphers cipher = TwoWayCiphers.aes) {
+            try {
+                if (cipher == TwoWayCiphers.aes) {
+                    return Crypto.decryptStringAES(sourceToDecrypt, core.appConfig.privateKey);
+                } else {
+                    return decryptDes(core, sourceToDecrypt);
+                }
+            } catch (Exception) {
+                //
+                // -- crypto errors should just return a blank response
+                return string.Empty;
             }
         }
         //

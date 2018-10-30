@@ -143,7 +143,14 @@ namespace Contensive.Addons.AdminSite {
         /// <summary>
         /// list of all ContentWatchLists for this Content, read from response, then later saved to Rules
         /// </summary>
-        public int[] ContentWatchListID { get; set; }
+        public int[] ContentWatchListID {
+            get {
+                return _ContentWatchListID;
+            }
+            set {
+            _ContentWatchListID = value;
+            }   
+        } private int[] _ContentWatchListID;
         /// <summary>
         /// size of ContentWatchListID() array
         /// </summary>
@@ -286,7 +293,7 @@ namespace Contensive.Addons.AdminSite {
                         if (core.docProperties.getBoolean("ContentWatchList." + RecordID)) {
                             if (ContentWatchListIDCount >= ContentWatchListIDSize) {
                                 ContentWatchListIDSize = ContentWatchListIDSize + 50;
-                                Array.Resize(ref ContentWatchListID, ContentWatchListIDSize);
+                                Array.Resize(ref _ContentWatchListID, ContentWatchListIDSize);
                             }
                             ContentWatchListID[ContentWatchListIDCount] = RecordID;
                             ContentWatchListIDCount = ContentWatchListIDCount + 1;
