@@ -144,27 +144,25 @@ namespace Contensive.Processor.Controllers {
                     } else {
                         //
                         resultSessionContext = new SessionController(core);
-                        DateTime visitCookieTimestamp = DateTime.MinValue;
                         string appNameCookiePrefix = encodeCookieName(core.appConfig.name);
                         string visitCookie = core.webServer.getRequestCookie(appNameCookiePrefix + cookieNameVisit);
                         string memberLinkinEID = core.docProperties.getText("eid");
-                        int memberLinkLoginID = 0;
                         int memberLinkRecognizeID = 0;
-                        DateTime tokenDate = default(DateTime);
                         //
                         LogController.logTrace(core, "SessionController.create(), visitCookie [" + visitCookie + "], MemberLinkinEID [" + memberLinkinEID + "]");
                         //
+                        var linkToken = new SecurityController.TokenData();
                         if (!string.IsNullOrEmpty(memberLinkinEID)) {
                             //
                             // -- attempt link authentication
                             if (core.siteProperties.getBoolean("AllowLinkLogin", true)) {
                                 //
                                 // -- allow Link Login
-                                SecurityController.decodeToken(core, memberLinkinEID, ref memberLinkLoginID, ref tokenDate);
+                                linkToken = SecurityController.decodeToken(core, memberLinkinEID);
                             } else if (core.siteProperties.getBoolean("AllowLinkRecognize", true)) {
                                 //
                                 // -- allow Link Recognize
-                                SecurityController.decodeToken(core, memberLinkinEID, ref memberLinkRecognizeID, ref tokenDate);
+                                linkToken = SecurityController.decodeToken(core, memberLinkinEID);
                             } else {
                                 //
                                 // -- block link login
@@ -172,28 +170,28 @@ namespace Contensive.Processor.Controllers {
                             }
                         }
                         bool AllowOnNewVisitEvent = false;
-                        if ((trackVisits) || (!string.IsNullOrEmpty(visitCookie)) || (memberLinkLoginID != 0) || (memberLinkRecognizeID != 0)) {
+                        if ((trackVisits) || (!string.IsNullOrEmpty(visitCookie)) || (linkToken.id != 0) || (memberLinkRecognizeID != 0)) {
                             //
                             // -- Visit Tracking
                             //
                             LogController.logTrace(core, "SessionController.create(), visittracking");
-                            int cookieVisitId = 0;
+                            var visitToken = new SecurityController.TokenData();
                             if (!string.IsNullOrEmpty(visitCookie)) {
                                 //
                                 // -- visit cookie found
-                                SecurityController.decodeToken(core, visitCookie, ref cookieVisitId, ref visitCookieTimestamp);
-                                if (cookieVisitId == 0) {
+                                visitToken = SecurityController.decodeToken(core, visitCookie);
+                                if (visitToken.id == 0) {
                                     //
                                     // -- Bad Cookie, clear it so a new one will be written
                                     visitCookie = "";
                                     LogController.logInfo(core, "SessionController.create(), BAD COOKIE");
                                 }
                             }
-                            if (cookieVisitId != 0) {
+                            if (visitToken.id != 0) {
                                 //
                                 // -- Visit is good, setup visit, then secondary visitor/user if possible
-                                LogController.logTrace(core, "SessionController.create(), valid cookieVisit [" + cookieVisitId + "]");
-                                resultSessionContext.visit = VisitModel.create(core, cookieVisitId);
+                                LogController.logTrace(core, "SessionController.create(), valid cookieVisit [" + visitToken.id + "]");
+                                resultSessionContext.visit = VisitModel.create(core, visitToken.id);
                                 if (resultSessionContext.visit == null) {
                                     //
                                     // -- visit record is missing, create a new visit
@@ -228,8 +226,8 @@ namespace Contensive.Processor.Controllers {
                                             resultSessionContext.user = testUser;
                                         }
                                     }
-                                    if (((visitCookieTimestamp - resultSessionContext.visit.lastVisitTime).TotalSeconds) > 2) {
-                                        LogController.logTrace(core, "SessionController.create(), visit cookie timestamp [" + visitCookieTimestamp + "] does not match lastvisittime [" + resultSessionContext.visit.lastVisitTime + "]");
+                                    if (((visitToken.timeStamp - resultSessionContext.visit.lastVisitTime).TotalSeconds) > 2) {
+                                        LogController.logTrace(core, "SessionController.create(), visit cookie timestamp [" + visitToken.timeStamp + "] does not match lastvisittime [" + resultSessionContext.visit.lastVisitTime + "]");
                                         resultSessionContext.visit_stateOK = false;
                                     }
                                 }
@@ -276,12 +274,11 @@ namespace Contensive.Processor.Controllers {
                                     if (core.siteProperties.getBoolean("AllowAutoRecognize", true)) {
                                         //
                                         // -- auto recognize, setup user based on visitor
-                                        int cookieVisitorId = 0;
-                                        SecurityController.decodeToken(core, CookieVisitor, ref cookieVisitorId, ref tokenDate);
-                                        if (cookieVisitorId != 0) {
+                                        var visitorToken = SecurityController.decodeToken(core, CookieVisitor);
+                                        if (visitorToken.id != 0) {
                                             //
                                             // -- visitor cookie good
-                                            VisitorModel testVisitor = VisitorModel.create(core, cookieVisitorId);
+                                            VisitorModel testVisitor = VisitorModel.create(core, visitorToken.id);
                                             if (testVisitor != null) {
                                                 resultSessionContext.visitor = testVisitor;
                                                 visitor_changes = true;
@@ -459,11 +456,11 @@ namespace Contensive.Processor.Controllers {
                             }
                             //
                             // -- Attempt Link-in recognize or login
-                            if (memberLinkLoginID != 0) {
+                            if (linkToken.id != 0) {
                                 //
                                 // -- Link Login
-                                LogController.logTrace(core, "SessionController.create(), attempt link Login, memberLinkLoginID [" + memberLinkLoginID + "]");
-                                if (authenticateById(core, memberLinkLoginID, resultSessionContext)) {
+                                LogController.logTrace(core, "SessionController.create(), attempt link Login, linkToken.id [" + linkToken.id + "]");
+                                if (authenticateById(core, linkToken.id, resultSessionContext)) {
                                     LogController.addSiteActivity(core, "link login with eid " + memberLinkinEID, resultSessionContext.user.id, resultSessionContext.user.OrganizationID);
                                 }
                             } else if (memberLinkRecognizeID != 0) {

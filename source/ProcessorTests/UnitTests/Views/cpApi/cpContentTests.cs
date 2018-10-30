@@ -14,7 +14,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         /// <summary>
         /// cp.content.addRecord
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void Views_cpContent_AddRecordTest() {
             // arrange
             CPClass cp = new CPClass(testAppName);
@@ -37,7 +37,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         /// <summary>
         /// cp.content.delete
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void Views_cpContent_DeleteRecordTest() {
             // arrange
             CPClass cp = new CPClass(testAppName);
@@ -66,7 +66,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         /// <summary>
         /// cp.content.getCopy
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void Views_cpContent_GetCopyTest() {
             // arrange
             CPClass cp = new CPClass(testAppName);
@@ -88,7 +88,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         /// <summary>
         /// cp.content.setCopy
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void Views_cpContent_SetCopyTest() {
             // arrange
             CPClass cp = new CPClass(testAppName);
@@ -111,7 +111,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         /// <summary>
         /// cp.content.getId
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void Views_cpContent_GetId() {
             // arrange
             CPClass cp = new CPClass(testAppName);
@@ -133,7 +133,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         /// <summary>
         /// cp.content.addContent_name_test
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void Views_cpContent_AddContentTest() {
             // arrange
             CPClass cp = new CPClass(testAppName);
@@ -175,7 +175,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         /// <summary>
         /// cp.content.addContent_name_test
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void Views_cpContent_AddContentFieldTest() {
             // arrange
             CPClass cp = new CPClass(testAppName);

@@ -17,7 +17,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         //
         //====================================================================================================
         //
-        [TestMethod()]
+        [TestMethod]
         public void Controllers_ActiveContent_Content() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange

@@ -20,7 +20,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         //
         //====================================================================================================
         //
-        [TestMethod()]
+        [TestMethod]
         public void Controllers_cache_blank() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
@@ -32,7 +32,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         //
         //====================================================================================================
         //
-        [TestMethod()]
+        [TestMethod]
         public void Controllers_cache_SetGetString() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
@@ -56,7 +56,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         //
         //====================================================================================================
         //
-        [TestMethod()]
+        [TestMethod]
         public void Controllers_cache_SetGetObjectDefault() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
@@ -70,7 +70,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             }
         }
         //
-        [TestMethod()]
+        [TestMethod]
         public void Controllers_cache_SetGetObjectNonDefault() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
@@ -90,7 +90,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             }
         }
         //
-        [TestMethod()]
+        [TestMethod]
         public void Controllers_cache_SetGetObjectWithDependency() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
@@ -112,7 +112,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             }
         }
         //
-        [TestMethod()]
+        [TestMethod]
         public void Controllers_cache_SetGetObjectWithDependencyList() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
@@ -137,7 +137,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             }
         }
         //
-        [TestMethod()]
+        [TestMethod]
         public void Controllers_cache_SetGetObjectWithInvalidationDate() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
@@ -157,7 +157,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             }
         }
         //
-        [TestMethod()]
+        [TestMethod]
         public void Controllers_cache_SetGetObjectWithInvalidate() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
@@ -179,7 +179,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         /// <summary>
         /// set a key with a dependency on a content. insert a record into content, key should be invalidated
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void Controllers_cache_SetGetAlias() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
@@ -198,7 +198,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         /// <summary>
         /// if you invalidate a key, any alias pointing to it should be invalidated
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void Controllers_cache_SetGetAliasInvalidateKey() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
@@ -220,7 +220,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         /// <summary>
         /// if you invalidate an alias, the parent key should be invalidated
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void Controllers_cache_SetGetAliasInvalidateAlias() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange

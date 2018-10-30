@@ -14,7 +14,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
     //
     [TestClass()]
     public class adminUIControllerTests {
-        [TestMethod()]
+        [TestMethod]
         //
         //====================================================================================================
         // todo - write out tests

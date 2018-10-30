@@ -13,7 +13,7 @@ using static Contensive.Processor.Tests.testConstants;
 namespace Contensive.Processor.Tests.UnitTests.Models {
     [TestClass()]
     public class routeMapModelTests {
-        [TestMethod()]
+        [TestMethod]
         public void Models_RouteMap_DictionaryHasAdmin() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange

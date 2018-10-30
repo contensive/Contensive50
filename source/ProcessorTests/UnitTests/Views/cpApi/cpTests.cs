@@ -13,7 +13,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         /// <summary>
         ///  Test 1 - cp ok without application (cluster mode).
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void Views_cp_ConstructorWithoutApp() {
             // arrange
             CPClass cp = new CPClass();
@@ -29,7 +29,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         /// <summary>
         /// Test 2 - cp ok with application
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void Views_cp_ConstructorWithApp() {
             // arrange
             CPClass cp = new CPClass(testAppName);
@@ -46,7 +46,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         /// <summary>
         /// cpExecuteAddontest
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void Views_cp_ExecuteAddontest() {
             // arrange
             CPClass cp = new CPClass(testAppName);
@@ -84,7 +84,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         /// <summary>
         /// cpExecuteAddontest
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void Views_cp_ExecuteRouteTest() {
             // todo - this method fails when run with all the tests, passes when run alone. Might be the route cache not clearing after change
             // arrange

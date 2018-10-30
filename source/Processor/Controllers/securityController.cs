@@ -5,6 +5,7 @@ using System.Security.Cryptography;
 using System.IO;
 using static Contensive.Processor.Controllers.GenericController;
 using Contensive.Processor.Exceptions;
+using System.Linq;
 //
 namespace Contensive.Processor.Controllers {
     public class SecurityController {
@@ -41,20 +42,29 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="core"></param>
         /// <param name="token"></param>
-        /// <param name="returnNumber"></param>
-        /// <param name="returnDate"></param>
-        public static void decodeToken(CoreController core, string token, ref int returnNumber, ref DateTime returnDate) {
+        public static TokenData decodeToken(CoreController core, string token) {
+            var result = new TokenData();
             try {
-                returnNumber = 0;
-                returnDate = DateTime.MinValue;
                 string decodedString = twoWayDecrypt(core, token);
                 string[] parts = decodedString.Split(Convert.ToChar("\t"));
                 if (parts.Length == 2) {
-                    returnNumber = GenericController.encodeInteger(parts[0]);
-                    returnDate = GenericController.encodeDate(parts[1]);
+                    result.id = GenericController.encodeInteger(parts[0]);
+                    result.timeStamp = GenericController.encodeDate(parts[1]);
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex, "DecodeToken failure. Returning blank result for token [" + token + "]");
+            }
+            return result;
+        }
+        /// <summary>
+        /// token, initialize to 0 and mindate
+        /// </summary>
+        public class TokenData {
+            public int id;
+            public DateTime timeStamp;
+            public TokenData() {
+                id = 0;
+                timeStamp = DateTime.MinValue;
             }
         }
         //
@@ -67,7 +77,7 @@ namespace Contensive.Processor.Controllers {
         public static  string oneWayEncrypt(CoreController core, string password) {
             string returnResult = "";
             try {
-                returnResult = hashEncode.ComputeHash(password, "SHA512", null);
+                returnResult = HashEncode.computeHash(password, "SHA512", null);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
@@ -84,7 +94,7 @@ namespace Contensive.Processor.Controllers {
         public static bool oneWayVerify(CoreController core, string sourceToTest, string encryptedToken) {
             bool returnResult = false;
             try {
-                returnResult = hashEncode.VerifyHash(sourceToTest, "SHA512", encryptedToken);
+                returnResult = HashEncode.verifyHash(sourceToTest, "SHA512", encryptedToken);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
@@ -94,13 +104,13 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// return a DES encrypted string. This is a two way so use it for little sister security, not foreign government security
+        /// return an encrypted string. This is a two way so use it for little sister security, not foreign government security
         /// </summary>
         /// <param name="core"></param>
         /// <param name="sourceToEncrypt"></param>
         /// <param name="cipher">Select the cipher. Des is older, Aes is newer and more secure. The selection is provided </param>
         /// <returns></returns>
-        public static string twoWayEncrypt(CoreController core, string sourceToEncrypt, TwoWayCiphers cipher = TwoWayCiphers.aes) {
+        public static string twoWayEncrypt(CoreController core, string sourceToEncrypt, TwoWayCiphers cipher) {
             try {
                 if (cipher == TwoWayCiphers.aes) {
                     return Crypto.encryptStringAES(sourceToEncrypt, core.appConfig.privateKey);
@@ -113,16 +123,23 @@ namespace Contensive.Processor.Controllers {
                 return string.Empty;
             }
         }
+        /// <summary>
+        /// Return an AES encrypted string. This is a two way so use it for little sister security, not foreign government security
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="sourceToEncrypt"></param>
+        /// <returns></returns>
+        public static string twoWayEncrypt(CoreController core, string sourceToEncrypt) => twoWayEncrypt(core, sourceToEncrypt, TwoWayCiphers.aes);
         //
         //====================================================================================================
         /// <summary>
-        /// decrypt a token encrypted with twoWayEncrypt
+        /// Decrypt a token encrypted with twoWayEncrypt
         /// </summary>
         /// <param name="core"></param>
         /// <param name="sourceToDecrypt"></param>
         /// <param name="cipher"></param>
         /// <returns></returns>
-        public static string twoWayDecrypt(CoreController core, string sourceToDecrypt, TwoWayCiphers cipher = TwoWayCiphers.aes) {
+        public static string twoWayDecrypt(CoreController core, string sourceToDecrypt, TwoWayCiphers cipher) {
             try {
                 if (cipher == TwoWayCiphers.aes) {
                     return Crypto.decryptStringAES(sourceToDecrypt, core.appConfig.privateKey);
@@ -135,6 +152,13 @@ namespace Contensive.Processor.Controllers {
                 return string.Empty;
             }
         }
+        /// <summary>
+        /// Decrypt a token encrypted with twoWayEncrypt using AES
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="sourceToDecrypt"></param>
+        /// <returns></returns>
+        public static string twoWayDecrypt(CoreController core, string sourceToDecrypt) => twoWayDecrypt(core, sourceToDecrypt, TwoWayCiphers.aes);
         //
         //====================================================================================================
         /// <summary>
@@ -142,28 +166,22 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="sourceToEncrypt"></param>
         /// <returns></returns>
-        private static  string encryptDes(CoreController core, string sourceToEncrypt) {
+        private static string encryptDes(CoreController core, string sourceToEncrypt) {
             string returnResult = "";
             try {
                 if (string.IsNullOrEmpty(core.appConfig.privateKey)) {
                     //
                 } else {
-                    // Compute the MD5 hash.
+                    // Compute has key using DES
                     byte[] saltBytes = ASCIIEncoding.ASCII.GetBytes("notsorandomsalt");
-                    byte[] key = ASCIIEncoding.ASCII.GetBytes(hashEncode.ComputeHash(core.appConfig.privateKey,"SHA256",saltBytes));
+                    byte[] key = ASCIIEncoding.ASCII.GetBytes(HashEncode.computeHash(core.appConfig.privateKey,"SHA256",saltBytes));
                     Array.Resize(ref key, 24);
-                    //byte[] key = ASCIIEncoding.ASCII.GetBytes(core.appConfig.privateKey);
-                    //MD5CryptoServiceProvider hashMD5 = new MD5CryptoServiceProvider();
-                    //byte[] key = hashMD5.ComputeHash(ASCIIEncoding.ASCII.GetBytes(core.appConfig.privateKey));
                     TripleDESCryptoServiceProvider DES = new TripleDESCryptoServiceProvider {
                         Key = key,
                         Mode = CipherMode.ECB
                     };
-                    // Create the encryptor.
                     ICryptoTransform DESEncrypt = DES.CreateEncryptor();
-                    // Get a byte array of the string.
                     byte[] Buffer = ASCIIEncoding.ASCII.GetBytes(sourceToEncrypt);
-                    // Transform and return the string.
                     Buffer = DESEncrypt.TransformFinalBlock(Buffer, 0, Buffer.Length);
                     returnResult = Convert.ToBase64String(Buffer);
                 }
@@ -190,23 +208,17 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- source invalid, decrypt to blank
                 } else {
-                    // Compute the MD5 hash.
                     byte[] saltBytes = ASCIIEncoding.ASCII.GetBytes("notsorandomsalt");
-                    byte[] key = ASCIIEncoding.ASCII.GetBytes(hashEncode.ComputeHash(core.appConfig.privateKey, "SHA256", saltBytes));
+                    byte[] key = ASCIIEncoding.ASCII.GetBytes(HashEncode.computeHash(core.appConfig.privateKey, "SHA256", saltBytes));
                     Array.Resize(ref key, 24);
-                    //byte[] key = ASCIIEncoding.ASCII.GetBytes(core.appConfig.privateKey);
-                    //MD5CryptoServiceProvider hashMD5 = new MD5CryptoServiceProvider();
-                    //byte[] key = hashMD5.ComputeHash(ASCIIEncoding.ASCII.GetBytes(core.appConfig.privateKey));
                     byte[] buffer = System.Text.ASCIIEncoding.ASCII.GetBytes(core.appConfig.privateKey);
                     TripleDESCryptoServiceProvider DES = new TripleDESCryptoServiceProvider {
                         Key = key,
                         Mode = CipherMode.ECB
                     };
-                    // Create the decryptor.
                     ICryptoTransform DESDecrypt = DES.CreateDecryptor();
                     buffer = Convert.FromBase64String(sourceToDecrypt);
                     try {
-                        // Transform and return the string.
                         returnResult = System.Text.ASCIIEncoding.ASCII.GetString(DESDecrypt.TransformFinalBlock(buffer, 0, buffer.Length));
                     } catch (Exception ex) {
                         LogController.handleError( core,ex);
@@ -232,7 +244,7 @@ namespace Contensive.Processor.Controllers {
         /// also opt to keep results as byte arrays instead of converting them into
         /// base64-encoded strings.
         /// </summary>
-        private class hashEncode {
+        private static class HashEncode {
             //
             //==========================================================================================
             /// <summary>
@@ -258,105 +270,89 @@ namespace Contensive.Processor.Controllers {
             /// <returns>
             /// Hash value formatted as a base64-encoded string.
             /// </returns>
-            public static string ComputeHash(string plainText, string hashAlgorithm, byte[] saltBytes) {
-
-                // If salt is not specified, generate it on the fly.
-                if (saltBytes == null) {
-
-                    // Define min and max salt sizes.
-                    int minSaltSize = 0;
-                    int maxSaltSize = 0;
-
-                    minSaltSize = 4;
-                    maxSaltSize = 8;
-
+            public static string computeHash(string plainText, string hashAlgorithm, byte[] saltBytes) {
+                byte[] workingSalt;
+                if (saltBytes != null) {
+                    //
+                    // -- use provide sale
+                    workingSalt = saltBytes.ToArray();
+                } else {
+                    //
+                    // If salt is not specified, generate it on the fly.
+                    int minSaltSize = 4;
+                    int maxSaltSize = 8;
+                    //
                     // Generate a random number for the size of the salt.
-                    Random random = null;
-                    random = new Random();
-
+                    Random random = new Random();
                     int saltSize = random.Next(minSaltSize, maxSaltSize);
-
+                    //
                     // Allocate a byte array, which will hold the salt.
-                    saltBytes = new byte[saltSize];
-
-                    // Initialize a random number generator.
+                    workingSalt = new byte[saltSize];
+                    //
+                    // Initialize 
                     RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
-
+                    //
                     // Fill the salt with cryptographically strong byte values.
-                    rng.GetNonZeroBytes(saltBytes);
+                    rng.GetNonZeroBytes(workingSalt);
                 }
-
+                //
                 // Convert plain text into a byte array.
                 byte[] plainTextBytes = Encoding.UTF8.GetBytes(plainText);
-
+                //
                 // Allocate array, which will hold plain text and salt.
-                byte[] plainTextWithSaltBytes = new byte[plainTextBytes.Length + saltBytes.Length];
-
+                byte[] plainTextWithSaltBytes = new byte[plainTextBytes.Length + workingSalt.Length];
+                //
                 // Copy plain text bytes into resulting array.
-                int I = 0;
-                for (I = 0; I < plainTextBytes.Length; I++) {
-                    plainTextWithSaltBytes[I] = plainTextBytes[I];
+                for (int i = 0; i < plainTextBytes.Length; i++) {
+                    plainTextWithSaltBytes[i] = plainTextBytes[i];
                 }
-
+                //
                 // Append salt bytes to the resulting array.
-                for (I = 0; I < saltBytes.Length; I++) {
-                    plainTextWithSaltBytes[plainTextBytes.Length + I] = saltBytes[I];
+                for (int i = 0; i < workingSalt.Length; i++) {
+                    plainTextWithSaltBytes[plainTextBytes.Length + i] = workingSalt[i];
                 }
-
+                //
                 // Because we support multiple hashing algorithms, we must define
                 // hash object as a common (abstract) base class. We will specify the
                 // actual hashing algorithm class later during object creation.
                 HashAlgorithm hash = null;
-
-                // Make sure hashing algorithm name is specified.
-                if (hashAlgorithm == null) {
-                    hashAlgorithm = "";
-                }
-
-                // Initialize appropriate hashing algorithm class.
-                switch (hashAlgorithm.ToUpper()) {
-
+                switch ((hashAlgorithm != null) ? hashAlgorithm.ToUpperInvariant() : "") {
                     case "SHA1":
                         hash = new SHA1Managed();
-
                         break;
                     case "SHA256":
                         hash = new SHA256Managed();
-
                         break;
                     case "SHA384":
                         hash = new SHA384Managed();
-
                         break;
                     case "SHA512":
                         hash = new SHA512Managed();
-
                         break;
                     default:
                         hash = new MD5CryptoServiceProvider();
-
                         break;
                 }
-
+                //
                 // Compute hash value of our plain text with appended salt.
                 byte[] hashBytes = hash.ComputeHash(plainTextWithSaltBytes);
-
+                //
                 // Create array which will hold hash and original salt bytes.
-                byte[] hashWithSaltBytes = new byte[hashBytes.Length + saltBytes.Length];
-
+                byte[] hashWithSaltBytes = new byte[hashBytes.Length + workingSalt.Length];
+                //
                 // Copy hash bytes into resulting array.
-                for (I = 0; I < hashBytes.Length; I++) {
-                    hashWithSaltBytes[I] = hashBytes[I];
+                for (int i = 0; i < hashBytes.Length; i++) {
+                    hashWithSaltBytes[i] = hashBytes[i];
                 }
-
+                //
                 // Append salt bytes to the result.
-                for (I = 0; I < saltBytes.Length; I++) {
-                    hashWithSaltBytes[hashBytes.Length + I] = saltBytes[I];
+                for (int i = 0; i < workingSalt.Length; i++) {
+                    hashWithSaltBytes[hashBytes.Length + i] = workingSalt[i];
                 }
-
+                //
                 // Convert result into a base64-encoded string.
                 string hashValue = Convert.ToBase64String(hashWithSaltBytes);
-
+                //
                 // Return the result.
                 return hashValue;
             }
@@ -385,18 +381,13 @@ namespace Contensive.Processor.Controllers {
             /// If computed hash mathes the specified hash the function the return
             /// value is true; otherwise, the function returns false.
             /// </returns>
-            public static bool VerifyHash(string plainText, string hashAlgorithm, string hashValue) {
+            public static bool verifyHash(string plainText, string hashAlgorithm, string hashValue) {
                 // Convert base64-encoded hash value into a byte array.
                 byte[] hashWithSaltBytes = Convert.FromBase64String(hashValue);
+                //
                 // We must know size of hash (without salt).
                 int hashSizeInBits = 0;
-                int hashSizeInBytes = 0;
-                // Make sure that hashing algorithm name is specified.
-                if (hashAlgorithm == null) {
-                    hashAlgorithm = "";
-                }
-                // Size of hash is based on the specified algorithm.
-                switch (hashAlgorithm.ToUpper()) {
+                switch ((hashAlgorithm != null) ? hashAlgorithm.ToUpperInvariant() : "") {
                     case "SHA1":
                         hashSizeInBits = 160;
                         break;
@@ -414,68 +405,17 @@ namespace Contensive.Processor.Controllers {
                         break;
                 }
                 // Convert size of hash from bits to bytes.
-                hashSizeInBytes = encodeInteger(hashSizeInBits / 8.0);
-                // Make sure that the specified hash value is long enough.
-                if (hashWithSaltBytes.Length < hashSizeInBytes) {
-                }
-                // Allocate array to hold original salt bytes retrieved from hash.
-                byte[] saltBytes = new byte[hashWithSaltBytes.Length - hashSizeInBytes];
+                int hashSizeInBytes = encodeInteger(hashSizeInBits / 8.0);
+                //
                 // Copy salt from the end of the hash to the new array.
-                int I = 0;
-                for (I = 0; I < saltBytes.Length; I++) {
-                    saltBytes[I] = hashWithSaltBytes[hashSizeInBytes + I];
+                byte[] saltBytes = new byte[hashWithSaltBytes.Length - hashSizeInBytes];
+                for (int i = 0; i < saltBytes.Length; i++) {
+                    saltBytes[i] = hashWithSaltBytes[hashSizeInBytes + i];
                 }
                 // Compute a new hash string.
-                string expectedHashString = ComputeHash(plainText, hashAlgorithm, saltBytes);
+                string expectedHashString = computeHash(plainText, hashAlgorithm, saltBytes);
                 return (hashValue == expectedHashString);
             }
-        }
-        //
-        //====================================================================================================
-        // <summary>
-        /// The main entry point for the application.
-        /// </summary>
-        private void sampleUse() {
-
-            string password = null; // original password
-            string wrongPassword = null; // wrong password
-
-            password = "myP@5sw0rd";
-            wrongPassword = "password";
-
-            string passwordHashMD5 = null;
-            string passwordHashSha1 = null;
-            string passwordHashSha256 = null;
-            string passwordHashSha384 = null;
-            string passwordHashSha512 = null;
-
-            passwordHashMD5 = hashEncode.ComputeHash(password, "MD5", null);
-            passwordHashSha1 = hashEncode.ComputeHash(password, "SHA1", null);
-            passwordHashSha256 = hashEncode.ComputeHash(password, "SHA256", null);
-            passwordHashSha384 = hashEncode.ComputeHash(password, "SHA384", null);
-            passwordHashSha512 = hashEncode.ComputeHash(password, "SHA512", null);
-
-            Console.WriteLine("COMPUTING HASH VALUES");
-            Console.WriteLine("");
-            Console.WriteLine("MD5   : {0}", passwordHashMD5);
-            Console.WriteLine("SHA1  : {0}", passwordHashSha1);
-            Console.WriteLine("SHA256: {0}", passwordHashSha256);
-            Console.WriteLine("SHA384: {0}", passwordHashSha384);
-            Console.WriteLine("SHA512: {0}", passwordHashSha512);
-            Console.WriteLine("");
-
-            Console.WriteLine("COMPARING PASSWORD HASHES");
-            Console.WriteLine("");
-            Console.WriteLine("MD5    (good): {0}", hashEncode.VerifyHash(password, "MD5", passwordHashMD5).ToString());
-            Console.WriteLine("MD5    (bad) : {0}", hashEncode.VerifyHash(wrongPassword, "MD5", passwordHashMD5).ToString());
-            Console.WriteLine("SHA1   (good): {0}", hashEncode.VerifyHash(password, "SHA1", passwordHashSha1).ToString());
-            Console.WriteLine("SHA1   (bad) : {0}", hashEncode.VerifyHash(wrongPassword, "SHA1", passwordHashSha1).ToString());
-            Console.WriteLine("SHA256 (good): {0}", hashEncode.VerifyHash(password, "SHA256", passwordHashSha256).ToString());
-            Console.WriteLine("SHA256 (bad) : {0}", hashEncode.VerifyHash(wrongPassword, "SHA256", passwordHashSha256).ToString());
-            Console.WriteLine("SHA384 (good): {0}", hashEncode.VerifyHash(password, "SHA384", passwordHashSha384).ToString());
-            Console.WriteLine("SHA384 (bad) : {0}", hashEncode.VerifyHash(wrongPassword, "SHA384", passwordHashSha384).ToString());
-            Console.WriteLine("SHA512 (good): {0}", hashEncode.VerifyHash(password, "SHA512", passwordHashSha512).ToString());
-            Console.WriteLine("SHA512 (bad) : {0}", hashEncode.VerifyHash(wrongPassword, "SHA512", passwordHashSha512).ToString());
         }
         //
         //========================================================================
@@ -483,7 +423,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// A class for creating a symetric encryption
         /// </summary>
-        public class Crypto {
+        protected class Crypto {
             //
             //While an app specific salt is not the best practice for
             //password based encryption, it's probably safe enough as long as
@@ -567,7 +507,7 @@ namespace Contensive.Processor.Controllers {
                             aesAlg = new RijndaelManaged();
                             aesAlg.Key = key.GetBytes(aesAlg.KeySize / 8);
                             // Get the initialization vector from the encrypted stream
-                            aesAlg.IV = ReadByteArray(msDecrypt);
+                            aesAlg.IV = readByteArray(msDecrypt);
                             // Create a decrytor to perform the stream transform.
                             ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
                             using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read)) {
@@ -580,24 +520,23 @@ namespace Contensive.Processor.Controllers {
                         }
                     } finally {
                         // Clear the RijndaelManaged object.
-                        if (aesAlg != null)
+                        if (aesAlg != null) {
                             aesAlg.Clear();
+                        }
                     }
                     return plaintext;
                 }
             }
             //
-            private static byte[] ReadByteArray(Stream s) {
+            private static byte[] readByteArray(Stream s) {
                 byte[] rawLength = new byte[sizeof(int)];
                 if (s.Read(rawLength, 0, rawLength.Length) != rawLength.Length) {
                     throw new GenericException("Stream did not contain properly formatted byte array");
                 }
-
                 byte[] buffer = new byte[BitConverter.ToInt32(rawLength, 0)];
                 if (s.Read(buffer, 0, buffer.Length) != buffer.Length) {
                     throw new GenericException("Did not read byte array properly");
                 }
-
                 return buffer;
             }
         }

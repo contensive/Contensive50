@@ -11,7 +11,7 @@ using static Contensive.Processor.Tests.testConstants;
 namespace Contensive.Processor.Tests.Controllers {
     [TestClass()]
     public class _blank {
-        [TestMethod()]
+        [TestMethod]
         public void Controllers_blank() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange

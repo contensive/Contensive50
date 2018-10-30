@@ -14,7 +14,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         /// <summary>
         /// cp.cache save read
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void Views_cpCache_LegacySaveRead() {
             // arrange
             CPClass cp = new CPClass(testAppName);
@@ -30,7 +30,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         /// <summary>
         /// cp.cache save read
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void Views_cpCache_SetGet_integration() {
             // arrange
             CPClass cp = new CPClass(testAppName);
@@ -55,7 +55,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         /// <summary>
         /// cp.cache invalidateAll
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void Views_cpCache_InvalidateAll_integration() {
             // arrange
             CPClass cp = new CPClass(testAppName);
@@ -89,7 +89,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         /// <summary>
         /// cp.cache invalidateAll
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void Views_cpCache_InvalidateList_integration() {
             // arrange
             CPClass cp = new CPClass(testAppName);
@@ -129,7 +129,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         /// <summary>
         /// cp.cache invalidate on content save
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void Views_cpCache_TagInvalidationString() {
             // arrange
             CPClass cp = new CPClass(testAppName);

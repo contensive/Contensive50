@@ -15,7 +15,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
     //
     [TestClass()]
     public class dbControllerTests {
-        [TestMethod()]
+        [TestMethod]
         public void Controllers_db_encodeSqlTableNameTest() {
             // arrange
             // act
@@ -37,7 +37,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         /// <summary>
         /// set a value, close, open, and get it back
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void Controllers_db_csSetCloseOpenGetTest() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
@@ -81,7 +81,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         /// <summary>
         /// set a value and get it back
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void Controllers_db_csSetGetTest() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
@@ -103,7 +103,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         /// <summary>
         /// set a value and get it back
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void Controllers_db_csSetSaveGetTest() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
@@ -125,7 +125,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         //
         //====================================================================================================
         //
-        [TestMethod()]
+        [TestMethod]
         public void Controllers_db_csGetRowCount() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
@@ -142,7 +142,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         //
         //====================================================================================================
         //
-        [TestMethod()]
+        [TestMethod]
         public void Controllers_db_isSqlTableField() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
@@ -156,7 +156,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         //
         //====================================================================================================
         //
-        [TestMethod()]
+        [TestMethod]
         public void Controllers_db_csGoNext() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
@@ -196,7 +196,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         //
         //====================================================================================================
         //
-        [TestMethod()]
+        [TestMethod]
         public void Controllers_db_csGoFirst() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange

@@ -17,7 +17,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         //
         //====================================================================================================
         //
-        [TestMethod()]
+        [TestMethod]
         public void Controllers_CdnFiles_AppendTest() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
@@ -32,7 +32,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         //
         //====================================================================================================
         //
-        [TestMethod()]
+        [TestMethod]
         public void Controllers_CdnFiles_SaveTest() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
@@ -47,7 +47,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         //
         //====================================================================================================
         //
-        [TestMethod()]
+        [TestMethod]
         public void Controllers_CdnFiles_CopyTest() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
@@ -64,7 +64,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         //
         //====================================================================================================
         //
-        [TestMethod()]
+        [TestMethod]
         public void Controllers_CdnFiles_DeleteTest() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange

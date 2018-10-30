@@ -16,7 +16,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         /// <summary>
         /// simple syntax, one command, run addon
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void contentCmdController_SimpleSyntax_runAddon() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
@@ -37,7 +37,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         /// <summary>
         /// simple syntax, two commands, run addon
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void contentCmdController_SimpleSyntax_mulipleContextSwitch() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
@@ -62,7 +62,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         /// <summary>
         /// Multiple Command Syntax, one command, {%[{"command1":"commandArgument"},{"command2":"commandArgument"}]%}
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void contentCmdController_SimpleSyntax_CommandList() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
@@ -88,7 +88,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         /// <summary>
         /// Multiple Command Syntax, two commands, {%[{"command1":"commandArgument"},{"command2":"commandArgument"}]%}
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void contentCmdController_SimpleSyntax_CommandList_MultipleCommands() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
@@ -113,7 +113,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         /// <summary>
         /// json syntax, one command, run addon
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void contentCmdController_JsonSyntax() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
@@ -133,7 +133,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         /// <summary>
         /// json syntax, one command, run addon
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void contentCmdController_JsonSyntax_WithArgument() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
@@ -153,7 +153,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         /// <summary>
         /// json syntax, one command, run addon
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void Controllers_JsonSyntax_executeAddonTest_argumentReplacement() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange

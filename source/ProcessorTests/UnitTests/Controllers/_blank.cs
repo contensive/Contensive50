@@ -14,7 +14,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
     //
     [TestClass()]
     public class _blank {
-        [TestMethod()]
+        [TestMethod]
         //
         //====================================================================================================
         //

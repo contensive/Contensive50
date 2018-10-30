@@ -14,7 +14,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         /// <summary>
         /// cp.cs
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void Views_cpCS_OpenClose_test() {
             // arrange
             CPClass cp = new CPClass(testAppName);
@@ -50,7 +50,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         /// <summary>
         /// cp.cs.insert
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void Views_cpCS_Insert_Test() {
             // arrange
             CPClass cp = new CPClass(testAppName);
@@ -74,7 +74,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         /// <summary>
         /// cp.cs.insert
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void Views_cpCS_OpenRecord_Test() {
             // arrange
             CPClass cp = new CPClass(testAppName);
@@ -102,7 +102,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         /// <summary>
         /// cp.cs.OpenGroupUsers
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void Views_cpCS_OpenGroupUsers_Test() {
             // arrange
             CPClass cp = new CPClass(testAppName);
@@ -148,7 +148,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         /// <summary>
         /// cp.cs.FieldOK
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void Views_cpCS_FieldOK_Test() {
             // arrange
             CPClass cp = new CPClass(testAppName);
@@ -186,7 +186,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         /// <summary>
         /// cp.cs.Delete
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void Views_cpCS_Delete_Test() {
             // arrange
             CPClass cp = new CPClass(testAppName);
@@ -214,7 +214,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         /// <summary>
         /// cp.cs.Delete
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void Views_cpCS_SetGetField_Test() {
             // arrange
             CPClass cp = new CPClass(testAppName);
@@ -256,7 +256,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         /// <summary>
         /// cp.cs.Delete
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void Views_cpCS_GetRowCount_Test() {
             // arrange
             CPClass cp = new CPClass(testAppName);
@@ -301,7 +301,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         /// <summary>
         /// cp.cs.getSql
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void Views_cpCS_GetSql_Test() {
             // arrange
             CPClass cp = new CPClass(testAppName);

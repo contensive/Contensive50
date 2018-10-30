@@ -369,11 +369,9 @@ namespace Contensive.Processor.Controllers {
                     string CookieDetectKey = core.docProperties.getText(RequestNameCookieDetectVisitID);
                     if (!string.IsNullOrEmpty(CookieDetectKey)) {
                         //
-                        DateTime cookieDetectDate = new DateTime();
-                        int CookieDetectVisitId = 0;
-                        SecurityController.decodeToken(core,CookieDetectKey, ref CookieDetectVisitId, ref  cookieDetectDate);
-                        if (CookieDetectVisitId != 0) {
-                            core.db.executeNonQueryAsync("update ccvisits set CookieSupport=1 where id=" + CookieDetectVisitId);
+                        SecurityController.TokenData visitToken = SecurityController.decodeToken(core, CookieDetectKey);
+                        if (visitToken.id != 0) {
+                            core.db.executeNonQueryAsync("update ccvisits set CookieSupport=1 where id=" + visitToken.id);
                             core.doc.continueProcessing = false; //--- should be disposed by caller --- Call dispose
                             return core.doc.continueProcessing;
                         }

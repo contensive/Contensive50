@@ -42,7 +42,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         /// <summary>
         /// insert record, set (no-save), read, verify
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void csTests_InsertSetReadVerify() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange

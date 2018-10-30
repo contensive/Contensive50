@@ -18,7 +18,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         //
         //====================================================================================================
         //
-        [TestMethod()]
+        [TestMethod]
         public void Controllers_Security_blank() {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
@@ -30,7 +30,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         //
         //====================================================================================================
         //
-        [TestMethod()]
+        [TestMethod]
         public void Controllers_Security_twoWayEncode_des() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
@@ -54,7 +54,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         //
         //====================================================================================================
         //
-        [TestMethod()]
+        [TestMethod]
         public void Controllers_Security_twoWayEncode_aes() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
@@ -87,11 +87,9 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 string token = SecurityController.encodeToken(cp.core, testNumber, testDate);
                 //
                 // assert
-                int resultNumber = 0;
-                DateTime resultDate = DateTime.MinValue;
-                SecurityController.decodeToken(cp.core, token, ref resultNumber, ref resultDate);
-                Assert.AreEqual(testNumber, resultNumber);
-                Assert.AreEqual(testDate, resultDate);
+                var result = SecurityController.decodeToken(cp.core, token);
+                Assert.AreEqual(testNumber, result.id);
+                Assert.AreEqual(testDate, result.timeStamp);
             }
         }
 

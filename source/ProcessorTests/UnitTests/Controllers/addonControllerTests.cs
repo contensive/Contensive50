@@ -14,7 +14,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
     //
     [TestClass()]
     public class AddonControllerTests {
-        [TestMethod()]
+        [TestMethod]
         //
         //====================================================================================================
         //

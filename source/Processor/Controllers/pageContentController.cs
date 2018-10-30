@@ -893,13 +893,11 @@ namespace Contensive.Processor.Controllers {
                     // ----- Active Download hook
                     string RecordEID = core.docProperties.getText(RequestNameLibraryFileID);
                     if (!string.IsNullOrEmpty(RecordEID)) {
-                        DateTime tokenDate = default(DateTime);
-                        int downloadId = 0;
-                        SecurityController.decodeToken(core, RecordEID, ref downloadId, ref tokenDate);
-                        if (downloadId != 0) {
+                        var downloadToken = SecurityController.decodeToken(core, RecordEID);
+                        if (downloadToken.id != 0) {
                             //
                             // -- lookup record and set clicks
-                            LibraryFilesModel file = LibraryFilesModel.create(core, downloadId);
+                            LibraryFilesModel file = LibraryFilesModel.create(core, downloadToken.id);
                             if (file != null) {
                                 file.clicks += 1;
                                 file.save(core);
@@ -1455,17 +1453,12 @@ namespace Contensive.Processor.Controllers {
                         }
                         //
                         // Join Group requested by page that created form
-                        //
-                        DateTime tokenDate = default(DateTime);
-                        int GroupIDToJoinOnSuccess = 0;
-                        SecurityController.decodeToken(core, core.docProperties.getText("SuccessID"), ref GroupIDToJoinOnSuccess, ref tokenDate);
-                        //GroupIDToJoinOnSuccess = main_DecodeKeyNumber(main_GetStreamText2("SuccessID"))
-                        if (GroupIDToJoinOnSuccess != 0) {
-                            GroupController.group_AddGroupMember(core, GroupController.group_GetGroupName(core, GroupIDToJoinOnSuccess));
+                        var groupToken = SecurityController.decodeToken(core, core.docProperties.getText("SuccessID"));
+                        if ( groupToken.id != 0) {
+                            GroupController.group_AddGroupMember(core, GroupController.group_GetGroupName(core, groupToken.id));
                         }
                         //
                         // Join Groups requested by pageform
-                        //
                         if (f.AddGroupNameList != "") {
                             string[] Groups = (encodeText(f.AddGroupNameList).Trim(' ')).Split(',');
                             for (Ptr = 0; Ptr <= Groups.GetUpperBound(0); Ptr++) {

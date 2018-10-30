@@ -32,7 +32,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         //====================================================================================================
         // unit test - cp.blockNew
         //
-        [TestMethod()]
+        [TestMethod]
         public void Views_cpBlock_InnerOuterTest() {
             // arrange
             CPClass cpApp = new CPClass(testAppName);
@@ -93,7 +93,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         /// <summary>
         /// test block load and clear
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void Views_cpBlock_ClearTest() {
             CPClass cp = new CPClass(testAppName);
             CPBlockBaseClass block = cp.BlockNew();
@@ -109,7 +109,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         /// <summary>
         /// test block import
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void Views_cpBlock_ImportFileTest() {
             CPClass cp = new CPClass(testAppName);
             string filename = "cpBlockTest" + GetRandomInteger(cp.core).ToString() + ".html";
@@ -131,7 +131,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         /// <summary>
         /// test block openCopy
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void Views_cpBlock_OpenCopyTest() {
             CPClass cp = new CPClass(testAppName);
             string recordName = "cpBlockTest" + GetRandomInteger(cp.core).ToString();
@@ -159,7 +159,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         /// <summary>
         /// test block openFile
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void Views_cpBlock_OpenFileTest() {
             CPClass cp = new CPClass(testAppName);
             string filename = "cpBlockTest" + GetRandomInteger(cp.core).ToString() + ".html";
@@ -179,7 +179,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         /// <summary>
         /// test block openCopy
         /// </summary>
-        [TestMethod()]
+        [TestMethod]
         public void Views_cpBlock_OpenLayoutTest() {
             CPClass cp = new CPClass(testAppName);
             string recordName = "cpBlockTest" + GetRandomInteger(cp.core).ToString();
@@ -206,7 +206,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         //====================================================================================================
         // unit test - cp.blockNew
         //
-        [TestMethod()]
+        [TestMethod]
         public void Views_cpBlock_AppendPrependTest() {
             // arrange
             CPClass cpApp = new CPClass(testAppName);
@@ -232,7 +232,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
     //
     public class coreCommonTests {
         //
-        [TestMethod()]
+        [TestMethod]
         public void normalizePath_unit() {
             // arrange
             // act
@@ -248,7 +248,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
             Assert.AreEqual(FileController.normalizeDosPath("/test/"), "test\\");
         }
         //
-        [TestMethod()]
+        [TestMethod]
         public void normalizeRoute_unit() {
             // arrange
             // act
@@ -262,7 +262,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
             Assert.AreEqual(normalizeRoute("test//"), "/test");
         }
         //
-        [TestMethod()]
+        [TestMethod]
         public void encodeText_unit() {
             // arrange
             // act
@@ -270,7 +270,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
             Assert.AreEqual(encodeText(1), "1");
         }
         //
-        [TestMethod()]
+        [TestMethod]
         public void sample_unit() {
             // arrange
             // act
@@ -278,7 +278,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
             Assert.AreEqual(true, true);
         }
         //
-        [TestMethod()]
+        [TestMethod]
         public void dateToSeconds_unit() {
             // arrange
             // act
@@ -287,7 +287,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
             Assert.AreEqual(dateToSeconds(new DateTime(1900, 1, 2)), 86400);
         }
         //
-        [TestMethod()]
+        [TestMethod]
         public void ModifyQueryString_unit() {
             // arrange
             // act
@@ -299,7 +299,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
             Assert.AreEqual("a=1&b=2", modifyQueryString("a=1", "b", "2", true));
         }
         //
-        [TestMethod()]
+        [TestMethod]
         public void ModifyLinkQuery_unit() {
             // arrange
             // act
@@ -311,7 +311,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
             Assert.AreEqual("index.html?a=1&b=2", modifyLinkQuery("index.html?a=1", "b", "2", true));
         }
         //
-        [TestMethod()]
+        [TestMethod]
         public void vbInstr_test() {
             //genericController.vbInstr(1, Link, "?")
             Assert.AreEqual("abcdefgabcdefgabcdefgabcdefg".IndexOf("d") + 1, vbInstr("abcdefgabcdefgabcdefgabcdefg", "d"));
@@ -331,21 +331,21 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
             }
         }
         //
-        [TestMethod()]
+        [TestMethod]
         public void vbUCase_test() {
             Assert.AreEqual("AbCdEfG".ToUpper(), vbUCase("AbCdEfG"));
             Assert.AreEqual("ABCDEFG".ToUpper(), vbUCase("ABCDEFG"));
             Assert.AreEqual("abcdefg".ToUpper(), vbUCase("abcdefg"));
         }
         //
-        [TestMethod()]
+        [TestMethod]
         public void vbLCase_test() {
             Assert.AreEqual("AbCdEfG".ToLowerInvariant(), vbLCase("AbCdEfG"));
             Assert.AreEqual("ABCDEFG".ToLowerInvariant(), vbLCase("ABCDEFG"));
             Assert.AreEqual("abcdefg".ToLowerInvariant(), vbLCase("abcdefg"));
         }
         //
-        [TestMethod()]
+        [TestMethod]
         public void vbLeft_test() {
             Assert.AreEqual("AbCdEfG".ToLowerInvariant(), vbLCase("AbCdEfG"));
         }
@@ -360,7 +360,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         //====================================================================================================
         // unit test - cp.addVar
         //
-        [TestMethod()]
+        [TestMethod]
         public void Views_cpBlock_AddVar_unit() {
             // arrange
             CPClass cp = new CPClass();
@@ -390,7 +390,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         //====================================================================================================
         // unit test - cp.appOk
         //
-        [TestMethod()]
+        [TestMethod]
         public void Views_cpBlock_AppOk_unit() {
             // arrange
             CPClass cp = new CPClass();
@@ -408,7 +408,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         //====================================================================================================
         // unit test - sample
         //
-        [TestMethod()]
+        [TestMethod]
         public void Views_cpBlock_sample_unit() {
             // arrange
             CPClass cp = new CPClass();
