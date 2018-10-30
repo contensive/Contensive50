@@ -710,11 +710,25 @@ namespace Contensive.Processor.Controllers {
                             case "import": {
                                     throw new NotImplementedException("import contentCmd");
                                 }
+                            case "userproperty":
                             case "user": {
-                                    throw new NotImplementedException("user contentCmd");
+                                    CmdAccumulator = "";
+                                    string ArgName = "";
+                                    foreach (KeyValuePair<string, object> kvp in cmdArgDef) {
+                                        switch (kvp.Key.ToLower()) {
+                                            case "name":
+                                            case "default":
+                                                ArgName = (string)kvp.Value;
+                                                break;
+                                        }
+                                    }
+                                    if (!string.IsNullOrEmpty(ArgName)) {
+                                        CmdAccumulator = core.userProperty.getText(ArgName, "");
+                                    }
+                                    break;
                                 }
+                            case "siteproperty":
                             case "site": {
-                                    throw new NotImplementedException("site contentCmd");
                                     //
                                     // returns a site property
                                     //
@@ -723,17 +737,20 @@ namespace Contensive.Processor.Controllers {
                                     // default argument
                                     //   name
                                     //
-                                    //CmdAccumulator = ""
-                                    //ArgName = ""
-                                    //For Ptr = 0 To cmdArgDef.Count - 1
-                                    //    Select Case genericController.vbLCase(cmdArgDef.Keys[Ptr])
-                                    //        Case "name", "default"
-                                    //            ArgName = cmdArgDef.Item[Ptr]
-                                    //    End Select
-                                    //Next
-                                    //If ArgName <> "" Then
-                                    //    CmdAccumulator = core.app.siteProperty_getText(ArgName, "")
-                                    //End If
+                                    CmdAccumulator = "";
+                                    string ArgName = "";
+                                    foreach (KeyValuePair<string, object> kvp in cmdArgDef) {
+                                        switch (kvp.Key.ToLower()) {
+                                            case "name":
+                                            case "default":
+                                                ArgName = (string)kvp.Value;
+                                                break;
+                                        }
+                                    }
+                                    if (!string.IsNullOrEmpty(ArgName)) {
+                                        CmdAccumulator = core.siteProperties.getText(ArgName, "");
+                                    }
+                                    break;
                                 }
                             case "set": {
                                     throw new NotImplementedException("set contentCmd");

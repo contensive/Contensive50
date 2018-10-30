@@ -5709,6 +5709,9 @@ namespace Contensive.Addons.AdminSite {
                         adminContext.FormInputCount = adminContext.FormInputCount + 1;
                         field_readOnly = false;
                         //
+                        LogController.logInfo(core, "getForm_edit_tab, field [" + field.nameLc + "], field type id [" + field.fieldTypeId + "]");
+                        //
+                        //
                         // Read only Special Cases
                         //
                         if (IsLandingPage) {
@@ -5791,6 +5794,8 @@ namespace Contensive.Addons.AdminSite {
                         }
                         bool useEditorAddon = false;
                         if (editorAddonID != 0) {
+                            //
+                            LogController.logInfo(core, "getForm_edit_tab, use customer editor addon [" + editorAddonID + "]");
                             //
                             //--------------------------------------------------------------------------------------------
                             // ----- Custom Editor
@@ -5895,17 +5900,23 @@ namespace Contensive.Addons.AdminSite {
                                     case FieldTypeIdLink:
                                     case FieldTypeIdResourceLink:
                                         //
+                                        LogController.logInfo(core, "getForm_edit_tab, read-only, text");
+                                        //
                                         // ----- Text Type
                                         EditorString += AdminUIController.getDefaultEditor_Text(core, field.nameLc, fieldValue_text, true, fieldHtmlId);
                                         return_NewFieldList += "," + field.nameLc;
                                         break;
                                     case FieldTypeIdBoolean:
                                         //
+                                        LogController.logInfo(core, "getForm_edit_tab, read-only, boolean");
+                                        //
                                         // ----- Boolean ReadOnly
                                         EditorString += AdminUIController.getDefaultEditor_Bool(core, field.nameLc, GenericController.encodeBoolean(fieldValue_object), true, fieldHtmlId);
                                         return_NewFieldList += "," + field.nameLc;
                                         break;
                                     case FieldTypeIdLookup:
+                                        //
+                                        LogController.logInfo(core, "getForm_edit_tab, read-only, lookup");
                                         //
                                         // ----- Lookup, readonly
                                         if (field.lookupContentID != 0) {
@@ -5923,11 +5934,15 @@ namespace Contensive.Addons.AdminSite {
                                         break;
                                     case FieldTypeIdDate:
                                         //
+                                        LogController.logInfo(core, "getForm_edit_tab, read-only, date");
+                                        //
                                         // ----- date, readonly
                                         return_NewFieldList += "," + field.nameLc;
                                         EditorString = AdminUIController.getDefaultEditor_Date(core, field.nameLc, GenericController.encodeDate(fieldValue_object), field.readOnly, fieldHtmlId, field.required, WhyReadOnlyMsg);
                                         break;
                                     case FieldTypeIdMemberSelect:
+                                        //
+                                        LogController.logInfo(core, "getForm_edit_tab, read-only, memberselect");
                                         //
                                         // ----- Member Select ReadOnly
                                         //
@@ -5936,6 +5951,8 @@ namespace Contensive.Addons.AdminSite {
                                         //
                                         break;
                                     case FieldTypeIdManyToMany:
+                                        //
+                                        LogController.logInfo(core, "getForm_edit_tab, read-only, manytomany");
                                         //
                                         //   Placeholder
                                         //
@@ -5951,6 +5968,8 @@ namespace Contensive.Addons.AdminSite {
                                         break;
                                     case FieldTypeIdCurrency:
                                         //
+                                        LogController.logInfo(core, "getForm_edit_tab, read-only, currency");
+                                        //
                                         // ----- Currency ReadOnly
                                         //
                                         return_NewFieldList += "," + field.nameLc;
@@ -5965,6 +5984,8 @@ namespace Contensive.Addons.AdminSite {
                                     case FieldTypeIdFloat:
                                     case FieldTypeIdInteger:
                                         //
+                                        LogController.logInfo(core, "getForm_edit_tab, read-only, number");
+                                        //
                                         // ----- number readonly
                                         //
                                         return_NewFieldList += "," + field.nameLc;
@@ -5975,6 +5996,8 @@ namespace Contensive.Addons.AdminSite {
                                         break;
                                     case FieldTypeIdHTML:
                                     case FieldTypeIdFileHTML:
+                                        //
+                                        LogController.logInfo(core, "getForm_edit_tab, read-only, html");
                                         //
                                         // ----- HTML types readonly
                                         //
@@ -5998,6 +6021,8 @@ namespace Contensive.Addons.AdminSite {
                                     case FieldTypeIdLongText:
                                     case FieldTypeIdFileText:
                                         //
+                                        LogController.logInfo(core, "getForm_edit_tab, read-only, longtext");
+                                        //
                                         // ----- LongText, TextFile
                                         //
                                         return_NewFieldList += "," + field.nameLc;
@@ -6008,6 +6033,8 @@ namespace Contensive.Addons.AdminSite {
                                         break;
                                     case FieldTypeIdFile:
                                     case FieldTypeIdFileImage:
+                                        //
+                                        LogController.logInfo(core, "getForm_edit_tab, read-only, file");
                                         //
                                         // ----- File ReadOnly
                                         //
@@ -6028,6 +6055,8 @@ namespace Contensive.Addons.AdminSite {
                                         //
                                         break;
                                     default:
+                                        //
+                                        LogController.logInfo(core, "getForm_edit_tab, read-only, default");
                                         //
                                         // ----- Legacy text type -- not used unless something was missed
                                         //
@@ -6081,6 +6110,8 @@ namespace Contensive.Addons.AdminSite {
                                 switch (fieldTypeId) {
                                     case FieldTypeIdText:
                                         //
+                                        LogController.logInfo(core, "getForm_edit_tab, text");
+                                        //
                                         // ----- Text Type
                                         if (field.password) {
                                             EditorString += AdminUIController.getDefaultEditor_Password(core, field.nameLc, fieldValue_text, false, fieldHtmlId);
@@ -6091,11 +6122,15 @@ namespace Contensive.Addons.AdminSite {
                                         break;
                                     case FieldTypeIdBoolean:
                                         //
+                                        LogController.logInfo(core, "getForm_edit_tab, boolean");
+                                        //
                                         // ----- Boolean
                                         EditorString += AdminUIController.getDefaultEditor_Bool(core, field.nameLc, GenericController.encodeBoolean(fieldValue_object), false, fieldHtmlId);
                                         return_NewFieldList += "," + field.nameLc;
                                         break;
                                     case FieldTypeIdLookup:
+                                        //
+                                        LogController.logInfo(core, "getForm_edit_tab, lookup");
                                         //
                                         // ----- Lookup
                                         if (field.lookupContentID != 0) {
@@ -6113,11 +6148,15 @@ namespace Contensive.Addons.AdminSite {
                                         break;
                                     case FieldTypeIdDate:
                                         //
+                                        LogController.logInfo(core, "getForm_edit_tab, date");
+                                        //
                                         // ----- Date
                                         return_NewFieldList += "," + field.nameLc;
                                         EditorString = AdminUIController.getDefaultEditor_Date(core, field.nameLc, GenericController.encodeDate(fieldValue_object), field.readOnly, fieldHtmlId, field.required, WhyReadOnlyMsg);
                                         break;
                                     case FieldTypeIdMemberSelect:
+                                        //
+                                        LogController.logInfo(core, "getForm_edit_tab, memberselect");
                                         //
                                         // ----- Member Select
                                         //
@@ -6126,18 +6165,15 @@ namespace Contensive.Addons.AdminSite {
                                         break;
                                     case FieldTypeIdManyToMany:
                                         //
+                                        LogController.logInfo(core, "getForm_edit_tab, many-to-many");
+                                        //
                                         //   Placeholder
                                         EditorString = AdminUIController.getDefaultEditor_manyToMany(core, field, "field" + field.id, fieldValue_text, editRecord.id, false, WhyReadOnlyMsg);
-                                        //MTMContent0 = cdefModel.getContentNameByID(core, field.contentId);
-                                        //MTMContent1 = cdefModel.getContentNameByID(core, field.manyToManyContentID);
-                                        //MTMRuleContent = cdefModel.getContentNameByID(core, field.manyToManyRuleContentID);
-                                        //MTMRuleField0 = field.ManyToManyRulePrimaryField;
-                                        //MTMRuleField1 = field.ManyToManyRuleSecondaryField;
-                                        //EditorString += core.html.getCheckList("ManyToMany" + field.id, MTMContent0, editRecord.id, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, "", "", false, false, fieldValue_text);
-                                        ////EditorString &= (core.html.getInputCheckListCategories("ManyToMany" & .id, MTMContent0, editRecord.id, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, , , False, MTMContent1, FieldValueText))
                                         break;
                                     case FieldTypeIdFile:
                                     case FieldTypeIdFileImage:
+                                        //
+                                        LogController.logInfo(core, "getForm_edit_tab, file");
                                         //
                                         // ----- File
                                         return_NewFieldList += "," + field.nameLc;
@@ -6161,6 +6197,8 @@ namespace Contensive.Addons.AdminSite {
                                     case FieldTypeIdFloat:
                                     case FieldTypeIdInteger:
                                         //
+                                        LogController.logInfo(core, "getForm_edit_tab, number");
+                                        //
                                         // ----- Others that simply print
                                         return_NewFieldList += "," + field.nameLc;
                                         if (field.password) {
@@ -6179,6 +6217,8 @@ namespace Contensive.Addons.AdminSite {
                                         break;
                                     case FieldTypeIdLink:
                                         //
+                                        LogController.logInfo(core, "getForm_edit_tab, link");
+                                        //
                                         // ----- Link (href value
                                         //
                                         return_NewFieldList += "," + field.nameLc;
@@ -6188,6 +6228,8 @@ namespace Contensive.Addons.AdminSite {
                                         break;
                                     case FieldTypeIdResourceLink:
                                         //
+                                        LogController.logInfo(core, "getForm_edit_tab, resource link");
+                                        //
                                         // ----- Resource Link (src value)
                                         //
                                         return_NewFieldList += "," + field.nameLc;
@@ -6195,6 +6237,8 @@ namespace Contensive.Addons.AdminSite {
                                         break;
                                     case FieldTypeIdHTML:
                                     case FieldTypeIdFileHTML:
+                                        //
+                                        LogController.logInfo(core, "getForm_edit_tab, html");
                                         //
                                         // content is html
                                         //
@@ -6223,6 +6267,8 @@ namespace Contensive.Addons.AdminSite {
                                     case FieldTypeIdLongText:
                                     case FieldTypeIdFileText:
                                         //
+                                        LogController.logInfo(core, "getForm_edit_tab, long text");
+                                        //
                                         // -- Long Text, use text editor
                                         return_NewFieldList += "," + field.nameLc;
                                         FieldRows = (core.userProperty.getInteger(adminContext.adminContent.name + "." + field.nameLc + ".RowHeight", 10));
@@ -6231,12 +6277,16 @@ namespace Contensive.Addons.AdminSite {
                                         break;
                                     case FieldTypeIdFileCSS:
                                         //
+                                        LogController.logInfo(core, "getForm_edit_tab, css");
+                                        //
                                         // ----- CSS field
                                         return_NewFieldList += "," + field.nameLc;
                                         FieldRows = (core.userProperty.getInteger(adminContext.adminContent.name + "." + field.nameLc + ".RowHeight", 10));
                                         EditorString = HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, 10, -1, "", false, false, "styles form-control");
                                         break;
                                     case FieldTypeIdFileJavascript:
+                                        //
+                                        LogController.logInfo(core, "getForm_edit_tab, js");
                                         //
                                         // ----- Javascript field
                                         return_NewFieldList += "," + field.nameLc;
@@ -6246,6 +6296,8 @@ namespace Contensive.Addons.AdminSite {
                                         break;
                                     case FieldTypeIdFileXML:
                                         //
+                                        LogController.logInfo(core, "getForm_edit_tab, xml");
+                                        //
                                         // ----- xml field
                                         return_NewFieldList += "," + field.nameLc;
                                         FieldRows = (core.userProperty.getInteger(adminContext.adminContent.name + "." + field.nameLc + ".RowHeight", 10));
@@ -6253,6 +6305,8 @@ namespace Contensive.Addons.AdminSite {
                                         //
                                         break;
                                     default:
+                                        //
+                                        LogController.logInfo(core, "getForm_edit_tab, default");
                                         //
                                         // ----- Legacy text type -- not used unless something was missed
                                         //
