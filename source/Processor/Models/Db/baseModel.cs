@@ -394,7 +394,7 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="core"></param>
         /// <param name="recordId"></param>
         /// <returns></returns>
-        protected static T create<T>(CoreController core, int recordId) where T : BaseModel {
+        public static T create<T>(CoreController core, int recordId) where T : BaseModel {
             var tempVar = new List<string>();
             return create<T>(core, recordId, ref tempVar);
         }
@@ -476,7 +476,7 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="core"></param>
         /// <param name="recordGuid"></param>
         /// <returns></returns>
-        protected static T create<T>(CoreController core, string recordGuid) where T : BaseModel {
+        public static T create<T>(CoreController core, string recordGuid) where T : BaseModel {
             var tempVar = new List<string>();
             return create<T>(core, recordGuid, ref tempVar);
         }
@@ -531,7 +531,7 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="core"></param>
         /// <param name="recordName"></param>
         /// <returns></returns>
-        protected static T createByUniqueName<T>(CoreController core, string recordName) where T : BaseModel {
+        public static T createByUniqueName<T>(CoreController core, string recordName) where T : BaseModel {
             var cacheNameList = new List<string>();
             return createByUniqueName<T>(core, recordName, ref cacheNameList);
         }

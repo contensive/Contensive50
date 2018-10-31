@@ -190,15 +190,15 @@ namespace Contensive.Processor {
                 if (layoutRecordNameOrGuid.IsNumeric()) {
                     //
                     // -- recordId
-                    layout = LayoutModel.create(core, GenericController.encodeInteger(layoutRecordNameOrGuid));
+                    layout = LayoutModel.create<LayoutModel>(core, GenericController.encodeInteger(layoutRecordNameOrGuid));
                 } else if (GenericController.isGuid(layoutRecordNameOrGuid)) {
                     //
                     // -- record guid
-                    layout = LayoutModel.create(core, layoutRecordNameOrGuid);
+                    layout = LayoutModel.create<LayoutModel>(core, layoutRecordNameOrGuid);
                 } else {
                     //
                     // -- record name
-                    layout = LayoutModel.createByUniqueName(core, layoutRecordNameOrGuid);
+                    layout = LayoutModel.createByUniqueName<LayoutModel>(core, layoutRecordNameOrGuid);
                 }
                 if (layout != null) {
                     accum = layout.layout.content;
