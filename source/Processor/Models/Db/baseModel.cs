@@ -60,7 +60,6 @@ namespace Contensive.Processor.Models.Db {
         //====================================================================================================
         //-- const must be set in derived clases
         //
-        //Public Const contentName As String = "" '<------ set content name
         //Public Const contentTableName As String = "" '<------ set to tablename for the primary content (used for cache names)
         //Public Const contentDataSource As String = "" '<----- set to datasource if not default
         //
@@ -190,21 +189,21 @@ namespace Contensive.Processor.Models.Db {
         /// optionally used to sort recrods in the table
         /// </summary>
         public string sortOrder { get; set; }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// return the name of the content (metadata for the table) for the derived class
-        /// </summary>
-        /// <param name="derivedType"></param>
-        /// <returns></returns>
-        private static string derivedContentName(Type derivedType) {
-            FieldInfo fieldInfo = derivedType.GetField("contentName");
-            if (fieldInfo == null) {
-                throw new GenericException("Class [" + derivedType.Name + "] must declare constant [contentName].");
-            } else {
-                return fieldInfo.GetRawConstantValue().ToString();
-            }
-        }
+        ////
+        ////====================================================================================================
+        ///// <summary>
+        ///// return the name of the content (metadata for the table) for the derived class
+        ///// </summary>
+        ///// <param name="derivedType"></param>
+        ///// <returns></returns>
+        //private static string derivedContentName(Type derivedType) {
+        //    FieldInfo fieldInfo = derivedType.GetField("contentName");
+        //    if (fieldInfo == null) {
+        //        throw new GenericException("Class [" + derivedType.Name + "] must declare constant [contentName].");
+        //    } else {
+        //        return fieldInfo.GetRawConstantValue().ToString();
+        //    }
+        //}
         //
         //====================================================================================================
         /// <summary>
@@ -591,7 +590,6 @@ namespace Contensive.Processor.Models.Db {
                 if (row != null ) {
                     //filename = GenericController.encodeText(dt.Rows[0][instanceProperty.Name]);
                     Type instanceType = typeof(T);
-                    //string contentName = derivedContentName(instanceType);
                     string tableName = derivedTableName(instanceType);
                     int recordId = GenericController.encodeInteger(row["id"]);
                     modelInstance = (T)Activator.CreateInstance(instanceType);

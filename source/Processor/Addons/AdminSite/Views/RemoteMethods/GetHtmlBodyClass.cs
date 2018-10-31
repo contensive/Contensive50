@@ -125,7 +125,6 @@ namespace Contensive.Addons.AdminSite {
             string result = "";
             try {
                 // todo convert to jquery bind
-                core.html.addScriptCode_onLoad("document.getElementsByTagName('BODY')[0].onclick = BodyOnClick;", "Contensive");
                 core.doc.setMetaContent(0, 0);
                 //
                 // turn off chrome protection against submitting html content

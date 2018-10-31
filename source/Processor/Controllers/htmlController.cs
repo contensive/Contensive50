@@ -3593,13 +3593,39 @@ namespace Contensive.Processor.Controllers {
             return result.ToString();
         }
         //
-        public static string div(string innerHtml) => genericBlockTag("div", innerHtml, "", "", "");
+        //====================================================================================================
         //
-        public static string div(string innerHtml, string htmlName) => genericBlockTag("div", innerHtml, htmlName, "", "");
+        public static string li(string innerHtml) => genericBlockTag("li", innerHtml);
         //
-        public static string div(string innerHtml, string htmlName, string htmlClass) => genericBlockTag("div", innerHtml, htmlName, htmlClass, "");
+        public static string li(string innerHtml, string htmlClass) => genericBlockTag("li", innerHtml, htmlClass, "");
         //
-        public static string div(string innerHtml, string htmlName, string htmlClass, string htmlId) => genericBlockTag("div", innerHtml, htmlName, htmlClass, htmlId);
+        public static string li(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("li", innerHtml, htmlClass, htmlId);
+        //
+        //====================================================================================================
+        //
+        public static string ol(string innerHtml) => genericBlockTag("ol", innerHtml);
+        //
+        public static string ol(string innerHtml, string htmlClass) => genericBlockTag("ol", innerHtml, htmlClass);
+        //
+        public static string ol(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("ol", innerHtml, htmlClass, htmlId);
+        //
+        //====================================================================================================
+        //
+        public static string ul(string innerHtml) => genericBlockTag("ul", innerHtml, "", "", "");
+        //
+        public static string ul(string innerHtml, string htmlClass) => genericBlockTag("ul", innerHtml, htmlClass);
+        //
+        public static string ul(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("ul", innerHtml, htmlClass, htmlId);
+        //
+        //====================================================================================================
+        //
+        public static string div(string innerHtml) => genericBlockTag("div", innerHtml);
+        //
+        public static string div(string innerHtml, string htmlClass) => genericBlockTag("div", innerHtml, htmlClass);
+        //
+        public static string div(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("div", innerHtml, htmlClass, htmlId);
+        //
+        //====================================================================================================
         //
         public static string p(string innerHtml) => genericBlockTag("p", innerHtml, "", "", "");
         //
@@ -3607,11 +3633,15 @@ namespace Contensive.Processor.Controllers {
         //
         public static string p(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("p", innerHtml, htmlClass, htmlId, "");
         //
+        //====================================================================================================
+        //
         public static string h1(string innerHtml) => genericBlockTag("h1", innerHtml, "", "", "");
         //
         public static string h1(string innerHtml, string htmlClass) => genericBlockTag("h1", innerHtml, htmlClass, "", "");
         //
         public static string h1(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("h1", innerHtml, htmlClass, htmlId, "");
+        //
+        //====================================================================================================
         //
         public static string h2(string innerHtml) => genericBlockTag("h2", "", "", "", "");
         //
@@ -3619,11 +3649,15 @@ namespace Contensive.Processor.Controllers {
         //
         public static string h2(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("h2", innerHtml, htmlClass, htmlId, "");
         //
+        //====================================================================================================
+        //
         public static string h3(string innerHtml) => genericBlockTag("h3", innerHtml, "", "", "");
         //
         public static string h3(string innerHtml, string htmlClass) => genericBlockTag("h3", innerHtml, htmlClass, "", "");
         //
         public static string h3(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("h3", innerHtml, htmlClass, htmlId, "");
+        //
+        //====================================================================================================
         //
         public static string h4(string innerHtml) => genericBlockTag("h4", innerHtml, "", "", "");
         //
@@ -3631,17 +3665,23 @@ namespace Contensive.Processor.Controllers {
         //
         public static string h4(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("h4", innerHtml, htmlClass, htmlId, "");
         //
+        //====================================================================================================
+        //
         public static string h5(string innerHtml) => genericBlockTag("h5", innerHtml, "", "", "");
         //
         public static string h5(string innerHtml, string htmlClass) => genericBlockTag("h5", innerHtml, htmlClass, "", "");
         //
         public static string h5(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("h5", innerHtml, htmlClass, htmlId, "");
         //
+        //====================================================================================================
+        //
         public static string h6(string innerHtml) => genericBlockTag("h6", innerHtml, "", "", "");
         //
         public static string h6(string innerHtml, string htmlClass) => genericBlockTag("h6", innerHtml, htmlClass, "", "");
         //
         public static string h6(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("h6", innerHtml, htmlClass, htmlId, "");
+        //
+        //====================================================================================================
         //
         public static string label(string innerHtml, string forHtmlId = "", string htmlClass = "", string htmlId = "") {
             string s = "";

@@ -1194,7 +1194,8 @@
   <Addon name="Contensive Base Assets" guid="{F83EE7F9-79DA-4B3F-A1CD-45AEAD93D70F}" type="Add-on">
     <BlockEditTools>Yes</BlockEditTools>
     <IncludeAddon name="JQuery" guid="{9C882078-0DAC-48E3-AD4B-CF2AA230DF80}"/>
-    <IncludeAddon name="Bootstrap" guid="{EF1FD66C-D62F-4BD2-BF07-38F47996EBB3}"/>
+    <IncludeAddon name="Bootstrap Styles" guid="{EF1FD66C-D62F-4BD2-BF07-38F47996EBB3}"/>
+    <IncludeAddon name="Bootstrap Javascript" guid="{0D898BA4-E5FC-474A-82A3-E52DEFC307E5}"/>
   </Addon>
   <Addon name="Admin Site" guid="{c2de2acf-ca39-4668-b417-aa491e7d8460}" type="Add-on">
     <DotNetClass><![CDATA[Contensive.Addons.AdminSite.GetHtmlBodyClass]]></DotNetClass>
