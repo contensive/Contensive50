@@ -72,11 +72,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="defaultText"></param>
         /// <returns></returns>
         public static string encodeEmpty(string sourceText, string defaultText) {
-            string returnText = sourceText;
-            if (string.IsNullOrEmpty(returnText)) {
-                returnText = defaultText;
-            }
-            return returnText;
+            return (String.IsNullOrWhiteSpace(sourceText)) ? defaultText : sourceText;
         }
         //
         //====================================================================================================

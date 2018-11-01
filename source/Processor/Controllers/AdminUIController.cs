@@ -1448,7 +1448,7 @@ namespace Contensive.Processor {
         public static string getIconDeleteLink(string link) { return HtmlController.a(iconDelete, link); }
         public static string getIconArrowRightLink(string link) { return HtmlController.a(iconArrowRight, link); }
         public static string getIconArrowLeftLink(string link) { return HtmlController.a(iconArrowLeft, link); }
-        public static string getIconPlusLink(string link, string caption = "") { return HtmlController.a(iconPlus + caption, link); }
+        public static string getIconPlusLink(string link, string caption = "") { return HtmlController.a(iconAdd + caption, link); }
         public static string getIconExpandLink(string link) { return HtmlController.a(iconExpand, link); }
         public static string getIconContractLink(string link) { return HtmlController.a(iconContract, link); }
         //
@@ -1571,7 +1571,7 @@ namespace Contensive.Processor {
                                 if (allowCut) {
                                     int ContentID = 0;
                                     string WorkingLink = GenericController.modifyLinkQuery(core.webServer.requestPage + "?" + core.doc.refreshQueryString, RequestNameCut, GenericController.encodeText(ContentID) + "." + GenericController.encodeText(recordID), true);
-                                    result += "<a class=\"ccRecordCutLink\" TabIndex=\"-1\" href=\"" + HtmlController.encodeHtml(WorkingLink) + "\"><img src=\"/ContensiveBase/images/Contentcut.gif\" border=\"0\" alt=\"Cut this " + ContentCaption + " to clipboard\" title=\"Cut this " + ContentCaption + " to clipboard\" align=\"absmiddle\"></a>";
+                                    result += "<a class=\"ccRecordCutLink\" TabIndex=\"-1\" href=\"" + HtmlController.encodeHtml(WorkingLink) + "\">" + iconContentCut.Replace("content cut", "Cut this " + ContentCaption + " to clipboard") + "</a>";
                                 }
                                 result = "<span class=\"ccRecordLinkCon\" style=\"white-space:nowrap;\">" + result + "</span>";
                             }
@@ -1636,13 +1636,7 @@ namespace Contensive.Processor {
                             tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + "<a"
                                 + " TabIndex=-1"
                                 + " href=\"" + HtmlController.encodeHtml(Link) + "\"";
-                            tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + "><img"
-                                + " src=\"/ContensiveBase/images/IconContentAdd.gif\""
-                                + " border=\"0\""
-                                + " alt=\"Add record\""
-                                + " title=\"Add record\""
-                                + " align=\"absmiddle\""
-                                + "></a>";
+                            tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + ">" + iconAdd + "</a>";
                         } else {
                             //
                             MenuName = GenericController.GetRandomInteger(core).ToString();
