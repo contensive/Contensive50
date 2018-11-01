@@ -42,7 +42,7 @@ namespace Contensive.Processor.Controllers {
             public string Name; // Unique name for this entry
             public string ParentName; // Unique name of the parent entry
             public string Link; // URL
-            public string Image; // Image
+            public string imageSrc; // Image
             public string ImageOver; // Image Over
             public bool NewWindow; // True opens link in a new window
         }
@@ -176,28 +176,21 @@ namespace Contensive.Processor.Controllers {
         //   Create a new Menu Entry
         //===============================================================================
         //
-        public void AddEntry(string EntryName, string ParentiEntryName = "", string ImageLink = "", string ImageOverLink = "", string Link = "", string Caption = "", string CaptionImageLink = "", bool NewWindow = false) {
+        public void addEntry(string name, string ParentiEntryName = "", string imageSrc = "", string imageOverSrc = "", string Link = "", string Caption = "", string CaptionImageLink = "", bool NewWindow = false) {
             try {
-                //
-                string iEntryName = null;
-                string UcaseEntryName = null;
-                //
-                iEntryName = GenericController.vbReplace(encodeEmpty(EntryName, ""), ",", " ");
-                UcaseEntryName = GenericController.vbUCase(iEntryName);
-                //
-                if ((!string.IsNullOrEmpty(iEntryName)) && ((UsedEntries + ",").IndexOf("," + UcaseEntryName + ",")  == -1)) {
-                    UsedEntries = UsedEntries + "," + UcaseEntryName;
+                if ((!string.IsNullOrEmpty(name)) && ((UsedEntries + ",").IndexOf("," + name.ToLower() + ",")  == -1)) {
+                    UsedEntries = UsedEntries + "," + name.ToLower();
                     if (iEntryCount >= iEntrySize) {
                         iEntrySize = iEntrySize + 10;
                         Array.Resize(ref iEntry, iEntrySize + 1);
                     }
                     iEntry[iEntryCount].Link = encodeEmpty(Link, "");
-                    iEntry[iEntryCount].Image = encodeEmpty(ImageLink, "");
-                    if (string.IsNullOrEmpty(iEntry[iEntryCount].Image)) {
+                    iEntry[iEntryCount].imageSrc = encodeEmpty(imageSrc, "");
+                    if (string.IsNullOrEmpty(iEntry[iEntryCount].imageSrc)) {
                         //
                         // No image, must have a caption
                         //
-                        iEntry[iEntryCount].Caption = encodeEmpty(Caption, iEntryName);
+                        iEntry[iEntryCount].Caption = encodeEmpty(Caption, name);
                     } else {
                         //
                         // Image present, caption is extra
@@ -205,11 +198,11 @@ namespace Contensive.Processor.Controllers {
                         iEntry[iEntryCount].Caption = encodeEmpty(Caption, "");
                     }
                     iEntry[iEntryCount].CaptionImage = encodeEmpty(CaptionImageLink, "");
-                    iEntry[iEntryCount].Name = UcaseEntryName;
+                    iEntry[iEntryCount].Name = name;
                     iEntry[iEntryCount].ParentName = GenericController.vbUCase(encodeEmpty(ParentiEntryName, ""));
-                    iEntry[iEntryCount].ImageOver = ImageOverLink;
+                    iEntry[iEntryCount].ImageOver = imageOverSrc;
                     iEntry[iEntryCount].NewWindow = NewWindow;
-                    EntryIndexName.setPtr(UcaseEntryName, iEntryCount);
+                    EntryIndexName.setPtr(name, iEntryCount);
                     iEntryCount = iEntryCount + 1;
                 }
                 //
@@ -324,14 +317,14 @@ namespace Contensive.Processor.Controllers {
                         }
                         //
                         Link = HtmlController.encodeHtml(iEntry[EntryPointer].Link);
-                        if (!string.IsNullOrEmpty(iEntry[EntryPointer].Image)) {
+                        if (!string.IsNullOrEmpty(iEntry[EntryPointer].imageSrc)) {
                             //
                             // Create hotspot from image
                             //
-                            HotSpotHTML = "<img src=\"" + iEntry[EntryPointer].Image + "\" border=\"0\" alt=\"" + iEntry[EntryPointer].Caption + "\" ID=" + ImageID + " Name=" + ImageID + ">";
+                            HotSpotHTML = "<img src=\"" + iEntry[EntryPointer].imageSrc + "\" border=\"0\" alt=\"" + iEntry[EntryPointer].Caption + "\" ID=" + ImageID + " Name=" + ImageID + ">";
                             if (!string.IsNullOrEmpty(iEntry[EntryPointer].ImageOver)) {
                                 JavaCode = JavaCode + "var " + ImageID + "n=new Image; "
-                                + ImageID + "n.src='" + iEntry[EntryPointer].Image + "'; "
+                                + ImageID + "n.src='" + iEntry[EntryPointer].imageSrc + "'; "
                                 + "var " + ImageID + "o=new Image; "
                                 + ImageID + "o.src='" + iEntry[EntryPointer].ImageOver + "'; ";
                                 MouseOverCode = MouseOverCode + " document." + ImageID + ".src=" + ImageID + "o.src;";
@@ -479,8 +472,8 @@ namespace Contensive.Processor.Controllers {
                                 target = " target=\"_blank\"";
                             }
                             PanelChildren = GetMenuFlyoutPanel(iEntry[EntryPointer].Name, iUsedEntries, StyleSheetPrefix, FlyoutHover, PanelButtonCount);
-                            if (!string.IsNullOrEmpty(iEntry[EntryPointer].Image)) {
-                                HotSpotHTML = "<img src=\"" + iEntry[EntryPointer].Image + "\" border=\"0\" alt=\"" + iEntry[EntryPointer].Caption + "\">";
+                            if (!string.IsNullOrEmpty(iEntry[EntryPointer].imageSrc)) {
+                                HotSpotHTML = "<img src=\"" + iEntry[EntryPointer].imageSrc + "\" border=\"0\" alt=\"" + iEntry[EntryPointer].Caption + "\">";
                             } else {
                                 HotSpotHTML = iEntry[EntryPointer].Caption;
                             }
@@ -577,18 +570,16 @@ namespace Contensive.Processor.Controllers {
         // ----- Add a new DHTML menu entry
         //========================================================================
         //
-        public void menu_AddEntry(string Name, string ParentName = "", string ImageLink = "", string ImageOverLink = "", string Link = "", string Caption = "", string StyleSheet = "", string StyleSheetHover = "", bool NewWindow = false) {
-            string Image = null;
-            string ImageOver = "";
+        public void menu_AddEntry(string Name, string ParentName = "", string imageSrc = "", string imageOverSrc = "", string Link = "", string Caption = "", string StyleSheet = "", string StyleSheetHover = "", bool NewWindow = false) {
+            string newImageOverSrc = "";
             //
-            Image = GenericController.encodeText(ImageLink);
-            if (!string.IsNullOrEmpty(Image)) {
-                ImageOver = GenericController.encodeText(ImageOverLink);
-                if (Image == ImageOver) {
-                    ImageOver = "";
+            if (!string.IsNullOrEmpty(imageSrc)) {
+                newImageOverSrc = GenericController.encodeText(imageOverSrc);
+                if (imageSrc == newImageOverSrc) {
+                    newImageOverSrc = "";
                 }
             }
-            core.menuFlyout.AddEntry(GenericController.encodeText(Name), ParentName, Image, ImageOver, Link, Caption, "", NewWindow);
+            core.menuFlyout.addEntry(Name, ParentName, imageSrc, newImageOverSrc, Link, Caption, "", NewWindow);
         }
         //
         //========================================================================
