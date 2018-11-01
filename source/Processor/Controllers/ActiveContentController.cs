@@ -1958,29 +1958,29 @@ namespace Contensive.Processor.Controllers {
                                                                         }
                                                                     }
                                                                 }
-                                                                //
-                                                                // problem - in the case where the recordfilename = img-100x200, the imagefilenamenoext is img
-                                                                //
-                                                                //hint = hint & ",140"
-                                                                if ((RecordFilenameNoExt != ImageFilenameNoExt) | (RecordFilenameExt != ImageFilenameExt)) {
-                                                                    //
-                                                                    // There has been a change
-                                                                    //
-                                                                    string NewRecordFilename = null;
-                                                                    NewRecordFilename = RecordVirtualPath + RecordFilenameNoExt + "." + RecordFilenameExt;
-                                                                    //
-                                                                    // realtime image updates replace without creating new size - that is for the edit interface
-                                                                    //
-                                                                    // put the New file back into the tablesplit in case there are more then 4 splits
-                                                                    //
-                                                                    TableSplit[0] = "";
-                                                                    TableSplit[1] = "";
-                                                                    TableSplit[2] = "";
-                                                                    TableSplit[3] = SegmentAfterImage;
-                                                                    NewRecordFilename = GenericController.encodeURL(NewRecordFilename) + ((string)(string.Join("/", TableSplit))).Substring(3);
-                                                                    LinkSplit[LinkPtr] = NewRecordFilename;
-                                                                    SaveChanges = true;
-                                                                }
+                                                                ////
+                                                                //// problem - in the case where the recordfilename = img-100x200, the imagefilenamenoext is img
+                                                                ////
+                                                                ////hint = hint & ",140"
+                                                                //if ((RecordFilenameNoExt != ImageFilenameNoExt) | (RecordFilenameExt != ImageFilenameExt)) {
+                                                                //    //
+                                                                //    // There has been a change
+                                                                //    //
+                                                                //    string NewRecordFilename = null;
+                                                                //    NewRecordFilename = RecordVirtualPath + RecordFilenameNoExt + "." + RecordFilenameExt;
+                                                                //    //
+                                                                //    // realtime image updates replace without creating new size - that is for the edit interface
+                                                                //    //
+                                                                //    // put the New file back into the tablesplit in case there are more then 4 splits
+                                                                //    //
+                                                                //    TableSplit[0] = "";
+                                                                //    TableSplit[1] = "";
+                                                                //    TableSplit[2] = "";
+                                                                //    TableSplit[3] = SegmentAfterImage;
+                                                                //    NewRecordFilename = NewRecordFilename + (string.Join("/", TableSplit)).Substring(3);
+                                                                //    LinkSplit[LinkPtr] = NewRecordFilename;
+                                                                //    SaveChanges = true;
+                                                                //}
                                                             }
                                                         }
                                                     }
