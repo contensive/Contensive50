@@ -176,7 +176,7 @@ namespace Contensive.Processor.Controllers {
         //   Create a new Menu Entry
         //===============================================================================
         //
-        public void AddEntry(string EntryName, string ParentiEntryName = "", string ImageLink = "", string ImageOverLink = "", string Link = "", string Caption = "", string CaptionImageLink = "", bool NewWindow = false) {
+        public void addEntry(string EntryName, string ParentiEntryName = "", string ImageLink = "", string ImageOverLink = "", string Link = "", string Caption = "", string CaptionImageLink = "", bool NewWindow = false) {
             try {
                 //
                 string iEntryName = null;
@@ -227,7 +227,7 @@ namespace Contensive.Processor.Controllers {
         //   Returns javascripts, etc. required after all menus on a page are complete
         //===============================================================================
         //
-        public string GetMenuClose() {
+        public string getMenuClose() {
             string tempGetMenuClose = null;
             tempGetMenuClose = iMenuCloseString;
             iMenuCloseString = "";
@@ -551,7 +551,7 @@ namespace Contensive.Processor.Controllers {
         //
         //========================================================================
         //
-        public string MenuFlyoutIcon {
+        public string menuFlyoutIcon {
             get {
                 return MenuFlyoutIcon_Local;
             }
@@ -588,7 +588,7 @@ namespace Contensive.Processor.Controllers {
                     ImageOver = "";
                 }
             }
-            core.menuFlyout.AddEntry(GenericController.encodeText(Name), ParentName, Image, ImageOver, Link, Caption, "", NewWindow);
+            core.menuFlyout.addEntry(GenericController.encodeText(Name), ParentName, Image, ImageOver, Link, Caption, "", NewWindow);
         }
         //
         //========================================================================
@@ -604,7 +604,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 if (core.menuFlyout != null) {
                     core.doc.menuSystemCloseCount = core.doc.menuSystemCloseCount + 1;
-                    result += core.menuFlyout.GetMenuClose();
+                    result += core.menuFlyout.getMenuClose();
                     MenuFlyoutIcon = core.siteProperties.getText("MenuFlyoutIcon", "&#187;");
                     if (MenuFlyoutIcon != "&#187;") {
                         result = GenericController.vbReplace(result, "&#187;</a>", MenuFlyoutIcon + "</a>");

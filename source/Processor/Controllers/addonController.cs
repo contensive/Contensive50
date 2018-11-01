@@ -734,7 +734,7 @@ namespace Contensive.Processor.Controllers {
                 string fieldType = null;
                 string FieldSelector = null;
                 string DefaultFilename = null;
-                var adminMenu = new AdminMenuController();
+                var adminMenu = new TabController();
                 //
                 Button = core.docProperties.getText(RequestNameButton);
                 if (Button == ButtonCancel) {
@@ -1371,7 +1371,7 @@ namespace Contensive.Processor.Controllers {
                                             }
                                             Copy = AdminUIController.getEditPanel(core, true, TabHeading, TabDescription, AdminUIController.editTable( TabCell.Text ));
                                             if (!string.IsNullOrEmpty(Copy)) {
-                                                adminMenu.menuLiveTab.AddEntry(TabName.Replace(" ", "&nbsp;"), Copy, "ccAdminTab");
+                                                adminMenu.addEntry(TabName.Replace(" ", "&nbsp;"), Copy, "ccAdminTab");
                                             }
                                             //Content.Add( GetForm_Edit_AddTab(core,TabName, Copy, True))
                                             TabCell = null;
@@ -1392,7 +1392,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 //
                                 if (TabCnt > 0) {
-                                    Content.Add(adminMenu.menuLiveTab.GetTabs(core));
+                                    Content.Add(adminMenu.getTabs(core));
                                 }
                             }
                         }

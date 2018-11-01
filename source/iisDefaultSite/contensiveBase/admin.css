@@ -1264,7 +1264,7 @@ A.ccLiveTabHitLink:hover {
 .ccLiveTabBody {
     background-color: white;
     padding: 10px;
-    border-left: 1px solid black;
+    /* border-left: 1px solid black; */
     border-right: 1px solid black;
 }
 

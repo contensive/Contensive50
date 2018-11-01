@@ -339,7 +339,7 @@ namespace Contensive.Addons.AdminSite {
                                 errorContextMessage = "get Import Wizard for Admin"
                             });
                         } else if (adminData.AdminForm == AdminFormCustomReports) {
-                            adminBody = ToolCustomReports.GetForm_CustomReports(core);
+                            adminBody = ToolCustomReports.getForm_CustomReports(core);
                         } else if (adminData.AdminForm == AdminFormFormWizard) {
                             adminBody = core.addon.execute(addonGuidFormWizard, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                 addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,

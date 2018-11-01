@@ -25,7 +25,7 @@ namespace Contensive.Addons.AdminSite {
             string returnHtml = "";
             try {
                 bool AllowajaxTabs = (core.siteProperties.getBoolean("AllowAjaxEditTabBeta", false));
-                var adminMenu = new AdminMenuController();
+                var adminMenu = new TabController();
                 //
                 if ((core.doc.debug_iUserError != "") & adminData.editRecord.Loaded) {
                     //
@@ -100,7 +100,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // Print common form elements
                 StringBuilderLegacyController Stream = new StringBuilderLegacyController();
-                Stream.Add(GetForm_EditFormStart(core,adminData, AdminFormEdit));
+                Stream.Add(getForm_EditFormStart(core,adminData, AdminFormEdit));
                 bool IsLandingPageParent = false;
                 int TemplateIDForStyles = 0;
                 bool IsTemplateTable = (adminData.adminContent.tableName.ToLowerInvariant() == Processor.Models.Db.PageTemplateModel.contentTableName);
@@ -271,7 +271,7 @@ namespace Contensive.Addons.AdminSite {
                         Stream.Add(getTabs(core, adminData, adminMenu, adminData.editRecord.Read_Only, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
                         Stream.Add(addTab(core, adminMenu, "Groups", GroupRuleEditor.get(core, adminData), adminData.allowAdminTabs));
                         Stream.Add(addTab(core, adminMenu, "Control&nbsp;Info", ControlEditor.get(core, adminData), adminData.allowAdminTabs));
-                        if (adminData.allowAdminTabs) Stream.Add(adminMenu.menuComboTab.GetTabs(core));
+                        if (adminData.allowAdminTabs) Stream.Add(adminMenu.getTabs(core));
                         Stream.Add(EditSectionButtonBar);
                     }
                 } else if (adminContentTableNameLower == EmailModel.contentTableName.ToLowerInvariant()) {
@@ -324,7 +324,7 @@ namespace Contensive.Addons.AdminSite {
                         Stream.Add(addTab(core, adminMenu, "Send&nbsp;To&nbsp;Topics", EmailTopicEditor.get(core, adminData, adminData.editRecord.Read_Only & (!core.session.isAuthenticatedDeveloper(core))), adminData.allowAdminTabs));
                         Stream.Add(addTab(core, adminMenu, "Bounce&nbsp;Control", EmailBounceEditor.get(core, adminData), adminData.allowAdminTabs));
                         Stream.Add(addTab(core, adminMenu, "Control&nbsp;Info", ControlEditor.get(core, adminData), adminData.allowAdminTabs));
-                        if (adminData.allowAdminTabs) Stream.Add(adminMenu.menuComboTab.GetTabs(core));
+                        if (adminData.allowAdminTabs) Stream.Add(adminMenu.getTabs(core));
                         Stream.Add(EditSectionButtonBar);
                     } else if (CdefController.isWithinContent(core, adminData.editRecord.contentControlId, ConditionalEmailCID)) {
                         //
@@ -355,7 +355,7 @@ namespace Contensive.Addons.AdminSite {
                         Stream.Add(addTab(core, adminMenu, "Condition&nbsp;Groups", EmailRuleEditor.get(core, adminData, adminData.editRecord.Read_Only || EmailSubmitted), adminData.allowAdminTabs));
                         Stream.Add(addTab(core, adminMenu, "Bounce&nbsp;Control", EmailBounceEditor.get(core, adminData), adminData.allowAdminTabs));
                         Stream.Add(addTab(core, adminMenu, "Control&nbsp;Info", ControlEditor.get(core, adminData), adminData.allowAdminTabs));
-                        if (adminData.allowAdminTabs) Stream.Add(adminMenu.menuComboTab.GetTabs(core));
+                        if (adminData.allowAdminTabs) Stream.Add(adminMenu.getTabs(core));
                         Stream.Add(EditSectionButtonBar);
                     } else {
                         //
@@ -386,7 +386,7 @@ namespace Contensive.Addons.AdminSite {
                         Stream.Add(addTab(core, adminMenu, "Send&nbsp;To&nbsp;Topics", EmailTopicEditor.get(core, adminData, adminData.editRecord.Read_Only || EmailSubmitted || EmailSent), adminData.allowAdminTabs));
                         Stream.Add(addTab(core, adminMenu, "Bounce&nbsp;Control", EmailBounceEditor.get(core, adminData), adminData.allowAdminTabs));
                         Stream.Add(addTab(core, adminMenu, "Control&nbsp;Info", ControlEditor.get(core, adminData), adminData.allowAdminTabs));
-                        if (adminData.allowAdminTabs) Stream.Add(adminMenu.menuComboTab.GetTabs(core));
+                        if (adminData.allowAdminTabs) Stream.Add(adminMenu.getTabs(core));
                         Stream.Add(EditSectionButtonBar);
                     }
                 } else if (adminData.adminContent.tableName.ToLowerInvariant() == ContentModel.contentTableName.ToLowerInvariant()) {
@@ -413,10 +413,10 @@ namespace Contensive.Addons.AdminSite {
                         Stream.Add(EditSectionButtonBar);
                         Stream.Add(AdminUIController.getTitleBar(core, getTitle(core,adminData), titleBarDetails));
                         Stream.Add(getTabs(core, adminData, adminMenu, adminData.editRecord.Read_Only, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
-                        Stream.Add(addTab(core, adminMenu, "Authoring Permissions", GetForm_Edit_GroupRules(core,adminData), adminData.allowAdminTabs));
+                        Stream.Add(addTab(core, adminMenu, "Authoring Permissions", getForm_Edit_GroupRules(core,adminData), adminData.allowAdminTabs));
                         Stream.Add(addTab(core, adminMenu, "Control&nbsp;Info", ControlEditor.get(core, adminData), adminData.allowAdminTabs));
                         if (adminData.allowAdminTabs) {
-                            Stream.Add(adminMenu.menuComboTab.GetTabs(core));
+                            Stream.Add(adminMenu.getTabs(core));
                             //Call Stream.Add("<div class=""ccPanelBackground"">" & core.main_GetComboTabs() & "</div>")
                         }
                         Stream.Add(EditSectionButtonBar);
@@ -448,7 +448,7 @@ namespace Contensive.Addons.AdminSite {
                     Stream.Add(addTab(core, adminMenu, "Content Watch", ContentTrackingEditor.get(core, adminData), adminData.allowAdminTabs));
                     Stream.Add(addTab(core, adminMenu, "Control Info", ControlEditor.get(core, adminData), adminData.allowAdminTabs));
                     if (adminData.allowAdminTabs) {
-                        Stream.Add(adminMenu.menuComboTab.GetTabs(core));
+                        Stream.Add(adminMenu.getTabs(core));
                     }
                     Stream.Add(EditSectionButtonBar);
                     //else if (adminContentTableNameLower == sectionModel.contentTableName.ToLowerInvariant()) {
@@ -581,7 +581,7 @@ namespace Contensive.Addons.AdminSite {
                     Stream.Add(getTabs(core, adminData, adminMenu, adminData.editRecord.Read_Only, false, false, ContentType, AllowajaxTabs, TemplateIDForStyles, fieldTypeDefaultEditors, fieldEditorPreferencesList, styleList, styleOptionList, emailIdForStyles, IsTemplateTable, editorAddonListJSON));
                     Stream.Add(addTab(core, adminMenu, "Content Watch", ContentTrackingEditor.get(core, adminData), adminData.allowAdminTabs));
                     Stream.Add(addTab(core, adminMenu, "Control Info", ControlEditor.get(core, adminData), adminData.allowAdminTabs));
-                    if (adminData.allowAdminTabs) Stream.Add(adminMenu.menuComboTab.GetTabs(core));
+                    if (adminData.allowAdminTabs) Stream.Add(adminMenu.getTabs(core));
                     Stream.Add(EditSectionButtonBar);
                 }
                 Stream.Add("</form>");
@@ -1565,7 +1565,7 @@ namespace Contensive.Addons.AdminSite {
         /// <param name="IsTemplateTable"></param>
         /// <param name="editorAddonListJSON"></param>
         /// <returns></returns>
-        public static string getTabs(CoreController core, AdminDataModel adminData, AdminMenuController adminMenu, bool readOnlyField, bool IsLandingPage, bool IsRootPage, ContentTypeEnum EditorContext, bool allowAjaxTabs, int TemplateIDForStyles, string[] fieldTypeDefaultEditors, string fieldEditorPreferenceList, string styleList, string styleOptionList, int emailIdForStyles, bool IsTemplateTable, string editorAddonListJSON) {
+        public static string getTabs(CoreController core, AdminDataModel adminData, TabController adminMenu, bool readOnlyField, bool IsLandingPage, bool IsRootPage, ContentTypeEnum EditorContext, bool allowAjaxTabs, int TemplateIDForStyles, string[] fieldTypeDefaultEditors, string fieldEditorPreferenceList, string styleList, string styleOptionList, int emailIdForStyles, bool IsTemplateTable, string editorAddonListJSON) {
             string returnHtml = "";
             try {
                 // todo
@@ -1681,7 +1681,7 @@ namespace Contensive.Addons.AdminSite {
         /// <param name="Content"></param>
         /// <param name="AllowAdminTabs"></param>
         /// <returns></returns>
-        public static string addTab(CoreController core, AdminMenuController adminMenu, string Caption, string Content, bool AllowAdminTabs) {
+        public static string addTab(CoreController core, TabController adminMenu, string Caption, string Content, bool AllowAdminTabs) {
             string tempGetForm_Edit_AddTab = null;
             try {
                 //
@@ -1689,7 +1689,7 @@ namespace Contensive.Addons.AdminSite {
                     if (!AllowAdminTabs) {
                         tempGetForm_Edit_AddTab = Content;
                     } else {
-                        adminMenu.menuComboTab.AddEntry(Caption.Replace(" ", "&nbsp;"), "", "", Content, false, "ccAdminTab");
+                        adminMenu.addEntry(Caption.Replace(" ", "&nbsp;"), "", "", Content, false, "ccAdminTab");
                         //Call core.htmldoc.main_AddLiveTabEntry(Replace(Caption, " ", "&nbsp;"), Content, "ccAdminTab")
                     }
                 }
@@ -1702,7 +1702,7 @@ namespace Contensive.Addons.AdminSite {
         // ====================================================================================================
         //   Creates Tabbed content that is either Live (all content on page) or Ajax (click and ajax in the content)
         //
-        public static string addTab2(CoreController core, AdminMenuController adminMenu, string Caption, string Content, bool AllowAdminTabs, string AjaxLink) {
+        public static string addTab2(CoreController core, TabController adminMenu, string Caption, string Content, bool AllowAdminTabs, string AjaxLink) {
             string tempGetForm_Edit_AddTab2 = null;
             try {
                 //
@@ -1715,12 +1715,12 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // Ajax Tab
                     //
-                    adminMenu.menuComboTab.AddEntry(Caption.Replace(" ", "&nbsp;"), "", AjaxLink, "", false, "ccAdminTab");
+                    adminMenu.addEntry(Caption.Replace(" ", "&nbsp;"), "", AjaxLink, "", false, "ccAdminTab");
                 } else {
                     //
                     // Live Tab
                     //
-                    adminMenu.menuComboTab.AddEntry(Caption.Replace(" ", "&nbsp;"), "", "", Content, false, "ccAdminTab");
+                    adminMenu.addEntry(Caption.Replace(" ", "&nbsp;"), "", "", Content, false, "ccAdminTab");
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
@@ -1765,7 +1765,7 @@ namespace Contensive.Addons.AdminSite {
         //   EditRecord.ContentID is the ContentControlID of the Edit Record
         //========================================================================
         //
-        public static string GetForm_Edit_GroupRules(CoreController core, AdminDataModel adminData) {
+        public static string getForm_Edit_GroupRules(CoreController core, AdminDataModel adminData) {
             string tempGetForm_Edit_GroupRules = null;
             try {
                 // todo
@@ -1901,22 +1901,22 @@ namespace Contensive.Addons.AdminSite {
         //
         //========================================================================
         //
-        public static string GetForm_EditFormStart(CoreController core, AdminDataModel adminData, int AdminFormID) {
-            string s = "";
+        public static string getForm_EditFormStart(CoreController core, AdminDataModel adminData, int AdminFormID) {
+            string result = "";
             try {
                 core.html.addScriptCode("var docLoaded=false", "Form loader");
                 core.html.addScriptCode_onLoad("docLoaded=true;", "Form loader");
-                s = HtmlController.formMultipart_start(core, core.doc.refreshQueryString, "", "ccForm", "adminEditForm");
-                s = GenericController.vbReplace(s, ">", " onSubmit=\"cj.admin.saveEmptyFieldList('FormEmptyFieldList');\" autocomplete=\"off\">");
-                s += "\r\n<!-- block --><div class=\"d-none\"><input type=password name=\"password_block\" value=\"\"><input type=text name=\"username_block\" value=\"\"></div><!-- end block -->";
-                s += "\r\n<input TYPE=\"hidden\" NAME=\"" + rnAdminSourceForm + "\" VALUE=\"" + AdminFormID.ToString() + "\">";
-                s += "\r\n<input TYPE=\"hidden\" NAME=\"" + RequestNameTitleExtension + "\" VALUE=\"" + adminData.TitleExtension + "\">";
-                s += "\r\n<input TYPE=\"hidden\" NAME=\"" + RequestNameAdminDepth + "\" VALUE=\"" + adminData.ignore_legacyMenuDepth + "\">";
-                s += "\r\n<input TYPE=\"hidden\" NAME=\"FormEmptyFieldList\" ID=\"FormEmptyFieldList\" VALUE=\",\">";
+                result = HtmlController.formMultipart_start(core, core.doc.refreshQueryString, "", "ccForm", "adminEditForm");
+                result = GenericController.vbReplace(result, ">", " onSubmit=\"cj.admin.saveEmptyFieldList('FormEmptyFieldList');\" autocomplete=\"off\">");
+                result += "\r\n<!-- block --><div class=\"d-none\"><input type=password name=\"password_block\" value=\"\"><input type=text name=\"username_block\" value=\"\"></div><!-- end block -->";
+                result += "\r\n<input TYPE=\"hidden\" NAME=\"" + rnAdminSourceForm + "\" VALUE=\"" + AdminFormID.ToString() + "\">";
+                result += "\r\n<input TYPE=\"hidden\" NAME=\"" + RequestNameTitleExtension + "\" VALUE=\"" + adminData.TitleExtension + "\">";
+                result += "\r\n<input TYPE=\"hidden\" NAME=\"" + RequestNameAdminDepth + "\" VALUE=\"" + adminData.ignore_legacyMenuDepth + "\">";
+                result += "\r\n<input TYPE=\"hidden\" NAME=\"FormEmptyFieldList\" ID=\"FormEmptyFieldList\" VALUE=\",\">";
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
             }
-            return s;
+            return result;
         }
         //====================================================================================================
 

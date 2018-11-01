@@ -97,7 +97,6 @@
   <ItemGroup>
     <Compile Include="Addons\AdminSite\Constants.cs" />
     <Compile Include="Exceptions\Exceptions.cs" />
-    <Compile Include="Controllers\AdminMenuController.cs" />
     <Compile Include="Addons\AdminSite\Views\ControlEditor.cs" />
     <Compile Include="Addons\AdminSite\Views\EmailBounceEditor.cs" />
     <Compile Include="Addons\AdminSite\Views\LinkAliasEditor.cs" />
@@ -208,10 +207,8 @@
     <Compile Include="Controllers\KeyPtrController.cs" />
     <Compile Include="Controllers\LogController.cs" />
     <Compile Include="Controllers\LoginController.cs" />
-    <Compile Include="Controllers\MenuComboTabController.cs" />
+    <Compile Include="Controllers\TabController.cs" />
     <Compile Include="Controllers\MenuFlyoutController.cs" />
-    <Compile Include="Controllers\MenuLiveTabController.cs" />
-    <Compile Include="Controllers\MenuTabController.cs" />
     <Compile Include="Controllers\PageContentController.cs" />
     <Compile Include="Controllers\RemoteQueryController.cs" />
     <Compile Include="Controllers\SecurityController.cs" />

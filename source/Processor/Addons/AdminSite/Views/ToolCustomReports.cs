@@ -14,7 +14,7 @@ namespace Contensive.Addons.AdminSite {
         //
         //========================================================================
         //
-        public static string GetForm_CustomReports(CoreController core) {
+        public static string getForm_CustomReports(CoreController core) {
             string tempGetForm_CustomReports = null;
             try {
                 //
@@ -53,7 +53,7 @@ namespace Contensive.Addons.AdminSite {
                 StringBuilderLegacyController Tab1 = new StringBuilderLegacyController();
                 string Content = "";
                 string SQLFieldName = null;
-                var adminMenu = new AdminMenuController();
+                var adminMenu = new TabController();
                 //
                 const int ColumnCnt = 4;
                 //
@@ -241,9 +241,9 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // Build and add tabs
                     //
-                    adminMenu.menuLiveTab.AddEntry("Custom&nbsp;Reports", Tab0.Text, "ccAdminTab");
-                    adminMenu.menuLiveTab.AddEntry("Request&nbsp;New&nbsp;Report", Tab1.Text, "ccAdminTab");
-                    Content = adminMenu.menuLiveTab.GetTabs(core);
+                    adminMenu.addEntry("Custom&nbsp;Reports", Tab0.Text, "ccAdminTab");
+                    adminMenu.addEntry("Request&nbsp;New&nbsp;Report", Tab1.Text, "ccAdminTab");
+                    Content = adminMenu.getTabs(core);
                     //
                 }
                 //

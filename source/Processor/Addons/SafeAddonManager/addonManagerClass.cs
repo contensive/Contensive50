@@ -124,7 +124,7 @@ namespace Contensive.Addons.SafeAddonManager {
                 // BuildVersion = core.app.dataBuildVersion
                 string dataBuildVersion = core.siteProperties.dataBuildVersion;
                 string coreVersion = core.codeVersion();
-                var adminMenu = new AdminMenuController();
+                var adminMenu = new TabController();
 
 
                 DbUpToDate = (dataBuildVersion == coreVersion);
@@ -775,7 +775,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                     + "";
                                     BodyHTML = AdminUIController.getEditPanel(core,true, "Add-on Collection Library", "Select an Add-on to install from the Contensive Add-on Library. Please select only one at a time. Click OK to install the selected Add-on. The site may need to be stopped during the installation, but will be available again in approximately one minute.", BodyHTML);
                                     BodyHTML = BodyHTML + HtmlController.inputHidden("AOCnt", RowPtr);
-                                    adminMenu.menuLiveTab.AddEntry("<nobr>Collection&nbsp;Library</nobr>", BodyHTML, "ccAdminTab");
+                                    adminMenu.addEntry("<nobr>Collection&nbsp;Library</nobr>", BodyHTML, "ccAdminTab");
                                 }
                                 //
                                 // --------------------------------------------------------------------------------
@@ -837,7 +837,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                 BodyHTML = "<div style=\"width:100%\">" + AdminUIController.getReport2(core, RowPtr, ColCaption, ColAlign, ColWidth, Cells, RowPtr, 1, "", PostTableCopy, RowPtr, "ccAdmin", ColSortable, 0) + "</div>";
                                 BodyHTML = AdminUIController.getEditPanel(core,true, "Add-on Collections", "Use this form to review and delete current add-on collections.", BodyHTML);
                                 BodyHTML = BodyHTML + HtmlController.inputHidden("accnt", RowPtr);
-                                adminMenu.menuLiveTab.AddEntry("Installed&nbsp;Collections", BodyHTML, "ccAdminTab");
+                                adminMenu.addEntry("Installed&nbsp;Collections", BodyHTML, "ccAdminTab");
                                 //
                                 // --------------------------------------------------------------------------------
                                 // Get the Upload Add-ons tab
@@ -859,13 +859,13 @@ namespace Contensive.Addons.SafeAddonManager {
                                         + AdminUIController.getEditRowLegacy(core, FormInput, "&nbsp;", "", true, false, "")
                                         ));
                                 }
-                                adminMenu.menuLiveTab.AddEntry("Add&nbsp;Manually", AdminUIController.getEditPanel(core,true, "Install or Update an Add-on Collection.", "Use this form to upload a new or updated Add-on Collection to your site. A collection file can be a single xml configuration file, a single zip file containing the configuration file and other resource files, or a configuration with other resource files uploaded separately. Use the 'Add more files' link to add as many files as you need. When you hit OK, the Collection will be checked, and only submitted if all files are uploaded.", Body.Text), "ccAdminTab");
+                                adminMenu.addEntry("Add&nbsp;Manually", AdminUIController.getEditPanel(core,true, "Install or Update an Add-on Collection.", "Use this form to upload a new or updated Add-on Collection to your site. A collection file can be a single xml configuration file, a single zip file containing the configuration file and other resource files, or a configuration with other resource files uploaded separately. Use the 'Add more files' link to add as many files as you need. When you hit OK, the Collection will be checked, and only submitted if all files are uploaded.", Body.Text), "ccAdminTab");
                                 //
                                 // --------------------------------------------------------------------------------
                                 // Build Page from tabs
                                 // --------------------------------------------------------------------------------
                                 //
-                                Content.Add(adminMenu.menuLiveTab.GetTabs(core));
+                                Content.Add(adminMenu.getTabs(core));
                                 //
                                 ButtonList = ButtonCancel + "," + ButtonOK;
                                 Content.Add(HtmlController.inputHidden(RequestNameAdminSourceForm, AdminFormLegacyAddonManager));

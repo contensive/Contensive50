@@ -225,8 +225,6 @@ namespace Contensive.Processor.Models.Domain {
                 Models.Domain.CDefModel DefaultCDef = null;
                 Models.Domain.CDefFieldModel DefaultCDefField = null;
                 string contentNameLc = null;
-                string status = null;
-                string CollectionGuid = null;
                 string Collectionname = null;
                 string ContentTableName = null;
                 bool IsNavigator = false;
