@@ -527,12 +527,12 @@ namespace Contensive.Processor {
         /// </summary>
         public override CPFileSystemBaseClass WwwFiles {
             get {
-                if (_appRootFiles == null) {
-                    _appRootFiles = new CPFileSystemClass(core, core.appRootFiles);
+                if (_wwwFiles == null) {
+                    _wwwFiles = new CPFileSystemClass(core, core.appRootFiles);
                 }
-                return _appRootFiles;
+                return _wwwFiles;
             }
-        } private CPFileSystemClass _appRootFiles;
+        } private CPFileSystemClass _wwwFiles;
         //
         //====================================================================================================
         /// <summary>
@@ -638,8 +638,8 @@ namespace Contensive.Processor {
                     if (_cdnFiles != null) {
                         _cdnFiles.Dispose();
                     }
-                    if (_appRootFiles != null) {
-                        _appRootFiles.Dispose();
+                    if (_wwwFiles != null) {
+                        _wwwFiles.Dispose();
                     }
                     if (_privateFiles != null) {
                         _privateFiles.Dispose();

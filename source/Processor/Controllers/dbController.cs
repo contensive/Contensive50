@@ -5102,18 +5102,18 @@ namespace Contensive.Processor.Controllers {
     }
     //
     public class SqlFieldListClass {
-        private List<NameValuePairType> _sqlList = new List<NameValuePairType>();
+        private List<NameValueClass> _sqlList = new List<NameValueClass>();
         public void add(string name, string value) {
-            NameValuePairType nameValue;
-            nameValue.Name = name;
-            nameValue.Value = value;
-            _sqlList.Add(nameValue);
+            _sqlList.Add(new NameValueClass() {
+                name = name,
+                value = value
+            });
         }
         public string getNameValueList() {
             string returnPairs = "";
             string delim = "";
             foreach (var nameValue in _sqlList) {
-                returnPairs += delim + nameValue.Name + "=" + nameValue.Value;
+                returnPairs += delim + nameValue.name + "=" + nameValue.value;
                 delim = ",";
             }
             return returnPairs;
@@ -5122,7 +5122,7 @@ namespace Contensive.Processor.Controllers {
             string returnPairs = "";
             string delim = "";
             foreach (var nameValue in _sqlList) {
-                returnPairs += delim + nameValue.Name;
+                returnPairs += delim + nameValue.name;
                 delim = ",";
             }
             return returnPairs;
@@ -5131,7 +5131,7 @@ namespace Contensive.Processor.Controllers {
             string returnPairs = "";
             string delim = "";
             foreach (var nameValue in _sqlList) {
-                returnPairs += delim + nameValue.Value;
+                returnPairs += delim + nameValue.value;
                 delim = ",";
             }
             return returnPairs;

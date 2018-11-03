@@ -285,7 +285,7 @@ namespace Contensive.Addons.AdminSite {
                             + "<div style=\"display:block;float:left;width:50px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, ((int)FindWordMatchEnum.matchincludes).ToString(), FieldMatchOption.ToString(), "n" + FieldPtr) + "=</div>"
                             + "<div style=\"display:block;float:left;width:50px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, ((int)FindWordMatchEnum.MatchGreaterThan).ToString(), FieldMatchOption.ToString(), "") + "&gt;</div>"
                             + "<div style=\"display:block;float:left;width:50px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, ((int)FindWordMatchEnum.MatchLessThan).ToString(), FieldMatchOption.ToString(), "") + "&lt;</div>"
-                            + "<div style=\"display:block;float:left;width:300px;\">" + GetFormInputWithFocus2(core, "fieldvalue" + FieldPtr, FieldValue[FieldPtr], 1, 5, "", "var e=getElementById('n" + FieldPtr + "');e.checked=1;", "ccAdvSearchText") + "</div>"
+                            + "<div style=\"display:block;float:left;width:300px;\">" + getFormInputWithFocus2(core, "fieldvalue" + FieldPtr, FieldValue[FieldPtr], 1, 5, "", "var e=getElementById('n" + FieldPtr + "');e.checked=1;", "ccAdvSearchText") + "</div>"
                             + "</div>"
                             + "</td>"
                             + "</tr>";
@@ -341,7 +341,7 @@ namespace Contensive.Addons.AdminSite {
                             + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, ((int)FindWordMatchEnum.MatchEmpty).ToString(), FieldMatchOption.ToString(), "") + "empty</div>"
                             + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, ((int)FindWordMatchEnum.MatchNotEmpty).ToString(), FieldMatchOption.ToString(), "") + "not&nbsp;empty</div>"
                             + "<div style=\"display:block;float:left;width:150px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, ((int)FindWordMatchEnum.matchincludes).ToString(), FieldMatchOption.ToString(), "t" + FieldPtr) + "includes</div>"
-                            + "<div style=\"display:block;float:left;width:300px;\">" + GetFormInputWithFocus2(core, "fieldvalue" + FieldPtr, FieldValue[FieldPtr], 1, 5, "", "var e=getElementById('t" + FieldPtr + "');e.checked=1;", "ccAdvSearchText") + "</div>"
+                            + "<div style=\"display:block;float:left;width:300px;\">" + getFormInputWithFocus2(core, "fieldvalue" + FieldPtr, FieldValue[FieldPtr], 1, 5, "", "var e=getElementById('t" + FieldPtr + "');e.checked=1;", "ccAdvSearchText") + "</div>"
                             + "</div>"
                             + "</td>"
                             + "</tr>";
@@ -359,7 +359,7 @@ namespace Contensive.Addons.AdminSite {
                             + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, ((int)FindWordMatchEnum.MatchEmpty).ToString(), FieldMatchOption.ToString(), "") + "empty</div>"
                             + "<div style=\"display:block;float:left;width:100px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, ((int)FindWordMatchEnum.MatchNotEmpty).ToString(), FieldMatchOption.ToString(), "") + "not&nbsp;empty</div>"
                             + "<div style=\"display:block;float:left;width:150px;\">" + core.html.inputRadio("FieldMatch" + FieldPtr, ((int)FindWordMatchEnum.matchincludes).ToString(), FieldMatchOption.ToString(), "t" + FieldPtr) + "includes</div>"
-                            + "<div style=\"display:block;float:left;width:300px;\">" + GetFormInputWithFocus2(core, "fieldvalue" + FieldPtr, FieldValue[FieldPtr], 1, 5, "", "var e=getElementById('t" + FieldPtr + "');e.checked=1;", "ccAdvSearchText") + "</div>"
+                            + "<div style=\"display:block;float:left;width:300px;\">" + getFormInputWithFocus2(core, "fieldvalue" + FieldPtr, FieldValue[FieldPtr], 1, 5, "", "var e=getElementById('t" + FieldPtr + "');e.checked=1;", "ccAdvSearchText") + "</div>"
                             + "</div>"
                             + "</td>"
                             + "</tr>";

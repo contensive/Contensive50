@@ -119,7 +119,7 @@ namespace Contensive.Processor {
             string headTags = "";
             try {
                 if (!string.IsNullOrEmpty(wwwFileName)) {
-                    accum = cp.WwwFiles.read(wwwFileName);
+                    accum = cp.WwwFiles.Read(wwwFileName);
                     if (!string.IsNullOrEmpty(accum)) {
                         headTags = HtmlParseStaticController.getTagInnerHTML(accum, "head", false);
                         if (!string.IsNullOrEmpty(headTags)) {
@@ -173,7 +173,7 @@ namespace Contensive.Processor {
             try {
                 accum = "";
                 if (!string.IsNullOrEmpty(wwwFileName)) {
-                    accum = cp.WwwFiles.read(wwwFileName);
+                    accum = cp.WwwFiles.Read(wwwFileName);
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);

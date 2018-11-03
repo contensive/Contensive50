@@ -32,18 +32,11 @@ namespace Contensive.Addons.AdminSite {
         /// the next form requested (the get)
         /// </summary>
         public int AdminForm { get; set; }
-        /// <summary>
-        /// ccGroupRules storage for list of Content that a group can author
-        /// </summary>
-        public struct ContentGroupRuleType {
-            public int ContentID;
-            public bool AllowAdd;
-            public bool AllowDelete;
-        }
+
         /// <summary>
         /// Group Rules
         /// </summary>
-        public struct GroupRuleType {
+        public class GroupRuleType {
             public int GroupID;
             public bool AllowAdd;
             public bool AllowDelete;
@@ -104,10 +97,11 @@ namespace Contensive.Addons.AdminSite {
         /// String that adds on to the end of the title
         /// </summary>
         public string TitleExtension { get; set; }
+        // -- 20181101 remove top menu
         /// <summary>
         /// Controls the menu mode, set from core.main_MemberAdminMenuModeID
         /// </summary>
-        public int AdminMenuModeID { get; set; }
+        //public int AdminMenuModeID { get; set; }
         /// <summary>
         /// true uses tab system
         /// </summary>
@@ -545,17 +539,17 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // --- If AdminMenuMode is not given locally, use the Members Preferences
                 //
-                AdminMenuModeID = core.docProperties.getInteger("mm");
-                if (AdminMenuModeID == 0) {
-                    AdminMenuModeID = core.session.user.AdminMenuModeID;
-                }
-                if (AdminMenuModeID == 0) {
-                    AdminMenuModeID = AdminMenuModeLeft;
-                }
-                if (core.session.user.AdminMenuModeID != AdminMenuModeID) {
-                    core.session.user.AdminMenuModeID = AdminMenuModeID;
-                    core.session.user.save(core);
-                }
+                //AdminMenuModeID = core.docProperties.getInteger("mm");
+                //if (AdminMenuModeID == 0) {
+                //    AdminMenuModeID = core.session.user.AdminMenuModeID;
+                //}
+                //if (AdminMenuModeID == 0) {
+                //    AdminMenuModeID = AdminMenuModeLeft;
+                //}
+                //if (core.session.user.AdminMenuModeID != AdminMenuModeID) {
+                //    core.session.user.AdminMenuModeID = AdminMenuModeID;
+                //    core.session.user.save(core);
+                //}
                 //    '
                 //    ' ----- FieldName
                 //    '

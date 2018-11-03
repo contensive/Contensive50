@@ -716,7 +716,7 @@ namespace Contensive.Processor.Controllers {
                                     CmdAccumulator = "";
                                     string ArgName = "";
                                     foreach (KeyValuePair<string, object> kvp in cmdArgDef) {
-                                        switch (kvp.Key.ToLower()) {
+                                        switch (kvp.Key.ToLowerInvariant()) {
                                             case "name":
                                             case "default":
                                                 ArgName = (string)kvp.Value;
@@ -741,7 +741,7 @@ namespace Contensive.Processor.Controllers {
                                     CmdAccumulator = "";
                                     string ArgName = "";
                                     foreach (KeyValuePair<string, object> kvp in cmdArgDef) {
-                                        switch (kvp.Key.ToLower()) {
+                                        switch (kvp.Key.ToLowerInvariant()) {
                                             case "name":
                                             case "default":
                                                 ArgName = (string)kvp.Value;

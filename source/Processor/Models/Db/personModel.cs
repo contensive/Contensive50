@@ -29,7 +29,8 @@ namespace Contensive.Processor.Models.Db {
         public string Address { get; set; }
         public string Address2 { get; set; }
         public bool Admin { get; set; }
-        public int AdminMenuModeID { get; set; }
+        // -- 20181101 remove top menu
+        //public int AdminMenuModeID { get; set; }
         public bool AllowBulkEmail { get; set; }
         public bool AllowToolsPanel { get; set; }
         public bool AutoLogin { get; set; }

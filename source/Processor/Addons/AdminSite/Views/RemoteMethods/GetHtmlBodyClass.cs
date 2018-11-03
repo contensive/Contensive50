@@ -1701,9 +1701,10 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // Menuing
                 //
-                if ((adminData.ignore_legacyMenuDepth == 0) && (adminData.AdminMenuModeID == AdminMenuModeTop)) {
-                    Stream.Add(GetMenuTopMode(adminData));
-                }
+                // -- 20181101 remove top menu
+                //if ((adminData.ignore_legacyMenuDepth == 0) && (adminData.AdminMenuModeID == AdminMenuModeTop)) {
+                //    Stream.Add(GetMenuTopMode(adminData));
+                //}
                 //
                 // --- Rule to separate content
                 //
@@ -2382,157 +2383,158 @@ namespace Contensive.Addons.AdminSite {
         // PrintMenuTop()
         //   Prints the menu section of the admin page
         //========================================================================
-        //
-        private string GetMenuTopMode(AdminDataModel adminData) {
-            string tempGetMenuTopMode = null;
-            try {
-                //
-                //Const MenuEntryContentName = cnNavigatorEntries
-                //
-                int CSMenus = 0;
-                string Name = null;
-                int Id = 0;
-                int ParentID = 0;
-                bool NewWindow = false;
-                string Link = null;
-                string LinkLabel = null;
-                string StyleSheet = "";
-                string StyleSheetHover = "";
-                string ImageLink = null;
-                string ImageOverLink = null;
-                string BakeName = null;
-                string MenuHeader = null;
-                List<int> editableCdefIdList = null;
-                int ContentID = 0;
-                bool IsAdminLocal = false;
-                string MenuClose = null;
-                int MenuDelimiterPosition = 0;
-                bool AccessOK = false;
-                //
-                const string MenuDelimiter = "\r\n<!-- Menus -->\r\n";
-                //
-                // Create the menu
-                //
-                if (adminData.AdminMenuModeID == AdminMenuModeTop) {
-                    //
-                    // ----- Get the baked version
-                    //
-                    BakeName = "AdminMenu" + core.session.user.id.ToString("00000000");
-                    tempGetMenuTopMode = GenericController.encodeText(core.cache.getObject<string>(BakeName));
-                    MenuDelimiterPosition = GenericController.vbInstr(1, tempGetMenuTopMode, MenuDelimiter, 1);
-                    if (MenuDelimiterPosition > 1) {
-                        MenuClose = tempGetMenuTopMode.Substring((MenuDelimiterPosition + MenuDelimiter.Length) - 1);
-                        tempGetMenuTopMode = tempGetMenuTopMode.Left(MenuDelimiterPosition - 1);
-                    } else {
-                        //If GetMenuTopMode = "" Then
-                        //
-                        // ----- Bake the menu
-                        //
-                        CSMenus = GetMenuCSPointer("");
-                        //CSMenus = core.app_openCsSql_Rev_Internal("default", GetMenuSQLNew())
-                        if (core.db.csOk(CSMenus)) {
-                            //
-                            // There are menu items to bake
-                            //
-                            IsAdminLocal = core.session.isAuthenticatedAdmin(core);
-                            if (!IsAdminLocal) {
-                                //
-                                // content managers, need the ContentManagementList
-                                //
-                                editableCdefIdList = CdefController.getEditableCdefIdList(core);
-                            } else {
-                                editableCdefIdList = new List<int>();
-                            }
-                            ImageLink = "";
-                            ImageOverLink = "";
-                            while (core.db.csOk(CSMenus)) {
-                                ContentID = core.db.csGetInteger(CSMenus, "ContentID");
-                                if (IsAdminLocal || ContentID == 0) {
-                                    AccessOK = true;
-                                } else if (editableCdefIdList.Contains(ContentID)) {
-                                    AccessOK = true;
-                                } else {
-                                    AccessOK = false;
-                                }
-                                Id = core.db.csGetInteger(CSMenus, "ID");
-                                ParentID = core.db.csGetInteger(CSMenus, "ParentID");
-                                if (AccessOK) {
-                                    Link = GetMenuLink(core.db.csGet(CSMenus, "LinkPage"), ContentID);
-                                    if (GenericController.vbInstr(1, Link, "?") == 1) {
-                                        Link = core.appConfig.adminRoute + Link;
-                                    }
-                                } else {
-                                    Link = "";
-                                }
-                                LinkLabel = core.db.csGet(CSMenus, "Name");
-                                //If LinkLabel = "Calendar" Then
-                                //    Link = Link
-                                //    End If
-                                NewWindow = core.db.csGetBoolean(CSMenus, "NewWindow");
-                                core.menuFlyout.menu_AddEntry(GenericController.encodeText(Id), ParentID.ToString(), ImageLink, ImageOverLink, Link, LinkLabel, StyleSheet, StyleSheetHover, NewWindow);
+        ////
+        //private string GetMenuTopMode(AdminDataModel adminData) {
+        //    string tempGetMenuTopMode = null;
+        //    try {
+        //        //
+        //        //Const MenuEntryContentName = cnNavigatorEntries
+        //        //
+        //        int CSMenus = 0;
+        //        string Name = null;
+        //        int Id = 0;
+        //        int ParentID = 0;
+        //        bool NewWindow = false;
+        //        string Link = null;
+        //        string LinkLabel = null;
+        //        string StyleSheet = "";
+        //        string StyleSheetHover = "";
+        //        string ImageLink = null;
+        //        string ImageOverLink = null;
+        //        string BakeName = null;
+        //        string MenuHeader = null;
+        //        List<int> editableCdefIdList = null;
+        //        int ContentID = 0;
+        //        bool IsAdminLocal = false;
+        //        string MenuClose = null;
+        //        int MenuDelimiterPosition = 0;
+        //        bool AccessOK = false;
+        //        //
+        //        const string MenuDelimiter = "\r\n<!-- Menus -->\r\n";
+        //        //
+        //        // Create the menu
+        //        //
+        //        //if (adminData.AdminMenuModeID == AdminMenuModeTop) {
+        //        //    //
+        //        //    // ----- Get the baked version
+        //        //    //
+        //        //    BakeName = "AdminMenu" + core.session.user.id.ToString("00000000");
+        //        //    tempGetMenuTopMode = GenericController.encodeText(core.cache.getObject<string>(BakeName));
+        //        //    MenuDelimiterPosition = GenericController.vbInstr(1, tempGetMenuTopMode, MenuDelimiter, 1);
+        //        //    if (MenuDelimiterPosition > 1) {
+        //        //        MenuClose = tempGetMenuTopMode.Substring((MenuDelimiterPosition + MenuDelimiter.Length) - 1);
+        //        //        tempGetMenuTopMode = tempGetMenuTopMode.Left(MenuDelimiterPosition - 1);
+        //        //    } else {
+        //        //        //If GetMenuTopMode = "" Then
+        //        //        //
+        //        //        // ----- Bake the menu
+        //        //        //
+        //        //        CSMenus = GetMenuCSPointer("");
+        //        //        //CSMenus = core.app_openCsSql_Rev_Internal("default", GetMenuSQLNew())
+        //        //        if (core.db.csOk(CSMenus)) {
+        //        //            //
+        //        //            // There are menu items to bake
+        //        //            //
+        //        //            IsAdminLocal = core.session.isAuthenticatedAdmin(core);
+        //        //            if (!IsAdminLocal) {
+        //        //                //
+        //        //                // content managers, need the ContentManagementList
+        //        //                //
+        //        //                editableCdefIdList = CdefController.getEditableCdefIdList(core);
+        //        //            } else {
+        //        //                editableCdefIdList = new List<int>();
+        //        //            }
+        //        //            ImageLink = "";
+        //        //            ImageOverLink = "";
+        //        //            while (core.db.csOk(CSMenus)) {
+        //        //                ContentID = core.db.csGetInteger(CSMenus, "ContentID");
+        //        //                if (IsAdminLocal || ContentID == 0) {
+        //        //                    AccessOK = true;
+        //        //                } else if (editableCdefIdList.Contains(ContentID)) {
+        //        //                    AccessOK = true;
+        //        //                } else {
+        //        //                    AccessOK = false;
+        //        //                }
+        //        //                Id = core.db.csGetInteger(CSMenus, "ID");
+        //        //                ParentID = core.db.csGetInteger(CSMenus, "ParentID");
+        //        //                if (AccessOK) {
+        //        //                    Link = GetMenuLink(core.db.csGet(CSMenus, "LinkPage"), ContentID);
+        //        //                    if (GenericController.vbInstr(1, Link, "?") == 1) {
+        //        //                        Link = core.appConfig.adminRoute + Link;
+        //        //                    }
+        //        //                } else {
+        //        //                    Link = "";
+        //        //                }
+        //        //                LinkLabel = core.db.csGet(CSMenus, "Name");
+        //        //                //If LinkLabel = "Calendar" Then
+        //        //                //    Link = Link
+        //        //                //    End If
+        //        //                NewWindow = core.db.csGetBoolean(CSMenus, "NewWindow");
+        //        //                core.menuFlyout.menu_AddEntry(GenericController.encodeText(Id), ParentID.ToString(), ImageLink, ImageOverLink, Link, LinkLabel, StyleSheet, StyleSheetHover, NewWindow);
 
-                                core.db.csGoNext(CSMenus);
-                            }
-                        }
-                        core.db.csClose(ref CSMenus);
-                        //            '
-                        //            ' Add in top level node for "switch to navigator"
-                        //            '
-                        //            Call core.htmldoc.main_AddMenuEntry("GoToNav", 0, "?" & core.main_RefreshQueryString & "&mm=1", "", "", "Switch To Navigator", StyleSheet, StyleSheetHover, False)
-                        //
-                        // Create menus
-                        //
-                        int ButtonCnt = 0;
-                        CSMenus = GetMenuCSPointer("(ParentID is null)or(ParentID=0)");
-                        if (core.db.csOk(CSMenus)) {
-                            tempGetMenuTopMode = "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr>";
-                            ButtonCnt = 0;
-                            while (core.db.csOk(CSMenus)) {
-                                Name = core.db.csGet(CSMenus, "Name");
-                                Id = core.db.csGetInteger(CSMenus, "ID");
-                                NewWindow = core.db.csGetBoolean(CSMenus, "NewWindow");
-                                MenuHeader = core.menuFlyout.getMenu(GenericController.encodeText(Id), 0);
-                                if (!string.IsNullOrEmpty(MenuHeader)) {
-                                    if (ButtonCnt > 0) {
-                                        tempGetMenuTopMode = tempGetMenuTopMode + "<td class=\"ccFlyoutDelimiter\">|</td>";
-                                    }
-                                    //GetMenuTopMode = GetMenuTopMode & "<td width=""1"" class=""ccPanelShadow""><img alt=""space"" src=""/ContensiveBase/images/spacer.gif"" width=""1"" height=""1"" ></td>"
-                                    //GetMenuTopMode = GetMenuTopMode & "<td width=""1"" class=""ccPanelHilite""><img alt=""space"" src=""/ContensiveBase/images/spacer.gif"" width=""1"" height=""1"" ></td>"
-                                    //
-                                    // --- Add New GetMenuTopMode Button and leave the column open
-                                    //
-                                    Link = "";
-                                    tempGetMenuTopMode = tempGetMenuTopMode + "<td class=\"ccFlyoutButton\">" + MenuHeader + "</td>";
-                                    // GetMenuTopMode = GetMenuTopMode & "<td><nobr>&nbsp;" & MenuHeader & "&nbsp;</nobr></td>"
-                                }
-                                ButtonCnt = ButtonCnt + 1;
-                                core.db.csGoNext(CSMenus);
-                            }
-                            tempGetMenuTopMode = tempGetMenuTopMode + "</tr></table>";
-                            tempGetMenuTopMode = core.html.getPanel(tempGetMenuTopMode, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 1);
-                        }
-                        core.db.csClose(ref CSMenus);
-                        //
-                        // Save the Baked Menu
-                        //
-                        MenuClose = core.menuFlyout.menu_GetClose();
-                        //GetMenuTopMode = GetMenuTopMode & core.main_GetMenuClose
-                        var depList = new List<string> { };
-                        depList.Add(PersonModel.getTableInvalidationKey(core));
-                        depList.Add(ContentModel.getTableInvalidationKey(core));
-                        depList.Add(NavigatorEntryModel.getTableInvalidationKey(core));
-                        depList.Add(GroupModel.getTableInvalidationKey(core));
-                        depList.Add(GroupRuleModel.getTableInvalidationKey(core));
-                        core.cache.setObject(BakeName, tempGetMenuTopMode + MenuDelimiter + MenuClose, depList);
-                    }
-                    core.doc.htmlForEndOfBody = core.doc.htmlForEndOfBody + MenuClose;
-                }
-            } catch (Exception ex) {
-                LogController.handleError(core, ex);
-            }
-            return tempGetMenuTopMode;
-        }
-        //
+        //        //                core.db.csGoNext(CSMenus);
+        //        //            }
+        //        //        }
+        //        //        core.db.csClose(ref CSMenus);
+        //        //        //            '
+        //        //        //            ' Add in top level node for "switch to navigator"
+        //        //        //            '
+        //        //        //            Call core.htmldoc.main_AddMenuEntry("GoToNav", 0, "?" & core.main_RefreshQueryString & "&mm=1", "", "", "Switch To Navigator", StyleSheet, StyleSheetHover, False)
+        //        //        //
+        //        //        // Create menus
+        //        //        //
+        //        //        int ButtonCnt = 0;
+        //        //        CSMenus = GetMenuCSPointer("(ParentID is null)or(ParentID=0)");
+        //        //        if (core.db.csOk(CSMenus)) {
+        //        //            tempGetMenuTopMode = "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr>";
+        //        //            ButtonCnt = 0;
+        //        //            while (core.db.csOk(CSMenus)) {
+        //        //                Name = core.db.csGet(CSMenus, "Name");
+        //        //                Id = core.db.csGetInteger(CSMenus, "ID");
+        //        //                NewWindow = core.db.csGetBoolean(CSMenus, "NewWindow");
+        //        //                MenuHeader = core.menuFlyout.getMenu(GenericController.encodeText(Id), 0);
+        //        //                if (!string.IsNullOrEmpty(MenuHeader)) {
+        //        //                    if (ButtonCnt > 0) {
+        //        //                        tempGetMenuTopMode = tempGetMenuTopMode + "<td class=\"ccFlyoutDelimiter\">|</td>";
+        //        //                    }
+        //        //                    //GetMenuTopMode = GetMenuTopMode & "<td width=""1"" class=""ccPanelShadow""><img alt=""space"" src=""/ContensiveBase/images/spacer.gif"" width=""1"" height=""1"" ></td>"
+        //        //                    //GetMenuTopMode = GetMenuTopMode & "<td width=""1"" class=""ccPanelHilite""><img alt=""space"" src=""/ContensiveBase/images/spacer.gif"" width=""1"" height=""1"" ></td>"
+        //        //                    //
+        //        //                    // --- Add New GetMenuTopMode Button and leave the column open
+        //        //                    //
+        //        //                    Link = "";
+        //        //                    tempGetMenuTopMode = tempGetMenuTopMode + "<td class=\"ccFlyoutButton\">" + MenuHeader + "</td>";
+        //        //                    // GetMenuTopMode = GetMenuTopMode & "<td><nobr>&nbsp;" & MenuHeader & "&nbsp;</nobr></td>"
+        //        //                }
+        //        //                ButtonCnt = ButtonCnt + 1;
+        //        //                core.db.csGoNext(CSMenus);
+        //        //            }
+        //        //            tempGetMenuTopMode = tempGetMenuTopMode + "</tr></table>";
+        //        //            tempGetMenuTopMode = core.html.getPanel(tempGetMenuTopMode, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 1);
+        //        //        }
+        //        //        core.db.csClose(ref CSMenus);
+        //        //        //
+        //        //        // Save the Baked Menu
+        //        //        //
+        //        //        MenuClose = core.menuFlyout.menu_GetClose();
+        //        //        //GetMenuTopMode = GetMenuTopMode & core.main_GetMenuClose
+        //        //        var depList = new List<string> { };
+        //        //        depList.Add(PersonModel.getTableInvalidationKey(core));
+        //        //        depList.Add(ContentModel.getTableInvalidationKey(core));
+        //        //        depList.Add(NavigatorEntryModel.getTableInvalidationKey(core));
+        //        //        depList.Add(GroupModel.getTableInvalidationKey(core));
+        //        //        depList.Add(GroupRuleModel.getTableInvalidationKey(core));
+        //        //        core.cache.setObject(BakeName, tempGetMenuTopMode + MenuDelimiter + MenuClose, depList);
+        //        //    }
+        //        //    core.doc.htmlForEndOfBody = core.doc.htmlForEndOfBody + MenuClose;
+        //        //}
+
+        //    } catch (Exception ex) {
+        //        LogController.handleError(core, ex);
+        //    }
+        //    return tempGetMenuTopMode;
+        //}
+        ////
         //========================================================================
         // Read and save a GetForm_InputCheckList
         //   see GetForm_InputCheckList for an explaination of the input

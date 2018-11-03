@@ -205,21 +205,21 @@ Namespace Contensive.BaseClasses
         ''' read and write cdn files, like content uploads
         ''' </summary>
         ''' <returns></returns>
-        Public MustOverride ReadOnly Property cdnFiles() As CPFileSystemBaseClass
+        Public MustOverride ReadOnly Property CdnFiles() As CPFileSystemBaseClass
         '
         '====================================================================================================
         ''' <summary>
         ''' read and write files in the root folder of the application (wwwRoot,htdocs,etc)
         ''' </summary>
         ''' <returns></returns>
-        Public MustOverride ReadOnly Property wwwFiles() As CPFileSystemBaseClass
+        Public MustOverride ReadOnly Property WwwFiles() As CPFileSystemBaseClass
         '
         '====================================================================================================
         ''' <summary>
         ''' read and write files not available to the Internet
         ''' </summary>
         ''' <returns></returns>
-        Public MustOverride ReadOnly Property privateFiles() As CPFileSystemBaseClass
+        Public MustOverride ReadOnly Property PrivateFiles() As CPFileSystemBaseClass
         '
     End Class
 

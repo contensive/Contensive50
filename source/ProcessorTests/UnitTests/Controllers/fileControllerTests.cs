@@ -24,9 +24,9 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 string tmpFilename = "tmp" + GenericController.GetRandomInteger(cp.core).ToString() + ".txt";
                 string content = GenericController.GetRandomInteger(cp.core).ToString();
                 // act
-                cp.CdnFiles.append(tmpFilename, content);
+                cp.CdnFiles.Append(tmpFilename, content);
                 // assert
-                Assert.AreEqual(content, cp.CdnFiles.read(tmpFilename));
+                Assert.AreEqual(content, cp.CdnFiles.Read(tmpFilename));
             }
         }
         //
@@ -39,9 +39,9 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 string tmpFilename = "tmp" + GenericController.GetRandomInteger(cp.core).ToString() + ".txt";
                 string content = GenericController.GetRandomInteger(cp.core).ToString();
                 // act
-                cp.CdnFiles.save(tmpFilename, content);
+                cp.CdnFiles.Save(tmpFilename, content);
                 // assert
-                Assert.AreEqual(content, cp.CdnFiles.read(tmpFilename));
+                Assert.AreEqual(content, cp.CdnFiles.Read(tmpFilename));
             }
         }
         //
@@ -55,10 +55,10 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 string tmpContent = GenericController.GetRandomInteger(cp.core).ToString();
                 string dstFilename = "dst" + GenericController.GetRandomInteger(cp.core).ToString() + ".txt";
                 // act
-                cp.CdnFiles.save(srcFilename, tmpContent);
-                cp.CdnFiles.copy(srcFilename, dstFilename);
+                cp.CdnFiles.Save(srcFilename, tmpContent);
+                cp.CdnFiles.Copy(srcFilename, dstFilename);
                 // assert
-                Assert.AreEqual(tmpContent, cp.CdnFiles.read(dstFilename));
+                Assert.AreEqual(tmpContent, cp.CdnFiles.Read(dstFilename));
             }
         }
         //
@@ -71,10 +71,10 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 string srcFilename = "src" + GenericController.GetRandomInteger(cp.core).ToString() + ".txt";
                 string tmpContent = GenericController.GetRandomInteger(cp.core).ToString();
                 // act
-                cp.CdnFiles.save(srcFilename, tmpContent);
-                cp.CdnFiles.deleteFile(srcFilename);
+                cp.CdnFiles.Save(srcFilename, tmpContent);
+                cp.CdnFiles.DeleteFile(srcFilename);
                 // assert
-                Assert.AreEqual("", cp.CdnFiles.read(srcFilename));
+                Assert.AreEqual("", cp.CdnFiles.Read(srcFilename));
             }
         }
     }

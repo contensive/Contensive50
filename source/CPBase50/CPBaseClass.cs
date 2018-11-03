@@ -217,14 +217,14 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
-        /// read and write cdn files, like content uploads
+        /// read and write cdn files, like content uploads. Sites with static front-ends may put static files here.
         /// </summary>
         /// <returns></returns>
         public abstract CPFileSystemBaseClass CdnFiles { get; }
         //
         //====================================================================================================
         /// <summary>
-        /// read and write files in the root folder of the application (wwwRoot,htdocs,etc)
+        /// read and write files in the root folder of the application (appRoot, wwwRoot,htdocs,etc)
         /// </summary>
         /// <returns></returns>
         public abstract CPFileSystemBaseClass WwwFiles { get; }

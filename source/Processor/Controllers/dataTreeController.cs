@@ -25,7 +25,7 @@ namespace Contensive.Processor.Controllers {
         // ----- Tracking values, should be set before each exit
         //
         //Private NodePtr as integer
-        private struct TierNode {
+        private class TierNode {
             public XmlNode Node;
             //    Element As xmlNode
             public int ChildPtr;

@@ -14,7 +14,7 @@ using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 //
-namespace Contensive.Addons.AdminSite {
+namespace Contensive.Addons.xxxxxxxCollectionNamexxxxxxx {
     //
     public class _blankClass : Contensive.BaseClasses.AddonBaseClass {
         //

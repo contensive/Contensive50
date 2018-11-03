@@ -1600,8 +1600,8 @@ namespace Contensive.Processor {
                 string iContentName = null;
                 int iContentID = 0;
                 string iPresetNameValueList = null;
-                string MenuName = null;
-                string LowestRequiredMenuName = "";
+                //string MenuName = null;
+               // string LowestRequiredMenuName = "";
                 string ClipBoard = null;
                 string PasteLink = "";
                 int Position = 0;
@@ -1610,7 +1610,7 @@ namespace Contensive.Processor {
                 int ClipChildRecordID = 0;
                 bool iAllowPaste = false;
                 bool useFlyout = false;
-                int csChildContent = 0;
+                //int csChildContent = 0;
                 string Link = null;
                 //
                 tempmain_GetRecordAddLink2 = "";
@@ -1624,9 +1624,9 @@ namespace Contensive.Processor {
                         throw (new GenericException("Method called with blank ContentName")); // handleLegacyError14(MethodName, "")
                     } else {
                         iContentID = CdefController.getContentId(core, iContentName);
-                        csChildContent = core.db.csOpen("Content", "ParentID=" + iContentID, "", true, 0, false, false, "id");
-                        useFlyout = core.db.csOk(csChildContent);
-                        core.db.csClose(ref csChildContent);
+                        //csChildContent = core.db.csOpen("Content", "ParentID=" + iContentID, "", true, 0, false, false, "id");
+                        //useFlyout = core.db.csOk(csChildContent);
+                        //core.db.csClose(ref csChildContent);
                         //
                         if (!useFlyout) {
                             Link = "/" + core.appConfig.adminRoute + "?cid=" + iContentID + "&af=4&aa=2&ad=1";
@@ -1638,10 +1638,10 @@ namespace Contensive.Processor {
                                 + " href=\"" + HtmlController.encodeHtml(Link) + "\"";
                             tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + ">" + iconAdd + "</a>";
                         } else {
-                            //
-                            MenuName = GenericController.GetRandomInteger(core).ToString();
-                            core.menuFlyout.menu_AddEntry(MenuName, "", "/ContensiveBase/images/IconContentAdd.gif", "", "", "", "stylesheet", "stylesheethover");
-                            LowestRequiredMenuName = getRecordAddLink_AddMenuEntry(core, iContentName, iPresetNameValueList, "", MenuName, MenuName);
+                            ////
+                            //MenuName = GenericController.GetRandomInteger(core).ToString();
+                            //core.menuFlyout.menu_AddEntry(MenuName, "", "/ContensiveBase/images/IconContentAdd.gif", "", "", "", "stylesheet", "stylesheethover");
+                            //LowestRequiredMenuName = getRecordAddLink_AddMenuEntry(core, iContentName, iPresetNameValueList, "", MenuName, MenuName);
                         }
                         //
                         // Add in the paste entry, if needed
@@ -1688,13 +1688,13 @@ namespace Contensive.Processor {
                         //
                         // Add in the available flyout Navigator Entries
                         //
-                        if (!string.IsNullOrEmpty(LowestRequiredMenuName)) {
-                            tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + core.menuFlyout.getMenu(LowestRequiredMenuName, 0);
-                            tempmain_GetRecordAddLink2 = GenericController.vbReplace(tempmain_GetRecordAddLink2, "class=\"ccFlyoutButton\" ", "", 1, 99, 1);
-                            if (!string.IsNullOrEmpty(PasteLink)) {
-                                tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + "<a TabIndex=-1 href=\"" + HtmlController.encodeHtml(PasteLink) + "\"><img src=\"/ContensiveBase/images/ContentPaste.gif\" border=\"0\" alt=\"Paste content from clipboard\" align=\"absmiddle\"></a>";
-                            }
-                        }
+                        //if (!string.IsNullOrEmpty(LowestRequiredMenuName)) {
+                        //    tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + core.menuFlyout.getMenu(LowestRequiredMenuName, 0);
+                        //    tempmain_GetRecordAddLink2 = GenericController.vbReplace(tempmain_GetRecordAddLink2, "class=\"ccFlyoutButton\" ", "", 1, 99, 1);
+                        //    if (!string.IsNullOrEmpty(PasteLink)) {
+                        //        tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + "<a TabIndex=-1 href=\"" + HtmlController.encodeHtml(PasteLink) + "\"><img src=\"/ContensiveBase/images/ContentPaste.gif\" border=\"0\" alt=\"Paste content from clipboard\" align=\"absmiddle\"></a>";
+                        //    }
+                        //}
                         //
                         // Help link if enabled
                         //
@@ -1710,12 +1710,12 @@ namespace Contensive.Processor {
                         // ----- Add the flyout panels to the content to return
                         //       This must be here so if the call is made after main_ClosePage, the panels will still deliver
                         //
-                        if (!string.IsNullOrEmpty(LowestRequiredMenuName)) {
-                            tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + core.menuFlyout.menu_GetClose();
-                            if (GenericController.vbInstr(1, tempmain_GetRecordAddLink2, "IconContentAdd.gif", 1) != 0) {
-                                tempmain_GetRecordAddLink2 = GenericController.vbReplace(tempmain_GetRecordAddLink2, "IconContentAdd.gif\" ", "IconContentAdd.gif\" align=\"absmiddle\" ");
-                            }
-                        }
+                        //if (!string.IsNullOrEmpty(LowestRequiredMenuName)) {
+                        //    tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + core.menuFlyout.menu_GetClose();
+                        //    if (GenericController.vbInstr(1, tempmain_GetRecordAddLink2, "IconContentAdd.gif", 1) != 0) {
+                        //        tempmain_GetRecordAddLink2 = GenericController.vbReplace(tempmain_GetRecordAddLink2, "IconContentAdd.gif\" ", "IconContentAdd.gif\" align=\"absmiddle\" ");
+                        //    }
+                        //}
                         tempmain_GetRecordAddLink2 = GenericController.vbReplace(tempmain_GetRecordAddLink2, "target=", "xtarget=", 1, 99, 1);
                     }
                 }
@@ -1844,7 +1844,7 @@ namespace Contensive.Processor {
                                 Link = Link + "&wc=" + GenericController.encodeRequestVariable(PresetNameValueList);
                             }
                         }
-                        core.menuFlyout.menu_AddEntry(MenuName + ":" + ContentName, ParentMenuName, "", "", Link, ButtonCaption, "", "", true);
+                        //core.menuFlyout.menu_AddEntry(MenuName + ":" + ContentName, ParentMenuName, "", "", Link, ButtonCaption, "", "", true);
                         //
                         // Create child submenu if Child Entries found
                         //
@@ -1883,7 +1883,7 @@ namespace Contensive.Processor {
         //
         //
         //
-        public static string GetFormInputWithFocus2(CoreController core, string ElementName, string CurrentValue = "", int Height = -1, int Width = -1, string ElementID = "", string OnFocusJavascript = "", string HtmlClass = "") {
+        public static string getFormInputWithFocus2(CoreController core, string ElementName, string CurrentValue = "", int Height = -1, int Width = -1, string ElementID = "", string OnFocusJavascript = "", string HtmlClass = "") {
             string result = "";
             result = HtmlController.inputText(core, ElementName, CurrentValue, Height, Width, ElementID);
             if (!string.IsNullOrEmpty(OnFocusJavascript)) {

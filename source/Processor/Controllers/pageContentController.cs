@@ -1353,31 +1353,30 @@ namespace Contensive.Processor.Controllers {
                     string PeopleFirstName = "";
                     string PeopleLastName = "";
                     string PeopleName = "";
-                    for (Ptr = 0; Ptr <= f.Inst.GetUpperBound(0); Ptr++) {
-                        var tempVar = f.Inst[Ptr];
+                    foreach ( var IDontKnowWhat in f.IDontKnowWhatList) {
                         bool IsInGroup = false;
                         bool WasInGroup = false;
                         string FormValue = null;
-                        switch (tempVar.Type) {
+                        switch (IDontKnowWhat.Type) {
                             case 1:
                                 //
                                 // People Record
                                 //
-                                FormValue = core.docProperties.getText(tempVar.PeopleField);
-                                if ((!string.IsNullOrEmpty(FormValue)) & GenericController.encodeBoolean(CdefController.getContentFieldProperty(core, "people", tempVar.PeopleField, "uniquename"))) {
-                                    string SQL = "select count(*) from ccMembers where " + tempVar.PeopleField + "=" + core.db.encodeSQLText(FormValue);
+                                FormValue = core.docProperties.getText(IDontKnowWhat.PeopleField);
+                                if ((!string.IsNullOrEmpty(FormValue)) & GenericController.encodeBoolean(CdefController.getContentFieldProperty(core, "people", IDontKnowWhat.PeopleField, "uniquename"))) {
+                                    string SQL = "select count(*) from ccMembers where " + IDontKnowWhat.PeopleField + "=" + core.db.encodeSQLText(FormValue);
                                     CS = core.db.csOpenSql(SQL);
                                     if (core.db.csOk(CS)) {
                                         Success = core.db.csGetInteger(CS, "cnt") == 0;
                                     }
                                     core.db.csClose(ref CS);
                                     if (!Success) {
-                                        ErrorController.addUserError(core, "The field [" + tempVar.Caption + "] must be unique, and the value [" + HtmlController.encodeHtml(FormValue) + "] has already been used.");
+                                        ErrorController.addUserError(core, "The field [" + IDontKnowWhat.Caption + "] must be unique, and the value [" + HtmlController.encodeHtml(FormValue) + "] has already been used.");
                                     }
                                 }
-                                if ((tempVar.REquired || GenericController.encodeBoolean(CdefController.getContentFieldProperty(core, "people", tempVar.PeopleField, "required"))) && string.IsNullOrEmpty(FormValue)) {
+                                if ((IDontKnowWhat.REquired || GenericController.encodeBoolean(CdefController.getContentFieldProperty(core, "people", IDontKnowWhat.PeopleField, "required"))) && string.IsNullOrEmpty(FormValue)) {
                                     Success = false;
-                                    ErrorController.addUserError(core, "The field [" + HtmlController.encodeHtml(tempVar.Caption) + "] is required.");
+                                    ErrorController.addUserError(core, "The field [" + HtmlController.encodeHtml(IDontKnowWhat.Caption) + "] is required.");
                                 } else {
                                     if (!core.db.csOk(CSPeople)) {
                                         CSPeople = core.db.csOpenRecord("people", core.session.user.id);
@@ -1386,33 +1385,33 @@ namespace Contensive.Processor.Controllers {
                                         string PeopleUsername = null;
                                         string PeoplePassword = null;
                                         string PeopleEmail = "";
-                                        switch (GenericController.vbUCase(tempVar.PeopleField)) {
+                                        switch (GenericController.vbUCase(IDontKnowWhat.PeopleField)) {
                                             case "NAME":
                                                 PeopleName = FormValue;
-                                                core.db.csSet(CSPeople, tempVar.PeopleField, FormValue);
+                                                core.db.csSet(CSPeople, IDontKnowWhat.PeopleField, FormValue);
                                                 break;
                                             case "FIRSTNAME":
                                                 PeopleFirstName = FormValue;
-                                                core.db.csSet(CSPeople, tempVar.PeopleField, FormValue);
+                                                core.db.csSet(CSPeople, IDontKnowWhat.PeopleField, FormValue);
                                                 break;
                                             case "LASTNAME":
                                                 PeopleLastName = FormValue;
-                                                core.db.csSet(CSPeople, tempVar.PeopleField, FormValue);
+                                                core.db.csSet(CSPeople, IDontKnowWhat.PeopleField, FormValue);
                                                 break;
                                             case "EMAIL":
                                                 PeopleEmail = FormValue;
-                                                core.db.csSet(CSPeople, tempVar.PeopleField, FormValue);
+                                                core.db.csSet(CSPeople, IDontKnowWhat.PeopleField, FormValue);
                                                 break;
                                             case "USERNAME":
                                                 PeopleUsername = FormValue;
-                                                core.db.csSet(CSPeople, tempVar.PeopleField, FormValue);
+                                                core.db.csSet(CSPeople, IDontKnowWhat.PeopleField, FormValue);
                                                 break;
                                             case "PASSWORD":
                                                 PeoplePassword = FormValue;
-                                                core.db.csSet(CSPeople, tempVar.PeopleField, FormValue);
+                                                core.db.csSet(CSPeople, IDontKnowWhat.PeopleField, FormValue);
                                                 break;
                                             default:
-                                                core.db.csSet(CSPeople, tempVar.PeopleField, FormValue);
+                                                core.db.csSet(CSPeople, IDontKnowWhat.PeopleField, FormValue);
                                                 break;
                                         }
                                     }
@@ -1422,12 +1421,12 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // Group main_MemberShip
                                 //
-                                IsInGroup = core.docProperties.getBoolean("Group" + tempVar.GroupName);
-                                WasInGroup = core.session.isMemberOfGroup(core, tempVar.GroupName);
+                                IsInGroup = core.docProperties.getBoolean("Group" + IDontKnowWhat.GroupName);
+                                WasInGroup = core.session.isMemberOfGroup(core, IDontKnowWhat.GroupName);
                                 if (WasInGroup && !IsInGroup) {
-                                    GroupController.group_DeleteGroupMember(core, tempVar.GroupName);
+                                    GroupController.group_DeleteGroupMember(core, IDontKnowWhat.GroupName);
                                 } else if (IsInGroup && !WasInGroup) {
-                                    GroupController.group_AddGroupMember(core, tempVar.GroupName);
+                                    GroupController.group_AddGroupMember(core, IDontKnowWhat.GroupName);
                                 }
                                 break;
                         }
@@ -1530,10 +1529,10 @@ namespace Contensive.Processor.Controllers {
                                         //
                                         // read in and compose the repeat lines
                                         //
-                                        Array.Resize(ref result.Inst, i.GetUpperBound(0));
+                                        //Array.Resize(ref result.IDontKnowWhatList, i.GetUpperBound(0));
                                         int IPtr = 0;
                                         for (IPtr = 0; IPtr <= i.GetUpperBound(0) - IStart; IPtr++) {
-                                            var tempVar = result.Inst[IPtr];
+                                            var tempVar = result.IDontKnowWhatList[IPtr];
                                             string[] IArgs = i[IPtr + IStart].Split(',');
                                             if (IArgs.GetUpperBound(0) >= main_IPosMax) {
                                                 tempVar.Caption = IArgs[main_IPosCaption];
@@ -1588,11 +1587,10 @@ namespace Contensive.Processor.Controllers {
                 f = loadFormPageInstructions(core, FormInstructions, Formhtml);
                 string RepeatBody = "";
                 int CSPeople = -1;
-                int IPtr = 0;
+                //int IPtr = 0;
                 string Body = null;
                 bool HasRequiredFields = false;
-                for (IPtr = 0; IPtr <= f.Inst.GetUpperBound(0); IPtr++) {
-                    var tempVar = f.Inst[IPtr];
+                foreach( var tempVar in f.IDontKnowWhatList) {                 
                     bool GroupValue = false;
                     int GroupRowPtr = 0;
                     string CaptionSpan = null;

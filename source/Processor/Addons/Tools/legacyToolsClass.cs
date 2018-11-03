@@ -79,7 +79,7 @@ namespace Contensive.Addons.Tools {
         private int DiagActionCount;
         private const int DiagActionCountMax = 10;
         //
-        private struct DiagActionType {
+        private class  DiagActionType {
             public string Name;
             public string Command;
         }

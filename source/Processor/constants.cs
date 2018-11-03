@@ -1211,10 +1211,6 @@ namespace Contensive.Processor {
             public string name;
             public string value;
         }
-        public struct NameValuePairType {
-            public string Name;
-            public string Value;
-        }
         //
         //========================================================================
         //   defined errors (event log eventId)
@@ -1323,7 +1319,7 @@ namespace Contensive.Processor {
         internal const int main_IPosPeopleField = 3;
         internal const int main_IPosGroupName = 3;
         //
-        public struct Main_FormPagetype_InstType {
+        public class  Main_FormPagetype_InstType {
             public int Type;
             public string Caption;
             public bool REquired;
@@ -1331,13 +1327,13 @@ namespace Contensive.Processor {
             public string GroupName;
         }
         //
-        public struct Main_FormPagetype {
+        public class  Main_FormPagetype {
             public string PreRepeat;
             public string PostRepeat;
             public string RepeatCell;
             public string AddGroupNameList;
             public bool AuthenticateOnFormProcess;
-            public Main_FormPagetype_InstType[] Inst;
+            public List<Main_FormPagetype_InstType> IDontKnowWhatList = new List<Main_FormPagetype_InstType>();
         }
         //
         // Cache the input selects (admin uses the same ones over and over)
@@ -1368,7 +1364,7 @@ namespace Contensive.Processor {
         }
         //
         // -- metaDescription
-        public struct HtmlMetaClass {
+        public class HtmlMetaClass {
             public string content; // the description, title, etc.
             public string addedByMessage; // message used during debug to show where the asset came from
         }
@@ -1386,16 +1382,7 @@ namespace Contensive.Processor {
         public string addonName;
         public Dictionary<string, string> args;
     }
-    //
-    //-----------------------------------------------------------------------
-    //   legacy mainClass arguments
-    //   REFACTOR - organize and rename
-    //-----------------------------------------------------------------------
-    //
-    public struct NameValuePrivateType {
-        public string Name;
-        public string Value;
-    }
+
     //
     //====================================================================================================
     //

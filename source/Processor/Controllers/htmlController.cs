@@ -56,9 +56,9 @@ namespace Contensive.Processor.Controllers {
                 //
                 // TODO -- closing the menu attaches the flyout panels -- should be done when the menu is returned, not at page end
                 // -- output the menu system
-                if (core.menuFlyout != null) {
-                    result.Add(core.menuFlyout.menu_GetClose());
-                }
+                //if (core.menuFlyout != null) {
+                //    result.Add(core.menuFlyout.menu_GetClose());
+                //}
                 //
                 // -- body Javascript
                 bool allowDebugging = core.visitProperty.getBoolean("AllowDebugging");

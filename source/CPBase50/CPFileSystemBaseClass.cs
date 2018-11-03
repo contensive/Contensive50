@@ -55,21 +55,21 @@ namespace Contensive.BaseClasses
             public string Type { get; set; }
         }
         //
-        public abstract void append(string Filename, string FileContent);
-		public abstract void copy(string SourceFilename, string DestinationFilename);
-		public abstract void createFolder(string FolderPath);
-		public abstract void deleteFile(string Filename);
-		public abstract void deleteFolder(string folderPath);
-		public abstract string read(string Filename);
-		public abstract byte[] readBinary(string Filename);
-		public abstract void save(string Filename, string FileContent);
-		public abstract void saveBinary(string Filename, byte[] FileContent);
-		public abstract List<FileDetail> fileList(string folderName, int pageSize = 0, int pageNumber = 1);
-		public abstract List<FolderDetail> folderList(string folderName);
-		public abstract bool fileExists(string pathFileName);
-		public abstract bool folderExists(string folderName);
-		public abstract bool saveUpload(string htmlformName, ref string returnFilename);
-		public abstract bool saveUpload(string htmlformName, string folderpath, ref string returnFilename);
+        public abstract void Append(string Filename, string FileContent);
+		public abstract void Copy(string SourceFilename, string DestinationFilename);
+		public abstract void CreateFolder(string FolderPath);
+		public abstract void DeleteFile(string Filename);
+		public abstract void DeleteFolder(string folderPath);
+		public abstract string Read(string Filename);
+		public abstract byte[] ReadBinary(string Filename);
+		public abstract void Save(string Filename, string FileContent);
+		public abstract void SaveBinary(string Filename, byte[] FileContent);
+		public abstract List<FileDetail> FileList(string folderName, int pageSize = 0, int pageNumber = 1);
+		public abstract List<FolderDetail> FolderList(string folderName);
+		public abstract bool FileExists(string pathFileName);
+		public abstract bool FolderExists(string folderName);
+		public abstract bool SaveUpload(string htmlformName, ref string returnFilename);
+		public abstract bool SaveUpload(string htmlformName, string folderpath, ref string returnFilename);
 	}
 }
 

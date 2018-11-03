@@ -145,15 +145,15 @@ namespace Contensive.Processor.Controllers {
         private Controllers.AddonController _addon;
         //
         //===================================================================================================
-        public MenuFlyoutController menuFlyout {
-            get {
-                if (_menuFlyout == null) {
-                    _menuFlyout = new MenuFlyoutController(this);
-                }
-                return _menuFlyout;
-            }
-        }
-        private MenuFlyoutController _menuFlyout;
+        //public MenuFlyoutController menuFlyout {
+        //    get {
+        //        if (_menuFlyout == null) {
+        //            _menuFlyout = new MenuFlyoutController(this);
+        //        }
+        //        return _menuFlyout;
+        //    }
+        //}
+        //private MenuFlyoutController _menuFlyout;
         //
         //===================================================================================================
         public PropertyModelClass userProperty {
@@ -1316,11 +1316,11 @@ namespace Contensive.Processor.Controllers {
                         _webServer = null;
                     }
                     //
-                    if (_menuFlyout != null) {
-                        // no dispose
-                        //Call _menuFlyout.Dispose()
-                        _menuFlyout = null;
-                    }
+                    //if (_menuFlyout != null) {
+                    //    // no dispose
+                    //    //Call _menuFlyout.Dispose()
+                    //    _menuFlyout = null;
+                    //}
                     //
                     if (_visitProperty != null) {
                         // no dispose

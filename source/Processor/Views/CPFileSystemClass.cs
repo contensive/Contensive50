@@ -48,79 +48,79 @@ namespace Contensive.Processor {
         }
         //
         //==========================================================================================
-        public override void append(string filename, string fileContent) {
+        public override void Append(string filename, string fileContent) {
             fileSystem.appendFile(filename, fileContent);
         }
         //
         //==========================================================================================
-        public override void copy(string sourceFilename, string destinationFilename) {
+        public override void Copy(string sourceFilename, string destinationFilename) {
             fileSystem.copyFile(sourceFilename, destinationFilename);
         }
         //
         //==========================================================================================
-        public override void createFolder(string folderPath) {
+        public override void CreateFolder(string folderPath) {
             fileSystem.createPath(folderPath);
         }
         //
         //==========================================================================================
-        public override void deleteFile(string filename) {
+        public override void DeleteFile(string filename) {
             fileSystem.deleteFile(filename);
         }
         //
         //==========================================================================================
-        public override string read(string filename) {
+        public override string Read(string filename) {
             return fileSystem.readFileText(filename);
         }
         //
         //==========================================================================================
-        public override byte[] readBinary(string filename) {
+        public override byte[] ReadBinary(string filename) {
             return fileSystem.readFileBinary(filename);
         }
         //
         //==========================================================================================
-        public override void save(string filename, string fileContent) {
+        public override void Save(string filename, string fileContent) {
             fileSystem.saveFile(filename, fileContent);
         }
         //
         //==========================================================================================
-        public override void saveBinary(string filename, byte[] fileContent) {
+        public override void SaveBinary(string filename, byte[] fileContent) {
             fileSystem.saveFile(filename, fileContent);
         }
         //
         //==========================================================================================
-        public override bool fileExists(string pathFileName) {
+        public override bool FileExists(string pathFileName) {
             return fileSystem.fileExists(pathFileName);
         }
         //
         //==========================================================================================
-        public override bool folderExists(string folderName) {
+        public override bool FolderExists(string folderName) {
             return fileSystem.pathExists(folderName);
         }
         //
         //==========================================================================================
-        public override List<FileDetail> fileList(string folderName, int pageSize = 0, int pageNumber = 1) {
+        public override List<FileDetail> FileList(string folderName, int pageSize = 0, int pageNumber = 1) {
             return fileSystem.getFileList(folderName);
         }
         //
         //==========================================================================================
-        public override List<FolderDetail> folderList(string folderName) {
+        public override List<FolderDetail> FolderList(string folderName) {
             return fileSystem.getFolderList(folderName);
         }
         //
         //==========================================================================================
-        public override void deleteFolder(string folderPath) {
+        public override void DeleteFolder(string folderPath) {
             fileSystem.deleteFolder(folderPath);
         }
         //
         //==========================================================================================
         //
-        public override bool saveUpload(string htmlformName, ref string returnFilename) {
+        public override bool SaveUpload(string htmlformName, ref string returnFilename) {
             return fileSystem.upload(htmlformName, "\\upload", ref returnFilename);
         }
         //
         //==========================================================================================
         //
-        public override bool saveUpload(string htmlformName, string folderpath, ref string returnFilename) {
+        public override bool SaveUpload(string htmlformName, string folderpath, ref string returnFilename) {
             return fileSystem.upload(htmlformName, folderpath, ref  returnFilename);
         }
         #region  IDisposable Support 
