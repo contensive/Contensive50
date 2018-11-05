@@ -73,7 +73,9 @@ namespace Contensive.BaseClasses
         /// <param name="tableName"></param>
         /// <param name="dataSourceName"></param>
         /// <returns></returns>
-        public abstract string CreateKeyForDbTable(string tableName, string dataSourceName = "default");
+        public abstract string CreateKeyForDbTable(string tableName, string dataSourceName);
+        //
+        public abstract string CreateKeyForDbTable(string tableName );
         /// <summary>
         /// get a cache key for a database model object
         /// </summary>
@@ -81,14 +83,18 @@ namespace Contensive.BaseClasses
         /// <param name="tableName"></param>
         /// <param name="dataSourceName"></param>
         /// <returns></returns>
-        public abstract string CreateKeyForDbRecord(int recordId, string tableName, string dataSourceName = "default");
+        public abstract string CreateKeyForDbRecord(int recordId, string tableName, string dataSourceName);
+        //
+        public abstract string CreateKeyForDbRecord(int recordId, string tableName);
         /// <summary>
         /// get a cache key for a domain model
         /// </summary>
         /// <param name="objectName"></param>
         /// <param name="objectUniqueIdentifier"></param>
         /// <returns></returns>
-        public abstract string CreateKey(string objectName, string objectUniqueIdentifier = "");
+        public abstract string CreateKey(string objectName, string objectUniqueIdentifier);
+        //
+        public abstract string CreateKey(string objectName);
         /// <summary>
         /// return a Ptr Key for a db model object. 
         /// A Ptr key doesnt contain the object, but points to a key that does create the object.
@@ -98,7 +104,9 @@ namespace Contensive.BaseClasses
         /// <param name="tableName"></param>
         /// <param name="dataSourceName"></param>
         /// <returns></returns>
-        public abstract string CreatePtrKeyforDbRecordGuid(string guid, string tableName, string dataSourceName = "default");
+        public abstract string CreatePtrKeyforDbRecordGuid(string guid, string tableName, string dataSourceName);
+        //
+        public abstract string CreatePtrKeyforDbRecordGuid(string guid, string tableName);
         /// <summary>
         /// return a Ptr key for a db model object based on the record name. Only for tables where the name is unique
         /// </summary>
@@ -106,36 +114,31 @@ namespace Contensive.BaseClasses
         /// <param name="tableName"></param>
         /// <param name="dataSourceName"></param>
         /// <returns></returns>
-        public abstract string CreatePtrKeyforDbRecordUniqueName(string name, string tableName, string dataSourceName = "default");
-        /// <summary>
-        /// Store a Db Model with a guid ptr
-        /// </summary>
-        /// <param name="guid"></param>
-        /// <param name="recordId"></param>
-        /// <param name="tableName"></param>
-        /// <param name="dataSourceName"></param>
-        public abstract void StoreDbModel<T>(string guid, int recordId);
-        /// <summary>
-        /// Store a Db Model without a guid pointer
-        /// </summary>
-        /// <param name="recordId"></param>
-        /// <param name="tableName"></param>
-        /// <param name="dataSourceName"></param>
-        public abstract void StoreDbModel<T>(int recordId);
-        /// <summary>
-        /// return a model of type T from its id. If not valid, returns Null
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="recordId"></param>
-        /// <returns></returns>
-        public abstract T GetDbModel<T>(int recordId);
-        /// <summary>
-        /// return a model of type T from its guid. If not valid, returns Null
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="guid"></param>
-        /// <returns></returns>
-        public abstract T GetDbModel<T>(string guid);
+        public abstract string CreatePtrKeyforDbRecordUniqueName(string name, string tableName, string dataSourceName);
+        //
+        public abstract string CreatePtrKeyforDbRecordUniqueName(string name, string tableName);
+        ///// <summary>
+        ///// Store a Db Model with a guid ptr
+        ///// </summary>
+        ///// <typeparam name="T"></typeparam>
+        ///// <param name="guid"></param>
+        ///// <param name="recordId"></param>
+        ///// <param name="modelContent"></param>
+        //public abstract void StoreDbModel(string guid, int recordId, string tableName, string dataSourceName, object modelContent);
+        ///// <summary>
+        ///// return a model of type T from its id. If not valid, returns Null
+        ///// </summary>
+        ///// <typeparam name="T"></typeparam>
+        ///// <param name="recordId"></param>
+        ///// <returns></returns>
+        //public abstract T GetDbModel<T>(int recordId);
+        ///// <summary>
+        ///// return a model of type T from its guid. If not valid, returns Null
+        ///// </summary>
+        ///// <typeparam name="T"></typeparam>
+        ///// <param name="guid"></param>
+        ///// <returns></returns>
+        //public abstract T GetDbModel<T>(string guid);
         /// <summary>
         /// Get an object of type T from cache. If empty or invalid type, returns Null.
         /// </summary>

@@ -7,6 +7,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using System.Runtime.Caching;
 using Contensive.Processor.Exceptions;
+using System.Reflection;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -335,13 +336,56 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// save an object to cache, for compatibility with existing site.
+        /// save an object to cache, for compatibility with existing site. Always use a key generated from createKey methods
         /// </summary>
-        /// <param name="key"></param>
+        /// <param name="key">key generated from createKey methods</param>
         /// <param name="content"></param>
-        /// <remarks></remarks>
         public void storeObject(string key, object content) {
             storeObject(key, content, DateTime.Now.AddDays(invalidationDaysDefault), new List<string> { });
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// save a Db Model cache.
+        /// </summary>
+        /// <param name="guid"></param>
+        /// <param name="recordId"></param>
+        /// <param name="tableName"></param>
+        /// <param name="datasourceName"></param>
+        /// <param name="modelContent"></param>
+        public void StoreDbModel(string guid, int recordId, string tableName, string datasourceName, object modelContent) {
+            string key = createCacheKey_forDbRecord(recordId, tableName, datasourceName);
+            storeObject(key, modelContent);
+            string keyPtr = createCachePtr_forDbRecord_guid(guid, tableName, datasourceName);
+            storePtr(keyPtr, key);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// future method. To support a cpbase implementation, but wait until Models.Db.BaseModel is exposed
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="guid"></param>
+        /// <param name="recordId"></param>
+        /// <param name="content"></param>
+        public void StoreDbModel<T>(string guid, int recordId, object content) where T : BaseModel {
+            Type derivedType = this.GetType();
+            FieldInfo fieldInfoTable = derivedType.GetField("contentTableName");
+            if (fieldInfoTable == null) {
+                throw new GenericException("Class [" + derivedType.Name + "] must declare constant [contentTableName].");
+            } else {
+                string tableName = fieldInfoTable.GetRawConstantValue().ToString();
+                FieldInfo fieldInfoDatasource = derivedType.GetField("contentDataSource");
+                if (fieldInfoDatasource == null) {
+                    throw new GenericException("Class [" + derivedType.Name + "] must declare public constant [contentDataSource].");
+                } else {
+                    string datasourceName = fieldInfoDatasource.GetRawConstantValue().ToString();
+                    string key = createCacheKey_forDbRecord(recordId, tableName, datasourceName);
+                    storeObject(key, content);
+                    string keyPtr = createCachePtr_forDbRecord_guid(guid, tableName, datasourceName);
+                    storePtr(keyPtr, key);
+                }
+            }
         }
         //
         //====================================================================================================
@@ -495,11 +539,13 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public static string createCacheKey_forDbTable( string tableName ) {
-            string key = "dbtable/" + tableName + "/";
+        public static string createCacheKey_forDbTable( string tableName, string dataSourceName ) {
+            string key = (String.IsNullOrWhiteSpace(dataSourceName)) ? "dbtable/default/" + tableName.Trim() + "/" : "dbtable/" + dataSourceName.Trim() + "/" + tableName.Trim() + "/";
             key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
             return key;
         }
+        //
+        public static string createCacheKey_forDbTable(string tableName) => createCacheKey_forDbTable(tableName, "default");
         /// <summary>
         /// return the standard key for Db records. 
         /// setObject for this key should only be the object model for this id
@@ -509,11 +555,13 @@ namespace Contensive.Processor.Controllers {
         /// <param name="tableName"></param>
         /// <param name="dataSourceName"></param>
         /// <returns></returns>
-        public static string createCacheKey_forDbRecord(int recordId, string tableName, string dataSourceName = "default") {
-            string key = "dbrecord/" + dataSourceName + "/" + tableName + "/id/" + recordId.ToString() + "/";
+        public static string createCacheKey_forDbRecord(int recordId, string tableName, string dataSourceName) {
+            string key = (String.IsNullOrWhiteSpace(dataSourceName)) ? "dbtable/default/" : "dbtable/" + dataSourceName.Trim() + "/";
+            key += tableName.Trim() + "/id/" + recordId.ToString() + "/";
             key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
             return key;
         }
+        public static string createCacheKey_forDbRecord(int recordId, string tableName) => createCacheKey_forDbRecord(recordId, tableName, "default");
         /// <summary>
         /// return the standard key for cache ptr by Guid for Db records.  
         /// Only use this Ptr in setPtr. NEVER setObject for a ptr.
@@ -523,11 +571,13 @@ namespace Contensive.Processor.Controllers {
         /// <param name="tableName"></param>
         /// <param name="dataSourceName"></param>
         /// <returns></returns>
-        public static string createCachePtr_forDbRecord_guid(string guid, string tableName, string dataSourceName = "default") {
+        public static string createCachePtr_forDbRecord_guid(string guid, string tableName, string dataSourceName) {
             string key = "dbptr/" + dataSourceName + "/" + tableName + "/ccguid/" + guid + "/";
             key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
             return key;
         }
+        //
+        public static string createCachePtr_forDbRecord_guid(string guid, string tableName) => createCachePtr_forDbRecord_guid(guid, tableName, "default");
         /// <summary>
         /// return the standard key for cache ptr by name for Db records. 
         /// ONLY use this for tables where the name is unique.
@@ -538,11 +588,13 @@ namespace Contensive.Processor.Controllers {
         /// <param name="tableName"></param>
         /// <param name="dataSourceName"></param>
         /// <returns></returns>
-        public static string createCachePtr_forDbRecord_uniqueName(string name, string tableName, string dataSourceName = "default") {
+        public static string createCachePtr_forDbRecord_uniqueName(string name, string tableName, string dataSourceName) {
             string key = "dbptr/" + dataSourceName + "/" + tableName + "/name/" + name + "/";
             key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
             return key;
         }
+        //
+        public static string createCachePtr_forDbRecord_uniqueName(string name, string tableName) => createCachePtr_forDbRecord_uniqueName(name, tableName, "default");
         //
         //====================================================================================================
         /// <summary>

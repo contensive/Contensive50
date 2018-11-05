@@ -29,6 +29,128 @@ namespace Contensive.Processor {
         }
         //
         //====================================================================================================
+        //
+        public override void Clear(List<string> keyList) => core.cache.invalidate(keyList);
+        //
+        //====================================================================================================
+        //
+        public override object GetObject(string key) => core.cache.getObject<object>(key);
+        //
+        //====================================================================================================
+        //
+        public override string GetText(string key) => core.cache.getObject<string>(key);
+        //
+        //====================================================================================================
+        //
+        public override int GetInteger(string key) => core.cache.getObject<int>(key);
+        //
+        //====================================================================================================
+        //
+        public override double GetNumber(string key) => core.cache.getObject<double>(key);
+        //
+        //====================================================================================================
+        //
+        public override DateTime GetDate(string key) => core.cache.getObject<DateTime>(key);
+        //
+        //====================================================================================================
+        //
+        public override bool GetBoolean(string key) => core.cache.getObject<bool>(key);
+        //
+        //====================================================================================================
+        //
+        public override void Invalidate(string key) => core.cache.invalidate(key);
+        //
+        //====================================================================================================
+        //
+        public override string CreateKeyForDbTable(string tableName) => CacheController.createCacheKey_forDbTable(tableName);
+        //
+        public override string CreateKeyForDbTable(string tableName, string dataSourceName) => CacheController.createCacheKey_forDbTable(tableName, dataSourceName);
+        //
+        //====================================================================================================
+        //
+        public override string CreateKeyForDbRecord(int recordId, string tableName, string dataSourceName) => CacheController.createCacheKey_forDbRecord(recordId, tableName, dataSourceName);
+
+        public override string CreateKeyForDbRecord(int recordId, string tableName) => CacheController.createCacheKey_forDbRecord(recordId, tableName);
+        //
+        //====================================================================================================
+        //
+        public override string CreateKey(string objectName) => CacheController.createCacheKey_forObject(objectName);
+
+        //
+        public override string CreateKey(string objectName, string objectUniqueIdentifier = "") => CacheController.createCacheKey_forObject(objectName, objectUniqueIdentifier);
+        //
+        //====================================================================================================
+        //
+        public override string CreatePtrKeyforDbRecordGuid(string guid, string tableName, string dataSourceName) => CacheController.createCachePtr_forDbRecord_guid(guid, tableName, dataSourceName);
+        //
+        public override string CreatePtrKeyforDbRecordGuid(string guid, string tableName) => CacheController.createCachePtr_forDbRecord_guid(guid, tableName);
+        //
+        //====================================================================================================
+        //
+        public override string CreatePtrKeyforDbRecordUniqueName(string name, string tableName, string dataSourceName) => CacheController.createCachePtr_forDbRecord_uniqueName(name, tableName, dataSourceName);
+
+        public override string CreatePtrKeyforDbRecordUniqueName(string name, string tableName) => CacheController.createCachePtr_forDbRecord_uniqueName(name, tableName);
+        ////
+        ////====================================================================================================
+        ////
+        //public override void StoreDbModel(string guid, int recordId, string tableName, string datasourceName, object modelContent) => core.cache.StoreDbModel(guid, recordId, tableName, datasourceName, modelContent);
+        ////
+        ////====================================================================================================
+        ////
+        //public override T GetDbModel<T>(int recordId) {
+        //    return core.cache.getObject<T>()
+        //    throw new NotImplementedException();
+        //}
+        ////
+        ////====================================================================================================
+        ////
+        //public override T GetDbModel<T>(string guid) {
+        //    throw new NotImplementedException();
+        //}
+        //
+        //====================================================================================================
+        //
+        public override T GetObject<T>(string key) {
+            throw new NotImplementedException();
+        }
+        //
+        //====================================================================================================
+        //
+        public override void StoreObject(string key, object value) {
+            throw new NotImplementedException();
+        }
+        //
+        //====================================================================================================
+        //
+        public override void StoreObject(string key, object value, DateTime invalidationDate) {
+            throw new NotImplementedException();
+        }
+        //
+        //====================================================================================================
+        //
+        public override void StoreObject(string key, object value, List<string> dependentKeyList) {
+            throw new NotImplementedException();
+        }
+        //
+        //====================================================================================================
+        //
+        public override void StoreObject(string key, object value, DateTime invalidationDate, List<string> dependentKeyList) {
+            throw new NotImplementedException();
+        }
+        //
+        //====================================================================================================
+        //
+        public override void StoreObject(string key, object value, string dependentKey) {
+            throw new NotImplementedException();
+        }
+        //
+        //====================================================================================================
+        //
+        public override void StoreObject(string key, object value, DateTime invalidationDate, string dependentKey) {
+            throw new NotImplementedException();
+        }
+        //
+        //====================================================================================================
         /// <summary>
         /// Clear all cache values
         /// </summary>
@@ -43,6 +165,8 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="ContentNameList"></param>
         /// <remarks></remarks>
+        ///
+        [Obsolete("Use Clear(dependentKeyList)", true)]
         public override void Clear(string ContentNameList) {
             if (!string.IsNullOrEmpty(ContentNameList)) {
                 List<string> tableNameList = new List<string>();
@@ -75,14 +199,18 @@ namespace Contensive.Processor {
         /// <param name="invalidationTagCommaList"></param>
         /// <param name="ClearOnDate"></param>
         /// <remarks></remarks>
+        /// 
+        [Obsolete("Use StoreObject()",true)]
         public override void Save(string key, string Value) {
-            Save(key, Value, "", DateTime.MinValue);
+            StoreObject(key, Value);
         }
         //
+        [Obsolete("Use StoreObject()", true)]
         public override void Save(string key, string Value, string invalidationTagCommaList) {
             Save(key, Value, invalidationTagCommaList, DateTime.MinValue);
         }
         //
+        [Obsolete("Use StoreObject()", true)]
         public override void Save(string key, string Value, string invalidationTagCommaList, DateTime invalidationDate) {
             try {
                 List<string> invalidationTagList = new List<string>();
@@ -240,6 +368,7 @@ namespace Contensive.Processor {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+
         ~CPCacheClass() {
             Dispose(false);
             

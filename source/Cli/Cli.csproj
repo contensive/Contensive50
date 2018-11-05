@@ -254,9 +254,9 @@
       <Project>{46657d07-74bc-4ddc-8fdd-9078eb1a1cd2}</Project>
       <Name>Processor</Name>
     </ProjectReference>
-    <ProjectReference Include="..\CPBase50\CPBase50.csproj">
+    <ProjectReference Include="..\CPBase50\CPBase501.csproj">
       <Project>{0619e0e6-1565-47e7-b8fe-f8bd1c8eb48b}</Project>
-      <Name>CPBase50</Name>
+      <Name>CPBase501</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
