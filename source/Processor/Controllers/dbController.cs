@@ -2357,7 +2357,7 @@ namespace Contensive.Processor.Controllers {
                         List<string> invaldiateObjectList = new List<string>();
                         CSPointer = csOpen(ContentName, Criteria, "", false, MemberID, true, true);
                         while (csOk(CSPointer)) {
-                            invaldiateObjectList.Add(CacheController.getCacheKey_forDbRecord(csGetInteger(CSPointer, "id"), CDef.tableName, CDef.dataSourceName));
+                            invaldiateObjectList.Add(CacheController.createCacheKey_forDbRecord(csGetInteger(CSPointer, "id"), CDef.tableName, CDef.dataSourceName));
                             csDeleteRecord(CSPointer);
                             csGoNext(CSPointer);
                         }

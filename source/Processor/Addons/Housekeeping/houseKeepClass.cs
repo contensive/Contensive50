@@ -167,7 +167,7 @@ namespace Contensive.Addons.Housekeeping {
                             if (NeedToClearCache) {
                                 object emptyData = null;
                                 core.cache.invalidate("Page Content");
-                                core.cache.setObject("PCC", emptyData);
+                                core.cache.storeObject("PCC", emptyData);
                             }
                         }
                         {

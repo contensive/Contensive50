@@ -382,7 +382,7 @@ namespace Contensive.Processor.Controllers {
                                                 + "";
                                             core.privateFiles.saveFile(Filename, botFileContent);
                                         }
-                                        core.cache.setObject("DefaultBotNameList", botFileContent, DateTime.Now.AddHours(1), new List<string>());
+                                        core.cache.storeObject("DefaultBotNameList", botFileContent, DateTime.Now.AddHours(1), new List<string>());
                                     }
                                     //
                                     if (!string.IsNullOrEmpty(botFileContent)) {

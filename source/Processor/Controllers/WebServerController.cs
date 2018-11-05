@@ -436,7 +436,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // if there was a change, update the cache
                         //
-                        core.cache.setObject("domainContentList", core.domainDictionary, new List<string> { DomainModel.getTableInvalidationKey(core) });
+                        core.cache.storeObject("domainContentList", core.domainDictionary, new List<string> { DomainModel.getTableInvalidationKey(core) });
                     }
                     //
                     // domain found

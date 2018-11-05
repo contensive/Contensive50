@@ -39,7 +39,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 string key = "test" + GenericController.GetRandomInteger(cp.core).ToString();
                 string value = "value" + GenericController.GetRandomInteger(cp.core).ToString();
                 // act
-                cp.core.cache.setObject(key, value);
+                cp.core.cache.storeObject(key, value);
                 string readBack = cp.core.cache.getObject<string>(key);
                 // assert
                 Assert.AreEqual(value, readBack);
@@ -63,7 +63,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 var srcTest = new cacheTestClass();
                 string key = "test" + GenericController.GetRandomInteger(cp.core).ToString();
                 // act
-                cp.core.cache.setObject(key, srcTest);
+                cp.core.cache.storeObject(key, srcTest);
                 var dstTest = cp.core.cache.getObject<cacheTestClass>(key);
                 // assert
                 Assert.AreEqual(srcTest, dstTest);
@@ -83,7 +83,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 };
                 string key = "test" + GenericController.GetRandomInteger(cp.core).ToString();
                 // act
-                cp.core.cache.setObject(key, srcTest);
+                cp.core.cache.storeObject(key, srcTest);
                 var dstTest = cp.core.cache.getObject<cacheTestClass>(key);
                 // assert
                 Assert.AreEqual(srcTest, dstTest);
@@ -98,12 +98,12 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 string keyTest = "test" + GenericController.GetRandomInteger(cp.core).ToString();
                 string keyDependency = "dependencyKey1" + GenericController.GetRandomInteger(cp.core).ToString();
                 // act
-                cp.core.cache.setObject(keyDependency, "1");
+                cp.core.cache.storeObject(keyDependency, "1");
                 cp.Utils.Sleep(1);
-                cp.core.cache.setObject(keyTest, originalObject, keyDependency);
+                cp.core.cache.storeObject(keyTest, originalObject, keyDependency);
                 cp.Utils.Sleep(1);
                 var valueBeforeDependencySave = cp.core.cache.getObject<cacheTestClass>(keyTest);
-                cp.core.cache.setObject(keyDependency, "2");
+                cp.core.cache.storeObject(keyDependency, "2");
                 cp.Utils.Sleep(1);
                 var valueAfterDependencySave = cp.core.cache.getObject<cacheTestClass>(keyTest);
                 // assert
@@ -123,12 +123,12 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 dependencyList.Add(keyDependency);
                 dependencyList.Add("fake");
                 // act
-                cp.core.cache.setObject(keyDependency, "1");
+                cp.core.cache.storeObject(keyDependency, "1");
                 cp.Utils.Sleep(1);
-                cp.core.cache.setObject(keyTest, originalObject, dependencyList);
+                cp.core.cache.storeObject(keyTest, originalObject, dependencyList);
                 cp.Utils.Sleep(1);
                 var valueBeforeDependencySave = cp.core.cache.getObject<cacheTestClass>(keyTest);
-                cp.core.cache.setObject(keyDependency, "2");
+                cp.core.cache.storeObject(keyDependency, "2");
                 cp.Utils.Sleep(1);
                 var valueAfterDependencySave = cp.core.cache.getObject<cacheTestClass>(keyTest);
                 // assert
@@ -146,8 +146,8 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 string keyTestNoDate = "testNoDate" + GenericController.GetRandomInteger(cp.core).ToString();
                 DateTime invalidateDate = DateTime.Now.AddMilliseconds(1);
                 // act
-                cp.core.cache.setObject(keyTestNoDate, originalObject);
-                cp.core.cache.setObject(keyTestWithDate, originalObject, invalidateDate);
+                cp.core.cache.storeObject(keyTestNoDate, originalObject);
+                cp.core.cache.storeObject(keyTestWithDate, originalObject, invalidateDate);
                 cp.Utils.Sleep(1);
                 var valueWithDate = cp.core.cache.getObject<cacheTestClass>(keyTestWithDate);
                 var valueNoDate = cp.core.cache.getObject<cacheTestClass>(keyTestNoDate);
@@ -164,7 +164,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 var originalObject = new cacheTestClass();
                 string keyTest = "test" + GenericController.GetRandomInteger(cp.core).ToString();
                 // act
-                cp.core.cache.setObject(keyTest, originalObject);
+                cp.core.cache.storeObject(keyTest, originalObject);
                 cp.Utils.Sleep(1);
                 var valueBeforeInvalidate = cp.core.cache.getObject<cacheTestClass>(keyTest);
                 cp.core.cache.invalidate(keyTest);
@@ -187,8 +187,8 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 string testKey = "test" + GenericController.GetRandomInteger(cp.core).ToString();
                 string testAlias = "test" + GenericController.GetRandomInteger(cp.core).ToString();
                 // act
-                cp.core.cache.setObject(testKey, originalObject);
-                cp.core.cache.setPtr(testAlias, testKey);
+                cp.core.cache.storeObject(testKey, originalObject);
+                cp.core.cache.storePtr(testAlias, testKey);
                 var valueFromAlias = cp.core.cache.getObject<cacheTestClass>(testAlias);
                 // assert
                 Assert.AreEqual(originalObject, valueFromAlias);
@@ -206,8 +206,8 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 string testKey = "test" + GenericController.GetRandomInteger(cp.core).ToString();
                 string testAlias = "test" + GenericController.GetRandomInteger(cp.core).ToString();
                 // act
-                cp.core.cache.setObject(testKey, originalObject);
-                cp.core.cache.setPtr(testAlias, testKey);
+                cp.core.cache.storeObject(testKey, originalObject);
+                cp.core.cache.storePtr(testAlias, testKey);
                 cp.core.cache.invalidate(testAlias);
                 var valueFromKey = cp.core.cache.getObject<cacheTestClass>(testKey);
                 var valueFromAlias = cp.core.cache.getObject<cacheTestClass>(testAlias);
@@ -228,8 +228,8 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 string testKey = "test" + GenericController.GetRandomInteger(cp.core).ToString();
                 string testAlias = "test" + GenericController.GetRandomInteger(cp.core).ToString();
                 // act
-                cp.core.cache.setObject(testKey, originalObject);
-                cp.core.cache.setPtr(testAlias, testKey);
+                cp.core.cache.storeObject(testKey, originalObject);
+                cp.core.cache.storePtr(testAlias, testKey);
                 cp.core.cache.invalidate(testAlias);
                 var valueFromKey = cp.core.cache.getObject<cacheTestClass>(testKey);
                 var valueFromAlias = cp.core.cache.getObject<cacheTestClass>(testAlias);

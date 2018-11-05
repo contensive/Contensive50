@@ -20,25 +20,6 @@ namespace Contensive.Addons.AdminSite {
         //
         //====================================================================================================
         /// <summary>
-        /// REFACTOR - Constructor for addon instances. Until refactoring, calls into other methods must be constructed with (coreClass) variation.
-        /// </summary>
-        /// <param name="cp"></param>
-        /// <remarks></remarks>
-        public GetHtmlBodyClass() : base() {
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// get the admin content
-        /// </summary>
-        /// <param name="core"></param>
-        public GetHtmlBodyClass(Contensive.Processor.CPClass cp) : base() {
-            this.cp = cp;
-            core = this.cp.core;
-        }
-        //
-        //====================================================================================================
-        /// <summary>
         /// addon method, deliver complete Html admin site
         /// </summary>
         /// <param name="cp"></param>
@@ -46,36 +27,6 @@ namespace Contensive.Addons.AdminSite {
         public override object Execute(Contensive.BaseClasses.CPBaseClass cp) {
             string result = "";
             try {
-                //
-                // -- ok to cast cpbase to cp because they build from the same solution
-                this.cp = (CPClass)cp;
-                core = this.cp.core;
-                //
-                // -- log request
-                string logContent = "Admin Site Request:"
-                        + "\r\n" + DateTime.Now
-                        + "\r\nmember.name:" + core.session.user.name
-                        + "\r\nmember.id:" + core.session.user.id
-                        + "\r\nvisit.id:" + core.session.visit.id
-                        + "\r\nurl:" + core.webServer.requestUrl
-                        + "\r\nurl source:" + core.webServer.requestUrlSource + "\r\n----------"
-                        + "\r\nform post:";
-                foreach (string key in core.docProperties.getKeyList()) {
-                    DocPropertiesClass docProperty = core.docProperties.getProperty(key);
-                    if (docProperty.IsForm) {
-                        logContent += "\r\n" + docProperty.NameValue;
-                    }
-                }
-                if (!(core.webServer.requestFormBinaryHeader == null)) {
-                    byte[] BinaryHeader = core.webServer.requestFormBinaryHeader;
-                    string BinaryHeaderString = GenericController.byteArrayToString(BinaryHeader);
-                    logContent += ""
-                            + "\r\n----------"
-                            + "\r\nbinary header:"
-                            + "\r\n" + BinaryHeaderString + "\r\n";
-                }
-                LogController.addSiteActivity(core, logContent, core.session.user.id, core.session.user.OrganizationID);
-                //
                 if (!core.session.isAuthenticated) {
                     //
                     // --- must be authenticated to continue. Force a local login
@@ -1699,17 +1650,6 @@ namespace Contensive.Addons.AdminSite {
                 StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 Stream.Add(AdminUIController.getHeader(core, LeftSide, RightSide));
                 //
-                // Menuing
-                //
-                // -- 20181101 remove top menu
-                //if ((adminData.ignore_legacyMenuDepth == 0) && (adminData.AdminMenuModeID == AdminMenuModeTop)) {
-                //    Stream.Add(GetMenuTopMode(adminData));
-                //}
-                //
-                // --- Rule to separate content
-                //
-                //Stream.Add("\r<div style=\"border-top:1px solid white;border-bottom:1px solid black;height:2px\"><img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=1 height=1></div>");
-                //
                 // --- Content Definition
                 adminData.adminFooter = "";
                 //
@@ -1720,11 +1660,13 @@ namespace Contensive.Addons.AdminSite {
                 });
                 //
                 // -- shortterm fix - make navigator changes, long term pull it into project
-                string src = "<img title=\"Open Navigator\" alt=\"Open Navigator\" src=\"/ContensiveBase/images/OpenRightRev1313.gif\" width=13 height=13 border=0 style=\"text-align:right;\">";
+                // "<ximg title=\"Open Navigator\" alt=\"Open Navigator\" src=\"/ContensiveBase/images/OpenRightRev1313.gif\" width=13 height=13 border=0 style=\"text-align:right;\">";
+                string src = HtmlController.img("/ContensiveBase/images/OpenRightRev1313.gif", "Open Navigator", 13, 13 ).Replace( ">", "style=\"text-align:right;\">");
                 AdminNavFull = AdminNavFull.Replace(src, iconOpen);
-                src = "<img alt=\"Close Navigator\" title=\"Close Navigator\" src=\"/ContensiveBase/images/ClosexRev1313.gif\" width=13 height=13 border=0>";
+                // "<ximg alt=\"Close Navigator\" title=\"Close Navigator\" src=\"/ContensiveBase/images/ClosexRev1313.gif\" width=13 height=13 border=0>";
+                src = HtmlController.img("/ContensiveBase/images/ClosexRev1313.gif", "Close Navigator", 13, 13);
                 AdminNavFull = AdminNavFull.Replace(src, iconClose);
-                Stream.Add("<table border=0 cellpadding=0 cellspacing=0><tr>\r<td class=\"ccToolsCon\" valign=top>" + GenericController.nop(AdminNavFull) + "\r</td>\r<td id=\"desktop\" class=\"ccContentCon\" valign=top>");
+                Stream.Add("<table border=0 cellpadding=0 cellspacing=0><tr>\r<td class=\"ccToolsCon\" valign=top>" + AdminNavFull + "</td>\r<td id=\"desktop\" class=\"ccContentCon\" valign=top>");
                 adminData.adminFooter = adminData.adminFooter + "</td></tr></table>";
                 //
                 result = Stream.Text;

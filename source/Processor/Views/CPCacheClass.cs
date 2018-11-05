@@ -90,9 +90,9 @@ namespace Contensive.Processor {
                     invalidationTagList.AddRange(invalidationTagCommaList.Split(','));
                 }
                 if (invalidationDate.isOld()) {
-                    core.cache.setObject(key, Value, invalidationTagList);
+                    core.cache.storeObject(key, Value, invalidationTagList);
                 } else {
-                    core.cache.setObject(key, Value, invalidationDate, invalidationTagList);
+                    core.cache.storeObject(key, Value, invalidationDate, invalidationTagList);
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -161,7 +161,7 @@ namespace Contensive.Processor {
         /// <param name="key"></param>
         /// <param name="value"></param>
         public override void setKey(string key, object value) {
-            core.cache.setObject(key, value);
+            core.cache.storeObject(key, value);
         }
         //
         //====================================================================================================
@@ -172,7 +172,7 @@ namespace Contensive.Processor {
         /// <param name="value"></param>
         /// <param name="invalidationDate"></param>
         public override void setKey(string key, object value, DateTime invalidationDate) {
-            core.cache.setObject(key, value, invalidationDate, new List<string> { });
+            core.cache.storeObject(key, value, invalidationDate, new List<string> { });
         }
         //
         //====================================================================================================
@@ -183,7 +183,7 @@ namespace Contensive.Processor {
         /// <param name="value"></param>
         /// <param name="tagList"></param>
         public override void setKey(string key, object value, List<string> tagList) {
-            core.cache.setObject(key, value, tagList);
+            core.cache.storeObject(key, value, tagList);
         }
         //
         //====================================================================================================
@@ -195,20 +195,20 @@ namespace Contensive.Processor {
         /// <param name="tagList"></param>
         /// <param name="invalidationDate"></param>
         public override void setKey(string key, object value, DateTime invalidationDate, List<string> tagList) {
-            core.cache.setObject(key, value, invalidationDate, tagList);
+            core.cache.storeObject(key, value, invalidationDate, tagList);
         }
         //
         //====================================================================================================
         //
         public override void setKey(string key, object value, string tag) {
-            core.cache.setObject(key, value, tag);
+            core.cache.storeObject(key, value, tag);
         }
         //
         //====================================================================================================
         //
         public override void setKey(string key, object Value, DateTime invalidationDate, string tag) {
             List<string> depKeyList = (string.IsNullOrWhiteSpace(tag) ? new List<string> { } : tag.Split(',').ToList());
-            core.cache.setObject(key, Value, invalidationDate, depKeyList);
+            core.cache.storeObject(key, Value, invalidationDate, depKeyList);
         }
         //
         public override void InvalidateContentRecord(string contentName, int recordId) {

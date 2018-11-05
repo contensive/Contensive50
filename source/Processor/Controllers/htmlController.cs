@@ -796,7 +796,8 @@ namespace Contensive.Processor.Controllers {
                     if (GenericController.vbLCase(IconFilename.Left(7)) != "/ContensiveBase/") {
                         IconFilename = GenericController.getCdnFileLink(core, IconFilename);
                     }
-                    result += "<img alt=\"Login\" src=\"" + IconFilename + "\" border=\"0\" >";
+                    // original  "<img alt=\"Login\" src=\"" + IconFilename + "\" border=\"0\" >"
+                    result += HtmlController.img( IconFilename, "Login" );
                     result += "</A>";
                     result += "</td></tr></table>";
                 }
@@ -2608,72 +2609,62 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public string getPanel(string content, string StylePanel = "", string StyleHilite = "ccPanelHilite", string StyleShadow = "ccPanelShadow", string Width = "100%", int Padding = 5, int HeightMin = 1) {
-            string result = null;
-            string ContentPanelWidth = null;
-            string MyStylePanel = null;
-            string MyStyleHilite = null;
-            string MyStyleShadow = null;
-            string MyWidth = null;
-            string MyPadding = null;
-            string MyHeightMin = null;
-            string s0 = null;
-            string s1 = null;
-            string s2 = null;
-            string s3 = null;
-            string s4 = null;
-            string contentPanelWidthStyle = null;
-            //
-            MyStylePanel = GenericController.encodeEmpty(StylePanel, "ccPanel");
-            MyStyleHilite = GenericController.encodeEmpty(StyleHilite, "ccPanelHilite");
-            MyStyleShadow = GenericController.encodeEmpty(StyleShadow, "ccPanelShadow");
-            MyWidth = GenericController.encodeEmpty(Width, "100%");
-            MyPadding = Padding.ToString();
-            MyHeightMin = HeightMin.ToString();
-            //
-            if (MyWidth.IsNumeric()) {
-                ContentPanelWidth = (int.Parse(MyWidth) - 2).ToString();
+        public string getPanel(string content, string stylePanel, string styleHilite, string styleShadow, string width, int padding, int heightMin) {
+            string ContentPanelWidth = "";
+            string contentPanelWidthStyle = "";
+            if (width.IsNumeric()) {
+                ContentPanelWidth = (int.Parse(width) - 2).ToString();
                 contentPanelWidthStyle = ContentPanelWidth + "px";
             } else {
                 ContentPanelWidth = "100%";
                 contentPanelWidthStyle = ContentPanelWidth;
             }
             //
-            //
-            //
-            s0 = ""
-                + "\r<td style=\"padding:" + MyPadding + "px;vertical-align:top\" class=\"" + MyStylePanel + "\">"
-                + GenericController.nop(GenericController.encodeText(content))
-                + "\r</td>"
+            string s0 = ""
+                + "<td style=\"padding:" + padding + "px;vertical-align:top\" class=\"" + stylePanel + "\">"
+                + content
+                + "</td>"
                 + "";
             //
-            s1 = ""
-                + "\r<tr>"
-                + GenericController.nop(s0)
-                + "\r</tr>"
+            string s1 = ""
+                + "<tr>"
+                + s0
+                + "</tr>"
                 + "";
-            s2 = ""
-                + "\r<table style=\"width:" + contentPanelWidthStyle + ";border:0px;\" class=\"" + MyStylePanel + "\" cellspacing=\"0\">"
-                + GenericController.nop(s1)
-                + "\r</table>"
+            string s2 = ""
+                + "<table style=\"width:" + contentPanelWidthStyle + ";border:0px;\" class=\"" + stylePanel + "\" cellspacing=\"0\">"
+                + s1
+                + "</table>"
                 + "";
-            s3 = ""
-                + "\r<td colspan=\"3\" width=\"" + ContentPanelWidth + "\" valign=\"top\" align=\"left\" class=\"" + MyStylePanel + "\">"
-                + GenericController.nop(s2)
-                + "\r</td>"
+            string s3 = ""
+                + "<td colspan=\"3\" width=\"" + ContentPanelWidth + "\" valign=\"top\" align=\"left\" class=\"" + stylePanel + "\">"
+                + s2
+                + "</td>"
                 + "";
-            s4 = ""
-                + "\r<tr>"
-                + GenericController.nop(s3)
-                + "\r</tr>"
+            string s4 = ""
+                + "<tr>"
+                + s3
+                + "</tr>"
                 + "";
-            result = ""
-                + "\r<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"" + MyWidth + "\" class=\"" + MyStylePanel + "\">"
-                + GenericController.nop(s4)
-                + "\r</table>"
+            string result = ""
+                + "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"" + width + "\" class=\"" + stylePanel + "\">"
+                + s4
+                + "</table>"
                 + "";
             return result;
         }
+        //
+        public string getPanel(string content) => getPanel(content, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5, 1);
+        //
+        public string getPanel(string content, string stylePanel) => getPanel(content, stylePanel, "ccPanelHilite", "ccPanelShadow", "100%", 5, 1);
+        //
+        public string getPanel(string content, string stylePanel, string styleHilite) => getPanel(content, stylePanel, styleHilite, "ccPanelShadow", "100%", 5, 1);
+        //
+        public string getPanel(string content, string stylePanel, string styleHilite, string styleShadow) => getPanel(content, stylePanel, styleHilite, styleShadow, "100%", 5, 1);
+        //
+        public string getPanel(string content, string stylePanel, string styleHilite, string styleShadow, string width) => getPanel(content, stylePanel, styleHilite, styleShadow, width, 5, 1);
+        //
+        public string getPanel(string content, string stylePanel, string styleHilite, string styleShadow, string width, int padding) => getPanel(content, stylePanel, styleHilite, styleShadow, width, padding, 1);
         //
         //====================================================================================================
         public string getPanelHeader(string HeaderMessage, string RightSideMessage = "") {
@@ -3709,13 +3700,28 @@ namespace Contensive.Processor.Controllers {
         //
         // ====================================================================================================
         /// <summary>
-        /// html img tag
+        /// img tag
         /// </summary>
         /// <param name="src"></param>
+        /// <param name="alt"></param>
+        /// <param name="widthPx"></param>
+        /// <param name="heightPx"></param>
         /// <returns></returns>
-        public static string img(string src) {
-            return String.Join("_", new String[] {"<img src=\"", src, ">" });
+        public static string img(string src, string alt, int widthPx, int heightPx) {
+            var result = new StringBuilder("<img");
+            result.Append(!string.IsNullOrEmpty(src) ? " src=\"" + src + "\"" : "");
+            result.Append(!string.IsNullOrEmpty(alt) ? " alt=\"" + alt + "\"" : "");
+            result.Append(!widthPx.Equals(0) ? " width=\"" + widthPx.ToString() + "\"" : "");
+            result.Append(!heightPx.Equals(0) ? " height=\"" + heightPx.ToString() + "\"" : "");
+            result.Append(">");
+            return result.ToString();
         }
+        //
+        public static string img(string src, string alt, int widthPx) => img(src, alt, widthPx, 0);
+        //
+        public static string img(string src, string alt) => img(src, alt, 0, 0);
+        //
+        public static string img(string src) => img(src, "", 0, 0);
         //
         // ====================================================================================================
         /// <summary>

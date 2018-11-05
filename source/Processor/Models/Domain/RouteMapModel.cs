@@ -159,11 +159,11 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="routeDictionary"></param>
         private static void setCache(CoreController core, RouteMapModel routeDictionary) {
             var dependentKeyList = new List<string> {
-                CacheController.getCacheKey_forDbTable(AddonModel.contentTableName),
-                CacheController.getCacheKey_forDbTable(LinkAliasModel.contentTableName),
-                CacheController.getCacheKey_forDbTable(LinkForwardModel.contentTableName)
+                CacheController.createCacheKey_forDbTable(AddonModel.contentTableName),
+                CacheController.createCacheKey_forDbTable(LinkAliasModel.contentTableName),
+                CacheController.createCacheKey_forDbTable(LinkForwardModel.contentTableName)
             };
-            core.cache.setObject(cacheNameRouteMap, routeDictionary,dependentKeyList);
+            core.cache.storeObject(cacheNameRouteMap, routeDictionary,dependentKeyList);
         }
         //
         //====================================================================================================

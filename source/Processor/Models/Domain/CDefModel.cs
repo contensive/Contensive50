@@ -722,7 +722,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="contentId"></param>
         /// <returns></returns>
         public static string getCacheKey(int contentId) {
-            return CacheController.getCacheKey_forObject("cdef", contentId.ToString());
+            return CacheController.createCacheKey_forObject("cdef", contentId.ToString());
         }
         //
         //====================================================================================================
@@ -744,7 +744,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="cdef"></param>
         public static void setCache(CoreController core, int contentId, CDefModel cdef) {
             List<string> dependantList = new List<string>();
-            core.cache.setObject(getCacheKey(contentId), cdef, dependantList);
+            core.cache.storeObject(getCacheKey(contentId), cdef, dependantList);
         }
         //
         //====================================================================================================

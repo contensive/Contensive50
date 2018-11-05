@@ -97,11 +97,6 @@ namespace Contensive.Addons.AdminSite {
         /// String that adds on to the end of the title
         /// </summary>
         public string TitleExtension { get; set; }
-        // -- 20181101 remove top menu
-        /// <summary>
-        /// Controls the menu mode, set from core.main_MemberAdminMenuModeID
-        /// </summary>
-        //public int AdminMenuModeID { get; set; }
         /// <summary>
         /// true uses tab system
         /// </summary>

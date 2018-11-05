@@ -663,16 +663,16 @@ namespace Contensive.Processor.Models.Db {
                         // -- add all cachenames to the injected cachenamelist
                         if (modelInstance is BaseModel baseInstance) {
                             string datasourceName = derivedDataSourceName(instanceType);
-                            string cacheKey = CacheController.getCacheKey_forDbRecord(baseInstance.id, tableName, datasourceName);
+                            string cacheKey = CacheController.createCacheKey_forDbRecord(baseInstance.id, tableName, datasourceName);
                             callersCacheKeyList.Add(cacheKey);
-                            core.cache.setObject(cacheKey, modelInstance);
+                            core.cache.storeObject(cacheKey, modelInstance);
                             //
-                            string cachePtr = CacheController.getCachePtr_forDbRecord_guid(baseInstance.ccguid, tableName, datasourceName);
-                            core.cache.setPtr(cachePtr, cacheKey);
+                            string cachePtr = CacheController.createCachePtr_forDbRecord_guid(baseInstance.ccguid, tableName, datasourceName);
+                            core.cache.storePtr(cachePtr, cacheKey);
                             //
                             if (derivedNameFieldIsUnique(instanceType)) {
-                                cachePtr = CacheController.getCachePtr_forDbRecord_uniqueName(baseInstance.name, tableName, datasourceName);
-                                core.cache.setPtr(cachePtr, cacheKey);
+                                cachePtr = CacheController.createCachePtr_forDbRecord_uniqueName(baseInstance.name, tableName, datasourceName);
+                                core.cache.storePtr(cachePtr, cacheKey);
                             }
                         }
                     }
@@ -839,10 +839,10 @@ namespace Contensive.Processor.Models.Db {
                     //cs.close(asyncSave);
                     //
                     // -- object is here, but the cache was invalidated, setting
-                    string cacheKey = CacheController.getCacheKey_forDbRecord(id, tableName, datasourceName);
-                    core.cache.setObject(cacheKey, this);
-                    core.cache.setPtr(CacheController.getCachePtr_forDbRecord_guid(ccguid, tableName, datasourceName), cacheKey);
-                    if (derivedNameFieldIsUnique(instanceType)) core.cache.setPtr(CacheController.getCachePtr_forDbRecord_uniqueName(name, tableName, datasourceName), cacheKey);
+                    string cacheKey = CacheController.createCacheKey_forDbRecord(id, tableName, datasourceName);
+                    core.cache.storeObject(cacheKey, this);
+                    core.cache.storePtr(CacheController.createCachePtr_forDbRecord_guid(ccguid, tableName, datasourceName), cacheKey);
+                    if (derivedNameFieldIsUnique(instanceType)) core.cache.storePtr(CacheController.createCachePtr_forDbRecord_uniqueName(name, tableName, datasourceName), cacheKey);
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -873,7 +873,7 @@ namespace Contensive.Processor.Models.Db {
                         string dataSourceName = derivedDataSourceName(instanceType);
                         string tableName = derivedTableName(instanceType);
                         core.db.deleteTableRecord(recordId, tableName, dataSourceName);
-                        core.cache.invalidate(CacheController.getCacheKey_forDbRecord(recordId, tableName, derivedDataSourceName(instanceType)));
+                        core.cache.invalidate(CacheController.createCacheKey_forDbRecord(recordId, tableName, derivedDataSourceName(instanceType)));
                     }
                 }
             } catch (Exception ex) {
@@ -1127,7 +1127,7 @@ namespace Contensive.Processor.Models.Db {
         //
         private static T readRecordCache<T>(CoreController core, int recordId) where T : BaseModel {
             Type instanceType = typeof(T);
-            T result = core.cache.getObject<T>(CacheController.getCacheKey_forDbRecord(recordId, derivedTableName(instanceType), derivedDataSourceName(instanceType)));
+            T result = core.cache.getObject<T>(CacheController.createCacheKey_forDbRecord(recordId, derivedTableName(instanceType), derivedDataSourceName(instanceType)));
             restoreCacheDataObjects(core, result);
             return result;
         }
@@ -1136,7 +1136,7 @@ namespace Contensive.Processor.Models.Db {
         //
         private static T readRecordCacheByGuidPtr<T>(CoreController core, string ccGuid) where T : BaseModel {
             Type instanceType = typeof(T);
-            T result = core.cache.getObject<T>(CacheController.getCachePtr_forDbRecord_guid(ccGuid, derivedTableName(instanceType), derivedDataSourceName(instanceType)));
+            T result = core.cache.getObject<T>(CacheController.createCachePtr_forDbRecord_guid(ccGuid, derivedTableName(instanceType), derivedDataSourceName(instanceType)));
             restoreCacheDataObjects(core, result);
             return result;
         }
@@ -1145,7 +1145,7 @@ namespace Contensive.Processor.Models.Db {
         //
         private static T readRecordCacheByUniqueNamePtr<T>(CoreController core, string uniqueName) where T : BaseModel {
             Type instanceType = typeof(T);
-            T result = core.cache.getObject<T>(CacheController.getCachePtr_forDbRecord_uniqueName(uniqueName, derivedTableName(instanceType), derivedDataSourceName(instanceType)));
+            T result = core.cache.getObject<T>(CacheController.createCachePtr_forDbRecord_uniqueName(uniqueName, derivedTableName(instanceType), derivedDataSourceName(instanceType)));
             restoreCacheDataObjects(core, result);
             return result;
         }
@@ -1197,7 +1197,7 @@ namespace Contensive.Processor.Models.Db {
         //====================================================================================================
         //
         public static string getTableCacheKey<T>(CoreController core) {
-            return CacheController.getCacheKey_forDbTable(derivedTableName(typeof(T)));
+            return CacheController.createCacheKey_forDbTable(derivedTableName(typeof(T)));
         }
     }
 }

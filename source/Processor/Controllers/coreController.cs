@@ -323,7 +323,7 @@ namespace Contensive.Processor.Controllers {
                     _addonCache = cache.getObject<AddonCacheModel>(cacheObject_addonCache);
                     if (_addonCache == null) {
                         _addonCache = new AddonCacheModel(this);
-                        cache.setObject(cacheObject_addonCache, _addonCache);
+                        cache.storeObject(cacheObject_addonCache, _addonCache);
                     }
                 }
                 return _addonCache;
@@ -1204,7 +1204,7 @@ namespace Contensive.Processor.Controllers {
                     if (_assemblySkipList != null) {
                         if (_assemblySkipList.Count > _assemblySkipList_CountWhenLoaded) {
                             LogController.forceNLog("CoreController dispose, save assemblySkipList to cache, _assemblySkipList.Count [" + _assemblySkipList.Count + "], _assemblySkipList_CountWhenLoaded [" + _assemblySkipList_CountWhenLoaded + "]", LogController.logLevel.Trace);
-                            cache.setObject(cacheNameAssemblySkipList, _assemblySkipList);
+                            cache.storeObject(cacheNameAssemblySkipList, _assemblySkipList);
                         }
                     }
                     //

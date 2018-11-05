@@ -95,6 +95,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Addons\AdminNavigator\common.cs" />
+    <Compile Include="Addons\AdminNavigator\Controllers\genericController.cs" />
+    <Compile Include="Addons\AdminNavigator\Controllers\keyPtrIndexClass.cs" />
+    <Compile Include="Addons\AdminNavigator\Views\getFullClass.cs" />
+    <Compile Include="Addons\AdminNavigator\Views\getNodeClass.cs" />
     <Compile Include="Addons\AdminSite\Constants.cs" />
     <Compile Include="Addons\Monitor\configClass.cs" />
     <Compile Include="Addons\Monitor\constants.cs" />

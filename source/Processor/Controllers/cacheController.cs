@@ -107,7 +107,7 @@ namespace Contensive.Processor.Controllers {
                                 CacheWrapperClass dependantObject = getWrappedContent(dependentKey);
                                 if (dependantObject == null) {
                                     // create dummy cache to validate future cache requests, fake saveDate as last globalinvalidationdate
-                                    setWrappedObject(dependentKey, new CacheWrapperClass() {
+                                    storeWrappedObject(dependentKey, new CacheWrapperClass() {
                                         keyPtr = null,
                                         content = "",
                                         saveDate = globalInvalidationDate
@@ -176,7 +176,7 @@ namespace Contensive.Processor.Controllers {
                 if (string.IsNullOrEmpty(key)) {
                     throw new ArgumentException("key cannot be blank");
                 } else {
-                    string serverKey = convertKeyToServerKey(key);
+                    string serverKey = createServerKey(key);
                     if (remoteCacheInitialized) {
                         //
                         // -- use remote cache
@@ -228,7 +228,7 @@ namespace Contensive.Processor.Controllers {
                         } else {
                             //logController.appendCacheLog(core,"getWrappedContent(" + key + "), file hit, write to memory cache");
                             result = Newtonsoft.Json.JsonConvert.DeserializeObject<CacheWrapperClass>(serializedDataObject);
-                            setWrappedObject_MemoryCache(serverKey, result);
+                            storeWrappedObject_MemoryCache(serverKey, result);
                         }
                         if (result != null) {
                             //logController.appendCacheLog(core,"getWrappedContent(" + key + "), fileCache hit");
@@ -262,7 +262,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="invalidationDate"></param>
         /// <param name="dependentKeyList">Each tag should represent the source of data, and should be invalidated when that source changes.</param>
         /// <remarks></remarks>
-        public void setObject(string key, object content, DateTime invalidationDate, List<string> dependentKeyList) {
+        public void storeObject(string key, object content, DateTime invalidationDate, List<string> dependentKeyList) {
             try {
                 key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
                 CacheWrapperClass wrappedContent = new CacheWrapperClass {
@@ -271,7 +271,7 @@ namespace Contensive.Processor.Controllers {
                     invalidationDate = invalidationDate,
                     dependentKeyList = dependentKeyList
                 };
-                setWrappedObject(key, wrappedContent);
+                storeWrappedObject(key, wrappedContent);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
             }
@@ -303,8 +303,8 @@ namespace Contensive.Processor.Controllers {
         /// ex - org/id/10 has primary contact person/id/99. if org/id/10 object includes person/id/99 object, then org/id/10 depends on person/id/99,
         /// and "person/id/99" is a dependent key for "org/id/10". When "org/id/10" is read, it checks all its dependent keys (person/id/99) and
         /// invalidates if any dependent key is invalid.</remarks>
-        public void setObject(string key, object content, List<string> dependentKeyList) {
-            setObject(key, content, DateTime.Now.AddDays(invalidationDaysDefault), dependentKeyList);
+        public void storeObject(string key, object content, List<string> dependentKeyList) {
+            storeObject(key, content, DateTime.Now.AddDays(invalidationDaysDefault), dependentKeyList);
         }
         //
         //====================================================================================================
@@ -316,8 +316,8 @@ namespace Contensive.Processor.Controllers {
         /// <param name="content"></param>
         /// <param name="dependantKey"></param>
         /// <remarks></remarks>
-        public void setObject(string key, object content, string dependantKey) {
-            setObject(key, content, DateTime.Now.AddDays(invalidationDaysDefault), new List<string> { dependantKey });
+        public void storeObject(string key, object content, string dependantKey) {
+            storeObject(key, content, DateTime.Now.AddDays(invalidationDaysDefault), new List<string> { dependantKey });
         }
         //
         //====================================================================================================
@@ -329,8 +329,8 @@ namespace Contensive.Processor.Controllers {
         /// <param name="content"></param>
         /// <param name="invalidationDate"></param>
         /// <remarks></remarks>
-        public void setObject(string key, object content, DateTime invalidationDate) {
-            setObject(key, content, invalidationDate, new List<string> { });
+        public void storeObject(string key, object content, DateTime invalidationDate) {
+            storeObject(key, content, invalidationDate, new List<string> { });
         }
         //
         //====================================================================================================
@@ -340,8 +340,8 @@ namespace Contensive.Processor.Controllers {
         /// <param name="key"></param>
         /// <param name="content"></param>
         /// <remarks></remarks>
-        public void setObject(string key, object content) {
-            setObject(key, content, DateTime.Now.AddDays(invalidationDaysDefault), new List<string> { });
+        public void storeObject(string key, object content) {
+            storeObject(key, content, DateTime.Now.AddDays(invalidationDaysDefault), new List<string> { });
         }
         //
         //====================================================================================================
@@ -353,7 +353,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="keyPtr"></param>
         /// <param name="data"></param>
         /// <remarks></remarks>
-        public void setPtr(string keyPtr, string key) {
+        public void storePtr(string keyPtr, string key) {
             try {
                 keyPtr = Regex.Replace(keyPtr, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
                 key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
@@ -362,7 +362,7 @@ namespace Contensive.Processor.Controllers {
                     invalidationDate = DateTime.Now.AddDays(invalidationDaysDefault),
                     keyPtr = key
                 };
-                setWrappedObject(keyPtr, cacheWrapper);
+                storeWrappedObject(keyPtr, cacheWrapper);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
             }
@@ -376,7 +376,7 @@ namespace Contensive.Processor.Controllers {
         public void invalidateAll() {
             try {
                 string key = Regex.Replace(cacheNameGlobalInvalidationDate, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
-                setWrappedObject(key, new CacheWrapperClass { saveDate = DateTime.Now });
+                storeWrappedObject(key, new CacheWrapperClass { saveDate = DateTime.Now });
                 _globalInvalidationDate = null;
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -398,14 +398,14 @@ namespace Contensive.Processor.Controllers {
                     CacheWrapperClass wrapper = getWrappedContent(key);
                     if (wrapper == null) {
                         // no cache for this key, if this is a dependency for another key, save invalidated
-                        setWrappedObject(key, new CacheWrapperClass { saveDate = DateTime.Now });
+                        storeWrappedObject(key, new CacheWrapperClass { saveDate = DateTime.Now });
                     } else { 
                         if (!string.IsNullOrWhiteSpace(wrapper.keyPtr)) {
                             // this key is an alias, invalidate it's parent key
                             invalidate(wrapper.keyPtr, --recursionLimit);
                         } else {
                             // key is a valid cache, invalidate it
-                            setWrappedObject(key, new CacheWrapperClass { saveDate = DateTime.Now });
+                            storeWrappedObject(key, new CacheWrapperClass { saveDate = DateTime.Now });
                         }
                     }
                 }
@@ -422,7 +422,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="tableName"></param>
         /// <param name="recordId"></param>
         public void invalidateDbRecord(int recordId, string tableName, string dataSourceName = "default") {
-            invalidate(getCacheKey_forDbRecord(recordId, tableName, dataSourceName));
+            invalidate(createCacheKey_forDbRecord(recordId, tableName, dataSourceName));
         }
         ////
         ////========================================================================
@@ -484,7 +484,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="key">The cache key to be converted</param>
         /// <returns></returns>
-        private string convertKeyToServerKey(string key) {
+        private string createServerKey(string key) {
             string result = core.appConfig.name + "-" + core.codeVersion() + "-" + key;
             result = Regex.Replace(result, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
             return result;
@@ -495,7 +495,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public static string getCacheKey_forDbTable( string tableName ) {
+        public static string createCacheKey_forDbTable( string tableName ) {
             string key = "dbtable/" + tableName + "/";
             key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
             return key;
@@ -509,7 +509,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="tableName"></param>
         /// <param name="dataSourceName"></param>
         /// <returns></returns>
-        public static string getCacheKey_forDbRecord(int recordId, string tableName, string dataSourceName = "default") {
+        public static string createCacheKey_forDbRecord(int recordId, string tableName, string dataSourceName = "default") {
             string key = "dbrecord/" + dataSourceName + "/" + tableName + "/id/" + recordId.ToString() + "/";
             key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
             return key;
@@ -523,7 +523,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="tableName"></param>
         /// <param name="dataSourceName"></param>
         /// <returns></returns>
-        public static string getCachePtr_forDbRecord_guid(string guid, string tableName, string dataSourceName = "default") {
+        public static string createCachePtr_forDbRecord_guid(string guid, string tableName, string dataSourceName = "default") {
             string key = "dbptr/" + dataSourceName + "/" + tableName + "/ccguid/" + guid + "/";
             key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
             return key;
@@ -538,7 +538,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="tableName"></param>
         /// <param name="dataSourceName"></param>
         /// <returns></returns>
-        public static string getCachePtr_forDbRecord_uniqueName(string name, string tableName, string dataSourceName = "default") {
+        public static string createCachePtr_forDbRecord_uniqueName(string name, string tableName, string dataSourceName = "default") {
             string key = "dbptr/" + dataSourceName + "/" + tableName + "/name/" + name + "/";
             key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
             return key;
@@ -551,7 +551,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="objectName">The key that describes the object. This can be more general like "person" and used with a uniqueIdentities like "5"</param>
         /// <param name="objectUniqueIdentifier"></param>
         /// <returns></returns>
-        public static string getCacheKey_forObject(string objectName, string objectUniqueIdentifier = "") {
+        public static string createCacheKey_forObject(string objectName, string objectUniqueIdentifier = "") {
             string key = "obj/" + objectName + "/" + objectUniqueIdentifier;
             key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
             return key;
@@ -608,7 +608,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 if (setDefault) {
                     _globalInvalidationDate = new DateTime(1990, 8, 7);
-                    setWrappedObject(cacheNameGlobalInvalidationDate, new CacheWrapperClass { saveDate = encodeDate(_globalInvalidationDate) });
+                    storeWrappedObject(cacheNameGlobalInvalidationDate, new CacheWrapperClass { saveDate = encodeDate(_globalInvalidationDate) });
                 }
                 return encodeDate(_globalInvalidationDate);
             }
@@ -658,21 +658,20 @@ namespace Contensive.Processor.Controllers {
         /// <param name="wrappedObject">Either a string, a date, or a serializable object</param>
         /// <param name="invalidationDate"></param>
         /// <remarks></remarks>
-        private void setWrappedObject(string key, CacheWrapperClass wrappedObject) {
+        private void storeWrappedObject(string key, CacheWrapperClass wrappedObject) {
             try {
                 //
                 if (string.IsNullOrEmpty(key)) {
                     throw new ArgumentException("cache key cannot be blank");
                 } else {
-                    string serverKey = convertKeyToServerKey(key);
+                    string serverKey = createServerKey(key);
                     //
-                    //LogController.logTrace(core, "setWrappedObject(" + serverKey + ")");
-                    LogController.logTrace(core, "setWrappedObject(" + serverKey + "), expires [" + wrappedObject.invalidationDate.ToString() + "], depends on [" + string.Join(",", wrappedObject.dependentKeyList) + "], points to [" + string.Join(",", wrappedObject.keyPtr) + "]");
+                    LogController.logTrace(core, "storeWrappedObject(" + serverKey + "), expires [" + wrappedObject.invalidationDate.ToString() + "], depends on [" + string.Join(",", wrappedObject.dependentKeyList) + "], points to [" + string.Join(",", wrappedObject.keyPtr) + "]");
                     //
                     if (core.serverConfig.enableLocalMemoryCache) {
                         //
                         // -- save local memory cache
-                        setWrappedObject_MemoryCache(serverKey, wrappedObject);
+                        storeWrappedObject_MemoryCache(serverKey, wrappedObject);
                     }
                     if (core.serverConfig.enableLocalFileCache) {
                         //
@@ -703,7 +702,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="serverKey">key converted to serverKey with app name and code version</param>
         /// <param name="wrappedObject"></param>
-        public void setWrappedObject_MemoryCache(string serverKey, CacheWrapperClass wrappedObject) {
+        public void storeWrappedObject_MemoryCache(string serverKey, CacheWrapperClass wrappedObject) {
             ObjectCache cache = MemoryCache.Default;
             CacheItemPolicy policy = new CacheItemPolicy {
                 AbsoluteExpiration = wrappedObject.invalidationDate // DateTime.Now.AddMinutes(100);
