@@ -20,9 +20,9 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
             CPClass cp = new CPClass(testAppName);
             cp.core.siteProperties.setProperty("AllowBake", true);
             // act
-            cp.Cache.Save("testString", "testValue");
+            cp.Cache.Store("testString", "testValue");
             // assert
-            Assert.AreEqual(cp.Cache.Read("testString"), "testValue");
+            Assert.AreEqual(cp.Cache.GetText("testString"), "testValue");
             // dispose
             cp.Dispose();
         }
@@ -37,17 +37,17 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
             DateTime testDate = new DateTime(1990, 8, 7);
             cp.core.siteProperties.setProperty("AllowBake", true);
             // act
-            cp.Cache.setKey("testString", "testValue");
-            cp.Cache.setKey("testInt", 12345);
-            cp.Cache.setKey("testDate", testDate);
-            cp.Cache.setKey("testTrue", true);
-            cp.Cache.setKey("testFalse", false);
+            cp.Cache.Store("testString", "testValue");
+            cp.Cache.Store("testInt", 12345);
+            cp.Cache.Store("testDate", testDate);
+            cp.Cache.Store("testTrue", true);
+            cp.Cache.Store("testFalse", false);
             // assert
-            Assert.AreEqual(cp.Cache.getText("testString"), "testValue");
-            Assert.AreEqual(cp.Cache.getInteger("testInt"), 12345);
-            Assert.AreEqual(cp.Cache.getDate("testDate"), testDate);
-            Assert.AreEqual(cp.Cache.getBoolean("testTrue"), true);
-            Assert.AreEqual(cp.Cache.getBoolean("testFalse"), false);
+            Assert.AreEqual(cp.Cache.GetText("testString"), "testValue");
+            Assert.AreEqual(cp.Cache.GetInteger("testInt"), 12345);
+            Assert.AreEqual(cp.Cache.GetDate("testDate"), testDate);
+            Assert.AreEqual(cp.Cache.GetBoolean("testTrue"), true);
+            Assert.AreEqual(cp.Cache.GetBoolean("testFalse"), false);
             // dispose
             cp.Dispose();
         }
@@ -62,26 +62,26 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
             DateTime testDate = new DateTime(1990, 8, 7);
             cp.core.siteProperties.setProperty("AllowBake", true);
             // act
-            cp.Cache.setKey("testString", "testValue", "a");
-            cp.Cache.setKey("testInt", 12345, "a");
-            cp.Cache.setKey("testDate", testDate, "a");
-            cp.Cache.setKey("testTrue", true, "a");
-            cp.Cache.setKey("testFalse", false, "a");
+            cp.Cache.Store("testString", "testValue", "a");
+            cp.Cache.Store("testInt", 12345, "a");
+            cp.Cache.Store("testDate", testDate, "a");
+            cp.Cache.Store("testTrue", true, "a");
+            cp.Cache.Store("testFalse", false, "a");
             // assert
-            Assert.AreEqual("testValue", cp.Cache.getText("testString"));
-            Assert.AreEqual(12345, cp.Cache.getInteger("testInt"));
-            Assert.AreEqual(testDate, cp.Cache.getDate("testDate"));
-            Assert.AreEqual(true, cp.Cache.getBoolean("testTrue"));
-            Assert.AreEqual(false, cp.Cache.getBoolean("testFalse"));
+            Assert.AreEqual("testValue", cp.Cache.GetText("testString"));
+            Assert.AreEqual(12345, cp.Cache.GetInteger("testInt"));
+            Assert.AreEqual(testDate, cp.Cache.GetDate("testDate"));
+            Assert.AreEqual(true, cp.Cache.GetBoolean("testTrue"));
+            Assert.AreEqual(false, cp.Cache.GetBoolean("testFalse"));
             // act
-            cp.Cache.InvalidateTag("a");
+            cp.Cache.Invalidate("a");
             // assert
-            Assert.AreEqual(null, cp.Cache.getObject("testString"));
-            Assert.AreEqual("", cp.Cache.getText("testString"));
-            Assert.AreEqual(0, cp.Cache.getInteger("testInt"));
-            Assert.AreEqual(DateTime.MinValue, cp.Cache.getDate("testDate"));
-            Assert.AreEqual(false, cp.Cache.getBoolean("testTrue"));
-            Assert.AreEqual(false, cp.Cache.getBoolean("testFalse"));
+            Assert.AreEqual(null, cp.Cache.GetObject("testString"));
+            Assert.AreEqual("", cp.Cache.GetText("testString"));
+            Assert.AreEqual(0, cp.Cache.GetInteger("testInt"));
+            Assert.AreEqual(DateTime.MinValue, cp.Cache.GetDate("testDate"));
+            Assert.AreEqual(false, cp.Cache.GetBoolean("testTrue"));
+            Assert.AreEqual(false, cp.Cache.GetBoolean("testFalse"));
             // dispose
             cp.Dispose();
         }
@@ -102,26 +102,26 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
             tagList.Add("d");
             tagList.Add("e");
             // act
-            cp.Cache.setKey("testString", "testValue", "a");
-            cp.Cache.setKey("testInt", 12345, "b");
-            cp.Cache.setKey("testDate", testDate, "c");
-            cp.Cache.setKey("testTrue", true, "d");
-            cp.Cache.setKey("testFalse", false, "e");
+            cp.Cache.Store("testString", "testValue", "a");
+            cp.Cache.Store("testInt", 12345, "b");
+            cp.Cache.Store("testDate", testDate, "c");
+            cp.Cache.Store("testTrue", true, "d");
+            cp.Cache.Store("testFalse", false, "e");
             // assert
-            Assert.AreEqual("testValue", cp.Cache.getText("testString"));
-            Assert.AreEqual(12345, cp.Cache.getInteger("testInt"));
-            Assert.AreEqual(testDate, cp.Cache.getDate("testDate"));
-            Assert.AreEqual(true, cp.Cache.getBoolean("testTrue"));
-            Assert.AreEqual(false, cp.Cache.getBoolean("testFalse"));
+            Assert.AreEqual("testValue", cp.Cache.GetText("testString"));
+            Assert.AreEqual(12345, cp.Cache.GetInteger("testInt"));
+            Assert.AreEqual(testDate, cp.Cache.GetDate("testDate"));
+            Assert.AreEqual(true, cp.Cache.GetBoolean("testTrue"));
+            Assert.AreEqual(false, cp.Cache.GetBoolean("testFalse"));
             // act
             cp.Cache.InvalidateTagList(tagList);
             // assert
-            Assert.AreEqual(null, cp.Cache.getObject("testString"));
-            Assert.AreEqual("", cp.Cache.getText("testString"));
-            Assert.AreEqual(0, cp.Cache.getInteger("testInt"));
-            Assert.AreEqual(DateTime.MinValue, cp.Cache.getDate("testDate"));
-            Assert.AreEqual(false, cp.Cache.getBoolean("testTrue"));
-            Assert.AreEqual(false, cp.Cache.getBoolean("testFalse"));
+            Assert.AreEqual(null, cp.Cache.GetObject("testString"));
+            Assert.AreEqual("", cp.Cache.GetText("testString"));
+            Assert.AreEqual(0, cp.Cache.GetInteger("testInt"));
+            Assert.AreEqual(DateTime.MinValue, cp.Cache.GetDate("testDate"));
+            Assert.AreEqual(false, cp.Cache.GetBoolean("testTrue"));
+            Assert.AreEqual(false, cp.Cache.GetBoolean("testFalse"));
             // dispose
             cp.Dispose();
         }
@@ -135,13 +135,13 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
             CPClass cp = new CPClass(testAppName);
             cp.core.siteProperties.setProperty("AllowBake", true);
             // act
-            cp.Cache.Save("keyA", "testValue", "a,b,c,d,e");
+            cp.Cache.Store("keyA", "testValue", "a,b,c,d,e");
             // assert
-            Assert.AreEqual(cp.Cache.Read("keyA"), "testValue");
+            Assert.AreEqual(cp.Cache.GetText("keyA"), "testValue");
             // act
-            cp.Cache.InvalidateTag("c");
+            cp.Cache.Invalidate("c");
             // assert
-            Assert.AreEqual(cp.Cache.getText("keyA"), "");
+            Assert.AreEqual(cp.Cache.GetText("keyA"), "");
             // dispose
             cp.Dispose();
         }

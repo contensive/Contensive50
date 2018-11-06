@@ -109,7 +109,7 @@ namespace Contensive.Addons.AdminNavigator {
 						}
 						cs2.Close();
 						cp.Site.TestPoint("adminNavigator, emptyNodeList from db=[" + EmptyNodeList + "]");
-						cp.Cache.StoreObject(BakeName, EmptyNodeList, NavigatorEntryModel.contentTableName);
+						cp.Cache.Store(BakeName, EmptyNodeList, NavigatorEntryModel.contentTableName);
 					}
 					//string EmptyNodeListInitial = EmptyNodeList;
 					string TopParentNode = ParentNode;
@@ -474,7 +474,7 @@ namespace Contensive.Addons.AdminNavigator {
                                     Contensive.Processor.Models.Db.AddonModel.contentTableName,
                                     Contensive.Processor.Models.Db.AddonCollectionModel.contentTableName
                                 };
-                                cp.Cache.StoreObject(cacheName, nodeHtml, dependentList);
+                                cp.Cache.Store(cacheName, nodeHtml, dependentList);
 							}
 							s += nodeHtml;
 							break;
@@ -859,7 +859,7 @@ namespace Contensive.Addons.AdminNavigator {
                     //
                     //
                     //
-                    cp.Cache.StoreObject(BakeName, EmptyNodeList, Contensive.Processor.Models.Db.NavigatorEntryModel.contentTableName);
+                    cp.Cache.Store(BakeName, EmptyNodeList, Contensive.Processor.Models.Db.NavigatorEntryModel.contentTableName);
      //               if (EmptyNodeListInitial != EmptyNodeList) {
 					//	cp.Cache.Save(BakeName, EmptyNodeList, "Navigator Entries");
 					//}

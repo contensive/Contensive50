@@ -496,14 +496,32 @@ namespace Contensive.Processor.Controllers {
         /// <param name="dbTableName"></param>
         public void invalidateAllKeysInTable(string dbTableName) {
             try {
-                string key = Regex.Replace(dbTableName, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
-                invalidate(key);
+                invalidate(createCacheKey_forDbTable(dbTableName));
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
-                throw;
             }
         }
- 
+        //
+        public void legacyInvalidateAllKeysInTableList(List<string> tableNameList) {
+            foreach (var tableName in tableNameList) {
+                core.cache.invalidateAllKeysInTable(tableName);
+            }
+        }
+        //
+        public void legacyInvalidateAllKeysInContentList(string ContentNameList) {
+            if (!string.IsNullOrEmpty(ContentNameList)) {
+                List<string> tableNameList = new List<string>();
+                foreach (var contentName in new List<string>(ContentNameList.ToLowerInvariant().Split(','))) {
+                    string tableName = CdefController.getContentTablename(core, contentName).ToLowerInvariant();
+                    if (!tableNameList.Contains(tableName)) {
+                        tableNameList.Add(tableName);
+                    }
+                    legacyInvalidateAllKeysInTableList(tableNameList);
+                }
+            }
+
+        }
+
         //
         //====================================================================================================
         /// <summary>
