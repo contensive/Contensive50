@@ -51,9 +51,10 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // -- Active
                 {
-                    string fieldEditor = HtmlController.checkbox("active", editRecord.active);
+                    string htmlId = "fieldActive";
+                    string fieldEditor = HtmlController.checkbox("active", editRecord.active, htmlId);
                     string fieldHelp = "When unchecked, add-ons can ignore this record as if it was temporarily deleted.";
-                    tabPanel.Add(AdminUIController.getEditRow(core, fieldEditor, "Active", fieldHelp, false, false, ""));
+                    tabPanel.Add(AdminUIController.getEditRow(core, fieldEditor, "Active", fieldHelp, false, false, htmlId));
                 }
                 ////
                 //// ----- If Page Content , check if this is the default PageNotFound page
@@ -86,6 +87,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // -- GUID
                 {
+                    string htmlId = "fieldGuid";
                     string fieldValue = GenericController.encodeText(editRecord.fieldsLc["ccguid"].value);
                     string FieldHelp = "This is a unique number that identifies this record globally. A GUID is not required, but when set it should never be changed. GUIDs are used to synchronize records. When empty, you can create a new guid. Only Developers can modify the guid.";
                     string fieldEditor = "";
@@ -94,19 +96,20 @@ namespace Contensive.Addons.AdminSite {
                         // add a set button
                         string fieldId = "setGuid" + GenericController.GetRandomInteger(core).ToString();
                         string buttonCell = HtmlController.div(AdminUIController.getButtonPrimary("Set", "var e=document.getElementById('" + fieldId + "');if(e){e.value='" + GenericController.getGUID(true) + "';this.disabled=true;}"), "col-xs-1");
-                        string inputCell = HtmlController.div(AdminUIController.getDefaultEditor_Text(core, "ccguid", "", false, fieldId), "col-xs-11");
+                        string inputCell = HtmlController.div(AdminUIController.getDefaultEditor_Text(core, "ccguid", "", false, htmlId), "col-xs-11");
                         fieldEditor = HtmlController.div(HtmlController.div(buttonCell + inputCell, "row"), "container-fluid");
                     } else {
                         //
                         // field is read-only except for developers
-                        fieldEditor = AdminUIController.getDefaultEditor_Text(core, "ccguid", fieldValue, !core.session.isAuthenticatedDeveloper(core), "");
+                        fieldEditor = AdminUIController.getDefaultEditor_Text(core, "ccguid", fieldValue, !core.session.isAuthenticatedDeveloper(core), htmlId);
                     }
-                    tabPanel.Add(AdminUIController.getEditRow(core, fieldEditor, "GUID", FieldHelp, false, false, ""));
+                    tabPanel.Add(AdminUIController.getEditRow(core, fieldEditor, "GUID", FieldHelp, false, false, htmlId));
                 }
                 //
                 // ----- EID (Encoded ID)
                 {
                     if (GenericController.vbUCase(adminData.adminContent.tableName) == GenericController.vbUCase("ccMembers")) {
+                        string htmlId = "fieldGuid";
                         bool AllowEID = (core.siteProperties.getBoolean("AllowLinkLogin", true)) || (core.siteProperties.getBoolean("AllowLinkRecognize", true));
                         string fieldHelp = "";
                         string fieldEditor = "";
@@ -124,9 +127,9 @@ namespace Contensive.Addons.AdminSite {
                             }
                             fieldHelp += " To enable, disable or modify this feature, use the security tab on the Preferences page.";
                             fieldHelp += "<br>For example: " + sampleUrl;
-                            fieldEditor = AdminUIController.getDefaultEditor_Text(core, "ignore_eid", eidQueryString, true, "");
+                            fieldEditor = AdminUIController.getDefaultEditor_Text(core, "ignore_eid", eidQueryString, true, htmlId);
                         }
-                        tabPanel.Add(AdminUIController.getEditRow(core, fieldEditor, "Member Link Login Querystring", fieldHelp, true, false, ""));
+                        tabPanel.Add(AdminUIController.getEditRow(core, fieldEditor, "Member Link Login Querystring", fieldHelp, true, false, htmlId));
                     }
                 }
                 //

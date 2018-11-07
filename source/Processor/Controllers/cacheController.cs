@@ -163,6 +163,46 @@ namespace Contensive.Processor.Controllers {
             return result;
         }
         //
+        //========================================================================
+        /// <summary>
+        /// get an object from cache. If the cache misses or is invalidated, return ""
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public string getText(string key) => getObject<string>(key) ?? "";
+        //
+        //========================================================================
+        /// <summary>
+        /// get an object from cache. If the cache misses or is invalidated, return 0
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public int getInteger(string key) => getObject<int>(key);
+        //
+        //========================================================================
+        /// <summary>
+        /// get an object from cache. If the cache misses or is invalidated, return 0.0
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public double getNumber(string key) => getObject<double>(key);
+        //
+        //========================================================================
+        /// <summary>
+        /// get an object from cache. If the cache misses or is invalidated, return minDate
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public DateTime getDate(string key) => getObject<DateTime>(key);
+        //
+        //========================================================================
+        /// <summary>
+        /// get an object from cache. If the cache misses or is invalidated, return false
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public bool getBoolean(string key) => getObject<bool>(key);
+        //
         //====================================================================================================
         /// <summary>
         /// get a cache object from the cache. returns the cacheObject that wraps the object

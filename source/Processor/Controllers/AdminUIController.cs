@@ -1448,7 +1448,7 @@ namespace Contensive.Processor {
         public static string getIconDeleteLink(string link) { return HtmlController.a(iconDelete_Red, link); }
         public static string getIconArrowRightLink(string link) { return HtmlController.a(iconArrowRight, link); }
         public static string getIconArrowLeftLink(string link) { return HtmlController.a(iconArrowLeft, link); }
-        public static string getIconPlusLink(string link, string caption = "") { return HtmlController.a(iconAdd + caption, link); }
+        public static string getIconPlusLink(string link, string caption = "") { return HtmlController.a(iconAdd_Green + caption, link); }
         public static string getIconExpandLink(string link) { return HtmlController.a(iconExpand, link); }
         public static string getIconContractLink(string link) { return HtmlController.a(iconContract, link); }
         //
@@ -1467,8 +1467,8 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="link"></param>
         /// <returns></returns>
-        public static string getIconEditLink(string link) { return HtmlController.a(iconEdit, link); }
-        public static string getIconEditLink(string link, string htmlClass) { return HtmlController.a(iconEdit, link, htmlClass); }
+        public static string getIconEditLink(string link) { return HtmlController.a(iconEdit_Green, link); }
+        public static string getIconEditLink(string link, string htmlClass) { return HtmlController.a(iconEdit_Green, link, htmlClass); }
         /// <summary>
         /// get a link to edit a record in the admin site
         /// </summary>
@@ -1636,7 +1636,7 @@ namespace Contensive.Processor {
                             tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + "<a"
                                 + " TabIndex=-1"
                                 + " href=\"" + HtmlController.encodeHtml(Link) + "\"";
-                            tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + ">" + iconAdd + "</a>";
+                            tempmain_GetRecordAddLink2 = tempmain_GetRecordAddLink2 + ">" + iconAdd_Green + "</a>";
                         } else {
                             ////
                             //MenuName = GenericController.GetRandomInteger(core).ToString();

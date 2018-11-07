@@ -38,23 +38,23 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override string GetText(string key) => core.cache.getObject<string>(key);
+        public override string GetText(string key) => core.cache.getText(key);
         //
         //====================================================================================================
         //
-        public override int GetInteger(string key) => core.cache.getObject<int>(key);
+        public override int GetInteger(string key) => core.cache.getInteger(key);
         //
         //====================================================================================================
         //
-        public override double GetNumber(string key) => core.cache.getObject<double>(key);
+        public override double GetNumber(string key) => core.cache.getNumber(key);
         //
         //====================================================================================================
         //
-        public override DateTime GetDate(string key) => core.cache.getObject<DateTime>(key);
+        public override DateTime GetDate(string key) => core.cache.getDate(key);
         //
         //====================================================================================================
         //
-        public override bool GetBoolean(string key) => core.cache.getObject<bool>(key);
+        public override bool GetBoolean(string key) => core.cache.getBoolean(key);
         //
         //====================================================================================================
         //
@@ -155,7 +155,7 @@ namespace Contensive.Processor {
         /// <returns></returns>
         /// <remarks></remarks>
         [Obsolete("Use GetText()", true)]
-        public override string Read(string Name) => core.cache.getObject<string>(Name);
+        public override string Read(string Name) => core.cache.getText(Name);
         //====================================================================================================
         /// <summary>
         /// save a cache value. Legacy. Use object value.
@@ -204,6 +204,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
+        [Obsolete()]
         public override void InvalidateTag(string tag) {
             core.cache.invalidate(tag);
         }
@@ -214,6 +215,7 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
+        [Obsolete()]
         public override void setKey(string key, object value) {
             core.cache.storeObject(key, value);
         }
@@ -225,6 +227,7 @@ namespace Contensive.Processor {
         /// <param name="key"></param>
         /// <param name="value"></param>
         /// <param name="invalidationDate"></param>
+        [Obsolete()]
         public override void setKey(string key, object value, DateTime invalidationDate) {
             core.cache.storeObject(key, value, invalidationDate, new List<string> { });
         }
@@ -236,6 +239,7 @@ namespace Contensive.Processor {
         /// <param name="key"></param>
         /// <param name="value"></param>
         /// <param name="tagList"></param>
+        [Obsolete()]
         public override void setKey(string key, object value, List<string> tagList) {
             core.cache.storeObject(key, value, tagList);
         }
@@ -248,18 +252,21 @@ namespace Contensive.Processor {
         /// <param name="value"></param>
         /// <param name="tagList"></param>
         /// <param name="invalidationDate"></param>
+        [Obsolete()]
         public override void setKey(string key, object value, DateTime invalidationDate, List<string> tagList) {
             core.cache.storeObject(key, value, invalidationDate, tagList);
         }
         //
         //====================================================================================================
         //
+        [Obsolete()]
         public override void setKey(string key, object value, string tag) {
             core.cache.storeObject(key, value, tag);
         }
         //
         //====================================================================================================
         //
+        [Obsolete()]
         public override void setKey(string key, object Value, DateTime invalidationDate, string tag) {
             List<string> depKeyList = (string.IsNullOrWhiteSpace(tag) ? new List<string> { } : tag.Split(',').ToList());
             core.cache.storeObject(key, Value, invalidationDate, depKeyList);
@@ -298,8 +305,6 @@ namespace Contensive.Processor {
 
         ~CPCacheClass() {
             Dispose(false);
-            
-            
         }
         #endregion
     }

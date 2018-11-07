@@ -989,7 +989,7 @@ namespace Contensive.Addons.AdminSite {
                                         return_NewFieldList += "," + field.nameLc;
                                         FieldValueNumber = GenericController.encodeNumber(fieldValue_object);
                                         EditorString += (HtmlController.inputHidden(field.nameLc, GenericController.encodeText(FieldValueNumber)));
-                                        EditorString += (HtmlController.inputText(core, field.nameLc, FieldValueNumber.ToString(), -1, -1, "", false, true, "text form-control"));
+                                        EditorString += (HtmlController.inputText(core, field.nameLc, FieldValueNumber.ToString(), -1, -1, fieldHtmlId, false, true, "text form-control"));
                                         EditorString += (string.Format("{0:C}", FieldValueNumber));
                                         EditorString += WhyReadOnlyMsg;
                                         //
@@ -1002,7 +1002,7 @@ namespace Contensive.Addons.AdminSite {
                                         //
                                         return_NewFieldList += "," + field.nameLc;
                                         EditorString += (HtmlController.inputHidden(field.nameLc, fieldValue_text));
-                                        EditorString += (HtmlController.inputText(core, field.nameLc, fieldValue_text, -1, -1, "", false, true, "number form-control"));
+                                        EditorString += (HtmlController.inputText(core, field.nameLc, fieldValue_text, -1, -1, fieldHtmlId, false, true, "number form-control"));
                                         EditorString += WhyReadOnlyMsg;
                                         //
                                         break;
@@ -1019,13 +1019,13 @@ namespace Contensive.Addons.AdminSite {
                                             EditorString += HtmlController.inputHidden(field.nameLc, fieldValue_text);
                                             //EditorStyleModifier = "textexpandable";
                                             FieldRows = (core.userProperty.getInteger(adminData.adminContent.name + "." + field.nameLc + ".RowHeight", 10));
-                                            EditorString += HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, FieldRows, -1, field.nameLc, false, true, "form-control");
+                                            EditorString += HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, FieldRows, -1, fieldHtmlId, false, true, "form-control");
                                         } else {
                                             //
                                             // edit html as wysiwyg readonly
                                             //
                                             return_NewFieldList += "," + field.nameLc;
-                                            EditorString += AdminUIController.getDefaultEditor_Html(core, field.nameLc, fieldValue_text, editorAddonListJSON, styleList, styleOptionList, true);
+                                            EditorString += AdminUIController.getDefaultEditor_Html(core, field.nameLc, fieldValue_text, editorAddonListJSON, styleList, styleOptionList, true, fieldHtmlId);
                                         }
                                         break;
                                     case _fieldTypeIdLongText:
@@ -1037,7 +1037,7 @@ namespace Contensive.Addons.AdminSite {
                                         EditorString += HtmlController.inputHidden(field.nameLc, fieldValue_text);
                                         //EditorStyleModifier = "textexpandable";
                                         FieldRows = (core.userProperty.getInteger(adminData.adminContent.name + "." + field.nameLc + ".RowHeight", 10));
-                                        EditorString += HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, FieldRows, -1, field.nameLc, false, true, " form-control");
+                                        EditorString += HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, FieldRows, -1, fieldHtmlId, false, true, " form-control");
                                         break;
                                     case _fieldTypeIdFile:
                                     case _fieldTypeIdFileImage:
@@ -1070,7 +1070,7 @@ namespace Contensive.Addons.AdminSite {
                                             //
                                             // Password forces simple text box
                                             //
-                                            EditorString += HtmlController.inputText(core, field.nameLc, "*****", 0, 0, "", true, true, "password form-control");
+                                            EditorString += HtmlController.inputText(core, field.nameLc, "*****", 0, 0, fieldHtmlId, true, true, "password form-control");
                                         } else if (!field.htmlContent) {
                                             //
                                             // not HTML capable, textarea with resizing
@@ -1079,13 +1079,13 @@ namespace Contensive.Addons.AdminSite {
                                                 //
                                                 // text field shorter then 40 characters without a CR
                                                 //
-                                                EditorString += HtmlController.inputText(core, field.nameLc, fieldValue_text, 1, 0, "", false, true, "text form-control");
+                                                EditorString += HtmlController.inputText(core, field.nameLc, fieldValue_text, 1, 0, fieldHtmlId, false, true, "text form-control");
                                             } else {
                                                 //
                                                 // longer text data, or text that contains a CR
                                                 //
                                                 //EditorStyleModifier = "textexpandable";
-                                                EditorString += HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, 10, -1, "", false, true, " form-control");
+                                                EditorString += HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, 10, -1, fieldHtmlId, false, true, " form-control");
                                             }
                                         } else if (field.htmlContent) {
                                             //
@@ -1103,7 +1103,7 @@ namespace Contensive.Addons.AdminSite {
                                             //
                                             //EditorStyleModifier = "textexpandable";
                                             FieldRows = (core.userProperty.getInteger(adminData.adminContent.name + "." + field.nameLc + ".RowHeight", 10));
-                                            EditorString += HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, FieldRows, -1, field.nameLc, false, true);
+                                            EditorString += HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, FieldRows, -1, fieldHtmlId, false, true);
                                             //EditorString = core.main_GetFormInputTextExpandable(FormFieldLCaseName, encodeHTML(FieldValueText), FieldRows, "600px", FormFieldLCaseName, False)
                                         }
                                         break;
@@ -1185,7 +1185,7 @@ namespace Contensive.Addons.AdminSite {
                                             core.cdnFiles.splitDosPathFilename(fieldValue_text, ref path, ref filename);
                                             EditorString += ("&nbsp;<a href=\"" + EncodedLink + "\" target=\"_blank\">" + SpanClassAdminSmall + "[" + filename + "]</A>");
                                             EditorString += ("&nbsp;&nbsp;&nbsp;Delete:&nbsp;" + HtmlController.checkbox(field.nameLc + ".DeleteFlag", false));
-                                            EditorString += ("&nbsp;&nbsp;&nbsp;Change:&nbsp;" + core.html.inputFile(field.nameLc, "", "file form-control"));
+                                            EditorString += ("&nbsp;&nbsp;&nbsp;Change:&nbsp;" + core.html.inputFile(field.nameLc, fieldHtmlId, "file form-control"));
                                         }
                                         //
                                         break;
@@ -1197,15 +1197,15 @@ namespace Contensive.Addons.AdminSite {
                                         // ----- Others that simply print
                                         return_NewFieldList += "," + field.nameLc;
                                         if (field.password) {
-                                            EditorString += (HtmlController.inputText(core, field.nameLc, fieldValue_text, -1, -1, "", true, false, "password form-control"));
+                                            EditorString += (HtmlController.inputText(core, field.nameLc, fieldValue_text, -1, -1, fieldHtmlId, true, false, "password form-control"));
                                         } else {
                                             if (string.IsNullOrEmpty(fieldValue_text)) {
-                                                EditorString += (HtmlController.inputText(core, field.nameLc, "", -1, -1, "", false, false, "text form-control"));
+                                                EditorString += (HtmlController.inputText(core, field.nameLc, "", -1, -1, fieldHtmlId, false, false, "text form-control"));
                                             } else {
                                                 if (encodeBoolean(fieldValue_text.IndexOf("\n") + 1) || (fieldValue_text.Length > 40)) {
-                                                    EditorString += (HtmlController.inputText(core, field.nameLc, fieldValue_text, -1, -1, "", false, false, "text form-control"));
+                                                    EditorString += (HtmlController.inputText(core, field.nameLc, fieldValue_text, -1, -1, fieldHtmlId, false, false, "text form-control"));
                                                 } else {
-                                                    EditorString += (HtmlController.inputText(core, field.nameLc, fieldValue_text, 1, -1, "", false, false, "text form-control"));
+                                                    EditorString += (HtmlController.inputText(core, field.nameLc, fieldValue_text, 1, -1, fieldHtmlId, false, false, "text form-control"));
                                                 }
                                             }
                                         }
@@ -1216,7 +1216,7 @@ namespace Contensive.Addons.AdminSite {
                                         //
                                         return_NewFieldList += "," + field.nameLc;
                                         EditorString = ""
-                                            + HtmlController.inputText(core, field.nameLc, fieldValue_text, 1, 80, field.nameLc, false, false, "link form-control") + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + field.nameLc + "' ) ;return false;\"><img src=\"/ContensiveBase/images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>"
+                                            + HtmlController.inputText(core, field.nameLc, fieldValue_text, 1, 80, fieldHtmlId, false, false, "link form-control") + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + field.nameLc + "' ) ;return false;\"><img src=\"/ContensiveBase/images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>"
                                             + "&nbsp;<a href=\"#\" onClick=\"OpenSiteExplorerWindow( '" + field.nameLc + "' ) ;return false;\"><img src=\"/ContensiveBase/images/PageLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a page\" title=\"Link to a page\"></a>";
                                         break;
                                     case _fieldTypeIdResourceLink:
@@ -1224,7 +1224,7 @@ namespace Contensive.Addons.AdminSite {
                                         // ----- Resource Link (src value)
                                         //
                                         return_NewFieldList += "," + field.nameLc;
-                                        EditorString = HtmlController.inputText(core, field.nameLc, fieldValue_text, 1, 80, field.nameLc, false, false, "resourceLink form-control") + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + field.nameLc + "' ) ;return false;\"><img src=\"/ContensiveBase/images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>";
+                                        EditorString = HtmlController.inputText(core, field.nameLc, fieldValue_text, 1, 80, fieldHtmlId, false, false, "resourceLink form-control") + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + field.nameLc + "' ) ;return false;\"><img src=\"/ContensiveBase/images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>";
                                         break;
                                     case _fieldTypeIdHTML:
                                     case _fieldTypeIdFileHTML:
@@ -1235,12 +1235,12 @@ namespace Contensive.Addons.AdminSite {
                                         if (field.htmlContent) {
                                             //
                                             // View the content as Html, not wysiwyg
-                                            EditorString = AdminUIController.getDefaultEditor_TextArea(core, field.nameLc, fieldValue_text, editorReadOnly);
+                                            EditorString = AdminUIController.getDefaultEditor_TextArea(core, field.nameLc, fieldValue_text, editorReadOnly, fieldHtmlId);
                                             //EditorString = htmlController.inputTextarea( core,field.nameLc, fieldValue_text, 10, -1, "", false, false, "text form-control");
                                         } else {
                                             //
                                             // wysiwyg editor
-                                            EditorString = AdminUIController.getDefaultEditor_Html(core, field.nameLc, fieldValue_text, editorAddonListJSON, styleList, styleOptionList, editorReadOnly);
+                                            EditorString = AdminUIController.getDefaultEditor_Html(core, field.nameLc, fieldValue_text, editorAddonListJSON, styleList, styleOptionList, editorReadOnly, fieldHtmlId);
 
                                             //if (string.IsNullOrEmpty(fieldValue_text)) {
                                             //    //
@@ -1259,7 +1259,7 @@ namespace Contensive.Addons.AdminSite {
                                         // -- Long Text, use text editor
                                         return_NewFieldList += "," + field.nameLc;
                                         FieldRows = (core.userProperty.getInteger(adminData.adminContent.name + "." + field.nameLc + ".RowHeight", 10));
-                                        EditorString = HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, FieldRows, -1, field.nameLc, false, false, "text form-control");
+                                        EditorString = HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, FieldRows, -1, fieldHtmlId, false, false, "text form-control");
                                         //
                                         break;
                                     case _fieldTypeIdFileCSS:
@@ -1267,14 +1267,14 @@ namespace Contensive.Addons.AdminSite {
                                         // ----- CSS field
                                         return_NewFieldList += "," + field.nameLc;
                                         FieldRows = (core.userProperty.getInteger(adminData.adminContent.name + "." + field.nameLc + ".RowHeight", 10));
-                                        EditorString = HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, 10, -1, "", false, false, "styles form-control");
+                                        EditorString = HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, 10, -1, fieldHtmlId, false, false, "styles form-control");
                                         break;
                                     case _fieldTypeIdFileJavascript:
                                         //
                                         // ----- Javascript field
                                         return_NewFieldList += "," + field.nameLc;
                                         FieldRows = (core.userProperty.getInteger(adminData.adminContent.name + "." + field.nameLc + ".RowHeight", 10));
-                                        EditorString = HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, FieldRows, -1, field.nameLc, false, false, "text form-control");
+                                        EditorString = HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, FieldRows, -1, fieldHtmlId, false, false, "text form-control");
                                         //
                                         break;
                                     case _fieldTypeIdFileXML:
@@ -1282,7 +1282,7 @@ namespace Contensive.Addons.AdminSite {
                                         // ----- xml field
                                         return_NewFieldList += "," + field.nameLc;
                                         FieldRows = (core.userProperty.getInteger(adminData.adminContent.name + "." + field.nameLc + ".RowHeight", 10));
-                                        EditorString = HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, FieldRows, -1, field.nameLc, false, false, "text form-control");
+                                        EditorString = HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, FieldRows, -1, fieldHtmlId, false, false, "text form-control");
                                         //
                                         break;
                                     default:
@@ -1293,7 +1293,7 @@ namespace Contensive.Addons.AdminSite {
                                         if (field.password) {
                                             //
                                             // Password forces simple text box
-                                            EditorString = HtmlController.inputText(core, field.nameLc, fieldValue_text, -1, -1, "", true, false, "password form-control");
+                                            EditorString = HtmlController.inputText(core, field.nameLc, fieldValue_text, -1, -1, fieldHtmlId, true, false, "password form-control");
                                         } else if (!field.htmlContent) {
                                             //
                                             // not HTML capable, textarea with resizing
@@ -1302,13 +1302,13 @@ namespace Contensive.Addons.AdminSite {
                                                 //
                                                 // text field shorter then 40 characters without a CR
                                                 //
-                                                EditorString = HtmlController.inputText(core, field.nameLc, fieldValue_text, 1, -1, "", false, false, "text form-control");
+                                                EditorString = HtmlController.inputText(core, field.nameLc, fieldValue_text, 1, -1, fieldHtmlId, false, false, "text form-control");
                                             } else {
                                                 //
                                                 // longer text data, or text that contains a CR
                                                 //
                                                 //EditorStyleModifier = "textexpandable";
-                                                EditorString = HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, 10, -1, "", false, false, "text form-control");
+                                                EditorString = HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, 10, -1, fieldHtmlId, false, false, "text form-control");
                                             }
                                         } else if (field.htmlContent) {
                                             //
@@ -1332,7 +1332,7 @@ namespace Contensive.Addons.AdminSite {
                                             //
                                             //EditorStyleModifier = "textexpandable";
                                             FieldRows = (core.userProperty.getInteger(adminData.adminContent.name + "." + field.nameLc + ".RowHeight", 10));
-                                            EditorString = HtmlController.inputTextarea(core, field.nameLc, HtmlController.encodeHtml(fieldValue_text), FieldRows, -1, field.nameLc, false, false, "text");
+                                            EditorString = HtmlController.inputTextarea(core, field.nameLc, HtmlController.encodeHtml(fieldValue_text), FieldRows, -1, fieldHtmlId, false, false, "text");
                                         }
                                         //s.Add( "<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal & EditorString & "</span></nobr></td>")
                                         break;

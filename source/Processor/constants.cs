@@ -45,7 +45,9 @@ namespace Contensive.Processor {
         public const string iconDelete = "<i alt=\"delete\" title=\"delete\" class=\"fas fa-times\"></i>";
         public const string iconDelete_Red = "<span style=\"color:#f00\">" + iconDelete + "</span>";
         public const string iconAdd = "<i alt=\"add\" title=\"add\" class=\"fas fa-plus-circle\"></i>";
+        public const string iconAdd_Green = "<span style=\"color:#0c0\">" + iconAdd + "</span>";
         public const string iconEdit = "<i alt=\"edit\" title=\"edit\" class=\"fas fa-pen-square\"></i>";
+        public const string iconEdit_Green = "<span style=\"color:#0c0\">" + iconEdit + "</span>";
         public const string iconRefresh = "<i alt=\"refresh\" title=\"refresh\" class=\"fas fa-sync-alt\">";
         public const string iconContentCut = "<i alt=\"cut\" title=\"cut\" class=\"fas fa-cut\">";
         public const string iconContentPaste = "<i alt=\"add\" title=\"add\" class=\"fas fa-paste\">";
