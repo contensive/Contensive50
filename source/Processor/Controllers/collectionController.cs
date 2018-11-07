@@ -1179,7 +1179,7 @@ namespace Contensive.Processor.Controllers {
                                                         // ----- remove any current navigator nodes installed by the collection previously
                                                         //
                                                         if (collection.id != 0) {
-                                                            core.db.deleteContentRecords(cnNavigatorEntries, "installedbycollectionid=" + collection.id);
+                                                            core.db.deleteContentRecords(Processor.Models.Db.NavigatorEntryModel.contentName, "installedbycollectionid=" + collection.id);
                                                         }
                                                     }
                                                     //
@@ -1995,7 +1995,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 int CS;
                 //
-                CS = core.db.csOpen(cnNavigatorEntries, "ccguid=" + core.db.encodeSQLText(ccGuid), "ID",true,0,false,false, "ID");
+                CS = core.db.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, "ccguid=" + core.db.encodeSQLText(ccGuid), "ID",true,0,false,false, "ID");
                 if (core.db.csOk(CS)) {
                     navId = core.db.csGetInteger(CS, "id");
                 }
@@ -2131,7 +2131,7 @@ namespace Contensive.Processor.Controllers {
                         navTypeId = NavTypeIDAddon;
                     }
                     string Criteria = "(" + AddonGuidFieldName + "=" + core.db.encodeSQLText(addonGuid) + ")";
-                    int CS = core.db.csOpen(cnAddons, Criteria, "", false);
+                    int CS = core.db.csOpen(Models.Db.AddonModel.contentName, Criteria, "", false);
                     if (core.db.csOk(CS)) {
                         //
                         // Update the Addon
@@ -2143,7 +2143,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         core.db.csClose(ref CS);
                         Criteria = "(name=" + core.db.encodeSQLText(addonName) + ")and(" + AddonGuidFieldName + " is null)";
-                        CS = core.db.csOpen(cnAddons, Criteria,"", false);
+                        CS = core.db.csOpen(Models.Db.AddonModel.contentName, Criteria,"", false);
                         if (core.db.csOk(CS)) {
                             LogController.logInfo(core, "UpgradeAppFromLocalCollection, Add-on name matched an existing Add-on that has no GUID, Updating legacy Aggregate Function to Add-on [" + addonName + "], Guid [" + addonGuid + "]");
                         }
@@ -2153,7 +2153,7 @@ namespace Contensive.Processor.Controllers {
                         // not found by GUID or by name, Insert a new addon
                         //
                         core.db.csClose(ref CS);
-                        CS = core.db.csInsertRecord(cnAddons, 0);
+                        CS = core.db.csInsertRecord(Models.Db.AddonModel.contentName, 0);
                         if (core.db.csOk(CS)) {
                             LogController.logInfo(core, "UpgradeAppFromLocalCollection, Creating new Add-on [" + addonName + "], Guid [" + addonGuid + "]");
                         }
@@ -2644,7 +2644,7 @@ namespace Contensive.Processor.Controllers {
                     //                                                End If
                     //                                                If Criteria <> "" Then
                     //                                                    '$$$$$ cache this
-                    //                                                    CS2 = core.db.cs_open(cnAddons, Criteria, "ID")
+                    //                                                    CS2 = core.db.cs_open(Models.Db.AddonModel.contentName, Criteria, "ID")
                     //                                                    If core.db.cs_ok(CS2) Then
                     //                                                        SrcAddonID = core.db.cs_getInteger(CS2, "ID")
                     //                                                    End If
@@ -2728,7 +2728,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     AddOnType =XmlController.GetXMLAttribute(core, IsFound, AddonNode, "type", "");
                     Criteria = "(" + AddonGuidFieldName + "=" + core.db.encodeSQLText(AOGuid) + ")";
-                    CS = core.db.csOpen(cnAddons, Criteria,"", false);
+                    CS = core.db.csOpen(Models.Db.AddonModel.contentName, Criteria,"", false);
                     if (core.db.csOk(CS)) {
                         //
                         // Update the Addon
@@ -2740,7 +2740,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         core.db.csClose(ref CS);
                         Criteria = "(name=" + core.db.encodeSQLText(AOName) + ")and(" + AddonGuidFieldName + " is null)";
-                        CS = core.db.csOpen(cnAddons, Criteria,"", false);
+                        CS = core.db.csOpen(Models.Db.AddonModel.contentName, Criteria,"", false);
                     }
                     if (!core.db.csOk(CS)) {
                         //
@@ -2774,7 +2774,7 @@ namespace Contensive.Processor.Controllers {
                                                 Criteria = "(name=" + core.db.encodeSQLText(IncludeAddonName) + ")";
                                             }
                                             if (!string.IsNullOrEmpty(Criteria)) {
-                                                CS2 = core.db.csOpen(cnAddons, Criteria);
+                                                CS2 = core.db.csOpen(Models.Db.AddonModel.contentName, Criteria);
                                                 if (core.db.csOk(CS2)) {
                                                     IncludeAddonID = core.db.csGetInteger(CS2, "ID");
                                                 }

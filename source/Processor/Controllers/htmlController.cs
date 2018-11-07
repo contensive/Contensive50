@@ -1537,7 +1537,7 @@ namespace Contensive.Processor.Controllers {
                             Criteria = Criteria + "and(template<>0)";
                         }
                     }
-                    string AddonContentName = cnAddons;
+                    string AddonContentName = Models.Db.AddonModel.contentName;
                     string SelectList = "Name,Link,ID,ArgumentList,ObjectProgramID,IconFilename,IconWidth,IconHeight,IconSprites,IsInline,ccguid";
                     int CSAddons = core.db.csOpen(AddonContentName, Criteria, "Name,ID", false, 0, false, false, SelectList);
                     if (core.db.csOk(CSAddons)) {

@@ -15,7 +15,7 @@ namespace Contensive.Addons.AdminSite {
         //   Print the Configure Index Form
         //=============================================================================
         //
-        public static string GetForm_Index_SetColumns(CoreController core, AdminDataModel adminData) {
+        public static string GetForm_Index_SetColumns(CPClass cp, CoreController core, AdminDataModel adminData) {
             string result = "";
             try {
                 // todo refactor out
@@ -236,7 +236,7 @@ namespace Contensive.Addons.AdminSite {
                             foreach (var column in IndexConfig.columns) {
                                 column.Width = encodeInteger((1000 * column.Width) / (double)ColumnWidthTotal);
                             }
-                            GetHtmlBodyClass.setIndexSQL_SaveIndexConfig(core, IndexConfig);
+                            GetHtmlBodyClass.setIndexSQL_SaveIndexConfig(cp, core, IndexConfig);
                             IndexConfig = IndexConfigClass.get(core, adminData);
                         }
                     }

@@ -186,7 +186,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                         //
                                         // Delete any addons from this collection
                                         //
-                                        core.db.deleteContentRecords(Constants.cnAddons, "collectionid=" + TargetCollectionID);
+                                        core.db.deleteContentRecords(Processor.Models.Db.AddonModel.contentName, "collectionid=" + TargetCollectionID);
 
                                         //                            '
                                         //                            ' Load all collections into local collection storage
@@ -299,7 +299,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                         //                                '
                                         //                                ' delete all addons associated to this collection
                                         //                                '
-                                        //                                Call core.app.DeleteContentRecords(cnAddons, "collectionid=" & TargetCollectionID)
+                                        //                                Call core.app.DeleteContentRecords(Models.Db.AddonModel.contentName, "collectionid=" & TargetCollectionID)
                                         //                            Else
                                         //                                ' deprecated the addoncollectionrules for collectionid in addon
                                         //                                If (TargetCollectionPtr >= 0) And (CollectionCnt <> 0) Then
@@ -337,7 +337,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                         //                                            Else
                                         //                                                Criteria = "(name=" & encodeSQLText(TargetAddonName) & ")"
                                         //                                            End If
-                                        //                                            Call core.app.DeleteContentRecords(cnAddons, Criteria)
+                                        //                                            Call core.app.DeleteContentRecords(Models.Db.AddonModel.contentName, Criteria)
                                         //                                        End If
                                         //                                    Next
                                         //                                End If
@@ -364,7 +364,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                         //                                        '
                                         //                                        ' OK to delete the target addon
                                         //                                        '
-                                        //                                        Call core.app.DeleteContentRecords(cnNavigatorEntries, "(name=" & encodeSQLText(TargetName) & ")")
+                                        //                                        Call core.app.DeleteContentRecords(Processor.Models.Db.NavigatorEntryModel.contentName, "(name=" & encodeSQLText(TargetName) & ")")
                                         //                                    End If
                                         //                                Next
                                         //                                '
@@ -398,7 +398,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                         //                                        '
                                         //                                        ' OK to delete the target addon
                                         //                                        '
-                                        //                                        ParentID = GetParentIDFromNameSpace(cnNavigatorEntries, TargetNameSpace)
+                                        //                                        ParentID = GetParentIDFromNameSpace(Processor.Models.Db.NavigatorEntryModel.contentName, TargetNameSpace)
                                         //                                        ReDim Preserve Deletes(DeleteCnt)
                                         //                                        Deletes(DeleteCnt).name = TargetName
                                         //                                        Deletes(DeleteCnt).ParentID = ParentID
@@ -419,7 +419,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                         //
                                         if (TargetCollectionID > 0) {
                                             AddonNavigatorID = 0;
-                                            CS = core.db.csOpen(Constants.cnNavigatorEntries, "name='Manage Add-ons' and ((parentid=0)or(parentid is null))");
+                                            CS = core.db.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, "name='Manage Add-ons' and ((parentid=0)or(parentid is null))");
                                             if (core.db.csOk(CS)) {
                                                 AddonNavigatorID = core.db.csGetInteger(CS, "ID");
                                             }
@@ -434,7 +434,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                             //
                                             // Delete Navigator Entries set as installed by the collection (this may be all that is needed)
                                             //
-                                            core.db.deleteContentRecords(Constants.cnNavigatorEntries, "installedbycollectionid=" + TargetCollectionID);
+                                            core.db.deleteContentRecords(Processor.Models.Db.NavigatorEntryModel.contentName, "installedbycollectionid=" + TargetCollectionID);
                                         }
                                     }
                                 }
@@ -448,7 +448,7 @@ namespace Contensive.Addons.SafeAddonManager {
                             if (Cnt > 0) {
                                 for (Ptr = 0; Ptr < Cnt; Ptr++) {
                                     if (core.docProperties.getBoolean("ao" + Ptr)) {
-                                        core.db.deleteContentRecord(Constants.cnAddons, core.docProperties.getInteger("aoID" + Ptr));
+                                        core.db.deleteContentRecord(Processor.Models.Db.AddonModel.contentName, core.docProperties.getInteger("aoID" + Ptr));
                                     }
                                 }
                             }
@@ -908,9 +908,9 @@ namespace Contensive.Addons.SafeAddonManager {
                 int EntryID = 0;
                 //
                 if (EntryParentID == 0) {
-                    CS = core.db.csOpen(cnNavigatorEntries, "(name=" + core.db.encodeSQLText(EntryName) + ")and((parentID is null)or(parentid=0))");
+                    CS = core.db.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, "(name=" + core.db.encodeSQLText(EntryName) + ")and((parentID is null)or(parentid=0))");
                 } else {
-                    CS = core.db.csOpen(cnNavigatorEntries, "(name=" + core.db.encodeSQLText(EntryName) + ")and(parentID=" + core.db.encodeSQLNumber(EntryParentID) + ")");
+                    CS = core.db.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, "(name=" + core.db.encodeSQLText(EntryName) + ")and(parentID=" + core.db.encodeSQLNumber(EntryParentID) + ")");
                 }
                 if (core.db.csOk(CS)) {
                     EntryID = core.db.csGetInteger(CS, "ID");
@@ -918,13 +918,13 @@ namespace Contensive.Addons.SafeAddonManager {
                 core.db.csClose(ref CS);
                 //
                 if (EntryID != 0) {
-                    CS = core.db.csOpen(cnNavigatorEntries, "(parentID=" + core.db.encodeSQLNumber(EntryID) + ")");
+                    CS = core.db.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, "(parentID=" + core.db.encodeSQLNumber(EntryID) + ")");
                     while (core.db.csOk(CS)) {
                         GetForm_SafeModeAddonManager_DeleteNavigatorBranch(core.db.csGetText(CS, "name"), EntryID);
                         core.db.csGoNext(CS);
                     }
                     core.db.csClose(ref CS);
-                    core.db.deleteContentRecord(cnNavigatorEntries, EntryID);
+                    core.db.deleteContentRecord(Processor.Models.Db.NavigatorEntryModel.contentName, EntryID);
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);

@@ -1021,7 +1021,7 @@ namespace Contensive.Processor.Controllers {
             int returnEntry = 0;
             try {
                 if (!string.IsNullOrEmpty(EntryName.Trim())) {
-                    int addonId = core.db.getRecordID(cnAddons, AddonName);
+                    int addonId = core.db.getRecordID(Models.Db.AddonModel.contentName, AddonName);
                     int parentId = verifyNavigatorEntry_getParentIdFromNameSpace(core, menuNameSpace);
                     int contentId = CdefController.getContentId(core, ContentName);
                     string listCriteria = "(name=" + core.db.encodeSQLText(EntryName) + ")and(Parentid=" + parentId + ")";
@@ -1082,13 +1082,13 @@ namespace Contensive.Processor.Controllers {
                                 Criteria += "and(Parentid=" + parentRecordId + ")";
                             }
                             int RecordID = 0;
-                            int CS = core.db.csOpen(cnNavigatorEntries, Criteria, "ID", true, 0, false, false, "ID", 1);
+                            int CS = core.db.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, Criteria, "ID", true, 0, false, false, "ID", 1);
                             if (core.db.csOk(CS)) {
                                 RecordID = (core.db.csGetInteger(CS, "ID"));
                             }
                             core.db.csClose(ref CS);
                             if (RecordID == 0) {
-                                CS = core.db.csInsertRecord(cnNavigatorEntries, SystemMemberID);
+                                CS = core.db.csInsertRecord(Processor.Models.Db.NavigatorEntryModel.contentName, SystemMemberID);
                                 if (core.db.csOk(CS)) {
                                     RecordID = core.db.csGetInteger(CS, "ID");
                                     core.db.csSet(CS, "name", recordName);

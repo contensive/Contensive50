@@ -290,7 +290,7 @@ namespace Contensive.Processor.Controllers {
                                                             //
                                                             // Get IconFilename, update the optionstring, and execute optionstring replacement functions
                                                             //
-                                                            string AddonContentName = cnAddons;
+                                                            string AddonContentName = Models.Db.AddonModel.contentName;
                                                             string SelectList = "Name,Link,ID,ArgumentList,ObjectProgramID,IconFilename,IconWidth,IconHeight,IconSprites,IsInline,ccGuid";
                                                             string Criteria = "";
                                                             int IconWidth = 0;

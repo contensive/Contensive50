@@ -147,7 +147,7 @@ namespace Contensive.Processor.Controllers {
                                     + "  or((ProcessInterval is not null)and(ProcessInterval<>0)and(ProcessNextRun is null))"
                                     + "  or(ProcessNextRun<" + SQLNow + ")"
                                     + " )";
-                                int CS = coreApp.db.csOpen(cnAddons, sqlAddonsCriteria);
+                                int CS = coreApp.db.csOpen(Models.Db.AddonModel.contentName, sqlAddonsCriteria);
                                 while (coreApp.db.csOk(CS)) {
                                     int addonProcessInterval = coreApp.db.csGetInteger(CS, "ProcessInterval");
                                     string addonName = coreApp.db.csGetText(CS, "name");

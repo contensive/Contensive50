@@ -20,7 +20,7 @@ namespace Contensive.Addons.AdminSite {
         /// <param name="editRecord"></param>
         /// <param name="IsEmailContent"></param>
         /// <returns></returns>
-        public static string get(CoreController core, AdminDataModel adminData, bool IsEmailContent) {
+        public static string get(CPClass cp, CoreController core, AdminDataModel adminData, bool IsEmailContent) {
             string result = "";
             try {
                 //
@@ -65,10 +65,10 @@ namespace Contensive.Addons.AdminSite {
                                 Copy = FormIndexExport.get( core, adminData);
                                 break;
                             case AdminFormIndex_SubFormSetColumns:
-                                Copy = ToolSetListColumnsClass.GetForm_Index_SetColumns(core, adminData);
+                                Copy = ToolSetListColumnsClass.GetForm_Index_SetColumns(cp, core, adminData);
                                 break;
                             case AdminFormIndex_SubFormAdvancedSearch:
-                                Copy = FormIndexAdvancedSearchClass.get( core, adminData);
+                                Copy = FormIndexAdvancedSearchClass.get(cp, core, adminData);
                                 break;
                         }
                     }
@@ -80,7 +80,7 @@ namespace Contensive.Addons.AdminSite {
                         // -- Load Index page customizations
                         IndexConfigClass IndexConfig = IndexConfigClass.get(core, adminData);
                         setIndexSQL_ProcessIndexConfigRequests(core, adminData, ref IndexConfig);
-                        GetHtmlBodyClass.setIndexSQL_SaveIndexConfig(core, IndexConfig);
+                        GetHtmlBodyClass.setIndexSQL_SaveIndexConfig(cp, core, IndexConfig);
                         //
                         // Get the SQL parts
                         bool AllowAccessToContent = false;
@@ -159,11 +159,11 @@ namespace Contensive.Addons.AdminSite {
                                     + "\r\n<div id=\"IndexFilterHeCursorTypeEnum.ADOPENed\" class=\"opened\">"
                                     + "\r<table border=0 cellpadding=0 cellspacing=0 width=\"100%\"><tr>"
                                     + "\r<td valign=Middle class=\"left\">Filters</td>"
-                                    + "\r<td valign=Middle class=\"right\"><a href=\"#\" onClick=\"CloseIndexFilter();return false\">" + iconClose + "</i></a></td>"
+                                    + "\r<td valign=Middle class=\"right\"><a href=\"#\" onClick=\"CloseIndexFilter();return false\">" + iconClose_White + "</i></a></td>"
                                     + "\r</tr></table>"
                                     + "\r\n</div>"
                                     + "\r\n<div id=\"IndexFilterHeadClosed\" class=\"closed\" style=\"display:none;\">"
-                                    + "\r<a href=\"#\" onClick=\"OpenIndexFilter();return false\">" + iconOpen + "</i></a>"
+                                    + "\r<a href=\"#\" onClick=\"OpenIndexFilter();return false\">" + iconOpen_White + "</i></a>"
                                     + "\r\n</div>"
                                     + "\r\n</div>"
                                     + "";
@@ -186,11 +186,11 @@ namespace Contensive.Addons.AdminSite {
                                     + "\r\n<div id=\"IndexFilterHeCursorTypeEnum.ADOPENed\" class=\"opened\" style=\"display:none;\">"
                                     + "\r<table border=0 cellpadding=0 cellspacing=0 width=\"100%\"><tr>"
                                     + "\r<td valign=Middle class=\"left\">Filter</td>"
-                                    + "\r<td valign=Middle class=\"right\"><a href=\"#\" onClick=\"CloseIndexFilter();return false\"><i title=\"close\" class=\"fa fa-remove\" style=\"color:#f00\"></i></a></td>"
+                                    + "\r<td valign=Middle class=\"right\"><a href=\"#\" onClick=\"CloseIndexFilter();return false\">" + iconClose_White + "</i></a></td>"
                                     + "\r</tr></table>"
                                     + "\r\n</div>"
                                     + "\r\n<div id=\"IndexFilterHeadClosed\" class=\"closed\">"
-                                    + "\r<a href=\"#\" onClick=\"OpenIndexFilter();return false\"><i title=\"open\" class=\"fa fa-angle-double-right\" style=\"color:#fff\"></i></a>"
+                                    + "\r<a href=\"#\" onClick=\"OpenIndexFilter();return false\">" + iconOpen_White + "</i></a>"
                                     + "\r\n</div>"
                                     + "\r\n</div>"
                                     + "";

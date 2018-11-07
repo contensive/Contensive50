@@ -425,19 +425,19 @@ namespace Contensive.Addons.Tools {
                         core.cache.invalidateAll();
                         core.doc.clearMetaData();
                         ContentID = CdefController.getContentId(core, ContentName);
-                        ParentNavID = core.db.getRecordID(cnNavigatorEntries, "Manage Site Content");
+                        ParentNavID = core.db.getRecordID(Processor.Models.Db.NavigatorEntryModel.contentName, "Manage Site Content");
                         if (ParentNavID != 0) {
-                            CS = core.db.csOpen(cnNavigatorEntries, "(name=" + core.db.encodeSQLText("Advanced") + ")and(parentid=" + ParentNavID + ")");
+                            CS = core.db.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, "(name=" + core.db.encodeSQLText("Advanced") + ")and(parentid=" + ParentNavID + ")");
                             ParentNavID = 0;
                             if (core.db.csOk(CS)) {
                                 ParentNavID = core.db.csGetInteger(CS, "ID");
                             }
                             core.db.csClose(ref CS);
                             if (ParentNavID != 0) {
-                                CS = core.db.csOpen(cnNavigatorEntries, "(name=" + core.db.encodeSQLText(ContentName) + ")and(parentid=" + NavID + ")");
+                                CS = core.db.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, "(name=" + core.db.encodeSQLText(ContentName) + ")and(parentid=" + NavID + ")");
                                 if (!core.db.csOk(CS)) {
                                     core.db.csClose(ref CS);
-                                    CS = core.db.csInsertRecord(cnNavigatorEntries);
+                                    CS = core.db.csInsertRecord(Processor.Models.Db.NavigatorEntryModel.contentName);
                                 }
                                 if (core.db.csOk(CS)) {
                                     core.db.csSet(CS, "name", ContentName);
@@ -1439,7 +1439,7 @@ namespace Contensive.Addons.Tools {
                         //
                         if (DiagActionCount < DiagActionCountMax) {
                             Stream.Add(GetDiagHeader("Checking Navigator Entries...<br>"));
-                            CSPointer = core.db.csOpen(cnNavigatorEntries);
+                            CSPointer = core.db.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName);
                             if (!core.db.csOk(CSPointer)) {
                                 DiagProblem = "PROBLEM: Could not open the [Navigator Entries] content.";
                                 DiagActions = new DiagActionType[4];
@@ -1664,7 +1664,7 @@ namespace Contensive.Addons.Tools {
                         //
                         //If AddAdminMenuEntry Then
                         //    Stream.Add("<br>Adding menu entry (will not display until the next page)...")
-                        //    CS = core.db.cs_open(cnNavigatorEntries, "ContentID=" & ParentContentID)
+                        //    CS = core.db.cs_open(Processor.Models.Db.NavigatorEntryModel.contentName, "ContentID=" & ParentContentID)
                         //    If core.db.cs_ok(CS) Then
                         //        MenuName = core.db.cs_getText(CS, "name")
                         //        AdminOnly = core.db.cs_getBoolean(CS, "AdminOnly")

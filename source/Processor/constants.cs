@@ -42,21 +42,20 @@ namespace Contensive.Processor {
         public const string iconArrowDown = "<i alt=\"right\" title=\"right\" class=\"fas fa-arrow-circle-down\"></i>";
         public const string iconArrowRight = "<i alt=\"right\" title=\"right\" class=\"fas fa-arrow-circle-right\"></i>";
         public const string iconArrowLeft = "<i alt=\"left\" title=\"left\" class=\"fas fa-arrow-circle-left\"></i>";
-        public const string iconDelete = "<i alt=\"delete\" title=\"delete\" class=\"fas fa-trash\" style=\"color:#f00\"></i>";
+        public const string iconDelete = "<i alt=\"delete\" title=\"delete\" class=\"fas fa-times\"></i>";
+        public const string iconDelete_Red = "<span style=\"color:#f00\">" + iconDelete + "</span>";
         public const string iconAdd = "<i alt=\"add\" title=\"add\" class=\"fas fa-plus-circle\"></i>";
-        public const string iconClose = "<i alt=\"close\" title=\"close\" class=\"fas fa-window-close\"></i>";
         public const string iconEdit = "<i alt=\"edit\" title=\"edit\" class=\"fas fa-pen-square\"></i>";
-        public const string iconOpen = "<i alt=\"open\" title=\"open\" class=\"fas fa-angle-double-right\">";
         public const string iconRefresh = "<i alt=\"refresh\" title=\"refresh\" class=\"fas fa-sync-alt\">";
-        public const string iconContentCut = "<i alt=\"content cut\" title=\"refresh\" class=\"fas fa-cut\">";
-        public const string iconContentPaste = "<i alt=\"content add\" title=\"refresh\" class=\"fas fa-paste\">";
+        public const string iconContentCut = "<i alt=\"cut\" title=\"cut\" class=\"fas fa-cut\">";
+        public const string iconContentPaste = "<i alt=\"add\" title=\"add\" class=\"fas fa-paste\">";
+        public const string iconClose = "<i alt=\"close\" title=\"close\" class=\"fas fa-times\"></i>";
+        //public const string iconClose = "<i alt=\"close\" title=\"close\" class=\"fas fa-window-close\"></i>";
+        public const string iconClose_White = "<span style=\"color:#fff\">" + iconClose + "</span>";
+        public const string iconClose_Red = "<span style=\"color:#f00\">" + iconClose + "</span>";
+        public const string iconOpen = "<i alt=\"open\" title=\"open\" class=\"fas fa-angle-double-right\">";
+        public const string iconOpen_White = "<span style=\"color:#fff\">" + iconOpen + "</span>";
         //
-        // -- content names
-        internal const string cnBlank = "";
-        internal const string cnDataSources = "data sources";
-        internal const string cnPeople = "people";
-        internal const string cnAddons = "Add-ons";
-        internal const string cnNavigatorEntries = "Navigator Entries";
         /// <summary>
         /// deprecated. legacy was "/" and it was used in path in front of path. Path now includes a leading slash
         /// </summary>

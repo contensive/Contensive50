@@ -552,7 +552,7 @@ namespace Contensive.Processor.Controllers {
                 // ****************************** if cdef not loaded, this fails
                 //
                 appName = core.appConfig.name;
-                MenuContentID = core.db.getRecordID("Content", cnNavigatorEntries);
+                MenuContentID = core.db.getRecordID("Content", Processor.Models.Db.NavigatorEntryModel.contentName);
                 dt = core.db.executeQuery("select * from ccMenuEntries where (contentcontrolid=" + MenuContentID + ")and(name<>'')");
                 if (dt.Rows.Count > 0) {
                     NavIconType = 0;
@@ -601,7 +601,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 System.Text.StringBuilder sb = new System.Text.StringBuilder();
                 string appName = core.appConfig.name;
-                int MenuContentID = core.db.getRecordID("Content", cnNavigatorEntries);
+                int MenuContentID = core.db.getRecordID("Content", Processor.Models.Db.NavigatorEntryModel.contentName);
                 DataTable rs = core.db.executeQuery("select * from ccMenuEntries where (contentcontrolid=" + MenuContentID + ")and(name<>'')");
                 if (DbController.isDataTableOk(rs)) {
                     if (true) {

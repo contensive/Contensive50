@@ -135,8 +135,8 @@
   <ItemGroup>
     <Content Include="ClearScriptV8-32.dll" />
     <Content Include="ContensiveBase\arrowUpDown.png" />
-    <Content Include="ContensiveBase\admin.js" />
-    <Content Include="ContensiveBase\admin.css" />
+    <Content Include="ContensiveBase\adminUI.js" />
+    <Content Include="ContensiveBase\adminUI.css" />
     <Content Include="ContensiveBase\ClientSide\Core.js" />
     <Content Include="ContensiveBase\Config\DefaultCountryList.txt" />
     <Content Include="ContensiveBase\Config\DefaultEditorConfig.txt" />

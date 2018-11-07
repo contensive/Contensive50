@@ -1445,7 +1445,7 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="link"></param>
         /// <returns></returns>
-        public static string getIconDeleteLink(string link) { return HtmlController.a(iconDelete, link); }
+        public static string getIconDeleteLink(string link) { return HtmlController.a(iconDelete_Red, link); }
         public static string getIconArrowRightLink(string link) { return HtmlController.a(iconArrowRight, link); }
         public static string getIconArrowLeftLink(string link) { return HtmlController.a(iconArrowLeft, link); }
         public static string getIconPlusLink(string link, string caption = "") { return HtmlController.a(iconAdd + caption, link); }

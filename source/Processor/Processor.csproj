@@ -137,7 +137,7 @@
     <Compile Include="Addons\_blank.cs" />
     <Compile Include="Addons\SafeAddonManager\AddonManagerClass.cs" />
     <Compile Include="Addons\AdminSite\Views\RemoteMethods\CloseAjaxIndexFilter.cs" />
-    <Compile Include="Addons\AdminSite\Views\RemoteMethods\GetHtmlBodyClass.cs" />
+    <Compile Include="Addons\AdminSite\Views\GetHtmlBodyClass.cs" />
     <Compile Include="Addons\AdminSite\Views\RemoteMethods\GetAjaxDefaultAddonOptionString.cs" />
     <Compile Include="Addons\AdminSite\Views\RemoteMethods\GetAjaxVisitProperty.cs" />
     <Compile Include="Addons\AdminSite\Views\RemoteMethods\GetFieldEditorPreference.cs" />

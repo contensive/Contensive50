@@ -23,7 +23,7 @@ namespace Contensive.Addons.AdminSite {
                 addonId = 0;
                 if (core.session.visit.id == core.docProperties.getInteger(RequestNameDashboardReset)) {
                     //$$$$$ cache this
-                    CS = core.db.csOpen(cnAddons, "ccguid=" + core.db.encodeSQLText(addonGuidDashboard));
+                    CS = core.db.csOpen(Processor.Models.Db.AddonModel.contentName, "ccguid=" + core.db.encodeSQLText(addonGuidDashboard));
                     if (core.db.csOk(CS)) {
                         addonId = core.db.csGetInteger(CS, "id");
                         core.siteProperties.setProperty("AdminRootAddonID", GenericController.encodeText(addonId));
