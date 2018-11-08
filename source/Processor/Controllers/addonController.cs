@@ -63,28 +63,36 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         public string execute(string addonGuid, CPUtilsBaseClass.addonExecuteContext executeContext) {
-            var addon = AddonModel.create(core, addonGuid);
-            if (addon == null) {
-                //
-                // -- addon not found
-                LogController.handleError(core, new ArgumentException("AddonExecute called without valid guid [" + addonGuid + "] from context [" + executeContext.errorContextMessage + "]."));
-                return "";
-            } else {
-                return execute(addon, executeContext);
+            try {
+                var addon = AddonModel.create(core, addonGuid);
+                if (addon == null) {
+                    //
+                    // -- addon not found
+                    LogController.handleError(core, new ArgumentException("AddonExecute called without valid guid [" + addonGuid + "] from context [" + executeContext.errorContextMessage + "]."),"10");
+                } else {
+                    return execute(addon, executeContext);
+                }
+            } catch (Exception ex) {
+                LogController.handleError(core, ex, "execure by addonGuid");
             }
+            return "";
         }
         //
         //====================================================================================================
         public string execute(int addonId, CPUtilsBaseClass.addonExecuteContext executeContext) {
-            var addon = AddonModel.create(core, addonId);
-            if (addon == null) {
-                //
-                // -- addon not found
-                LogController.handleError(core, new ArgumentException("AddonExecute called without valid id [" + addonId + "] from context [" + executeContext.errorContextMessage + "]."));
-                return "";
-            } else {
-                return execute(addon, executeContext);
+            try {
+                var addon = AddonModel.create(core, addonId);
+                if (addon == null) {
+                    //
+                    // -- addon not found
+                    LogController.handleError(core, new ArgumentException("AddonExecute called without valid id [" + addonId + "] from context [" + executeContext.errorContextMessage + "]."), "11");
+                } else {
+                    return execute(addon, executeContext);
+                }
+            } catch (Exception ex) {
+                LogController.handleError(core, ex, "execure by addonId");
             }
+            return "";
         }
         //
         //====================================================================================================
@@ -96,572 +104,596 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public string execute(Models.Db.AddonModel addon, CPUtilsBaseClass.addonExecuteContext executeContext) {
             string result = "";
-            //
-            // -- setup values that have to be in finalize
-            bool rootLevelAddon = core.doc.addonRecursionDepth.Count.Equals(0);
-            bool save_forceJavascriptToHead = executeContext.forceJavascriptToHead;
-            long addonStart = core.doc.appStopWatch.ElapsedMilliseconds;
-            if (addon == null) {
+            string hint = "enter";
+            try {
                 //
-                // -- addon not found
-                LogController.handleError(core, new ArgumentException("AddonExecute called without valid addon [" + executeContext.errorContextMessage + "]."));
-            } else {
-                try {
+                // -- setup values that have to be in finalize
+                bool rootLevelAddon = core.doc.addonRecursionDepth.Count.Equals(0);
+                bool save_forceJavascriptToHead = executeContext.forceJavascriptToHead;
+                long addonStart = core.doc.appStopWatch.ElapsedMilliseconds;
+                if (addon == null) {
                     //
-                    // -- save the addon details in a fifo stack to popoff during exit. The top of the stack represents the addon being executed
-                    core.doc.addonModelStack.Push(addon);
-                    if (executeContext == null) {
+                    // -- addon not found
+                    LogController.handleError(core, new ArgumentException("AddonExecute called without valid addon [" + executeContext.errorContextMessage + "]."), "12");
+                } else {
+                    try {
                         //
-                        // -- context not configured 
-                        LogController.handleError(core, new ArgumentException("The Add-on executeContext was not configured for addon [#" + addon.id + ", " + addon.name + "]."));
-                    } else if (!string.IsNullOrEmpty(addon.objectProgramID)) {
-                        //
-                        // -- addons with activeX components are deprecated
-                        string addonDescription = getAddonDescription(core, addon);
-                        throw new ApplicationException("Addon is no longer supported because it contains an active-X component, add-on " + addonDescription + ".");
-                    } else {
-                        //
-                        // -- check for addon recursion beyond limit (addonRecursionLimit)
-                        bool blockRecursion = false;
-                        bool inRecursionList = core.doc.addonRecursionDepth.ContainsKey(addon.id);
-                        if (inRecursionList) blockRecursion = (core.doc.addonRecursionDepth[addon.id] > addonRecursionLimit);
-                        if (blockRecursion) {
+                        // -- save the addon details in a fifo stack to popoff during exit. The top of the stack represents the addon being executed
+                        core.doc.addonModelStack.Push(addon);
+                        if (executeContext == null) {
                             //
-                            // -- cannot call an addon within an addon
-                            throw new ApplicationException("Addon recursion limit exceeded. An addon [#" + addon.id + ", " + addon.name + "] cannot be called by itself more than " + addonRecursionLimit + " times.");
+                            // -- context not configured 
+                            LogController.handleError(core, new ArgumentException("The Add-on executeContext was not configured for addon [#" + addon.id + ", " + addon.name + "]."), "13");
+                        } else if (!string.IsNullOrEmpty(addon.objectProgramID)) {
+                            //
+                            // -- addons with activeX components are deprecated
+                            string addonDescription = getAddonDescription(core, addon);
+                            throw new ApplicationException("Addon is no longer supported because it contains an active-X component, add-on " + addonDescription + ".");
                         } else {
                             //
-                            // -- track recursion and continue
-                            if (!inRecursionList) {
-                                core.doc.addonRecursionDepth.Add(addon.id, 1);
+                            // -- check for addon recursion beyond limit (addonRecursionLimit)
+                            hint += ",recursionTest";
+                            bool blockRecursion = false;
+                            bool inRecursionList = core.doc.addonRecursionDepth.ContainsKey(addon.id);
+                            if (inRecursionList) blockRecursion = (core.doc.addonRecursionDepth[addon.id] > addonRecursionLimit);
+                            if (blockRecursion) {
+                                //
+                                // -- cannot call an addon within an addon
+                                throw new ApplicationException("Addon recursion limit exceeded. An addon [#" + addon.id + ", " + addon.name + "] cannot be called by itself more than " + addonRecursionLimit + " times.");
                             } else {
-                                core.doc.addonRecursionDepth[addon.id] += 1;
-                            }
-                            string parentInstanceId = core.docProperties.getText("instanceId");
-                            core.docProperties.setProperty("instanceId", executeContext.instanceGuid);
-                            //
-                            // -- if the addon's javascript is required in the head, set it in the executeContext now so it will propigate into the dependant addons as well
-                            executeContext.forceJavascriptToHead = executeContext.forceJavascriptToHead || addon.javascriptForceHead;
-                            //
-                            // -- run included add-ons before their parent
-                            List<int> dependentAddonList = core.doc.getDependentAddonList(addon.id);
-                            foreach ( int includedAddonID in dependentAddonList) {
-                                AddonModel dependentAddon = AddonModel.create(core, includedAddonID);
-                                if (dependentAddon == null) {
-                                    LogController.handleError(core, new ApplicationException("Addon not found. An included addon of [" + addon.name + "] was not found. The included addon may have been deleted. Recreate or reinstall the missing addon, then reinstall [" + addon.name + "] or manually correct the included addon selection."));
+                                //
+                                // -- track recursion and continue
+                                if (!inRecursionList) {
+                                    core.doc.addonRecursionDepth.Add(addon.id, 1);
                                 } else {
-                                    executeContext.errorContextMessage = "adding dependent addon [" + dependentAddon.name + "] for addon [" + addon.name + "] called within context [" + executeContext.errorContextMessage + "]";
-                                    result += executeDependency(dependentAddon, executeContext);
+                                    core.doc.addonRecursionDepth[addon.id] += 1;
                                 }
-                            }
-                            //List<Models.Db.AddonIncludeRuleModel> addonIncludeRules = AddonIncludeRuleModel.createList(core, "(addonid=" + addon.id + ")");
-                            //if (addonIncludeRules.Count > 0) {
-                            //    string addonContextMessage = executeContext.errorContextMessage;
-                            //    foreach (Models.Db.AddonIncludeRuleModel addonRule in addonIncludeRules) {
-                            //        if (addonRule.includedAddonID > 0) {
-                            //            AddonModel dependentAddon = AddonModel.create(core, addonRule.includedAddonID);
-                            //            if (dependentAddon == null) {
-                            //                LogController.handleError(core, new ApplicationException("Addon not found. An included addon of [" + addon.name + "] was not found. The included addon may have been deleted. Recreate or reinstall the missing addon, then reinstall [" + addon.name + "] or manually correct the included addon selection."));
-                            //            } else {
-                            //                executeContext.errorContextMessage = "adding dependent addon [" + dependentAddon.name + "] for addon [" + addon.name + "] called within context [" + addonContextMessage + "]";
-                            //                result += executeDependency(dependentAddon, executeContext);
-                            //            }
-                            //        }
-                            //    }
-                            //    executeContext.errorContextMessage = addonContextMessage;
-                            //}
-                            //
-                            // -- properties referenced multiple time 
-                            bool allowAdvanceEditor = core.visitProperty.getBoolean("AllowAdvancedEditor");
-                            //
-                            // -- add addon record arguments to doc properties
-                            if (!string.IsNullOrWhiteSpace(addon.argumentList)) {
-                                foreach (var addon_argument in addon.argumentList.Replace("\r\n", "\r").Replace("\n", "\r").Split(Convert.ToChar("\r"))) {
-                                    if (!string.IsNullOrEmpty(addon_argument)) {
-                                        string[] nvp = addon_argument.Split('=');
-                                        if (!string.IsNullOrEmpty(nvp[0])) {
-                                            string nvpValue = "";
-                                            if (nvp.Length > 1) {
-                                                nvpValue = nvp[1];
-                                            }
-                                            if (nvpValue.IndexOf("[") >= 0) {
-                                                nvpValue = nvpValue.Left(nvpValue.IndexOf("["));
-                                            }
-                                            core.docProperties.setProperty(nvp[0], nvpValue);
-                                        }
-                                    }
-                                }
-                            }
-                            //
-                            // -- add instance properties to doc properties
-                            string ContainerCssID = "";
-                            string ContainerCssClass = "";
-                            foreach (var kvp in executeContext.instanceArguments) {
-                                switch (kvp.Key.ToLower()) {
-                                    case "wrapper":
-                                        executeContext.wrapperID = GenericController.encodeInteger(kvp.Value);
-                                        break;
-                                    case "as ajax":
-                                        addon.asAjax = GenericController.encodeBoolean(kvp.Value);
-                                        break;
-                                    case "css container id":
-                                        ContainerCssID = kvp.Value;
-                                        break;
-                                    case "css container class":
-                                        ContainerCssClass = kvp.Value;
-                                        break;
-                                }
-                                core.docProperties.setProperty(kvp.Key, kvp.Value);
-                            }
-                            //
-                            // Preprocess arguments into OptionsForCPVars, and set generic instance values wrapperid and asajax
-                            if (addon.inFrame & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) {
+                                string parentInstanceId = core.docProperties.getText("instanceId");
+                                core.docProperties.setProperty("instanceId", executeContext.instanceGuid);
                                 //
-                                // -- inframe execution, deliver iframe with link back to remote method
-                                result = "TBD - inframe";
-                                //Link = core.webServer.requestProtocol & core.webServer.requestDomain & requestAppRootPath & core.siteProperties.serverPageDefault
-                                //If genericController.vbInstr(1, Link, "?") = 0 Then
-                                //    Link = Link & "?"
-                                //Else
-                                //    Link = Link & "&"
-                                //End If
-                                //Link = Link _
-                                //        & "nocache=" & Rnd() _
-                                //        & "&HostContentName=" & EncodeRequestVariable(HostContentName) _
-                                //        & "&HostRecordID=" & HostRecordID _
-                                //        & "&remotemethodaddon=" & EncodeURL(addon.id.ToString) _
-                                //        & "&optionstring=" & EncodeRequestVariable(WorkingOptionString) _
-                                //        & ""
-                                //FrameID = "frame" & GetRandomInteger(core)
-                                //returnVal = "<iframe src=""" & Link & """ id=""" & FrameID & """ onload=""cj.setFrameHeight('" & FrameID & "');"" class=""ccAddonFrameCon"" frameborder=""0"" scrolling=""no"">This content is not visible because your browser does not support iframes</iframe>" _
-                                //        & cr & "<script language=javascript type=""text/javascript"">" _
-                                //        & cr & "// Safari and Opera need a kick-start." _
-                                //        & cr & "var e=document.getElementById('" & FrameID & "');if(e){var iSource=e.src;e.src='';e.src = iSource;}" _
-                                //        & cr & "</script>"
-                            } else if (addon.asAjax & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) {
+                                // -- if the addon's javascript is required in the head, set it in the executeContext now so it will propigate into the dependant addons as well
+                                executeContext.forceJavascriptToHead = executeContext.forceJavascriptToHead || addon.javascriptForceHead;
                                 //
-                                // -- asajax execution, deliver div with ajax callback
-                                //
-                                result = "TBD - asajax";
-                                //-----------------------------------------------------------------
-                                // AsAjax and this is NOT the callback - setup the ajax callback
-                                // js,styles and other features from the addon record are added to the host page
-                                // during the remote method, these are blocked, but if any are added during
-                                //   DLL processing, they have to be handled
-                                //-----------------------------------------------------------------
-                                //
-                                //If True Then
-                                //    AsAjaxID = "asajax" & GetRandomInteger(core)
-                                //    QS = "" _
-                                //& RequestNameRemoteMethodAddon & "=" & EncodeRequestVariable(addon.id.ToString()) _
-                                //& "&HostContentName=" & EncodeRequestVariable(HostContentName) _
-                                //& "&HostRecordID=" & HostRecordID _
-                                //& "&HostRQS=" & EncodeRequestVariable(core.doc.refreshQueryString) _
-                                //& "&HostQS=" & EncodeRequestVariable(core.webServer.requestQueryString) _
-                                //& "&optionstring=" & EncodeRequestVariable(WorkingOptionString) _
-                                //& ""
-                                //    '
-                                //    ' -- exception made here. AsAjax is not used often, and this can create a QS too long
-                                //    '& "&HostForm=" & EncodeRequestVariable(core.webServer.requestFormString) _
-                                //    If IsInline Then
-                                //        returnVal = cr & "<div ID=" & AsAjaxID & " Class=""ccAddonAjaxCon"" style=""display:inline;""><img src=""/ccLib/images/ajax-loader-small.gif"" width=""16"" height=""16""></div>"
-                                //    Else
-                                //        returnVal = cr & "<div ID=" & AsAjaxID & " Class=""ccAddonAjaxCon""><img src=""/ccLib/images/ajax-loader-small.gif"" width=""16"" height=""16""></div>"
-                                //    End If
-                                //    returnVal = returnVal _
-                                //& cr & "<script Language=""javaScript"" type=""text/javascript"">" _
-                                //& cr & "cj.ajax.qs('" & QS & "','','" & AsAjaxID & "');AdminNavPop=true;" _
-                                //& cr & "</script>"
-                                //    '
-                                //    ' Problem - AsAjax addons must add styles, js and meta to the head
-                                //    '   Adding them to the host page covers most cases, but sometimes the DLL itself
-                                //    '   adds styles, etc during processing. These have to be added during the remote method processing.
-                                //    '   appending the .innerHTML of the head works for FF, but ie blocks it.
-                                //    '   using .createElement works in ie, but the tag system right now not written
-                                //    '   to save links, etc, it is written to store the entire tag.
-                                //    '   Also, OtherHeadTags can not be added this was.
-                                //    '
-                                //    ' Short Term Fix
-                                //    '   For Ajax, Add javascript and style features to head of host page
-                                //    '   Then during remotemethod, clear these strings before dll processing. Anything
-                                //    '   that is added must have come from the dll. So far, the only addons we have that
-                                //    '   do this load styles, so instead of putting in the the head (so ie fails), add styles inline.
-                                //    '
-                                //    '   This is because ie does not allow innerHTML updates to head tag
-                                //    '   scripts and js could be handled with .createElement if only the links were saved, but
-                                //    '   otherhead could not.
-                                //    '   The case this does not cover is if the addon itself manually adds one of these entries.
-                                //    '   In no case can ie handle the OtherHead, however, all the others can be done with .createElement.
-                                //    ' Long Term Fix
-                                //    '   Convert js, style, and meta tag system to use .createElement during remote method processing
-                                //    '
-                                //    Call core.html.doc_AddPagetitle2(PageTitle, AddedByName)
-                                //    Call core.html.doc_addMetaDescription2(MetaDescription, AddedByName)
-                                //    Call core.html.doc_addMetaKeywordList2(MetaKeywordList, AddedByName)
-                                //    Call core.html.doc_AddHeadTag2(OtherHeadTags, AddedByName)
-                                //    If Not blockJavascriptAndCss Then
-                                //        '
-                                //        ' add javascript and styles if it has not run already
-                                //        '
-                                //        Call core.html.addOnLoadJavascript(JSOnLoad, AddedByName)
-                                //        Call core.html.addBodyJavascriptCode(JSBodyEnd, AddedByName)
-                                //        Call core.html.addJavaScriptLinkHead(JSFilename, AddedByName)
-                                //        If addon.StylesFilename.filename <> "" Then
-                                //            Call core.html.addStyleLink(core.webServer.requestProtocol & core.webServer.requestDomain & genericController.getCdnFileLink(core, addon.StylesFilename.filename), addon.name & " default")
-                                //        End If
-                                //        'If CustomStylesFilename <> "" Then
-                                //        '    Call core.html.addStyleLink(core.webServer.requestProtocol & core.webServer.requestDomain & genericController.getCdnFileLink(core, CustomStylesFilename), AddonName & " custom")
-                                //        'End If
-                                //    End If
-                                //End If
-                            } else {
-                                //
-                                //-----------------------------------------------------------------
-                                // otherwise - produce the content from the addon
-                                //   setup RQS as needed - RQS provides the querystring for add-ons to create links that return to the same page
-                                //-----------------------------------------------------------------------------------------------------
-                                //
-                                if (addon.inFrame && (executeContext.addonType == CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml)) {
-                                    //
-                                    // -- remote method called from inframe execution
-                                    result = "TBD - remotemethod inframe";
-                                    // Add-on setup for InFrame, running the call-back - this page must think it is just the remotemethod
-                                    //If True Then
-                                    //    Call core.doc.addRefreshQueryString(RequestNameRemoteMethodAddon, addon.id.ToString)
-                                    //    Call core.doc.addRefreshQueryString("optionstring", WorkingOptionString)
-                                    //End If
-                                } else if (addon.asAjax && (executeContext.addonType == CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml)) {
-                                    //
-                                    // -- remotemethod called from asajax execution
-                                    result = "TBD - remotemethod ajax";
-                                    //
-                                    // Add-on setup for AsAjax, running the call-back - put the referring page's QS as the RQS
-                                    // restore form values
-                                    //
-                                    //If True Then
-                                    //    QS = core.docProperties.getText("Hostform")
-                                    //    If QS <> "" Then
-                                    //        Call core.docProperties.addQueryString(QS)
-                                    //    End If
-                                    //    '
-                                    //    ' restore refresh querystring values
-                                    //    '
-                                    //    QS = core.docProperties.getText("HostRQS")
-                                    //    QSSplit = Split(QS, "&")
-                                    //    For Ptr = 0 To UBound(QSSplit)
-                                    //        NVPair = QSSplit[Ptr]
-                                    //        If NVPair <> "" Then
-                                    //            NVSplit = Split(NVPair, "=")
-                                    //            If UBound(NVSplit) > 0 Then
-                                    //                Call core.doc.addRefreshQueryString(NVSplit(0), NVSplit(1))
-                                    //            End If
-                                    //        End If
-                                    //    Next
-                                    //    '
-                                    //    ' restore query string
-                                    //    '
-                                    //    QS = core.docProperties.getText("HostQS")
-                                    //    Call core.docProperties.addQueryString(QS)
-                                    //    '
-                                    //    ' Clear the style,js and meta features that were delivered to the host page
-                                    //    ' After processing, if these strings are not empty, they must have been added by the DLL
-                                    //    '
-                                    //    '
-                                    //    JSOnLoad = ""
-                                    //    JSBodyEnd = ""
-                                    //    PageTitle = ""
-                                    //    MetaDescription = ""
-                                    //    MetaKeywordList = ""
-                                    //    OtherHeadTags = ""
-                                    //    addon.StylesFilename.filename = ""
-                                    //    '  CustomStylesFilename = ""
-                                    //End If
-                                }
-                                //
-                                //-----------------------------------------------------------------
-                                // Do replacements from Option String and Pick out WrapperID, and AsAjax
-                                //-----------------------------------------------------------------
-                                //
-                                string testString = (addon.copy + addon.copyText + addon.pageTitle + addon.metaDescription + addon.metaKeywordList + addon.otherHeadTags + addon.formXML).ToLower();
-                                if (!string.IsNullOrWhiteSpace(testString)) {
-                                    foreach (var key in core.docProperties.getKeyList()) {
-                                        if (testString.Contains(("$" + key + "$").ToLower())) {
-                                            string ReplaceSource = "$" + key + "$";
-                                            string ReplaceValue = core.docProperties.getText(key);
-                                            addon.copy = addon.copy.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
-                                            addon.copyText = addon.copyText.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
-                                            addon.pageTitle = addon.pageTitle.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
-                                            addon.metaDescription = addon.metaDescription.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
-                                            addon.metaKeywordList = addon.metaKeywordList.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
-                                            addon.otherHeadTags = addon.otherHeadTags.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
-                                            addon.formXML = addon.formXML.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
-                                        }
-                                    }
-                                }
-                                //
-                                // -- text components
-                                string contentParts = addon.copyText + addon.copy;
-                                if (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextEditor) {
-                                    //
-                                    // not editor, encode the content parts of the addon
-                                    //
-                                    switch (executeContext.addonType) {
-                                        case CPUtilsBaseClass.addonContext.ContextEditor:
-                                            contentParts = ActiveContentController.renderHtmlForWysiwygEditor(core, contentParts);
-                                            break;
-                                        case CPUtilsBaseClass.addonContext.ContextEmail:
-                                            contentParts = ActiveContentController.renderHtmlForEmail(core, contentParts, executeContext.personalizationPeopleId, "");
-                                            break;
-                                        case CPUtilsBaseClass.addonContext.ContextFilter:
-                                        case CPUtilsBaseClass.addonContext.ContextOnBodyEnd:
-                                        case CPUtilsBaseClass.addonContext.ContextOnBodyStart:
-                                        case CPUtilsBaseClass.addonContext.ContextOnPageEnd:
-                                        case CPUtilsBaseClass.addonContext.ContextOnPageStart:
-                                        case CPUtilsBaseClass.addonContext.ContextPage:
-                                        case CPUtilsBaseClass.addonContext.ContextTemplate:
-                                        case CPUtilsBaseClass.addonContext.ContextAdmin:
-                                        case CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml:
-                                            contentParts = ActiveContentController.renderHtmlForWeb(core, contentParts, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, executeContext.personalizationPeopleId, "", 0, executeContext.addonType);
-                                            break;
-                                        case CPUtilsBaseClass.addonContext.ContextOnContentChange:
-                                        case CPUtilsBaseClass.addonContext.ContextSimple:
-                                            contentParts = ActiveContentController.renderHtmlForWeb(core, contentParts, "", 0, executeContext.personalizationPeopleId, "", 0, executeContext.addonType);
-                                            break;
-                                        case CPUtilsBaseClass.addonContext.ContextRemoteMethodJson:
-                                            contentParts = ActiveContentController.renderJSONForRemoteMethod(core, contentParts, "", 0, executeContext.personalizationPeopleId, "", 0, "", executeContext.addonType);
-                                            break;
-                                        default:
-                                            contentParts = ActiveContentController.renderHtmlForWeb(core, contentParts, "", 0, executeContext.personalizationPeopleId, "", 0, executeContext.addonType);
-                                            break;
-                                    }
-                                }
-                                result += contentParts;
-                                //
-                                // -- Scripting code
-                                if (addon.scriptingCode != "") {
-                                    try {
-                                        if (addon.scriptingLanguageID == (int)ScriptLanguages.Javascript ) {
-                                            result += execute_Script_JScript(ref addon);
-                                        } else {
-                                            result += execute_Script_VBScript(ref addon);
-                                        }
-                                    } catch (Exception ex) {
-                                        string addonDescription = getAddonDescription(core, addon);
-                                        throw new ApplicationException("There was an error executing the script component of Add-on " + addonDescription + ". The details of this error follow.</p><p>" + ex.InnerException.Message + "");
-                                    }
-                                }
-                                //
-                                // -- DotNet
-                                if (addon.dotNetClass != "") {
-                                    result += execute_assembly(executeContext, addon, AddonCollection.create(core, addon.collectionID));
-                                }
-                                //
-                                // -- RemoteAssetLink
-                                if (addon.remoteAssetLink != "") {
-                                    string RemoteAssetLink = addon.remoteAssetLink;
-                                    if (RemoteAssetLink.IndexOf("://") < 0) {
-                                        //
-                                        // use request object to build link
-                                        if (RemoteAssetLink.Left(1) == "/") {
-                                            // asset starts with a slash, add to appRoot
-                                            RemoteAssetLink = core.webServer.requestProtocol + core.webServer.requestDomain + RemoteAssetLink;
-                                        } else {
-                                            // asset is public files
-                                            RemoteAssetLink = core.webServer.requestProtocol + core.webServer.requestDomain + core.appConfig.cdnFileUrl + RemoteAssetLink;
-                                        }
-                                    }
-                                    int PosStart = 0;
-                                    HttpRequestController kmaHTTP = new HttpRequestController();
-                                    string RemoteAssetContent = kmaHTTP.getURL(ref RemoteAssetLink);
-                                    int Pos = GenericController.vbInstr(1, RemoteAssetContent, "<body", 1);
-                                    if (Pos > 0) {
-                                        Pos = GenericController.vbInstr(Pos, RemoteAssetContent, ">");
-                                        if (Pos > 0) {
-                                            PosStart = Pos + 1;
-                                            Pos = GenericController.vbInstr(Pos, RemoteAssetContent, "</body", 1);
-                                            if (Pos > 0) {
-                                                RemoteAssetContent = RemoteAssetContent.Substring(PosStart - 1, Pos - PosStart);
-                                            }
-                                        }
-                                    }
-                                    result += RemoteAssetContent;
-                                }
-                                //
-                                // --  FormXML
-                                if (addon.formXML != "") {
-                                    bool ExitAddonWithBlankResponse = false;
-                                    result += execute_formContent(null, addon.formXML, ref ExitAddonWithBlankResponse, "addon [" + addon.name + "]");
-                                    if (ExitAddonWithBlankResponse) {
-                                        return string.Empty;
-                                    }
-                                }
-                                //
-                                // -- Script Callback
-                                if (addon.link != "") {
-                                    string callBackLink = encodeVirtualPath(addon.link, core.appConfig.cdnFileUrl, appRootPath, core.webServer.requestDomain);
-                                    foreach (var key in core.docProperties.getKeyList()) {
-                                        callBackLink = modifyLinkQuery(callBackLink, encodeRequestVariable(key), encodeRequestVariable(core.docProperties.getText(key)), true);
-                                    }
-                                    foreach (var kvp in executeContext.instanceArguments) {
-                                        callBackLink = modifyLinkQuery(callBackLink, encodeRequestVariable(kvp.Key), encodeRequestVariable(core.docProperties.getText(kvp.Value)), true);
-                                    }
-                                    result += "<SCRIPT LANGUAGE=\"JAVASCRIPT\" SRC=\"" + callBackLink + "\"></SCRIPT>";
-                                }
-                                string AddedByName = addon.name + " addon";
-                                //
-                                // -- js head links
-                                if (addon.jsHeadScriptSrc != "") {
-                                    core.html.addScriptLinkSrc(addon.jsHeadScriptSrc, AddedByName + " Javascript Head Src", (executeContext.forceJavascriptToHead || addon.javascriptForceHead), addon.id);
-                                }
-                                //
-                                // -- js head code
-                                if (addon.jsFilename.filename != "") {
-                                    string scriptFilename = GenericController.getCdnFileLink(core, addon.jsFilename.filename);
-                                    //string scriptFilename = core.webServer.requestProtocol + core.webServer.requestDomain + genericController.getCdnFileLink(core, addon.JSFilename.filename);
-                                    core.html.addScriptLinkSrc(scriptFilename, AddedByName + " Javascript Head Code", (executeContext.forceJavascriptToHead || addon.javascriptForceHead), addon.id);
-                                }
-                                //
-                                // -- non-js html assets (styles,head tags), set flag to block duplicates 
-                                if (!core.doc.addonIdListRunInThisDoc.Contains(addon.id)) {
-                                    core.doc.addonIdListRunInThisDoc.Add(addon.id);
-                                    core.html.addTitle(addon.pageTitle, AddedByName);
-                                    core.html.addMetaDescription(addon.metaDescription, AddedByName);
-                                    core.html.addMetaKeywordList(addon.metaKeywordList, AddedByName);
-                                    core.html.addHeadTag(addon.otherHeadTags, AddedByName);
-                                    ////
-                                    //// -- js body links
-                                    //if (addon.JSBodyScriptSrc != "") {
-                                    //    core.html.addScriptLink_Body(addon.JSBodyScriptSrc, AddedByName + " Javascript Body Src");
-                                    //}
-                                    ////
-                                    //// -- js body code
-                                    //core.html.addScriptCode_body(addon.JavaScriptBodyEnd, AddedByName + " Javascript Body Code");
-                                    //
-                                    // -- styles
-                                    if (addon.stylesFilename.filename != "") {
-                                        core.html.addStyleLink(GenericController.getCdnFileLink(core, addon.stylesFilename.filename), addon.name + " Stylesheet");
-                                    }
-                                    //
-                                    // -- link to stylesheet
-                                    if (addon.stylesLinkHref != "") {
-                                        core.html.addStyleLink(addon.stylesLinkHref, addon.name + " Stylesheet Link");
-                                    }
-                                }
-                                //
-                                // -- Add Css containers
-                                if (!string.IsNullOrEmpty(ContainerCssID) | !string.IsNullOrEmpty(ContainerCssClass)) {
-                                    if (addon.isInline) {
-                                        result = "\r<span id=\"" + ContainerCssID + "\" class=\"" + ContainerCssClass + "\" style=\"display:inline;\">" + result + "</span>";
+                                // -- run included add-ons before their parent
+                                hint += ",runDependencies";
+                                List<int> dependentAddonList = core.doc.getDependentAddonList(addon.id);
+                                foreach (int includedAddonID in dependentAddonList) {
+                                    AddonModel dependentAddon = AddonModel.create(core, includedAddonID);
+                                    if (dependentAddon == null) {
+                                        LogController.handleError(core, new ApplicationException("Addon not found. An included addon of [" + addon.name + "] was not found. The included addon may have been deleted. Recreate or reinstall the missing addon, then reinstall [" + addon.name + "] or manually correct the included addon selection."), "14");
                                     } else {
-                                        result = "\r<div id=\"" + ContainerCssID + "\" class=\"" + ContainerCssClass + "\">" + nop(result) + "\r</div>";
+                                        executeContext.errorContextMessage = "adding dependent addon [" + dependentAddon.name + "] for addon [" + addon.name + "] called within context [" + executeContext.errorContextMessage + "]";
+                                        result += executeDependency(dependentAddon, executeContext);
                                     }
                                 }
-                            }
-                            //
-                            //   Add Wrappers to content
-                            if (addon.inFrame && (executeContext.addonType == CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml)) {
+                                //List<Models.Db.AddonIncludeRuleModel> addonIncludeRules = AddonIncludeRuleModel.createList(core, "(addonid=" + addon.id + ")");
+                                //if (addonIncludeRules.Count > 0) {
+                                //    string addonContextMessage = executeContext.errorContextMessage;
+                                //    foreach (Models.Db.AddonIncludeRuleModel addonRule in addonIncludeRules) {
+                                //        if (addonRule.includedAddonID > 0) {
+                                //            AddonModel dependentAddon = AddonModel.create(core, addonRule.includedAddonID);
+                                //            if (dependentAddon == null) {
+                                //                LogController.handleError(core, new ApplicationException("Addon not found. An included addon of [" + addon.name + "] was not found. The included addon may have been deleted. Recreate or reinstall the missing addon, then reinstall [" + addon.name + "] or manually correct the included addon selection."));
+                                //            } else {
+                                //                executeContext.errorContextMessage = "adding dependent addon [" + dependentAddon.name + "] for addon [" + addon.name + "] called within context [" + addonContextMessage + "]";
+                                //                result += executeDependency(dependentAddon, executeContext);
+                                //            }
+                                //        }
+                                //    }
+                                //    executeContext.errorContextMessage = addonContextMessage;
+                                //}
                                 //
-                                // -- iFrame content, framed in content, during the remote method call, add in the rest of the html page
-                                core.doc.setMetaContent(0, 0);
-                                result = ""
-                                    + core.siteProperties.docTypeDeclaration + "\r\n<html>"
-                                    + "\r\n<head>"
-                                    + core.html.getHtmlHead()
-                                    + "\r\n</head>"
-                                    + "\r\n" + TemplateDefaultBodyTag
-                                    + "\r\n</body>"
-                                    + "\r\n</html>";
-                            } else if (addon.asAjax && (executeContext.addonType == CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) {
+                                // -- properties referenced multiple time 
+                                hint += ",setupArgs";
+                                bool allowAdvanceEditor = core.visitProperty.getBoolean("AllowAdvancedEditor");
                                 //
-                                // -- as ajax content, AsAjax addon, during the Ajax callback, need to create an onload event that runs everything appended to onload within this content
-                            } else if ((executeContext.addonType == CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) || (executeContext.addonType == CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) {
+                                // -- add addon record arguments to doc properties
+                                if (!string.IsNullOrWhiteSpace(addon.argumentList)) {
+                                    foreach (var addon_argument in addon.argumentList.Replace("\r\n", "\r").Replace("\n", "\r").Split(Convert.ToChar("\r"))) {
+                                        if (!string.IsNullOrEmpty(addon_argument)) {
+                                            string[] nvp = addon_argument.Split('=');
+                                            if (!string.IsNullOrEmpty(nvp[0])) {
+                                                string nvpValue = "";
+                                                if (nvp.Length > 1) {
+                                                    nvpValue = nvp[1];
+                                                }
+                                                if (nvpValue.IndexOf("[") >= 0) {
+                                                    nvpValue = nvpValue.Left(nvpValue.IndexOf("["));
+                                                }
+                                                core.docProperties.setProperty(nvp[0], nvpValue);
+                                            }
+                                        }
+                                    }
+                                }
                                 //
-                                // -- non-ajax/non-Iframe remote method content (no wrapper)
-                            } else if (executeContext.addonType == CPUtilsBaseClass.addonContext.ContextEmail) {
+                                // -- add instance properties to doc properties
+                                string ContainerCssID = "";
+                                string ContainerCssClass = "";
+                                foreach (var kvp in executeContext.instanceArguments) {
+                                    switch (kvp.Key.ToLower()) {
+                                        case "wrapper":
+                                            executeContext.wrapperID = GenericController.encodeInteger(kvp.Value);
+                                            break;
+                                        case "as ajax":
+                                            addon.asAjax = GenericController.encodeBoolean(kvp.Value);
+                                            break;
+                                        case "css container id":
+                                            ContainerCssID = kvp.Value;
+                                            break;
+                                        case "css container class":
+                                            ContainerCssClass = kvp.Value;
+                                            break;
+                                    }
+                                    core.docProperties.setProperty(kvp.Key, kvp.Value);
+                                }
                                 //
-                                // -- return Email context (no wrappers)
-                            } else if (executeContext.addonType == CPUtilsBaseClass.addonContext.ContextSimple) {
-                                //
-                                // -- add-on called by another add-on, subroutine style (no wrappers)
-                            } else {
-                                //
-                                // -- Return all other types, Enable Edit Wrapper for Page Content edit mode
-                                bool IncludeEditWrapper = (!addon.blockEditTools) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextEditor) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextEmail) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextSimple) & (!executeContext.isIncludeAddon);
-                                if (IncludeEditWrapper) {
-                                    IncludeEditWrapper = IncludeEditWrapper && (allowAdvanceEditor && ((executeContext.addonType == CPUtilsBaseClass.addonContext.ContextAdmin) || core.session.isEditing(executeContext.hostRecord.contentName)));
-                                    if (IncludeEditWrapper) {
+                                // Preprocess arguments into OptionsForCPVars, and set generic instance values wrapperid and asajax
+                                if (addon.inFrame & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) {
+                                    //
+                                    // -- inframe execution, deliver iframe with link back to remote method
+                                    result = "TBD - inframe";
+                                    //Link = core.webServer.requestProtocol & core.webServer.requestDomain & requestAppRootPath & core.siteProperties.serverPageDefault
+                                    //If genericController.vbInstr(1, Link, "?") = 0 Then
+                                    //    Link = Link & "?"
+                                    //Else
+                                    //    Link = Link & "&"
+                                    //End If
+                                    //Link = Link _
+                                    //        & "nocache=" & Rnd() _
+                                    //        & "&HostContentName=" & EncodeRequestVariable(HostContentName) _
+                                    //        & "&HostRecordID=" & HostRecordID _
+                                    //        & "&remotemethodaddon=" & EncodeURL(addon.id.ToString) _
+                                    //        & "&optionstring=" & EncodeRequestVariable(WorkingOptionString) _
+                                    //        & ""
+                                    //FrameID = "frame" & GetRandomInteger(core)
+                                    //returnVal = "<iframe src=""" & Link & """ id=""" & FrameID & """ onload=""cj.setFrameHeight('" & FrameID & "');"" class=""ccAddonFrameCon"" frameborder=""0"" scrolling=""no"">This content is not visible because your browser does not support iframes</iframe>" _
+                                    //        & cr & "<script language=javascript type=""text/javascript"">" _
+                                    //        & cr & "// Safari and Opera need a kick-start." _
+                                    //        & cr & "var e=document.getElementById('" & FrameID & "');if(e){var iSource=e.src;e.src='';e.src = iSource;}" _
+                                    //        & cr & "</script>"
+                                } else if (addon.asAjax & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) {
+                                    //
+                                    // -- asajax execution, deliver div with ajax callback
+                                    //
+                                    result = "TBD - asajax";
+                                    //-----------------------------------------------------------------
+                                    // AsAjax and this is NOT the callback - setup the ajax callback
+                                    // js,styles and other features from the addon record are added to the host page
+                                    // during the remote method, these are blocked, but if any are added during
+                                    //   DLL processing, they have to be handled
+                                    //-----------------------------------------------------------------
+                                    //
+                                    //If True Then
+                                    //    AsAjaxID = "asajax" & GetRandomInteger(core)
+                                    //    QS = "" _
+                                    //& RequestNameRemoteMethodAddon & "=" & EncodeRequestVariable(addon.id.ToString()) _
+                                    //& "&HostContentName=" & EncodeRequestVariable(HostContentName) _
+                                    //& "&HostRecordID=" & HostRecordID _
+                                    //& "&HostRQS=" & EncodeRequestVariable(core.doc.refreshQueryString) _
+                                    //& "&HostQS=" & EncodeRequestVariable(core.webServer.requestQueryString) _
+                                    //& "&optionstring=" & EncodeRequestVariable(WorkingOptionString) _
+                                    //& ""
+                                    //    '
+                                    //    ' -- exception made here. AsAjax is not used often, and this can create a QS too long
+                                    //    '& "&HostForm=" & EncodeRequestVariable(core.webServer.requestFormString) _
+                                    //    If IsInline Then
+                                    //        returnVal = cr & "<div ID=" & AsAjaxID & " Class=""ccAddonAjaxCon"" style=""display:inline;""><img src=""/ccLib/images/ajax-loader-small.gif"" width=""16"" height=""16""></div>"
+                                    //    Else
+                                    //        returnVal = cr & "<div ID=" & AsAjaxID & " Class=""ccAddonAjaxCon""><img src=""/ccLib/images/ajax-loader-small.gif"" width=""16"" height=""16""></div>"
+                                    //    End If
+                                    //    returnVal = returnVal _
+                                    //& cr & "<script Language=""javaScript"" type=""text/javascript"">" _
+                                    //& cr & "cj.ajax.qs('" & QS & "','','" & AsAjaxID & "');AdminNavPop=true;" _
+                                    //& cr & "</script>"
+                                    //    '
+                                    //    ' Problem - AsAjax addons must add styles, js and meta to the head
+                                    //    '   Adding them to the host page covers most cases, but sometimes the DLL itself
+                                    //    '   adds styles, etc during processing. These have to be added during the remote method processing.
+                                    //    '   appending the .innerHTML of the head works for FF, but ie blocks it.
+                                    //    '   using .createElement works in ie, but the tag system right now not written
+                                    //    '   to save links, etc, it is written to store the entire tag.
+                                    //    '   Also, OtherHeadTags can not be added this was.
+                                    //    '
+                                    //    ' Short Term Fix
+                                    //    '   For Ajax, Add javascript and style features to head of host page
+                                    //    '   Then during remotemethod, clear these strings before dll processing. Anything
+                                    //    '   that is added must have come from the dll. So far, the only addons we have that
+                                    //    '   do this load styles, so instead of putting in the the head (so ie fails), add styles inline.
+                                    //    '
+                                    //    '   This is because ie does not allow innerHTML updates to head tag
+                                    //    '   scripts and js could be handled with .createElement if only the links were saved, but
+                                    //    '   otherhead could not.
+                                    //    '   The case this does not cover is if the addon itself manually adds one of these entries.
+                                    //    '   In no case can ie handle the OtherHead, however, all the others can be done with .createElement.
+                                    //    ' Long Term Fix
+                                    //    '   Convert js, style, and meta tag system to use .createElement during remote method processing
+                                    //    '
+                                    //    Call core.html.doc_AddPagetitle2(PageTitle, AddedByName)
+                                    //    Call core.html.doc_addMetaDescription2(MetaDescription, AddedByName)
+                                    //    Call core.html.doc_addMetaKeywordList2(MetaKeywordList, AddedByName)
+                                    //    Call core.html.doc_AddHeadTag2(OtherHeadTags, AddedByName)
+                                    //    If Not blockJavascriptAndCss Then
+                                    //        '
+                                    //        ' add javascript and styles if it has not run already
+                                    //        '
+                                    //        Call core.html.addOnLoadJavascript(JSOnLoad, AddedByName)
+                                    //        Call core.html.addBodyJavascriptCode(JSBodyEnd, AddedByName)
+                                    //        Call core.html.addJavaScriptLinkHead(JSFilename, AddedByName)
+                                    //        If addon.StylesFilename.filename <> "" Then
+                                    //            Call core.html.addStyleLink(core.webServer.requestProtocol & core.webServer.requestDomain & genericController.getCdnFileLink(core, addon.StylesFilename.filename), addon.name & " default")
+                                    //        End If
+                                    //        'If CustomStylesFilename <> "" Then
+                                    //        '    Call core.html.addStyleLink(core.webServer.requestProtocol & core.webServer.requestDomain & genericController.getCdnFileLink(core, CustomStylesFilename), AddonName & " custom")
+                                    //        'End If
+                                    //    End If
+                                    //End If
+                                } else {
+                                    //
+                                    //-----------------------------------------------------------------
+                                    // otherwise - produce the content from the addon
+                                    //   setup RQS as needed - RQS provides the querystring for add-ons to create links that return to the same page
+                                    //-----------------------------------------------------------------------------------------------------
+                                    //
+                                    if (addon.inFrame && (executeContext.addonType == CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml)) {
                                         //
-                                        // Edit Icon
-                                        string EditWrapperHTMLID = "eWrapper" + core.doc.addonInstanceCnt;
-                                        string DialogList = "";
-                                        string HelpIcon = getHelpBubble(addon.id, addon.help, addon.collectionID, ref DialogList);
-                                        if (core.visitProperty.getBoolean("AllowAdvancedEditor")) {
-                                            string addonArgumentListPassToBubbleEditor = ""; // comes from method in this class the generates it from addon and instance properites - lost it in the shuffle
-                                            string AddonEditIcon = getIconSprite("", 0, "/ccLib/images/tooledit.png", 22, 22, "Edit the " + addon.name + " Add-on", "Edit the " + addon.name + " Add-on", "", true, "");
-                                            AddonEditIcon = "<a href=\"/" + core.appConfig.adminRoute + "?cid=" + CDefModel.getContentId(core, cnAddons) + "&id=" + addon.id + "&af=4&aa=2&ad=1\" tabindex=\"-1\">" + AddonEditIcon + "</a>";
-                                            string InstanceSettingsEditIcon = getInstanceBubble(addon.name, addonArgumentListPassToBubbleEditor, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, executeContext.hostRecord.fieldName, executeContext.instanceGuid, executeContext.addonType, ref DialogList);
-                                            string HTMLViewerEditIcon = getHTMLViewerBubble(addon.id, "editWrapper" + core.doc.editWrapperCnt, ref DialogList);
-                                            string SiteStylesEditIcon = ""; // ?????
-                                            string ToolBar = InstanceSettingsEditIcon + AddonEditIcon + getAddonStylesBubble(addon.id, ref DialogList) + SiteStylesEditIcon + HTMLViewerEditIcon + HelpIcon;
-                                            ToolBar = GenericController.vbReplace(ToolBar, "&nbsp;", "", 1, 99, 1);
-                                            result = AdminUIController.getEditWrapper(core, "<div class=\"ccAddonEditTools\">" + ToolBar + "&nbsp;" + addon.name + DialogList + "</div>", result);
-                                        } else if (core.visitProperty.getBoolean("AllowEditing")) {
-                                            result = AdminUIController.getEditWrapper(core, "<div class=\"ccAddonEditCaption\">" + addon.name + "&nbsp;" + HelpIcon + "</div>", result);
+                                        // -- remote method called from inframe execution
+                                        result = "TBD - remotemethod inframe";
+                                        // Add-on setup for InFrame, running the call-back - this page must think it is just the remotemethod
+                                        //If True Then
+                                        //    Call core.doc.addRefreshQueryString(RequestNameRemoteMethodAddon, addon.id.ToString)
+                                        //    Call core.doc.addRefreshQueryString("optionstring", WorkingOptionString)
+                                        //End If
+                                    } else if (addon.asAjax && (executeContext.addonType == CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml)) {
+                                        //
+                                        // -- remotemethod called from asajax execution
+                                        result = "TBD - remotemethod ajax";
+                                        //
+                                        // Add-on setup for AsAjax, running the call-back - put the referring page's QS as the RQS
+                                        // restore form values
+                                        //
+                                        //If True Then
+                                        //    QS = core.docProperties.getText("Hostform")
+                                        //    If QS <> "" Then
+                                        //        Call core.docProperties.addQueryString(QS)
+                                        //    End If
+                                        //    '
+                                        //    ' restore refresh querystring values
+                                        //    '
+                                        //    QS = core.docProperties.getText("HostRQS")
+                                        //    QSSplit = Split(QS, "&")
+                                        //    For Ptr = 0 To UBound(QSSplit)
+                                        //        NVPair = QSSplit[Ptr]
+                                        //        If NVPair <> "" Then
+                                        //            NVSplit = Split(NVPair, "=")
+                                        //            If UBound(NVSplit) > 0 Then
+                                        //                Call core.doc.addRefreshQueryString(NVSplit(0), NVSplit(1))
+                                        //            End If
+                                        //        End If
+                                        //    Next
+                                        //    '
+                                        //    ' restore query string
+                                        //    '
+                                        //    QS = core.docProperties.getText("HostQS")
+                                        //    Call core.docProperties.addQueryString(QS)
+                                        //    '
+                                        //    ' Clear the style,js and meta features that were delivered to the host page
+                                        //    ' After processing, if these strings are not empty, they must have been added by the DLL
+                                        //    '
+                                        //    '
+                                        //    JSOnLoad = ""
+                                        //    JSBodyEnd = ""
+                                        //    PageTitle = ""
+                                        //    MetaDescription = ""
+                                        //    MetaKeywordList = ""
+                                        //    OtherHeadTags = ""
+                                        //    addon.StylesFilename.filename = ""
+                                        //    '  CustomStylesFilename = ""
+                                        //End If
+                                    }
+                                    //
+                                    //-----------------------------------------------------------------
+                                    // Do replacements from Option String and Pick out WrapperID, and AsAjax
+                                    //-----------------------------------------------------------------
+                                    //
+                                    hint += ",contentReplacement";
+                                    string testString = (addon.copy + addon.copyText + addon.pageTitle + addon.metaDescription + addon.metaKeywordList + addon.otherHeadTags + addon.formXML).ToLower();
+                                    if (!string.IsNullOrWhiteSpace(testString)) {
+                                        foreach (var key in core.docProperties.getKeyList()) {
+                                            if (testString.Contains(("$" + key + "$").ToLower())) {
+                                                string ReplaceSource = "$" + key + "$";
+                                                string ReplaceValue = core.docProperties.getText(key);
+                                                addon.copy = addon.copy.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
+                                                addon.copyText = addon.copyText.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
+                                                addon.pageTitle = addon.pageTitle.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
+                                                addon.metaDescription = addon.metaDescription.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
+                                                addon.metaKeywordList = addon.metaKeywordList.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
+                                                addon.otherHeadTags = addon.otherHeadTags.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
+                                                addon.formXML = addon.formXML.Replace(ReplaceSource, ReplaceValue, StringComparison.CurrentCultureIgnoreCase);
+                                            }
                                         }
                                     }
-                                }
-                                //
-                                // -- Add Comment wrapper, to help debugging except email, remote methods and admin (empty is used to detect no result)
-                                if (true && (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextAdmin) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextEmail) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextSimple)) {
-                                    if (core.visitProperty.getBoolean("AllowDebugging")) {
-                                        string AddonCommentName = GenericController.vbReplace(addon.name, "-->", "..>");
+                                    //
+                                    // -- text components
+                                    string contentParts = addon.copyText + addon.copy;
+                                    if (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextEditor) {
+                                        //
+                                        // not editor, encode the content parts of the addon
+                                        //
+                                        hint += ",contextEditor";
+                                        switch (executeContext.addonType) {
+                                            case CPUtilsBaseClass.addonContext.ContextEditor:
+                                                contentParts = ActiveContentController.renderHtmlForWysiwygEditor(core, contentParts);
+                                                break;
+                                            case CPUtilsBaseClass.addonContext.ContextEmail:
+                                                contentParts = ActiveContentController.renderHtmlForEmail(core, contentParts, executeContext.personalizationPeopleId, "");
+                                                break;
+                                            case CPUtilsBaseClass.addonContext.ContextFilter:
+                                            case CPUtilsBaseClass.addonContext.ContextOnBodyEnd:
+                                            case CPUtilsBaseClass.addonContext.ContextOnBodyStart:
+                                            case CPUtilsBaseClass.addonContext.ContextOnPageEnd:
+                                            case CPUtilsBaseClass.addonContext.ContextOnPageStart:
+                                            case CPUtilsBaseClass.addonContext.ContextPage:
+                                            case CPUtilsBaseClass.addonContext.ContextTemplate:
+                                            case CPUtilsBaseClass.addonContext.ContextAdmin:
+                                            case CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml:
+                                                contentParts = ActiveContentController.renderHtmlForWeb(core, contentParts, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, executeContext.personalizationPeopleId, "", 0, executeContext.addonType);
+                                                break;
+                                            case CPUtilsBaseClass.addonContext.ContextOnContentChange:
+                                            case CPUtilsBaseClass.addonContext.ContextSimple:
+                                                contentParts = ActiveContentController.renderHtmlForWeb(core, contentParts, "", 0, executeContext.personalizationPeopleId, "", 0, executeContext.addonType);
+                                                break;
+                                            case CPUtilsBaseClass.addonContext.ContextRemoteMethodJson:
+                                                contentParts = ActiveContentController.renderJSONForRemoteMethod(core, contentParts, "", 0, executeContext.personalizationPeopleId, "", 0, "", executeContext.addonType);
+                                                break;
+                                            default:
+                                                contentParts = ActiveContentController.renderHtmlForWeb(core, contentParts, "", 0, executeContext.personalizationPeopleId, "", 0, executeContext.addonType);
+                                                break;
+                                        }
+                                    }
+                                    result += contentParts;
+                                    //
+                                    // -- Scripting code
+                                    if (addon.scriptingCode != "") {
+                                        hint += ",runScriptCode";
+                                        try {
+                                            if (addon.scriptingLanguageID == (int)ScriptLanguages.Javascript) {
+                                                result += execute_Script_JScript(ref addon);
+                                            } else {
+                                                result += execute_Script_VBScript(ref addon);
+                                            }
+                                        } catch (Exception ex) {
+                                            string addonDescription = getAddonDescription(core, addon);
+                                            throw new ApplicationException("There was an error executing the script component of Add-on " + addonDescription + ". The details of this error follow.</p><p>" + ex.InnerException.Message + "");
+                                        }
+                                    }
+                                    //
+                                    // -- DotNet
+                                    if (addon.dotNetClass != "") {
+                                        hint += ",runDotnetCode";
+                                        result += execute_assembly(executeContext, addon, AddonCollection.create(core, addon.collectionID));
+                                    }
+                                    //
+                                    // -- RemoteAssetLink
+                                    if (addon.remoteAssetLink != "") {
+                                        hint += ",runRemoteAsset";
+                                        string RemoteAssetLink = addon.remoteAssetLink;
+                                        if (RemoteAssetLink.IndexOf("://") < 0) {
+                                            //
+                                            // use request object to build link
+                                            if (RemoteAssetLink.Left(1) == "/") {
+                                                // asset starts with a slash, add to appRoot
+                                                RemoteAssetLink = core.webServer.requestProtocol + core.webServer.requestDomain + RemoteAssetLink;
+                                            } else {
+                                                // asset is public files
+                                                RemoteAssetLink = core.webServer.requestProtocol + core.webServer.requestDomain + core.appConfig.cdnFileUrl + RemoteAssetLink;
+                                            }
+                                        }
+                                        int PosStart = 0;
+                                        HttpRequestController kmaHTTP = new HttpRequestController();
+                                        string RemoteAssetContent = kmaHTTP.getURL(ref RemoteAssetLink);
+                                        int Pos = GenericController.vbInstr(1, RemoteAssetContent, "<body", 1);
+                                        if (Pos > 0) {
+                                            Pos = GenericController.vbInstr(Pos, RemoteAssetContent, ">");
+                                            if (Pos > 0) {
+                                                PosStart = Pos + 1;
+                                                Pos = GenericController.vbInstr(Pos, RemoteAssetContent, "</body", 1);
+                                                if (Pos > 0) {
+                                                    RemoteAssetContent = RemoteAssetContent.Substring(PosStart - 1, Pos - PosStart);
+                                                }
+                                            }
+                                        }
+                                        result += RemoteAssetContent;
+                                    }
+                                    //
+                                    // --  FormXML
+                                    if (addon.formXML != "") {
+                                        hint += ",runFormXml";
+                                        bool ExitAddonWithBlankResponse = false;
+                                        result += execute_formContent(null, addon.formXML, ref ExitAddonWithBlankResponse, "addon [" + addon.name + "]");
+                                        if (ExitAddonWithBlankResponse) {
+                                            return string.Empty;
+                                        }
+                                    }
+                                    //
+                                    // -- Script Callback
+                                    if (addon.link != "") {
+                                        hint += ",runCallback";
+                                        string callBackLink = encodeVirtualPath(addon.link, core.appConfig.cdnFileUrl, appRootPath, core.webServer.requestDomain);
+                                        foreach (var key in core.docProperties.getKeyList()) {
+                                            callBackLink = modifyLinkQuery(callBackLink, encodeRequestVariable(key), encodeRequestVariable(core.docProperties.getText(key)), true);
+                                        }
+                                        foreach (var kvp in executeContext.instanceArguments) {
+                                            callBackLink = modifyLinkQuery(callBackLink, encodeRequestVariable(kvp.Key), encodeRequestVariable(core.docProperties.getText(kvp.Value)), true);
+                                        }
+                                        result += "<SCRIPT LANGUAGE=\"JAVASCRIPT\" SRC=\"" + callBackLink + "\"></SCRIPT>";
+                                    }
+                                    string AddedByName = addon.name + " addon";
+                                    //
+                                    // -- non-js html assets (styles,head tags), set flag to block duplicates 
+                                    if (!core.doc.addonIdListRunInThisDoc.Contains(addon.id)) {
+                                        hint += ",addHtmlAssetsToDoc";
+                                        core.doc.addonIdListRunInThisDoc.Add(addon.id);
+                                        core.html.addTitle(addon.pageTitle, AddedByName);
+                                        core.html.addMetaDescription(addon.metaDescription, AddedByName);
+                                        core.html.addMetaKeywordList(addon.metaKeywordList, AddedByName);
+                                        core.html.addHeadTag(addon.otherHeadTags, AddedByName);
+                                        //
+                                        // -- js head links
+                                        if (addon.jsHeadScriptSrc != "") {
+                                            core.html.addScriptLinkSrc(addon.jsHeadScriptSrc, AddedByName + " Javascript Head Src", (executeContext.forceJavascriptToHead || addon.javascriptForceHead), addon.id);
+                                        }
+                                        //
+                                        // -- js head code
+                                        if (addon.jsFilename.filename != "") {
+                                            string scriptFilename = GenericController.getCdnFileLink(core, addon.jsFilename.filename);
+                                            core.html.addScriptLinkSrc(scriptFilename, AddedByName + " Javascript Head Code", (executeContext.forceJavascriptToHead || addon.javascriptForceHead), addon.id);
+                                        }
+                                        //
+                                        // -- styles
+                                        if (addon.stylesFilename.filename != "") {
+                                            core.html.addStyleLink(GenericController.getCdnFileLink(core, addon.stylesFilename.filename), addon.name + " Stylesheet");
+                                        }
+                                        //
+                                        // -- link to stylesheet
+                                        if (addon.stylesLinkHref != "") {
+                                            core.html.addStyleLink(addon.stylesLinkHref, addon.name + " Stylesheet Link");
+                                        }
+                                        //
+                                        // -- these fields are deprecated, but use them for now and log error
+                                        //
+                                        // -- js body links
+                                        if (!String.IsNullOrWhiteSpace(addon.jsBodyScriptSrc)) {
+                                            LogController.logError(core, "Deprecated field [jsBodyScriptSrc] used by Addon [" + addon.name + "], was added to doc. Modify addon and move to jsHeadScriptSrc.");
+                                            core.html.addScriptLinkSrc(addon.jsBodyScriptSrc, AddedByName + " Javascript Body Src");
+                                        }
+                                        //
+                                        // -- js body code
+                                        if (!String.IsNullOrWhiteSpace(addon.javaScriptBodyEnd)) {
+                                            LogController.logError(core, "Deprecated field [javaScriptBodyEnd] used by Addon [" + addon.name + "], was added to doc. Modify addon and move to jsFilename.");
+                                            core.html.addScriptCode(addon.javaScriptBodyEnd, AddedByName + " Javascript Body Code");
+                                        }
+                                    }
+                                    //
+                                    // -- Add Css containers
+                                    if (!string.IsNullOrEmpty(ContainerCssID) | !string.IsNullOrEmpty(ContainerCssClass)) {
                                         if (addon.isInline) {
-                                            result = "<!-- Add-on " + AddonCommentName + " -->" + result + "<!-- /Add-on " + AddonCommentName + " -->";
+                                            result = "\r<span id=\"" + ContainerCssID + "\" class=\"" + ContainerCssClass + "\" style=\"display:inline;\">" + result + "</span>";
                                         } else {
-                                            result = "\r<!-- Add-on " + AddonCommentName + " -->" + nop(result) + "\r<!-- /Add-on " + AddonCommentName + " -->";
+                                            result = "\r<div id=\"" + ContainerCssID + "\" class=\"" + ContainerCssClass + "\">" + nop(result) + "\r</div>";
                                         }
                                     }
                                 }
                                 //
-                                // -- Add Design Wrapper
-                                if ((!string.IsNullOrEmpty(result)) & (!addon.isInline) && (executeContext.wrapperID > 0)) {
-                                    result = addWrapperToResult(result, executeContext.wrapperID, "for Add-on " + addon.name);
+                                //   Add Wrappers to content
+                                if (addon.inFrame && (executeContext.addonType == CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml)) {
+                                    hint += ",addWrappers";
+                                    //
+                                    // -- iFrame content, framed in content, during the remote method call, add in the rest of the html page
+                                    core.doc.setMetaContent(0, 0);
+                                    result = ""
+                                        + core.siteProperties.docTypeDeclaration + "\r\n<html>"
+                                        + "\r\n<head>"
+                                        + core.html.getHtmlHead()
+                                        + "\r\n</head>"
+                                        + "\r\n" + TemplateDefaultBodyTag
+                                        + "\r\n</body>"
+                                        + "\r\n</html>";
+                                } else if (addon.asAjax && (executeContext.addonType == CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) {
+                                    //
+                                    // -- as ajax content, AsAjax addon, during the Ajax callback, need to create an onload event that runs everything appended to onload within this content
+                                } else if ((executeContext.addonType == CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) || (executeContext.addonType == CPUtilsBaseClass.addonContext.ContextRemoteMethodJson)) {
+                                    //
+                                    // -- non-ajax/non-Iframe remote method content (no wrapper)
+                                } else if (executeContext.addonType == CPUtilsBaseClass.addonContext.ContextEmail) {
+                                    //
+                                    // -- return Email context (no wrappers)
+                                } else if (executeContext.addonType == CPUtilsBaseClass.addonContext.ContextSimple) {
+                                    //
+                                    // -- add-on called by another add-on, subroutine style (no wrappers)
+                                } else {
+                                    //
+                                    // -- Return all other types, Enable Edit Wrapper for Page Content edit mode
+                                    bool IncludeEditWrapper = (!addon.blockEditTools) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextEditor) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextEmail) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextSimple) & (!executeContext.isIncludeAddon);
+                                    if (IncludeEditWrapper) {
+                                        IncludeEditWrapper = IncludeEditWrapper && (allowAdvanceEditor && ((executeContext.addonType == CPUtilsBaseClass.addonContext.ContextAdmin) || core.session.isEditing(executeContext.hostRecord.contentName)));
+                                        if (IncludeEditWrapper) {
+                                            //
+                                            // Edit Icon
+                                            hint += ",addEditWrapper";
+                                            string EditWrapperHTMLID = "eWrapper" + core.doc.addonInstanceCnt;
+                                            string DialogList = "";
+                                            string HelpIcon = getHelpBubble(addon.id, addon.help, addon.collectionID, ref DialogList);
+                                            if (core.visitProperty.getBoolean("AllowAdvancedEditor")) {
+                                                string addonArgumentListPassToBubbleEditor = ""; // comes from method in this class the generates it from addon and instance properites - lost it in the shuffle
+                                                string AddonEditIcon = getIconSprite("", 0, "/ccLib/images/tooledit.png", 22, 22, "Edit the " + addon.name + " Add-on", "Edit the " + addon.name + " Add-on", "", true, "");
+                                                AddonEditIcon = "<a href=\"/" + core.appConfig.adminRoute + "?cid=" + CDefModel.getContentId(core, cnAddons) + "&id=" + addon.id + "&af=4&aa=2&ad=1\" tabindex=\"-1\">" + AddonEditIcon + "</a>";
+                                                string InstanceSettingsEditIcon = getInstanceBubble(addon.name, addonArgumentListPassToBubbleEditor, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, executeContext.hostRecord.fieldName, executeContext.instanceGuid, executeContext.addonType, ref DialogList);
+                                                string HTMLViewerEditIcon = getHTMLViewerBubble(addon.id, "editWrapper" + core.doc.editWrapperCnt, ref DialogList);
+                                                string SiteStylesEditIcon = ""; // ?????
+                                                string ToolBar = InstanceSettingsEditIcon + AddonEditIcon + getAddonStylesBubble(addon.id, ref DialogList) + SiteStylesEditIcon + HTMLViewerEditIcon + HelpIcon;
+                                                ToolBar = GenericController.vbReplace(ToolBar, "&nbsp;", "", 1, 99, 1);
+                                                result = AdminUIController.getEditWrapper(core, "<div class=\"ccAddonEditTools\">" + ToolBar + "&nbsp;" + addon.name + DialogList + "</div>", result);
+                                            } else if (core.visitProperty.getBoolean("AllowEditing")) {
+                                                result = AdminUIController.getEditWrapper(core, "<div class=\"ccAddonEditCaption\">" + addon.name + "&nbsp;" + HelpIcon + "</div>", result);
+                                            }
+                                        }
+                                    }
+                                    //
+                                    // -- Add Comment wrapper, to help debugging except email, remote methods and admin (empty is used to detect no result)
+                                    if (true && (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextAdmin) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextEmail) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodHtml) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextRemoteMethodJson) & (executeContext.addonType != CPUtilsBaseClass.addonContext.ContextSimple)) {
+                                        if (core.visitProperty.getBoolean("AllowDebugging")) {
+                                            string AddonCommentName = GenericController.vbReplace(addon.name, "-->", "..>");
+                                            if (addon.isInline) {
+                                                result = "<!-- Add-on " + AddonCommentName + " -->" + result + "<!-- /Add-on " + AddonCommentName + " -->";
+                                            } else {
+                                                result = "\r<!-- Add-on " + AddonCommentName + " -->" + nop(result) + "\r<!-- /Add-on " + AddonCommentName + " -->";
+                                            }
+                                        }
+                                    }
+                                    //
+                                    // -- Add Design Wrapper
+                                    if ((!string.IsNullOrEmpty(result)) & (!addon.isInline) && (executeContext.wrapperID > 0)) {
+                                        result = addWrapperToResult(result, executeContext.wrapperID, "for Add-on " + addon.name);
+                                    }
+                                    // -- restore the parent's instanceId
+                                    core.docProperties.setProperty("instanceId", parentInstanceId);
                                 }
-                                // -- restore the parent's instanceId
-                                core.docProperties.setProperty("instanceId", parentInstanceId);
+                                //
+                                // -- unwind recursion count
+                                if (core.doc.addonRecursionDepth.ContainsKey(addon.id)) {
+                                    if (--core.doc.addonRecursionDepth[addon.id] <= 0) {
+                                        core.doc.addonRecursionDepth.Remove(addon.id);
+                                    }
+                                }
                             }
-                            //
-                            // -- unwind recursion count
-                            if (core.doc.addonRecursionDepth.ContainsKey(addon.id)) {
-                                if( --core.doc.addonRecursionDepth[addon.id] <=0 ) {
-                                    core.doc.addonRecursionDepth.Remove(addon.id);
-                                }
+                            hint += ",done";
+                        }
+                    } catch (Exception ex) {
+                        LogController.handleError(core, ex, "unexpected exception, addon [#" + addon.id + "" + addon.name + "], errorContextMessage [" + executeContext.errorContextMessage + "], hint [" + hint + "]");
+                    } finally {
+                        //
+                        // -- this completes the execute of this core.addon. remove it from the 'running' list
+                        core.doc.addonInstanceCnt = core.doc.addonInstanceCnt + 1;
+                        //
+                        // -- restore the forceJavascriptToHead value of the caller
+                        executeContext.forceJavascriptToHead = save_forceJavascriptToHead;
+                        //
+                        // -- if root level addon, and the addon is an html document, create the html document around it and uglify if not debugging
+                        if ((executeContext.forceHtmlDocument) || ((rootLevelAddon) && (addon.htmlDocument))) {
+                            DebugController.testPoint(core, "root level addon is html, build document around result");
+                            result = core.html.getHtmlDoc(result, "<body>");
+                            if (!core.doc.visitPropertyAllowDebugging) {
+                                result = NUglify.Uglify.Html(result).Code;
                             }
                         }
+                        //
+                        // -- pop modelstack and test point message
+                        core.doc.addonModelStack.Pop();
+                        DebugController.testPoint(core, "execute exit (" + (core.doc.appStopWatch.ElapsedMilliseconds - addonStart) + "ms) [#" + addon.id + ", " + addon.name + ", guid " + addon.ccguid + "]");
                     }
-                } catch (Exception ex) {
-                    LogController.handleError(core, ex);
-                } finally {
-                    //
-                    // -- this completes the execute of this core.addon. remove it from the 'running' list
-                    core.doc.addonInstanceCnt = core.doc.addonInstanceCnt + 1;
-                    //
-                    // -- restore the forceJavascriptToHead value of the caller
-                    executeContext.forceJavascriptToHead = save_forceJavascriptToHead;
-                    //
-                    // -- if root level addon, and the addon is an html document, create the html document around it and uglify if not debugging
-                    if ((executeContext.forceHtmlDocument) || ((rootLevelAddon) && (addon.htmlDocument))) {
-                        DebugController.testPoint(core, "root level addon is html, build document around result");
-                        result = core.html.getHtmlDoc(result, "<body>");
-                        if (!core.doc.visitPropertyAllowDebugging) {
-                            result = NUglify.Uglify.Html(result).Code;
-                        }
-                    }
-                    //
-                    // -- pop modelstack and test point message
-                    core.doc.addonModelStack.Pop();
-                    DebugController.testPoint(core, "execute exit (" + (core.doc.appStopWatch.ElapsedMilliseconds - addonStart) + "ms) [#" + addon.id + ", " + addon.name + ", guid " + addon.ccguid + "]");
                 }
+            } catch (Exception ex) {
+                LogController.handleError(core, ex, "unexpected exception, addon [#" + addon.id + "" + addon.name + "], errorContextMessage [" + executeContext.errorContextMessage + "], hint [outer-try: " + hint + "]");
             }
             return result;
         }
@@ -1382,7 +1414,7 @@ namespace Contensive.Processor.Controllers {
                 Content = null;
 
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.handleError(core, ex, "execute_formContent");
             }
             return result;
         }
@@ -1587,7 +1619,7 @@ namespace Contensive.Processor.Controllers {
                     throw new ApplicationException(errorMessage, ex);
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.handleError(core, ex, "unexpected exception in execute_Script_VBScript");
                 throw;
             }
             return returnText;
@@ -1666,7 +1698,7 @@ namespace Contensive.Processor.Controllers {
                     throw new ApplicationException(errorMessage, ex);
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.handleError(core, ex, "execute_Script_JScript");
                 throw;
             }
             return returnText;
@@ -1739,8 +1771,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
-                throw;
+                LogController.handleError(core, ex, "execute_assembly");
             } finally {
                 LogController.logTrace(core, "execute_assembly dotNetClass [" + addon.dotNetClass + "], exit");
             }
@@ -1880,7 +1911,7 @@ namespace Contensive.Processor.Controllers {
                                 LogController.logDebug(core, "Assembly Exception-2, [" + TestFilePathname + "], adding to assemblySkipList, ex [" + ex.Message + "]");
                                 core.assemblySkipList.Add(TestFilePathname);
                                 string detailedErrorMessage = "A non-load exception occured while loading the addon [" + addon.name + "], DLL [" + TestFilePathname + "]. The error was [" + ex.ToString() + "].";
-                                LogController.handleError(core, new ApplicationException(detailedErrorMessage));
+                                LogController.handleError(core, new ApplicationException(detailedErrorMessage), "20");
                             }
                         }
                     }
@@ -1888,8 +1919,7 @@ namespace Contensive.Processor.Controllers {
             } catch (Exception ex) {
                 //
                 // -- this exception should interrupt the caller
-                LogController.handleError(core, ex);
-                throw;
+                LogController.handleError(core, ex, "execute_assembly_byFilePath");
             }
             return returnValue;
         }
@@ -1937,7 +1967,7 @@ namespace Contensive.Processor.Controllers {
                     LogController.logTrace(core, "end: add process to background cmd queue, addon [" + addon.name + "/" + addon.id + "], optionstring [" + OptionString + "]");
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.handleError(core, ex, "executeAsync");
             }
             return result;
         }
@@ -2197,10 +2227,8 @@ namespace Contensive.Processor.Controllers {
                 //
                 return tempgetInstanceBubble;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.handleError(core, ex, "getInstanceBubble");
             }
-            //ErrorTrap:
-            //throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError18("addon_execute_GetInstanceBubble")
             return tempgetInstanceBubble;
         }
         //
@@ -2272,7 +2300,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.handleError(core, ex, "8");
             }
             return result;
         }
@@ -2419,7 +2447,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 return tempgetHTMLViewerBubble;
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.handleError(core, ex, "7");
             }
             //ErrorTrap:
             //throw new ApplicationException("Unexpected exception"); // Call core.handleLegacyError18("addon_execute_GetHTMLViewerBubble")
@@ -3370,7 +3398,7 @@ namespace Contensive.Processor.Controllers {
                     addonArgumentListPassToBubbleEditor = addonArgumentListPassToBubbleEditor.Substring(2);
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.handleError(core, ex, "1");
             }
         }
         //
@@ -3463,7 +3491,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 core.db.csClose(ref CS);
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.handleError(core, ex, "2");
             }
             return s;
         }
@@ -3499,7 +3527,7 @@ namespace Contensive.Processor.Controllers {
                     result = DefaultIfNotFound;
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.handleError(core, ex, "3");
             }
             return result;
         }
@@ -3693,11 +3721,11 @@ namespace Contensive.Processor.Controllers {
                         });
                     }
                 } catch (Exception ex) {
-                    LogController.handleError(core, new Exception("Error calling ExecuteAddon with AddonManagerGuid, will attempt Safe Mode Addon Manager. Exception=[" + ex.ToString() + "]"));
+                    LogController.handleError(core, new Exception("Error calling ExecuteAddon with AddonManagerGuid, will attempt Safe Mode Addon Manager. Exception=[" + ex.ToString() + "]"),"23");
                     AddonStatusOK = false;
                 }
                 if (string.IsNullOrEmpty(result)) {
-                    LogController.handleError(core, new Exception("AddonManager returned blank, calling Safe Mode Addon Manager."));
+                    LogController.handleError(core, new Exception("AddonManager returned blank, calling Safe Mode Addon Manager."), "21");
                     AddonStatusOK = false;
                 }
                 if (!AddonStatusOK) {
@@ -3705,7 +3733,7 @@ namespace Contensive.Processor.Controllers {
                     result = AddonMan.GetForm_SafeModeAddonManager();
                 }
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.handleError(core, ex, "6");
                 throw;
             }
             return result;
@@ -3775,7 +3803,7 @@ namespace Contensive.Processor.Controllers {
                 cs.close();
                 //
             } catch (Exception ex) {
-                LogController.handleError(core, ex);
+                LogController.handleError(core, ex,"5");
             }
             return returnString;
         }
@@ -3936,7 +3964,7 @@ namespace Contensive.Processor.Controllers {
                     tempGetIconSprite += " ACInstanceID=\"" + ACInstanceID + "\"";
                 }
                 tempGetIconSprite += " style=\"" + ImgStyle + "\">";
-            } catch (Exception) {
+            } catch (Exception ex) {
                 throw;
             }
             return tempGetIconSprite;

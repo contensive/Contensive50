@@ -4841,7 +4841,7 @@ namespace Contensive.Addons.AdminSite {
                     + " f.id,f.editorAddonID"
                     + " from ccfields f"
                     + " where"
-                    + " f.ContentID=" + adminInfo.adminContent.id + " and f.editorAddonId is not null";
+                    + " (f.ContentID=" + adminInfo.adminContent.id + ")and(f.editorAddonId is not null)and(f.editorAddonId>0)";
                 DataTable dt = core.db.executeQuery(SQL);
 
                 string[,] Cells = core.db.convertDataTabletoArray(dt);

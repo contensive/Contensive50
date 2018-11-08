@@ -38,9 +38,6 @@ namespace Contensive.Processor.Models.Db {
         public bool javascriptForceHead { get; set; }
         public string jsHeadScriptSrc { get; set; }
         public FieldTypeJavascriptFile jsFilename { get; set; }
-        //public string JavaScriptBodyEnd { get; set; }
-        //Public Property JavaScriptOnLoad As String
-        //public string JSBodyScriptSrc { get; set; }
         public string link { get; set; }
         public string metaDescription { get; set; }
         public string metaKeywordList { get; set; }
@@ -68,6 +65,13 @@ namespace Contensive.Processor.Models.Db {
         public FieldTypeCSSFile stylesFilename { get; set; }
         public string stylesLinkHref { get; set; }
         public bool template { get; set; }
+        //
+        // -- deprecated, but for leave for now and log error
+        public string javaScriptBodyEnd { get; set; }
+        public string jsBodyScriptSrc { get; set; }
+        //
+        // -- deprecated
+        //Public Property JavaScriptOnLoad As String
         //====================================================================================================
         public static AddonModel add(CoreController core) {
             return add<AddonModel>(core);
