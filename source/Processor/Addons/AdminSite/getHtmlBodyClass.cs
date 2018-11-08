@@ -5938,7 +5938,7 @@ namespace Contensive.Addons.AdminSite {
                                         //
                                         // ----- date, readonly
                                         return_NewFieldList += "," + field.nameLc;
-                                        EditorString = AdminUIController.getDefaultEditor_Date(core, field.nameLc, GenericController.encodeDate(fieldValue_object), field.readOnly, fieldHtmlId, field.required, WhyReadOnlyMsg);
+                                        EditorString = AdminUIController.getDefaultEditor_DateTime(core, field.nameLc, GenericController.encodeDate(fieldValue_object), field.readOnly, fieldHtmlId, field.required, WhyReadOnlyMsg);
                                         break;
                                     case FieldTypeIdMemberSelect:
                                         //
@@ -6152,7 +6152,7 @@ namespace Contensive.Addons.AdminSite {
                                         //
                                         // ----- Date
                                         return_NewFieldList += "," + field.nameLc;
-                                        EditorString = AdminUIController.getDefaultEditor_Date(core, field.nameLc, GenericController.encodeDate(fieldValue_object), field.readOnly, fieldHtmlId, field.required, WhyReadOnlyMsg);
+                                        EditorString = AdminUIController.getDefaultEditor_DateTime(core, field.nameLc, GenericController.encodeDate(fieldValue_object), field.readOnly, fieldHtmlId, field.required, WhyReadOnlyMsg);
                                         break;
                                     case FieldTypeIdMemberSelect:
                                         //
@@ -6651,9 +6651,9 @@ namespace Contensive.Addons.AdminSite {
                         // ----- Whats New Expiration
                         //
                         if (editRecord.Read_Only) {
-                            HTMLFieldString = AdminUIController.getDefaultEditor_Date(core, "ContentWatchExpires", adminContext.ContentWatchExpires, true, "", false, "");
+                            HTMLFieldString = AdminUIController.getDefaultEditor_DateTime(core, "ContentWatchExpires", adminContext.ContentWatchExpires, true, "", false, "");
                         } else {
-                            HTMLFieldString = AdminUIController.getDefaultEditor_Date(core, "ContentWatchExpires", adminContext.ContentWatchExpires, false, "", false, "");
+                            HTMLFieldString = AdminUIController.getDefaultEditor_DateTime(core, "ContentWatchExpires", adminContext.ContentWatchExpires, false, "", false, "");
                         }
                         FastString.Add(AdminUIController.getEditRowLegacy(core, HTMLFieldString, "Expires", "When this record is included in a What's New list, this record is blocked from the list after this date.", false, false, ""));
                         //
@@ -7649,7 +7649,7 @@ namespace Contensive.Addons.AdminSite {
                     + "<td class=\"ccAdminEditField\" colspan=2>" + SpanClassAdminNormal + s + "</span></td>"
                     + "</tr><tr>"
                     + "<td class=\"ccAdminEditCaption\">&nbsp;</td>"
-                    + "<td class=\"ccAdminEditField\" colspan=2>" + SpanClassAdminNormal + "[<a href=?cid=" + CDefModel.getContentId(core, "Groups") + " target=_blank>Manage Groups</a>]</span></td>"
+                    + "<td class=\"ccAdminEditField\" colspan=2>" + SpanClassAdminNormal + "[<a href=\"?cid=" + CDefModel.getContentId(core, "Groups") + "\" target=_blank>Manage Groups</a>]</span></td>"
                     + "</tr>";
                 s = AdminUIController.editTableOpen + s + AdminUIController.editTableClose;
                 s = AdminUIController.getEditPanel(core, (!adminContext.allowAdminTabs), "Email Rules", "Send email to people in these groups", s);
@@ -7681,7 +7681,7 @@ namespace Contensive.Addons.AdminSite {
                     + "<td class=\"ccAdminEditField\" colspan=2>" + SpanClassAdminNormal + s + "</span></td>"
                     + "</tr><tr>"
                     + "<td class=\"ccAdminEditCaption\">&nbsp;</td>"
-                    + "<td class=\"ccAdminEditField\" colspan=2>" + SpanClassAdminNormal + "[<a href=?cid=" + CDefModel.getContentId(core, "Topics") + " target=_blank>Manage Topics</a>]</span></td>"
+                    + "<td class=\"ccAdminEditField\" colspan=2>" + SpanClassAdminNormal + "[<a href=\"?cid=" + CDefModel.getContentId(core, "Topics") + "\" target=_blank>Manage Topics</a>]</span></td>"
                     + "</tr>";
                 s = AdminUIController.editTableOpen + s + AdminUIController.editTableClose;
                 s = AdminUIController.getEditPanel(core, (!adminContext.allowAdminTabs), "Email Rules", "Send email to people in these groups", s);
@@ -7703,7 +7703,7 @@ namespace Contensive.Addons.AdminSite {
                 string Copy = null;
                 //adminUIController Adminui = new adminUIController(core);
                 //
-                f.Add(AdminUIController.getEditRowLegacy(core, "<a href=?" + rnAdminForm + "=28 target=_blank>Open in New Window</a>", "Email Control", "The settings in this section can be modified with the Email Control page."));
+                f.Add(AdminUIController.getEditRowLegacy(core, "<a href=\"?" + rnAdminForm + "=28\" target=_blank>Open in New Window</a>", "Email Control", "The settings in this section can be modified with the Email Control page."));
                 f.Add(AdminUIController.getEditRowLegacy(core, core.siteProperties.getText("EmailBounceAddress", ""), "Bounce Email Address", "All bounced emails will be sent to this address automatically. This must be a valid email account, and you should either use Contensive Bounce processing to capture the emails, or manually remove them from the account yourself."));
                 f.Add(AdminUIController.getEditRowLegacy(core, GenericController.getYesNo(GenericController.encodeBoolean(core.siteProperties.getBoolean("AllowEmailBounceProcessing", false))), "Allow Bounce Email Processing", "If checked, Contensive will periodically retrieve all the email from the POP email account and take action on the membefr account that sent the email."));
                 switch (core.siteProperties.getText("EMAILBOUNCEPROCESSACTION", "0")) {
@@ -7849,7 +7849,7 @@ namespace Contensive.Addons.AdminSite {
                 }
                 body.Add("<tr>");
                 body.Add("<td class=\"ccAdminEditCaption\">&nbsp;</td>");
-                body.Add("<td class=\"ccAdminEditField\">" + SpanClassAdminNormal + "[<a href=?cid=" + CDefModel.getContentId(core, "Groups") + " target=_blank>Manage Groups</a>]</span></td>");
+                body.Add("<td class=\"ccAdminEditField\">" + SpanClassAdminNormal + "[<a href=\"?cid=" + CDefModel.getContentId(core, "Groups") + "\" target=_blank>Manage Groups</a>]</span></td>");
                 body.Add("</tr>");
 
                 result = AdminUIController.getEditPanel(core, (!adminContext.allowAdminTabs), "Group Membership", "This person is a member of these groups", AdminUIController.editTableOpen + body.Text + AdminUIController.editTableClose);

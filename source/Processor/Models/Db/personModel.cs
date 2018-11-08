@@ -216,7 +216,7 @@ namespace Contensive.Processor.Models.Db {
                 if (!string.IsNullOrEmpty(sqlGroups)) {
                     sqlCriteria += "and(" + sqlGroups + ")";
                 }
-                personList = createList(core, sqlCriteria);
+                personList = createList(core, "(id in (" + sqlCriteria + "))");
             } catch (Exception) {
                 throw;
             }

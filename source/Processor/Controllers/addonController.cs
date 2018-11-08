@@ -1026,7 +1026,7 @@ namespace Contensive.Processor.Controllers {
                                                                         //}
                                                                         break;
                                                                     case "date":
-                                                                        Copy = AdminUIController.getDefaultEditor_Date(core, FieldName, encodeDate(FieldValue), FieldReadOnly);
+                                                                        Copy = AdminUIController.getDefaultEditor_DateTime(core, FieldName, encodeDate(FieldValue), FieldReadOnly);
 
                                                                         //if (FieldReadOnly) {
                                                                         //    Copy = FieldValue + htmlController.inputHidden(FieldName, FieldValue);

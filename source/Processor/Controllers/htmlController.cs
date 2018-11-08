@@ -985,14 +985,23 @@ namespace Contensive.Processor.Controllers {
                 // yyyy-MM-dd
                 core.doc.formInputTextCnt += 1;
                 core.doc.inputDateCnt = core.doc.inputDateCnt + 1;
-                string attrList = " type=\"date\"  name=\"" + HtmlController.encodeHtml(htmlName) + "\"";
-                if ((htmlValue != null) & (htmlValue > DateTime.MinValue)) attrList += " value=\"" + String.Format("{0:s}", htmlValue) + "\"";
-                attrList += (string.IsNullOrEmpty(htmlId)) ? "" : " id=\"" + htmlId + "\"";
-                attrList += (string.IsNullOrEmpty(htmlClass)) ? "" : " class=\"" + htmlClass + "\"";
-                attrList += (!readOnly) ? "" : " readonly";
-                attrList += (!disabled) ? "" : " disabled";
-                attrList += (!required) ? "" : " required";
-                return "<input" + attrList + ">";
+                result = "<input type=\"date\"  name=\"" + HtmlController.encodeHtml(htmlName) + "\"";
+                if ((htmlValue != null) & (htmlValue > DateTime.MinValue)) result += " value=\"" + String.Format("{0:s}", htmlValue) + "\"";
+                result += (string.IsNullOrEmpty(htmlId)) ? "" : " id=\"" + htmlId + "\"";
+                result += (string.IsNullOrEmpty(htmlClass)) ? "" : " class=\"" + htmlClass + "\"";
+                result += (!readOnly) ? "" : " readonly";
+                result += (!disabled) ? "" : " disabled";
+                result += (!required) ? "" : " required";
+                result += ">";
+
+                result += "<input type=\"time\"  name=\"" + HtmlController.encodeHtml(htmlName + "_time") + "\"";
+                if ((htmlValue != null) & (htmlValue > DateTime.MinValue)) result += " value=\"" + String.Format("{0:s}", htmlValue) + "\"";
+                result += (!readOnly) ? "" : " readonly";
+                result += (!disabled) ? "" : " disabled";
+                result += ">";
+
+
+
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
             }

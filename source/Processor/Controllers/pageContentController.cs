@@ -1848,7 +1848,7 @@ namespace Contensive.Processor.Controllers {
                                     // login subform form
                                     BlockForm = ""
                                         + "<p>This content has limited access. If you have an account, please login using this form.</p>"
-                                        + "<p>If you do not have an account, <a href=?" + core.doc.refreshQueryString + "&subform=0>click here to register</a>.</p>"
+                                        + "<p>If you do not have an account, <a href=\"?" + core.doc.refreshQueryString + "&subform=0\">click here to register</a>.</p>"
                                         + core.addon.execute(AddonModel.create(core, addonGuidLoginForm), new CPUtilsBaseClass.addonExecuteContext {
                                             addonType = CPUtilsBaseClass.addonContext.ContextPage,
                                             errorContextMessage = "calling login form addon [" + addonGuidLoginPage + "] because content box is blocked for registration"
@@ -1867,7 +1867,7 @@ namespace Contensive.Processor.Controllers {
                                         // -- Not Authenticated
                                         core.doc.verifyRegistrationFormPage(core);
                                         BlockForm = ""
-                                            + "<p>This content has limited access. If you have an account, <a href=?" + core.doc.refreshQueryString + "&subform=" + main_BlockSourceLogin + ">Click Here to login</a>.</p>"
+                                            + "<p>This content has limited access. If you have an account, <a href=\"?" + core.doc.refreshQueryString + "&subform=" + main_BlockSourceLogin + "\">Click Here to login</a>.</p>"
                                             + "<p>To view this content, please complete this form.</p>"
                                             + getFormPage(core, "Registration Form", RegistrationGroupID) + "";
                                     } else {
