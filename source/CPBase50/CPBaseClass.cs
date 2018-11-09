@@ -215,21 +215,21 @@ namespace Contensive.BaseClasses
 		/// read and write cdn files, like content uploads
 		/// </summary>
 		/// <returns></returns>
-		public abstract CPFileSystemBaseClass cdnFiles {get;}
+		public abstract CPFileSystemBaseClass CdnFiles {get;}
 		//
 		//====================================================================================================
 		/// <summary>
 		/// read and write files in the root folder of the application (wwwRoot,htdocs,etc)
 		/// </summary>
 		/// <returns></returns>
-		public abstract CPFileSystemBaseClass wwwFiles {get;}
+		public abstract CPFileSystemBaseClass WwwFiles {get;}
 		//
 		//====================================================================================================
 		/// <summary>
 		/// read and write files not available to the Internet
 		/// </summary>
 		/// <returns></returns>
-		public abstract CPFileSystemBaseClass privateFiles {get;}
+		public abstract CPFileSystemBaseClass PrivateFiles {get;}
 		//
 	}
 

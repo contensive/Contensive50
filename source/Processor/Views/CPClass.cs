@@ -301,7 +301,7 @@ namespace Contensive.Processor {
         //
         //=========================================================================================================
         //
-        public override CPFileSystemBaseClass cdnFiles {
+        public override CPFileSystemBaseClass CdnFiles {
             get {
                 if (_cdnFiles == null) {
                     _cdnFiles = new CPFileSystemClass(core, core.cdnFiles);
@@ -430,7 +430,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override CPFileSystemBaseClass privateFiles {
+        public override CPFileSystemBaseClass PrivateFiles {
             get {
                 if (_privateFiles == null) {
                     _privateFiles = new CPFileSystemClass(core, core.privateFiles);
@@ -514,7 +514,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override CPFileSystemBaseClass wwwFiles {
+        public override CPFileSystemBaseClass WwwFiles {
             get {
                 if (_appRootFiles == null) {
                     _appRootFiles = new CPFileSystemClass(core, core.appRootFiles);
