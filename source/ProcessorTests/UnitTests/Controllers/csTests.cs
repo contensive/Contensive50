@@ -132,7 +132,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 csAddon.SetField("StylesFilename", "abc123");
                 Assert.AreEqual("abc123", csAddon.GetText("StylesFilename"));
                 string cdnFilename = csAddon.GetFilename("StylesFilename");
-                Assert.AreEqual("abc123", cp.cdnFiles.read(cdnFilename));
+                Assert.AreEqual("abc123", cp.cdnFiles.Read(cdnFilename));
                 //
                 // filexml
                 // todo - find example of this field type
@@ -146,7 +146,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                     // todo -- dont save the value to drive until the cs.save()
                     //    Assert.AreNotEqual(valueString, cp.cdnFiles.read(jsFilename));
                     csAddon.Save();
-                    Assert.AreEqual(valueString, cp.cdnFiles.read(jsFilename));
+                    Assert.AreEqual(valueString, cp.cdnFiles.Read(jsFilename));
                 }
                 //
                 // link
@@ -181,7 +181,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                     // todo -- dont save the value to drive until the cs.save()
                     //    Assert.AreNotEqual(valueString, cp.cdnFiles.read(filename));
                     cs.Save();
-                    Assert.AreEqual(valueString, cp.cdnFiles.read(filename));
+                    Assert.AreEqual(valueString, cp.cdnFiles.Read(filename));
                     cs.Close();
                 }
                 //
