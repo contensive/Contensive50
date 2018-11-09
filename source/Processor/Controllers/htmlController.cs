@@ -2927,7 +2927,7 @@ namespace Contensive.Processor.Controllers {
                             // Buttons
                             //
                             OptionsPanel = OptionsPanel + ""
-                            + "\r<div class=\"ccButtonCon\">"
+                            + "\r<div class=\"border bg-white p-2\">"
                             + cr2 + getHtmlInputSubmit(ButtonApply, "mb","","",false, "btn btn-primary mr-1 btn-sm")
                             + "\r</div>"
                             + "";
