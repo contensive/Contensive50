@@ -275,7 +275,7 @@ namespace Contensive.Processor {
                     docProperties.Add("sql", SQL);
                     docProperties.Add("ExportName", ExportName);
                     docProperties.Add("filename", Filename);
-                    var cmdDetail = new cmdDetailClass() {
+                    var cmdDetail = new TaskModel.cmdDetailClass() {
                         addonId = ExportCSVAddon.id,
                         addonName = ExportCSVAddon.name,
                         args = docProperties

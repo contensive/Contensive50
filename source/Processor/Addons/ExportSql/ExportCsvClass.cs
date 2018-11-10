@@ -16,8 +16,9 @@ namespace Contensive.Addons.ExportSql {
             string result = "";
             try {
                 string sql = cp.Doc.GetText("sql");
-                DataTable dt = cp.Db.ExecuteQuery(sql, cp.Doc.GetText("datasource"));
-                cp.CdnFiles.Save(cp.Doc.GetText("filename"), dt.ToCsv());
+                string datasource = cp.Doc.GetText("datasource");
+                DataTable dt = cp.Db.ExecuteQuery(sql, datasource);
+                result = dt.ToCsv();
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }

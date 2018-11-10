@@ -11057,7 +11057,7 @@ namespace Contensive.Addons.AdminSite {
                                                 { "ExportName", ExportName },
                                                 { "filename", "Export-" + GenericController.GetRandomInteger(core).ToString() + ".csv" }
                                             };
-                                            var cmdDetail = new cmdDetailClass() {
+                                            var cmdDetail = new TaskModel.cmdDetailClass() {
                                                 addonId = ExportCSVAddon.id,
                                                 addonName = ExportCSVAddon.name,
                                                 args = docProperties
@@ -11075,7 +11075,7 @@ namespace Contensive.Addons.AdminSite {
                                                 { "ExportName", ExportName },
                                                 { "filename", "Export-" + GenericController.GetRandomInteger(core).ToString() + ".xml" }
                                             };
-                                            var cmdDetail = new cmdDetailClass() {
+                                            var cmdDetail = new TaskModel.cmdDetailClass() {
                                                 addonId = ExportXMLAddon.id,
                                                 addonName = ExportXMLAddon.name,
                                                 args = docProperties

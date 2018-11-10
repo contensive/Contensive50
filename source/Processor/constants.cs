@@ -1816,15 +1816,6 @@ namespace Contensive.Processor {
         //public const string buildCsv = "buildcsv";
         //public const string buildXml = "buildxml";
     }
-    public static class taskQueueCommandEnumModule {
-        public const string runAddon = "runaddon";
-    }
-
-    public class cmdDetailClass {
-        public int addonId;
-        public string addonName;
-        public Dictionary<string, string> args;
-    }
     //
     //-----------------------------------------------------------------------
     //   legacy mainClass arguments

@@ -22,19 +22,47 @@ namespace Contensive.Processor.Models.Db {
         public const string contentName = "tasks";
         public const string contentTableName = "ccTasks";
         public const string contentDataSource = "default";
+        /// <summary>
+        /// enum of all possible commands in task model
+        /// </summary>
+        public static class taskQueueCommandEnumModule {
+            public const string runAddon = "runaddon";
+        }
+        /// <summary>
+        /// model for cmdDetail field. Field contains a JSON serialization of this class
+        /// </summary>
+        public class cmdDetailClass {
+            public int addonId;
+            public string addonName;
+            public Dictionary<string, string> args;
+        }
         //
         //====================================================================================================
-        //
-        public string command { get; set; }
-        public string dataSource { get; set; }
-        public DateTime dateCompleted { get; set; }
-        public DateTime dateStarted { get; set; }
-        public string filename { get; set; }
-        public string importMapFilename { get; set; }
-        public string notifyEmail { get; set; }
-        public string resultMessage { get; set; }
-        public string sqlQuery { get; set; }
+        /// <summary>
+        /// JSON serialization of the cmdDetailClass containing information on how to run the task
+        /// </summary>
         public string cmdDetail { get; set; }
+        /// <summary>
+        /// The file where the output of the command is stored. 
+        /// </summary>
+        public BaseModel.FieldCdnFile filename { get; set; }
+        /// <summary>
+        /// datetime when the task completes
+        /// </summary>
+        public DateTime dateCompleted { get; set; }
+        /// <summary>
+        /// datetime when the task is started
+        /// </summary>
+        public DateTime dateStarted { get; set; }
+        //
+        // -- deprecated fields. This information should be stored in cmdDetails
+        //
+        //public string command { get; set; }
+        //public string dataSource { get; set; }
+        //public string importMapFilename { get; set; }
+        //public string notifyEmail { get; set; }
+        //public string resultMessage { get; set; }
+        //public string sqlQuery { get; set; }
         //
         //====================================================================================================
         public static TaskModel add(CoreController core) {

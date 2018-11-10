@@ -1938,7 +1938,7 @@ namespace Contensive.Processor.Controllers {
         //       if true, this routine calls the addon
         //       if false, the server is called remotely, which starts a cccmd process, gets the command and calls this routine with true
         //====================================================================================================================
-        //
+        // todo convert optionstrings to dictionary of name/value
         public string executeAsync(string AddonIDGuidOrName, string OptionString = "") {
             string result = "";
             try {
@@ -1950,19 +1950,25 @@ namespace Contensive.Processor.Controllers {
                 } else {
                     addon = core.addonCache.getAddonByName(AddonIDGuidOrName);
                 }
-                if (addon != null) {
+                if (addon == null) {
+                    //
+                    // -- addon not found
+                    LogController.logError(core, "executeAsync, addon not found, AddonIDGuidOrName [" + AddonIDGuidOrName + "]");
+                } else { 
                     //
                     // -- addon found
                     LogController.logTrace(core, "start: add process to background cmd queue, addon [" + addon.name + "/" + addon.id + "], optionstring [" + OptionString + "]");
                     //
                     string cmdQueryString = ""
-                        + "appname=" + encodeNvaArgument(encodeRequestVariable(core.appConfig.name)) + "&AddonID=" + encodeText(addon.id) + "&OptionString=" + encodeNvaArgument(encodeRequestVariable(OptionString));
-                    cmdDetailClass cmdDetail = new cmdDetailClass {
+                        + "appname=" + encodeNvaArgument(encodeRequestVariable(core.appConfig.name)) 
+                        + "&AddonID=" + encodeText(addon.id) 
+                        + "&OptionString=" + encodeNvaArgument(encodeRequestVariable(OptionString));
+                    var cmdDetail = new TaskModel.cmdDetailClass {
                         addonId = addon.id,
                         addonName = addon.name,
                         args = GenericController.convertAddonArgumentstoDocPropertiesList(core, cmdQueryString)
                     };
-                    TaskSchedulerControllerx.addTaskToQueue(core, taskQueueCommandEnumModule.runAddon, cmdDetail, false);
+                    TaskSchedulerControllerx.addTaskToQueue(core, cmdDetail, false);
                     //
                     LogController.logTrace(core, "end: add process to background cmd queue, addon [" + addon.name + "/" + addon.id + "], optionstring [" + OptionString + "]");
                 }

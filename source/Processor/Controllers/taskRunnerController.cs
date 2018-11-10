@@ -172,7 +172,7 @@ namespace Contensive.Processor.Controllers {
                                         if (cpApp.Site.GetBoolean("Run tasks in service process")) {
                                             //
                                             // -- execute here
-                                            runTask(cpApp.Site.Name, runnerGuid);
+                                            executeRunnerTasks(cpApp.Site.Name, runnerGuid);
                                         } else {
                                             //
                                             // -- execute in new  process
@@ -207,38 +207,32 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// run as single task from the cctasks table of an app, makred with a runnerGuid
         /// called from runTasks or from the cli in a different process
+        /// when the task starts, 
+        /// saves the addons output to the task.filename
         /// </summary>
-        public static void runTask(string appName, string runnerGuid) {
+        public static void executeRunnerTasks(string appName, string runnerGuid) {
             try {
                 using (var cp = new Contensive.Processor.CPClass(appName)) {
-                    //
-                    // -- execute here
                     foreach (var task in TaskModel.createList(cp.core, "(cmdRunner=" + cp.core.db.encodeSQLText(runnerGuid) + ")and(datestarted is null)", "id")) {
                         //
-                        Console.WriteLine("runTask, runTask, task [" + task.name + "], command [" + task.command + "], cmdDetail [" + task.cmdDetail + "]");
-                        LogController.logTrace(cp.core, "runTask, task [" + task.name + "], command [" + task.command + "], cmdDetail [" + task.cmdDetail + "]");
+                        Console.WriteLine("runTask, runTask, task [" + task.name + "], cmdDetail [" + task.cmdDetail + "]");
+                        LogController.logTrace(cp.core, "runTask, task [" + task.name + "], cmdDetail [" + task.cmdDetail + "]");
                         //
-                        //tasksRemaining = true;
                         task.dateStarted = DateTime.Now;
                         task.save(cp.core);
-                        cmdDetailClass cmdDetail = cp.core.json.Deserialize<cmdDetailClass>(task.cmdDetail);
-                        switch ((task.command.ToLower())) {
-                            case taskQueueCommandEnumModule.runAddon:
-                                var addon = AddonModel.create(cp.core, cmdDetail.addonId);
+                        var cmdDetail = cp.core.json.Deserialize<TaskModel.cmdDetailClass>(task.cmdDetail);
+                        if (cmdDetail != null) {
+                            var addon = AddonModel.create(cp.core, cmdDetail.addonId);
+                            if ( addon != null ) {
                                 var context = new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
                                     backgroundProcess = true,
                                     addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple,
                                     instanceArguments = cmdDetail.args,
                                     errorContextMessage = "running task, addon [" + cmdDetail.addonId + "]"
                                 };
-                                cp.core.addon.execute( addon, context );
-                                break;
-                            //case taskQueueCommandEnumModule.buildCsv:
-                            //    runTask_buildCsv(cp, task);
-                            //    break;
-                            default:
-                                LogController.logTrace(cp.core, "runTask, task command not recognized, command [" + task.command + "]");
-                                break;
+                                string result = cp.core.addon.execute(addon, context);
+                                task.filename.content = result;
+                            }
                         }
                         task.dateCompleted = DateTime.Now;
                         task.save(cp.core);
@@ -248,22 +242,6 @@ namespace Contensive.Processor.Controllers {
                 Console.WriteLine("Error: [" + ex.ToString() + "]");
             }
         }
-        ////
-        ////====================================================================================================
-        ///// <summary>
-        ///// Build csv
-        ///// </summary>
-        ///// <param name="cp"></param>
-        ///// <param name="task"></param>
-        //public static void runTask_buildCsv(CPClass cp, TaskModel task) {
-        //    try {
-        //        DataTable dt = cp.core.db.executeQuery(task.sqlQuery);
-        //        cp.core.cdnFiles.saveFile(task.filename, dt.ToCsv());
-        //    } catch (Exception ex) {
-        //        LogController.handleError(cp.core, ex);
-        //    }
-        //}
-
         #region  IDisposable Support 
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
