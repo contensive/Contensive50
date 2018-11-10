@@ -238,6 +238,8 @@ namespace Contensive.Processor.Controllers {
             return returnTaskAdded;
         }
         //
+        static public bool addTaskToQueue(CoreController cpSiteCore, cmdDetailClass cmdDetail, bool BlockDuplicates) => addTaskToQueue(cpSiteCore, taskQueueCommandEnumModule.runAddon, cmdDetail, BlockDuplicates);
+        //
         //====================================================================================================
         //
         #region  IDisposable Support 

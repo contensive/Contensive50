@@ -1812,8 +1812,9 @@ namespace Contensive.Processor {
         }
         //
         // -- tasks
-        public const string taskCommandBuildCsv = "buildcsv";
-        public const string taskCommandBuildXml = "buildxml";
+        // only task supported is runaddon
+        //public const string buildCsv = "buildcsv";
+        //public const string buildXml = "buildxml";
     }
     public static class taskQueueCommandEnumModule {
         public const string runAddon = "runaddon";

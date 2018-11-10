@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -164,5 +165,39 @@ public static class ExtensionMethods {
             list[indexB] = tmp;
         }
         return list;
+    }
+    //
+    //====================================================================================================
+    /// <summary>
+    /// convert a datatable to csv string
+    /// </summary>
+    /// <param name="dataTable"></param>
+    /// <returns></returns>
+    public static string ToCsv(this DataTable dataTable) {
+        StringBuilder sbData = new StringBuilder();
+        //
+        // -- Only return Null if there is no structure.
+        if (dataTable.Columns.Count == 0) return null;
+        //
+        // -- append header
+        foreach (var col in dataTable.Columns) {
+            if (col == null)
+                sbData.Append(",");
+            else
+                sbData.Append("\"" + col.ToString().Replace("\"", "\"\"") + "\",");
+        }
+        sbData.Replace(",", System.Environment.NewLine, sbData.Length - 1, 1);
+        //
+        // -- append data
+        foreach (DataRow dr in dataTable.Rows) {
+            foreach (var column in dr.ItemArray) {
+                if (column == null)
+                    sbData.Append(",");
+                else
+                    sbData.Append("\"" + column.ToString().Replace("\"", "\"\"") + "\",");
+            }
+            sbData.Replace(",", System.Environment.NewLine, sbData.Length - 1, 1);
+        }
+        return sbData.ToString();
     }
 }
