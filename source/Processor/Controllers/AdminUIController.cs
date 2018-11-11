@@ -636,14 +636,14 @@ namespace Contensive.Processor {
                 }
                 //
                 if (!string.IsNullOrEmpty(Width)) {
-                    WidthTest = GenericController.encodeInteger(Width.ToLower().Replace("px", ""));
-                    if (WidthTest != 0) {
-                        Style = Style + "width:" + WidthTest + "px;";
-                        Copy += "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"" + WidthTest + "\" height=1 border=0>";
-                        //Copy = Copy & "<br><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""" & WidthTest & """ height=1 border=0>"
-                    } else {
-                        Style = Style + "width:" + Width + ";";
-                    }
+                    Style = Style + "width:" + Width + ";";
+                    //WidthTest = GenericController.encodeInteger(Width.ToLower().Replace("px", ""));
+                    //if (WidthTest != 0) {
+                    //    Style = Style + "width:" + WidthTest + "px;";
+                    //    Copy += "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"" + WidthTest + "\" height=1 border=0>";
+                    //    //Copy = Copy & "<br><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""" & WidthTest & """ height=1 border=0>"
+                    //} else {
+                    //}
                 }
                 result = "\r\n<td style=\"" + Style + "\" class=\"" + ClassStyle + "\">" + Copy + "</td>";
             } catch (Exception ex) {
@@ -767,7 +767,7 @@ namespace Contensive.Processor {
                 // ----- Header
                 //
                 Content.Add("\r\n<tr>");
-                Content.Add(getReport_CellHeader(core, 0, "Row", "50", "Right", "ccAdminListCaption", RQS, SortingStateEnum.NotSortable));
+                Content.Add(getReport_CellHeader(core, 0, "&nbsp", "50px", "Right", "ccAdminListCaption", RQS, SortingStateEnum.NotSortable));
                 for (ColumnPtr = 0; ColumnPtr < ColumnCount; ColumnPtr++) {
                     ColumnWidth = ColWidth[ColumnPtr];
                     if (!ColSortable[ColumnPtr]) {

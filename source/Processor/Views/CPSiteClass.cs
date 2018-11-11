@@ -280,7 +280,7 @@ namespace Contensive.Processor {
                             { "filename", Filename }
                         }
                     };
-                    TaskSchedulerControllerx.addTaskToQueue(core, cmdDetail, false, false );
+                    TaskSchedulerControllerx.addTaskToQueue(core, cmdDetail, false );
                 }
             } catch (Exception) {
                 throw;

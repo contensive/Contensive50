@@ -9318,83 +9318,9 @@ namespace Contensive.Addons.AdminSite {
                                 if (RowCnt > 0) {
                                     for (RowPtr = 0; RowPtr < RowCnt; RowPtr++) {
                                         if (core.docProperties.getBoolean("Row" + RowPtr)) {
-                                            core.db.deleteContentRecord("Tasks", core.docProperties.getInteger("RowID" + RowPtr));
+                                            DownloadModel.delete(core, core.docProperties.getInteger("RowID" + RowPtr));
                                         }
                                     }
-                                }
-                                break;
-                            case ButtonRequestDownload:
-                                //
-                                // Request the download again
-                                //
-                                RowCnt = core.docProperties.getInteger("RowCnt");
-                                if (RowCnt > 0) {
-                                    for (RowPtr = 0; RowPtr < RowCnt; RowPtr++) {
-                                        if (core.docProperties.getBoolean("Row" + RowPtr)) {
-                                            int CSSrc = 0;
-                                            int CSDst = 0;
-
-                                            CSSrc = core.db.csOpenRecord("Tasks", core.docProperties.getInteger("RowID" + RowPtr));
-                                            if (core.db.csOk(CSSrc)) {
-                                                CSDst = core.db.csInsertRecord("Tasks");
-                                                if (core.db.csOk(CSDst)) {
-                                                    core.db.csSet(CSDst, "Name", core.db.csGetText(CSSrc, "name"));
-                                                    core.db.csSet(CSDst, SQLFieldName, core.db.csGetText(CSSrc, SQLFieldName));
-                                                    if (GenericController.vbLCase(core.db.csGetText(CSSrc, "command")) == "xml") {
-                                                        core.db.csSet(CSDst, "Filename", "DupDownload_" + encodeText(GenericController.dateToSeconds(core.doc.profileStartTime)) + encodeText(GenericController.GetRandomInteger(core)) + ".xml");
-                                                        core.db.csSet(CSDst, "Command", "BUILDXML");
-                                                    } else {
-                                                        core.db.csSet(CSDst, "Filename", "DupDownload_" + encodeText(GenericController.dateToSeconds(core.doc.profileStartTime)) + encodeText(GenericController.GetRandomInteger(core)) + ".csv");
-                                                        core.db.csSet(CSDst, "Command", "BUILDCSV");
-                                                    }
-                                                }
-                                                core.db.csClose(ref CSDst);
-                                            }
-                                            core.db.csClose(ref CSSrc);
-                                        }
-                                    }
-                                }
-                                //
-                                //
-                                //
-                                if ((!string.IsNullOrEmpty(Format)) && (ContentID == 0)) {
-                                    Description = Description + "<p>Please select a Content before requesting a download</p>";
-                                } else if ((string.IsNullOrEmpty(Format)) && (ContentID != 0)) {
-                                    Description = Description + "<p>Please select a Format before requesting a download</p>";
-                                } else if (Format == "CSV") {
-                                    int CS = core.db.csInsertRecord("Tasks");
-                                    if (core.db.csOk(CS)) {
-                                        ContentName = CDefModel.getContentNameByID(core, ContentID);
-                                        TableName = CDefModel.getContentTablename(core, ContentName);
-                                        Criteria = CDefModel.getContentControlCriteria(core, ContentName);
-                                        Name = "CSV Download, " + ContentName;
-                                        Filename = GenericController.vbReplace(ContentName, " ", "") + "_" + encodeText(GenericController.dateToSeconds(core.doc.profileStartTime)) + encodeText(GenericController.GetRandomInteger(core)) + ".csv";
-                                        core.db.csSet(CS, "Name", Name);
-                                        core.db.csSet(CS, "Filename", Filename);
-                                        core.db.csSet(CS, "Command", "BUILDCSV");
-                                        core.db.csSet(CS, SQLFieldName, "SELECT * from " + TableName + " where " + Criteria);
-                                        Description = Description + "<p>Your CSV Download has been requested.</p>";
-                                    }
-                                    core.db.csClose(ref CS);
-                                    Format = "";
-                                    ContentID = 0;
-                                } else if (Format == "XML") {
-                                    int CS = core.db.csInsertRecord("Tasks");
-                                    if (core.db.csOk(CS)) {
-                                        ContentName = CDefModel.getContentNameByID(core, ContentID);
-                                        TableName = CDefModel.getContentTablename(core, ContentName);
-                                        Criteria = CDefModel.getContentControlCriteria(core, ContentName);
-                                        Name = "XML Download, " + ContentName;
-                                        Filename = GenericController.vbReplace(ContentName, " ", "") + "_" + encodeText(GenericController.dateToSeconds(core.doc.profileStartTime)) + encodeText(GenericController.GetRandomInteger(core)) + ".xml";
-                                        core.db.csSet(CS, "Name", Name);
-                                        core.db.csSet(CS, "Filename", Filename);
-                                        core.db.csSet(CS, "Command", "BUILDXML");
-                                        core.db.csSet(CS, SQLFieldName, "SELECT * from " + TableName + " where " + Criteria);
-                                        Description = Description + "<p>Your XML Download has been requested.</p>";
-                                    }
-                                    core.db.csClose(ref CS);
-                                    Format = "";
-                                    ContentID = 0;
                                 }
                                 break;
                         }
@@ -9423,29 +9349,29 @@ namespace Contensive.Addons.AdminSite {
                     ColWidth = new string[ColumnCnt + 1];
                     Cells = new string[PageSize + 1, ColumnCnt + 1];
                     //
-                    ColCaption[ColumnPtr] = "Select<br><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=10 height=1>";
+                    ColCaption[ColumnPtr] = "&nbsp;";
                     ColAlign[ColumnPtr] = "center";
-                    ColWidth[ColumnPtr] = "10";
+                    ColWidth[ColumnPtr] = "10px";
                     ColumnPtr = ColumnPtr + 1;
                     //
                     ColCaption[ColumnPtr] = "Name";
                     ColAlign[ColumnPtr] = "left";
-                    ColWidth[ColumnPtr] = "100%";
+                    ColWidth[ColumnPtr] = "";
                     ColumnPtr = ColumnPtr + 1;
                     //
-                    ColCaption[ColumnPtr] = "For<br><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=100 height=1>";
+                    ColCaption[ColumnPtr] = "For";
                     ColAlign[ColumnPtr] = "left";
-                    ColWidth[ColumnPtr] = "100";
+                    ColWidth[ColumnPtr] = "100px";
                     ColumnPtr = ColumnPtr + 1;
                     //
-                    ColCaption[ColumnPtr] = "Requested<br><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=150 height=1>";
+                    ColCaption[ColumnPtr] = "Requested";
                     ColAlign[ColumnPtr] = "left";
-                    ColWidth[ColumnPtr] = "150";
+                    ColWidth[ColumnPtr] = "200px";
                     ColumnPtr = ColumnPtr + 1;
                     //
-                    ColCaption[ColumnPtr] = "File<br><img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=100 height=1>";
+                    ColCaption[ColumnPtr] = "File";
                     ColAlign[ColumnPtr] = "Left";
-                    ColWidth[ColumnPtr] = "100";
+                    ColWidth[ColumnPtr] = "100px";
                     ColumnPtr = ColumnPtr + 1;
                     //
                     //   Get Downloads available
@@ -9680,7 +9606,7 @@ namespace Contensive.Addons.AdminSite {
                 int CS = 0;
                 string RecordName = null;
                 int RecordID = 0;
-                string SQL = null;
+                string customReportSql = null;
                 string RQS = null;
                 int PageSize = 0;
                 int PageNumber = 0;
@@ -9700,7 +9626,7 @@ namespace Contensive.Addons.AdminSite {
                 int ContentID = 0;
                 string Format = null;
                 string Filename = null;
-                string Name = null;
+                string customReportName = null;
                 string Caption = null;
                 string Description = null;
                 string ButtonListLeft = null;
@@ -9753,16 +9679,16 @@ namespace Contensive.Addons.AdminSite {
                             case ButtonRequestDownload:
                             case ButtonApply:
                                 //
-                                Name = core.docProperties.getText("name");
-                                SQL = core.docProperties.getText(SQLFieldName);
-                                if (!string.IsNullOrEmpty(Name) | !string.IsNullOrEmpty(SQL)) {
-                                    if ((string.IsNullOrEmpty(Name)) || (string.IsNullOrEmpty(SQL))) {
+                                customReportName = core.docProperties.getText("name");
+                                customReportSql = core.docProperties.getText(SQLFieldName);
+                                if (!string.IsNullOrEmpty(customReportName) | !string.IsNullOrEmpty(customReportSql)) {
+                                    if ((string.IsNullOrEmpty(customReportName)) || (string.IsNullOrEmpty(customReportSql))) {
                                         ErrorController.addUserError(core, "A name and SQL Query are required to save a new custom report.");
                                     } else {
                                         CS = core.db.csInsertRecord("Custom Reports");
                                         if (core.db.csOk(CS)) {
-                                            core.db.csSet(CS, "Name", Name);
-                                            core.db.csSet(CS, SQLFieldName, SQL);
+                                            core.db.csSet(CS, "Name", customReportName);
+                                            core.db.csSet(CS, SQLFieldName, customReportSql);
                                         }
                                         core.db.csClose(ref CS);
                                     }
@@ -9775,26 +9701,27 @@ namespace Contensive.Addons.AdminSite {
                                             RecordID = core.docProperties.getInteger("RowID" + RowPtr);
                                             CS = core.db.csOpenRecord("Custom Reports", RecordID);
                                             if (core.db.csOk(CS)) {
-                                                SQL = core.db.csGetText(CS, SQLFieldName);
-                                                Name = core.db.csGetText(CS, "Name");
+                                                customReportSql = core.db.csGetText(CS, SQLFieldName);
+                                                customReportName = core.db.csGetText(CS, "Name");
                                             }
                                             core.db.csClose(ref CS);
                                             //
-                                            CS = core.db.csInsertRecord("Tasks");
-                                            if (core.db.csOk(CS)) {
-                                                RecordName = "CSV Download, Custom Report [" + Name + "]";
-                                                Filename = "CustomReport_" + encodeText(GenericController.dateToSeconds(core.doc.profileStartTime)) + encodeText(GenericController.GetRandomInteger(core)) + ".csv";
-                                                core.db.csSet(CS, "Name", RecordName);
-                                                core.db.csSet(CS, "Filename", Filename);
-                                                if (Format == "XML") {
-                                                    core.db.csSet(CS, "Command", "BUILDXML");
-                                                } else {
-                                                    core.db.csSet(CS, "Command", "BUILDCSV");
-                                                }
-                                                core.db.csSet(CS, SQLFieldName, SQL);
-                                                Description = Description + "<p>Your Download [" + Name + "] has been requested, and will be available in the <a href=\"?" + rnAdminForm + "=30\">Download Manager</a> when it is complete. This may take a few minutes depending on the size of the report.</p>";
-                                            }
-                                            core.db.csClose(ref CS);
+                                            var ExportCSVAddon = Processor.Models.Db.AddonModel.create(core, addonGuidExportCSV);
+                                            if (ExportCSVAddon == null) {
+                                                Description = Description + "<p>The export could not be created because the csv export addon was not found.</p>";
+                                                LogController.handleError(core, new ApplicationException("ExportCSV addon not found. Task could not be added to task queue."));
+                                            } else {
+                                                var cmdDetail = new TaskModel.cmdDetailClass() {
+                                                    addonId = ExportCSVAddon.id,
+                                                    addonName = ExportCSVAddon.name,
+                                                    args = new Dictionary<string, string> {
+                                                        { "sql", customReportSql },
+                                                        { "datasource", "default" }
+                                                    }
+                                                };
+                                                TaskSchedulerControllerx.addTaskToQueue(core, cmdDetail, false, customReportName, "export.csv");
+                                                Description = Description + "<p>Your Download [" + customReportName + "] has been requested, and will be available in the <a href=\"?" + rnAdminForm + "=30\">Download Manager</a> when it is complete. This may take a few minutes depending on the size of the report.</p>";
+                                            };
                                         }
                                     }
                                 }
@@ -10976,43 +10903,19 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 // Request the download
                                 //
-                                switch (ExportType) {
-                                    case 1:
-                                        var ExportCSVAddon = Processor.Models.Db.AddonModel.create(core, addonGuidExportCSV);
-                                        if (ExportCSVAddon == null) {
-                                            LogController.handleError(core, new ApplicationException("ExportCSV addon not found. Task could not be added to task queue."));
-                                        } else {
-                                            var docProperties = new Dictionary<string, string> {
-                                                { "sql", SQL },
-                                                { "ExportName", ExportName },
-                                                { "filename", "Export-" + GenericController.GetRandomInteger(core).ToString() + ".csv" }
-                                            };
-                                            var cmdDetail = new TaskModel.cmdDetailClass() {
-                                                addonId = ExportCSVAddon.id,
-                                                addonName = ExportCSVAddon.name,
-                                                args = docProperties
-                                            };
-                                            TaskSchedulerControllerx.addTaskToQueue(core, cmdDetail, false, true);
-                                        }
-                                        break;
-                                    default:
-                                        var ExportXMLAddon = Processor.Models.Db.AddonModel.create(core, addonGuidExportXML);
-                                        if (ExportXMLAddon == null) {
-                                            LogController.handleError(core, new ApplicationException(message: "ExportXML addon not found. Task could not be added to task queue."));
-                                        } else {
-                                            var docProperties = new Dictionary<string, string> {
-                                                { "sql", SQL },
-                                                { "ExportName", ExportName },
-                                                { "filename", "Export-" + GenericController.GetRandomInteger(core).ToString() + ".xml" }
-                                            };
-                                            var cmdDetail = new TaskModel.cmdDetailClass() {
-                                                addonId = ExportXMLAddon.id,
-                                                addonName = ExportXMLAddon.name,
-                                                args = docProperties
-                                            };
-                                            TaskSchedulerControllerx.addTaskToQueue(core, cmdDetail, false, true );
-                                        }
-                                        break;
+                                var ExportCSVAddon = Processor.Models.Db.AddonModel.create(core, addonGuidExportCSV);
+                                if (ExportCSVAddon == null) {
+                                    LogController.handleError(core, new ApplicationException("ExportCSV addon not found. Task could not be added to task queue."));
+                                } else {
+                                    var cmdDetail = new TaskModel.cmdDetailClass() {
+                                        addonId = ExportCSVAddon.id,
+                                        addonName = ExportCSVAddon.name,
+                                        args = new Dictionary<string, string> {
+                                                    { "sql", SQL },
+                                                    { "datasource", "default" }
+                                                }
+                                    };
+                                    TaskSchedulerControllerx.addTaskToQueue(core, cmdDetail, false, "Export " + adminContext.adminContent.name, "export.csv");
                                 }
                                 //
                                 Content = ""

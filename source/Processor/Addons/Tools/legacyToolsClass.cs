@@ -3292,7 +3292,7 @@ namespace Contensive.Addons.Tools {
                         cmdDetail.addonId = 0;
                         cmdDetail.addonName = "GetForm_FindAndReplace";
                         cmdDetail.args = GenericController.convertAddonArgumentstoDocPropertiesList(core, QS);
-                        TaskSchedulerControllerx.addTaskToQueue(core, cmdDetail, false, false);
+                        TaskSchedulerControllerx.addTaskToQueue(core, cmdDetail, false);
                         Stream.Add("Find and Replace has been requested for content definitions [" + CDefList + "], finding [" + FindText + "] and replacing with [" + ReplaceText + "]");
                     }
                 } else {
@@ -3377,7 +3377,7 @@ namespace Contensive.Addons.Tools {
                     cmdDetail.addonId = 0;
                     cmdDetail.addonName = "GetForm_IISReset";
                     cmdDetail.args = GenericController.convertAddonArgumentstoDocPropertiesList(core, "");
-                    TaskSchedulerControllerx.addTaskToQueue(core, cmdDetail, false, false );
+                    TaskSchedulerControllerx.addTaskToQueue(core, cmdDetail, false );
                 }
                 //
                 // Display form

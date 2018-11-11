@@ -173,7 +173,7 @@ namespace Contensive.Processor.Controllers {
                                         cmdDetail.addonId = coreApp.db.csGetInteger(CS, "ID");
                                         cmdDetail.addonName = addonName;
                                         cmdDetail.args = GenericController.convertAddonArgumentstoDocPropertiesList(coreApp, coreApp.db.csGetText(CS, "argumentlist"));
-                                        addTaskToQueue(coreApp, cmdDetail, false, false);
+                                        addTaskToQueue(coreApp, cmdDetail, false);
                                     } else if (coreApp.db.csGetDate(CS, "ProcessNextRun") == DateTime.MinValue) {
                                         //
                                         LogController.logTrace(coreApp, "scheduleTasks, addon [" + addonName + "], setup next run, ProcessInterval set but no processNextRun, set processNextRun [" + nextRun + "]");
@@ -205,23 +205,29 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="command"></param>
         /// <param name="cmdDetail"></param>
-        /// <param name="BlockDuplicates"></param>
+        /// <param name="downloadName"></param>
         /// <returns></returns>
-        static public bool addTaskToQueue(CoreController core, TaskModel.cmdDetailClass cmdDetail, bool BlockDuplicates, bool saveResultToDownloads) {
+        static public bool addTaskToQueue(CoreController core, TaskModel.cmdDetailClass cmdDetail, bool blockDuplicates, string downloadName, string downloadFilename) {
             bool resultTaskAdded = true;
             try {
                 //
                 int downloadId = 0;
-                if ( saveResultToDownloads) {
+                if (!string.IsNullOrEmpty(downloadName)) {
                     var download = DownloadModel.add(core);
-                    download.name = "Download requested by " + core.session.user.name;
+                    download.name = downloadName;
                     download.dateRequested = DateTime.Now;
                     download.requestedBy = core.session.user.id;
+                    if (!string.IsNullOrEmpty(downloadFilename)) {
+                        //
+                        // -- if the donwloadfilename is specified, save it in the download record and force the file to save with a space in content
+                        download.filename.filename = FileController.getVirtualRecordUnixPathFilename(DownloadModel.contentTableName, "filename", download.id, downloadFilename);
+                        download.filename.content = " ";
+                    }
                     downloadId = download.id;
                     download.save(core);
                 }
                 string cmdDetailJson = core.json.Serialize(cmdDetail);
-                if (BlockDuplicates) {
+                if (blockDuplicates) {
                     //
                     // -- Search for a duplicate
                     string sql = "select top 1 id from cctasks where ((cmdDetail=" + cmdDetailJson + ")and(datestarted is not null))";
@@ -245,6 +251,12 @@ namespace Contensive.Processor.Controllers {
             }
             return resultTaskAdded;
         }
+        //
+        static public bool addTaskToQueue(CoreController core, TaskModel.cmdDetailClass cmdDetail, bool blockDuplicates)
+            => addTaskToQueue(core, cmdDetail, blockDuplicates, "", "");
+        //
+        static public bool addTaskToQueue(CoreController core, TaskModel.cmdDetailClass cmdDetail, bool blockDuplicates, string downloadName)
+            => addTaskToQueue(core, cmdDetail, blockDuplicates, downloadName, "");
         //
         //====================================================================================================
         //
