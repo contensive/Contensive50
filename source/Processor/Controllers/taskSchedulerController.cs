@@ -169,11 +169,11 @@ namespace Contensive.Processor.Controllers {
                                         coreApp.db.csSave(CS);
                                         //
                                         // -- add task to queue for runner
-                                        CmdDetailClass cmdDetail = new CmdDetailClass();
+                                        var cmdDetail = new TaskModel.cmdDetailClass();
                                         cmdDetail.addonId = coreApp.db.csGetInteger(CS, "ID");
                                         cmdDetail.addonName = addonName;
                                         cmdDetail.args = GenericController.convertAddonArgumentstoDocPropertiesList(coreApp, coreApp.db.csGetText(CS, "argumentlist"));
-                                        addTaskToQueue(coreApp, TaskQueueCommandEnumModule.runAddon, cmdDetail, false);
+                                        addTaskToQueue(coreApp, cmdDetail, false);
                                     } else if (coreApp.db.csGetDate(CS, "ProcessNextRun") == DateTime.MinValue) {
                                         //
                                         LogController.logTrace(coreApp, "scheduleTasks, addon [" + addonName + "], setup next run, ProcessInterval set but no processNextRun, set processNextRun [" + nextRun + "]");
@@ -202,41 +202,61 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Add a command task to the taskQueue to be run by the taskRunner. Returns false if the task was already there (dups fround by command name and cmdDetailJson)
         /// </summary>
-        /// <param name="cpSiteCore"></param>
+        /// <param name="core"></param>
         /// <param name="command"></param>
         /// <param name="cmdDetail"></param>
-        /// <param name="BlockDuplicates"></param>
+        /// <param name="downloadName"></param>
         /// <returns></returns>
-        static public bool addTaskToQueue(CoreController cpSiteCore, string command, CmdDetailClass cmdDetail, bool BlockDuplicates) {
-            bool returnTaskAdded = true;
+        static public bool addTaskToQueue(CoreController core, TaskModel.cmdDetailClass cmdDetail, bool blockDuplicates, string downloadName, string downloadFilename) {
+            bool resultTaskAdded = true;
             try {
-                string cmdDetailJson = cpSiteCore.json.Serialize(cmdDetail);
-                if (BlockDuplicates) {
+                //
+                int downloadId = 0;
+                if (!string.IsNullOrEmpty(downloadName)) {
+                    var download = DownloadModel.add(core);
+                    download.name = downloadName;
+                    download.dateRequested = DateTime.Now;
+                    download.requestedBy = core.session.user.id;
+                    if (!string.IsNullOrEmpty(downloadFilename)) {
+                        //
+                        // -- if the donwloadfilename is specified, save it in the download record and force the file to save with a space in content
+                        download.filename.filename = FileController.getVirtualRecordUnixPathFilename(DownloadModel.contentTableName, "filename", download.id, downloadFilename);
+                        download.filename.content = " ";
+                    }
+                    downloadId = download.id;
+                    download.save(core);
+                }
+                string cmdDetailJson = core.json.Serialize(cmdDetail);
+                if (blockDuplicates) {
                     //
                     // -- Search for a duplicate
-                    string sql = "select top 1 id from cctasks where ((command=" + cpSiteCore.db.encodeSQLText(command) + ")and(cmdDetail=" + cmdDetailJson + ")and(datestarted is not null))";
-                    int cs = cpSiteCore.db.csOpenSql(sql);
-                    returnTaskAdded = !cpSiteCore.db.csOk(cs);
-                    cpSiteCore.db.csClose(ref cs);
+                    string sql = "select top 1 id from cctasks where ((cmdDetail=" + cmdDetailJson + ")and(datestarted is not null))";
+                    int cs = core.db.csOpenSql(sql);
+                    resultTaskAdded = !core.db.csOk(cs);
+                    core.db.csClose(ref cs);
                 }
                 //
                 // -- add it to the queue and shell out to the command
-                if (returnTaskAdded) {
-                    int cs = cpSiteCore.db.csInsertRecord("tasks");
-                    if (cpSiteCore.db.csOk(cs)) {
-                        cpSiteCore.db.csSet(cs, "name", "command [" + command + "], addon [#" + cmdDetail.addonId + "," + cmdDetail.addonName + "]");
-                        cpSiteCore.db.csSet(cs, "command", command);
-                        cpSiteCore.db.csSet(cs, "cmdDetail", cmdDetailJson);
-                    }
-                    cpSiteCore.db.csClose(ref cs);
-                    LogController.logTrace(cpSiteCore, "addTaskToQueue, command [" + command + "], cmdDetailJson [" + cmdDetailJson + "]");
+                if (resultTaskAdded) {
+                    var task = TaskModel.add(core);
+                    task.name = "addon [#" + cmdDetail.addonId + "," + cmdDetail.addonName + "]";
+                    task.cmdDetail = cmdDetailJson;
+                    task.resultDownloadId = downloadId;
+                    task.save(core);
+                    LogController.logTrace(core, "addTaskToQueue, cmdDetailJson [" + cmdDetailJson + "]");
                 }
             } catch (Exception ex) {
-                LogController.logTrace(cpSiteCore, "addTaskToQueue, exeception [" + ex.ToString() + "]");
-                LogController.handleError(cpSiteCore, ex);
+                LogController.logTrace(core, "addTaskToQueue, exeception [" + ex.ToString() + "]");
+                LogController.handleError(core, ex);
             }
-            return returnTaskAdded;
+            return resultTaskAdded;
         }
+        //
+        static public bool addTaskToQueue(CoreController core, TaskModel.cmdDetailClass cmdDetail, bool blockDuplicates)
+            => addTaskToQueue(core, cmdDetail, blockDuplicates, "", "");
+        //
+        static public bool addTaskToQueue(CoreController core, TaskModel.cmdDetailClass cmdDetail, bool blockDuplicates, string downloadName)
+            => addTaskToQueue(core, cmdDetail, blockDuplicates, downloadName, "");
         //
         //====================================================================================================
         //

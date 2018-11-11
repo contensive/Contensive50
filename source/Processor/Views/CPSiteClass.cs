@@ -263,16 +263,16 @@ namespace Contensive.Processor {
                 if (ExportCSVAddon == null) {
                     LogController.handleError( core,new GenericException("ExportCSV addon not found. Task could not be added to task queue."));
                 } else {
-                    var docProperties = new Dictionary<string, string>();
-                    docProperties.Add("sql", SQL);
-                    docProperties.Add("ExportName", ExportName);
-                    docProperties.Add("filename", Filename);
-                    var cmdDetail = new CmdDetailClass() {
+                    var cmdDetail = new TaskModel.cmdDetailClass() {
                         addonId = ExportCSVAddon.id,
                         addonName = ExportCSVAddon.name,
-                        args = docProperties
+                        args = new Dictionary<string, string> {
+                            { "sql", SQL },
+                            { "ExportName", ExportName },
+                            { "filename", Filename }
+                        }
                     };
-                    TaskSchedulerControllerx.addTaskToQueue(core, taskCommandBuildCsv, cmdDetail, false);
+                    TaskSchedulerControllerx.addTaskToQueue(core, cmdDetail, false );
                 }
             } catch (Exception) {
                 throw;

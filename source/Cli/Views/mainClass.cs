@@ -350,7 +350,7 @@ namespace Contensive.CLI {
                                             runnerGuid = args[argPtr];
                                         }
                                         Console.WriteLine("runTask, appName [" + appName + "], runnerGuid [" + runnerGuid + "]");
-                                        TaskRunnerController.runTask(appName, runnerGuid);
+                                        TaskRunnerController.executeRunnerTasks(appName, runnerGuid);
                                     }
                                     break;
                                 case "--installservice":

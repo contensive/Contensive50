@@ -278,10 +278,6 @@ namespace Contensive.Addons.Tools {
                                 //
                                 Stream.Add(GetForm_LoadCDef());
                                 break;
-                            case AdminFormToolRestart:
-                                //
-                                Stream.Add(GetForm_Restart());
-                                break;
                             case AdminFormToolLoadTemplates:
                                 //
                                 Stream.Add(GetForm_LoadTemplates());
@@ -2864,89 +2860,11 @@ namespace Contensive.Addons.Tools {
             return result;
         }
         //
-        //=============================================================================
-        //   Print the manual query form
-        //=============================================================================
-        //
-        private string GetForm_Restart() {
-            string tempGetForm_Restart = null;
-            try {
-                //
-                StringBuilderLegacyController Stream = new StringBuilderLegacyController();
-                string ButtonList;
-                // Dim runAtServer As runAtServerClass
-                //
-                ButtonList = ButtonCancel + "," + ButtonRestartContensiveApplication;
-                Stream.Add(AdminUIController.getToolFormTitle("Load Content Definitions", "This tool stops and restarts the Contensive Application controlling this website. If you restart, the site will be unavailable for up to a minute while the site is stopped and restarted. If the site does not restart, you will need to contact a site administrator to have the Contensive Server restarted."));
-                //
-                if (!core.session.isAuthenticatedAdmin(core)) {
-                    //
-                    tempGetForm_Restart = "<P>You must be an administrator to use this tool.</P>";
-                    //
-                } else if ((core.docProperties.getText("button")) != ButtonRestartContensiveApplication) {
-                    //
-                    // First pass, initialize
-                    //
-                } else {
-                    //
-                    // Restart
-                    LogController.logDebug(core, "Restarting Contensive");
-                    core.webServer.redirect("/ContensiveBase/Popup/WaitForIISReset.htm");
-                    Thread.Sleep(2000);
-                    //
-                    TaskSchedulerControllerx.addTaskToQueue(core, TaskQueueCommandEnumModule.runAddon, new CmdDetailClass() {
-                        addonId = 0,
-                        addonName = "commandRestart",
-                        args = GenericController.convertAddonArgumentstoDocPropertiesList(core, "")
-                    }, false);
-                }
-                //
-                // Display form
-                //
-                Stream.Add(SpanClassAdminNormal);
-                Stream.Add("<br>");
-                Stream.Add("</SPAN>");
-                //
-                tempGetForm_Restart = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
-                //tempGetForm_Restart =  adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-            }
-            return tempGetForm_Restart;
-        }
-        //
         //
         //
         private Processor.Models.Domain.CDefModel GetCDef(string ContentName) {
             return Processor.Models.Domain.CDefModel.create(core, ContentName);
         }
-
-
-
-        //Function CloseFormTable(ByVal ButtonList As String) As String
-        //    If ButtonList <> "" Then
-        //        CloseFormTable = "</td></tr></TABLE>" & core.htmldoc.main_GetPanelButtons(ButtonList, "Button") & "</form>"
-        //    Else
-        //        CloseFormTable = "</td></tr></TABLE></form>"
-        //    End If
-        //End Function
-        //
-        //
-        //
-        //Function genericLegacyView.OpenFormTable(core,ByVal ButtonList As String) As String
-        //    Dim result As String = ""
-        //    Try
-        //        OpenFormTable = core.htmldoc.html_GetFormStart()
-        //        If ButtonList <> "" Then
-        //            OpenFormTable = OpenFormTable & core.htmldoc.main_GetPanelButtons(ButtonList, "Button")
-        //        End If
-        //        OpenFormTable = OpenFormTable & "<table border=""0"" cellpadding=""10"" cellspacing=""0"" width=""100%""><tr><TD>"
-        //    Catch ex As Exception
-        //        core.handleExceptionAndContinue(ex)
-        //    End Try
-        //    Return result
-        //End Function
-
         //
         //=============================================================================
         //   Import the htm and html files in the FileRootPath and below into Page Templates
@@ -3371,11 +3289,11 @@ namespace Contensive.Addons.Tools {
                         FindText = core.docProperties.getText("FindText");
                         ReplaceText = core.docProperties.getText("ReplaceText");
                         QS = "app=" + encodeNvaArgument(core.appConfig.name) + "&FindText=" + encodeNvaArgument(FindText) + "&ReplaceText=" + encodeNvaArgument(ReplaceText) + "&CDefNameList=" + encodeNvaArgument(CDefList);
-                        CmdDetailClass cmdDetail = new CmdDetailClass();
+                        var cmdDetail = new TaskModel.cmdDetailClass();
                         cmdDetail.addonId = 0;
                         cmdDetail.addonName = "GetForm_FindAndReplace";
                         cmdDetail.args = GenericController.convertAddonArgumentstoDocPropertiesList(core, QS);
-                        TaskSchedulerControllerx.addTaskToQueue(core, TaskQueueCommandEnumModule.runAddon, cmdDetail, false);
+                        TaskSchedulerControllerx.addTaskToQueue(core, cmdDetail, false);
                         Stream.Add("Find and Replace has been requested for content definitions [" + CDefList + "], finding [" + FindText + "] and replacing with [" + ReplaceText + "]");
                     }
                 } else {
@@ -3456,11 +3374,11 @@ namespace Contensive.Addons.Tools {
                     LogController.logDebug(core, "Restarting IIS");
                     core.webServer.redirect("/ContensiveBase/Popup/WaitForIISReset.htm");
                     Thread.Sleep(2000);
-                    CmdDetailClass cmdDetail = new CmdDetailClass();
+                    var cmdDetail = new TaskModel.cmdDetailClass();
                     cmdDetail.addonId = 0;
                     cmdDetail.addonName = "GetForm_IISReset";
                     cmdDetail.args = GenericController.convertAddonArgumentstoDocPropertiesList(core, "");
-                    TaskSchedulerControllerx.addTaskToQueue(core, TaskQueueCommandEnumModule.runAddon, cmdDetail, false);
+                    TaskSchedulerControllerx.addTaskToQueue(core, cmdDetail, false );
                 }
                 //
                 // Display form

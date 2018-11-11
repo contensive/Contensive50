@@ -19,7 +19,7 @@
 	The CP object includes properties, methods, and objects that can be used in the application. 
 	For example, cp.file.read( filename ) reads the content from a text file from a repository configured in the application, which could be the local file system, Amazon S3 bucket, etc.
 	</description>
-    <releaseNotes></releaseNotes>
+    <releaseNotes>CPBaseClass methods were camelCase not PascalCase</releaseNotes>
     <copyright>Copyright 2018</copyright>
     <tags></tags>
   </metadata>

@@ -129,6 +129,10 @@
     <Compile Include="Addons\AdminSite\Views\GroupRuleEditor.cs" />
     <Compile Include="Addons\AdminSite\Views\FormIndex.cs" />
     <Compile Include="Addons\AdminSite\Views\ToolSetListColumnsClass.cs" />
+    <Compile Include="Addons\AdminSite\adminClearCacheToolAddon.cs" />
+    <Compile Include="Addons\AdminSite\adminInfoDomainModel.cs" />
+    <Compile Include="Addons\AdminSite\toolSetListColumnsClass.cs" />
+    <Compile Include="Addons\ExportSql\ExportCsvClass.cs" />
     <Compile Include="Addons\PageManager\getChildPageList.cs" />
     <Compile Include="Addons\Tools\MetakeywordToolClass.cs" />
     <Compile Include="Addons\Tools\DefineContentFieldsFromTable.cs" />
@@ -238,6 +242,7 @@
     <Compile Include="Models\Db\Datasource.cs" />
     <Compile Include="Models\Db\SitePropertyModel.cs" />
     <Compile Include="Models\Db\StateModel.cs" />
+    <Compile Include="Models\Db\DownloadModel.cs" />
     <Compile Include="Models\Domain\AppConfigModel.cs" />
     <Compile Include="Models\Db\EmailQueueModel.cs" />
     <Compile Include="Models\Db\ConditionalEmailModel.cs" />

@@ -2182,110 +2182,113 @@ namespace Contensive.Processor.Controllers {
                         string StyleSheet = "";
                         if (AddonNode.ChildNodes.Count > 0) {
                             foreach (XmlNode PageInterfaceWithinLoop in AddonNode.ChildNodes) {
-                                XmlNode PageInterface = PageInterfaceWithinLoop;
-                                string test = null;
-                                int scriptinglanguageid = 0;
-                                string ScriptingCode = null;
-                                string FieldName = null;
-                                string NodeName = null;
-                                string NewValue = null;
-                                string menuNameSpace = null;
-                                string FieldValue = "";
-                                int CS2 = 0;
-                                string ScriptingEntryPoint = null;
-                                int ScriptingTimeout = 0;
-                                string ScriptingLanguage = null;
-                                switch (GenericController.vbLCase(PageInterfaceWithinLoop.Name)) {
-                                    case "activexdll":
-                                        //
-                                        // This is handled in BuildLocalCollectionFolder
-                                        //
-                                        break;
-                                    case "editors":
-                                        //
-                                        // list of editors
-                                        //
-                                        foreach (XmlNode TriggerNode in PageInterfaceWithinLoop.ChildNodes) {
+                                if (!(PageInterfaceWithinLoop is XmlComment)) {
+                                    XmlNode PageInterface = PageInterfaceWithinLoop;
+                                    string test = null;
+                                    int scriptinglanguageid = 0;
+                                    string ScriptingCode = null;
+                                    string FieldName = null;
+                                    string NodeName = null;
+                                    string NewValue = null;
+                                    string menuNameSpace = null;
+                                    string FieldValue = "";
+                                    int CS2 = 0;
+                                    string ScriptingEntryPoint = null;
+                                    int ScriptingTimeout = 0;
+                                    string ScriptingLanguage = null;
+                                    switch (GenericController.vbLCase(PageInterfaceWithinLoop.Name)) {
+                                        case "activexdll":
                                             //
-                                            int fieldTypeID = 0;
-                                            string fieldType = null;
-                                            switch (GenericController.vbLCase(TriggerNode.Name)) {
-                                                case "type":
-                                                    fieldType = TriggerNode.InnerText;
-                                                    fieldTypeID = core.db.getRecordID("Content Field Types", fieldType);
-                                                    if (fieldTypeID > 0) {
-                                                        Criteria = "(addonid=" + addonId + ")and(contentfieldTypeID=" + fieldTypeID + ")";
-                                                        CS2 = core.db.csOpen("Add-on Content Field Type Rules", Criteria);
-                                                        if (!core.db.csOk(CS2)) {
-                                                            core.db.csClose(ref CS2);
-                                                            CS2 = core.db.csInsertRecord("Add-on Content Field Type Rules", 0);
-                                                        }
-                                                        if (core.db.csOk(CS2)) {
-                                                            core.db.csSet(CS2, "addonid", addonId);
-                                                            core.db.csSet(CS2, "contentfieldTypeID", fieldTypeID);
-                                                        }
-                                                        core.db.csClose(ref CS2);
-                                                    }
-                                                    break;
-                                            }
-                                        }
-                                        break;
-                                    case "processtriggers":
-                                        //
-                                        // list of events that trigger a process run for this addon
-                                        //
-                                        foreach (XmlNode TriggerNode in PageInterfaceWithinLoop.ChildNodes) {
-                                            int TriggerContentID = 0;
-                                            string ContentNameorGuid = null;
-                                            switch (GenericController.vbLCase(TriggerNode.Name)) {
-                                                case "contentchange":
-                                                    TriggerContentID = 0;
-                                                    ContentNameorGuid = TriggerNode.InnerText;
-                                                    if (string.IsNullOrEmpty(ContentNameorGuid)) {
-                                                        ContentNameorGuid = XmlController.GetXMLAttribute(core, IsFound, TriggerNode, "guid", "");
-                                                        if (string.IsNullOrEmpty(ContentNameorGuid)) {
-                                                            ContentNameorGuid = XmlController.GetXMLAttribute(core, IsFound, TriggerNode, "name", "");
-                                                        }
-                                                    }
-                                                    Criteria = "(ccguid=" + core.db.encodeSQLText(ContentNameorGuid) + ")";
-                                                    CS2 = core.db.csOpen("Content", Criteria);
-                                                    if (!core.db.csOk(CS2)) {
-                                                        core.db.csClose(ref CS2);
-                                                        Criteria = "(ccguid is null)and(name=" + core.db.encodeSQLText(ContentNameorGuid) + ")";
-                                                        CS2 = core.db.csOpen("content", Criteria);
-                                                    }
-                                                    if (core.db.csOk(CS2)) {
-                                                        TriggerContentID = core.db.csGetInteger(CS2, "ID");
-                                                    }
-                                                    core.db.csClose(ref CS2);
-                                                    //If TriggerContentID = 0 Then
-                                                    //    CS2 = core.db.cs_insertRecord("Scripting Modules", 0)
-                                                    //    If core.db.cs_ok(CS2) Then
-                                                    //        Call core.db.cs_set(CS2, "name", ScriptingNameorGuid)
-                                                    //        Call core.db.cs_set(CS2, "ccguid", ScriptingNameorGuid)
-                                                    //        TriggerContentID = core.db.cs_getInteger(CS2, "ID")
-                                                    //    End If
-                                                    //    Call core.db.cs_Close(CS2)
-                                                    //End If
-                                                    if (TriggerContentID == 0) {
-                                                        //
-                                                        // could not find the content
-                                                        //
-                                                    } else {
-                                                        Criteria = "(addonid=" + addonId + ")and(contentid=" + TriggerContentID + ")";
-                                                        CS2 = core.db.csOpen("Add-on Content Trigger Rules", Criteria);
-                                                        if (!core.db.csOk(CS2)) {
-                                                            core.db.csClose(ref CS2);
-                                                            CS2 = core.db.csInsertRecord("Add-on Content Trigger Rules", 0);
+                                            // This is handled in BuildLocalCollectionFolder
+                                            //
+                                            break;
+                                        case "editors":
+                                            //
+                                            // list of editors
+                                            //
+                                            foreach (XmlNode TriggerNode in PageInterfaceWithinLoop.ChildNodes) {
+                                                //
+                                                int fieldTypeID = 0;
+                                                string fieldType = null;
+                                                switch (GenericController.vbLCase(TriggerNode.Name)) {
+                                                    case "type":
+                                                        fieldType = TriggerNode.InnerText;
+                                                        fieldTypeID = core.db.getRecordID("Content Field Types", fieldType);
+                                                        if (fieldTypeID > 0) {
+                                                            Criteria = "(addonid=" + addonId + ")and(contentfieldTypeID=" + fieldTypeID + ")";
+                                                            CS2 = core.db.csOpen("Add-on Content Field Type Rules", Criteria);
+                                                            if (!core.db.csOk(CS2)) {
+                                                                core.db.csClose(ref CS2);
+                                                                CS2 = core.db.csInsertRecord("Add-on Content Field Type Rules", 0);
+                                                            }
                                                             if (core.db.csOk(CS2)) {
                                                                 core.db.csSet(CS2, "addonid", addonId);
-                                                                core.db.csSet(CS2, "contentid", TriggerContentID);
+                                                                core.db.csSet(CS2, "contentfieldTypeID", fieldTypeID);
+                                                            }
+                                                            core.db.csClose(ref CS2);
+                                                        }
+                                                        break;
+                                                }
+                                            }
+                                            break;
+                                        case "processtriggers":
+                                            //
+                                            // list of events that trigger a process run for this addon
+                                            //
+                                            foreach (XmlNode TriggerNode in PageInterfaceWithinLoop.ChildNodes) {
+                                                int TriggerContentID = 0;
+                                                string ContentNameorGuid = null;
+                                                switch (GenericController.vbLCase(TriggerNode.Name)) {
+                                                    case "contentchange":
+                                                        TriggerContentID = 0;
+                                                        ContentNameorGuid = TriggerNode.InnerText;
+                                                        if (string.IsNullOrEmpty(ContentNameorGuid)) {
+                                                            ContentNameorGuid = XmlController.GetXMLAttribute(core, IsFound, TriggerNode, "guid", "");
+                                                            if (string.IsNullOrEmpty(ContentNameorGuid)) {
+                                                                ContentNameorGuid = XmlController.GetXMLAttribute(core, IsFound, TriggerNode, "name", "");
                                                             }
                                                         }
+                                                        Criteria = "(ccguid=" + core.db.encodeSQLText(ContentNameorGuid) + ")";
+                                                        CS2 = core.db.csOpen("Content", Criteria);
+                                                        if (!core.db.csOk(CS2)) {
+                                                            core.db.csClose(ref CS2);
+                                                            Criteria = "(ccguid is null)and(name=" + core.db.encodeSQLText(ContentNameorGuid) + ")";
+                                                            CS2 = core.db.csOpen("content", Criteria);
+                                                        }
+                                                        if (core.db.csOk(CS2)) {
+                                                            TriggerContentID = core.db.csGetInteger(CS2, "ID");
+                                                        }
                                                         core.db.csClose(ref CS2);
-                                                    }
-                                                    break;
+                                                        //If TriggerContentID = 0 Then
+                                                        //    CS2 = core.db.cs_insertRecord("Scripting Modules", 0)
+                                                        //    If core.db.cs_ok(CS2) Then
+                                                        //        Call core.db.cs_set(CS2, "name", ScriptingNameorGuid)
+                                                        //        Call core.db.cs_set(CS2, "ccguid", ScriptingNameorGuid)
+                                                        //        TriggerContentID = core.db.cs_getInteger(CS2, "ID")
+                                                        //    End If
+                                                        //    Call core.db.cs_Close(CS2)
+                                                        //End If
+                                                        if (TriggerContentID == 0) {
+                                                            //
+                                                            // could not find the content
+                                                            //
+                                                        } else {
+                                                            Criteria = "(addonid=" + addonId + ")and(contentid=" + TriggerContentID + ")";
+                                                            CS2 = core.db.csOpen("Add-on Content Trigger Rules", Criteria);
+                                                            if (!core.db.csOk(CS2)) {
+                                                                core.db.csClose(ref CS2);
+                                                                CS2 = core.db.csInsertRecord("Add-on Content Trigger Rules", 0);
+                                                                if (core.db.csOk(CS2)) {
+                                                                    core.db.csSet(CS2, "addonid", addonId);
+                                                                    core.db.csSet(CS2, "contentid", TriggerContentID);
+                                                                }
+                                                            }
+                                                            core.db.csClose(ref CS2);
+                                                        }
+                                                        break;
+                                                }
                                             }
+<<<<<<< HEAD
                                         }
                                         break;
                                     case "scripting":
@@ -2314,262 +2317,290 @@ namespace Contensive.Processor.Controllers {
                                                 case "code":
                                                     ScriptingCode = ScriptingCode + ScriptingNode.InnerText;
                                                     //Case "includemodule"
+=======
+                                            break;
+                                        case "scripting":
+                                            //
+                                            // include add-ons - NOTE - import collections must be run before interfaces
+                                            // when importing a collectin that will be used for an include
+                                            //
+                                            ScriptingLanguage = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "language", "");
+                                            if (ScriptingLanguage.ToLower() == "jscript") {
+                                                scriptinglanguageid = 2;
+                                            } else {
+                                                scriptinglanguageid = 1;
+                                            }
+                                            //scriptinglanguageid = core.db.getRecordID("scripting languages", ScriptingLanguage);
+                                            core.db.csSet(CS, "scriptinglanguageid", scriptinglanguageid);
+                                            ScriptingEntryPoint = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "entrypoint", "");
+                                            core.db.csSet(CS, "ScriptingEntryPoint", ScriptingEntryPoint);
+                                            ScriptingTimeout = GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "timeout", "5000"));
+                                            core.db.csSet(CS, "ScriptingTimeout", ScriptingTimeout);
+                                            ScriptingCode = "";
+                                            //Call core.app.csv_SetCS(CS, "ScriptingCode", ScriptingCode)
+                                            foreach (XmlNode ScriptingNode in PageInterfaceWithinLoop.ChildNodes) {
+                                                switch (GenericController.vbLCase(ScriptingNode.Name)) {
+                                                    case "code":
+                                                        ScriptingCode = ScriptingCode + ScriptingNode.InnerText;
+                                                        //Case "includemodule"
+>>>>>>> v50-Master
 
-                                                    //    ScriptingModuleID = 0
-                                                    //    ScriptingNameorGuid = ScriptingNode.InnerText
-                                                    //    If ScriptingNameorGuid = "" Then
-                                                    //        ScriptingNameorGuid =xmlController.GetXMLAttribute(core,IsFound, ScriptingNode, "guid", "")
-                                                    //        If ScriptingNameorGuid = "" Then
-                                                    //            ScriptingNameorGuid =xmlController.GetXMLAttribute(core,IsFound, ScriptingNode, "name", "")
-                                                    //        End If
-                                                    //    End If
-                                                    //    Criteria = "(ccguid=" & core.db.encodeSQLText(ScriptingNameorGuid) & ")"
-                                                    //    CS2 = core.db.cs_open("Scripting Modules", Criteria)
-                                                    //    If Not core.db.cs_ok(CS2) Then
-                                                    //        Call core.db.cs_Close(CS2)
-                                                    //        Criteria = "(ccguid is null)and(name=" & core.db.encodeSQLText(ScriptingNameorGuid) & ")"
-                                                    //        CS2 = core.db.cs_open("Scripting Modules", Criteria)
-                                                    //    End If
-                                                    //    If core.db.cs_ok(CS2) Then
-                                                    //        ScriptingModuleID = core.db.cs_getInteger(CS2, "ID")
-                                                    //    End If
-                                                    //    Call core.db.cs_Close(CS2)
-                                                    //    If ScriptingModuleID = 0 Then
-                                                    //        CS2 = core.db.cs_insertRecord("Scripting Modules", 0)
-                                                    //        If core.db.cs_ok(CS2) Then
-                                                    //            Call core.db.cs_set(CS2, "name", ScriptingNameorGuid)
-                                                    //            Call core.db.cs_set(CS2, "ccguid", ScriptingNameorGuid)
-                                                    //            ScriptingModuleID = core.db.cs_getInteger(CS2, "ID")
-                                                    //        End If
-                                                    //        Call core.db.cs_Close(CS2)
-                                                    //    End If
-                                                    //    Criteria = "(addonid=" & addonId & ")and(scriptingmoduleid=" & ScriptingModuleID & ")"
-                                                    //    CS2 = core.db.cs_open("Add-on Scripting Module Rules", Criteria)
-                                                    //    If Not core.db.cs_ok(CS2) Then
-                                                    //        Call core.db.cs_Close(CS2)
-                                                    //        CS2 = core.db.cs_insertRecord("Add-on Scripting Module Rules", 0)
-                                                    //        If core.db.cs_ok(CS2) Then
-                                                    //            Call core.db.cs_set(CS2, "addonid", addonId)
-                                                    //            Call core.db.cs_set(CS2, "scriptingmoduleid", ScriptingModuleID)
-                                                    //        End If
-                                                    //    End If
-                                                    //    Call core.db.cs_Close(CS2)
-                                                    break;
+                                                        //    ScriptingModuleID = 0
+                                                        //    ScriptingNameorGuid = ScriptingNode.InnerText
+                                                        //    If ScriptingNameorGuid = "" Then
+                                                        //        ScriptingNameorGuid =xmlController.GetXMLAttribute(core,IsFound, ScriptingNode, "guid", "")
+                                                        //        If ScriptingNameorGuid = "" Then
+                                                        //            ScriptingNameorGuid =xmlController.GetXMLAttribute(core,IsFound, ScriptingNode, "name", "")
+                                                        //        End If
+                                                        //    End If
+                                                        //    Criteria = "(ccguid=" & core.db.encodeSQLText(ScriptingNameorGuid) & ")"
+                                                        //    CS2 = core.db.cs_open("Scripting Modules", Criteria)
+                                                        //    If Not core.db.cs_ok(CS2) Then
+                                                        //        Call core.db.cs_Close(CS2)
+                                                        //        Criteria = "(ccguid is null)and(name=" & core.db.encodeSQLText(ScriptingNameorGuid) & ")"
+                                                        //        CS2 = core.db.cs_open("Scripting Modules", Criteria)
+                                                        //    End If
+                                                        //    If core.db.cs_ok(CS2) Then
+                                                        //        ScriptingModuleID = core.db.cs_getInteger(CS2, "ID")
+                                                        //    End If
+                                                        //    Call core.db.cs_Close(CS2)
+                                                        //    If ScriptingModuleID = 0 Then
+                                                        //        CS2 = core.db.cs_insertRecord("Scripting Modules", 0)
+                                                        //        If core.db.cs_ok(CS2) Then
+                                                        //            Call core.db.cs_set(CS2, "name", ScriptingNameorGuid)
+                                                        //            Call core.db.cs_set(CS2, "ccguid", ScriptingNameorGuid)
+                                                        //            ScriptingModuleID = core.db.cs_getInteger(CS2, "ID")
+                                                        //        End If
+                                                        //        Call core.db.cs_Close(CS2)
+                                                        //    End If
+                                                        //    Criteria = "(addonid=" & addonId & ")and(scriptingmoduleid=" & ScriptingModuleID & ")"
+                                                        //    CS2 = core.db.cs_open("Add-on Scripting Module Rules", Criteria)
+                                                        //    If Not core.db.cs_ok(CS2) Then
+                                                        //        Call core.db.cs_Close(CS2)
+                                                        //        CS2 = core.db.cs_insertRecord("Add-on Scripting Module Rules", 0)
+                                                        //        If core.db.cs_ok(CS2) Then
+                                                        //            Call core.db.cs_set(CS2, "addonid", addonId)
+                                                        //            Call core.db.cs_set(CS2, "scriptingmoduleid", ScriptingModuleID)
+                                                        //        End If
+                                                        //    End If
+                                                        //    Call core.db.cs_Close(CS2)
+                                                        break;
+                                                }
                                             }
-                                        }
-                                        core.db.csSet(CS, "ScriptingCode", ScriptingCode);
-                                        break;
-                                    case "activexprogramid":
-                                        //
-                                        // save program id
-                                        //
-                                        FieldValue = PageInterfaceWithinLoop.InnerText;
-                                        core.db.csSet(CS, "ObjectProgramID", FieldValue);
-                                        break;
-                                    case "navigator":
-                                        //
-                                        // create a navigator entry with a parent set to this
-                                        //
-                                        core.db.csSave(CS);
-                                        menuNameSpace = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "NameSpace", "");
-                                        if (!string.IsNullOrEmpty(menuNameSpace)) {
-                                            string NavIconTypeString = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "type", "");
-                                            if (string.IsNullOrEmpty(NavIconTypeString)) {
-                                                NavIconTypeString = "Addon";
-                                            }
-                                            //Dim builder As New coreBuilderClass(core)
-                                            AppBuilderController.verifyNavigatorEntry(core, "", menuNameSpace, addonName, "", "", "", false, false, false, true, addonName, NavIconTypeString, addonName, CollectionID);
-                                        }
-                                        break;
-                                    case "argument":
-                                    case "argumentlist":
-                                        //
-                                        // multiple argumentlist elements are concatinated with crlf
-                                        //
-                                        NewValue = encodeText(PageInterfaceWithinLoop.InnerText).Trim(' ');
-                                        if (!string.IsNullOrEmpty(NewValue)) {
-                                            if (string.IsNullOrEmpty(ArgumentList)) {
-                                                ArgumentList = NewValue;
-                                            } else if (NewValue != FieldValue) {
-                                                ArgumentList = ArgumentList + "\r\n" + NewValue;
-                                            }
-                                        }
-                                        break;
-                                    case "style":
-                                        //
-                                        // import exclusive style
-                                        //
-                                        NodeName = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "name", "");
-                                        NewValue = encodeText(PageInterfaceWithinLoop.InnerText).Trim(' ');
-                                        if (NewValue.Left(1) != "{") {
-                                            NewValue = "{" + NewValue;
-                                        }
-                                        if (NewValue.Substring(NewValue.Length - 1) != "}") {
-                                            NewValue = NewValue + "}";
-                                        }
-                                        StyleSheet = StyleSheet + "\r\n" + NodeName + " " + NewValue;
-                                        //Case "includesharedstyle"
-                                        //    '
-                                        //    ' added 9/3/2012
-                                        //    '
-                                        //    sharedStyleId = 0
-                                        //    nodeNameOrGuid =xmlController.GetXMLAttribute(core,IsFound, PageInterface, "guid", "")
-                                        //    If nodeNameOrGuid = "" Then
-                                        //        nodeNameOrGuid =xmlController.GetXMLAttribute(core,IsFound, PageInterface, "name", "")
-                                        //    End If
-                                        //    Criteria = "(ccguid=" & core.db.encodeSQLText(nodeNameOrGuid) & ")"
-                                        //    CS2 = core.db.cs_open("shared styles", Criteria)
-                                        //    If Not core.db.cs_ok(CS2) Then
-                                        //        Call core.db.cs_Close(CS2)
-                                        //        Criteria = "(ccguid is null)and(name=" & core.db.encodeSQLText(nodeNameOrGuid) & ")"
-                                        //        CS2 = core.db.cs_open("shared styles", Criteria)
-                                        //    End If
-                                        //    If core.db.cs_ok(CS2) Then
-                                        //        sharedStyleId = core.db.cs_getInteger(CS2, "ID")
-                                        //    End If
-                                        //    Call core.db.cs_Close(CS2)
-                                        //    If sharedStyleId = 0 Then
-                                        //        CS2 = core.db.cs_insertRecord("shared styles", 0)
-                                        //        If core.db.cs_ok(CS2) Then
-                                        //            Call core.db.cs_set(CS2, "name", nodeNameOrGuid)
-                                        //            Call core.db.cs_set(CS2, "ccguid", nodeNameOrGuid)
-                                        //            sharedStyleId = core.db.cs_getInteger(CS2, "ID")
-                                        //        End If
-                                        //        Call core.db.cs_Close(CS2)
-                                        //    End If
-                                        //    Criteria = "(addonid=" & addonId & ")and(StyleId=" & sharedStyleId & ")"
-                                        //    CS2 = core.db.cs_open("Shared Styles Add-on Rules", Criteria)
-                                        //    If Not core.db.cs_ok(CS2) Then
-                                        //        Call core.db.cs_Close(CS2)
-                                        //        CS2 = core.db.cs_insertRecord("Shared Styles Add-on Rules", 0)
-                                        //        If core.db.cs_ok(CS2) Then
-                                        //            Call core.db.cs_set(CS2, "addonid", addonId)
-                                        //            Call core.db.cs_set(CS2, "StyleId", sharedStyleId)
-                                        //        End If
-                                        //    End If
-                                        //    Call core.db.cs_Close(CS2)
-                                        break;
-                                    case "stylesheet":
-                                    case "styles":
-                                        //
-                                        // import exclusive stylesheet if more then whitespace
-                                        //
-                                        test = PageInterfaceWithinLoop.InnerText;
-                                        test = GenericController.vbReplace(test, " ", "");
-                                        test = GenericController.vbReplace(test, "\r", "");
-                                        test = GenericController.vbReplace(test, "\n", "");
-                                        test = GenericController.vbReplace(test, "\t", "");
-                                        if (!string.IsNullOrEmpty(test)) {
-                                            StyleSheet = StyleSheet + "\r\n" + PageInterfaceWithinLoop.InnerText;
-                                        }
-                                        break;
-                                    case "template":
-                                    case "content":
-                                    case "admin":
-                                        //
-                                        // these add-ons will be "non-developer only" in navigation
-                                        //
-                                        FieldName = PageInterfaceWithinLoop.Name;
-                                        FieldValue = PageInterfaceWithinLoop.InnerText;
-                                        if (!core.db.csIsFieldSupported(CS, FieldName)) {
+                                            core.db.csSet(CS, "ScriptingCode", ScriptingCode);
+                                            break;
+                                        case "activexprogramid":
                                             //
-                                            // Bad field name - need to report it somehow
+                                            // save program id
                                             //
-                                        } else {
-                                            core.db.csSet(CS, FieldName, FieldValue);
-                                            if (GenericController.encodeBoolean(PageInterfaceWithinLoop.InnerText)) {
+                                            FieldValue = PageInterfaceWithinLoop.InnerText;
+                                            core.db.csSet(CS, "ObjectProgramID", FieldValue);
+                                            break;
+                                        case "navigator":
+                                            //
+                                            // create a navigator entry with a parent set to this
+                                            //
+                                            core.db.csSave(CS);
+                                            menuNameSpace = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "NameSpace", "");
+                                            if (!string.IsNullOrEmpty(menuNameSpace)) {
+                                                string NavIconTypeString = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "type", "");
+                                                if (string.IsNullOrEmpty(NavIconTypeString)) {
+                                                    NavIconTypeString = "Addon";
+                                                }
+                                                //Dim builder As New coreBuilderClass(core)
+                                                AppBuilderController.verifyNavigatorEntry(core, "", menuNameSpace, addonName, "", "", "", false, false, false, true, addonName, NavIconTypeString, addonName, CollectionID);
+                                            }
+                                            break;
+                                        case "argument":
+                                        case "argumentlist":
+                                            //
+                                            // multiple argumentlist elements are concatinated with crlf
+                                            //
+                                            NewValue = encodeText(PageInterfaceWithinLoop.InnerText).Trim(' ');
+                                            if (!string.IsNullOrEmpty(NewValue)) {
+                                                if (string.IsNullOrEmpty(ArgumentList)) {
+                                                    ArgumentList = NewValue;
+                                                } else if (NewValue != FieldValue) {
+                                                    ArgumentList = ArgumentList + "\r\n" + NewValue;
+                                                }
+                                            }
+                                            break;
+                                        case "style":
+                                            //
+                                            // import exclusive style
+                                            //
+                                            NodeName = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "name", "");
+                                            NewValue = encodeText(PageInterfaceWithinLoop.InnerText).Trim(' ');
+                                            if (NewValue.Left(1) != "{") {
+                                                NewValue = "{" + NewValue;
+                                            }
+                                            if (NewValue.Substring(NewValue.Length - 1) != "}") {
+                                                NewValue = NewValue + "}";
+                                            }
+                                            StyleSheet = StyleSheet + "\r\n" + NodeName + " " + NewValue;
+                                            //Case "includesharedstyle"
+                                            //    '
+                                            //    ' added 9/3/2012
+                                            //    '
+                                            //    sharedStyleId = 0
+                                            //    nodeNameOrGuid =xmlController.GetXMLAttribute(core,IsFound, PageInterface, "guid", "")
+                                            //    If nodeNameOrGuid = "" Then
+                                            //        nodeNameOrGuid =xmlController.GetXMLAttribute(core,IsFound, PageInterface, "name", "")
+                                            //    End If
+                                            //    Criteria = "(ccguid=" & core.db.encodeSQLText(nodeNameOrGuid) & ")"
+                                            //    CS2 = core.db.cs_open("shared styles", Criteria)
+                                            //    If Not core.db.cs_ok(CS2) Then
+                                            //        Call core.db.cs_Close(CS2)
+                                            //        Criteria = "(ccguid is null)and(name=" & core.db.encodeSQLText(nodeNameOrGuid) & ")"
+                                            //        CS2 = core.db.cs_open("shared styles", Criteria)
+                                            //    End If
+                                            //    If core.db.cs_ok(CS2) Then
+                                            //        sharedStyleId = core.db.cs_getInteger(CS2, "ID")
+                                            //    End If
+                                            //    Call core.db.cs_Close(CS2)
+                                            //    If sharedStyleId = 0 Then
+                                            //        CS2 = core.db.cs_insertRecord("shared styles", 0)
+                                            //        If core.db.cs_ok(CS2) Then
+                                            //            Call core.db.cs_set(CS2, "name", nodeNameOrGuid)
+                                            //            Call core.db.cs_set(CS2, "ccguid", nodeNameOrGuid)
+                                            //            sharedStyleId = core.db.cs_getInteger(CS2, "ID")
+                                            //        End If
+                                            //        Call core.db.cs_Close(CS2)
+                                            //    End If
+                                            //    Criteria = "(addonid=" & addonId & ")and(StyleId=" & sharedStyleId & ")"
+                                            //    CS2 = core.db.cs_open("Shared Styles Add-on Rules", Criteria)
+                                            //    If Not core.db.cs_ok(CS2) Then
+                                            //        Call core.db.cs_Close(CS2)
+                                            //        CS2 = core.db.cs_insertRecord("Shared Styles Add-on Rules", 0)
+                                            //        If core.db.cs_ok(CS2) Then
+                                            //            Call core.db.cs_set(CS2, "addonid", addonId)
+                                            //            Call core.db.cs_set(CS2, "StyleId", sharedStyleId)
+                                            //        End If
+                                            //    End If
+                                            //    Call core.db.cs_Close(CS2)
+                                            break;
+                                        case "stylesheet":
+                                        case "styles":
+                                            //
+                                            // import exclusive stylesheet if more then whitespace
+                                            //
+                                            test = PageInterfaceWithinLoop.InnerText;
+                                            test = GenericController.vbReplace(test, " ", "");
+                                            test = GenericController.vbReplace(test, "\r", "");
+                                            test = GenericController.vbReplace(test, "\n", "");
+                                            test = GenericController.vbReplace(test, "\t", "");
+                                            if (!string.IsNullOrEmpty(test)) {
+                                                StyleSheet = StyleSheet + "\r\n" + PageInterfaceWithinLoop.InnerText;
+                                            }
+                                            break;
+                                        case "template":
+                                        case "content":
+                                        case "admin":
+                                            //
+                                            // these add-ons will be "non-developer only" in navigation
+                                            //
+                                            FieldName = PageInterfaceWithinLoop.Name;
+                                            FieldValue = PageInterfaceWithinLoop.InnerText;
+                                            if (!core.db.csIsFieldSupported(CS, FieldName)) {
                                                 //
-                                                // if template, admin or content - let non-developers have navigator entry
-                                                //
-                                            }
-                                        }
-                                        break;
-                                    case "icon":
-                                        //
-                                        // icon
-                                        //
-                                        FieldValue = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "link", "");
-                                        if (!string.IsNullOrEmpty(FieldValue)) {
-                                            //
-                                            // Icons can be either in the root of the website or in content files
-                                            //
-                                            FieldValue = GenericController.vbReplace(FieldValue, "\\", "/"); // make it a link, not a file
-                                            if (GenericController.vbInstr(1, FieldValue, "://") != 0) {
-                                                //
-                                                // the link is an absolute URL, leave it link this
+                                                // Bad field name - need to report it somehow
                                                 //
                                             } else {
-                                                if (FieldValue.Left(1) != "/") {
+                                                core.db.csSet(CS, FieldName, FieldValue);
+                                                if (GenericController.encodeBoolean(PageInterfaceWithinLoop.InnerText)) {
                                                     //
-                                                    // make sure it starts with a slash to be consistance
+                                                    // if template, admin or content - let non-developers have navigator entry
                                                     //
-                                                    FieldValue = "/" + FieldValue;
-                                                }
-                                                if (FieldValue.Left(17) == "/contensivefiles/") {
-                                                    //
-                                                    // in content files, start link without the slash
-                                                    //
-                                                    FieldValue = FieldValue.Substring(17);
                                                 }
                                             }
-                                            core.db.csSet(CS, "IconFilename", FieldValue);
+                                            break;
+                                        case "icon":
+                                            //
+                                            // icon
+                                            //
+                                            FieldValue = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "link", "");
+                                            if (!string.IsNullOrEmpty(FieldValue)) {
+                                                //
+                                                // Icons can be either in the root of the website or in content files
+                                                //
+                                                FieldValue = GenericController.vbReplace(FieldValue, "\\", "/"); // make it a link, not a file
+                                                if (GenericController.vbInstr(1, FieldValue, "://") != 0) {
+                                                    //
+                                                    // the link is an absolute URL, leave it link this
+                                                    //
+                                                } else {
+                                                    if (FieldValue.Left(1) != "/") {
+                                                        //
+                                                        // make sure it starts with a slash to be consistance
+                                                        //
+                                                        FieldValue = "/" + FieldValue;
+                                                    }
+                                                    if (FieldValue.Left(17) == "/contensivefiles/") {
+                                                        //
+                                                        // in content files, start link without the slash
+                                                        //
+                                                        FieldValue = FieldValue.Substring(17);
+                                                    }
+                                                }
+                                                core.db.csSet(CS, "IconFilename", FieldValue);
+                                                if (true) {
+                                                    core.db.csSet(CS, "IconWidth", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "width", "0")));
+                                                    core.db.csSet(CS, "IconHeight", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "height", "0")));
+                                                    core.db.csSet(CS, "IconSprites", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "sprites", "0")));
+                                                }
+                                            }
+                                            break;
+                                        case "includeaddon":
+                                        case "includeadd-on":
+                                        case "include addon":
+                                        case "include add-on":
+                                            //
+                                            // processed in phase2 of this routine, after all the add-ons are installed
+                                            //
+                                            break;
+                                        case "form":
+                                            //
+                                            // The value of this node is the xml instructions to create a form. Take then
+                                            //   entire node, children and all, and save them in the formxml field.
+                                            //   this replaces the settings add-on type, and soo to be report add-on types as well.
+                                            //   this removes the ccsettingpages and settingcollectionrules, etc.
+                                            //
                                             if (true) {
-                                                core.db.csSet(CS, "IconWidth", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "width", "0")));
-                                                core.db.csSet(CS, "IconHeight", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "height", "0")));
-                                                core.db.csSet(CS, "IconSprites", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "sprites", "0")));
+                                                core.db.csSet(CS, "formxml", PageInterfaceWithinLoop.InnerXml);
                                             }
-                                        }
-                                        break;
-                                    case "includeaddon":
-                                    case "includeadd-on":
-                                    case "include addon":
-                                    case "include add-on":
-                                        //
-                                        // processed in phase2 of this routine, after all the add-ons are installed
-                                        //
-                                        break;
-                                    case "form":
-                                        //
-                                        // The value of this node is the xml instructions to create a form. Take then
-                                        //   entire node, children and all, and save them in the formxml field.
-                                        //   this replaces the settings add-on type, and soo to be report add-on types as well.
-                                        //   this removes the ccsettingpages and settingcollectionrules, etc.
-                                        //
-                                        if (true) {
-                                            core.db.csSet(CS, "formxml", PageInterfaceWithinLoop.InnerXml);
-                                        }
-                                        break;
-                                    case "javascript":
-                                    case "javascriptinhead":
-                                        //
-                                        // these all translate to JSFilename
-                                        //
-                                        FieldName = "jsfilename";
-                                        core.db.csSet(CS, FieldName, PageInterfaceWithinLoop.InnerText);
+                                            break;
+                                        case "javascript":
+                                        case "javascriptinhead":
+                                            //
+                                            // these all translate to JSFilename
+                                            //
+                                            FieldName = "jsfilename";
+                                            core.db.csSet(CS, FieldName, PageInterfaceWithinLoop.InnerText);
 
-                                        break;
-                                    case "iniframe":
-                                        //
-                                        // typo - field is inframe
-                                        //
-                                        FieldName = "inframe";
-                                        core.db.csSet(CS, FieldName, PageInterfaceWithinLoop.InnerText);
-                                        break;
-                                    default:
-                                        //
-                                        // All the other fields should match the Db fields
-                                        //
-                                        FieldName = PageInterfaceWithinLoop.Name;
-                                        FieldValue = PageInterfaceWithinLoop.InnerText;
-                                        if (!core.db.csIsFieldSupported(CS, FieldName)) {
+                                            break;
+                                        case "iniframe":
                                             //
-                                            // Bad field name - need to report it somehow
+                                            // typo - field is inframe
                                             //
-                                            LogController.handleError(core, new GenericException("bad field found [" + FieldName + "], in addon node [" + addonName + "], of collection [" + core.db.getRecordName("add-on collections", CollectionID) + "]"));
-                                        } else {
-                                            core.db.csSet(CS, FieldName, FieldValue);
-                                        }
-                                        break;
+                                            FieldName = "inframe";
+                                            core.db.csSet(CS, FieldName, PageInterfaceWithinLoop.InnerText);
+                                            break;
+                                        default:
+                                            //
+                                            // All the other fields should match the Db fields
+                                            //
+                                            FieldName = PageInterfaceWithinLoop.Name;
+                                            FieldValue = PageInterfaceWithinLoop.InnerText;
+                                            if (!core.db.csIsFieldSupported(CS, FieldName)) {
+                                                //
+                                                // Bad field name - need to report it somehow
+                                                //
+                                                LogController.handleError(core, new ApplicationException("bad field found [" + FieldName + "], in addon node [" + addonName + "], of collection [" + core.db.getRecordName("add-on collections", CollectionID) + "]"));
+                                            } else {
+                                                core.db.csSet(CS, FieldName, FieldValue);
+                                            }
+                                            break;
+                                    }
                                 }
                             }
                         }

@@ -66,7 +66,7 @@ namespace Contensive.Processor.Models.Db {
         //====================================================================================================
         //-- field types
         //
-        public abstract class FieldCdnFile {
+        public abstract class FieldTypeFileBase {
             //
             // -- 
             // during load
@@ -108,6 +108,7 @@ namespace Contensive.Processor.Models.Db {
                 set {
                     _content = value;
                     contentUpdated = true;
+                    contentLoaded = true;
                 }
                 get {
                     if (!contentLoaded) {
@@ -134,13 +135,13 @@ namespace Contensive.Processor.Models.Db {
             public CoreController internalcore { get; set; } = null;
         }
         //
-        public class FieldTypeTextFile : FieldCdnFile {
+        public class FieldTypeTextFile : FieldTypeFileBase {
         }
-        public class FieldTypeJavascriptFile : FieldCdnFile {
+        public class FieldTypeJavascriptFile : FieldTypeFileBase {
         }
-        public class FieldTypeCSSFile : FieldCdnFile {
+        public class FieldTypeCSSFile : FieldTypeFileBase {
         }
-        public class FieldTypeHTMLFile : FieldCdnFile {
+        public class FieldTypeHTMLFile : FieldTypeFileBase {
         }
         //
         //====================================================================================================
@@ -750,44 +751,82 @@ namespace Contensive.Processor.Models.Db {
                                         sqlPairs.add(instanceProperty.Name, core.db.encodeSQLNumber(valueDbl));
                                         //cs.setField(instanceProperty.Name, valueDbl);
                                         break;
-                                    case "FieldTypeTextFile": {
-                                            fieldTypeId = fieldTypeIdFileText;
-                                            FieldTypeTextFile fileProperty = (FieldTypeTextFile)instanceProperty.GetValue(this);
-                                            fileProperty.internalcore = core;
-                                            contentProperty = instanceProperty.PropertyType.GetProperty("content");
-                                            contentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
-                                            fileContentUpdated = (bool)contentUpdatedProperty.GetValue(fileProperty);
-                                            content = (string)contentProperty.GetValue(fileProperty);
+                                    case "FieldTypeTextFile":
+                                    case "FieldTypeJavascriptFile":
+                                    case "FieldTypeCSSFile":
+                                    case "FieldTypeHTMLFile":
+                                        int fieldTypeId = 0;
+                                        bool fileFieldContentUpdated = false;
+                                        string fileFieldContent = "";
+                                        string fileFieldFilename = "";
+                                        switch (instanceProperty.PropertyType.Name) {
+                                            case "FieldTypeJavascriptFile": {
+                                                    fieldTypeId = FieldTypeIdFileJavascript;
+                                                    FieldTypeJavascriptFile fileProperty = (FieldTypeJavascriptFile)instanceProperty.GetValue(this);
+                                                    fileProperty.internalcore = core;
+                                                    PropertyInfo fileFieldContentProperty = instanceProperty.PropertyType.GetProperty("content");
+                                                    fileFieldContent = (string)fileFieldContentProperty.GetValue(fileProperty);
+                                                    PropertyInfo fileFieldContentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
+                                                    fileFieldContentUpdated = (bool)fileFieldContentUpdatedProperty.GetValue(fileProperty);
+                                                    PropertyInfo fileFieldFilenameProperty = instanceProperty.PropertyType.GetProperty("filename");
+                                                    fileFieldFilename = (string)fileFieldFilenameProperty.GetValue(fileProperty);
+                                                    break;
+                                                }
+                                            case "FieldTypeCSSFile": {
+                                                    fieldTypeId = FieldTypeIdFileCSS;
+                                                    FieldTypeCSSFile fileProperty = (FieldTypeCSSFile)instanceProperty.GetValue(this);
+                                                    fileProperty.internalcore = core;
+                                                    PropertyInfo fileFieldContentProperty = instanceProperty.PropertyType.GetProperty("content");
+                                                    fileFieldContent = (string)fileFieldContentProperty.GetValue(fileProperty);
+                                                    PropertyInfo fileFieldContentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
+                                                    fileFieldContentUpdated = (bool)fileFieldContentUpdatedProperty.GetValue(fileProperty);
+                                                    PropertyInfo fileFieldFilenameProperty = instanceProperty.PropertyType.GetProperty("filename");
+                                                    fileFieldFilename = (string)fileFieldFilenameProperty.GetValue(fileProperty);
+                                                    break;
+                                                }
+                                            case "FieldTypeHTMLFile": {
+                                                    fieldTypeId = FieldTypeIdFileHTML;
+                                                    FieldTypeHTMLFile fileProperty = (FieldTypeHTMLFile)instanceProperty.GetValue(this);
+                                                    fileProperty.internalcore = core;
+                                                    PropertyInfo fileFieldContentProperty = instanceProperty.PropertyType.GetProperty("content");
+                                                    fileFieldContent = (string)fileFieldContentProperty.GetValue(fileProperty);
+                                                    PropertyInfo fileFieldContentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
+                                                    fileFieldContentUpdated = (bool)fileFieldContentUpdatedProperty.GetValue(fileProperty);
+                                                    PropertyInfo fileFieldFilenameProperty = instanceProperty.PropertyType.GetProperty("filename");
+                                                    fileFieldFilename = (string)fileFieldFilenameProperty.GetValue(fileProperty);
+                                                    break;
+                                                }
+                                            default: {
+                                                    fieldTypeId = FieldTypeIdFileText;
+                                                    FieldTypeTextFile fileProperty = (FieldTypeTextFile)instanceProperty.GetValue(this);
+                                                    fileProperty.internalcore = core;
+                                                    PropertyInfo fileFieldContentProperty = instanceProperty.PropertyType.GetProperty("content");
+                                                    fileFieldContent = (string)fileFieldContentProperty.GetValue(fileProperty);
+                                                    PropertyInfo fileFieldContentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
+                                                    fileFieldContentUpdated = (bool)fileFieldContentUpdatedProperty.GetValue(fileProperty);
+                                                    PropertyInfo fileFieldFilenameProperty = instanceProperty.PropertyType.GetProperty("filename");
+                                                    fileFieldFilename = (string)fileFieldFilenameProperty.GetValue(fileProperty);
+                                                    break;
+                                                }
                                         }
-                                        break;
-                                    case "FieldTypeJavascriptFile": {
-                                            fieldTypeId = fieldTypeIdFileJavascript;
-                                            FieldTypeJavascriptFile fileProperty = (FieldTypeJavascriptFile)instanceProperty.GetValue(this);
-                                            fileProperty.internalcore = core;
-                                            contentProperty = instanceProperty.PropertyType.GetProperty("content");
-                                            contentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
-                                            fileContentUpdated = (bool)contentUpdatedProperty.GetValue(fileProperty);
-                                            content = (string)contentProperty.GetValue(fileProperty);
-                                        }
-                                        break;
-                                    case "FieldTypeCSSFile": {
-                                            fieldTypeId = fieldTypeIdFileCSS;
-                                            FieldTypeCSSFile fileProperty = (FieldTypeCSSFile)instanceProperty.GetValue(this);
-                                            fileProperty.internalcore = core;
-                                            contentProperty = instanceProperty.PropertyType.GetProperty("content");
-                                            contentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
-                                            fileContentUpdated = (bool)contentUpdatedProperty.GetValue(fileProperty);
-                                            content = (string)contentProperty.GetValue(fileProperty);
-                                        }
-                                        break;
-                                    case "FieldTypeHTMLFile": {
-                                            fieldTypeId = fieldTypeIdFileHTML;
-                                            FieldTypeHTMLFile fileProperty = (FieldTypeHTMLFile)instanceProperty.GetValue(this);
-                                            fileProperty.internalcore = core;
-                                            contentProperty = instanceProperty.PropertyType.GetProperty("content");
-                                            contentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
-                                            fileContentUpdated = (bool)contentUpdatedProperty.GetValue(fileProperty);
-                                            content = (string)contentProperty.GetValue(fileProperty);
+                                        if (fileFieldContentUpdated) {
+                                            //
+                                            string readBufferfilename = cs.getValue(instanceProperty.Name);
+                                            if (string.IsNullOrEmpty(fileFieldContent)) {
+                                                //
+                                                // -- empty content, delete file, clear filename from Db field
+                                                if (!string.IsNullOrEmpty(readBufferfilename)) {
+                                                    cs.setField(instanceProperty.Name, "");
+                                                    core.cdnFiles.deleteFile(readBufferfilename);
+                                                }
+                                            } else {
+                                                //
+                                                // -- save content
+                                                string filename = (!string.IsNullOrEmpty(fileFieldFilename)) ? fileFieldFilename : readBufferfilename;
+                                                if (string.IsNullOrEmpty(filename)) filename = FileController.getVirtualRecordUnixPathFilename(tableName, instanceProperty.Name.ToLower(), id, fieldTypeId);
+                                                core.cdnFiles.saveFile(filename, fileFieldContent);
+                                                cs.setFieldFilename(instanceProperty.Name, filename);
+                                            }
                                         }
                                         break;
                                     default:
@@ -916,31 +955,6 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         /// <summary>
-        /// create a list of objects based on the sql criteria
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="core"></param>
-        /// <param name="sqlCriteria"></param>
-        /// <returns></returns>
-        protected static List<T> createList<T>(CoreController core, string sqlCriteria) where T : BaseModel {
-            return createList<T>(core, sqlCriteria, "id", new List<string> { });
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// create a list of objects based on the sql criteria and sort order
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="core"></param>
-        /// <param name="sqlCriteria"></param>
-        /// <param name="sqlOrderBy"></param>
-        /// <returns></returns>
-        protected static List<T> createList<T>(CoreController core, string sqlCriteria, string sqlOrderBy) where T : BaseModel {
-            return createList<T>(core, sqlCriteria, sqlOrderBy, new List<string> { });
-        }
-        //
-        //====================================================================================================
-        /// <summary>
         /// create a list of objects based on the sql criteria and sort order, and add a cache object to an argument
         /// </summary>
         /// <param name="cp"></param>
@@ -974,6 +988,29 @@ namespace Contensive.Processor.Models.Db {
             }
             return result;
         }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// create a list of objects based on the sql criteria and sort order
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="core"></param>
+        /// <param name="sqlCriteria"></param>
+        /// <param name="sqlOrderBy"></param>
+        /// <returns></returns>
+        protected static List<T> createList<T>(CoreController core, string sqlCriteria, string sqlOrderBy) where T : BaseModel => createList<T>(core, sqlCriteria, sqlOrderBy, new List<string> { });
+        //
+        //====================================================================================================
+        /// <summary>
+        /// create a list of objects based on the sql criteria
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="core"></param>
+        /// <param name="sqlCriteria"></param>
+        /// <returns></returns>
+        protected static List<T> createList<T>(CoreController core, string sqlCriteria) where T : BaseModel => createList<T>(core, sqlCriteria, "id", new List<string> { });
+        //
+        protected static List<T> createList<T>(CoreController core) where T : BaseModel => createList<T>(core, "", "id", new List<string> { });
         //
         //====================================================================================================
         /// <summary>

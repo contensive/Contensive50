@@ -172,7 +172,7 @@ namespace Contensive.Processor.Controllers {
                                         if (cpApp.Site.GetBoolean("Run tasks in service process")) {
                                             //
                                             // -- execute here
-                                            runTask(cpApp.Site.Name, runnerGuid);
+                                            executeRunnerTasks(cpApp.Site.Name, runnerGuid);
                                         } else {
                                             //
                                             // -- execute in new  process
@@ -207,30 +207,46 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// run as single task from the cctasks table of an app, makred with a runnerGuid
         /// called from runTasks or from the cli in a different process
+        /// when the task starts, 
+        /// saves the addons output to the task.filename
         /// </summary>
-        public static void runTask(string appName, string runnerGuid) {
+        public static void executeRunnerTasks(string appName, string runnerGuid) {
             try {
                 using (var cp = new Contensive.Processor.CPClass(appName)) {
-                    //
-                    // -- execute here
                     foreach (var task in TaskModel.createList(cp.core, "(cmdRunner=" + cp.core.db.encodeSQLText(runnerGuid) + ")and(datestarted is null)", "id")) {
                         //
-                        Console.WriteLine("runTask, runTask, task [" + task.name + "], command [" + task.command + "], cmdDetail [" + task.cmdDetail + "]");
-                        LogController.logTrace(cp.core, "runTask, task [" + task.name + "], command [" + task.command + "], cmdDetail [" + task.cmdDetail + "]");
+                        Console.WriteLine("runTask, runTask, task [" + task.name + "], cmdDetail [" + task.cmdDetail + "]");
+                        LogController.logTrace(cp.core, "runTask, task [" + task.name + "], cmdDetail [" + task.cmdDetail + "]");
                         //
-                        //tasksRemaining = true;
-                        task.dateStarted = DateTime.Now;
+                        DateTime dateStarted = DateTime.Now;
+                        task.dateStarted = dateStarted;
                         task.save(cp.core);
-                        CmdDetailClass cmdDetail = cp.core.json.Deserialize<CmdDetailClass>(task.cmdDetail);
-                        switch ((task.command.ToLowerInvariant())) {
-                            case TaskQueueCommandEnumModule.runAddon:
-                                cp.core.addon.execute(AddonModel.create(cp.core, cmdDetail.addonId), new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
+                        var cmdDetail = cp.core.json.Deserialize<TaskModel.cmdDetailClass>(task.cmdDetail);
+                        if (cmdDetail != null) {
+                            var addon = AddonModel.create(cp.core, cmdDetail.addonId);
+                            if ( addon != null ) {
+                                var context = new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
                                     backgroundProcess = true,
                                     addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple,
                                     instanceArguments = cmdDetail.args,
                                     errorContextMessage = "running task, addon [" + cmdDetail.addonId + "]"
-                                });
-                                break;
+                                };
+                                string result = cp.core.addon.execute(addon, context);
+                                if ( task.resultDownloadId>0) {
+                                    var download = DownloadModel.create(cp.core, task.resultDownloadId);
+                                    if ( download != null ) {
+                                        if ( string.IsNullOrEmpty( download.name )) {
+                                            download.name = "Download";
+                                        }
+                                        download.resultMessage = "Completed";
+                                        download.filename.content = result;
+                                        download.dateRequested = dateStarted;
+                                        download.dateCompleted = DateTime.Now;
+                                        download.save(cp.core);
+                                    }
+                                }
+                                task.filename.content = result;
+                            }
                         }
                         task.dateCompleted = DateTime.Now;
                         task.save(cp.core);

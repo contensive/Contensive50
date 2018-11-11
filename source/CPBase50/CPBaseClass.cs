@@ -237,5 +237,4 @@ namespace Contensive.BaseClasses {
         public abstract CPFileSystemBaseClass PrivateFiles { get; }
         //
     }
-
 }

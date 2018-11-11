@@ -572,14 +572,14 @@ namespace Contensive.Processor {
                 }
                 //
                 if (!string.IsNullOrEmpty(Width)) {
-                    WidthTest = GenericController.encodeInteger(Width.ToLowerInvariant().Replace("px", ""));
-                    if (WidthTest != 0) {
-                        Style = Style + "width:" + WidthTest + "px;";
-                        Copy += "<img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=\"" + WidthTest + "\" height=1 border=0>";
-                        //Copy = Copy & "<br><img alt=""space"" src=""/ContensiveBase/images/spacer.gif"" width=""" & WidthTest & """ height=1 border=0>"
-                    } else {
-                        Style = Style + "width:" + Width + ";";
-                    }
+                    Style = Style + "width:" + Width + ";";
+                    //WidthTest = GenericController.encodeInteger(Width.ToLower().Replace("px", ""));
+                    //if (WidthTest != 0) {
+                    //    Style = Style + "width:" + WidthTest + "px;";
+                    //    Copy += "<img alt=\"space\" src=\"/ccLib/images/spacer.gif\" width=\"" + WidthTest + "\" height=1 border=0>";
+                    //    //Copy = Copy & "<br><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""" & WidthTest & """ height=1 border=0>"
+                    //} else {
+                    //}
                 }
                 result = "\r\n<td style=\"" + Style + "\" class=\"" + ClassStyle + "\">" + Copy + "</td>";
             } catch (Exception ex) {
@@ -703,7 +703,7 @@ namespace Contensive.Processor {
                 // ----- Header
                 //
                 Content.Add("\r\n<tr>");
-                Content.Add(getReport_CellHeader(core, 0, "Row", "50", "Right", "ccAdminListCaption", RQS, SortingStateEnum.NotSortable));
+                Content.Add(getReport_CellHeader(core, 0, "&nbsp", "50px", "Right", "ccAdminListCaption", RQS, SortingStateEnum.NotSortable));
                 for (ColumnPtr = 0; ColumnPtr < ColumnCount; ColumnPtr++) {
                     ColumnWidth = ColWidth[ColumnPtr];
                     if (!ColSortable[ColumnPtr]) {
@@ -1184,26 +1184,35 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         //
-        public static string getDefaultEditor_Date( CoreController core, string fieldName, DateTime FieldValueDate, bool readOnly = false, string htmlId = "", bool fieldRequired = false, string WhyReadOnlyMsg = "") {
-            string result = "";
-            string fieldValue_text = "";
-            if (FieldValueDate == DateTime.MinValue) {
-                fieldValue_text = "";
-            } else {
-                fieldValue_text = encodeText(FieldValueDate);
+        public static string getDefaultEditor_DateTime( CoreController core, string fieldName, DateTime FieldValueDate, bool readOnly = false, string htmlId = "", bool fieldRequired = false, string WhyReadOnlyMsg = "") {
+            string inputDate = "";
+            if (FieldValueDate.CompareTo(new DateTime(1900,1,1))>0) {
+                if (FieldValueDate.Hour.Equals(0) && FieldValueDate.Minute.Equals(0) && FieldValueDate.Second.Equals(0)) {
+                    inputDate = FieldValueDate.ToShortDateString();
+                } else {
+                    inputDate = FieldValueDate.ToString();
+                }
             }
-            if (readOnly) {
-                //
-                // -- readOnly
-                result += HtmlController.inputHidden(fieldName, fieldValue_text);
-                result += HtmlController.inputText( core,fieldName, fieldValue_text, -1, -1, "", false, true, "date form-control");
-                result += WhyReadOnlyMsg;
-            } else {
-                //
-                // -- editable
-                result += HtmlController.inputDate( core,fieldName, encodeDate(fieldValue_text),"",htmlId, "date form-control", readOnly, fieldRequired);
-            }
-            return result;
+            return getDefaultEditor_Text(core, fieldName, inputDate, readOnly, htmlId);
+            //string result = "";
+            //string fieldValue_text = "";
+            //if (FieldValueDate == DateTime.MinValue) {
+            //    fieldValue_text = "";
+            //} else {
+            //    fieldValue_text = encodeText(FieldValueDate);
+            //}
+            //if (readOnly) {
+            //    //
+            //    // -- readOnly
+            //    result += HtmlController.inputHidden(fieldName, fieldValue_text);
+            //    result += HtmlController.inputText( core,fieldName, fieldValue_text, -1, -1, "", false, true, "date form-control");
+            //    result += WhyReadOnlyMsg;
+            //} else {
+            //    //
+            //    // -- editable
+            //    result += HtmlController.inputDateTime( core,fieldName, encodeDate(fieldValue_text),"",htmlId, "date form-control", readOnly, fieldRequired);
+            //}
+            //return result;
         }
         //
         // ====================================================================================================
