@@ -65,7 +65,7 @@ namespace Contensive.Processor.Models.Db {
         //====================================================================================================
         //-- field types
         //
-        public abstract class FieldCdnFile {
+        public abstract class FieldTypeFileBase {
             //
             // -- 
             // during load
@@ -132,13 +132,13 @@ namespace Contensive.Processor.Models.Db {
             public CoreController internalcore { get; set; } = null;
         }
         //
-        public class FieldTypeTextFile : FieldCdnFile {
+        public class FieldTypeTextFile : FieldTypeFileBase {
         }
-        public class FieldTypeJavascriptFile : FieldCdnFile {
+        public class FieldTypeJavascriptFile : FieldTypeFileBase {
         }
-        public class FieldTypeCSSFile : FieldCdnFile {
+        public class FieldTypeCSSFile : FieldTypeFileBase {
         }
-        public class FieldTypeHTMLFile : FieldCdnFile {
+        public class FieldTypeHTMLFile : FieldTypeFileBase {
         }
         //
         //====================================================================================================
@@ -873,31 +873,6 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         /// <summary>
-        /// create a list of objects based on the sql criteria
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="core"></param>
-        /// <param name="sqlCriteria"></param>
-        /// <returns></returns>
-        protected static List<T> createList<T>(CoreController core, string sqlCriteria) where T : BaseModel {
-            return createList<T>(core, sqlCriteria, "id", new List<string> { });
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// create a list of objects based on the sql criteria and sort order
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="core"></param>
-        /// <param name="sqlCriteria"></param>
-        /// <param name="sqlOrderBy"></param>
-        /// <returns></returns>
-        protected static List<T> createList<T>(CoreController core, string sqlCriteria, string sqlOrderBy) where T : BaseModel {
-            return createList<T>(core, sqlCriteria, sqlOrderBy, new List<string> { });
-        }
-        //
-        //====================================================================================================
-        /// <summary>
         /// create a list of objects based on the sql criteria and sort order, and add a cache object to an argument
         /// </summary>
         /// <param name="cp"></param>
@@ -940,6 +915,29 @@ namespace Contensive.Processor.Models.Db {
             }
             return result;
         }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// create a list of objects based on the sql criteria and sort order
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="core"></param>
+        /// <param name="sqlCriteria"></param>
+        /// <param name="sqlOrderBy"></param>
+        /// <returns></returns>
+        protected static List<T> createList<T>(CoreController core, string sqlCriteria, string sqlOrderBy) where T : BaseModel => createList<T>(core, sqlCriteria, sqlOrderBy, new List<string> { });
+        //
+        //====================================================================================================
+        /// <summary>
+        /// create a list of objects based on the sql criteria
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="core"></param>
+        /// <param name="sqlCriteria"></param>
+        /// <returns></returns>
+        protected static List<T> createList<T>(CoreController core, string sqlCriteria) where T : BaseModel => createList<T>(core, sqlCriteria, "id", new List<string> { });
+        //
+        protected static List<T> createList<T>(CoreController core) where T : BaseModel => createList<T>(core, "", "id", new List<string> { });
         //
         //====================================================================================================
         /// <summary>

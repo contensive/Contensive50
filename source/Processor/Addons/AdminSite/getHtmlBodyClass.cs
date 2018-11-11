@@ -9250,15 +9250,11 @@ namespace Contensive.Addons.AdminSite {
         private string GetForm_Downloads() {
             string tempGetForm_Downloads = null;
             try {
-                string ResultMessage = null;
                 string LinkPrefix = null;
                 string LinkSuffix = null;
                 string RemoteKey = null;
                 string Button = null;
-                int CS = 0;
                 string ContentName = null;
-                int RecordID = 0;
-                string SQL = null;
                 string RQS = null;
                 string Criteria = null;
                 int PageSize = 0;
@@ -9274,7 +9270,6 @@ namespace Contensive.Addons.AdminSite {
                 string[] ColWidth = null;
                 string[,] Cells = null;
                 string AdminURL = null;
-                DateTime DateCompleted = default(DateTime);
                 int RowCnt = 0;
                 int RowPtr = 0;
                 int ContentID = 0;
@@ -9367,7 +9362,7 @@ namespace Contensive.Addons.AdminSite {
                                 } else if ((string.IsNullOrEmpty(Format)) && (ContentID != 0)) {
                                     Description = Description + "<p>Please select a Format before requesting a download</p>";
                                 } else if (Format == "CSV") {
-                                    CS = core.db.csInsertRecord("Tasks");
+                                    int CS = core.db.csInsertRecord("Tasks");
                                     if (core.db.csOk(CS)) {
                                         ContentName = CDefModel.getContentNameByID(core, ContentID);
                                         TableName = CDefModel.getContentTablename(core, ContentName);
@@ -9384,7 +9379,7 @@ namespace Contensive.Addons.AdminSite {
                                     Format = "";
                                     ContentID = 0;
                                 } else if (Format == "XML") {
-                                    CS = core.db.csInsertRecord("Tasks");
+                                    int CS = core.db.csInsertRecord("Tasks");
                                     if (core.db.csOk(CS)) {
                                         ContentName = CDefModel.getContentNameByID(core, ContentID);
                                         TableName = CDefModel.getContentTablename(core, ContentName);
@@ -9453,104 +9448,39 @@ namespace Contensive.Addons.AdminSite {
                     ColWidth[ColumnPtr] = "100";
                     ColumnPtr = ColumnPtr + 1;
                     //
-                    //   Get Data
+                    //   Get Downloads available
                     //
-                    SQL = "select M.Name as CreatedByName, T.* from ccTasks T left join ccMembers M on M.ID=T.CreatedBy where (T.Command='BuildCSV')or(T.Command='BuildXML') order by T.DateAdded Desc";
-                    //Call core.main_TestPoint("Selection SQL=" & SQL)
-                    CS = core.db.csOpenSql(SQL, "Default", PageSize, PageNumber);
-                    RowPointer = 0;
-                    if (!core.db.csOk(CS)) {
+                    var downloadList = DownloadModel.createList(core, "", "id desc");
+                    if ( downloadList.Count==0) {
                         Cells[0, 1] = "There are no download requests";
                         RowPointer = 1;
                     } else {
-                        DataRowCount = core.db.csGetRowCount(CS);
+                        RowPointer = 0;
+                        DataRowCount = downloadList.Count;
                         LinkPrefix = "<a href=\"" + core.appConfig.cdnFileUrl;
                         LinkSuffix = "\" target=_blank>Available</a>";
-                        while (core.db.csOk(CS) && (RowPointer < PageSize)) {
-                            RecordID = core.db.csGetInteger(CS, "ID");
-                            DateCompleted = core.db.csGetDate(CS, "DateCompleted");
-                            ResultMessage = core.db.csGetText(CS, "ResultMessage");
-                            Cells[RowPointer, 0] = HtmlController.checkbox("Row" + RowPointer) + HtmlController.inputHidden("RowID" + RowPointer, RecordID);
-                            Cells[RowPointer, 1] = core.db.csGetText(CS, "name");
-                            Cells[RowPointer, 2] = core.db.csGetText(CS, "CreatedByName");
-                            Cells[RowPointer, 3] = core.db.csGetDate(CS, "DateAdded").ToShortDateString();
-                            if (DateCompleted == DateTime.MinValue) {
-                                RemoteKey = RemoteQueryController.main_GetRemoteQueryKey(core, "select DateCompleted,filename,resultMessage from cctasks where id=" + RecordID, "default", 1);
-                                Cell = "";
-                                Cell = Cell + "\r\n<div id=\"pending" + RowPointer + "\">Pending <img src=\"/ccLib/images/ajax-loader-small.gif\" width=16 height=16></div>";
-                                //
-                                Cell = Cell + "\r\n<script>";
-                                Cell = Cell + "\r\nfunction statusHandler" + RowPointer + "(results) {";
-                                Cell = Cell + "\r\n var jo,isDone=false;";
-                                Cell = Cell + "\r\n eval('jo='+results);";
-                                Cell = Cell + "\r\n if (jo){";
-                                Cell = Cell + "\r\n  if(jo.DateCompleted) {";
-                                Cell = Cell + "\r\n    var dst=document.getElementById('pending" + RowPointer + "');";
-                                Cell = Cell + "\r\n    isDone=true;";
-                                Cell = Cell + "\r\n    if(jo.resultMessage=='OK') {";
-                                Cell = Cell + "\r\n      dst.innerHTML='" + LinkPrefix + "'+jo.filename+'" + LinkSuffix + "';";
-                                Cell = Cell + "\r\n    }else{";
-                                Cell = Cell + "\r\n      dst.innerHTML='error';";
-                                Cell = Cell + "\r\n    }";
-                                Cell = Cell + "\r\n  }";
-                                Cell = Cell + "\r\n }";
-                                Cell = Cell + "\r\n if(!isDone) setTimeout(\"requestStatus" + RowPointer + "()\",5000)";
-                                Cell = Cell + "\r\n}";
-                                //
-                                Cell = Cell + "\r\nfunction requestStatus" + RowPointer + "() {";
-                                Cell = Cell + "\r\n  cj.ajax.getNameValue(statusHandler" + RowPointer + ",'" + RemoteKey + "');";
-                                Cell = Cell + "\r\n}";
-                                Cell = Cell + "\r\nrequestStatus" + RowPointer + "();";
-                                Cell = Cell + "\r\n</script>";
-                                //
-                                Cells[RowPointer, 4] = Cell;
-                            } else if (ResultMessage == "ok") {
-                                Cells[RowPointer, 4] = "<div id=\"pending" + RowPointer + "\">" + LinkPrefix + core.db.csGetText(CS, "filename") + LinkSuffix + "</div>";
+                        foreach (var download in downloadList) {
+                            if (RowPointer >= PageSize) break;
+                            var requestedBy = PersonModel.create(core, download.requestedBy);
+                            Cells[RowPointer, 0] = HtmlController.checkbox("Row" + RowPointer) + HtmlController.inputHidden("RowID" + RowPointer, download.id);
+                            Cells[RowPointer, 1] = download.name;
+                            Cells[RowPointer, 2] = (requestedBy == null) ? "unknown" : requestedBy.name;
+                            Cells[RowPointer, 3] = download.dateRequested.ToString();
+                            if ( download.dateCompleted == DateTime.MinValue) {
+                                Cells[RowPointer, 4] = "\r\n<div id=\"pending" + RowPointer + "\">Pending <img src=\"/ccLib/images/ajax-loader-small.gif\" width=16 height=16></div>";
+                            } else if (!string.IsNullOrEmpty(download.filename.filename)) {
+                                Cells[RowPointer, 4] = "<div id=\"pending" + RowPointer + "\">" + LinkPrefix + download.filename.filename + LinkSuffix + "</div>";
                             } else {
-                                Cells[RowPointer, 4] = "<div id=\"pending" + RowPointer + "\"><a href=\"javascript:alert('" + GenericController.EncodeJavascriptStringSingleQuote(ResultMessage) + ";return false');\">error</a></div>";
+                                Cells[RowPointer, 4] = "<div id=\"pending" + RowPointer + "\">error</div>";
                             }
                             RowPointer = RowPointer + 1;
-                            core.db.csGoNext(CS);
                         }
                     }
-                    core.db.csClose(ref CS);
                     Tab0.Add(HtmlController.inputHidden("RowCnt", RowPointer));
                     Cell = AdminUIController.getReport(core, RowPointer, ColCaption, ColAlign, ColWidth, Cells, PageSize, PageNumber, PreTableCopy, PostTableCopy, DataRowCount, "ccPanel");
                     Tab0.Add(Cell);
-                    //Tab0.Add( "<div style=""height:200px;"">" & Cell & "</div>"
-                    //        '
-                    //        ' Build RequestContent Form
-                    //        '
-                    //        Tab1.Add( "<p>Use this form to request a download. Select the criteria for the download and click the [Request Download] button. The request should then appear on the requested download list in the other tab. When the download has been created, it will be become available.</p>")
-                    //        '
-                    //        Tab1.Add( "<table border=""0"" cellpadding=""3"" cellspacing=""0"" width=""100%"">")
-                    //        '
-                    //        Call Tab1.Add("<tr>")
-                    //        Call Tab1.Add("<td align=right>Content</td>")
-                    //        Call Tab1.Add("<td>" & core.htmldoc.main_GetFormInputSelect2("ContentID", ContentID, "Content", "", "", "", IsEmptyList) & "</td>")
-                    //        Call Tab1.Add("</tr>")
-                    //        '
-                    //        Call Tab1.Add("<tr>")
-                    //        Call Tab1.Add("<td align=right>Format</td>")
-                    //        Call Tab1.Add("<td><select name=Format value=""" & Format & """><option value=CSV>CSV</option><option name=XML value=XML>XML</option></select></td>")
-                    //        Call Tab1.Add("</tr>")
-                    //        '
-                    //        Call Tab1.Add("" _
-                    //            & "<tr>" _
-                    //            & "<td width=""120""><img alt=""space"" src=""/ccLib/images/spacer.gif"" width=""120"" height=""1""></td>" _
-                    //            & "<td width=""100%"">&nbsp;</td>" _
-                    //            & "</tr>" _
-                    //            & "</table>")
-                    //        '
-                    //        ' Build and add tabs
-                    //        '
-                    //        Call core.htmldoc.main_AddLiveTabEntry("Current&nbsp;Downloads", Tab0.Text, "ccAdminTab")
-                    //        Call core.htmldoc.main_AddLiveTabEntry("Request&nbsp;New&nbsp;Download", Tab1.Text, "ccAdminTab")
-                    //        Content = core.htmldoc.main_GetLiveTabs()
                     Content = Tab0.Text;
-                    //
                     ButtonListLeft = ButtonCancel + "," + ButtonRefresh + "," + ButtonDelete;
-                    //ButtonListLeft = ButtonCancel & "," & ButtonRefresh & "," & ButtonDelete & "," & ButtonRequestDownload
                     ButtonListRight = "";
                     Content = Content + HtmlController.inputHidden(rnAdminSourceForm, AdminFormDownloads);
                 }

@@ -45,7 +45,7 @@ namespace Contensive.Processor.Models.Db {
         /// <summary>
         /// The file where the output of the command is stored. 
         /// </summary>
-        public BaseModel.FieldCdnFile filename { get; set; }
+        public BaseModel.FieldTypeTextFile filename { get; set; }
         /// <summary>
         /// datetime when the task completes
         /// </summary>
