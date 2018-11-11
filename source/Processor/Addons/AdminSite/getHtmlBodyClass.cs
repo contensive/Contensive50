@@ -9458,7 +9458,7 @@ namespace Contensive.Addons.AdminSite {
                         RowPointer = 0;
                         DataRowCount = downloadList.Count;
                         LinkPrefix = "<a href=\"" + core.appConfig.cdnFileUrl;
-                        LinkSuffix = "\" target=_blank>Available</a>";
+                        LinkSuffix = "\" target=_blank>Download</a>";
                         foreach (var download in downloadList) {
                             if (RowPointer >= PageSize) break;
                             var requestedBy = PersonModel.create(core, download.requestedBy);
@@ -10992,7 +10992,7 @@ namespace Contensive.Addons.AdminSite {
                                                 addonName = ExportCSVAddon.name,
                                                 args = docProperties
                                             };
-                                            TaskSchedulerControllerx.addTaskToQueue(core, cmdDetail, false);
+                                            TaskSchedulerControllerx.addTaskToQueue(core, cmdDetail, false, true);
                                         }
                                         break;
                                     default:
@@ -11010,7 +11010,7 @@ namespace Contensive.Addons.AdminSite {
                                                 addonName = ExportXMLAddon.name,
                                                 args = docProperties
                                             };
-                                            TaskSchedulerControllerx.addTaskToQueue(core, cmdDetail, false);
+                                            TaskSchedulerControllerx.addTaskToQueue(core, cmdDetail, false, true );
                                         }
                                         break;
                                 }

@@ -173,7 +173,7 @@ namespace Contensive.Processor.Controllers {
                                         cmdDetail.addonId = coreApp.db.csGetInteger(CS, "ID");
                                         cmdDetail.addonName = addonName;
                                         cmdDetail.args = GenericController.convertAddonArgumentstoDocPropertiesList(coreApp, coreApp.db.csGetText(CS, "argumentlist"));
-                                        addTaskToQueue(coreApp, cmdDetail, false);
+                                        addTaskToQueue(coreApp, cmdDetail, false, false);
                                     } else if (coreApp.db.csGetDate(CS, "ProcessNextRun") == DateTime.MinValue) {
                                         //
                                         LogController.logTrace(coreApp, "scheduleTasks, addon [" + addonName + "], setup next run, ProcessInterval set but no processNextRun, set processNextRun [" + nextRun + "]");
@@ -202,37 +202,46 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Add a command task to the taskQueue to be run by the taskRunner. Returns false if the task was already there (dups fround by command name and cmdDetailJson)
         /// </summary>
-        /// <param name="cpSiteCore"></param>
+        /// <param name="core"></param>
         /// <param name="command"></param>
         /// <param name="cmdDetail"></param>
         /// <param name="BlockDuplicates"></param>
         /// <returns></returns>
-        static public bool addTaskToQueue(CoreController cpSiteCore, TaskModel.cmdDetailClass cmdDetail, bool BlockDuplicates) {
+        static public bool addTaskToQueue(CoreController core, TaskModel.cmdDetailClass cmdDetail, bool BlockDuplicates, bool saveResultToDownloads) {
             bool resultTaskAdded = true;
             try {
-                string cmdDetailJson = cpSiteCore.json.Serialize(cmdDetail);
+                //
+                int downloadId = 0;
+                if ( saveResultToDownloads) {
+                    var download = DownloadModel.add(core);
+                    download.name = "Download requested by " + core.session.user.name;
+                    download.dateRequested = DateTime.Now;
+                    download.requestedBy = core.session.user.id;
+                    downloadId = download.id;
+                    download.save(core);
+                }
+                string cmdDetailJson = core.json.Serialize(cmdDetail);
                 if (BlockDuplicates) {
                     //
                     // -- Search for a duplicate
                     string sql = "select top 1 id from cctasks where ((cmdDetail=" + cmdDetailJson + ")and(datestarted is not null))";
-                    int cs = cpSiteCore.db.csOpenSql(sql);
-                    resultTaskAdded = !cpSiteCore.db.csOk(cs);
-                    cpSiteCore.db.csClose(ref cs);
+                    int cs = core.db.csOpenSql(sql);
+                    resultTaskAdded = !core.db.csOk(cs);
+                    core.db.csClose(ref cs);
                 }
                 //
                 // -- add it to the queue and shell out to the command
                 if (resultTaskAdded) {
-                    int cs = cpSiteCore.db.csInsertRecord("tasks");
-                    if (cpSiteCore.db.csOk(cs)) {
-                        cpSiteCore.db.csSet(cs, "name", "addon [#" + cmdDetail.addonId + "," + cmdDetail.addonName + "]");
-                        cpSiteCore.db.csSet(cs, "cmdDetail", cmdDetailJson);
-                    }
-                    cpSiteCore.db.csClose(ref cs);
-                    LogController.logTrace(cpSiteCore, "addTaskToQueue, cmdDetailJson [" + cmdDetailJson + "]");
+                    var task = TaskModel.add(core);
+                    task.name = "addon [#" + cmdDetail.addonId + "," + cmdDetail.addonName + "]";
+                    task.cmdDetail = cmdDetailJson;
+                    task.resultDownloadId = downloadId;
+                    task.save(core);
+                    LogController.logTrace(core, "addTaskToQueue, cmdDetailJson [" + cmdDetailJson + "]");
                 }
             } catch (Exception ex) {
-                LogController.logTrace(cpSiteCore, "addTaskToQueue, exeception [" + ex.ToString() + "]");
-                LogController.handleError(cpSiteCore, ex);
+                LogController.logTrace(core, "addTaskToQueue, exeception [" + ex.ToString() + "]");
+                LogController.handleError(core, ex);
             }
             return resultTaskAdded;
         }

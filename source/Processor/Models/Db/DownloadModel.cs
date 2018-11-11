@@ -18,6 +18,7 @@ namespace Contensive.Processor.Models.Db {
         public int requestedBy { get; set; }
         public DateTime dateRequested { get; set; }
         public DateTime dateCompleted { get; set; }
+        public string resultMessage { get; set; }
         //
         //====================================================================================================
         public static DownloadModel add(CoreController core) {

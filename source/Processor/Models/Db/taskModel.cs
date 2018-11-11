@@ -1,18 +1,7 @@
 ﻿
 using System;
-using System.Reflection;
-using System.Xml;
-using System.Diagnostics;
-using System.Linq;
-using System.Text.RegularExpressions;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
-using Contensive.Processor;
-using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.constants;
 //
 namespace Contensive.Processor.Models.Db {
     public class TaskModel : BaseModel {
@@ -54,6 +43,12 @@ namespace Contensive.Processor.Models.Db {
         /// datetime when the task is started
         /// </summary>
         public DateTime dateStarted { get; set; }
+        /// <summary>
+        /// if 0, this field is ignore. if non-zero, the output from the task is saved to the download record with this id.
+        /// To save a tasks output, create a download record and set this field with its id.
+        /// </summary>
+        public int resultDownloadId { get; set; }
+
         //
         // -- deprecated fields. This information should be stored in cmdDetails
         //

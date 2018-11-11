@@ -218,7 +218,8 @@ namespace Contensive.Processor.Controllers {
                         Console.WriteLine("runTask, runTask, task [" + task.name + "], cmdDetail [" + task.cmdDetail + "]");
                         LogController.logTrace(cp.core, "runTask, task [" + task.name + "], cmdDetail [" + task.cmdDetail + "]");
                         //
-                        task.dateStarted = DateTime.Now;
+                        DateTime dateStarted = DateTime.Now;
+                        task.dateStarted = dateStarted;
                         task.save(cp.core);
                         var cmdDetail = cp.core.json.Deserialize<TaskModel.cmdDetailClass>(task.cmdDetail);
                         if (cmdDetail != null) {
@@ -231,6 +232,19 @@ namespace Contensive.Processor.Controllers {
                                     errorContextMessage = "running task, addon [" + cmdDetail.addonId + "]"
                                 };
                                 string result = cp.core.addon.execute(addon, context);
+                                if ( task.resultDownloadId>0) {
+                                    var download = DownloadModel.create(cp.core, task.resultDownloadId);
+                                    if ( download != null ) {
+                                        if ( string.IsNullOrEmpty( download.name )) {
+                                            download.name = "Download";
+                                        }
+                                        download.resultMessage = "Completed";
+                                        download.filename.content = result;
+                                        download.dateRequested = dateStarted;
+                                        download.dateCompleted = DateTime.Now;
+                                        download.save(cp.core);
+                                    }
+                                }
                                 task.filename.content = result;
                             }
                         }
