@@ -722,9 +722,11 @@ namespace Contensive.Processor.Models.Db {
                                 break;
                             default:
                                 int fieldTypeId = 0;
-                                //PropertyInfo contentProperty = null;
-                                //PropertyInfo contentUpdatedProperty = null;
                                 bool fileContentUpdated = false;
+                                bool fileFieldContentUpdated = false;
+                                string fileFieldContent = "";
+                                string fileFieldFilename = "";
+
                                 string content = "";
                                 switch (instanceProperty.PropertyType.Name) {
                                     case "Int32":
@@ -751,106 +753,94 @@ namespace Contensive.Processor.Models.Db {
                                         sqlPairs.add(instanceProperty.Name, core.db.encodeSQLNumber(valueDbl));
                                         //cs.setField(instanceProperty.Name, valueDbl);
                                         break;
-                                    case "FieldTypeTextFile":
-                                    case "FieldTypeJavascriptFile":
-                                    case "FieldTypeCSSFile":
-                                    case "FieldTypeHTMLFile":
-                                        fieldTypeId = 0;
-                                        bool fileFieldContentUpdated = false;
-                                        string fileFieldContent = "";
-                                        string fileFieldFilename = "";
-                                        switch (instanceProperty.PropertyType.Name) {
-                                            case "FieldTypeJavascriptFile": {
-                                                    fieldTypeId = fieldTypeIdFileJavascript;
-                                                    FieldTypeJavascriptFile fileProperty = (FieldTypeJavascriptFile)instanceProperty.GetValue(this);
-                                                    fileProperty.internalcore = core;
-                                                    PropertyInfo fileFieldContentProperty = instanceProperty.PropertyType.GetProperty("content");
-                                                    fileFieldContent = (string)fileFieldContentProperty.GetValue(fileProperty);
-                                                    PropertyInfo fileFieldContentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
-                                                    fileFieldContentUpdated = (bool)fileFieldContentUpdatedProperty.GetValue(fileProperty);
-                                                    PropertyInfo fileFieldFilenameProperty = instanceProperty.PropertyType.GetProperty("filename");
-                                                    fileFieldFilename = (string)fileFieldFilenameProperty.GetValue(fileProperty);
-                                                    break;
-                                                }
-                                            case "FieldTypeCSSFile": {
-                                                    fieldTypeId = fieldTypeIdFileCSS;
-                                                    FieldTypeCSSFile fileProperty = (FieldTypeCSSFile)instanceProperty.GetValue(this);
-                                                    fileProperty.internalcore = core;
-                                                    PropertyInfo fileFieldContentProperty = instanceProperty.PropertyType.GetProperty("content");
-                                                    fileFieldContent = (string)fileFieldContentProperty.GetValue(fileProperty);
-                                                    PropertyInfo fileFieldContentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
-                                                    fileFieldContentUpdated = (bool)fileFieldContentUpdatedProperty.GetValue(fileProperty);
-                                                    PropertyInfo fileFieldFilenameProperty = instanceProperty.PropertyType.GetProperty("filename");
-                                                    fileFieldFilename = (string)fileFieldFilenameProperty.GetValue(fileProperty);
-                                                    break;
-                                                }
-                                            case "FieldTypeHTMLFile": {
-                                                    fieldTypeId = fieldTypeIdFileHTML;
-                                                    FieldTypeHTMLFile fileProperty = (FieldTypeHTMLFile)instanceProperty.GetValue(this);
-                                                    fileProperty.internalcore = core;
-                                                    PropertyInfo fileFieldContentProperty = instanceProperty.PropertyType.GetProperty("content");
-                                                    fileFieldContent = (string)fileFieldContentProperty.GetValue(fileProperty);
-                                                    PropertyInfo fileFieldContentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
-                                                    fileFieldContentUpdated = (bool)fileFieldContentUpdatedProperty.GetValue(fileProperty);
-                                                    PropertyInfo fileFieldFilenameProperty = instanceProperty.PropertyType.GetProperty("filename");
-                                                    fileFieldFilename = (string)fileFieldFilenameProperty.GetValue(fileProperty);
-                                                    break;
-                                                }
-                                            default: {
-                                                    fieldTypeId = fieldTypeIdFileText;
-                                                    FieldTypeTextFile fileProperty = (FieldTypeTextFile)instanceProperty.GetValue(this);
-                                                    fileProperty.internalcore = core;
-                                                    PropertyInfo fileFieldContentProperty = instanceProperty.PropertyType.GetProperty("content");
-                                                    fileFieldContent = (string)fileFieldContentProperty.GetValue(fileProperty);
-                                                    PropertyInfo fileFieldContentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
-                                                    fileFieldContentUpdated = (bool)fileFieldContentUpdatedProperty.GetValue(fileProperty);
-                                                    PropertyInfo fileFieldFilenameProperty = instanceProperty.PropertyType.GetProperty("filename");
-                                                    fileFieldFilename = (string)fileFieldFilenameProperty.GetValue(fileProperty);
-                                                    break;
-                                                }
-                                        }
-                                        if (fileFieldContentUpdated) {
-                                            //
-                                            string readBufferfilename = cs.getValue(instanceProperty.Name);
-                                            if (string.IsNullOrEmpty(fileFieldContent)) {
-                                                //
-                                                // -- empty content, delete file, clear filename from Db field
-                                                if (!string.IsNullOrEmpty(readBufferfilename)) {
-                                                    cs.setField(instanceProperty.Name, "");
-                                                    core.cdnFiles.deleteFile(readBufferfilename);
-                                                }
-                                            } else {
-                                                //
-                                                // -- save content
-                                                string filename = (!string.IsNullOrEmpty(fileFieldFilename)) ? fileFieldFilename : readBufferfilename;
-                                                if (string.IsNullOrEmpty(filename)) filename = FileController.getVirtualRecordUnixPathFilename(tableName, instanceProperty.Name.ToLower(), id, fieldTypeId);
-                                                core.cdnFiles.saveFile(filename, fileFieldContent);
-                                                cs.setFieldFilename(instanceProperty.Name, filename);
-                                            }
+                                    case "FieldTypeTextFile": {
+                                            fieldTypeId = fieldTypeIdFileText;
+                                            FieldTypeTextFile fileProperty = (FieldTypeTextFile)instanceProperty.GetValue(this);
+                                            fileProperty.internalcore = core;
+                                            PropertyInfo fileFieldContentProperty = instanceProperty.PropertyType.GetProperty("content");
+                                            fileFieldContent = (string)fileFieldContentProperty.GetValue(fileProperty);
+                                            PropertyInfo fileFieldContentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
+                                            fileFieldContentUpdated = (bool)fileFieldContentUpdatedProperty.GetValue(fileProperty);
+                                            PropertyInfo fileFieldFilenameProperty = instanceProperty.PropertyType.GetProperty("filename");
+                                            fileFieldFilename = (string)fileFieldFilenameProperty.GetValue(fileProperty);
                                         }
                                         break;
+                                    case "FieldTypeJavascriptFile": {
+                                            fieldTypeId = fieldTypeIdFileJavascript;
+                                            FieldTypeJavascriptFile fileProperty = (FieldTypeJavascriptFile)instanceProperty.GetValue(this);
+                                            fileProperty.internalcore = core;
+                                            PropertyInfo fileFieldContentProperty = instanceProperty.PropertyType.GetProperty("content");
+                                            fileFieldContent = (string)fileFieldContentProperty.GetValue(fileProperty);
+                                            PropertyInfo fileFieldContentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
+                                            fileFieldContentUpdated = (bool)fileFieldContentUpdatedProperty.GetValue(fileProperty);
+                                            PropertyInfo fileFieldFilenameProperty = instanceProperty.PropertyType.GetProperty("filename");
+                                            fileFieldFilename = (string)fileFieldFilenameProperty.GetValue(fileProperty);
+                                        }
+                                        break;
+                                    case "FieldTypeCSSFile": {
+                                            fieldTypeId = fieldTypeIdFileCSS;
+                                            FieldTypeCSSFile fileProperty = (FieldTypeCSSFile)instanceProperty.GetValue(this);
+                                            fileProperty.internalcore = core;
+                                            PropertyInfo fileFieldContentProperty = instanceProperty.PropertyType.GetProperty("content");
+                                            fileFieldContent = (string)fileFieldContentProperty.GetValue(fileProperty);
+                                            PropertyInfo fileFieldContentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
+                                            fileFieldContentUpdated = (bool)fileFieldContentUpdatedProperty.GetValue(fileProperty);
+                                            PropertyInfo fileFieldFilenameProperty = instanceProperty.PropertyType.GetProperty("filename");
+                                            fileFieldFilename = (string)fileFieldFilenameProperty.GetValue(fileProperty);
+                                        }
+                                        break;
+                                    case "FieldTypeHTMLFile": {
+                                            fieldTypeId = fieldTypeIdFileHTML;
+                                            FieldTypeHTMLFile fileProperty = (FieldTypeHTMLFile)instanceProperty.GetValue(this);
+                                            fileProperty.internalcore = core;
+                                            PropertyInfo fileFieldContentProperty = instanceProperty.PropertyType.GetProperty("content");
+                                            fileFieldContent = (string)fileFieldContentProperty.GetValue(fileProperty);
+                                            PropertyInfo fileFieldContentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
+                                            fileFieldContentUpdated = (bool)fileFieldContentUpdatedProperty.GetValue(fileProperty);
+                                            PropertyInfo fileFieldFilenameProperty = instanceProperty.PropertyType.GetProperty("filename");
+                                            fileFieldFilename = (string)fileFieldFilenameProperty.GetValue(fileProperty);
+                                        }
+                                        break;
+                                        //if (fileFieldContentUpdated) {
+                                        //    //
+                                        //    string readBufferfilename = cs.getValue(instanceProperty.Name);
+                                        //    if (string.IsNullOrEmpty(fileFieldContent)) {
+                                        //        //
+                                        //        // -- empty content, delete file, clear filename from Db field
+                                        //        if (!string.IsNullOrEmpty(readBufferfilename)) {
+                                        //            cs.setField(instanceProperty.Name, "");
+                                        //            core.cdnFiles.deleteFile(readBufferfilename);
+                                        //        }
+                                        //    } else {
+                                        //        //
+                                        //        // -- save content
+                                        //        string filename = (!string.IsNullOrEmpty(fileFieldFilename)) ? fileFieldFilename : readBufferfilename;
+                                        //        if (string.IsNullOrEmpty(filename)) filename = FileController.getVirtualRecordUnixPathFilename(tableName, instanceProperty.Name.ToLower(), id, fieldTypeId);
+                                        //        core.cdnFiles.saveFile(filename, fileFieldContent);
+                                        //        cs.setFieldFilename(instanceProperty.Name, filename);
+                                        //    }
+                                        //}
+                                        //break;
                                     default:
                                         sqlPairs.add(instanceProperty.Name, core.db.encodeSQLText(instanceProperty.GetValue(this, null).ToString()));
                                         break;
                                 }
                                 if (fileContentUpdated) {
-                                    string filename = "";
-                                    // 
-                                    // -- if record exists, we have to get the field filename
-                                    if (id == 0) {
+                                    string filename = fileFieldFilename;
+                                    if ((String.IsNullOrEmpty(filename)) && (id != 0)) {
+                                        // 
+                                        // -- if record exists and file property's filename is not set, get the filename from the Db
                                         using (System.Data.DataTable dt = core.db.executeQuery("select " + instanceProperty.Name + " from " + tableName + " where (id=" + id + ")")) {
                                             if (dt.Rows.Count > 0) {
                                                 filename = GenericController.encodeText(dt.Rows[0][instanceProperty.Name]);
                                             }
                                         }
                                     }
-                                    if (string.IsNullOrEmpty(content)) {
+                                    if ((string.IsNullOrEmpty(content)) && (!string.IsNullOrEmpty(filename))) {
                                         //
-                                        // -- empty content
-                                        if (!string.IsNullOrEmpty(filename)) {
-                                            sqlPairs.add(instanceProperty.Name, "");
-                                            core.cdnFiles.deleteFile(filename);
-                                        }
+                                        // -- empty content and valid filename, delete the file and clear the filename
+                                        sqlPairs.add(instanceProperty.Name, "");
+                                        core.cdnFiles.deleteFile(filename);
                                     } else {
                                         //
                                         // -- save content
