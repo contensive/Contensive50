@@ -2288,36 +2288,6 @@ namespace Contensive.Processor.Controllers {
                                                         break;
                                                 }
                                             }
-<<<<<<< HEAD
-                                        }
-                                        break;
-                                    case "scripting":
-                                        //
-                                        // include add-ons - NOTE - import collections must be run before interfaces
-                                        // when importing a collectin that will be used for an include
-                                        //
-                                        ScriptingLanguage = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "language", "");
-                                        //
-                                        // -- todo - need to look this up correctly
-                                        if ( ScriptingLanguage.ToLowerInvariant()=="jscript") {
-                                            scriptinglanguageid = (int)AddonController.ScriptLanguages.Javascript;
-                                        } else {
-                                            scriptinglanguageid = (int)AddonController.ScriptLanguages.VBScript;
-                                        }
-                                        //scriptinglanguageid = core.db.getRecordID("scripting languages", ScriptingLanguage);
-                                        core.db.csSet(CS, "scriptinglanguageid", scriptinglanguageid);
-                                        ScriptingEntryPoint = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "entrypoint", "");
-                                        core.db.csSet(CS, "ScriptingEntryPoint", ScriptingEntryPoint);
-                                        ScriptingTimeout = GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "timeout", "5000"));
-                                        core.db.csSet(CS, "ScriptingTimeout", ScriptingTimeout);
-                                        ScriptingCode = "";
-                                        //Call core.app.csv_SetCS(CS, "ScriptingCode", ScriptingCode)
-                                        foreach (XmlNode ScriptingNode in PageInterfaceWithinLoop.ChildNodes) {
-                                            switch (GenericController.vbLCase(ScriptingNode.Name)) {
-                                                case "code":
-                                                    ScriptingCode = ScriptingCode + ScriptingNode.InnerText;
-                                                    //Case "includemodule"
-=======
                                             break;
                                         case "scripting":
                                             //
@@ -2326,64 +2296,20 @@ namespace Contensive.Processor.Controllers {
                                             //
                                             ScriptingLanguage = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "language", "");
                                             if (ScriptingLanguage.ToLower() == "jscript") {
-                                                scriptinglanguageid = 2;
+                                                scriptinglanguageid = (int)AddonController.ScriptLanguages.Javascript;
                                             } else {
-                                                scriptinglanguageid = 1;
+                                                scriptinglanguageid = (int)AddonController.ScriptLanguages.VBScript;
                                             }
-                                            //scriptinglanguageid = core.db.getRecordID("scripting languages", ScriptingLanguage);
                                             core.db.csSet(CS, "scriptinglanguageid", scriptinglanguageid);
                                             ScriptingEntryPoint = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "entrypoint", "");
                                             core.db.csSet(CS, "ScriptingEntryPoint", ScriptingEntryPoint);
                                             ScriptingTimeout = GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "timeout", "5000"));
                                             core.db.csSet(CS, "ScriptingTimeout", ScriptingTimeout);
                                             ScriptingCode = "";
-                                            //Call core.app.csv_SetCS(CS, "ScriptingCode", ScriptingCode)
                                             foreach (XmlNode ScriptingNode in PageInterfaceWithinLoop.ChildNodes) {
                                                 switch (GenericController.vbLCase(ScriptingNode.Name)) {
                                                     case "code":
-                                                        ScriptingCode = ScriptingCode + ScriptingNode.InnerText;
-                                                        //Case "includemodule"
->>>>>>> v50-Master
-
-                                                        //    ScriptingModuleID = 0
-                                                        //    ScriptingNameorGuid = ScriptingNode.InnerText
-                                                        //    If ScriptingNameorGuid = "" Then
-                                                        //        ScriptingNameorGuid =xmlController.GetXMLAttribute(core,IsFound, ScriptingNode, "guid", "")
-                                                        //        If ScriptingNameorGuid = "" Then
-                                                        //            ScriptingNameorGuid =xmlController.GetXMLAttribute(core,IsFound, ScriptingNode, "name", "")
-                                                        //        End If
-                                                        //    End If
-                                                        //    Criteria = "(ccguid=" & core.db.encodeSQLText(ScriptingNameorGuid) & ")"
-                                                        //    CS2 = core.db.cs_open("Scripting Modules", Criteria)
-                                                        //    If Not core.db.cs_ok(CS2) Then
-                                                        //        Call core.db.cs_Close(CS2)
-                                                        //        Criteria = "(ccguid is null)and(name=" & core.db.encodeSQLText(ScriptingNameorGuid) & ")"
-                                                        //        CS2 = core.db.cs_open("Scripting Modules", Criteria)
-                                                        //    End If
-                                                        //    If core.db.cs_ok(CS2) Then
-                                                        //        ScriptingModuleID = core.db.cs_getInteger(CS2, "ID")
-                                                        //    End If
-                                                        //    Call core.db.cs_Close(CS2)
-                                                        //    If ScriptingModuleID = 0 Then
-                                                        //        CS2 = core.db.cs_insertRecord("Scripting Modules", 0)
-                                                        //        If core.db.cs_ok(CS2) Then
-                                                        //            Call core.db.cs_set(CS2, "name", ScriptingNameorGuid)
-                                                        //            Call core.db.cs_set(CS2, "ccguid", ScriptingNameorGuid)
-                                                        //            ScriptingModuleID = core.db.cs_getInteger(CS2, "ID")
-                                                        //        End If
-                                                        //        Call core.db.cs_Close(CS2)
-                                                        //    End If
-                                                        //    Criteria = "(addonid=" & addonId & ")and(scriptingmoduleid=" & ScriptingModuleID & ")"
-                                                        //    CS2 = core.db.cs_open("Add-on Scripting Module Rules", Criteria)
-                                                        //    If Not core.db.cs_ok(CS2) Then
-                                                        //        Call core.db.cs_Close(CS2)
-                                                        //        CS2 = core.db.cs_insertRecord("Add-on Scripting Module Rules", 0)
-                                                        //        If core.db.cs_ok(CS2) Then
-                                                        //            Call core.db.cs_set(CS2, "addonid", addonId)
-                                                        //            Call core.db.cs_set(CS2, "scriptingmoduleid", ScriptingModuleID)
-                                                        //        End If
-                                                        //    End If
-                                                        //    Call core.db.cs_Close(CS2)
+                                                        ScriptingCode += ScriptingNode.InnerText;
                                                         break;
                                                 }
                                             }

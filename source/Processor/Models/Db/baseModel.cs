@@ -197,7 +197,7 @@ namespace Contensive.Processor.Models.Db {
         /// </summary>
         /// <param name="derivedType"></param>
         /// <returns></returns>
-        private static string derivedTableName(Type derivedType) {
+        public static string derivedTableName(Type derivedType) {
             FieldInfo fieldInfo = derivedType.GetField("contentTableName");
             if (fieldInfo == null) {
                 throw new GenericException("Class [" + derivedType.Name + "] must declare constant [contentTableName].");
@@ -212,7 +212,7 @@ namespace Contensive.Processor.Models.Db {
         /// </summary>
         /// <param name="derivedType"></param>
         /// <returns></returns>
-        private static string derivedDataSourceName(Type derivedType) {
+        public static string derivedDataSourceName(Type derivedType) {
             FieldInfo fieldInfo = derivedType.GetField("contentDataSource");
             if (fieldInfo == null) {
                 throw new GenericException("Class [" + derivedType.Name + "] must declare public constant [contentDataSource].");
@@ -227,7 +227,7 @@ namespace Contensive.Processor.Models.Db {
         /// </summary>
         /// <param name="derivedType"></param>
         /// <returns></returns>
-        private static bool derivedNameFieldIsUnique(Type derivedType) {
+        public static bool derivedNameFieldIsUnique(Type derivedType) {
             FieldInfo fieldInfo = derivedType.GetField("nameFieldIsUnique");
             if (fieldInfo == null) {
                 throw new GenericException("Class [" + derivedType.Name + "] must declare public constant [nameFieldIsUnique].");
@@ -251,7 +251,7 @@ namespace Contensive.Processor.Models.Db {
         /// <typeparam name="T"></typeparam>
         /// <param name="core"></param>
         /// <returns></returns>
-        protected static T addDefault<T>(CoreController core, Domain.CDefModel cdef) where T : BaseModel {
+        public static T addDefault<T>(CoreController core, Domain.CDefModel cdef) where T : BaseModel {
             var callersCacheNameList = new List<string>();
             return addDefault<T>(core, cdef, ref callersCacheNameList);
         }
@@ -263,7 +263,7 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="core"></param>
         /// <param name="callersCacheNameList"></param>
         /// <returns></returns>
-        protected static T addDefault<T>(CoreController core, Domain.CDefModel cdef, ref List<string> callersCacheNameList) where T : BaseModel {
+        public static T addDefault<T>(CoreController core, Domain.CDefModel cdef, ref List<string> callersCacheNameList) where T : BaseModel {
             T result = default(T);
             try {
                 result = addEmpty<T>(core);
@@ -350,7 +350,7 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="core"></param>
         /// <param name="callersCacheNameList"></param>
         /// <returns></returns>
-        protected static T addEmpty<T>(CoreController core) where T : BaseModel {
+        public static T addEmpty<T>(CoreController core) where T : BaseModel {
             T result = default(T);
             try {
                 if (core.serverConfig == null) {
@@ -391,7 +391,7 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="cp"></param>
         /// <param name="recordId">The id of the record to be read into the new object</param>
         /// <param name="callersCacheNameList">Any cachenames effected by this record will be added to this list. If the method consumer creates a cache object, add these cachenames to its dependent cachename list.</param>
-        protected static T create<T>(CoreController core, int recordId, ref List<string> callersCacheNameList) where T : BaseModel {
+        public static T create<T>(CoreController core, int recordId, ref List<string> callersCacheNameList) where T : BaseModel {
             T result = default(T);
             try {
                 if (core.serverConfig == null) {
@@ -472,7 +472,7 @@ namespace Contensive.Processor.Models.Db {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="recordGuid"></param>
-        protected static T create<T>(CoreController core, string recordGuid, ref List<string> callersCacheNameList) where T : BaseModel {
+        public static T create<T>(CoreController core, string recordGuid, ref List<string> callersCacheNameList) where T : BaseModel {
             T result = default(T);
             try {
                 if (core.serverConfig == null) {
@@ -528,7 +528,7 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="cp"></param>
         /// <param name="recordName"></param>
         /// <param name="callersCacheNameList">method will add the cache name to this list.</param>
-        protected static T createByUniqueName<T>(CoreController core, string recordName, ref List<string> callersCacheNameList) where T : BaseModel {
+        public static T createByUniqueName<T>(CoreController core, string recordName, ref List<string> callersCacheNameList) where T : BaseModel {
             T result = default(T);
             try {
                 if (core.serverConfig == null) {
@@ -691,7 +691,7 @@ namespace Contensive.Processor.Models.Db {
         /// </summary>
         /// <param name="core"></param>
         /// <returns></returns>
-        protected int save(CoreController core, bool asyncSave = false) {
+        public int save(CoreController core, bool asyncSave = false) {
             try {
                 if (core.serverConfig == null) {
                     //
@@ -722,8 +722,8 @@ namespace Contensive.Processor.Models.Db {
                                 break;
                             default:
                                 int fieldTypeId = 0;
-                                PropertyInfo contentProperty = null;
-                                PropertyInfo contentUpdatedProperty = null;
+                                //PropertyInfo contentProperty = null;
+                                //PropertyInfo contentUpdatedProperty = null;
                                 bool fileContentUpdated = false;
                                 string content = "";
                                 switch (instanceProperty.PropertyType.Name) {
@@ -755,13 +755,13 @@ namespace Contensive.Processor.Models.Db {
                                     case "FieldTypeJavascriptFile":
                                     case "FieldTypeCSSFile":
                                     case "FieldTypeHTMLFile":
-                                        int fieldTypeId = 0;
+                                        fieldTypeId = 0;
                                         bool fileFieldContentUpdated = false;
                                         string fileFieldContent = "";
                                         string fileFieldFilename = "";
                                         switch (instanceProperty.PropertyType.Name) {
                                             case "FieldTypeJavascriptFile": {
-                                                    fieldTypeId = FieldTypeIdFileJavascript;
+                                                    fieldTypeId = fieldTypeIdFileJavascript;
                                                     FieldTypeJavascriptFile fileProperty = (FieldTypeJavascriptFile)instanceProperty.GetValue(this);
                                                     fileProperty.internalcore = core;
                                                     PropertyInfo fileFieldContentProperty = instanceProperty.PropertyType.GetProperty("content");
@@ -773,7 +773,7 @@ namespace Contensive.Processor.Models.Db {
                                                     break;
                                                 }
                                             case "FieldTypeCSSFile": {
-                                                    fieldTypeId = FieldTypeIdFileCSS;
+                                                    fieldTypeId = fieldTypeIdFileCSS;
                                                     FieldTypeCSSFile fileProperty = (FieldTypeCSSFile)instanceProperty.GetValue(this);
                                                     fileProperty.internalcore = core;
                                                     PropertyInfo fileFieldContentProperty = instanceProperty.PropertyType.GetProperty("content");
@@ -785,7 +785,7 @@ namespace Contensive.Processor.Models.Db {
                                                     break;
                                                 }
                                             case "FieldTypeHTMLFile": {
-                                                    fieldTypeId = FieldTypeIdFileHTML;
+                                                    fieldTypeId = fieldTypeIdFileHTML;
                                                     FieldTypeHTMLFile fileProperty = (FieldTypeHTMLFile)instanceProperty.GetValue(this);
                                                     fileProperty.internalcore = core;
                                                     PropertyInfo fileFieldContentProperty = instanceProperty.PropertyType.GetProperty("content");
@@ -797,7 +797,7 @@ namespace Contensive.Processor.Models.Db {
                                                     break;
                                                 }
                                             default: {
-                                                    fieldTypeId = FieldTypeIdFileText;
+                                                    fieldTypeId = fieldTypeIdFileText;
                                                     FieldTypeTextFile fileProperty = (FieldTypeTextFile)instanceProperty.GetValue(this);
                                                     fileProperty.internalcore = core;
                                                     PropertyInfo fileFieldContentProperty = instanceProperty.PropertyType.GetProperty("content");
@@ -896,7 +896,7 @@ namespace Contensive.Processor.Models.Db {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="recordId"></param>
-        protected static void delete<T>(CoreController core, int recordId) where T : BaseModel {
+        public static void delete<T>(CoreController core, int recordId) where T : BaseModel {
             try {
                 if (core.serverConfig == null) {
                     //
@@ -927,7 +927,7 @@ namespace Contensive.Processor.Models.Db {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="ccguid"></param>
-        protected static void delete<T>(CoreController core, string ccguid) where T : BaseModel {
+        public static void delete<T>(CoreController core, string ccguid) where T : BaseModel {
             try {
                 if (core.serverConfig == null) {
                     //
@@ -960,7 +960,7 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="cp"></param>
         /// <param name="sqlCriteria"></param>
         /// <returns></returns>
-        protected static List<T> createList<T>(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) where T : BaseModel {
+        public static List<T> createList<T>(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) where T : BaseModel {
             List<T> result = new List<T>();
             try {
                 if (core.serverConfig == null) {
@@ -998,7 +998,7 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="sqlCriteria"></param>
         /// <param name="sqlOrderBy"></param>
         /// <returns></returns>
-        protected static List<T> createList<T>(CoreController core, string sqlCriteria, string sqlOrderBy) where T : BaseModel => createList<T>(core, sqlCriteria, sqlOrderBy, new List<string> { });
+        public static List<T> createList<T>(CoreController core, string sqlCriteria, string sqlOrderBy) where T : BaseModel => createList<T>(core, sqlCriteria, sqlOrderBy, new List<string> { });
         //
         //====================================================================================================
         /// <summary>
@@ -1008,9 +1008,9 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="core"></param>
         /// <param name="sqlCriteria"></param>
         /// <returns></returns>
-        protected static List<T> createList<T>(CoreController core, string sqlCriteria) where T : BaseModel => createList<T>(core, sqlCriteria, "id", new List<string> { });
+        public static List<T> createList<T>(CoreController core, string sqlCriteria) where T : BaseModel => createList<T>(core, sqlCriteria, "id", new List<string> { });
         //
-        protected static List<T> createList<T>(CoreController core) where T : BaseModel => createList<T>(core, "", "id", new List<string> { });
+        public static List<T> createList<T>(CoreController core) where T : BaseModel => createList<T>(core, "", "id", new List<string> { });
         //
         //====================================================================================================
         /// <summary>
@@ -1018,7 +1018,7 @@ namespace Contensive.Processor.Models.Db {
         /// </summary>
         /// <param name="core"></param>
         /// <param name="recordId"></param>
-        protected static void invalidateRecordCache<T>(CoreController core, int recordId) where T : BaseModel {
+        public static void invalidateRecordCache<T>(CoreController core, int recordId) where T : BaseModel {
             try {
                 if (core.serverConfig == null) {
                     //
@@ -1043,7 +1043,7 @@ namespace Contensive.Processor.Models.Db {
         /// </summary>
         /// <param name="core"></param>
         /// <param name="recordId"></param>
-        protected static void invalidateTableCache<T>(CoreController core) where T : BaseModel {
+        public static void invalidateTableCache<T>(CoreController core) where T : BaseModel {
             try {
                 if (core.serverConfig == null) {
                     //
@@ -1069,7 +1069,7 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="cp"></param>
         /// <param name="recordId"></param>record
         /// <returns></returns>
-        protected static string getRecordName<T>(CoreController core, int recordId) where T : BaseModel {
+        public static string getRecordName<T>(CoreController core, int recordId) where T : BaseModel {
             try {
                 var record = create<BaseModel>(core, recordId);
                 if ( record != null ) {
@@ -1089,7 +1089,7 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="cp"></param>
         /// <param name="guid"></param>record
         /// <returns></returns>
-        protected static string getRecordName<T>(CoreController core, string guid) where T : BaseModel {
+        public static string getRecordName<T>(CoreController core, string guid) where T : BaseModel {
             try {
                 var record = create<BaseModel>(core, guid);
                 if (record != null) {
@@ -1109,7 +1109,7 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="cp"></param>
         /// <param name="guid"></param>record
         /// <returns></returns>
-        protected static int getRecordId<T>(CoreController core, string guid) where T : BaseModel {
+        public static int getRecordId<T>(CoreController core, string guid) where T : BaseModel {
             try {
                 var record = create<BaseModel>(core, guid);
                 if (record != null) {
@@ -1129,7 +1129,7 @@ namespace Contensive.Processor.Models.Db {
         /// <typeparam name="T"></typeparam>
         /// <param name="core"></param>
         /// <returns></returns>
-        protected static T createEmpty<T>( CoreController core ) where T : BaseModel {
+        public static T createEmpty<T>( CoreController core ) where T : BaseModel {
             T instance = default(T);
             try {
                 if (core.serverConfig == null) {
@@ -1162,7 +1162,7 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         //
-        private static T readRecordCache<T>(CoreController core, int recordId) where T : BaseModel {
+        public static T readRecordCache<T>(CoreController core, int recordId) where T : BaseModel {
             Type instanceType = typeof(T);
             T result = core.cache.getObject<T>(CacheController.createCacheKey_forDbRecord(recordId, derivedTableName(instanceType), derivedDataSourceName(instanceType)));
             restoreCacheDataObjects(core, result);
@@ -1171,7 +1171,7 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         //
-        private static T readRecordCacheByGuidPtr<T>(CoreController core, string ccGuid) where T : BaseModel {
+        public static T readRecordCacheByGuidPtr<T>(CoreController core, string ccGuid) where T : BaseModel {
             Type instanceType = typeof(T);
             T result = core.cache.getObject<T>(CacheController.createCachePtr_forDbRecord_guid(ccGuid, derivedTableName(instanceType), derivedDataSourceName(instanceType)));
             restoreCacheDataObjects(core, result);
@@ -1180,7 +1180,7 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         //
-        private static T readRecordCacheByUniqueNamePtr<T>(CoreController core, string uniqueName) where T : BaseModel {
+        public static T readRecordCacheByUniqueNamePtr<T>(CoreController core, string uniqueName) where T : BaseModel {
             Type instanceType = typeof(T);
             T result = core.cache.getObject<T>(CacheController.createCachePtr_forDbRecord_uniqueName(uniqueName, derivedTableName(instanceType), derivedDataSourceName(instanceType)));
             restoreCacheDataObjects(core, result);
@@ -1191,16 +1191,16 @@ namespace Contensive.Processor.Models.Db {
         /// <summary>
         /// After reading a cached Db object, go through instance properties and verify internal core objects populated
         /// </summary>
-        private static void restoreCacheDataObjects<T>( CoreController core, T restoredInstance ) {
+        public static void restoreCacheDataObjects<T>( CoreController core, T restoredInstance ) {
             if (restoredInstance != null) {
                 foreach (PropertyInfo instanceProperty in restoredInstance.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
                     // todo change test to is-subsclass-of-fieldCdnFile
                     switch (instanceProperty.PropertyType.Name) {
-                        case "FieldTypeTextFile":
+                        case "FieldTypeTextFile": 
                         case "FieldTypeCSSFile":
                         case "FieldTypeHTMLFile":
                         case "FieldTypeJavascriptFile":
-                            FieldCdnFile fileProperty = (FieldCdnFile)instanceProperty.GetValue(restoredInstance);
+                            FieldTypeFileBase fileProperty = (FieldTypeFileBase)instanceProperty.GetValue(restoredInstance);
                             fileProperty.internalcore = core;
                             break;
                     }
@@ -1210,7 +1210,7 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         //
-        private static string getSelectSql<T>( CoreController core, List<string> fieldList = null, string criteria = "", string orderBy = "") where T : BaseModel {
+        public static string getSelectSql<T>( CoreController core, List<string> fieldList = null, string criteria = "", string orderBy = "") where T : BaseModel {
             string result = "";
             Type instanceType = typeof(T);
             string tableName = derivedTableName(instanceType);

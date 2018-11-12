@@ -1047,7 +1047,7 @@ namespace Contensive.Processor.Controllers {
                                                                         //}
                                                                         break;
                                                                     case "date":
-                                                                        Copy = AdminUIController.getDefaultEditor_Date(core, FieldName, encodeDate(FieldValue), FieldReadOnly);
+                                                                        Copy = AdminUIController.getDefaultEditor_DateTime(core, FieldName, encodeDate(FieldValue), FieldReadOnly);
 
                                                                         //if (FieldReadOnly) {
                                                                         //    Copy = FieldValue + htmlController.inputHidden(FieldName, FieldValue);
@@ -1821,12 +1821,12 @@ namespace Contensive.Processor.Controllers {
                     //
                     string cmdQueryString = ""
                         + "appname=" + encodeNvaArgument(encodeRequestVariable(core.appConfig.name)) + "&AddonID=" + encodeText(addon.id) + "&OptionString=" + encodeNvaArgument(encodeRequestVariable(OptionString));
-                    CmdDetailClass cmdDetail = new CmdDetailClass {
+                    var cmdDetail = new TaskModel.CmdDetailClass {
                         addonId = addon.id,
                         addonName = addon.name,
                         args = GenericController.convertAddonArgumentstoDocPropertiesList(core, cmdQueryString)
                     };
-                    TaskSchedulerControllerx.addTaskToQueue(core, TaskQueueCommandEnumModule.runAddon, cmdDetail, false);
+                    TaskSchedulerControllerx.addTaskToQueue(core, cmdDetail, false);
                     //
                     LogController.logTrace(core, "end: add process to background cmd queue, addon [" + addon.name + "/" + addon.id + "], optionstring [" + OptionString + "]");
                 }

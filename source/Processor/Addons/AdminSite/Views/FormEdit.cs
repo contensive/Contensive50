@@ -958,7 +958,7 @@ namespace Contensive.Addons.AdminSite {
                                         //
                                         // ----- date, readonly
                                         return_NewFieldList += "," + field.nameLc;
-                                        EditorString = AdminUIController.getDefaultEditor_Date(core, field.nameLc, GenericController.encodeDate(fieldValue_object), field.readOnly, fieldHtmlId, field.required, WhyReadOnlyMsg);
+                                        EditorString = AdminUIController.getDefaultEditor_DateTime(core, field.nameLc, GenericController.encodeDate(fieldValue_object), field.readOnly, fieldHtmlId, field.required, WhyReadOnlyMsg);
                                         break;
                                     case _fieldTypeIdMemberSelect:
                                         //
@@ -1148,7 +1148,7 @@ namespace Contensive.Addons.AdminSite {
                                         //
                                         // ----- Date
                                         return_NewFieldList += "," + field.nameLc;
-                                        EditorString = AdminUIController.getDefaultEditor_Date(core, field.nameLc, GenericController.encodeDate(fieldValue_object), field.readOnly, fieldHtmlId, field.required, WhyReadOnlyMsg);
+                                        EditorString = AdminUIController.getDefaultEditor_DateTime(core, field.nameLc, GenericController.encodeDate(fieldValue_object), field.readOnly, fieldHtmlId, field.required, WhyReadOnlyMsg);
                                         break;
                                     case _fieldTypeIdMemberSelect:
                                         //

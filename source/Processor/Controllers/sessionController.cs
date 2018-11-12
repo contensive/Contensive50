@@ -916,7 +916,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // admin is content manager if the CDef is not developer only
                         //
-                        CDefModel CDef = CDefModel.create(core, ContentName);
+                        var CDef = CDefModel.create(core, ContentName);
                         if (CDef.id != 0) {
                             if (!CDef.developerOnly) {
                                 returnAllowEdit = true;

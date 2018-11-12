@@ -169,7 +169,7 @@ namespace Contensive.Processor.Controllers {
                                         coreApp.db.csSave(CS);
                                         //
                                         // -- add task to queue for runner
-                                        var cmdDetail = new TaskModel.cmdDetailClass();
+                                        var cmdDetail = new TaskModel.CmdDetailClass();
                                         cmdDetail.addonId = coreApp.db.csGetInteger(CS, "ID");
                                         cmdDetail.addonName = addonName;
                                         cmdDetail.args = GenericController.convertAddonArgumentstoDocPropertiesList(coreApp, coreApp.db.csGetText(CS, "argumentlist"));
@@ -207,13 +207,13 @@ namespace Contensive.Processor.Controllers {
         /// <param name="cmdDetail"></param>
         /// <param name="downloadName"></param>
         /// <returns></returns>
-        static public bool addTaskToQueue(CoreController core, TaskModel.cmdDetailClass cmdDetail, bool blockDuplicates, string downloadName, string downloadFilename) {
+        static public bool addTaskToQueue(CoreController core, TaskModel.CmdDetailClass cmdDetail, bool blockDuplicates, string downloadName, string downloadFilename) {
             bool resultTaskAdded = true;
             try {
                 //
                 int downloadId = 0;
                 if (!string.IsNullOrEmpty(downloadName)) {
-                    var download = DownloadModel.add(core);
+                    var download = BaseModel.addDefault<DownloadModel>(core, CDefModel.create(core, DownloadModel.contentName));
                     download.name = downloadName;
                     download.dateRequested = DateTime.Now;
                     download.requestedBy = core.session.user.id;
@@ -238,7 +238,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- add it to the queue and shell out to the command
                 if (resultTaskAdded) {
-                    var task = TaskModel.add(core);
+                    var task = TaskModel.addEmpty<TaskModel>(core);
                     task.name = "addon [#" + cmdDetail.addonId + "," + cmdDetail.addonName + "]";
                     task.cmdDetail = cmdDetailJson;
                     task.resultDownloadId = downloadId;
@@ -252,10 +252,10 @@ namespace Contensive.Processor.Controllers {
             return resultTaskAdded;
         }
         //
-        static public bool addTaskToQueue(CoreController core, TaskModel.cmdDetailClass cmdDetail, bool blockDuplicates)
+        static public bool addTaskToQueue(CoreController core, TaskModel.CmdDetailClass cmdDetail, bool blockDuplicates)
             => addTaskToQueue(core, cmdDetail, blockDuplicates, "", "");
         //
-        static public bool addTaskToQueue(CoreController core, TaskModel.cmdDetailClass cmdDetail, bool blockDuplicates, string downloadName)
+        static public bool addTaskToQueue(CoreController core, TaskModel.CmdDetailClass cmdDetail, bool blockDuplicates, string downloadName)
             => addTaskToQueue(core, cmdDetail, blockDuplicates, downloadName, "");
         //
         //====================================================================================================

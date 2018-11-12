@@ -3289,7 +3289,7 @@ namespace Contensive.Addons.Tools {
                         FindText = core.docProperties.getText("FindText");
                         ReplaceText = core.docProperties.getText("ReplaceText");
                         QS = "app=" + encodeNvaArgument(core.appConfig.name) + "&FindText=" + encodeNvaArgument(FindText) + "&ReplaceText=" + encodeNvaArgument(ReplaceText) + "&CDefNameList=" + encodeNvaArgument(CDefList);
-                        var cmdDetail = new TaskModel.cmdDetailClass();
+                        var cmdDetail = new TaskModel.CmdDetailClass();
                         cmdDetail.addonId = 0;
                         cmdDetail.addonName = "GetForm_FindAndReplace";
                         cmdDetail.args = GenericController.convertAddonArgumentstoDocPropertiesList(core, QS);
@@ -3374,7 +3374,7 @@ namespace Contensive.Addons.Tools {
                     LogController.logDebug(core, "Restarting IIS");
                     core.webServer.redirect("/ContensiveBase/Popup/WaitForIISReset.htm");
                     Thread.Sleep(2000);
-                    var cmdDetail = new TaskModel.cmdDetailClass();
+                    var cmdDetail = new TaskModel.CmdDetailClass();
                     cmdDetail.addonId = 0;
                     cmdDetail.addonName = "GetForm_IISReset";
                     cmdDetail.args = GenericController.convertAddonArgumentstoDocPropertiesList(core, "");

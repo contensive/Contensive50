@@ -94,9 +94,9 @@ namespace Contensive.Addons.AdminSite {
                         // ----- Whats New Expiration
                         //
                         if (editRecord.Read_Only) {
-                            HTMLFieldString = AdminUIController.getDefaultEditor_Date(core, "ContentWatchExpires", adminData.ContentWatchExpires, true, "", false, "");
+                            HTMLFieldString = AdminUIController.getDefaultEditor_DateTime(core, "ContentWatchExpires", adminData.ContentWatchExpires, true, "", false, "");
                         } else {
-                            HTMLFieldString = AdminUIController.getDefaultEditor_Date(core, "ContentWatchExpires", adminData.ContentWatchExpires, false, "", false, "");
+                            HTMLFieldString = AdminUIController.getDefaultEditor_DateTime(core, "ContentWatchExpires", adminData.ContentWatchExpires, false, "", false, "");
                         }
                         FastString.Add(AdminUIController.getEditRowLegacy(core, HTMLFieldString, "Expires", "When this record is included in a What's New list, this record is blocked from the list after this date.", false, false, ""));
                         //

@@ -23,7 +23,7 @@ namespace Contensive.Processor.Models.Db {
         /// <summary>
         /// model for cmdDetail field. Field contains a JSON serialization of this class
         /// </summary>
-        public class cmdDetailClass {
+        public class CmdDetailClass {
             public int addonId;
             public string addonName;
             public Dictionary<string, string> args;

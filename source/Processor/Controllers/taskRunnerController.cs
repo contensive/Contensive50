@@ -221,7 +221,7 @@ namespace Contensive.Processor.Controllers {
                         DateTime dateStarted = DateTime.Now;
                         task.dateStarted = dateStarted;
                         task.save(cp.core);
-                        var cmdDetail = cp.core.json.Deserialize<TaskModel.cmdDetailClass>(task.cmdDetail);
+                        var cmdDetail = cp.core.json.Deserialize<TaskModel.CmdDetailClass>(task.cmdDetail);
                         if (cmdDetail != null) {
                             var addon = AddonModel.create(cp.core, cmdDetail.addonId);
                             if ( addon != null ) {
@@ -233,7 +233,7 @@ namespace Contensive.Processor.Controllers {
                                 };
                                 string result = cp.core.addon.execute(addon, context);
                                 if ( task.resultDownloadId>0) {
-                                    var download = DownloadModel.create(cp.core, task.resultDownloadId);
+                                    var download = BaseModel.create<DownloadModel>(cp.core, task.resultDownloadId);
                                     if ( download != null ) {
                                         if ( string.IsNullOrEmpty( download.name )) {
                                             download.name = "Download";

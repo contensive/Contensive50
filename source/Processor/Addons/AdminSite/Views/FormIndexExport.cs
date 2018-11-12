@@ -148,43 +148,20 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 // Request the download
                                 //
-                                switch (ExportType) {
-                                    case 1:
-                                        var ExportCSVAddon = Processor.Models.Db.AddonModel.create(core, addonGuidExportCSV);
-                                        if (ExportCSVAddon == null) {
-                                            LogController.handleError(core, new GenericException("ExportCSV addon not found. Task could not be added to task queue."));
-                                        } else {
-                                            var docProperties = new Dictionary<string, string> {
+                                var ExportCSVAddon = Processor.Models.Db.AddonModel.create(core, addonGuidExportCSV);
+                                if (ExportCSVAddon == null) {
+                                    LogController.handleError(core, new GenericException("ExportCSV addon not found. Task could not be added to task queue."));
+                                } else {
+                                    var docProperties = new Dictionary<string, string> {
                                                 { "sql", SQL },
-                                                { "ExportName", ExportName },
-                                                { "filename", "Export-" + GenericController.GetRandomInteger(core).ToString() + ".csv" }
+                                                { "datasource", "default" }
                                             };
-                                            var cmdDetail = new CmdDetailClass() {
-                                                addonId = ExportCSVAddon.id,
-                                                addonName = ExportCSVAddon.name,
-                                                args = docProperties
-                                            };
-                                            TaskSchedulerControllerx.addTaskToQueue(core, taskCommandBuildCsv, cmdDetail, false);
-                                        }
-                                        break;
-                                    default:
-                                        var ExportXMLAddon = Processor.Models.Db.AddonModel.create(core, addonGuidExportXML);
-                                        if (ExportXMLAddon == null) {
-                                            LogController.handleError(core, new GenericException(message: "ExportXML addon not found. Task could not be added to task queue."));
-                                        } else {
-                                            var docProperties = new Dictionary<string, string> {
-                                                { "sql", SQL },
-                                                { "ExportName", ExportName },
-                                                { "filename", "Export-" + GenericController.GetRandomInteger(core).ToString() + ".xml" }
-                                            };
-                                            var cmdDetail = new CmdDetailClass() {
-                                                addonId = ExportXMLAddon.id,
-                                                addonName = ExportXMLAddon.name,
-                                                args = docProperties
-                                            };
-                                            TaskSchedulerControllerx.addTaskToQueue(core, taskCommandBuildXml, cmdDetail, false);
-                                        }
-                                        break;
+                                    var cmdDetail = new TaskModel.CmdDetailClass() {
+                                        addonId = ExportCSVAddon.id,
+                                        addonName = ExportCSVAddon.name,
+                                        args = docProperties
+                                    };
+                                    TaskSchedulerControllerx.addTaskToQueue(core, cmdDetail, false);
                                 }
                                 //
                                 Content = ""

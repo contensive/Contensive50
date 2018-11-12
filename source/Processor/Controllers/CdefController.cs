@@ -344,9 +344,7 @@ namespace Contensive.Processor.Controllers {
         public static string getContentTablename(CoreController core, string ContentName) {
             string returnTableName = "";
             try {
-                Models.Domain.CDefModel CDef;
-                //
-                CDef = CDefModel.create(core, ContentName);
+                var CDef = CDefModel.create(core, ContentName);
                 if (CDef != null) {
                     returnTableName = CDef.tableName;
                 }

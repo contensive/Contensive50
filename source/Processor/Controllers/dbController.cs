@@ -1296,7 +1296,7 @@ namespace Contensive.Processor.Controllers {
                 if (string.IsNullOrEmpty(ContentName)) {
                     throw new ArgumentException("ContentName cannot be blank");
                 } else {
-                    CDefModel CDef = CDefModel.create(core, ContentName);
+                    var CDef = CDefModel.create(core, ContentName);
                     if (CDef == null) {
                         throw (new GenericException("No content found For [" + ContentName + "]"));
                     } else if (CDef.id <= 0) {
@@ -1430,7 +1430,7 @@ namespace Contensive.Processor.Controllers {
                 if (string.IsNullOrEmpty(ContentName)) {
                     throw new ArgumentException("ContentName cannot be blank");
                 } else {
-                    CDefModel CDef = CDefModel.create(core, ContentName);
+                    var CDef = CDefModel.create(core, ContentName);
                     if (CDef == null) {
                         throw (new GenericException("No content found For [" + ContentName + "]"));
                     } else if (CDef.id <= 0) {
