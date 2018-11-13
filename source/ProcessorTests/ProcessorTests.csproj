@@ -128,6 +128,7 @@
     <Compile Include="UnitTests\Views\cpApi\cpContentTests.cs" />
     <Compile Include="UnitTests\Views\cpApi\cpCSTests.cs" />
     <Compile Include="UnitTests\Views\cpApi\cpSecurityTests.cs" />
+    <Compile Include="UnitTests\Views\cpApi\cpUserTests.cs" />
     <Compile Include="UnitTests\Views\cpApi\cpTests.cs" />
     <Compile Include="UnitTests\Views\cpApi\NumericHelper.cs" />
   </ItemGroup>
