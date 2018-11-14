@@ -8378,10 +8378,10 @@ namespace Contensive.Addons.AdminSite {
                 });
                 //
                 // -- shortterm fix - make navigator changes, long term pull it into project
-                string src = "<img title=\"Open Navigator\" alt=\"Open Navigator\" src=\"/cclib/images/OpenRightRev1313.gif\" width=13 height=13 border=0 style=\"text-align:right;\">";
-                AdminNavFull = AdminNavFull.Replace(src, iconOpen);
-                src = "<img alt=\"Close Navigator\" title=\"Close Navigator\" src=\"/cclib/images/ClosexRev1313.gif\" width=13 height=13 border=0>";
-                AdminNavFull = AdminNavFull.Replace(src, iconClose);
+                //string src = "<img title=\"Open Navigator\" alt=\"Open Navigator\" src=\"/cclib/images/OpenRightRev1313.gif\" width=13 height=13 border=0 style=\"text-align:right;\">";
+                //AdminNavFull = AdminNavFull.Replace(src, iconOpen);
+                //src = "<img alt=\"Close Navigator\" title=\"Close Navigator\" src=\"/cclib/images/ClosexRev1313.gif\" width=13 height=13 border=0>";
+                //AdminNavFull = AdminNavFull.Replace(src, iconClose);
                 Stream.Add("<table border=0 cellpadding=0 cellspacing=0><tr>\r<td class=\"ccToolsCon\" valign=top>" + GenericController.nop(AdminNavFull) + "\r</td>\r<td id=\"desktop\" class=\"ccContentCon\" valign=top>");
                 adminContext.adminFooter = adminContext.adminFooter + "</td></tr></table>";
                 //

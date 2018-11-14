@@ -13,21 +13,21 @@ namespace Contensive.Processor {
         public const string cacheObject_addonCache = "addonCache";
         //
         // -- symbols 
-        public const string iconNotAvailable = "<i alt=\"not available\" title=\"not available\" class=\"fas fa-ban\"></i>";
-        public const string iconExpand = "<i alt=\"expand\" title=\"expand\" class=\"fas fa-chevron-circle-up\"></i>";
-        public const string iconContract = "<i alt=\"contract\" title=\"contract\" class=\"fas fa-chevron-circle-down\"></i>";
-        public const string iconArrowUp = "<i alt=\"right\" title=\"right\" class=\"fas fa-arrow-circle-up\"></i>";
-        public const string iconArrowDown = "<i alt=\"right\" title=\"right\" class=\"fas fa-arrow-circle-down\"></i>";
-        public const string iconArrowRight = "<i alt=\"right\" title=\"right\" class=\"fas fa-arrow-circle-right\"></i>";
-        public const string iconArrowLeft = "<i alt=\"left\" title=\"left\" class=\"fas fa-arrow-circle-left\"></i>";
-        public const string iconDelete = "<i alt=\"delete\" title=\"delete\" class=\"fas fa-trash\" style=\"color:#f00\"></i>";
-        public const string iconAdd = "<i alt=\"add\" title=\"add\" class=\"fas fa-plus-circle\"></i>";
-        public const string iconClose = "<i alt=\"close\" title=\"close\" class=\"fas fa-window-close\"></i>";
-        public const string iconEdit = "<i alt=\"edit\" title=\"edit\" class=\"fas fa-pen-square\"></i>";
-        public const string iconOpen = "<i alt=\"open\" title=\"open\" class=\"fas fa-angle-double-right\">";
-        public const string iconRefresh = "<i alt=\"refresh\" title=\"refresh\" class=\"fas fa-sync-alt\">";
-        public const string iconContentCut = "<i alt=\"content cut\" title=\"refresh\" class=\"fas fa-cut\">";
-        public const string iconContentPaste = "<i alt=\"content add\" title=\"refresh\" class=\"fas fa-paste\">";
+        public const string iconNotAvailable = "<i title=\"not available\" class=\"fas fa-ban\"></i>";
+        public const string iconExpand = "<i title=\"expand\" class=\"fas fa-chevron-circle-up\"></i>";
+        public const string iconContract = "<i title=\"contract\" class=\"fas fa-chevron-circle-down\"></i>";
+        public const string iconArrowUp = "<i title=\"right\" class=\"fas fa-arrow-circle-up\"></i>";
+        public const string iconArrowDown = "<i title=\"right\" class=\"fas fa-arrow-circle-down\"></i>";
+        public const string iconArrowRight = "<i title=\"right\" class=\"fas fa-arrow-circle-right\"></i>";
+        public const string iconArrowLeft = "<i title=\"left\" class=\"fas fa-arrow-circle-left\"></i>";
+        public const string iconDelete = "<i title=\"delete\" class=\"fas fa-trash\" style=\"color:#f00\"></i>";
+        public const string iconAdd = "<i title=\"add\" class=\"fas fa-plus-circle\"></i>";
+        public const string iconClose = "<i title=\"close\" class=\"fas fa-window-close\"></i>";
+        public const string iconEdit = "<i title=\"edit\" class=\"fas fa-pen-square\"></i>";
+        public const string iconOpen = "<i title=\"open\" class=\"fas fa-angle-double-right\"></i>";
+        public const string iconRefresh = "<i title=\"refresh\" class=\"fas fa-sync-alt\"></i>";
+        public const string iconContentCut = "<i title=\"refresh\" class=\"fas fa-cut\"></i>";
+        public const string iconContentPaste = "<i title=\"refresh\" class=\"fas fa-paste\"></i>";
         //
         // -- content names
         public const string cnBlank = "";
