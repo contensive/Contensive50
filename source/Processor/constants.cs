@@ -48,14 +48,14 @@ namespace Contensive.Processor {
         public const string iconAdd_Green = "<span style=\"color:#0c0\">" + iconAdd + "</span>";
         public const string iconEdit = "<i alt=\"edit\" title=\"edit\" class=\"fas fa-pen-square\"></i>";
         public const string iconEdit_Green = "<span style=\"color:#0c0\">" + iconEdit + "</span>";
-        public const string iconRefresh = "<i alt=\"refresh\" title=\"refresh\" class=\"fas fa-sync-alt\">";
-        public const string iconContentCut = "<i alt=\"cut\" title=\"cut\" class=\"fas fa-cut\">";
-        public const string iconContentPaste = "<i alt=\"add\" title=\"add\" class=\"fas fa-paste\">";
+        public const string iconRefresh = "<i alt=\"refresh\" title=\"refresh\" class=\"fas fa-sync-alt\"></i>";
+        public const string iconContentCut = "<i alt=\"cut\" title=\"cut\" class=\"fas fa-cut\"></i>";
+        public const string iconContentPaste = "<i alt=\"add\" title=\"add\" class=\"fas fa-paste\"></i>";
         public const string iconClose = "<i alt=\"close\" title=\"close\" class=\"fas fa-times\"></i>";
         //public const string iconClose = "<i alt=\"close\" title=\"close\" class=\"fas fa-window-close\"></i>";
         public const string iconClose_White = "<span style=\"color:#fff\">" + iconClose + "</span>";
         public const string iconClose_Red = "<span style=\"color:#f00\">" + iconClose + "</span>";
-        public const string iconOpen = "<i alt=\"open\" title=\"open\" class=\"fas fa-angle-double-right\">";
+        public const string iconOpen = "<i alt=\"open\" title=\"open\" class=\"fas fa-angle-double-right\"></i>";
         public const string iconOpen_White = "<span style=\"color:#fff\">" + iconOpen + "</span>";
         //
         /// <summary>

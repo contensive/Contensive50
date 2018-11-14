@@ -1665,11 +1665,11 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // -- shortterm fix - make navigator changes, long term pull it into project
                 // "<ximg title=\"Open Navigator\" alt=\"Open Navigator\" src=\"/ContensiveBase/images/OpenRightRev1313.gif\" width=13 height=13 border=0 style=\"text-align:right;\">";
-                string src = HtmlController.img("/ContensiveBase/images/OpenRightRev1313.gif", "Open Navigator", 13, 13 ).Replace( ">", "style=\"text-align:right;\">");
-                AdminNavFull = AdminNavFull.Replace(src, iconOpen_White);
-                // "<ximg alt=\"Close Navigator\" title=\"Close Navigator\" src=\"/ContensiveBase/images/ClosexRev1313.gif\" width=13 height=13 border=0>";
-                src = HtmlController.img("/ContensiveBase/images/ClosexRev1313.gif", "Close Navigator", 13, 13);
-                AdminNavFull = AdminNavFull.Replace(src, iconClose_White);
+                //string src = HtmlController.img("/ContensiveBase/images/OpenRightRev1313.gif", "Open Navigator", 13, 13 ).Replace( ">", "style=\"text-align:right;\">");
+                //AdminNavFull = AdminNavFull.Replace(src, iconOpen_White);
+                //// "<ximg alt=\"Close Navigator\" title=\"Close Navigator\" src=\"/ContensiveBase/images/ClosexRev1313.gif\" width=13 height=13 border=0>";
+                //src = HtmlController.img("/ContensiveBase/images/ClosexRev1313.gif", "Close Navigator", 13, 13);
+                //AdminNavFull = AdminNavFull.Replace(src, iconClose_White);
                 Stream.Add("<table border=0 cellpadding=0 cellspacing=0><tr>\r<td class=\"ccToolsCon\" valign=top>" + AdminNavFull + "</td>\r<td id=\"desktop\" class=\"ccContentCon\" valign=top>");
                 adminData.adminFooter = adminData.adminFooter + "</td></tr></table>";
                 //
