@@ -673,7 +673,7 @@ namespace Contensive.Processor.Controllers {
                     if ((executeContext.forceHtmlDocument) || ((rootLevelAddon) && (addon.htmlDocument))) {
                         DebugController.testPoint(core, "root level addon is html, build document around result");
                         result = core.html.getHtmlDoc(result, "<body>");
-                        if (!core.doc.visitPropertyAllowDebugging) {
+                        if ((!core.doc.visitPropertyAllowDebugging) && (core.siteProperties.getBoolean("Allow Html Minify", true))) {
                             result = NUglify.Uglify.Html(result).Code;
                         }
                     }
