@@ -1504,15 +1504,19 @@ namespace Contensive.Processor.Controllers {
         //====================================================================================================
         //
         public static DateTime encodeDate(object Expression) {
-            DateTime tempEncodeDate = default(DateTime);
-            tempEncodeDate = DateTime.MinValue;
-            if (DateController.IsDate(Expression)) {
-                tempEncodeDate = Convert.ToDateTime(Expression);
-                //If EncodeDate < #1/1/1990# Then
-                //    EncodeDate = Date.MinValue
-                //End If
+            DateTime result = DateTime.MinValue;
+            if (Expression is string) {
+                // visual basic - when converting a date to a string, it converts minDate to "12:00:00 AM". 
+                // however, Convert.ToDateTime() converts "12:00:00 AM" to the current date.
+                // this is a terrible hack, but to be compatible with current software, "#12:00:00 AM#" must return mindate
+                if ((String)Expression == "12:00:00 AM") {
+                    return result;
+                }
             }
-            return tempEncodeDate;
+            if (DateController.IsDate(Expression)) {
+                result = Convert.ToDateTime(Expression);
+            }
+            return result;
         }
         //
         //========================================================================
