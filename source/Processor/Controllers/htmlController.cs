@@ -1365,18 +1365,15 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static string getHtmlInputSubmit(string value, string name = "button", string htmlId = "", string OnClick = "", bool Disabled = false, string htmlClass = "") {
-            string s = "<input type=\"submit\""
-                + " name=\"" + GenericController.encodeEmpty(name, "button") + "\""
-                + " value=\"" + value + "\""
-                + " onclick=\"" + OnClick + "\""
-                + " id=\"" + htmlId + "\""
-                + " class=\"" + htmlClass + "\"";
-            if (Disabled) {
-                s = s + " disabled=\"disabled\"";
-            }
-            s += ">";
-            return s;
+        public static string getHtmlInputSubmit(string htmlValue, string htmlName = "button", string htmlId = "", string onClick = "", bool disabled = false, string htmlClass = "") {
+            string attrList = " type=submit name=\"" + HtmlController.encodeHtml(htmlName) + "\"";
+            attrList += (string.IsNullOrEmpty(htmlName)) ? "" : " name=\"" + htmlName + "\"";
+            attrList += (string.IsNullOrEmpty(htmlValue)) ? "" : " value=\"" + htmlValue + "\"";
+            attrList += (string.IsNullOrEmpty(htmlId)) ? "" : " id=\"" + htmlId + "\"";
+            attrList += (string.IsNullOrEmpty(htmlClass)) ? "" : " class=\"" + htmlClass + "\"";
+            attrList += (string.IsNullOrEmpty(onClick)) ? "" : " onclick=\"" + onClick + "\"";
+            attrList += (!disabled) ? "" : " disabled";
+            return "<input" + attrList + ">";
         }
         //
         //====================================================================================================
