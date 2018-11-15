@@ -1435,7 +1435,7 @@ namespace Contensive.Addons.AdminSite {
                                     + "\r\n<div id=\"IndexFilterHeCursorTypeEnum.ADOPENed\" class=\"opened\" style=\"display:none;\">"
                                     + "\r<table border=0 cellpadding=0 cellspacing=0 width=\"100%\"><tr>"
                                     + "\r<td valign=Middle class=\"left\">Filter</td>"
-                                    + "\r<td valign=Middle class=\"right\"><a href=\"#\" onClick=\"CloseIndexFilter();return false\"><i title=\"close\" class=\"fa fa-remove\" style=\"color:#f00\"></i></a></td>"
+                                    + "\r<td valign=Middle class=\"right\"><a href=\"#\" onClick=\"CloseIndexFilter();return false\">" + iconClose + "</i></a></td>"
                                     + "\r</tr></table>"
                                     + "\r\n</div>"
                                     + "\r\n<div id=\"IndexFilterHeadClosed\" class=\"closed\">"

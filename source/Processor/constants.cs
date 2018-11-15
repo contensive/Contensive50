@@ -20,7 +20,7 @@ namespace Contensive.Processor {
         public const string iconArrowDown = "<i title=\"right\" class=\"fas fa-arrow-circle-down\"></i>";
         public const string iconArrowRight = "<i title=\"right\" class=\"fas fa-arrow-circle-right\"></i>";
         public const string iconArrowLeft = "<i title=\"left\" class=\"fas fa-arrow-circle-left\"></i>";
-        public const string iconDelete = "<i title=\"delete\" class=\"fas fa-trash\" style=\"color:#f00\"></i>";
+        public const string iconDelete = "<i title=\"delete\" class=\"fas fa-times\" style=\"color:#f00\"></i>";
         public const string iconAdd = "<i title=\"add\" class=\"fas fa-plus-circle\"></i>";
         public const string iconClose = "<i title=\"close\" class=\"fas fa-window-close\"></i>";
         public const string iconEdit = "<i title=\"edit\" class=\"fas fa-pen-square\"></i>";

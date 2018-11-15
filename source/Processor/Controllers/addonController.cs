@@ -2015,7 +2015,7 @@ namespace Contensive.Processor.Controllers {
                             + "<table border=0 cellpadding=0 cellspacing=0 width=\"100%\">"
                             + "<tr>"
                             + "<td align=left class=\"bbLeft\">Options for this instance of " + AddonName + "</td>"
-                            + "<td align=right class=\"bbRight\"><a href=\"#\" onClick=\"HelpBubbleOff('HelpBubble" + core.doc.helpCodes.Count + "');return false;\"><i title=\"close\" class=\"fa fa-remove\" style=\"color:#f00\"></i></a></td>"
+                            + "<td align=right class=\"bbRight\"><a href=\"#\" onClick=\"HelpBubbleOff('HelpBubble" + core.doc.helpCodes.Count + "');return false;\">" + iconClose + "</a></td>"
                             + "</tr>"
                             + "</table>"
                             + "</div>";
@@ -2260,7 +2260,7 @@ namespace Contensive.Processor.Controllers {
                             + "<table border=0 cellpadding=0 cellspacing=0 width=\"100%\">"
                             + "<tr>"
                             + "<td align=left class=\"bbLeft\">Stylesheet for " + addon.name + "</td>"
-                            + "<td align=right class=\"bbRight\"><a href=\"#\" onClick=\"HelpBubbleOff('HelpBubble" + core.doc.helpCodes.Count + "');return false;\"><i title=\"close\" class=\"fa fa-remove\" style=\"color:#f00\"></i></a></td>"
+                            + "<td align=right class=\"bbRight\"><a href=\"#\" onClick=\"HelpBubbleOff('HelpBubble" + core.doc.helpCodes.Count + "');return false;\">" + iconClose + "</a></td>"
                             + "</tr>"
                             + "</table>"
                             + "</div>";
@@ -2350,7 +2350,7 @@ namespace Contensive.Processor.Controllers {
                         + "<table border=0 cellpadding=0 cellspacing=0 width=\"100%\">"
                         + "<tr>"
                         + "<td align=left class=\"bbLeft\">Help Viewer</td>"
-                        + "<td align=right class=\"bbRight\"><a href=\"#\" onClick=\"HelpBubbleOff('HelpBubble" + core.doc.helpCodes.Count + "');return false;\"><i title=\"close\" class=\"fa fa-remove\" style=\"color:#f00\"></i></a></td>"
+                        + "<td align=right class=\"bbRight\"><a href=\"#\" onClick=\"HelpBubbleOff('HelpBubble" + core.doc.helpCodes.Count + "');return false;\">" + iconClose + "</i></a></td>"
                         + "</tr>"
                         + "</table>"
                         + "</div>";
@@ -2414,7 +2414,7 @@ namespace Contensive.Processor.Controllers {
                             + "<table border=0 cellpadding=0 cellspacing=0 width=\"100%\">"
                             + "<tr>"
                             + "<td align=left class=\"bbLeft\">HTML viewer</td>"
-                            + "<td align=right class=\"bbRight\"><a href=\"#\" onClick=\"HelpBubbleOff('" + HTMLViewerBubbleID + "');return false;\"><i title=\"close\" class=\"fa fa-remove\" style=\"color:#f00\"></i></A></td>"
+                            + "<td align=right class=\"bbRight\"><a href=\"#\" onClick=\"HelpBubbleOff('" + HTMLViewerBubbleID + "');return false;\">" + iconClose + "</i></A></td>"
                             + "</tr>"
                             + "</table>"
                             + "</div>";
