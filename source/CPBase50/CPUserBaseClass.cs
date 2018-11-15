@@ -1,18 +1,5 @@
-﻿//========================================================================
-
-
-
-//========================================================================
-
-//
-// documentation should be in a new project that inherits these classes. The class names should be the object names in the actual cp project
-//
-
-
+﻿
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace Contensive.BaseClasses
 {
@@ -58,16 +45,34 @@ namespace Contensive.BaseClasses
 		public abstract int OrganizationID {get;}
 		public abstract string Password {get;}
 		public abstract string Username {get;}
-		//
-		public abstract string GetProperty(string PropertyName, string DefaultValue = "", int TargetVisitId = 0);
-		public abstract string GetText(string PropertyName, string DefaultValue = "");
-		public abstract bool GetBoolean(string PropertyName, string DefaultValue = "");
-		public abstract DateTime GetDate(string PropertyName, string DefaultValue = "");
-		public abstract int GetInteger(string PropertyName, string DefaultValue = "");
-		public abstract double GetNumber(string PropertyName, string DefaultValue = "");
-		//Public MustOverride Function IsProperty(ByVal PropertyName As String) As Boolean
-		public abstract void SetProperty(string PropertyName, string Value, int TargetVisitId = 0);
-	}
+        //
+        public abstract string GetProperty(string PropertyName, string DefaultValue = "", int TargetVisitId = 0);
+        public abstract string GetText(string PropertyName);
+        public abstract string GetText(string PropertyName, string DefaultValue);
+        public abstract bool GetBoolean(string PropertyName);
+        public abstract bool GetBoolean(string PropertyName, bool DefaultValue);
+        public abstract DateTime GetDate(string PropertyName);
+        public abstract DateTime GetDate(string PropertyName, DateTime DefaultValue);
+        public abstract int GetInteger(string PropertyName);
+        public abstract int GetInteger(string PropertyName, int DefaultValue);
+        public abstract double GetNumber(string PropertyName);
+        public abstract double GetNumber(string PropertyName, double DefaultValue);
+        public abstract void SetProperty(string PropertyName, string Value, int TargetVisitId = 0);
+        //
+        // -- deprecated
+        //
+        [Obsolete("correct default type", true)]
+        public abstract bool GetBoolean(string PropertyName, string DefaultValue);
+        //
+        [Obsolete("correct default type", true)]
+        public abstract DateTime GetDate(string PropertyName, string DefaultValue);
+        //
+        [Obsolete("correct default type", true)]
+        public abstract int GetInteger(string PropertyName, string DefaultValue);
+        //
+        [Obsolete("correct default type", true)]
+        public abstract double GetNumber(string PropertyName, string DefaultValue);
+    }
 
 
 }

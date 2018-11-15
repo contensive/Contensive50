@@ -354,42 +354,37 @@ namespace Contensive.Processor {
         }
         //
         //=======================================================================================================
-        // todo REFACTOR -- obsolete this and setup the defaultValue type correctly, and add the targetUserId
-        //=======================================================================================================
         //
-        public override bool GetBoolean(string PropertyName, string DefaultValue = "") {
-            return CP.core.userProperty.getBoolean(PropertyName, GenericController.encodeBoolean(DefaultValue));
-        }
-        //
-        //=======================================================================================================
-        //  todo REFACTOR -- obsolete this and setup the defaultValue type correctly, and add the targetUserId
-        //=======================================================================================================
-        //
-        public override DateTime GetDate(string PropertyName, string DefaultValue = "") {
-            return CP.core.userProperty.getDate(PropertyName, GenericController.encodeDate(DefaultValue));
-        }
-        //
-        //=======================================================================================================
-        // todo  REFACTOR -- obsolete this and setup the defaultValue type correctly, and add the targetUserId
-        //=======================================================================================================
-        //
-        public override int GetInteger(string PropertyName, string DefaultValue = "") {
-            return CP.core.userProperty.getInteger(PropertyName, GenericController.encodeInteger(DefaultValue));
-        }
-        //
-        //=======================================================================================================
-        // todo  REFACTOR -- obsolete this and setup the defaultValue type correctly, and add the targetUserId
-        //=======================================================================================================
-        //
-        public override double GetNumber(string PropertyName, string DefaultValue = "") {
-            return CP.core.userProperty.getNumber(PropertyName, encodeNumber(DefaultValue));
-        }
+        public override bool GetBoolean(string PropertyName) => CP.core.userProperty.getBoolean(PropertyName);
+        public override bool GetBoolean(string PropertyName, bool DefaultValue) => CP.core.userProperty.getBoolean(PropertyName, DefaultValue);
+        [Obsolete()]
+        public override bool GetBoolean(string PropertyName, string DefaultValue) => CP.core.userProperty.getBoolean(PropertyName, encodeBoolean(DefaultValue));
         //
         //=======================================================================================================
         //
-        public override string GetText(string PropertyName, string DefaultValue = "") {
-            return CP.core.userProperty.getText(PropertyName, DefaultValue);
-        }
+        public override DateTime GetDate(string PropertyName) => CP.core.userProperty.getDate(PropertyName);
+        public override DateTime GetDate(string PropertyName, DateTime DefaultValue) => CP.core.userProperty.getDate(PropertyName, DefaultValue);
+        [Obsolete()]
+        public override DateTime GetDate(string PropertyName, string DefaultValue) => CP.core.userProperty.getDate(PropertyName, encodeDate(DefaultValue));
+        //
+        //=======================================================================================================
+        //
+        public override int GetInteger(string PropertyName) => CP.core.userProperty.getInteger(PropertyName);
+        public override int GetInteger(string PropertyName, int DefaultValue) => CP.core.userProperty.getInteger(PropertyName, DefaultValue);
+        [Obsolete()]
+        public override int GetInteger(string PropertyName, string DefaultValue) => CP.core.userProperty.getInteger(PropertyName, encodeInteger(DefaultValue));
+        //
+        //=======================================================================================================
+        //
+        public override double GetNumber(string PropertyName) => CP.core.userProperty.getNumber(PropertyName);
+        public override double GetNumber(string PropertyName, double DefaultValue) => CP.core.userProperty.getNumber(PropertyName, DefaultValue);
+        [Obsolete()]
+        public override double GetNumber(string PropertyName, string DefaultValue) => CP.core.userProperty.getNumber(PropertyName, encodeNumber(DefaultValue));
+        //
+        //=======================================================================================================
+        //
+        public override string GetText(string PropertyName) => CP.core.userProperty.getText(PropertyName);
+        public override string GetText(string PropertyName, string DefaultValue) => CP.core.userProperty.getText(PropertyName, DefaultValue);
         //
         //====================================================================================================
         // todo  obsolete
