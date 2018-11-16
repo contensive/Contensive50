@@ -1366,43 +1366,40 @@ namespace Contensive.Processor.Controllers {
         //====================================================================================================
         //
         public static string getHtmlInputSubmit(string htmlValue, string htmlName = "button", string htmlId = "", string onClick = "", bool disabled = false, string htmlClass = "") {
-            string attrList = " type=submit name=\"" + HtmlController.encodeHtml(htmlName) + "\"";
+            string attrList = "<input type=submit name=\"" + HtmlController.encodeHtml(htmlName) + "\"";
             attrList += (string.IsNullOrEmpty(htmlName)) ? "" : " name=\"" + htmlName + "\"";
             attrList += (string.IsNullOrEmpty(htmlValue)) ? "" : " value=\"" + htmlValue + "\"";
             attrList += (string.IsNullOrEmpty(htmlId)) ? "" : " id=\"" + htmlId + "\"";
             attrList += (string.IsNullOrEmpty(htmlClass)) ? "" : " class=\"" + htmlClass + "\"";
             attrList += (string.IsNullOrEmpty(onClick)) ? "" : " onclick=\"" + onClick + "\"";
             attrList += (!disabled) ? "" : " disabled";
-            return "<input" + attrList + ">";
+            return attrList + ">";
         }
         //
         //====================================================================================================
         //
-        public static string inputHidden(string name, string value, string htmlId = "") {
-            string result = "<input type=\"hidden\" name=\"" + HtmlController.encodeHtml(name) + "\"";
-            string iTagValue = HtmlController.encodeHtml(value);
-            if (!string.IsNullOrEmpty(iTagValue)) {
-                result += " VALUE=\"" + iTagValue + "\"";
-            }
-            string ihtmlId = GenericController.encodeText(htmlId);
-            if (!string.IsNullOrEmpty(ihtmlId)) {
-                result += " ID=\"" + HtmlController.encodeHtml(ihtmlId) + "\"";
-            }
-            result += ">";
-            return result;
+        public static string inputHidden(string htmlName, string htmlValue, string htmlClass, string htmlId) {
+            string attrList = "<input type=hidden name=\"" + HtmlController.encodeHtml(htmlName) + "\"";
+            attrList += (string.IsNullOrEmpty(htmlName)) ? "" : " name=\"" + htmlName + "\"";
+            attrList += (string.IsNullOrEmpty(htmlValue)) ? "" : " value=\"" + htmlValue + "\"";
+            attrList += (string.IsNullOrEmpty(htmlId)) ? "" : " id=\"" + htmlId + "\"";
+            attrList += (string.IsNullOrEmpty(htmlClass)) ? "" : " class=\"" + htmlClass + "\"";
+            return attrList + ">";
         }
+        public static string inputHidden(string name, string value) => inputHidden(name, value, "", "");
+        public static string inputHidden(string name, string value, string htmlClass) => inputHidden(name, value, htmlClass, "");
         //
-        //====================================================================================================
+        public static string inputHidden(string TagName, bool TagValue) => inputHidden(TagName, TagValue.ToString());
+        public static string inputHidden(string TagName, bool TagValue, string htmlClass) => inputHidden(TagName, TagValue.ToString(), htmlClass);
+        public static string inputHidden(string TagName, bool TagValue, string htmlClass, string htmlId) => inputHidden(TagName, TagValue.ToString(), htmlClass, htmlId);
         //
-        public static string inputHidden(string TagName, bool TagValue, string htmlId = "") {
-            return inputHidden(TagName, TagValue.ToString(), htmlId);
-        }
+        public static string inputHidden(string TagName, int TagValue) => inputHidden(TagName, TagValue.ToString());
+        public static string inputHidden(string TagName, int TagValue, string htmlClass) => inputHidden(TagName, TagValue.ToString(), htmlClass);
+        public static string inputHidden(string TagName, int TagValue, string htmlClass, string htmlId) => inputHidden(TagName, TagValue.ToString(), htmlClass, htmlId);
         //
-        //====================================================================================================
-        //
-        public static string inputHidden(string TagName, int TagValue, string htmlId = "") {
-            return inputHidden(TagName, TagValue.ToString(), htmlId);
-        }
+        public static string inputHidden(string TagName, DateTime TagValue) => inputHidden(TagName, TagValue.ToString());
+        public static string inputHidden(string TagName, DateTime TagValue, string htmlClass) => inputHidden(TagName, TagValue.ToString(), htmlClass);
+        public static string inputHidden(string TagName, DateTime TagValue, string htmlClass, string htmlId) => inputHidden(TagName, TagValue.ToString(), htmlClass, htmlId);
         //
         //====================================================================================================
         //

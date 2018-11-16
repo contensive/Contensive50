@@ -184,9 +184,21 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         //
-        public override string Hidden(string HtmlName, string HtmlValue, string HtmlClass = "", string HtmlId = "") {
-            return HtmlController.inputHidden(HtmlName, HtmlValue, HtmlId);
-        }
+        public override string Hidden(string HtmlName, string HtmlValue) => HtmlController.inputHidden(HtmlName, HtmlValue);
+        public override string Hidden(string HtmlName, string HtmlValue, string HtmlClass) => HtmlController.inputHidden(HtmlName, HtmlValue, HtmlClass);
+        public override string Hidden(string HtmlName, string HtmlValue, string HtmlClass, string HtmlId) => HtmlController.inputHidden(HtmlName, HtmlValue, HtmlClass, HtmlId);
+        //
+        public override string Hidden(string HtmlName, int HtmlValue) => HtmlController.inputHidden(HtmlName, HtmlValue);
+        public override string Hidden(string HtmlName, int HtmlValue, string HtmlClass) => HtmlController.inputHidden(HtmlName, HtmlValue, HtmlClass);
+        public override string Hidden(string HtmlName, int HtmlValue, string HtmlClass, string HtmlId) => HtmlController.inputHidden(HtmlName, HtmlValue, HtmlClass, HtmlId);
+        //
+        public override string Hidden(string HtmlName, bool HtmlValue) => HtmlController.inputHidden(HtmlName, HtmlValue);
+        public override string Hidden(string HtmlName, bool HtmlValue, string HtmlClass) => HtmlController.inputHidden(HtmlName, HtmlValue, HtmlClass);
+        public override string Hidden(string HtmlName, bool HtmlValue, string HtmlClass, string HtmlId) => HtmlController.inputHidden(HtmlName, HtmlValue, HtmlClass, HtmlId);
+        //
+        public override string Hidden(string HtmlName, DateTime HtmlValue) => HtmlController.inputHidden(HtmlName, HtmlValue);
+        public override string Hidden(string HtmlName, DateTime HtmlValue, string HtmlClass) => HtmlController.inputHidden(HtmlName, HtmlValue, HtmlClass);
+        public override string Hidden(string HtmlName, DateTime HtmlValue, string HtmlClass, string HtmlId) => HtmlController.inputHidden(HtmlName, HtmlValue, HtmlClass, HtmlId);
         //
         // ====================================================================================================
         //

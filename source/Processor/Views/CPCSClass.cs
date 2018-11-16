@@ -492,6 +492,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
+        [Obsolete("Use SetField for all field types that store data in files (textfile, cssfile, etc)")]
         public override void SetFile(string FieldName, string Copy, string ContentName) {
             try {
                 core.db.csSetTextFile(cs, FieldName, Copy, ContentName);

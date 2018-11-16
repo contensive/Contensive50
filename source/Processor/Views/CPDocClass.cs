@@ -220,9 +220,11 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override void AddRefreshQueryString(string Name, string Value) {
-            core.doc.addRefreshQueryString(Name, Value);
-        }
+        public override void AddRefreshQueryString(string Name, string Value) => core.doc.addRefreshQueryString(Name, Value);
+        public override void AddRefreshQueryString(string Name, int Value) => core.doc.addRefreshQueryString(Name, GenericController.encodeText(Value));
+        public override void AddRefreshQueryString(string Name, double Value) => core.doc.addRefreshQueryString(Name, GenericController.encodeText(Value));
+        public override void AddRefreshQueryString(string Name, bool Value) => core.doc.addRefreshQueryString(Name, GenericController.encodeText(Value));
+        public override void AddRefreshQueryString(string Name, DateTime Value) => core.doc.addRefreshQueryString(Name, GenericController.encodeText(Value));
         //
         //====================================================================================================
         //

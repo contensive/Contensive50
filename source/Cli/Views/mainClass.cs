@@ -121,6 +121,7 @@ namespace Contensive.CLI {
                                                         if (!string.IsNullOrEmpty(returnErrorMessage)) {
                                                             Console.WriteLine("There was an error installing the collection: " + returnErrorMessage);
                                                         }
+                                                        cpApp.Cache.InvalidateAll();
                                                     }
                                                 }
                                             } else {
@@ -133,6 +134,7 @@ namespace Contensive.CLI {
                                                     if (!string.IsNullOrEmpty(returnErrorMessage)) {
                                                         Console.WriteLine("There was an error installing the collection: " + returnErrorMessage);
                                                     }
+                                                    cpApp.Cache.InvalidateAll();
                                                 }
                                             }
                                         }
@@ -146,6 +148,7 @@ namespace Contensive.CLI {
                                         using (Contensive.Processor.CPClass cpApp = new Contensive.Processor.CPClass(appName)) {
                                             cpApp.Doc.SetProperty("force", "1");
                                             cpApp.executeAddon(Contensive.Processor.Constants.addonGuidHousekeep, BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple);
+                                            cpApp.Cache.InvalidateAll();
                                         }
                                     } else {
                                         //
@@ -155,6 +158,7 @@ namespace Contensive.CLI {
                                             using (Contensive.Processor.CPClass cpApp = new Contensive.Processor.CPClass(housekeepAppName)) {
                                                 cpApp.Doc.SetProperty("force", "1");
                                                 cpApp.executeAddon(Contensive.Processor.Constants.addonGuidHousekeep, BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple);
+                                                cpApp.Cache.InvalidateAll();
                                             }
                                         }
                                     }
@@ -474,15 +478,17 @@ namespace Contensive.CLI {
             if (!string.IsNullOrEmpty(appName)) {
                 //
                 // -- upgrade app
-                using (Contensive.Processor.CPClass upgradeApp = new Contensive.Processor.CPClass(appName)) {
-                    Processor.Controllers.AppBuilderController.upgrade(upgradeApp.core, false, repair);
+                using (CPClass upgradeApp = new Contensive.Processor.CPClass(appName)) {
+                    AppBuilderController.upgrade(upgradeApp.core, false, repair);
+                    upgradeApp.Cache.InvalidateAll();
                 }
             } else {
                 //
                 // -- upgrade all apps
                 foreach (KeyValuePair<String, AppConfigModel> kvp in cp.core.serverConfig.apps) {
-                    using (Contensive.Processor.CPClass upgradeApp = new Contensive.Processor.CPClass(kvp.Key)) {
-                        Processor.Controllers.AppBuilderController.upgrade(upgradeApp.core, false, repair);
+                    using (CPClass upgradeApp = new Contensive.Processor.CPClass(kvp.Key)) {
+                        AppBuilderController.upgrade(upgradeApp.core, false, repair);
+                        upgradeApp.Cache.InvalidateAll();
                     }
                 }
             }

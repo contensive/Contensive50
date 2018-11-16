@@ -2218,8 +2218,8 @@ namespace Contensive.Processor.Controllers {
                 } else if (string.IsNullOrEmpty(ContentName)) {
                     throw new ArgumentException("contentName cannot be blank");
                 } else {
-                    var tempVar = dataSetStore[CSPointer];
-                    if (!tempVar.writeable) {
+                    var dataSet = dataSetStore[CSPointer];
+                    if (!dataSet.writeable) {
                         throw new GenericException("Cannot save this dataset because it is read-only.");
                     } else {
                         string OldFilename = csGetText(CSPointer, FieldName);

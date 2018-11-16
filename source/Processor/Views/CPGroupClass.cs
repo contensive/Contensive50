@@ -19,16 +19,18 @@ namespace Contensive.Processor {
         private Contensive.Processor.Controllers.CoreController core;
         private CPClass cp;
         protected bool disposed = false;
-        //
-        // Constructor
-        //
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="cpParent"></param>
         public CPGroupClass(CPClass cpParent) : base() {
             cp = cpParent;
             core = cp.core;
         }
-        //
-        // dispose
-        //
+        /// <summary>
+        /// dispose
+        /// </summary>
+        /// <param name="disposing"></param>
         protected virtual void Dispose(bool disposing) {
             if (!this.disposed) {
                 appendDebugLog(".dispose, dereference cp, main, csv");
@@ -36,8 +38,6 @@ namespace Contensive.Processor {
                     //
                     // call .dispose for managed objects
                     //
-                    cp = null;
-                    core = null;
                 }
                 //
                 // Add code here to release the unmanaged resource.
@@ -45,103 +45,70 @@ namespace Contensive.Processor {
             }
             this.disposed = true;
         }
+        /// <summary>
+        /// Add a group
+        /// </summary>
+        /// <param name="GroupName"></param>
+        public override void Add(string GroupName) => GroupController.add2(core, GroupName, GroupName);
+        /// <summary>
+        /// Add a group
+        /// </summary>
+        /// <param name="GroupName"></param>
+        /// <param name="GroupCaption"></param>
+        public override void Add(string GroupName, string GroupCaption) => GroupController.add2(core, GroupName, GroupCaption);
+        /// <summary>
+        /// Add current user to a group
+        /// </summary>
+        /// <param name="GroupNameIdOrGuid"></param>
+        public override void AddUser(string GroupNameIdOrGuid) => GroupController.addUser(core, GroupNameIdOrGuid, 0, DateTime.MinValue);
+        /// <summary>
+        /// Add current user to a group
+        /// </summary>
+        /// <param name="groupId"></param>
+        public override void AddUser(int groupId) => GroupController.addUser(core, groupId.ToString(), 0, DateTime.MinValue);
         //
-        // Add
+        public override void AddUser(string GroupNameIdOrGuid, int UserId) => GroupController.addUser(core, GroupNameIdOrGuid, UserId, DateTime.MinValue);
         //
-        public override void Add(string GroupNameOrGuid, string groupCaption = "") {
-            try {
-                GroupController.group_add2(core, GroupNameOrGuid, groupCaption);
-            } catch (Exception ex) {
-                LogController.handleError( core,ex, "Unexpected error in cp.group.add()");
-            }
-        }
+        public override void AddUser(string GroupNameIdOrGuid, int UserId, DateTime DateExpires) => GroupController.addUser(core, GroupNameIdOrGuid, UserId, DateExpires);
         //
-        // Add User
+        public override void AddUser(int GroupId, int UserId) => GroupController.addUser(core, GroupId.ToString(), UserId, DateTime.MinValue);
+
+        public override void AddUser(int GroupId, int UserId, DateTime DateExpires) => GroupController.addUser(core, GroupId.ToString(), UserId, DateExpires);
+
+        public override void Delete(string GroupNameIdOrGuid) => GroupModel.delete(core, GroupNameIdOrGuid);
         //
-        public override void AddUser(string GroupNameIdOrGuid) {
-            GroupController.group_AddUser(core, GroupNameIdOrGuid, 0, DateTime.MinValue);
-        }
-        public override void AddUser(string GroupNameIdOrGuid, int UserId) {
-            GroupController.group_AddUser(core, GroupNameIdOrGuid, UserId, DateTime.MinValue);
-        }
-        public override void AddUser(string GroupNameIdOrGuid, int UserId, DateTime DateExpires) {
-            try {
-                GroupController.group_AddUser(core, GroupNameIdOrGuid, UserId, DateExpires);
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-            }
-        }
+        public override void Delete(int GroupId) => GroupModel.delete(core, GroupId);
         //
-        // Delete Group
-        //
-        public override void Delete(string GroupNameIdOrGuid) {
-            try {
-                GroupModel.delete(core, GroupNameIdOrGuid);
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-            }
-        }
-        //
-        // Get Group ID
-        //
-        public override int GetId(string GroupNameIdOrGuid) {
-            int returnInteger = 0;
-            try {
-                returnInteger = core.db.getRecordID("groups", GroupNameIdOrGuid);
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-            }
-            return returnInteger;
-        }
-        //
-        // Get Group Name
+        public override int GetId(string GroupNameIdOrGuid) => core.db.getRecordID("groups", GroupNameIdOrGuid);
         //
         public override string GetName(string GroupIdOrGuid) {
-            string returnText = "";
-            try {
-                if (GroupIdOrGuid.IsNumeric()) {
-                    //
-                    // -- record Id
-                    returnText = core.db.getRecordName("groups", GenericController.encodeInteger(GroupIdOrGuid));
-                } else {
-                    //
-                    // -- record guid
-                    returnText = core.db.getRecordName("groups", GroupIdOrGuid);
-                }
-            } catch (Exception) {
-
+            if (GroupIdOrGuid.IsNumeric()) {
+                return core.db.getRecordName("groups", GenericController.encodeInteger(GroupIdOrGuid));
+            } else {
+                return core.db.getRecordName("groups", GroupIdOrGuid);
             }
-            return returnText;
         }
+        public override string GetName(int GroupId) => core.db.getRecordName("groups", GroupId);
         //
         // Remove User from Group
         //
-        public override void RemoveUser(string GroupNameIdOrGuid, int removeUserId = 0) //Inherits BaseClasses.CPGroupBaseClass.RemoveUser
+        public override void RemoveUser(string GroupNameIdOrGuid, int removeUserId)
         {
-            int GroupID = 0;
+            int groupID = GetId(GroupNameIdOrGuid);
             int userId = removeUserId;
-            //
-            GroupID = GetId(GroupNameIdOrGuid);
-            if (GroupID != 0) {
+            if (groupID != 0) {
                 if (userId == 0) {
-                    userId = cp.User.Id;
+                    cp.Content.Delete("Member Rules", "((memberid=" + cp.User.Id.ToString() + ")and(groupid=" + groupID.ToString() + "))");
+                } else {
+                    cp.Content.Delete("Member Rules", "((memberid=" + removeUserId.ToString() + ")and(groupid=" + groupID.ToString() + "))");
                 }
-                cp.Content.Delete("Member Rules", "((memberid=" + removeUserId.ToString() + ")and(groupid=" + GroupID.ToString() + "))");
             }
         }
         //
+        public override void RemoveUser(string GroupNameIdOrGuid) => RemoveUser(GroupNameIdOrGuid, 0);
         //
+        private void appendDebugLog(string copy) => LogController.logDebug(core, copy);
         //
-        private void appendDebugLog(string copy) {
-            //My.Computer.FileSystem.WriteAllText("c:\clibCpDebug.log", Now & " - cp.group, " & copy & vbCrLf, True)
-            // 'My.Computer.FileSystem.WriteAllText(System.AppDocmc.main_CurrentDocmc.main_BaseDirectory() & "cpLog.txt", Now & " - " & copy & vbCrLf, True)
-        }
-        //
-        // testpoint
-        //
-        private void tp(string msg) {
-            //Call appendDebugLog(msg)
-        }
         #region  IDisposable Support 
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).

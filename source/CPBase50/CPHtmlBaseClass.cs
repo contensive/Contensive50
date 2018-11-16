@@ -52,7 +52,6 @@ namespace Contensive.BaseClasses
         public abstract string SelectList(string HtmlName, string HtmlValue, string OptionList, string NoneCaption = "", string HtmlClass = "", string HtmlId = "");
 		public abstract void ProcessCheckList(string HtmlName, string PrimaryContentName, string PrimaryRecordID, string SecondaryContentName, string RulesContentName, string RulesPrimaryFieldname, string RulesSecondaryFieldName);
 	    [Obsolete("Instead, use cp.cdeFiles.saveUpload() or similar fileSystem object.")] public abstract void ProcessInputFile(string HtmlName, string VirtualFilePath = "");
-		public abstract string Hidden(string HtmlName, string HtmlValue, string HtmlClass = "", string HtmlId = "");
 		public abstract string InputDate(string HtmlName, string HtmlValue = "", string Width = "", string HtmlClass = "", string HtmlId = "");
 		public abstract string InputFile(string HtmlName, string HtmlClass = "", string HtmlId = "");
 		public abstract string InputText(string HtmlName, string HtmlValue = "", string Height = "", string Width = "", bool IsPassword = false, string HtmlClass = "", string HtmlId = "");
@@ -63,7 +62,23 @@ namespace Contensive.BaseClasses
 		public abstract void AddEvent(string HtmlId, string DOMEvent, string JavaScript);
 		public abstract string Button(string HtmlName, string HtmlValue = "", string HtmlClass = "", string HtmlId = "");
 		public abstract string adminHint(string innerHtml);
-	}
+        //
+        public abstract string Hidden(string HtmlName, string HtmlValue);
+        public abstract string Hidden(string HtmlName, string HtmlValue, string HtmlClass);
+        public abstract string Hidden(string HtmlName, string HtmlValue, string HtmlClass, string HtmlId = "");
+        //
+        public abstract string Hidden(string HtmlName, int HtmlValue);
+        public abstract string Hidden(string HtmlName, int HtmlValue, string HtmlClass);
+        public abstract string Hidden(string HtmlName, int HtmlValue, string HtmlClass, string HtmlId = "");
+        //
+        public abstract string Hidden(string HtmlName, bool HtmlValue);
+        public abstract string Hidden(string HtmlName, bool HtmlValue, string HtmlClass);
+        public abstract string Hidden(string HtmlName, bool HtmlValue, string HtmlClass, string HtmlId = "");
+        //
+        public abstract string Hidden(string HtmlName, DateTime HtmlValue);
+        public abstract string Hidden(string HtmlName, DateTime HtmlValue, string HtmlClass);
+        public abstract string Hidden(string HtmlName, DateTime HtmlValue, string HtmlClass, string HtmlId = "");
+    }
 
 }
 

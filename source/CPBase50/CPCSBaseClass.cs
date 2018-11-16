@@ -282,12 +282,13 @@ namespace Contensive.BaseClasses
         /// <param name="FieldValue"></param>
         public abstract void SetField(string FieldName, DateTime FieldValue);
         /// <summary>
-        /// 
+        /// Deprecated. use SetField for all field types that store data in files (textfile, cssfile, etc)
         /// </summary>
         /// <param name="FieldName"></param>
         /// <param name="Copy"></param>
         /// <param name="ContentName"></param>
         /// <remarks></remarks>
+        [Obsolete("Use SetField for all field types that store data in files (textfile, cssfile, etc)")]
         public abstract void SetFile(string FieldName, string Copy, string ContentName);
 		/// <summary>
 		/// Processes a value from the incoming request to a field in the current row.

@@ -80,7 +80,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="GroupNameOrGuid"></param>
         /// <param name="groupCaption"></param>
         /// <returns></returns>
-        public static int group_add2(CoreController core, string GroupNameOrGuid, string groupCaption = "") {
+        public static int add2(CoreController core, string GroupNameOrGuid, string groupCaption = "") {
             int returnGroupId = 0;
             try {
                 //
@@ -174,7 +174,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static void group_AddUser(CoreController core, string groupNameOrGuid, int userid, DateTime dateExpires) {
+        public static void addUser(CoreController core, string groupNameOrGuid, int userid, DateTime dateExpires) {
             try {
                 //
                 int GroupID = 0;
@@ -182,7 +182,7 @@ namespace Contensive.Processor.Controllers {
                 if (!string.IsNullOrEmpty(groupNameOrGuid)) {
                     GroupID = core.db.getRecordID("groups", groupNameOrGuid);
                     if (GroupID < 1) {
-                        group_add2(core, groupNameOrGuid);
+                        add2(core, groupNameOrGuid);
                         GroupID = core.db.getRecordID("groups", groupNameOrGuid);
                     }
                     if (GroupID < 1) {
@@ -217,8 +217,8 @@ namespace Contensive.Processor.Controllers {
                 throw (ex);
             }
         }
-        public static void group_AddUser(CoreController core, string groupNameOrGuid, int userid = 0) { var tmpDate = DateTime.MinValue; group_AddUser(core, groupNameOrGuid, userid, tmpDate); }
-        public static void group_AddUser(CoreController core, string groupNameOrGuid) { var tmpDate = DateTime.MinValue; group_AddUser(core, groupNameOrGuid, 0, tmpDate); }
+        public static void group_AddUser(CoreController core, string groupNameOrGuid, int userid = 0) { var tmpDate = DateTime.MinValue; addUser(core, groupNameOrGuid, userid, tmpDate); }
+        public static void group_AddUser(CoreController core, string groupNameOrGuid) { var tmpDate = DateTime.MinValue; addUser(core, groupNameOrGuid, 0, tmpDate); }
 
         //
         //=============================================================================

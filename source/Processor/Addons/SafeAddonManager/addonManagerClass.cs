@@ -853,7 +853,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                         + "<table border=\"0\" cellpadding=\"0\" cellspacing=\"1\" width=\"100%\">"
                                         + "<tr><td align=\"left\"><a href=\"#\" onClick=\"InsertUpload(); return false;\">+ Add more files</a></td></tr>"
                                         + "</table>"
-                                        + HtmlController.inputHidden("UploadCount", 1, "UploadCount") + "";
+                                        + HtmlController.inputHidden("UploadCount", 1, "", "UploadCount") + "";
                                     Body.Add(AdminUIController.editTable( ""
                                         + AdminUIController.getEditRowLegacy(core, core.html.inputFile("MetaFile"), "Add-on Collection File(s)", "", true, false, "")
                                         + AdminUIController.getEditRowLegacy(core, FormInput, "&nbsp;", "", true, false, "")

@@ -36,7 +36,6 @@ namespace Contensive.BaseClasses
 		public abstract void AddMetaKeywordList(string MetaKeywordList);
 		public abstract void AddOnLoadJavascript(string NewCode);
 		public abstract void AddTitle(string PageTitle);
-		public abstract void AddRefreshQueryString(string Name, string Value);
 		public abstract void AddBodyEnd(string html);
 		public abstract string Body {get; set;}
         [Obsolete("Site styles are no longer supported. Include styles and javascript in addons.", true)] public abstract string SiteStylesheet {get;}
@@ -55,6 +54,13 @@ namespace Contensive.BaseClasses
         public abstract bool get_IsVar(string Index);
         public abstract string get_Var(string Index);
         public abstract void set_Var(string Index, string Value);
+        //
+        public abstract void AddRefreshQueryString(string Name, string Value);
+        public abstract void AddRefreshQueryString(string Name, int Value);
+        public abstract void AddRefreshQueryString(string Name, Double Value);
+        public abstract void AddRefreshQueryString(string Name, bool Value);
+        public abstract void AddRefreshQueryString(string Name, DateTime Value);
+
     }
 }
 
