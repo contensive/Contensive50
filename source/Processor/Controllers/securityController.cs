@@ -149,7 +149,7 @@ namespace Contensive.Processor.Controllers {
                 } else {
                     // Compute the MD5 hash.
                     byte[] saltBytes = ASCIIEncoding.ASCII.GetBytes("notsorandomsalt");
-                    byte[] key = ASCIIEncoding.ASCII.GetBytes(hashEncode.ComputeHash(core.appConfig.privateKey,"SHA256",saltBytes));
+                    byte[] key = ASCIIEncoding.ASCII.GetBytes(hashEncode.ComputeHash(core.appConfig.privateKey,"SHA512",saltBytes));
                     Array.Resize(ref key, 24);
                     //byte[] key = ASCIIEncoding.ASCII.GetBytes(core.appConfig.privateKey);
                     //MD5CryptoServiceProvider hashMD5 = new MD5CryptoServiceProvider();
@@ -191,7 +191,7 @@ namespace Contensive.Processor.Controllers {
                 } else {
                     // Compute the MD5 hash.
                     byte[] saltBytes = ASCIIEncoding.ASCII.GetBytes("notsorandomsalt");
-                    byte[] key = ASCIIEncoding.ASCII.GetBytes(hashEncode.ComputeHash(core.appConfig.privateKey, "SHA256", saltBytes));
+                    byte[] key = ASCIIEncoding.ASCII.GetBytes(hashEncode.ComputeHash(core.appConfig.privateKey, "SHA512", saltBytes));
                     Array.Resize(ref key, 24);
                     //byte[] key = ASCIIEncoding.ASCII.GetBytes(core.appConfig.privateKey);
                     //MD5CryptoServiceProvider hashMD5 = new MD5CryptoServiceProvider();
