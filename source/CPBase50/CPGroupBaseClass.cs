@@ -1,8 +1,8 @@
 ﻿
 using System;
 
-namespace Contensive.BaseClasses{
-	public abstract class CPGroupBaseClass	{
+namespace Contensive.BaseClasses {
+    public abstract class CPGroupBaseClass {
         /// <summary>
         /// Add a new group
         /// </summary>
@@ -90,7 +90,10 @@ namespace Contensive.BaseClasses{
         /// <param name="GroupNameIdOrGuid"></param>
         /// <param name="UserId"></param>
         public abstract void RemoveUser(string GroupNameIdOrGuid, int UserId);
+        //
+        //====================================================================================================
+        // deprecated
+        //
     }
-
 }
 

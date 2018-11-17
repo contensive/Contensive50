@@ -1,23 +1,9 @@
-﻿//========================================================================
-
-
-
-//========================================================================
-
-//
-// documentation should be in a new project that inherits these classes. The class names should be the object names in the actual cp project
-//
-
-
+﻿
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 
-namespace Contensive.BaseClasses
-{
-	public abstract class CPFileSystemBaseClass
-	{
+namespace Contensive.BaseClasses {
+    public abstract class CPFileSystemBaseClass {
         /// <summary>
         /// argument details for file and folder methods
         /// </summary>
@@ -41,7 +27,8 @@ namespace Contensive.BaseClasses
                     }
                     return _extension;
                 }
-            } string _extension = "";
+            }
+            string _extension = "";
         }
         /// <summary>
         /// argument details for file and folder methods
@@ -56,20 +43,24 @@ namespace Contensive.BaseClasses
         }
         //
         public abstract void Append(string Filename, string FileContent);
-		public abstract void Copy(string SourceFilename, string DestinationFilename);
-		public abstract void CreateFolder(string FolderPath);
-		public abstract void DeleteFile(string Filename);
-		public abstract void DeleteFolder(string folderPath);
-		public abstract string Read(string Filename);
-		public abstract byte[] ReadBinary(string Filename);
-		public abstract void Save(string Filename, string FileContent);
-		public abstract void SaveBinary(string Filename, byte[] FileContent);
-		public abstract List<FileDetail> FileList(string folderName, int pageSize = 0, int pageNumber = 1);
-		public abstract List<FolderDetail> FolderList(string folderName);
-		public abstract bool FileExists(string pathFileName);
-		public abstract bool FolderExists(string folderName);
-		public abstract bool SaveUpload(string htmlformName, ref string returnFilename);
-		public abstract bool SaveUpload(string htmlformName, string folderpath, ref string returnFilename);
-	}
+        public abstract void Copy(string SourceFilename, string DestinationFilename);
+        public abstract void CreateFolder(string FolderPath);
+        public abstract void DeleteFile(string Filename);
+        public abstract void DeleteFolder(string folderPath);
+        public abstract string Read(string Filename);
+        public abstract byte[] ReadBinary(string Filename);
+        public abstract void Save(string Filename, string FileContent);
+        public abstract void SaveBinary(string Filename, byte[] FileContent);
+        public abstract List<FileDetail> FileList(string folderName, int pageSize = 0, int pageNumber = 1);
+        public abstract List<FolderDetail> FolderList(string folderName);
+        public abstract bool FileExists(string pathFileName);
+        public abstract bool FolderExists(string folderName);
+        public abstract bool SaveUpload(string htmlformName, ref string returnFilename);
+        public abstract bool SaveUpload(string htmlformName, string folderpath, ref string returnFilename);
+        //
+        //====================================================================================================
+        // deprecated
+        //
+    }
 }
 

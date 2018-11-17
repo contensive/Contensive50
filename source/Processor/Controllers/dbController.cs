@@ -5050,6 +5050,19 @@ namespace Contensive.Processor.Controllers {
             }
             return result;
         }
+        public static DataTable executeRemoteQuery( CoreController core, string remoteQueryKey ) {
+            DataTable result = null;
+            try {
+                var remoteQuery = Models.Db.RemoteQueryModel.create(core, remoreQueryKey);
+                if ( remoteQuery == null ) {
+                    throw new GenericException("remoteQuery was not found with key [" + remoteQueryKey + "]");
+                }
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+                result = null;
+            }
+            return result;
+        }
 
 
         #region  IDisposable Support 

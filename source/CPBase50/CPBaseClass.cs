@@ -1,23 +1,6 @@
 ﻿
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
 
-using System.Runtime.InteropServices;
-//====================================================================================================
-// Convensions:
-//
-// -- for these abstract base classes
-//      PascalCase all properties and methods 
-//      legacy case, case changes will break C# code written against these classes
-//      be consistent with new methods
-//
-// -- for code in general
-//https://docs.microsoft.com/en-us/dotnet/standard/design-guidelines/capitalization-conventions
-//   - camelCase arguemnts and properties
-//   - PascalCase everything else
-//
 namespace Contensive.BaseClasses {
     //
     //====================================================================================================

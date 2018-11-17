@@ -1,84 +1,106 @@
 ﻿
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 
-namespace Contensive.BaseClasses
-{
-	/// <summary>
-	/// CP.Cache - local and remote caching
-	/// </summary>
-	/// <remarks></remarks>
-	public abstract class CPCacheBaseClass
-	{
+namespace Contensive.BaseClasses {
+    /// <summary>
+    /// CP.Cache - local and remote caching
+    /// </summary>
+    /// <remarks></remarks>
+    public abstract class CPCacheBaseClass {
+        //
+        //====================================================================================================
         /// <summary>
         /// Invalidate one or more cache objects by key
         /// </summary>
         /// <param name="keyList"></param>
         public abstract void Clear(List<string> keyList);
+        //
+        //====================================================================================================
         /// <summary>
         /// Return the value of a cache. If empty or invalid, returns null.
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-		public abstract object GetObject(string key);
+        public abstract object GetObject(string key);
+        //
+        //====================================================================================================
         /// <summary>
         /// Return a string from cache. If empty or invalid, returns empty string.
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
         public abstract string GetText(string key);
+        //
+        //====================================================================================================
         /// <summary>
         /// Return an integer from cache. If empty or invalid, returns 0.
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-		public abstract int GetInteger(string key);
+        public abstract int GetInteger(string key);
+        //
+        //====================================================================================================
         /// <summary>
         /// Return a double from cache. If empty or invalid, returns 0.
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-		public abstract double GetNumber(string key);
+        public abstract double GetNumber(string key);
+        //
+        //====================================================================================================
         /// <summary>
         /// Return a date from cache. If empty or invalid, returns Date.MinValue.
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-		public abstract DateTime GetDate(string key);
+        public abstract DateTime GetDate(string key);
+        //
+        //====================================================================================================
         /// <summary>
         /// Return a boolean from cache. If empty or invalid, returns false.
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-		public abstract bool GetBoolean(string key);
-		/// <summary>
-		/// Invalidate all system cache.
-		/// </summary>
-		/// <remarks></remarks>
-		public abstract void ClearAll();
+        public abstract bool GetBoolean(string key);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Invalidate all system cache.
+        /// </summary>
+        /// <remarks></remarks>
+        public abstract void ClearAll();
+        //
+        //====================================================================================================
         /// <summary>
         /// Invalidate a cache.
         /// </summary>
         /// <param name="key"></param>
         public abstract void Invalidate(string key);
+        //
+        //====================================================================================================
         /// <summary>
         /// Invalidate all system cache.
         /// </summary>
-		public abstract void InvalidateAll();
+        public abstract void InvalidateAll();
+        //
+        //====================================================================================================
         /// <summary>
         /// Invalidate a list of cache keys.
         /// </summary>
         /// <param name="keyList"></param>
-		public abstract void InvalidateTagList(List<string> keyList);
+        public abstract void InvalidateTagList(List<string> keyList);
+        //
+        //====================================================================================================
         /// <summary>
         /// Invalidate a key based on the table and recordId
         /// </summary>
         /// <param name="contentName"></param>
         /// <param name="recordId"></param>
-		public abstract void InvalidateContentRecord(string contentName, int recordId);
+        public abstract void InvalidateContentRecord(string contentName, int recordId);
+        //
+        //====================================================================================================
         /// <summary>
         /// Create a key for a table. A table key is used as a dependent key to invalidate all record cache objects from a table.
         /// When storing a record object, add the tablekey as a dependent key
@@ -88,12 +110,16 @@ namespace Contensive.BaseClasses
         /// <param name="dataSourceName"></param>
         /// <returns></returns>
         public abstract string CreateKeyForDbTable(string tableName, string dataSourceName);
+        //
+        //====================================================================================================
         /// <summary>
         /// Create a key for a database table. Use this key to invalidate all keys based on thsi table using dependent keys.
         /// </summary>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public abstract string CreateKeyForDbTable(string tableName );
+        public abstract string CreateKeyForDbTable(string tableName);
+        //
+        //====================================================================================================
         /// <summary>
         /// Create a cache key for a database model object
         /// </summary>
@@ -102,6 +128,8 @@ namespace Contensive.BaseClasses
         /// <param name="dataSourceName"></param>
         /// <returns></returns>
         public abstract string CreateKeyForDbRecord(int recordId, string tableName, string dataSourceName);
+        //
+        //====================================================================================================
         /// <summary>
         /// Create a key for a database record in the default datasource
         /// </summary>
@@ -109,6 +137,8 @@ namespace Contensive.BaseClasses
         /// <param name="tableName"></param>
         /// <returns></returns>
         public abstract string CreateKeyForDbRecord(int recordId, string tableName);
+        //
+        //====================================================================================================
         /// <summary>
         /// Create a cache key for a domain model. ObjectName can be generic domain model name. The unique Identifier must be unique, for example the id of a core record in the model.
         /// </summary>
@@ -116,12 +146,16 @@ namespace Contensive.BaseClasses
         /// <param name="objectUniqueIdentifier"></param>
         /// <returns></returns>
         public abstract string CreateKey(string objectName, string objectUniqueIdentifier);
+        //
+        //====================================================================================================
         /// <summary>
         /// Create a cache key for a domain model.
         /// </summary>
         /// <param name="objectName"></param>
         /// <returns></returns>
         public abstract string CreateKey(string objectName);
+        //
+        //====================================================================================================
         /// <summary>
         /// Create a key pointer for a db model object.
         /// A Ptr key doesnt contain the object, but points to a key for an object.
@@ -133,6 +167,8 @@ namespace Contensive.BaseClasses
         /// <param name="dataSourceName"></param>
         /// <returns></returns>
         public abstract string CreatePtrKeyforDbRecordGuid(string guid, string tableName, string dataSourceName);
+        //
+        //====================================================================================================
         /// <summary>
         /// Create a key pointer for a db model object.
         /// </summary>
@@ -140,6 +176,8 @@ namespace Contensive.BaseClasses
         /// <param name="tableName"></param>
         /// <returns></returns>
         public abstract string CreatePtrKeyforDbRecordGuid(string guid, string tableName);
+        //
+        //====================================================================================================
         /// <summary>
         /// Create a Ptr key for a db model object based on the record name. Only for tables where the name is unique
         /// </summary>
@@ -148,6 +186,8 @@ namespace Contensive.BaseClasses
         /// <param name="dataSourceName"></param>
         /// <returns></returns>
         public abstract string CreatePtrKeyforDbRecordUniqueName(string name, string tableName, string dataSourceName);
+        //
+        //====================================================================================================
         /// <summary>
         /// Create a Ptr key for a db model object based on the record name.
         /// </summary>
@@ -155,6 +195,8 @@ namespace Contensive.BaseClasses
         /// <param name="tableName"></param>
         /// <returns></returns>
         public abstract string CreatePtrKeyforDbRecordUniqueName(string name, string tableName);
+        //
+        //====================================================================================================
         /// <summary>
         /// Get an object of type T from cache. If empty or invalid type, returns Null.
         /// </summary>
@@ -162,12 +204,16 @@ namespace Contensive.BaseClasses
         /// <param name="key"></param>
         /// <returns></returns>
         public abstract T GetObject<T>(string key);
+        //
+        //====================================================================================================
         /// <summary>
         /// Store an object to a key.
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
         public abstract void Store(string key, object value);
+        //
+        //====================================================================================================
         /// <summary>
         /// Store an object to a key. Invalidate at the date and time specified.
         /// </summary>
@@ -175,6 +221,8 @@ namespace Contensive.BaseClasses
         /// <param name="value"></param>
         /// <param name="invalidationDate"></param>
         public abstract void Store(string key, object value, DateTime invalidationDate);
+        //
+        //====================================================================================================
         /// <summary>
         /// Store an object to a key.
         ///  Invalidate the object if a dependentKey is updated after this object is stored.
@@ -183,6 +231,8 @@ namespace Contensive.BaseClasses
         /// <param name="value"></param>
         /// <param name="dependentKeyList"></param>
         public abstract void Store(string key, object value, List<string> dependentKeyList);
+        //
+        //====================================================================================================
         /// <summary>
         /// Store an object to a key. Invalidate at the date and time specified.
         /// </summary>
@@ -191,6 +241,8 @@ namespace Contensive.BaseClasses
         /// <param name="invalidationDate"></param>
         /// <param name="dependentKeyList"></param>
         public abstract void Store(string key, object value, DateTime invalidationDate, List<string> dependentKeyList);
+        //
+        //====================================================================================================
         /// <summary>
         /// Store an object to a key. 
         /// Invalidate the object if a dependentKey is updated after this object is stored.
@@ -199,6 +251,8 @@ namespace Contensive.BaseClasses
         /// <param name="value"></param>
         /// <param name="tag"></param>
         public abstract void Store(string key, object value, string dependentKey);
+        //
+        //====================================================================================================
         /// <summary>
         /// Store an object to a key.
         /// </summary>
@@ -207,6 +261,10 @@ namespace Contensive.BaseClasses
         /// <param name="invalidationDate"></param>
         /// <param name="dependentKey"></param>
         public abstract void Store(string key, object value, DateTime invalidationDate, string dependentKey);
+        //
+        //====================================================================================================
+        //
+        // Deprecated methods
         //
         //public abstract void Save(string key, string Value);
         //public abstract void Save(string key, string Value, string tagCommaList);
@@ -232,13 +290,13 @@ namespace Contensive.BaseClasses
         [Obsolete("Use Clear(dependentKeyList)", true)]
         public abstract void Clear(string ContentNameList);
         //
-        [Obsolete("Use GetText(key) instead",false)]
+        [Obsolete("Use GetText(key) instead", false)]
         public abstract string Read(string key);
         //
         [Obsolete("Use Invalidate(key)", true)]
         public abstract void InvalidateTag(string tag);
         //
-        [Obsolete("Use Store()",true)]
+        [Obsolete("Use Store()", true)]
         public abstract void Save(string key, string Value);
         //
         [Obsolete("Use Store()", true)]

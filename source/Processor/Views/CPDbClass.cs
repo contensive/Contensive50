@@ -246,6 +246,9 @@ namespace Contensive.Processor {
         public override bool IsTableField(string TableName, string FieldName) {
             return cp.core.db.isSQLTableField("", TableName, FieldName);
         }
+        public override DataTable ExecuteRemoteQuery(string remoteQueryKey) {
+            throw new NotImplementedException();
+        }
         //
         //====================================================================================================
         //
@@ -276,6 +279,7 @@ namespace Contensive.Processor {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+
         ~CPDbClass() {
             Dispose(false);
             
