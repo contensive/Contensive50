@@ -1,10 +1,6 @@
 ﻿
 using System;
-using System.Reflection;
-using System.Xml;
-using System.Text.RegularExpressions;
 using System.Collections.Generic;
-using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
@@ -12,7 +8,7 @@ using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
 using System.Text;
 using Contensive.Processor.Exceptions;
-//
+
 namespace Contensive.Processor {
     //
     //====================================================================================================
@@ -28,13 +24,8 @@ namespace Contensive.Processor {
         /// structure used in admin edit forms at the top
         /// </summary>
         public class RecordEditHeaderInfoClass {
-            //public string description;
             public string recordName;
             public int recordId;
-            //public DateTime recordDateAdded;
-            //public DateTime recordDateModified;
-            //public int recordAddedById;
-            //public int recordModifiedById;
             public DateTime recordLockExpiresDate;
             public int recordLockById;
         }

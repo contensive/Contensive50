@@ -80,22 +80,6 @@ namespace Contensive.Processor.Controllers {
                 if (!string.IsNullOrEmpty(AnchorQuery)) {
                     AnchorQuery = AnchorQuery.Substring(1);
                 }
-                ////
-                //// ----- xml contensive process instruction
-                //{
-                //    int Pos = genericController.vbInstr(1, workingContent, "<?contensive", 1);
-                //    if (Pos > 0) {
-                //        throw new GenericException("Structured xml data commands are no longer supported");
-                //    }
-                //}
-                //
-                // -- start-end gtroup - deprecated
-                //if (workingContent.IndexOf("<!-- STARTGROUPACCESS ") > 0) {
-                //    throw new GenericException("Structured xml data commands are no longer supported");
-                //}
-                //if (workingContent.IndexOf("<!-- ENDGROUPACCESS ") > 0) {
-                //    throw new GenericException("Structured xml data commands are no longer supported");
-                //}
                 //
                 // Test early if this needs to run at all
                 bool ProcessACTags = (((EncodeNonCachableTags || encodeACResourceLibraryImages || encodeForWysiwygEditor)) && (result.IndexOf("<AC ", System.StringComparison.OrdinalIgnoreCase) != -1));

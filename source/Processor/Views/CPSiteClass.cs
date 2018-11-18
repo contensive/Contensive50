@@ -15,15 +15,13 @@ namespace Contensive.Processor {
         public const string EventsId = "5E88DB23-E8D7-4CE8-9793-9C7A20F4CF3A";
         #endregion
         //
-        private Contensive.Processor.Controllers.CoreController core;
-        private CPClass CP;
+        private CoreController core;
         protected bool disposed = false;
         //
         //====================================================================================================
         //
         public CPSiteClass(Contensive.Processor.Controllers.CoreController coreObj, CPClass CPParent) : base() {
             core = coreObj;
-            CP = CPParent;
         }
         //
         //====================================================================================================
@@ -33,13 +31,10 @@ namespace Contensive.Processor {
                 if (disposing) {
                     //
                     // call .dispose for managed objects
-                    //
-                    CP = null;
                     core = null;
                 }
                 //
                 // Add code here to release the unmanaged resource.
-                //
             }
             this.disposed = true;
         }
@@ -281,9 +276,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override void TestPoint(string Message) {
-            DebugController.testPoint(core, Message);
-        }
+        public override void TestPoint(string message) => LogController.logDebug(core, message);
         //
         //====================================================================================================
         //
@@ -291,7 +284,7 @@ namespace Contensive.Processor {
             if ( string.IsNullOrWhiteSpace(DomainName)) {
                 return GetInteger("LandingPageID", 0);
             } else {
-                var domain = DomainModel.createByUniqueName(CP.core, DomainName);
+                var domain = DomainModel.createByUniqueName(core, DomainName);
                 if ( domain == null) {
                     return GetInteger("LandingPageID", 0);
                 } else {
@@ -302,15 +295,12 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override void addLinkAlias(string linkAlias, int pageId, string queryStringSuffix = "") {
-            LinkAliasController.addLinkAlias(core, linkAlias, pageId, queryStringSuffix);
-        }
+        public override void addLinkAlias(string linkAlias, int pageId, string queryStringSuffix = "") => LinkAliasController.addLinkAlias(core, linkAlias, pageId, queryStringSuffix);
         //
         //====================================================================================================
         //
-        public override string ThrowEvent(string eventNameIdOrGuid) {
-            return core.addon.throwEvent(eventNameIdOrGuid);
-        }
+        public override string ThrowEvent(string eventNameIdOrGuid) => core.addon.throwEvent(eventNameIdOrGuid);
+        //
         //==========================================================================================
         /// <summary>
         /// Install an uploaded collection file from a private folder. Return true if successful, else the issue is in the returnUserError

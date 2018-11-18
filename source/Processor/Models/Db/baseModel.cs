@@ -1151,7 +1151,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Read record cache by id
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="core"></param>
+        /// <param name="recordId"></param>
+        /// <returns></returns>
         public static T readRecordCache<T>(CoreController core, int recordId) where T : BaseModel {
             Type instanceType = typeof(T);
             T result = core.cache.getObject<T>(CacheController.createCacheKey_forDbRecord(recordId, derivedTableName(instanceType), derivedDataSourceName(instanceType)));
@@ -1160,7 +1166,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Read a record cache by guid
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="core"></param>
+        /// <param name="ccGuid"></param>
+        /// <returns></returns>
         public static T readRecordCacheByGuidPtr<T>(CoreController core, string ccGuid) where T : BaseModel {
             Type instanceType = typeof(T);
             T result = core.cache.getObject<T>(CacheController.createCachePtr_forDbRecord_guid(ccGuid, derivedTableName(instanceType), derivedDataSourceName(instanceType)));
@@ -1169,7 +1181,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Read a record cache using unique name (valid only if hasUniqueName is true)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="core"></param>
+        /// <param name="uniqueName"></param>
+        /// <returns></returns>
         public static T readRecordCacheByUniqueNamePtr<T>(CoreController core, string uniqueName) where T : BaseModel {
             Type instanceType = typeof(T);
             T result = core.cache.getObject<T>(CacheController.createCachePtr_forDbRecord_uniqueName(uniqueName, derivedTableName(instanceType), derivedDataSourceName(instanceType)));
@@ -1199,7 +1217,15 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// create an sql select for this model
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="core"></param>
+        /// <param name="fieldList"></param>
+        /// <param name="criteria"></param>
+        /// <param name="orderBy"></param>
+        /// <returns></returns>
         public static string getSelectSql<T>( CoreController core, List<string> fieldList = null, string criteria = "", string orderBy = "") where T : BaseModel {
             string result = "";
             Type instanceType = typeof(T);
@@ -1222,9 +1248,45 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// create the cache key for the table cache
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="core"></param>
+        /// <returns></returns>
         public static string getTableCacheKey<T>(CoreController core) {
             return CacheController.createCacheKey_forDbTable(derivedTableName(typeof(T)));
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Delete a selection of records
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="core"></param>
+        /// <param name="sqlCriteria"></param>
+        public static void deleteSelection<T>(CoreController core, string sqlCriteria) where T : BaseModel {
+            try {
+                if (core.serverConfig == null) {
+                    //
+                    // -- cannot use models without an application
+                    LogController.handleError(core, new GenericException("Cannot use data models without a valid server configuration."));
+                } else if (core.appConfig == null) {
+                    //
+                    // -- cannot use models without an application
+                    LogController.handleError(core, new GenericException("Cannot use data models without a valid application configuration."));
+                } else {
+                    if (!string.IsNullOrEmpty(sqlCriteria)) {
+                        Type instanceType = typeof(T);
+                        string dataSourceName = derivedDataSourceName(instanceType);
+                        string tableName = derivedTableName(instanceType);
+                        core.db.deleteTableRecords(tableName, sqlCriteria, dataSourceName);
+                    }
+                }
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+                throw;
+            }
         }
     }
 }

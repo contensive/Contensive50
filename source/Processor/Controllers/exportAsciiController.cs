@@ -1,20 +1,7 @@
 ﻿
 using System;
-using System.Reflection;
-using System.Xml;
-using System.Diagnostics;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
-using Contensive.Processor;
-using Contensive.Processor.Models.Db;
-using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
-//
-//
+
 namespace Contensive.Processor.Controllers {
     //
     //====================================================================================================
@@ -22,18 +9,6 @@ namespace Contensive.Processor.Controllers {
     /// static class controller
     /// </summary>
     public class ExportAsciiController : IDisposable {
-        //
-        // ----- constants
-        //
-        //Private Const invalidationDaysDefault As Double = 365
-        //
-        // ----- objects constructed that must be disposed
-        //
-        //Private cacheClient As Enyim.Caching.MemcachedClient
-        //
-        // ----- private instance storage
-        //
-        //Private remoteCacheDisabled As Boolean
         //
         //====================================================================================================
         //
@@ -198,8 +173,9 @@ namespace Contensive.Processor.Controllers {
             }
             return result;
         }
-
-
+        //
+        //====================================================================================================
+        //
         #region  IDisposable Support 
         //
         // this class must implement System.IDisposable

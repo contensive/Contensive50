@@ -277,15 +277,15 @@ namespace Contensive.Processor.Models.Domain {
                 if (contentId <= 0) {
                     //
                     // -- invalid id, return null
-                } else if ((!forceDbLoad) && (core.doc.cdefDictionary.ContainsKey(contentId.ToString()))) {
+                } else if ((!forceDbLoad) && (core.cdefDictionary.ContainsKey(contentId.ToString()))) {
                     //
                     // -- already loaded and no force re-load, just return the current cdef                    
-                    result = core.doc.cdefDictionary[contentId.ToString()];
+                    result = core.cdefDictionary[contentId.ToString()];
                 } else {
-                    if (core.doc.cdefDictionary.ContainsKey(contentId.ToString())) {
+                    if (core.cdefDictionary.ContainsKey(contentId.ToString())) {
                         //
                         // -- key is already there, remove it first                        
-                        core.doc.cdefDictionary.Remove(contentId.ToString());
+                        core.cdefDictionary.Remove(contentId.ToString());
                     }
 
                     List<string> dependantCacheNameList = new List<string>();
@@ -590,7 +590,7 @@ namespace Contensive.Processor.Models.Domain {
                         }
                         setCache(core, contentId, result);
                     }
-                    core.doc.cdefDictionary.Add(contentId.ToString(), result);
+                    core.cdefDictionary.Add(contentId.ToString(), result);
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);

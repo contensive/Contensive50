@@ -1507,7 +1507,7 @@ public string Instructions { get; set; }
 
 
 ---------------------------------------------
-RemoteQuerieModel
+RemoteQueryModel
 
 public bool AllowInactiveRecords { get; set; }
 

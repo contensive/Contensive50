@@ -315,21 +315,33 @@ namespace Contensive.Processor.Controllers {
         /// <param name="maxRecords"></param>
         /// <returns></returns>
         public DataTable executeQuery(string sql, string dataSourceName, int startRecord, int maxRecords) {
-            int tempVar = 0;
-            return executeQuery(sql, dataSourceName, startRecord, maxRecords, ref tempVar);
+            int recordsReturned = 0;
+            return executeQuery(sql, dataSourceName, startRecord, maxRecords, ref recordsReturned);
         }
+        //
+        //====================================================================================================
+        //
         public DataTable executeQuery(string sql, string dataSourceName, int startRecord) {
             int tempVar = 0;
             return executeQuery(sql, dataSourceName, startRecord, 9999, ref tempVar);
         }
+        //
+        //====================================================================================================
+        //
         public DataTable executeQuery(string sql, string dataSourceName) {
             int tempVar = 0;
             return executeQuery(sql, dataSourceName, 0, 9999, ref tempVar);
         }
+        //
+        //====================================================================================================
+        //
         public DataTable executeQuery(string sql) {
             int tempVar = 0;
             return executeQuery(sql, "", 0, 9999, ref tempVar);
         }
+        //
+        //====================================================================================================
+        //
         public DataTable executeQuery(string sql, string dataSourceName, int startRecord, int maxRecords, ref int recordsReturned) {
             DataTable returnData = new DataTable();
             try {
@@ -373,44 +385,6 @@ namespace Contensive.Processor.Controllers {
             }
             return returnData;
         }
-        ////
-        ////====================================================================================================
-        ///// <summary>
-        ///// Execute a command via ADO and return a recordset. Note the recordset must be disposed by the caller.
-        ///// </summary>
-        ///// <param name="sql"></param>
-        ///// <param name="dataSourceName"></param>
-        ///// <param name="startRecord"></param>
-        ///// <param name="maxRecords"></param>
-        ///// <returns>You must close the recordset after use.</returns>
-        //public ADODB.Recordset executeSql_getRecordSet(string sql, string dataSourceName = "", int startRecord = 0, int maxRecords = 9999) {
-        //    //
-        //    // from - https://support.microsoft.com/en-us/kb/308611
-        //    //
-        //    // REFACTOR 
-        //    // - add start recrod And max record in
-        //    // - add dataSourceName into the getConnectionString call - if no dataSourceName, return catalog in cluster Db, else return connstring
-        //    //
-        //    //Dim cn As ADODB.Connection = New ADODB.Connection()
-        //    ADODB.Recordset rs = new ADODB.Recordset();
-        //    string connString = getConnectionStringOLEDB(core.appConfig.name, dataSourceName);
-        //    try {
-        //        if (dbEnabled) {
-        //            if (maxRecords > 0) {
-        //                rs.MaxRecords = maxRecords;
-        //            }
-        //            // Open Recordset without connection object.
-        //            rs.Open(sql, connString, ADODB.CursorTypeEnum.adOpenKeyset, ADODB.LockTypeEnum.adLockOptimistic, -1);
-        //            // REFACTOR -- dbVerified Is only for the datasource. Need one for each...
-        //            dbVerified = true;
-        //        }
-        //    } catch (Exception ex) {
-        //        ApplicationException newEx = new GenericException("Exception [" + ex.Message + "] executing sql [" + sql + "], datasource [" + dataSourceName + "], startRecord [" + startRecord + "], maxRecords [" + maxRecords + "]", ex);
-        //        logController.handleError( core,newEx);
-        //        throw newEx;
-        //    }
-        //    return rs;
-        //}
         //
         //====================================================================================================
         /// <summary>
@@ -422,10 +396,24 @@ namespace Contensive.Processor.Controllers {
             int tempVar = 0;
             executeNonQuery(sql, dataSourceName, ref tempVar);
         }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// execute sql on a the default datasource. 
+        /// </summary>
+        /// <param name="sql"></param>
         public void executeNonQuery(string sql) {
             int tempVar = 0;
             executeNonQuery(sql, "", ref tempVar);
         }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// execute sql and return records affected
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="dataSourceName"></param>
+        /// <param name="recordsAffected"></param>
         public void executeNonQuery(string sql, string dataSourceName, ref int recordsAffected) {
             try {
                 if (dbEnabled) {
@@ -482,17 +470,17 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Update a record in a table
         /// </summary>
-        /// <param name="DataSourceName"></param>
-        /// <param name="TableName"></param>
-        /// <param name="Criteria"></param>
+        /// <param name="dataSourceName"></param>
+        /// <param name="tableName"></param>
+        /// <param name="criteria"></param>
         /// <param name="sqlList"></param>
-        public void updateTableRecord(string DataSourceName, string TableName, string Criteria, SqlFieldListClass sqlList, bool asyncSave = false ) {
+        public void updateTableRecord(string dataSourceName, string tableName, string criteria, SqlFieldListClass sqlList, bool asyncSave = false ) {
             try {
-                string SQL = "update " + TableName + " set " + sqlList.getNameValueList() + " where " + Criteria + ";";
+                string SQL = "update " + tableName + " set " + sqlList.getNameValueList() + " where " + criteria + ";";
                 if (!asyncSave) {
-                    executeNonQuery(SQL, DataSourceName);
+                    executeNonQuery(SQL, dataSourceName);
                 } else {
-                    executeNonQueryAsync(SQL, DataSourceName);
+                    executeNonQueryAsync(SQL, dataSourceName);
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -504,14 +492,14 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// iInserts a record into a table and returns the ID
         /// </summary>
-        /// <param name="DataSourceName"></param>
-        /// <param name="TableName"></param>
-        /// <param name="MemberID"></param>
+        /// <param name="dataSourceName"></param>
+        /// <param name="tableName"></param>
+        /// <param name="memberId"></param>
         /// <returns></returns>
-        public int insertTableRecordGetId(string DataSourceName, string TableName, int MemberID = 0) {
+        public int insertTableRecordGetId(string dataSourceName, string tableName, int memberId = 0) {
             int returnId = 0;
             try {
-                using (DataTable dt = insertTableRecordGetDataTable(DataSourceName, TableName, MemberID)) {
+                using (DataTable dt = insertTableRecordGetDataTable(dataSourceName, tableName, memberId)) {
                     if (dt.Rows.Count > 0) {
                         returnId = GenericController.encodeInteger(dt.Rows[0]["id"]);
                     }
@@ -527,11 +515,11 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Insert a record in a table, select it and return a datatable. You must dispose the datatable.
         /// </summary>
-        /// <param name="DataSourceName"></param>
-        /// <param name="TableName"></param>
-        /// <param name="MemberID"></param>
+        /// <param name="dataSourceName"></param>
+        /// <param name="tableName"></param>
+        /// <param name="memberId"></param>
         /// <returns></returns>
-        public DataTable insertTableRecordGetDataTable(string DataSourceName, string TableName, int MemberID = 0) {
+        public DataTable insertTableRecordGetDataTable(string dataSourceName, string tableName, int memberId = 0) {
             DataTable returnDt = null;
             try {
                 SqlFieldListClass sqlList = new SqlFieldListClass();
@@ -543,15 +531,15 @@ namespace Contensive.Processor.Controllers {
                 sqlList.add("ccguid", sqlGuid);
                 //sqlList.add("createkey", CreateKeyString);
                 sqlList.add("dateadded", sqlDateAdded);
-                sqlList.add("createdby", encodeSQLNumber(MemberID));
+                sqlList.add("createdby", encodeSQLNumber(memberId));
                 sqlList.add("ModifiedDate", sqlDateAdded);
-                sqlList.add("ModifiedBy", encodeSQLNumber(MemberID));
+                sqlList.add("ModifiedBy", encodeSQLNumber(memberId));
                 sqlList.add("ContentControlID", encodeSQLNumber(0));
                 sqlList.add("Name", encodeSQLText(""));
                 sqlList.add("Active", encodeSQLNumber(1));
                 //
-                insertTableRecord(DataSourceName, TableName, sqlList);
-                returnDt = openTable(DataSourceName, TableName, "(DateAdded=" + sqlDateAdded + ")and(ccguid=" + sqlGuid + ")", "ID DESC", "", 1);
+                insertTableRecord(dataSourceName, tableName, sqlList);
+                returnDt = openTable(dataSourceName, tableName, "(DateAdded=" + sqlDateAdded + ")and(ccguid=" + sqlGuid + ")", "ID DESC", "", 1);
                 //returnDt = openTable(DataSourceName, TableName, "(DateAdded=" + DateAddedString + ")and(CreateKey=" + CreateKeyString + ")", "ID DESC", "", 1);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -804,7 +792,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         if (clearMetaCache) {
                             core.cache.invalidateAll();
-                            core.doc.clearMetaData();
+                            core.clearMetaData();
                         }
                     }
                 }
@@ -824,7 +812,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 executeQuery("DROP TABLE " + TableName, DataSourceName).Dispose();
                 core.cache.invalidateAll();
-                core.doc.clearMetaData();
+                core.clearMetaData();
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
@@ -839,25 +827,8 @@ namespace Contensive.Processor.Controllers {
         /// <param name="TableName"></param>
         /// <param name="FieldName"></param>
         public void deleteTableField(string DataSourceName, string TableName, string FieldName) {
-            //Throw New NotImplementedException("deletetablefield")
             try {
                 if (isSQLTableField(DataSourceName, TableName, FieldName)) {
-                    //
-                    //   Delete any indexes that use this column
-                    // refactor -- need to finish this
-                    //DataTable tableScheme = getIndexSchemaData(TableName);
-                    //With cdefCache.tableSchema(SchemaPointer)
-                    //    If .IndexCount > 0 Then
-                    //        For IndexPointer = 0 To .IndexCount - 1
-                    //            If FieldName = .IndexFieldName(IndexPointer) Then
-                    //                Call csv_DeleteTableIndex(DataSourceName, TableName, .IndexName(IndexPointer))
-                    //            End If
-                    //        Next
-                    //    End If
-                    //End With
-                    //
-                    //   Delete the field
-                    //
                     executeQuery("ALTER TABLE " + TableName + " DROP COLUMN " + FieldName + ";", DataSourceName);
                 }
             } catch (Exception ex) {
@@ -885,7 +856,7 @@ namespace Contensive.Processor.Controllers {
                             executeQuery("CREATE INDEX [" + IndexName + "] ON [" + TableName + "]( " + FieldNames + " );", DataSourceName);
                             if (clearMetaCache) {
                                 core.cache.invalidateAll();
-                                core.doc.clearMetaData();
+                                core.clearMetaData();
                             }
                         }
                     }
@@ -1078,7 +1049,7 @@ namespace Contensive.Processor.Controllers {
                         }
                         executeQuery(sql, DataSourceName);
                         core.cache.invalidateAll();
-                        core.doc.clearMetaData();
+                        core.clearMetaData();
                     }
                 }
 
@@ -1436,76 +1407,6 @@ namespace Contensive.Processor.Controllers {
                     } else if (CDef.id <= 0) {
                         throw (new GenericException("No content found For [" + ContentName + "]"));
                     } else {
-                        //sqlOrderBy = GenericController.encodeEmpty(sqlOrderBy, CDef.defaultSortMethod);
-                        //sqlSelectFieldList = GenericController.encodeEmpty(sqlSelectFieldList, CDef.selectCommaList);
-                        ////
-                        //// verify the sortfields are in this table
-                        //if (!string.IsNullOrEmpty(sqlOrderBy)) {
-                        //    string[] SortFields = sqlOrderBy.Split(',');
-                        //    for (int ptr = 0; ptr < SortFields.GetUpperBound(0) + 1; ptr++) {
-                        //        string SortField = SortFields[ptr].ToLowerInvariant();
-                        //        SortField = GenericController.vbReplace(SortField, "asc", "", 1, 99, 1);
-                        //        SortField = GenericController.vbReplace(SortField, "desc", "", 1, 99, 1);
-                        //        SortField = SortField.Trim(' ');
-                        //        if (!CDef.selectList.Contains(SortField)) {
-                        //            throw (new GenericException("The field [" + SortField + "] was used in sqlOrderBy for content [" + ContentName + "], but the content does not include this field."));
-                        //        }
-                        //    }
-                        //}
-                        ////
-                        //// ----- fixup the criteria to include the ContentControlID(s) / EditSourceID
-                        //string sqlContentCriteria = CDef.contentControlCriteria;
-                        //if (string.IsNullOrEmpty(sqlContentCriteria)) {
-                        //    sqlContentCriteria = "(1=1)";
-                        //} else {
-                        //    //
-                        //    // remove tablename from contentcontrolcriteria - if in workflow mode, and authoringtable is different, this would be wrong, also makes sql smaller, and is not necessary
-                        //    sqlContentCriteria = GenericController.vbReplace(sqlContentCriteria, CDef.contentTableName + ".", "");
-                        //}
-                        //if (!string.IsNullOrEmpty(sqlCriteria)) {
-                        //    sqlContentCriteria = sqlContentCriteria + "and(" + sqlCriteria + ")";
-                        //}
-                        ////
-                        //// ----- Active Only records
-                        //if (activeOnly) {
-                        //    sqlContentCriteria = sqlContentCriteria + "and(active<>0)";
-                        //}
-                        ////
-                        //// ----- Process Select Fields, make sure ContentControlID,ID,Name,Active are included
-                        //sqlSelectFieldList = GenericController.vbReplace(sqlSelectFieldList, "\t", " ");
-                        //while (GenericController.vbInstr(1, sqlSelectFieldList, " ,") != 0) {
-                        //    sqlSelectFieldList = GenericController.vbReplace(sqlSelectFieldList, " ,", ",");
-                        //}
-                        //while (GenericController.vbInstr(1, sqlSelectFieldList, ", ") != 0) {
-                        //    sqlSelectFieldList = GenericController.vbReplace(sqlSelectFieldList, ", ", ",");
-                        //}
-                        //if ((!string.IsNullOrEmpty(sqlSelectFieldList)) && (sqlSelectFieldList.IndexOf("*", System.StringComparison.OrdinalIgnoreCase) == -1)) {
-                        //    string TestUcaseFieldList = GenericController.vbUCase("," + sqlSelectFieldList + ",");
-                        //    if (GenericController.vbInstr(1, TestUcaseFieldList, ",CONTENTCONTROLID,", 1) == 0) {
-                        //        sqlSelectFieldList = sqlSelectFieldList + ",ContentControlID";
-                        //    }
-                        //    if (GenericController.vbInstr(1, TestUcaseFieldList, ",NAME,", 1) == 0) {
-                        //        sqlSelectFieldList = sqlSelectFieldList + ",Name";
-                        //    }
-                        //    if (GenericController.vbInstr(1, TestUcaseFieldList, ",ID,", 1) == 0) {
-                        //        sqlSelectFieldList = sqlSelectFieldList + ",ID";
-                        //    }
-                        //    if (GenericController.vbInstr(1, TestUcaseFieldList, ",ACTIVE,", 1) == 0) {
-                        //        sqlSelectFieldList = sqlSelectFieldList + ",ACTIVE";
-                        //    }
-                        //}
-                        ////
-                        //// ----- Check for blank Tablename or DataSource
-                        //if (string.IsNullOrEmpty(CDef.contentTableName)) {
-                        //    throw (new Exception("Content metadata [" + ContentName + "] does not reference a valid table"));
-                        //} else if (string.IsNullOrEmpty(CDef.contentDataSourceName)) {
-                        //    throw (new Exception("Table metadata [" + CDef.contentTableName + "] does not reference a valid datasource"));
-                        //}
-                        ////
-                        //// ----- If no select list, use *
-                        //if (string.IsNullOrEmpty(sqlSelectFieldList)) {
-                        //    sqlSelectFieldList = "*";
-                        //}
                         //
                         // ----- Open the csv_ContentSet
                         returnCs = csInit(memberId);
@@ -1747,8 +1648,6 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //========================================================================
-        // Move the csv_ContentSet to the next row
-        //========================================================================
         //
         public void csGoNext(int CSPointer, bool AsyncSave = false) {
             try {
@@ -1787,8 +1686,6 @@ namespace Contensive.Processor.Controllers {
             }
         }
         //
-        //========================================================================
-        // Move the csv_ContentSet to the first row
         //========================================================================
         //
         public void csGoFirst(int CSPointer, bool AsyncSave = false) {
@@ -2791,7 +2688,7 @@ namespace Contensive.Processor.Controllers {
                                             //
                                             //
                                             //
-                                            if (DateController.IsDate(FieldValueVariant)) {
+                                            if (GenericController.IsDate(FieldValueVariant)) {
                                                 //
                                                 // formatdatetime returns 'wednesday june 5, 1990', which fails IsDate()!!
                                                 //
@@ -3112,15 +3009,27 @@ namespace Contensive.Processor.Controllers {
                 throw;
             }
         }
+        //
+        //========================================================================
+        //
         public void csSet(int CSPointer, string FieldName, DateTime FieldValue) {
             csSet(CSPointer, FieldName, FieldValue.ToString());
         }
+        //
+        //========================================================================
+        //
         public void csSet(int CSPointer, string FieldName, bool FieldValue) {
             csSet(CSPointer, FieldName, FieldValue.ToString());
         }
+        //
+        //========================================================================
+        //
         public void csSet(int CSPointer, string FieldName, int FieldValue) {
             csSet(CSPointer, FieldName, FieldValue.ToString());
         }
+        //
+        //========================================================================
+        //
         public void csSet(int CSPointer, string FieldName, double FieldValue) {
             csSet(CSPointer, FieldName, FieldValue.ToString());
         }
@@ -3557,6 +3466,8 @@ namespace Contensive.Processor.Controllers {
             return expression.ToString();
         }
         //
+        //========================================================================
+        //
         public string encodeSQLNumber(int expression) {
             return expression.ToString();
         }
@@ -3769,10 +3680,6 @@ namespace Contensive.Processor.Controllers {
                 throw;
             }
         }
-        //// todo deprecate
-        //public void deleteTableRecord(string TableName, int RecordID, string DataSourceName = "") {
-        //    deleteTableRecord(RecordID, TableName, DataSourceName);
-        //}
             //
             //==================================================================================================
             /// <summary>
@@ -4080,8 +3987,6 @@ namespace Contensive.Processor.Controllers {
         //
         //========================================================================
         //
-        //========================================================================
-        //
         public string[,] getContentRows(string ContentName, string Criteria = "", string SortFieldList = "", bool ActiveOnly = true, int MemberID = SystemMemberID, bool WorkflowRenderingMode = false, bool WorkflowEditingMode = false, string SelectFieldList = "", int PageSize = 9999, int PageNumber = 1) {
             string[,] returnRows = { { } };
             try {
@@ -4099,6 +4004,7 @@ namespace Contensive.Processor.Controllers {
             return returnRows;
         }
         //
+        //========================================================================
         /// <summary>
         /// 
         /// </summary>
@@ -4127,6 +4033,7 @@ namespace Contensive.Processor.Controllers {
             return SQL;
         }
         //
+        //========================================================================
         /// <summary>
         /// 
         /// </summary>
@@ -4153,6 +4060,7 @@ namespace Contensive.Processor.Controllers {
             return returnList;
         }
         //
+        //========================================================================
         /// <summary>
         /// 
         /// </summary>
@@ -4174,6 +4082,7 @@ namespace Contensive.Processor.Controllers {
             return returnDt;
         }
         //
+        //========================================================================
         /// <summary>
         /// 
         /// </summary>
@@ -4199,7 +4108,7 @@ namespace Contensive.Processor.Controllers {
             return returnDt;
         }
         //
-        // 
+        //========================================================================
         //
         public DataTable getIndexSchemaData(string tableName) {
             DataTable returnDt = new DataTable();
@@ -4325,7 +4234,7 @@ namespace Contensive.Processor.Controllers {
                         }
                         dt.Dispose();
                         core.cache.invalidateAll();
-                        core.doc.clearMetaData();
+                        core.clearMetaData();
                     }
                     //
                     //-----------------------------------------------------------
@@ -4373,7 +4282,7 @@ namespace Contensive.Processor.Controllers {
                 //       Leave Autoload false during load so more do not trigger
                 //
                 core.cache.invalidateAll();
-                core.doc.clearMetaData();
+                core.clearMetaData();
                 dt.Dispose();
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -4906,6 +4815,9 @@ namespace Contensive.Processor.Controllers {
                 csClose(ref CS);
             }
         }
+        //
+        // ====================================================================================================
+        //
         public string csGetRecordEditLink(int CSPointer, bool AllowCut = false) {
             string result = "";
 
@@ -4993,11 +4905,7 @@ namespace Contensive.Processor.Controllers {
                 }
             }
         }
-
-
         //
-        //=================================================================================
-        // fix for isDataTableOk
         //=================================================================================
         //
         public static bool isDataTableOk(DataTable dt) {
@@ -5005,31 +4913,9 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //=================================================================================
-        // fix for closeRS
-        //=================================================================================
         //
         public static void closeDataTable(DataTable dt) {
-            // nothing needed
-            //dt.Clear()
             dt.Dispose();
-        }
-        //
-        // ====================================================================================================
-        /// <summary>
-        /// Return just the tablename from a tablename reference (database.object.tablename->tablename)
-        /// </summary>
-        /// <param name="DbObject"></param>
-        /// <returns></returns>
-        public static string getDbObjectTableName(string DbObject) {
-            string tempGetDbObjectTableName = null;
-            int Position = 0;
-            //
-            tempGetDbObjectTableName = DbObject;
-            Position = tempGetDbObjectTableName.LastIndexOf(".") + 1;
-            if (Position > 0) {
-                tempGetDbObjectTableName = tempGetDbObjectTableName.Substring(Position);
-            }
-            return tempGetDbObjectTableName;
         }
         //
         //====================================================================================================
@@ -5050,12 +4936,17 @@ namespace Contensive.Processor.Controllers {
             }
             return result;
         }
-        public static DataTable executeRemoteQuery( CoreController core, string remoteQueryKey ) {
+        //
+        //====================================================================================================
+        //
+        public DataTable executeRemoteQuery( string remoteQueryKey ) {
             DataTable result = null;
             try {
-                var remoteQuery = Models.Db.RemoteQueryModel.create(core, remoreQueryKey);
+                var remoteQuery = Models.Db.RemoteQueryModel.create(core, remoteQueryKey);
                 if ( remoteQuery == null ) {
                     throw new GenericException("remoteQuery was not found with key [" + remoteQueryKey + "]");
+                } else {
+                    result = executeQuery(remoteQuery.SQLQuery);
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
@@ -5063,7 +4954,171 @@ namespace Contensive.Processor.Controllers {
             }
             return result;
         }
-
+        //
+        //====================================================================================================
+        //
+        public int csOpenWhatsNew(CoreController core, string SortFieldList = "", bool ActiveOnly = true, int PageSize = 1000, int PageNumber = 1) {
+            int result = -1;
+            try {
+                result = csOpenContentWatchList(core, "What's New", SortFieldList, ActiveOnly, PageSize, PageNumber);
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+            }
+            return result;
+        }
+        //
+        //====================================================================================================
+        //
+        public int csOpenContentWatchList(CoreController core, string ListName, string SortFieldList = "", bool ActiveOnly = true, int PageSize = 1000, int PageNumber = 1) {
+            int result = -1;
+            try {
+                string SQL = null;
+                string iSortFieldList = null;
+                string MethodName = null;
+                int CS = 0;
+                //
+                iSortFieldList = encodeText(encodeEmpty(SortFieldList, "")).Trim(' ');
+                //iSortFieldList = encodeMissingText(SortFieldList, "DateAdded")
+                if (string.IsNullOrEmpty(iSortFieldList)) {
+                    iSortFieldList = "DateAdded";
+                }
+                //
+                MethodName = "main_OpenCSContentWatchList( " + ListName + ", " + iSortFieldList + ", " + ActiveOnly + " )";
+                //
+                // ----- Add tablename to the front of SortFieldList fieldnames
+                //
+                iSortFieldList = " " + GenericController.vbReplace(iSortFieldList, ",", " , ") + " ";
+                iSortFieldList = GenericController.vbReplace(iSortFieldList, " ID ", " ccContentWatch.ID ", 1, 99, 1);
+                iSortFieldList = GenericController.vbReplace(iSortFieldList, " Link ", " ccContentWatch.Link ", 1, 99, 1);
+                iSortFieldList = GenericController.vbReplace(iSortFieldList, " LinkLabel ", " ccContentWatch.LinkLabel ", 1, 99, 1);
+                iSortFieldList = GenericController.vbReplace(iSortFieldList, " SortOrder ", " ccContentWatch.SortOrder ", 1, 99, 1);
+                iSortFieldList = GenericController.vbReplace(iSortFieldList, " DateAdded ", " ccContentWatch.DateAdded ", 1, 99, 1);
+                iSortFieldList = GenericController.vbReplace(iSortFieldList, " ContentID ", " ccContentWatch.ContentID ", 1, 99, 1);
+                iSortFieldList = GenericController.vbReplace(iSortFieldList, " RecordID ", " ccContentWatch.RecordID ", 1, 99, 1);
+                iSortFieldList = GenericController.vbReplace(iSortFieldList, " ModifiedDate ", " ccContentWatch.ModifiedDate ", 1, 99, 1);
+                //
+                // ----- Special case
+                //
+                iSortFieldList = GenericController.vbReplace(iSortFieldList, " name ", " ccContentWatch.LinkLabel ", 1, 99, 1);
+                //
+                SQL = "SELECT"
+                    + " ccContentWatch.ID AS ID"
+                    + ",ccContentWatch.Link as Link"
+                    + ",ccContentWatch.LinkLabel as LinkLabel"
+                    + ",ccContentWatch.SortOrder as SortOrder"
+                    + ",ccContentWatch.DateAdded as DateAdded"
+                    + ",ccContentWatch.ContentID as ContentID"
+                    + ",ccContentWatch.RecordID as RecordID"
+                    + ",ccContentWatch.ModifiedDate as ModifiedDate"
+                + " FROM (ccContentWatchLists"
+                    + " LEFT JOIN ccContentWatchListRules ON ccContentWatchLists.ID = ccContentWatchListRules.ContentWatchListID)"
+                    + " LEFT JOIN ccContentWatch ON ccContentWatchListRules.ContentWatchID = ccContentWatch.ID"
+                + " WHERE (((ccContentWatchLists.Name)=" + this.core.db.encodeSQLText(ListName) + ")"
+                    + "AND ((ccContentWatchLists.Active)<>0)"
+                    + "AND ((ccContentWatchListRules.Active)<>0)"
+                    + "AND ((ccContentWatch.Active)<>0)"
+                    + "AND (ccContentWatch.Link is not null)"
+                    + "AND (ccContentWatch.LinkLabel is not null)"
+                    + "AND ((ccContentWatch.WhatsNewDateExpires is null)or(ccContentWatch.WhatsNewDateExpires>" + this.core.db.encodeSQLDate(core.doc.profileStartTime) + "))"
+                    + ")"
+                + " ORDER BY " + iSortFieldList + ";";
+                result = this.core.db.csOpenSql(SQL, "", PageSize, PageNumber);
+                if (!this.core.db.csOk(result)) {
+                    //
+                    // Check if listname exists
+                    //
+                    CS = this.core.db.csOpen("Content Watch Lists", "name=" + this.core.db.encodeSQLText(ListName), "ID", false, 0, false, false, "ID");
+                    if (!this.core.db.csOk(CS)) {
+                        this.core.db.csClose(ref CS);
+                        CS = this.core.db.csInsertRecord("Content Watch Lists");
+                        if (this.core.db.csOk(CS)) {
+                            this.core.db.csSet(CS, "name", ListName);
+                        }
+                    }
+                    this.core.db.csClose(ref CS);
+                }
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+            }
+            return result;
+        }
+        //
+        // ====================================================================================================
+        /// <summary>
+        /// Return just the tablename from a tablename reference (database.object.tablename->tablename)
+        /// </summary>
+        /// <param name="DbObject"></param>
+        /// <returns></returns>
+        public static string getDbObjectTableName(string DbObject) {
+            string tempGetDbObjectTableName = null;
+            int Position = 0;
+            //
+            tempGetDbObjectTableName = DbObject;
+            Position = tempGetDbObjectTableName.LastIndexOf(".") + 1;
+            if (Position > 0) {
+                tempGetDbObjectTableName = tempGetDbObjectTableName.Substring(Position);
+            }
+            return tempGetDbObjectTableName;
+        }
+        //
+        //========================================================================
+        // main_DeleteChildRecords
+        //========================================================================
+        //
+        public string deleteChildRecords(string ContentName, int RecordID, bool ReturnListWithoutDelete = false) {
+            string result = "";
+            try {
+                bool QuickEditing = false;
+                string[] IDs = null;
+                int IDCnt = 0;
+                int Ptr = 0;
+                int CS = 0;
+                string ChildList = null;
+                bool SingleEntry = false;
+                //
+                // For now, the child delete only works in non-workflow
+                //
+                CS = core.db.csOpen(ContentName, "parentid=" + RecordID, "", false, 0, false, false, "ID");
+                while (core.db.csOk(CS)) {
+                    result += "," + core.db.csGetInteger(CS, "ID");
+                    core.db.csGoNext(CS);
+                }
+                core.db.csClose(ref CS);
+                if (!string.IsNullOrEmpty(result)) {
+                    result = result.Substring(1);
+                    //
+                    // main_Get a list of all pages, but do not delete anything yet
+                    //
+                    IDs = result.Split(',');
+                    IDCnt = IDs.GetUpperBound(0) + 1;
+                    SingleEntry = (IDCnt == 1);
+                    for (Ptr = 0; Ptr < IDCnt; Ptr++) {
+                        ChildList = deleteChildRecords(ContentName, GenericController.encodeInteger(IDs[Ptr]), true);
+                        if (!string.IsNullOrEmpty(ChildList)) {
+                            result += "," + ChildList;
+                            SingleEntry = false;
+                        }
+                    }
+                    if (!ReturnListWithoutDelete) {
+                        //
+                        // Do the actual delete
+                        //
+                        IDs = result.Split(',');
+                        IDCnt = IDs.GetUpperBound(0) + 1;
+                        SingleEntry = (IDCnt == 1);
+                        QuickEditing = core.session.isQuickEditing(core, "page content");
+                        for (Ptr = 0; Ptr < IDCnt; Ptr++) {
+                            int deleteRecordId = encodeInteger(IDs[Ptr]);
+                            core.db.deleteTableRecord(deleteRecordId, PageContentModel.contentTableName);
+                            PageContentModel.invalidateRecordCache(core, deleteRecordId);
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+            }
+            return result;
+        }
 
         #region  IDisposable Support 
         protected bool disposed = false;

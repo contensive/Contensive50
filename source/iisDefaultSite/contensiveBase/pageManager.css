@@ -23,3 +23,11 @@ div.ccTestPointMessageCon {
     padding: 20px;
     background-color: #eee;
 }
+/*
+    Dialog - page cannot be displayed
+*/
+div.ccDialogPageNotFound {
+    width: 300px;
+    margin: 100px auto auto auto;
+    text-align: center;
+}

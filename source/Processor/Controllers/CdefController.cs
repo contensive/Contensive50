@@ -1,12 +1,7 @@
 ﻿
 using System;
-using System.Reflection;
-using System.Xml;
-using System.Text.RegularExpressions;
 using System.Collections.Generic;
-using Contensive.Processor;
 using Contensive.Processor.Models.Db;
-using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
@@ -123,19 +118,19 @@ namespace Contensive.Processor.Controllers {
             try {
                 //
                 // -- method 2 - if name/id dictionary doesnt have it, load the one record
-                if (core.doc.contentNameIdDictionary.ContainsKey(contentName.ToLowerInvariant())) {
-                    returnId = core.doc.contentNameIdDictionary[contentName.ToLowerInvariant()];
+                if (core.contentNameIdDictionary.ContainsKey(contentName.ToLowerInvariant())) {
+                    returnId = core.contentNameIdDictionary[contentName.ToLowerInvariant()];
                 } else {
                     ContentModel content = ContentModel.createByUniqueName(core, contentName);
                     if (content != null) {
-                        core.doc.contentNameIdDictionary.Add(contentName.ToLowerInvariant(), content.id);
+                        core.contentNameIdDictionary.Add(contentName.ToLowerInvariant(), content.id);
                         returnId = content.id;
                     }
                 }
                 //
                 // -- method-1, on first request, load all content records
-                //if (core.doc.contentNameIdDictionary.ContainsKey(contentName.ToLowerInvariant())) {
-                //    returnId = core.doc.contentNameIdDictionary[contentName.ToLowerInvariant()];
+                //if (core.contentNameIdDictionary.ContainsKey(contentName.ToLowerInvariant())) {
+                //    returnId = core.contentNameIdDictionary[contentName.ToLowerInvariant()];
                 //}
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
@@ -331,7 +326,7 @@ namespace Contensive.Processor.Controllers {
                 // ----- Load CDef
                 //
                 core.cache.invalidateAll();
-                core.doc.clearMetaData();
+                core.clearMetaData();
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
             }
@@ -769,7 +764,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         ContentModel.invalidateTableCache(core);
                         ContentFieldModel.invalidateTableCache(core);
-                        core.doc.clearMetaData();
+                        core.clearMetaData();
                     }
                 }
             } catch (Exception ex) {
@@ -952,7 +947,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             if (!blockCacheClear) {
                                 core.cache.invalidateAll();
-                                core.doc.clearMetaData();
+                                core.clearMetaData();
                             }
                         }
                         if (returnId == 0) {

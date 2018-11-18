@@ -7,6 +7,7 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         //-- const
+        //
         public const string contentName = "tables";            //<------ set content name
         public const string contentTableName = "ccTables";     //<------ set to tablename for the primary content (used for cache names)
         public const string contentDataSource = "default";     //<------ set to datasource if not default
@@ -14,111 +15,87 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         // -- instance properties
+        //
         public int dataSourceID { get; set; }                   //<------ replace this with a list all model fields not part of the base model
         //
-        // todo -- add addEmpty to all models
         //====================================================================================================
-        public static _BlankModel addEmpty(CoreController core) {
-            return addEmpty<_BlankModel>(core);
-        }
+        //
+        public static _BlankModel addEmpty(CoreController core) => addEmpty<_BlankModel>(core);
         //
         //====================================================================================================
-        public static _BlankModel addDefault(CoreController core, Domain.CDefModel cdef) {
-            return addDefault<_BlankModel>(core, cdef);
-        }
+        //
+        public static _BlankModel addDefault(CoreController core, Domain.CDefModel cdef) => addDefault<_BlankModel>(core, cdef);
         //
         //====================================================================================================
-        public static _BlankModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefModel cdef) {
-            return addDefault<_BlankModel>(core, cdef, ref callersCacheNameList);
-        }
+        //
+        public static _BlankModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefModel cdef) => addDefault<_BlankModel>(core, cdef, ref callersCacheNameList);
         //
         //====================================================================================================
-        public static _BlankModel create(CoreController core, int recordId) {
-            return create<_BlankModel>(core, recordId);
-        }
+        //
+        public static _BlankModel create(CoreController core, int recordId) => create<_BlankModel>(core, recordId);
         //
         //====================================================================================================
-        public static _BlankModel create(CoreController core, int recordId, ref List<string> callersCacheNameList) {
-            return create<_BlankModel>(core, recordId, ref callersCacheNameList);
-        }
+        //
+        public static _BlankModel create(CoreController core, int recordId, ref List<string> callersCacheNameList) => create<_BlankModel>(core, recordId, ref callersCacheNameList);
         //
         //====================================================================================================
-        public static _BlankModel create(CoreController core, string recordGuid) {
-            return create<_BlankModel>(core, recordGuid);
-        }
+        //
+        public static _BlankModel create(CoreController core, string recordGuid) => create<_BlankModel>(core, recordGuid);
         //
         //====================================================================================================
-        public static _BlankModel create(CoreController core, string recordGuid, ref List<string> callersCacheNameList) {
-            return create<_BlankModel>(core, recordGuid, ref callersCacheNameList);
-        }
+        //
+        public static _BlankModel create(CoreController core, string recordGuid, ref List<string> callersCacheNameList) => create<_BlankModel>(core, recordGuid, ref callersCacheNameList);
         //
         //====================================================================================================
-        public static _BlankModel createByUniqueName(CoreController core, string recordName) {
-            return createByUniqueName<_BlankModel>(core, recordName);
-        }
+        //
+        public static _BlankModel createByUniqueName(CoreController core, string recordName) => createByUniqueName<_BlankModel>(core, recordName);
         //
         //====================================================================================================
-        public static _BlankModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
-            return createByUniqueName<_BlankModel>(core, recordName, ref callersCacheNameList);
-        }
+        public static _BlankModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) => createByUniqueName<_BlankModel>(core, recordName, ref callersCacheNameList);
         //
         //====================================================================================================
+        //
         public new void save(CoreController core, bool asyncSave = false) { base.save(core, asyncSave); }
         //
         //====================================================================================================
-        public static void delete(CoreController core, int recordId) {
-            delete<_BlankModel>(core, recordId);
-        }
+        //
+        public static void delete(CoreController core, int recordId) => delete<_BlankModel>(core, recordId);
         //
         //====================================================================================================
-        public static void delete(CoreController core, string ccGuid) {
-            delete<_BlankModel>(core, ccGuid);
-        }
+        //
+        public static void delete(CoreController core, string ccGuid) => delete<_BlankModel>(core, ccGuid);
         //
         //====================================================================================================
-        public static List<_BlankModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
-            return createList<_BlankModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
-        }
+        //
+        public static List<_BlankModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) => createList<_BlankModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
         //
         //====================================================================================================
-        public static List<_BlankModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy) {
-            return createList<_BlankModel>(core, sqlCriteria, sqlOrderBy);
-        }
+        //
+        public static List<_BlankModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy) => createList<_BlankModel>(core, sqlCriteria, sqlOrderBy);
         //
         //====================================================================================================
-        public static List<_BlankModel> createList(CoreController core, string sqlCriteria) {
-            return createList<_BlankModel>(core, sqlCriteria);
-        }
+        //
+        public static List<_BlankModel> createList(CoreController core, string sqlCriteria) => createList<_BlankModel>(core, sqlCriteria);
         //
         //====================================================================================================
-        public static void invalidateRecordCache(CoreController core, int recordId) {
-            invalidateRecordCache<_BlankModel>(core, recordId);
-        }
+        //
+        public static void invalidateRecordCache(CoreController core, int recordId) => invalidateRecordCache<_BlankModel>(core, recordId);
         //
         //====================================================================================================
-        public static void invalidateTableCache(CoreController core) {
-            invalidateTableCache<_BlankModel>(core);
-        }
+        //
+        public static void invalidateTableCache(CoreController core) => invalidateTableCache<_BlankModel>(core);
         //
         //====================================================================================================
-        public static string getRecordName(CoreController core, int recordId) {
-            return BaseModel.getRecordName<_BlankModel>(core, recordId);
-        }
+        //
+        public static string getRecordName(CoreController core, int recordId) => BaseModel.getRecordName<_BlankModel>(core, recordId);
         //
         //====================================================================================================
-        public static string getRecordName(CoreController core, string ccGuid) {
-            return BaseModel.getRecordName<_BlankModel>(core, ccGuid);
-        }
+        //
+        public static string getRecordName(CoreController core, string ccGuid) => BaseModel.getRecordName<_BlankModel>(core, ccGuid);
         //
         //====================================================================================================
-        public static int getRecordId(CoreController core, string ccGuid) {
-            return BaseModel.getRecordId<_BlankModel>(core, ccGuid);
-        }
-        ////
-        ////====================================================================================================
-        //public static _BlankModel createDefault(CoreController core) {
-        //    return createDefault<_BlankModel>(core);
-        //}
+        //
+        public static int getRecordId(CoreController core, string ccGuid) => BaseModel.getRecordId<_BlankModel>(core, ccGuid);
         //
         //====================================================================================================
         /// <summary>
@@ -126,8 +103,10 @@ namespace Contensive.Processor.Models.Db {
         /// </summary>
         /// <param name="core"></param>
         /// <returns></returns>
-        public static string getTableInvalidationKey(CoreController core) {
-            return getTableCacheKey<_BlankModel>(core);
-        }
+        public static string getTableInvalidationKey(CoreController core) => getTableCacheKey<_BlankModel>(core);
+        //
+        //====================================================================================================
+        //
+        public static void deleteSelection(CoreController core, string sqlCriteria) => BaseModel.deleteSelection<_BlankModel>(core, sqlCriteria);
     }
 }

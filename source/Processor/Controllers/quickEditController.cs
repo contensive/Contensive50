@@ -49,31 +49,10 @@ namespace Contensive.Processor.Controllers {
                     editLockMemberName = core.workflow.GetEditLockMemberName(PageContentModel.contentName, core.doc.pageController.page.id);
                     editLockDateExpires = GenericController.encodeDate(core.workflow.GetEditLockMemberName(PageContentModel.contentName, core.doc.pageController.page.id));
                 }
-                bool IsModified = false;
-                bool IsSubmitted = false;
-                bool IsApproved = false;
-                string SubmittedMemberName = "";
-                string ApprovedMemberName = "";
-                string ModifiedMemberName = "";
-                bool IsDeleted = false;
-                bool IsInserted = false;
-                bool IsRootPage = false;
-                DateTime SubmittedDate = default(DateTime);
-                DateTime ApprovedDate = default(DateTime);
-                DateTime ModifiedDate = default(DateTime);
-                core.doc.getAuthoringStatus(PageContentModel.contentName, core.doc.pageController.page.id, ref IsSubmitted, ref IsApproved, ref SubmittedMemberName, ref ApprovedMemberName, ref IsInserted, ref IsDeleted, ref IsModified, ref ModifiedMemberName, ref ModifiedDate, ref SubmittedDate, ref ApprovedDate);
-                bool tempVar = false;
-                bool tempVar2 = false;
-                bool tempVar3 = false;
-                bool tempVar4 = false;
-                bool AllowInsert = false;
-                bool AllowCancel = false;
-                bool allowSave = false;
-                bool AllowDelete = false;
-                bool readOnlyField = false;
-                core.doc.getAuthoringPermissions(PageContentModel.contentName, core.doc.pageController.page.id, ref AllowInsert, ref AllowCancel, ref allowSave, ref AllowDelete, ref tempVar, ref tempVar2, ref tempVar3, ref tempVar4, ref readOnlyField);
+                WorkflowController.AuthoringStatusClass authoringStatus = core.workflow.getAuthoringStatus(PageContentModel.contentName, core.doc.pageController.page.id);
+                PermissionController.AuthoringPermissions authoringPermissions = PermissionController.getAuthoringPermissions(core, PageContentModel.contentName, core.doc.pageController.page.id);
                 bool AllowMarkReviewed = CdefController.isContentFieldSupported(core, PageContentModel.contentName, "DateReviewed");
-                string OptionsPanelAuthoringStatus = core.session.getAuthoringStatusMessage(core, false, IsEditLocked, editLockMemberName, editLockDateExpires, IsApproved, ApprovedMemberName, IsSubmitted, SubmittedMemberName, IsDeleted, IsInserted, IsModified, ModifiedMemberName);
+                string OptionsPanelAuthoringStatus = core.session.getAuthoringStatusMessage(core, false, IsEditLocked, editLockMemberName, editLockDateExpires, authoringStatus.isApproved, authoringStatus.approvedMemberName, authoringStatus.isSubmitted, authoringStatus.submittedMemberName, authoringStatus.isDeleted, authoringStatus.isInserted, authoringStatus.isModified, authoringStatus.modifiedMemberName);
                 //
                 // Set Editing Authoring Control
                 //
@@ -82,20 +61,22 @@ namespace Contensive.Processor.Controllers {
                 // SubPanel: Authoring Status
                 //
                 string ButtonList = "";
-                if (AllowCancel) {
+                if (authoringPermissions.AllowCancel) {
                     ButtonList = ButtonList + "," + ButtonCancel;
                 }
-                if (allowSave) {
+                if (authoringPermissions.allowSave) {
                     ButtonList = ButtonList + "," + ButtonSave + "," + ButtonOK;
                 }
-                if (AllowDelete && !IsRootPage) {
+                if (authoringPermissions.AllowDelete && (core.doc.pageController.pageToRootList.Count==1)) {
+                    //
+                    // -- allow delete and not root page
                     ButtonList = ButtonList + "," + ButtonDelete;
                 }
-                if (AllowInsert) {
+                if (authoringPermissions.AllowInsert) {
                     ButtonList = ButtonList + "," + ButtonAddChildPage;
                 }
                 int page_ParentID = 0;
-                if ((page_ParentID != 0) && AllowInsert) {
+                if ((page_ParentID != 0) && authoringPermissions.AllowInsert) {
                     ButtonList = ButtonList + "," + ButtonAddSiblingPage;
                 }
                 if (AllowMarkReviewed) {
@@ -117,20 +98,20 @@ namespace Contensive.Processor.Controllers {
                         + cr2 + "<td colspan=2 class=\"qeRow\"><div class=\"qeHeadCon\">" + ErrorController.getUserError(core) + "</div></td>"
                         + "\r</tr>";
                 }
-                if (readOnlyField) {
+                if (authoringPermissions.readOnlyField) {
                     result += ""
                     + "\r<tr>"
-                    + cr2 + "<td colspan=\"2\" class=\"qeRow\">" + getQuickEditingBody(core, PageContentModel.contentName, OrderByClause, AllowPageList, true, rootPageId, readOnlyField, AllowReturnLink, PageContentModel.contentName, ArchivePages, contactMemberID) + "</td>"
+                    + cr2 + "<td colspan=\"2\" class=\"qeRow\">" + getQuickEditingBody(core, PageContentModel.contentName, OrderByClause, AllowPageList, true, rootPageId, authoringPermissions.readOnlyField, AllowReturnLink, PageContentModel.contentName, ArchivePages, contactMemberID) + "</td>"
                     + "\r</tr>";
                 } else {
                     result += ""
                     + "\r<tr>"
-                    + cr2 + "<td colspan=\"2\" class=\"qeRow\">" + getQuickEditingBody(core, PageContentModel.contentName, OrderByClause, AllowPageList, true, rootPageId, readOnlyField, AllowReturnLink, PageContentModel.contentName, ArchivePages, contactMemberID) + "</td>"
+                    + cr2 + "<td colspan=\"2\" class=\"qeRow\">" + getQuickEditingBody(core, PageContentModel.contentName, OrderByClause, AllowPageList, true, rootPageId, authoringPermissions.readOnlyField, AllowReturnLink, PageContentModel.contentName, ArchivePages, contactMemberID) + "</td>"
                     + "\r</tr>";
                 }
                 result += "\r<tr>"
                     + cr2 + "<td class=\"qeRow qeLeft\" style=\"padding-top:10px;\">Name</td>"
-                    + cr2 + "<td class=\"qeRow qeRight\">" + HtmlController.inputText(core, "name", core.doc.pageController.page.name, 1, 0, "", false, readOnlyField) + "</td>"
+                    + cr2 + "<td class=\"qeRow qeRight\">" + HtmlController.inputText(core, "name", core.doc.pageController.page.name, 1, 0, "", false, authoringPermissions.readOnlyField) + "</td>"
                     + "\r</tr>"
                     + "";
                 string PageList = null;

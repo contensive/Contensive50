@@ -399,7 +399,7 @@ namespace Contensive.Processor.Controllers {
                                                                         if (GenericController.vbInstr(1, LibGUID, "58c9", 1) != 0) {
                                                                             //LibGUID = LibGUID;
                                                                         }
-                                                                        if (!DateController.IsDate(LibLastChangeDateStr)) {
+                                                                        if (!GenericController.IsDate(LibLastChangeDateStr)) {
                                                                             LibLastChangeDate = DateTime.MinValue;
                                                                         } else {
                                                                             LibLastChangeDate = GenericController.encodeDate(LibLastChangeDateStr);
@@ -2844,7 +2844,7 @@ namespace Contensive.Processor.Controllers {
                                         FolderDetail lastSubFolder = SubFolderList.Last<FolderDetail>();
                                         FolderName = FolderName + "\\" + lastSubFolder.Name;
                                         LastChangeDate = lastSubFolder.Name.Substring(4, 2) + "/" + lastSubFolder.Name.Substring(6, 2) + "/" + lastSubFolder.Name.Left(4);
-                                        if (!DateController.IsDate(LastChangeDate)) {
+                                        if (!GenericController.IsDate(LastChangeDate)) {
                                             LastChangeDate = "";
                                         }
                                     }

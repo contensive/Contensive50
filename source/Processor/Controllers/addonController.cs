@@ -2,20 +2,16 @@
 using System;
 using System.Reflection;
 using System.Xml;
-using System.Text.RegularExpressions;
 using System.Collections.Generic;
-using Contensive.Processor;
 using Contensive.Processor.Models.Db;
-using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.BaseClasses;
 using System.IO;
 using System.Data;
-using Contensive.Processor.Models.Domain;
 using System.Linq;
 using Contensive.Processor.Exceptions;
-//
+
 namespace Contensive.Processor.Controllers {
     //
     //====================================================================================================
@@ -473,7 +469,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // -- DotNet
                                 if (addon.dotNetClass != "") {
-                                    result += execute_assembly(executeContext, addon, AddonCollectionModel.create(core, addon.collectionID));
+                                    result += execute_assembly(executeContext, addon, AddonCollectionModel.create<AddonCollectionModel>(core, addon.collectionID));
                                 }
                                 //
                                 // -- RemoteAssetLink
@@ -671,7 +667,6 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- if root level addon, and the addon is an html document, create the html document around it and uglify if not debugging
                     if ((executeContext.forceHtmlDocument) || ((rootLevelAddon) && (addon.htmlDocument))) {
-                        DebugController.testPoint(core, "root level addon is html, build document around result");
                         result = core.html.getHtmlDoc(result, "<body>");
                         if ((!core.doc.visitPropertyAllowDebugging) && (core.siteProperties.getBoolean("Allow Html Minify", true))) {
                             result = NUglify.Uglify.Html(result).Code;
@@ -680,7 +675,6 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- pop modelstack and test point message
                     core.doc.addonModelStack.Pop();
-                    DebugController.testPoint(core, "execute exit (" + (core.doc.appStopWatch.ElapsedMilliseconds - addonStart) + "ms) [#" + addon.id + ", " + addon.name + ", guid " + addon.ccguid + "]");
                 }
             }
             return result;

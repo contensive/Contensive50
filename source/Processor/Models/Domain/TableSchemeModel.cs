@@ -47,10 +47,10 @@ namespace Contensive.Processor.Models.Domain {
                     if (!string.IsNullOrEmpty(TableName)) {
                         string lowerTablename = TableName.ToLowerInvariant();
                         bool isInCache = false;
-                        if ((core.doc.tableSchemaDictionary) == null) {
-                            core.doc.tableSchemaDictionary = new Dictionary<string, Models.Domain.TableSchemaModel>();
+                        if ((core.tableSchemaDictionary) == null) {
+                            core.tableSchemaDictionary = new Dictionary<string, Models.Domain.TableSchemaModel>();
                         } else {
-                            isInCache = core.doc.tableSchemaDictionary.TryGetValue(lowerTablename, out tableSchema);
+                            isInCache = core.tableSchemaDictionary.TryGetValue(lowerTablename, out tableSchema);
                         }
                         bool buildCache = !isInCache;
                         if (isInCache) {
@@ -100,11 +100,11 @@ namespace Contensive.Processor.Models.Domain {
                                 }
                             }
                             if (!isInDb && isInCache) {
-                                core.doc.tableSchemaDictionary.Remove(lowerTablename);
+                                core.tableSchemaDictionary.Remove(lowerTablename);
                             } else if (isInDb && (!isInCache)) {
-                                core.doc.tableSchemaDictionary.Add(lowerTablename, tableSchema);
+                                core.tableSchemaDictionary.Add(lowerTablename, tableSchema);
                             } else if (isInDb && isInCache) {
-                                core.doc.tableSchemaDictionary[lowerTablename] = tableSchema;
+                                core.tableSchemaDictionary[lowerTablename] = tableSchema;
                             }
                         }
                     }
@@ -118,7 +118,7 @@ namespace Contensive.Processor.Models.Domain {
         //
         //====================================================================================================
         public static void tableSchemaListClear(CoreController core) {
-            core.doc.tableSchemaDictionary.Clear();
+            core.tableSchemaDictionary.Clear();
         }
     }
 

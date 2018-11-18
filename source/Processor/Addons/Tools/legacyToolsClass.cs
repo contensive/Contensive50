@@ -419,7 +419,7 @@ namespace Contensive.Addons.Tools {
                         core.db.createSQLTable(datasource.name, TableName);
                         core.db.createContentFromSQLTable(datasource, TableName, ContentName);
                         core.cache.invalidateAll();
-                        core.doc.clearMetaData();
+                        core.clearMetaData();
                         ContentID = CdefController.getContentId(core, ContentName);
                         ParentNavID = core.db.getRecordID(Processor.Models.Db.NavigatorEntryModel.contentName, "Manage Site Content");
                         if (ParentNavID != 0) {
@@ -876,7 +876,7 @@ namespace Contensive.Addons.Tools {
                     }
                     if (Button == ButtonSaveandInvalidateCache) {
                         core.cache.invalidateAll();
-                        core.doc.clearMetaData();
+                        core.clearMetaData();
                         return core.webServer.redirect("?af=" + AdminFormToolConfigureListing + "&ContentID=" + ContentID);
                     }
                     //
@@ -1654,7 +1654,7 @@ namespace Contensive.Addons.Tools {
                         //
                         Stream.Add("<br>Reloading Content Definitions...");
                         core.cache.invalidateAll();
-                        core.doc.clearMetaData();
+                        core.clearMetaData();
                         //
                         // Add Admin Menu Entry
                         //
@@ -2841,7 +2841,7 @@ namespace Contensive.Addons.Tools {
                     //
                     Stream.Add("<br>Loading Content Definitions...");
                     core.cache.invalidateAll();
-                    core.doc.clearMetaData();
+                    core.clearMetaData();
                     Stream.Add("<br>Content Definitions loaded");
                 }
                 //

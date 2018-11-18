@@ -18,7 +18,8 @@ namespace Contensive.Processor {
         //
         private Contensive.Processor.Controllers.CoreController core;
         private CPClass cp;
-        protected bool disposed = false;
+        //
+        //====================================================================================================
         /// <summary>
         /// Constructor
         /// </summary>
@@ -27,10 +28,109 @@ namespace Contensive.Processor {
             cp = cpParent;
             core = cp.core;
         }
+        //
+        //====================================================================================================
         /// <summary>
-        /// dispose
+        /// Add a group
         /// </summary>
-        /// <param name="disposing"></param>
+        /// <param name="groupName"></param>
+        public override void Add(string groupName) => GroupController.add(core, groupName);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Add a group
+        /// </summary>
+        /// <param name="groupName"></param>
+        /// <param name="groupCaption"></param>
+        public override void Add(string groupName, string groupCaption) => GroupController.add(core, groupName, groupCaption);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Add current user to a group
+        /// </summary>
+        /// <param name="groupNameOrGuid"></param>
+        public override void AddUser(string groupNameOrGuid) => GroupController.addUser(core, groupNameOrGuid, core.session.user.id, DateTime.MinValue);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Add current user to a group
+        /// </summary>
+        /// <param name="groupId"></param>
+        public override void AddUser(int groupId) => GroupController.addUser(core, groupId.ToString(), 0, DateTime.MinValue);
+        //
+        //====================================================================================================
+        //
+        public override void AddUser(string GroupNameIdOrGuid, int UserId) => GroupController.addUser(core, GroupNameIdOrGuid, UserId, DateTime.MinValue);
+        //
+        //====================================================================================================
+        //
+        public override void AddUser(string GroupNameIdOrGuid, int UserId, DateTime DateExpires) => GroupController.addUser(core, GroupNameIdOrGuid, UserId, DateExpires);
+        //
+        //====================================================================================================
+        //
+        public override void AddUser(int GroupId, int UserId) => GroupController.addUser(core, GroupId.ToString(), UserId, DateTime.MinValue);
+        //
+        //====================================================================================================
+        //
+        public override void AddUser(int GroupId, int UserId, DateTime DateExpires) => GroupController.addUser(core, GroupId.ToString(), UserId, DateExpires);
+        //
+        //====================================================================================================
+        //
+        public override void Delete(string GroupNameIdOrGuid) => GroupModel.delete(core, GroupNameIdOrGuid);
+        //
+        //====================================================================================================
+        //
+        public override void Delete(int GroupId) => GroupModel.delete(core, GroupId);
+        //
+        //====================================================================================================
+        //
+        public override int GetId(string GroupNameIdOrGuid) => core.db.getRecordID("groups", GroupNameIdOrGuid);
+        //
+        //====================================================================================================
+        //
+        public override string GetName(string GroupIdOrGuid) {
+            if (GroupIdOrGuid.IsNumeric()) {
+                return core.db.getRecordName("groups", GenericController.encodeInteger(GroupIdOrGuid));
+            } else {
+                return core.db.getRecordName("groups", GroupIdOrGuid);
+            }
+        }
+        public override string GetName(int GroupId) => core.db.getRecordName("groups", GroupId);
+        //
+        //====================================================================================================
+        //
+        public override void RemoveUser(string GroupNameIdOrGuid, int removeUserId) {
+            int groupID = GetId(GroupNameIdOrGuid);
+            int userId = removeUserId;
+            if (groupID != 0) {
+                if (userId == 0) {
+                    cp.Content.Delete("Member Rules", "((memberid=" + cp.User.Id.ToString() + ")and(groupid=" + groupID.ToString() + "))");
+                } else {
+                    cp.Content.Delete("Member Rules", "((memberid=" + removeUserId.ToString() + ")and(groupid=" + groupID.ToString() + "))");
+                }
+            }
+        }
+        //
+        //====================================================================================================
+        //
+        public override void RemoveUser(string GroupNameIdOrGuid) => RemoveUser(GroupNameIdOrGuid, 0);
+        //
+        //====================================================================================================
+        //
+        private void appendDebugLog(string copy) => LogController.logDebug(core, copy);
+        //
+        //====================================================================================================
+        //
+        #region  IDisposable Support 
+        // Do not change or add Overridable to these methods.
+        // Put cleanup code in Dispose(ByVal disposing As Boolean).
+        public void Dispose() {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        ~CPGroupClass() {
+            Dispose(false);
+        }
         protected virtual void Dispose(bool disposing) {
             if (!this.disposed) {
                 appendDebugLog(".dispose, dereference cp, main, csv");
@@ -45,82 +145,7 @@ namespace Contensive.Processor {
             }
             this.disposed = true;
         }
-        /// <summary>
-        /// Add a group
-        /// </summary>
-        /// <param name="GroupName"></param>
-        public override void Add(string GroupName) => GroupController.add2(core, GroupName, GroupName);
-        /// <summary>
-        /// Add a group
-        /// </summary>
-        /// <param name="GroupName"></param>
-        /// <param name="GroupCaption"></param>
-        public override void Add(string GroupName, string GroupCaption) => GroupController.add2(core, GroupName, GroupCaption);
-        /// <summary>
-        /// Add current user to a group
-        /// </summary>
-        /// <param name="GroupNameIdOrGuid"></param>
-        public override void AddUser(string GroupNameIdOrGuid) => GroupController.addUser(core, GroupNameIdOrGuid, 0, DateTime.MinValue);
-        /// <summary>
-        /// Add current user to a group
-        /// </summary>
-        /// <param name="groupId"></param>
-        public override void AddUser(int groupId) => GroupController.addUser(core, groupId.ToString(), 0, DateTime.MinValue);
-        //
-        public override void AddUser(string GroupNameIdOrGuid, int UserId) => GroupController.addUser(core, GroupNameIdOrGuid, UserId, DateTime.MinValue);
-        //
-        public override void AddUser(string GroupNameIdOrGuid, int UserId, DateTime DateExpires) => GroupController.addUser(core, GroupNameIdOrGuid, UserId, DateExpires);
-        //
-        public override void AddUser(int GroupId, int UserId) => GroupController.addUser(core, GroupId.ToString(), UserId, DateTime.MinValue);
-
-        public override void AddUser(int GroupId, int UserId, DateTime DateExpires) => GroupController.addUser(core, GroupId.ToString(), UserId, DateExpires);
-
-        public override void Delete(string GroupNameIdOrGuid) => GroupModel.delete(core, GroupNameIdOrGuid);
-        //
-        public override void Delete(int GroupId) => GroupModel.delete(core, GroupId);
-        //
-        public override int GetId(string GroupNameIdOrGuid) => core.db.getRecordID("groups", GroupNameIdOrGuid);
-        //
-        public override string GetName(string GroupIdOrGuid) {
-            if (GroupIdOrGuid.IsNumeric()) {
-                return core.db.getRecordName("groups", GenericController.encodeInteger(GroupIdOrGuid));
-            } else {
-                return core.db.getRecordName("groups", GroupIdOrGuid);
-            }
-        }
-        public override string GetName(int GroupId) => core.db.getRecordName("groups", GroupId);
-        //
-        // Remove User from Group
-        //
-        public override void RemoveUser(string GroupNameIdOrGuid, int removeUserId)
-        {
-            int groupID = GetId(GroupNameIdOrGuid);
-            int userId = removeUserId;
-            if (groupID != 0) {
-                if (userId == 0) {
-                    cp.Content.Delete("Member Rules", "((memberid=" + cp.User.Id.ToString() + ")and(groupid=" + groupID.ToString() + "))");
-                } else {
-                    cp.Content.Delete("Member Rules", "((memberid=" + removeUserId.ToString() + ")and(groupid=" + groupID.ToString() + "))");
-                }
-            }
-        }
-        //
-        public override void RemoveUser(string GroupNameIdOrGuid) => RemoveUser(GroupNameIdOrGuid, 0);
-        //
-        private void appendDebugLog(string copy) => LogController.logDebug(core, copy);
-        //
-        #region  IDisposable Support 
-        // Do not change or add Overridable to these methods.
-        // Put cleanup code in Dispose(ByVal disposing As Boolean).
-        public void Dispose() {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-        ~CPGroupClass() {
-            Dispose(false);
-            
-            
-        }
+        protected bool disposed = false;
         #endregion
     }
 }

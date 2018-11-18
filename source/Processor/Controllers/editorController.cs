@@ -1,19 +1,8 @@
 ﻿
 using System;
-using System.Reflection;
-using System.Xml;
-using System.Diagnostics;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
-using Contensive.Processor;
-using Contensive.Processor.Models.Db;
-using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
-//
+
 namespace Contensive.Processor.Controllers {
     //
     //====================================================================================================
@@ -22,11 +11,11 @@ namespace Contensive.Processor.Controllers {
     /// </summary>
     public class EditorController : IDisposable {
         //
-        //
-        //========================================================================
-        // ----- Process the active editor form
-        //========================================================================
-        //
+        //====================================================================================================
+        /// <summary>
+        /// Process the active editor form
+        /// </summary>
+        /// <param name="core"></param>
         public static void processActiveEditor(CoreController core) {
             //
             int CS = 0;
@@ -71,11 +60,9 @@ namespace Contensive.Processor.Controllers {
             }
         }
         //
-        //========================================================================
-        // Print the active editor form
-        //========================================================================
+        //====================================================================================================
         //
-        public static string main_GetActiveEditor(CoreController core, string ContentName, int RecordID, string FieldName, string FormElements = "") {
+        public static string getActiveEditor(CoreController core, string ContentName, int RecordID, string FieldName, string FormElements = "") {
             //
             int ContentID = 0;
             int CSPointer = 0;
@@ -126,23 +113,15 @@ namespace Contensive.Processor.Controllers {
             return Stream;
         }
         //
-        //========================================================================
-        // main_Get FieldEditorList
-        //
-        //   FieldEditorList is a comma delmited list of addonids, one for each fieldtype
-        //   to use it, split the list on comma and use the fieldtype as index
-        //========================================================================
+        //====================================================================================================
         //
         public static string getFieldTypeDefaultEditorAddonIdList(CoreController core) {
             string result = "";
             try {
-                string[] editorAddonIds = null;
-                DataTable RS = null;
-                int fieldTypeID = 0;
                 //
                 // load default editors into editors() - these are the editors used when there is no editorPreference
                 //   editors(fieldtypeid) = addonid
-                editorAddonIds = new string[fieldTypeIdMax + 1];
+                string[] editorAddonIds = new string[fieldTypeIdMax + 1];
                 string SQL = ""
                     + " select"
                     + " t.id as contentfieldtypeid"
@@ -150,9 +129,9 @@ namespace Contensive.Processor.Controllers {
                     + " from ccFieldTypes t"
                     + " left join ccaggregatefunctions a on a.id=t.editorAddonId"
                     + " where (t.active<>0)and(a.active<>0) order by t.id";
-                RS = core.db.executeQuery(SQL);
+                DataTable RS = core.db.executeQuery(SQL);
                 foreach (DataRow dr in RS.Rows) {
-                    fieldTypeID = GenericController.encodeInteger(dr["contentfieldtypeid"]);
+                    int fieldTypeID = GenericController.encodeInteger(dr["contentfieldtypeid"]);
                     if (fieldTypeID <= fieldTypeIdMax) {
                         editorAddonIds[fieldTypeID] = GenericController.encodeText(dr["editorAddonId"]);
                     }
@@ -162,7 +141,7 @@ namespace Contensive.Processor.Controllers {
                 SQL = "select contentfieldtypeid, max(addonId) as editorAddonId from ccAddonContentFieldTypeRules group by contentfieldtypeid";
                 RS = core.db.executeQuery(SQL);
                 foreach (DataRow dr in RS.Rows) {
-                    fieldTypeID = GenericController.encodeInteger(dr["contentfieldtypeid"]);
+                    int fieldTypeID = GenericController.encodeInteger(dr["contentfieldtypeid"]);
                     if (fieldTypeID <= fieldTypeIdMax) {
                         if (string.IsNullOrEmpty(editorAddonIds[fieldTypeID])) {
                             editorAddonIds[fieldTypeID] = GenericController.encodeText(dr["editorAddonId"]);

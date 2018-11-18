@@ -6,16 +6,12 @@ using Amazon.S3.Model;
 using System.Collections.Generic;
 using System.IO;
 using ICSharpCode.SharpZipLib.Zip;
-using System.Threading.Tasks;
-using Contensive.Processor.Models;
-using Contensive.Processor.Models.Domain;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
-using Amazon.Runtime;
 using System.Linq;
 using static Contensive.BaseClasses.CPFileSystemBaseClass;
 using Contensive.Processor.Exceptions;
-//
+
 namespace Contensive.Processor.Controllers {
     //
     //==============================================================================================================
@@ -66,7 +62,6 @@ namespace Contensive.Processor.Controllers {
         /// list of paths verified during the scope of this execution. If a path is deleted, it must be removed from this list
         /// </summary>
         private List<string> verifiedRemotePathList = new List<string>();
-        //
         //
         //==============================================================================================================
         /// <summary>
@@ -361,7 +356,6 @@ namespace Contensive.Processor.Controllers {
                 throw;
             }
         }
-
         //
         //==============================================================================================================
         /// <summary>
@@ -854,8 +848,6 @@ namespace Contensive.Processor.Controllers {
                 throw;
             }
         }
-
-
         //
         //==============================================================================================================
         /// <summary>
@@ -1595,7 +1587,6 @@ namespace Contensive.Processor.Controllers {
             }
             return result;
         }
-
         //
         //====================================================================================================
         // dispose

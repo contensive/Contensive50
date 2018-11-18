@@ -219,7 +219,7 @@ namespace Contensive.Addons.AdminSite {
                         // Reload CDef if it changed
                         //
                         if (reloadMetadata) {
-                            core.doc.clearMetaData();
+                            core.clearMetaData();
                             core.cache.invalidateAll();
                             CDef = CDefModel.create(core, adminContent.name);
                         }

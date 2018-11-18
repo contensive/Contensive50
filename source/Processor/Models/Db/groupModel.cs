@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Collections.Generic;
 using Contensive.Processor.Controllers;
 //
@@ -125,6 +126,36 @@ namespace Contensive.Processor.Models.Db {
         /// <returns></returns>
         public static string getTableInvalidationKey(CoreController core) {
             return getTableCacheKey<GroupModel>(core);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Verify a group exists by name. If so, verify the caption. If not create the group.
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="groupName"></param>
+        /// <param name="groupCaption"></param>
+        /// <returns></returns>
+        public static GroupModel verify(CoreController core, string groupName, string groupCaption) {
+            Models.Db.GroupModel result = null;
+            try {
+                result = Models.Db.GroupModel.createByUniqueName(core, groupName);
+                if (result != null) {
+                    if (result.caption != groupCaption) {
+                        result.caption = groupCaption;
+                        result.save(core);
+                    }
+                } else {
+                    var groupCdef = Models.Domain.CDefModel.create(core, "groups");
+                    result = Models.Db.GroupModel.addDefault(core, groupCdef);
+                    result.name = groupName;
+                    result.caption = groupCaption;
+                    result.save(core);
+                }
+            } catch (Exception ex) {
+                throw (ex);
+            }
+            return result;
         }
     }
 }

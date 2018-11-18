@@ -9,7 +9,7 @@ using System.Data;
 using System.Linq;
 using Contensive.Processor.Models.Domain;
 using Contensive.Processor.Exceptions;
-//
+
 namespace Contensive.Processor.Controllers {
     //
     //====================================================================================================
@@ -444,7 +444,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- Reload
                 core.cache.invalidateAll();
-                core.doc.clearMetaData();
+                core.clearMetaData();
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
                 throw;
@@ -869,7 +869,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 appendUpgradeLogAddStep(core, core.appConfig.name, "VerifyDefaultGroups", "Verify Default Groups");
                 //
-                GroupID = GroupController.group_add(core, "Site Managers");
+                GroupID = GroupController.add(core, "Site Managers");
                 SQL = "Update ccContent Set EditorGroupID=" + core.db.encodeSQLNumber(GroupID) + " where EditorGroupID is null;";
                 core.db.executeQuery(SQL);
             } catch (Exception ex) {

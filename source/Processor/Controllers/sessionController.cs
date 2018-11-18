@@ -1157,7 +1157,7 @@ namespace Contensive.Processor.Controllers {
                 if (iMemberID == 0) {
                     iMemberID = user.id;
                 }
-                result = isMemberOfGroupList(core, "," + GroupController.group_GetGroupID(core, GenericController.encodeText(GroupName)), iMemberID, true);
+                result = isMemberOfGroupList(core, "," + GroupController.getGroupId(core, GenericController.encodeText(GroupName)), iMemberID, true);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;

@@ -686,12 +686,6 @@ namespace Contensive.Addons.AdminSite {
                         LoadEditRecord_Dbase(core, CheckUserErrors);
                         LoadEditRecord_WherePairs(core);
                     }
-                    //        '
-                    //        ' ----- Test for a change of adminContext.content (the record is a child of adminContext.content )
-                    //        '
-                    //        If EditRecord.ContentID <> adminContext.content.Id Then
-                    //            adminContext.content = core.app.getCdef(EditRecord.ContentName)
-                    //        End If
                     //
                     // ----- Capture core fields needed for processing
                     //
@@ -722,18 +716,11 @@ namespace Contensive.Addons.AdminSite {
                         editRecord.parentID = GenericController.encodeInteger(editRecord.fieldsLc["parentid"].value);
                     }
                     //
-                    //editRecord.menuHeadline = "";
-                    //if (editRecord.fieldsLc.ContainsKey("rootpageid")) {
-                    //    editRecord.RootPageID = genericController.encodeInteger(editRecord.fieldsLc["rootpageid"].value);
-                    //}
-                    //
                     // ----- Set the local global copy of Edit Record Locks
-                    //
-                    core.doc.getAuthoringStatus(adminContent.name, editRecord.id, ref editRecord.SubmitLock, ref editRecord.ApproveLock, ref editRecord.SubmittedName, ref editRecord.ApprovedName, ref editRecord.IsInserted, ref editRecord.IsDeleted, ref editRecord.IsModified, ref editRecord.LockModifiedName, ref editRecord.LockModifiedDate, ref editRecord.SubmittedDate, ref editRecord.ApprovedDate);
+                    WorkflowController.AuthoringStatusClass authoringStatus = core.workflow.getAuthoringStatus(adminContent.name, editRecord.id);
                     //
                     // ----- Set flags used to determine the Authoring State
-                    //
-                    core.doc.getAuthoringPermissions(adminContent.name, editRecord.id, ref editRecord.AllowInsert, ref editRecord.AllowCancel, ref editRecord.AllowSave, ref editRecord.AllowDelete, ref editRecord.AllowPublish, ref editRecord.AllowAbort, ref editRecord.AllowSubmit, ref editRecord.AllowApprove, ref editRecord.Read_Only);
+                    PermissionController.AuthoringPermissions authoringPermissions = PermissionController.getAuthoringPermissions(core, adminContent.name, editRecord.id);
                     //
                     // ----- Set Edit Lock
                     //
@@ -1456,7 +1443,7 @@ namespace Contensive.Addons.AdminSite {
                                         //
                                         ResponseFieldIsEmpty = ResponseFieldIsEmpty || (string.IsNullOrEmpty(ResponseFieldValueText));
                                         if (!ResponseFieldIsEmpty) {
-                                            if (!DateController.IsDate(ResponseFieldValueText)) {
+                                            if (!GenericController.IsDate(ResponseFieldValueText)) {
                                                 Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " must be a date And/Or time in the form mm/dd/yy 0000 AM(PM).");
                                                 ResponseFieldValueIsOKToSave = false;
                                             }

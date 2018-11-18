@@ -78,7 +78,7 @@ namespace Contensive.Processor.Models.Db {
         public string parentListName { get; set; }
         public DateTime pubDate { get; set; }
         public int RegistrationGroupID { get; set; }
-        public int ReviewedBy { get; set; }
+        public int reviewedBy { get; set; }
         public int TemplateID { get; set; }
         public int TriggerAddGroupID { get; set; }
         public int TriggerConditionGroupID { get; set; }
@@ -198,6 +198,25 @@ namespace Contensive.Processor.Models.Db {
         /// <returns></returns>
         public static string getTableInvalidationKey(CoreController core) {
             return getTableCacheKey<PageContentModel>(core);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// mark record reviewed
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="pageId"></param>
+        public static void markReviewed(CoreController core, int pageId) {
+            try {
+                var page = create(core, pageId);
+                if ( page != null ) {
+                    page.dateReviewed = DateTime.Now;
+                    page.reviewedBy = core.session.user.id;
+                    page.save(core);
+                }
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+            }
         }
     }
 }

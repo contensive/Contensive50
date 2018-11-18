@@ -33,9 +33,9 @@ namespace Contensive.Processor.Controllers {
             template = new PageTemplateModel();
         }
         /// <summary>
-        /// current page to it's root
+        /// current page to it's root. List.First is current page, List.Last is rootpage
         /// </summary>
-        public List<Models.Db.PageContentModel> pageToRootList { get; set; }
+        public List<PageContentModel> pageToRootList { get; set; }
         /// <summary>
         /// current template
         /// </summary>
@@ -146,7 +146,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- domain not listed, this is now an error
                     LogController.logError(core, "Domain not recognized:" + core.webServer.requestUrlSource);
-                    return "<div style=\"width:300px; margin: 100px auto auto auto;text-align:center;\">The domain name is not configured for this site.</div>";
+                    return HtmlController.div("This domain name is not configured for this site.", "ccDialogPageNotFound");
                 }
                 //
                 // -- validate page
@@ -156,7 +156,7 @@ namespace Contensive.Processor.Controllers {
                     LogController.logInfo(core, "Requested page/document not found:" + core.webServer.requestUrlSource);
                     core.doc.redirectBecausePageNotFound = true;
                     core.doc.redirectReason = "Redirecting because the page selected could not be found.";
-                    core.doc.redirectLink = PageContentController.main_ProcessPageNotFound_GetLink(core, core.doc.redirectReason, "", "", 0, 0);
+                    core.doc.redirectLink = PageContentController.main_ProcessPageNotFound_GetLink(core, core.doc.redirectReason, "", "", 0);
                     return core.webServer.redirect(core.doc.redirectLink, core.doc.redirectReason, core.doc.redirectBecausePageNotFound);
                 }
                 //
@@ -226,11 +226,6 @@ namespace Contensive.Processor.Controllers {
                 if (copyRecord!=null) {
                     result = copyRecord.copy;
                 }
-                //int CS = core.db.csOpen("Copy Content", "name=" + core.db.encodeSQLText(ContentBlockCopyName), "ID", false, 0, false, false, "Copy,ID");
-                //if (core.db.csOk(CS)) {
-                //    result = core.db.csGet(CS, "Copy");
-                //}
-                //core.db.csClose(ref CS);
                 //
                 // ----- Do not allow blank message - if still nothing, create default
                 if (string.IsNullOrEmpty(result)) {
@@ -239,14 +234,6 @@ namespace Contensive.Processor.Controllers {
                     copyRecord.name = ContentBlockCopyName;
                     copyRecord.copy = result;
                     copyRecord.save(core);
-                    ////
-                    //// ----- Create Copy Content Record for future
-                    //CS = core.db.csInsertRecord("Copy Content");
-                    //if (core.db.csOk(CS)) {
-                    //    core.db.csSet(CS, "Name", ContentBlockCopyName);
-                    //    core.db.csSet(CS, "Copy", result);
-                    //}
-                    //core.db.csClose(ref CS);
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -254,7 +241,7 @@ namespace Contensive.Processor.Controllers {
             return result;
         }
         //
-        //
+        //=============================================================================
         //
         public static string getMoreInfoHtml(CoreController core, int PeopleID) {
             string result = "";
@@ -519,7 +506,7 @@ namespace Contensive.Processor.Controllers {
         //
         //
         //
-        internal static string main_ProcessPageNotFound_GetLink(CoreController core, string adminMessage, string BackupPageNotFoundLink = "", string PageNotFoundLink = "", int EditPageID = 0, int EditSectionID = 0) {
+        internal static string main_ProcessPageNotFound_GetLink(CoreController core, string adminMessage, string BackupPageNotFoundLink = "", string PageNotFoundLink = "", int EditPageID = 0) {
             string result = "";
             try {
                 int PageNotFoundPageID = getPageNotFoundPageId(core);
@@ -556,11 +543,11 @@ namespace Contensive.Processor.Controllers {
                     //
                     // Add the Referrer to the Admin Msg
                     if (core.webServer.requestReferer != "") {
-                        int Pos = GenericController.vbInstr(1, core.webServer.requestReferrer, "main_AdminWarningPageID=", 1);
+                        int Pos = GenericController.vbInstr(1, core.webServer.requestReferrer, "AdminWarningPageID=", 1);
                         if (Pos != 0) {
                             core.webServer.requestReferrer = core.webServer.requestReferrer.Left( Pos - 2);
                         }
-                        Pos = GenericController.vbInstr(1, core.webServer.requestReferrer, "main_AdminWarningMsg=", 1);
+                        Pos = GenericController.vbInstr(1, core.webServer.requestReferrer, "AdminWarningMsg=", 1);
                         if (Pos != 0) {
                             core.webServer.requestReferrer = core.webServer.requestReferrer.Left( Pos - 2);
                         }
@@ -574,15 +561,11 @@ namespace Contensive.Processor.Controllers {
                     adminMessage = adminMessage + "</p>";
                     //
                     if (EditPageID != 0) {
-                        Link = GenericController.modifyLinkQuery(Link, "main_AdminWarningPageID", EditPageID.ToString(), true);
-                    }
-                    //
-                    if (EditSectionID != 0) {
-                        Link = GenericController.modifyLinkQuery(Link, "main_AdminWarningSectionID", EditSectionID.ToString(), true);
+                        Link = GenericController.modifyLinkQuery(Link, "AdminWarningPageID", EditPageID.ToString(), true);
                     }
                     //
                     Link = GenericController.modifyLinkQuery(Link, RequestNameBlockContentTracking, "1", true);
-                    Link = GenericController.modifyLinkQuery(Link, "main_AdminWarningMsg", "<p>" + adminMessage + "</p>", true);
+                    Link = GenericController.modifyLinkQuery(Link, "AdminWarningMsg", "<p>" + adminMessage + "</p>", true);
                 }
                 //
                 result = Link;
@@ -818,8 +801,8 @@ namespace Contensive.Processor.Controllers {
                         executeContext.errorContextMessage = addonContextMessage;
                     }
                     //
-                    core.doc.adminWarning = core.docProperties.getText("main_AdminWarningMsg");
-                    core.doc.adminWarningPageID = core.docProperties.getInteger("main_AdminWarningPageID");
+                    core.doc.adminWarning = core.docProperties.getText("AdminWarningMsg");
+                    core.doc.adminWarningPageID = core.docProperties.getInteger("AdminWarningPageID");
                     //
                     // todo move cookie test to htmlDoc controller
                     // -- Add cookie test
@@ -1144,9 +1127,9 @@ namespace Contensive.Processor.Controllers {
                                 tmpLink = core.db.csGetText(CSPointer, "DestinationLink");
                                 GroupID = core.db.csGetInteger(CSPointer, "GroupID");
                                 if (GroupID != 0) {
-                                    groupName = GroupController.group_GetGroupName(core, GroupID);
+                                    groupName = GroupController.getGroupName(core, GroupID);
                                     if (!string.IsNullOrEmpty(groupName)) {
-                                        GroupController.group_AddGroupMember(core, groupName);
+                                        GroupController.addUser(core, groupName);
                                     }
                                 }
                                 if (!string.IsNullOrEmpty(tmpLink)) {
@@ -1424,9 +1407,9 @@ namespace Contensive.Processor.Controllers {
                                 IsInGroup = core.docProperties.getBoolean("Group" + IDontKnowWhat.GroupName);
                                 WasInGroup = core.session.isMemberOfGroup(core, IDontKnowWhat.GroupName);
                                 if (WasInGroup && !IsInGroup) {
-                                    GroupController.group_DeleteGroupMember(core, IDontKnowWhat.GroupName);
+                                    GroupController.removeUser(core, IDontKnowWhat.GroupName);
                                 } else if (IsInGroup && !WasInGroup) {
-                                    GroupController.group_AddGroupMember(core, IDontKnowWhat.GroupName);
+                                    GroupController.addUser(core, IDontKnowWhat.GroupName);
                                 }
                                 break;
                         }
@@ -1454,7 +1437,7 @@ namespace Contensive.Processor.Controllers {
                         // Join Group requested by page that created form
                         var groupToken = SecurityController.decodeToken(core, core.docProperties.getText("SuccessID"));
                         if ( groupToken.id != 0) {
-                            GroupController.group_AddGroupMember(core, GroupController.group_GetGroupName(core, groupToken.id));
+                            GroupController.addUser(core, GroupController.getGroupName(core, groupToken.id));
                         }
                         //
                         // Join Groups requested by pageform
@@ -1463,7 +1446,7 @@ namespace Contensive.Processor.Controllers {
                             for (Ptr = 0; Ptr <= Groups.GetUpperBound(0); Ptr++) {
                                 string GroupName = Groups[Ptr].Trim(' ');
                                 if (!string.IsNullOrEmpty(GroupName)) {
-                                    GroupController.group_AddGroupMember(core, GroupName);
+                                    GroupController.addUser(core, GroupName);
                                 }
                             }
                         }
@@ -1982,10 +1965,10 @@ namespace Contensive.Processor.Controllers {
                                     EmailController.queueSystemEmail(core, core.db.getRecordName("System Email", SystemEMailID), "", core.session.user.id);
                                 }
                                 if (main_AddGroupID != 0) {
-                                    GroupController.group_AddGroupMember(core, GroupController.group_GetGroupName(core, main_AddGroupID));
+                                    GroupController.addUser(core, GroupController.getGroupName(core, main_AddGroupID));
                                 }
                                 if (RemoveGroupID != 0) {
-                                    GroupController.group_DeleteGroupMember(core, GroupController.group_GetGroupName(core, RemoveGroupID));
+                                    GroupController.removeUser(core, GroupController.getGroupName(core, RemoveGroupID));
                                 }
                                 break;
                             case 2:
@@ -1993,15 +1976,15 @@ namespace Contensive.Processor.Controllers {
                                 // If in Condition Group
                                 //
                                 if (ConditionGroupID != 0) {
-                                    if (core.session.isMemberOfGroup(core, GroupController.group_GetGroupName(core, ConditionGroupID))) {
+                                    if (core.session.isMemberOfGroup(core, GroupController.getGroupName(core, ConditionGroupID))) {
                                         if (SystemEMailID != 0) {
                                             EmailController.queueSystemEmail(core, core.db.getRecordName("System Email", SystemEMailID), "", core.session.user.id);
                                         }
                                         if (main_AddGroupID != 0) {
-                                            GroupController.group_AddGroupMember(core, GroupController.group_GetGroupName(core, main_AddGroupID));
+                                            GroupController.addUser(core, GroupController.getGroupName(core, main_AddGroupID));
                                         }
                                         if (RemoveGroupID != 0) {
-                                            GroupController.group_DeleteGroupMember(core, GroupController.group_GetGroupName(core, RemoveGroupID));
+                                            GroupController.removeUser(core, GroupController.getGroupName(core, RemoveGroupID));
                                         }
                                     }
                                 }
@@ -2011,12 +1994,12 @@ namespace Contensive.Processor.Controllers {
                                 // If not in Condition Group
                                 //
                                 if (ConditionGroupID != 0) {
-                                    if (!core.session.isMemberOfGroup(core, GroupController.group_GetGroupName(core, ConditionGroupID))) {
+                                    if (!core.session.isMemberOfGroup(core, GroupController.getGroupName(core, ConditionGroupID))) {
                                         if (main_AddGroupID != 0) {
-                                            GroupController.group_AddGroupMember(core, GroupController.group_GetGroupName(core, main_AddGroupID));
+                                            GroupController.addUser(core, GroupController.getGroupName(core, main_AddGroupID));
                                         }
                                         if (RemoveGroupID != 0) {
-                                            GroupController.group_DeleteGroupMember(core, GroupController.group_GetGroupName(core, RemoveGroupID));
+                                            GroupController.removeUser(core, GroupController.getGroupName(core, RemoveGroupID));
                                         }
                                         if (SystemEMailID != 0) {
                                             EmailController.queueSystemEmail(core, core.db.getRecordName("System Email", SystemEMailID), "", core.session.user.id);
@@ -2195,7 +2178,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     BreadCrumbPrefix = core.siteProperties.getText("BreadCrumbPrefix", "Return to");
                     BreadCrumbDelimiter = core.siteProperties.getText("BreadCrumbDelimiter", " &gt; ");
-                    breadCrumb = core.doc.getReturnBreadcrumb(RootPageContentName, core.doc.pageController.page.parentID, rootPageId, "", ArchivePage, BreadCrumbDelimiter);
+                    breadCrumb = core.doc.pageController.getReturnBreadcrumb(core, RootPageContentName, core.doc.pageController.page.parentID, rootPageId, "", ArchivePage, BreadCrumbDelimiter);
                     if (!string.IsNullOrEmpty(breadCrumb)) {
                         breadCrumb = "\r<p class=\"ccPageListNavigation\">" + BreadCrumbPrefix + " " + breadCrumb + "</p>";
                     }
@@ -2332,12 +2315,12 @@ namespace Contensive.Processor.Controllers {
                 if ((core.doc.pageController.page.dateReviewed != DateTime.MinValue) & core.doc.pageController.page.allowReviewedFooter) {
                     result += "\r<p>This page was last reviewed " + core.doc.pageController.page.dateReviewed.ToString("");
                     if (core.session.isAuthenticatedAdmin(core)) {
-                        if (core.doc.pageController.page.ReviewedBy == 0) {
+                        if (core.doc.pageController.page.reviewedBy == 0) {
                             result += " (by unknown)";
                         } else {
-                            string personName = core.db.getRecordName("people", core.doc.pageController.page.ReviewedBy);
+                            string personName = core.db.getRecordName("people", core.doc.pageController.page.reviewedBy);
                             if (string.IsNullOrEmpty(personName)) {
-                                result += " (by person with unnamed or deleted record #" + core.doc.pageController.page.ReviewedBy + ")";
+                                result += " (by person with unnamed or deleted record #" + core.doc.pageController.page.reviewedBy + ")";
                             } else {
                                 result += " (by " + personName + ")";
                             }
@@ -2543,7 +2526,8 @@ namespace Contensive.Processor.Controllers {
             return result;
         }
         //
-        //=============================================================================
+        //====================================================================================================
+        //
         //   Creates the child page list used by PageContent
         //
         //   RequestedListName is the name of the ChildList (ActiveContent Child Page List)
@@ -2603,7 +2587,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     bool blockContentComposite = false;
                     if (childPage.blockContent || childPage.blockPage) {
-                        blockContentComposite = !core.doc.bypassContentBlock(childPage.contentControlID, childPage.id);
+                        blockContentComposite = !core.doc.pageController.allowThroughPageBlock(core, childPage.id);
                     }
                     string LinkedText = GenericController.csv_GetLinkedText("<a href=\"" + HtmlController.encodeHtml(link) + "\">", pageMenuHeadline);
                     if ((string.IsNullOrEmpty(UcaseRequestedListName)) && (childPage.parentListName != "") && (!isAuthoring)) {
@@ -2733,6 +2717,301 @@ namespace Contensive.Processor.Controllers {
             }
             return result;
         }
+        //
+        //====================================================================================================
+        //
+        public string getWatchList(CoreController core, string ListName, string SortField, bool SortReverse) {
+            string result = "";
+            try {
+                int CS = -1;
+                if (SortReverse && (!string.IsNullOrEmpty(SortField))) {
+                    CS = core.db.csOpenContentWatchList(core, ListName, SortField + " Desc", true);
+                } else {
+                    CS = core.db.csOpenContentWatchList(core, ListName, SortField, true);
+                }
+                //
+                if (core.db.csOk(CS)) {
+                    int ContentID = CdefController.getContentId(core, "Content Watch");
+                    while (core.db.csOk(CS)) {
+                        string Link = core.db.csGetText(CS, "link");
+                        string LinkLabel = core.db.csGetText(CS, "LinkLabel");
+                        int RecordID = core.db.csGetInteger(CS, "ID");
+                        if (!string.IsNullOrEmpty(LinkLabel)) {
+                            result += "\r<li id=\"main_ContentWatch" + RecordID + "\" class=\"ccListItem\">";
+                            if (!string.IsNullOrEmpty(Link)) {
+                                result += "<a href=\"http://" + core.webServer.requestDomain + "/" + core.webServer.requestPage + "?rc=" + ContentID + "&ri=" + RecordID + "\">" + LinkLabel + "</a>";
+                            } else {
+                                result += LinkLabel;
+                            }
+                            result += "</li>";
+                        }
+                        core.db.csGoNext(CS);
+                    }
+                    if (!string.IsNullOrEmpty(result)) {
+                        result = core.html.getContentCopy("Watch List Caption: " + ListName, ListName, core.session.user.id, true, core.session.isAuthenticated) + "\r<ul class=\"ccWatchList\">" + nop(result) + "\r</ul>";
+                    }
+                }
+                core.db.csClose(ref CS);
+                //
+                if (core.visitProperty.getBoolean("AllowAdvancedEditor")) {
+                    result = AdminUIController.getEditWrapper(core, "Watch List [" + ListName + "]", result);
+                }
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+            }
+            return result;
+        }
+        //
+        //========================================================================
+        //
+        public static void processFormQuickEditing(CoreController core) {
+            //
+            int recordId = (core.docProperties.getInteger("ID"));
+            string Button = core.docProperties.getText("Button");
+            bool iIsAdmin = core.session.isAuthenticatedAdmin(core);
+            if ((!string.IsNullOrEmpty(Button)) && (recordId != 0) && (PageContentModel.contentName != "") && (core.session.isAuthenticatedContentManager(core, PageContentModel.contentName))) {
+                WorkflowController.AuthoringStatusClass authoringStatus = core.workflow.getAuthoringStatus(PageContentModel.contentName, recordId);
+                bool IsEditLocked = core.workflow.GetEditLockStatus(PageContentModel.contentName, recordId);
+                string main_EditLockMemberName = core.workflow.GetEditLockMemberName(PageContentModel.contentName, recordId);
+                DateTime main_EditLockDateExpires = default(DateTime);
+                main_EditLockDateExpires = core.workflow.GetEditLockDateExpires(PageContentModel.contentName, recordId);
+                core.workflow.ClearEditLock(PageContentModel.contentName, recordId);
+                //
+                // tough case, in Quick mode, lets mark the record reviewed, no matter what button they push, except cancel
+                //
+                if (Button != ButtonCancel) {
+                    PageContentModel.markReviewed(core, recordId);
+                }
+                bool allowSave = false;
+                //
+                // Determine is the record should be saved
+                //
+                if ((!authoringStatus.isApproved) && (!core.docProperties.getBoolean("RENDERMODE"))) {
+                    if (iIsAdmin) {
+                        //
+                        // cases that admin can save
+                        //
+                        allowSave = false || (Button == ButtonAddChildPage) || (Button == ButtonAddSiblingPage) || (Button == ButtonSave) || (Button == ButtonOK);
+                    } else {
+                        //
+                        // cases that CM can save
+                        //
+                        allowSave = false || (Button == ButtonAddChildPage) || (Button == ButtonAddSiblingPage) || (Button == ButtonSave) || (Button == ButtonOK);
+                    }
+                }
+                if (allowSave) {
+                    //
+                    // ----- Save Changes
+                    bool SaveButNoChanges = true;
+                    PageContentModel page = PageContentModel.create(core, recordId);
+                    if (page != null) {
+                        string Copy = core.docProperties.getText("copyFilename");
+                        Copy = ActiveContentController.processWysiwygResponseForSave(core, Copy);
+                        if (Copy != page.copyfilename.content) {
+                            page.copyfilename.content = Copy;
+                            SaveButNoChanges = false;
+                        }
+                        string RecordName = core.docProperties.getText("name");
+                        if (RecordName != page.name) {
+                            page.name = RecordName;
+                            LinkAliasController.addLinkAlias(core, RecordName, recordId, "");
+                            SaveButNoChanges = false;
+                        }
+                        //
+                        int RecordParentID = page.parentID;
+                        page.save(core);
+                        //
+                        core.workflow.SetEditLock(PageContentModel.contentName, page.id);
+                        //
+                        if (!SaveButNoChanges) {
+                            core.processAfterSave(false, PageContentModel.contentName, page.id, page.name, page.parentID, false);
+                            PageContentModel.invalidateRecordCache(core, page.id);
+                        }
+                    }
+                }
+                string Link = null;
+                int CSBlock = 0;
+                if (Button == ButtonAddChildPage) {
+                    //
+                    //
+                    //
+                    CSBlock = core.db.csInsertRecord(PageContentModel.contentName);
+                    if (core.db.csOk(CSBlock)) {
+                        core.db.csSet(CSBlock, "active", true);
+                        core.db.csSet(CSBlock, "ParentID", recordId);
+                        core.db.csSet(CSBlock, "contactmemberid", core.session.user.id);
+                        core.db.csSet(CSBlock, "name", "New Page added " + core.doc.profileStartTime + " by " + core.session.user.name);
+                        core.db.csSet(CSBlock, "copyFilename", "");
+                        recordId = core.db.csGetInteger(CSBlock, "ID");
+                        core.db.csSave(CSBlock);
+                        //
+                        Link = PageContentController.getPageLink(core, recordId, "", true, false);
+                        //Link = main_GetPageLink(RecordID)
+                        //If main_WorkflowSupport Then
+                        //    If Not core.doc.authContext.isWorkflowRendering() Then
+                        //        Link = genericController.modifyLinkQuery(Link, "AdminWarningMsg", "This new unpublished page has been added and Workflow Rendering has been enabled so you can edit this page.", True)
+                        //        Call core.siteProperties.setProperty("AllowWorkflowRendering", True)
+                        //    End If
+                        //End If
+                        core.webServer.redirect(Link, "Redirecting because a new page has been added with the quick editor.", false, false);
+                    }
+                    core.db.csClose(ref CSBlock);
+                    //
+                    PageContentModel.invalidateRecordCache(core, recordId);
+                }
+                int ParentID = 0;
+                if (Button == ButtonAddSiblingPage) {
+                    //
+                    //
+                    //
+                    CSBlock = core.db.csOpenRecord(PageContentModel.contentName, recordId, false, false, "ParentID");
+                    if (core.db.csOk(CSBlock)) {
+                        ParentID = core.db.csGetInteger(CSBlock, "ParentID");
+                    }
+                    core.db.csClose(ref CSBlock);
+                    if (ParentID != 0) {
+                        CSBlock = core.db.csInsertRecord(PageContentModel.contentName);
+                        if (core.db.csOk(CSBlock)) {
+                            core.db.csSet(CSBlock, "active", true);
+                            core.db.csSet(CSBlock, "ParentID", ParentID);
+                            core.db.csSet(CSBlock, "contactmemberid", core.session.user.id);
+                            core.db.csSet(CSBlock, "name", "New Page added " + core.doc.profileStartTime + " by " + core.session.user.name);
+                            core.db.csSet(CSBlock, "copyFilename", "");
+                            recordId = core.db.csGetInteger(CSBlock, "ID");
+                            core.db.csSave(CSBlock);
+                            //
+                            Link = PageContentController.getPageLink(core, recordId, "", true, false);
+                            core.webServer.redirect(Link, "Redirecting because a new page has been added with the quick editor.", false, false);
+                        }
+                        core.db.csClose(ref CSBlock);
+                    }
+                }
+                if (Button == ButtonDelete) {
+                    CSBlock = core.db.csOpenRecord(PageContentModel.contentName, recordId);
+                    if (core.db.csOk(CSBlock)) {
+                        ParentID = core.db.csGetInteger(CSBlock, "parentid");
+                    }
+                    core.db.csClose(ref CSBlock);
+                    //
+                    core.db.deleteChildRecords(PageContentModel.contentName, recordId, false);
+                    core.db.deleteContentRecord(PageContentModel.contentName, recordId);
+                    PageContentModel.invalidateRecordCache(core, recordId);
+                    //
+                    if (!false) {
+                        Link = PageContentController.getPageLink(core, ParentID, "", true, false);
+                        Link = GenericController.modifyLinkQuery(Link, "AdminWarningMsg", "The page has been deleted, and you have been redirected to the parent of the deleted page.", true);
+                        core.webServer.redirect(Link, "Redirecting to the parent page because the page was deleted with the quick editor.", core.doc.redirectBecausePageNotFound, false);
+                        return;
+                    }
+                }
+                //
+                //If (Button = ButtonAbortEdit) Then
+                //    Call core.workflow.abortEdit2(pageContentModel.contentName, RecordID, core.doc.authContext.user.id)
+                //End If
+                //If (Button = ButtonPublishSubmit) Then
+                //    Call core.workflow.main_SubmitEdit(pageContentModel.contentName, RecordID)
+                //    Call sendPublishSubmitNotice(pageContentModel.contentName, RecordID, "")
+                //End If
+                if ((!(core.doc.debug_iUserError != "")) && ((Button == ButtonOK) || (Button == ButtonCancel))) {
+                    //
+                    // ----- Turn off Quick Editor if not save or add child
+                    //
+                    core.visitProperty.setProperty("AllowQuickEditor", "0");
+                }
+            }
+        }
+        //
+        //========================================================================
+        // Print Whats New
+        //   Prints a linked list of new content
+        //========================================================================
+        //
+        public string getWhatsNewList(CoreController core, string SortFieldList = "") {
+            string result = "";
+            try {
+                int CSPointer = 0;
+                int ContentID = 0;
+                int RecordID = 0;
+                string LinkLabel = null;
+                string Link = null;
+                //
+                CSPointer = core.db.csOpenWhatsNew(core, SortFieldList);
+                //
+                if (core.db.csOk(CSPointer)) {
+                    ContentID = CdefController.getContentId(core, "Content Watch");
+                    while (core.db.csOk(CSPointer)) {
+                        Link = core.db.csGetText(CSPointer, "link");
+                        LinkLabel = core.db.csGetText(CSPointer, "LinkLabel");
+                        RecordID = core.db.csGetInteger(CSPointer, "ID");
+                        if (!string.IsNullOrEmpty(LinkLabel)) {
+                            result += "\r<li class=\"ccListItem\">";
+                            if (!string.IsNullOrEmpty(Link)) {
+                                result += GenericController.csv_GetLinkedText("<a href=\"" + HtmlController.encodeHtml(core.webServer.requestPage + "?rc=" + ContentID + "&ri=" + RecordID) + "\">", LinkLabel);
+                            } else {
+                                result += LinkLabel;
+                            }
+                            result += "</li>";
+                        }
+                        core.db.csGoNext(CSPointer);
+                    }
+                    result = "\r<ul class=\"ccWatchList\">" + nop(result) + "\r</ul>";
+                }
+                core.db.csClose(ref CSPointer);
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+            }
+            return result;
+        }
+        //
+        //=============================================================================
+        //
+        internal string getReturnBreadcrumb(CoreController core, string RootPageContentName, int ignore, int rootPageId, string ParentIDPath, bool ArchivePage, string BreadCrumbDelimiter) {
+            string returnHtml = "";
+            //
+            foreach (PageContentModel testpage in pageToRootList) {
+                string pageCaption = testpage.menuHeadline;
+                if (string.IsNullOrEmpty(pageCaption)) {
+                    pageCaption = GenericController.encodeText(testpage.name);
+                }
+                if (string.IsNullOrEmpty(returnHtml)) {
+                    returnHtml = pageCaption;
+                } else {
+                    returnHtml = "<a href=\"" + HtmlController.encodeHtml(PageContentController.getPageLink(core, testpage.id, "", true, false)) + "\">" + pageCaption + "</a>" + BreadCrumbDelimiter + returnHtml;
+                }
+            }
+            return returnHtml;
+        }
+        //       
+        //=============================================================================
+        /// <summary>
+        /// Is This member allowed through the content block
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="ContentID"></param>
+        /// <param name="pageId"></param>
+        /// <returns></returns>
+        public bool allowThroughPageBlock(CoreController core, int pageId) {
+            bool result = false;
+            try {
+                if (core.session.isAuthenticatedAdmin(core)) return true;
+                string sql = "SELECT ccMemberRules.MemberID"
+                    + " FROM (ccPageContentBlockRules LEFT JOIN ccgroups ON ccPageContentBlockRules.GroupID = ccgroups.ID) LEFT JOIN ccMemberRules ON ccgroups.ID = ccMemberRules.GroupID"
+                    + " WHERE (((ccPageContentBlockRules.RecordID)=" + pageId + ")"
+                    + " AND ((ccPageContentBlockRules.Active)<>0)"
+                    + " AND ((ccgroups.Active)<>0)"
+                    + " AND ((ccMemberRules.Active)<>0)"
+                    + " AND ((ccMemberRules.DateExpires) Is Null Or (ccMemberRules.DateExpires)>" + core.db.encodeSQLDate(core.doc.profileStartTime) + ")"
+                    + " AND ((ccMemberRules.MemberID)=" + core.session.user.id + "));";
+                int recordsReturned = 0;
+                DataTable dt = core.db.executeQuery(sql,"",1,1, ref recordsReturned);
+                return !recordsReturned.Equals(0);
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+            }
+            return result;
+        }
+        //
+        //
         //
         //====================================================================================================
         #region  IDisposable Support 

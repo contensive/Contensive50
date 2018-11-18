@@ -27,10 +27,7 @@ namespace Contensive.Addons.Primitives {
             string result = "";
             try {
                 CoreController core = ((CPClass)cp).core;
-                //
-                // ----- Page Authoring Tools Panel
-                //
-                core.doc.processFormQuickEditing();
+                PageContentController.processFormQuickEditing(core);
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }

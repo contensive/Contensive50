@@ -12,8 +12,8 @@ namespace Contensive.Processor {
     /// </summary>
     public class CsController : IDisposable {
         //
-        private Contensive.Processor.Controllers.CoreController core;
-        private int csPtr;
+        private CoreController core;
+        private int csKey;
         private int openingMemberID;
         protected bool disposed = false;
         //
@@ -24,27 +24,9 @@ namespace Contensive.Processor {
         /// <param name="core"></param>
         public CsController(CoreController core) {
             this.core = core;
+            //
+            // -- capture userId at the time data opened
             openingMemberID = core.session.user.id;
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// dispose
-        /// </summary>
-        /// <param name="disposing"></param>
-        protected virtual void Dispose(bool disposing) {
-            if (!this.disposed) {
-                if (disposing) {
-                    //
-                    // -- call .dispose for managed objects
-                    if (csPtr > -1) {
-                        core.db.csClose(ref csPtr);
-                    }
-                }
-                //
-                // -- Add code here to release the unmanaged resource.
-            }
-            this.disposed = true;
         }
         //
         //====================================================================================================
@@ -56,11 +38,11 @@ namespace Contensive.Processor {
         public bool insert(string ContentName) {
             bool success = false;
             try {
-                if (csPtr != -1) {
-                    core.db.csClose(ref csPtr);
+                if (csKey != -1) {
+                    core.db.csClose(ref csKey);
                 }
-                csPtr = core.db.csInsertRecord(ContentName, openingMemberID);
-                success = core.db.csOk(csPtr);
+                csKey = core.db.csInsertRecord(ContentName, openingMemberID);
+                success = core.db.csOk(csKey);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
@@ -72,11 +54,11 @@ namespace Contensive.Processor {
         public bool open(string ContentName, string SQLCriteria = "", string SortFieldList = "", bool ActiveOnly = true, string SelectFieldList = "", int pageSize = 0, int PageNumber = 1) {
             bool success = false;
             try {
-                if (csPtr != -1) {
-                    core.db.csClose(ref csPtr);
+                if (csKey != -1) {
+                    core.db.csClose(ref csKey);
                 }
-                csPtr = core.db.csOpen(ContentName, SQLCriteria, SortFieldList, ActiveOnly, 0, false, false, SelectFieldList, pageSize, PageNumber);
-                success = core.db.csOk(csPtr);
+                csKey = core.db.csOpen(ContentName, SQLCriteria, SortFieldList, ActiveOnly, 0, false, false, SelectFieldList, pageSize, PageNumber);
+                success = core.db.csOk(csKey);
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
                 throw;
@@ -94,11 +76,11 @@ namespace Contensive.Processor {
         public bool openForUpdate(string ContentName, int recordId ) {
             bool success = false;
             try {
-                if (csPtr != -1) {
-                    core.db.csClose(ref csPtr);
+                if (csKey != -1) {
+                    core.db.csClose(ref csKey);
                 }
-                csPtr = core.db.csOpenForUpdate(ContentName, recordId);
-                success = core.db.csOk(csPtr);
+                csKey = core.db.csOpenForUpdate(ContentName, recordId);
+                success = core.db.csOk(csKey);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
@@ -110,11 +92,11 @@ namespace Contensive.Processor {
         public bool openSQL(string sql) {
             bool success = false;
             try {
-                if (csPtr != -1) {
-                    core.db.csClose(ref csPtr);
+                if (csKey != -1) {
+                    core.db.csClose(ref csKey);
                 }
-                csPtr = core.db.csOpenSql(sql,"Default");
-                success = core.db.csOk(csPtr);
+                csKey = core.db.csOpenSql(sql,"Default");
+                success = core.db.csOk(csKey);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
@@ -125,9 +107,9 @@ namespace Contensive.Processor {
         //====================================================================================================
         public void close(bool asyncSave = false) {
             try {
-                if (csPtr != -1) {
-                    core.db.csClose(ref csPtr, asyncSave);
-                    csPtr = -1;
+                if (csKey != -1) {
+                    core.db.csClose(ref csKey, asyncSave);
+                    csKey = -1;
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -136,23 +118,23 @@ namespace Contensive.Processor {
         }
         //
         //====================================================================================================
-        public bool getBoolean(string FieldName) {
-            return core.db.csGetBoolean(csPtr, FieldName);
+        public bool getBoolean(string fieldName) {
+            return core.db.csGetBoolean(csKey, fieldName);
         }
         //
         //====================================================================================================
-        public DateTime getDate(string FieldName) {
-            return core.db.csGetDate(csPtr, FieldName);
+        public DateTime getDate(string fieldName) {
+            return core.db.csGetDate(csKey, fieldName);
         }
         //
         //====================================================================================================
-        public int getInteger(string FieldName) {
-            return core.db.csGetInteger(csPtr, FieldName);
+        public int getInteger(string fieldName) {
+            return core.db.csGetInteger(csKey, fieldName);
         }
         //
         //====================================================================================================
-        public double getNumber(string FieldName) {
-            return core.db.csGetNumber(csPtr, FieldName);
+        public double getNumber(string fieldName) {
+            return core.db.csGetNumber(csKey, fieldName);
         }
         //
         //====================================================================================================
@@ -160,12 +142,12 @@ namespace Contensive.Processor {
         /// returns the text value stored in the field. For Lookup fields, this method returns the name of the foreign key record.
         /// For textFile fields, this method returns the filename.
         /// </summary>
-        /// <param name="FieldName"></param>
+        /// <param name="fieldName"></param>
         /// <returns></returns>
-        public string getText(string FieldName) {
+        public string getText(string fieldName) {
             string result = "";
             try {
-                result = core.db.csGet(csPtr, FieldName);
+                result = core.db.csGet(csKey, fieldName);
                 if (result == null) {
                     result = "";
                 }
@@ -178,12 +160,12 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         public void goNext() {
-            core.db.csGoNext(csPtr);
+            core.db.csGoNext(csKey);
         }
         //
         //====================================================================================================
         public bool ok() {
-            return core.db.csOk(csPtr);
+            return core.db.csOk(csKey);
         }
         //
         //====================================================================================================
@@ -193,7 +175,7 @@ namespace Contensive.Processor {
         /// <param name="FieldName"></param>
         /// <param name="FieldValue"></param>
         public void setField(string FieldName, DateTime FieldValue) {
-            core.db.csSet(csPtr, FieldName, FieldValue);
+            core.db.csSet(csKey, FieldName, FieldValue);
         }
         //
         //====================================================================================================
@@ -203,7 +185,7 @@ namespace Contensive.Processor {
         /// <param name="FieldName"></param>
         /// <param name="FieldValue"></param>
         public void setField(string FieldName, bool FieldValue) {
-            core.db.csSet(csPtr, FieldName, FieldValue);
+            core.db.csSet(csKey, FieldName, FieldValue);
         }
         //
         //====================================================================================================
@@ -213,7 +195,7 @@ namespace Contensive.Processor {
         /// <param name="FieldName"></param>
         /// <param name="FieldValue"></param>
         public void setField(string FieldName, string FieldValue) {
-            core.db.csSet(csPtr, FieldName, FieldValue);
+            core.db.csSet(csKey, FieldName, FieldValue);
         }
         //
         //====================================================================================================
@@ -221,7 +203,7 @@ namespace Contensive.Processor {
         /// set the value for the field.
         /// </summary>
         public void setField(string FieldName, double FieldValue) {
-            core.db.csSet(csPtr, FieldName, FieldValue);
+            core.db.csSet(csKey, FieldName, FieldValue);
         }
         //
         //====================================================================================================
@@ -231,7 +213,7 @@ namespace Contensive.Processor {
         /// <param name="FieldName"></param>
         /// <param name="FieldValue"></param>
         public void setField(string FieldName, int FieldValue) {
-            core.db.csSet(csPtr, FieldName, FieldValue);
+            core.db.csSet(csKey, FieldName, FieldValue);
         }
         //
         //====================================================================================================
@@ -241,7 +223,7 @@ namespace Contensive.Processor {
         /// <param name="fieldName"></param>
         /// <param name="filename"></param>
         public void setFieldFilename( string fieldName, string filename ) {
-            core.db.csSetFieldFilename(csPtr, fieldName, filename);
+            core.db.csSetFieldFilename(csKey, fieldName, filename);
         }
         //
         //========================================================================
@@ -262,7 +244,7 @@ namespace Contensive.Processor {
         public string getValue(string FieldName) {
             string result = "";
             try {
-                result = core.db.csGetValue(csPtr, FieldName);
+                result = core.db.csGetValue(csKey, FieldName);
                 if (result == null) {
                     result = "";
                 }
@@ -283,8 +265,26 @@ namespace Contensive.Processor {
         }
         ~CsController() {
             Dispose(false);
-            
-            
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// dispose
+        /// </summary>
+        /// <param name="disposing"></param>
+        protected virtual void Dispose(bool disposing) {
+            if (!this.disposed) {
+                if (disposing) {
+                    //
+                    // -- call .dispose for managed objects
+                    if (csKey > -1) {
+                        core.db.csClose(ref csKey);
+                    }
+                }
+                //
+                // -- Add code here to release the unmanaged resource.
+            }
+            this.disposed = true;
         }
         #endregion
     }

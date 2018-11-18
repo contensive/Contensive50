@@ -1,20 +1,10 @@
 ﻿
 using System;
-using System.Reflection;
-using System.Xml;
-using System.Diagnostics;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
-using Contensive.Processor;
-using Contensive.Processor.Models.Db;
-using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Exceptions;
-//
+using System.Linq;
+
 namespace Contensive.Processor.Controllers {
     //
     //====================================================================================================
@@ -23,354 +13,216 @@ namespace Contensive.Processor.Controllers {
     /// </summary>
     public class GroupController : IDisposable {
         //
-        // ----- constants
-        //
-        //Private Const invalidationDaysDefault As Double = 365
-        //
-        // ----- objects constructed that must be disposed
-        //
-        //Private cacheClient As Enyim.Caching.MemcachedClient
-        //
-        // ----- private instance storage
-        //
-        //Private remoteCacheDisabled As Boolean
-
+        //====================================================================================================
+        /// <summary>
+        /// Create a group, set the name and caption, return its Id. If the group already exists, the groups Id is returned.
+        /// </summary>
+        /// <param name="groupName"></param>
+        /// <returns></returns>
+        public static int add(CoreController core, string groupName, string groupCaption ) => Models.Db.GroupModel.verify(core, groupName, groupCaption).id;
         //
         //====================================================================================================
         /// <summary>
         /// Create a group and return its Id. If the group already exists, the groups Id is returned. If the group cannot be added a 0 is returned.
         /// </summary>
         /// <param name="groupName"></param>
+        /// <param name="groupCaption"></param>
         /// <returns></returns>
-        public static int group_add(CoreController core, string groupName) {
-            int returnGroupId = 0;
+        public static int add(CoreController core, string groupName) => add(core, groupName, groupName);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Add a user to a group with an expiration date
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="group"></param>
+        /// <param name="user"></param>
+        /// <param name="dateExpires"></param>
+        public static void addUser(CoreController core, Models.Db.GroupModel group, Models.Db.PersonModel user, DateTime dateExpires) {
             try {
-                DataTable dt = null;
-                string sql = null;
-                int createkey = 0;
-                int cid = 0;
-                string sqlGroupName = core.db.encodeSQLText(groupName);
-                //
-                dt = core.db.executeQuery("SELECT ID FROM CCGROUPS WHERE NAME=" + sqlGroupName + "");
-                if (dt.Rows.Count > 0) {
-                    returnGroupId = GenericController.encodeInteger(dt.Rows[0]["ID"]);
-                } else {
-                    cid = CdefController.getContentId(core, "groups");
-                    createkey = GenericController.GetRandomInteger(core);
-                    sql = "insert into ccgroups (contentcontrolid,active,createkey,name,caption) values (" + cid + ",1," + createkey + "," + sqlGroupName + "," + sqlGroupName + ")";
-                    core.db.executeQuery(sql);
-                    //
-                    sql = "select top 1 id from ccgroups where createkey=" + createkey + " order by id desc";
-                    dt = core.db.executeQuery(sql);
-                    if (dt.Rows.Count > 0) {
-                        returnGroupId = GenericController.encodeInteger(dt.Rows[0][0]);
+                var ruleList = Models.Db.MemberRuleModel.createList(core, "(MemberID=" + user.id.ToString() + ")and(GroupID=" + group.id.ToString() + ")");
+                if ( ruleList.Count==0) {
+                    // -- add new rule
+                    var groupsCdef = Models.Domain.CDefModel.create(core, "groups");
+                    var rule = Models.Db.MemberRuleModel.addDefault(core, groupsCdef ) ;
+                    rule.groupId = group.id;
+                    rule.MemberID = user.id;
+                    rule.dateExpires = dateExpires;
+                    rule.save(core);
+                    return;
+                }
+                // at least one rule found, set expire date, delete the rest
+                var ruleFirst = ruleList.First();
+                if (ruleFirst.dateExpires != dateExpires) {
+                    ruleFirst.dateExpires = dateExpires;
+                    ruleFirst.save(core);
+                }
+                if (ruleList.Count > 1) {
+                    foreach (var rule in ruleList) {
+                        if (!rule.Equals(ruleFirst)) Models.Db.MemberRuleModel.delete(core, rule.id);
                     }
                 }
-                dt.Dispose();
             } catch (Exception ex) {
-                throw (ex);
+                LogController.handleError(core, ex);
             }
-            return returnGroupId;
         }
         //
         //====================================================================================================
         /// <summary>
-        /// Create a group and return its Id. If the group already exists, the groups Id is returned. If the group cannot be added a 0 is returned.
+        /// Add a user to a group with no expiration date
         /// </summary>
-        /// <param name="GroupNameOrGuid"></param>
-        /// <param name="groupCaption"></param>
-        /// <returns></returns>
-        public static int add2(CoreController core, string GroupNameOrGuid, string groupCaption = "") {
-            int returnGroupId = 0;
-            try {
-                //
-                CsController cs = new CsController(core);
-                bool IsAlreadyThere = false;
-                string sqlCriteria = core.db.getNameIdOrGuidSqlCriteria(GroupNameOrGuid);
-                string groupName = null;
-                string groupGuid = null;
-                //
-                if (string.IsNullOrEmpty(GroupNameOrGuid)) {
-                    throw (new GenericException("A group cannot be added with a blank name"));
-                } else {
-                    cs.open("Groups", sqlCriteria, "", false, "id");
-                    IsAlreadyThere = cs.ok();
-                    cs.close();
-                    if (!IsAlreadyThere) {
-                        cs.insert("Groups");
-                        if (!cs.ok()) {
-                            throw (new GenericException("There was an error inserting a new group record"));
-                        } else {
-                            returnGroupId = cs.getInteger("id");
-                            if (GenericController.isGuid(GroupNameOrGuid)) {
-                                groupName = "Group " + cs.getInteger("id");
-                                groupGuid = GroupNameOrGuid;
-                            } else {
-                                groupName = GroupNameOrGuid;
-                                groupGuid = GenericController.getGUID();
-                            }
-                            if (string.IsNullOrEmpty(groupCaption)) {
-                                groupCaption = groupName;
-                            }
-                            cs.setField("name", groupName);
-                            cs.setField("caption", groupCaption);
-                            cs.setField("ccGuid", groupGuid);
-                            cs.setField("active", "1");
-                        }
-                        cs.close();
-                    }
-                }
-            } catch (Exception ex) {
-                throw new GenericException("Unexpected error in cp.group.add()", ex);
-            }
-            return returnGroupId;
-        }
+        /// <param name="core"></param>
+        /// <param name="group"></param>
+        /// <param name="user"></param>
+        public static void addUser(CoreController core, Models.Db.GroupModel group, Models.Db.PersonModel user) => addUser(core, group, user, DateTime.MinValue);
         //
         //====================================================================================================
-        //
-        // Add User
-        //
-        public static void group_addUser(CoreController core, int groupId, int userid, DateTime dateExpires) {
-            try {
-                //
-                string groupName = null;
-                //
-                if (true) {
-                    if (groupId < 1) {
-                        throw (new GenericException("Could not find or create the group with id [" + groupId + "]"));
-                    } else {
-                        if (userid == 0) {
-                            userid = core.session.user.id;
-                        }
-                        using (CsController cs = new CsController(core)) {
-                            cs.open("Member Rules", "(MemberID=" + userid.ToString() + ")and(GroupID=" + groupId.ToString() + ")", "", false);
-                            if (!cs.ok()) {
-                                cs.close();
-                                cs.insert("Member Rules");
-                            }
-                            if (!cs.ok()) {
-                                groupName = core.db.getRecordName("groups", groupId);
-                                throw (new GenericException("Could not find or create the Member Rule to add this member [" + userid + "] to the Group [" + groupId + ", " + groupName + "]"));
-                            } else {
-                                cs.setField("active", "1");
-                                cs.setField("memberid", userid.ToString());
-                                cs.setField("groupid", groupId.ToString());
-                                if (dateExpires != Convert.ToDateTime("12:00:00 AM")) {
-                                    cs.setField("DateExpires", dateExpires.ToString());
-                                } else {
-                                    cs.setField("DateExpires", "");
-                                }
-                            }
-                            cs.close();
-                        }
-                    }
-                }
-            } catch (Exception ex) {
-                throw (ex);
-            }
-        }
-        public static void group_addUser(CoreController core, int groupId, int userid) { group_addUser(core, groupId, userid, DateTime.MinValue ); }
-        public static void group_addUser(CoreController core, int groupId) { group_addUser(core, groupId, 0, DateTime.MinValue); }
-        //
-        //====================================================================================================
-        //
-        public static void addUser(CoreController core, string groupNameOrGuid, int userid, DateTime dateExpires) {
-            try {
-                //
-                int GroupID = 0;
-                //
-                if (!string.IsNullOrEmpty(groupNameOrGuid)) {
-                    GroupID = core.db.getRecordID("groups", groupNameOrGuid);
-                    if (GroupID < 1) {
-                        add2(core, groupNameOrGuid);
-                        GroupID = core.db.getRecordID("groups", groupNameOrGuid);
-                    }
-                    if (GroupID < 1) {
-                        throw (new GenericException("Could not find or create the group [" + groupNameOrGuid + "]"));
-                    } else {
-                        if (userid == 0) {
-                            userid = core.session.user.id;
-                        }
-                        using (CsController cs = new CsController(core)) {
-                            cs.open("Member Rules", "(MemberID=" + userid.ToString() + ")and(GroupID=" + GroupID.ToString() + ")", "", false);
-                            if (!cs.ok()) {
-                                cs.close();
-                                cs.insert("Member Rules");
-                            }
-                            if (!cs.ok()) {
-                                throw (new GenericException("Could not find or create the Member Rule to add this member [" + userid + "] to the Group [" + GroupID + ", " + groupNameOrGuid + "]"));
-                            } else {
-                                cs.setField("active", "1");
-                                cs.setField("memberid", userid.ToString());
-                                cs.setField("groupid", GroupID.ToString());
-                                if (dateExpires != Convert.ToDateTime("12:00:00 AM")) {
-                                    cs.setField("DateExpires", dateExpires.ToString());
-                                } else {
-                                    cs.setField("DateExpires", "");
-                                }
-                            }
-                            cs.close();
-                        }
-                    }
-                }
-            } catch (Exception ex) {
-                throw (ex);
-            }
-        }
-        public static void group_AddUser(CoreController core, string groupNameOrGuid, int userid = 0) { var tmpDate = DateTime.MinValue; addUser(core, groupNameOrGuid, userid, tmpDate); }
-        public static void group_AddUser(CoreController core, string groupNameOrGuid) { var tmpDate = DateTime.MinValue; addUser(core, groupNameOrGuid, 0, tmpDate); }
-
-        //
-        //=============================================================================
-        // main_Get the GroupID from iGroupName
-        //=============================================================================
-        //
-        public static int group_GetGroupID(CoreController core, string GroupName) {
-            int tempgroup_GetGroupID = 0;
-            DataTable dt = null;
-            //
-            string iGroupName = GenericController.encodeText(GroupName);
-            tempgroup_GetGroupID = 0;
-            if (!string.IsNullOrEmpty(iGroupName)) {
-                //
-                // ----- main_Get the Group ID
-                //
-                dt = core.db.executeQuery("select top 1 id from ccGroups where name=" + core.db.encodeSQLText(iGroupName));
-                if (dt.Rows.Count > 0) {
-                    tempgroup_GetGroupID = GenericController.encodeInteger(dt.Rows[0][0]);
-                }
-            }
-            return tempgroup_GetGroupID;
-        }
-        //
-        //=============================================================================
-        // main_Get the GroupName from iGroupID
-        //=============================================================================
-        //
-        public static string group_GetGroupName(CoreController core, int GroupID) {
-            string tempgroup_GetGroupName = null;
-            //
-            int CS = 0;
-            int iGroupID = GenericController.encodeInteger(GroupID);
-            //
-            tempgroup_GetGroupName = "";
-            if (iGroupID > 0) {
-                //
-                // ----- main_Get the Group name
-                //
-                CS = core.db.csOpen2("Groups", iGroupID);
-                if (core.db.csOk(CS)) {
-                    tempgroup_GetGroupName = GenericController.encodeText(core.db.csGetValue(CS, "Name"));
-                }
-                core.db.csClose(ref CS);
-            }
-            return tempgroup_GetGroupName;
-        }
-        //
-        //=============================================================================
-        // Add a new group, return its GroupID
-        //=============================================================================
-        //
-        public static int group_Add(CoreController core, string GroupName, string GroupCaption = "") {
-            int tempgroup_Add = 0;
-            int CS = 0;
-            string iGroupName = null;
-            string iGroupCaption = null;
-            //
-            iGroupName = GenericController.encodeText(GroupName);
-            iGroupCaption = GenericController.encodeEmpty(GroupCaption, iGroupName);
-            //
-            tempgroup_Add = -1;
-            DataTable dt = core.db.executeQuery("SELECT ID FROM ccgroups WHERE NAME=" + core.db.encodeSQLText(iGroupName));
-            if (dt.Rows.Count > 0) {
-                tempgroup_Add = GenericController.encodeInteger(dt.Rows[0][0]);
+        /// <summary>
+        /// Add a user to a group. If gorupId doesnt exist, an error is logged.
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="groupId"></param>
+        /// <param name="userid"></param>
+        /// <param name="dateExpires"></param>
+        public static void addUser(CoreController core, int groupId, int userid, DateTime dateExpires) {
+            var group = Models.Db.GroupModel.create(core, groupId);
+            if (group == null) {
+                LogController.handleError(core, new GenericException("addUser called with invalid groupId"));
             } else {
-                CS = core.db.csInsertRecord("Groups", SystemMemberID);
-                if (core.db.csOk(CS)) {
-                    tempgroup_Add = GenericController.encodeInteger(core.db.csGetValue(CS, "ID"));
-                    core.db.csSet(CS, "name", iGroupName);
-                    core.db.csSet(CS, "caption", iGroupCaption);
-                    core.db.csSet(CS, "active", true);
+                var user = Models.Db.PersonModel.create(core, userid);
+                if ( user != null ) {
+                    addUser(core, group, user, dateExpires);
                 }
-                core.db.csClose(ref CS);
             }
-            return tempgroup_Add;
         }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Add a user to a group. if group is missing and argument is name or guid, it is created.
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="groupNameIdOrGuid"></param>
+        /// <param name="userid"></param>
+        /// <param name="dateExpires"></param>
+        public static void addUser(CoreController core, string groupNameIdOrGuid, int userid, DateTime dateExpires) {
+            Models.Db.GroupModel group = null;
+            if ( groupNameIdOrGuid.IsNumeric()) {
+                group = Models.Db.GroupModel.create(core, GenericController.encodeInteger(groupNameIdOrGuid));
+                if (group == null) {
+                    LogController.handleError(core, new GenericException("addUser called with invalid groupId"));
+                    return;
+                }
+            } else if ( GenericController.isGuid( groupNameIdOrGuid )) {
+                group = Models.Db.GroupModel.create(core, groupNameIdOrGuid);
+                if (group == null) {
+                    var groupCdef = Models.Domain.CDefModel.create(core, "groups");
+                    group = Models.Db.GroupModel.addDefault(core, groupCdef);
+                    group.ccguid = groupNameIdOrGuid;
+                    group.name = groupNameIdOrGuid;
+                    group.caption = groupNameIdOrGuid;
+                    group.save(core);
+                }
+            } else {
+                group = Models.Db.GroupModel.createByUniqueName(core, groupNameIdOrGuid);
+                if (group == null) {
+                    var groupCdef = Models.Domain.CDefModel.create(core, "groups");
+                    group = Models.Db.GroupModel.addDefault(core, groupCdef);
+                    group.ccguid = groupNameIdOrGuid;
+                    group.name = groupNameIdOrGuid;
+                    group.caption = groupNameIdOrGuid;
+                    group.save(core);
+                }
 
-        //
-        //=============================================================================
-        // Add a new group, return its GroupID
-        //=============================================================================
-        //
-        public static void group_DeleteGroup(CoreController core, string GroupName) {
-            core.db.deleteContentRecords("Groups", "name=" + core.db.encodeSQLText(GroupName));
+            }
+            if ( group == null ) {
+                // -- create group if not found
+            }
+            if (group != null) {
+                var user = Models.Db.PersonModel.create(core, userid);
+                if (user != null) addUser(core, group, user, dateExpires);
+            }
         }
         //
-        //=============================================================================
-        // Add a member to a group
-        //=============================================================================
+        //====================================================================================================
+        /// <summary>
+        /// Add a user to a group. if group is missing and argument is name or guid, it is created.
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="groupNameIdOrGuid"></param>
+        /// <param name="userid"></param>
+        public static void addUser(CoreController core, string groupNameIdOrGuid, int userid) => addUser(core, groupNameIdOrGuid, userid, DateTime.MinValue);
         //
-        public static void group_AddGroupMember(CoreController core, string GroupName, int NewMemberID = SystemMemberID, DateTime DateExpires = default(DateTime)) {
-            //
-            int CS = 0;
-            int GroupID = 0;
-            string iGroupName = null;
-            DateTime iDateExpires = default(DateTime);
-            //
-            iGroupName = GenericController.encodeText(GroupName);
-            iDateExpires = DateExpires;
-            if (!string.IsNullOrEmpty(iGroupName)) {
-                GroupID = group_GetGroupID(core, iGroupName);
-                if (GroupID < 1) {
-                    GroupID = group_Add(core, GroupName, GroupName);
-                }
-                if (GroupID < 1) {
-                    throw (new GenericException("main_AddGroupMember could not find or add Group [" + GroupName + "]")); // handleLegacyError14(MethodName, "")
-                } else {
-                    CS = core.db.csOpen("Member Rules", "(MemberID=" + core.db.encodeSQLNumber(NewMemberID) + ")and(GroupID=" + core.db.encodeSQLNumber(GroupID) + ")", "", false);
-                    if (!core.db.csOk(CS)) {
-                        core.db.csClose(ref CS);
-                        CS = core.db.csInsertRecord("Member Rules");
-                    }
-                    if (!core.db.csOk(CS)) {
-                        throw (new GenericException("main_AddGroupMember could not add this member to the Group [" + GroupName + "]")); // handleLegacyError14(MethodName, "")
-                    } else {
-                        core.db.csSet(CS, "active", true);
-                        core.db.csSet(CS, "memberid", NewMemberID);
-                        core.db.csSet(CS, "groupid", GroupID);
-                        if (iDateExpires != DateTime.MinValue) {
-                            core.db.csSet(CS, "DateExpires", iDateExpires);
-                        } else {
-                            core.db.csSet(CS, "DateExpires", "");
-                        }
-                    }
-                    core.db.csClose(ref CS);
+        //====================================================================================================
+        /// <summary>
+        /// Add the current user to a group. if group is missing and argument is name or guid, it is created.
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="groupNameIdOrGuid"></param>
+        public static void addUser(CoreController core, string groupNameIdOrGuid) => addUser(core, groupNameIdOrGuid, core.session.user.id, DateTime.MinValue);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Get a group Id
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="GroupName"></param>
+        /// <returns></returns>
+        public static int getGroupId(CoreController core, string GroupName) {
+            var group = Models.Db.GroupModel.createByUniqueName(core, GroupName);
+            if (group != null) return group.id;
+            return 0;
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Get a group Name
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="groupId"></param>
+        /// <returns></returns>
+        public static string getGroupName(CoreController core, int groupId) {
+            var group = Models.Db.GroupModel.create(core, groupId);
+            if (group != null) return group.name;
+            return String.Empty;
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Remove a user from a group.
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="group"></param>
+        /// <param name="user"></param>
+        public static void removeUser(CoreController core, Models.Db.GroupModel group, Models.Db.PersonModel user) {
+            if ((group != null) && (user != null)) {
+                Models.Db.MemberRuleModel.deleteSelection(core, "(MemberID=" + core.db.encodeSQLNumber(user.id) + ")AND(groupid=" + core.db.encodeSQLNumber(group.id) + ")");
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Remove a user from a group. 
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="groupName"></param>
+        /// <param name="userId"></param>
+        public static void removeUser(CoreController core, string groupName, int userId) {
+            var group = Models.Db.GroupModel.createByUniqueName(core, groupName);
+            if ( group != null ) {
+                var user = Models.Db.PersonModel.create(core, userId);
+                if (user != null) {
+                    removeUser(core, group, user);
                 }
             }
         }
         //
-        //=============================================================================
-        // Delete a member from a group
-        //=============================================================================
-        //
-        public static void group_DeleteGroupMember(CoreController core, string GroupName, int NewMemberID = SystemMemberID) {
-            //
-            int GroupID = 0;
-            string iGroupName;
-            //
-            iGroupName = GenericController.encodeText(GroupName);
-            //
-            if (!string.IsNullOrEmpty(iGroupName)) {
-                GroupID = group_GetGroupID(core, iGroupName);
-                if (GroupID < 1) {
-                } else if (NewMemberID < 1) {
-                    throw (new GenericException("Member ID is invalid")); // handleLegacyError14(MethodName, "")
-                } else {
-                    core.db.deleteContentRecords("Member Rules", "(MemberID=" + core.db.encodeSQLNumber(NewMemberID) + ")AND(groupid=" + core.db.encodeSQLNumber(GroupID) + ")");
-                }
-            }
-        }
-
+        //====================================================================================================
+        /// <summary>
+        /// Remove the current user from a group
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="groupName"></param>
+        public static void removeUser(CoreController core, string groupName) => removeUser(core, groupName, core.session.user.id);
         //
         //====================================================================================================
         #region  IDisposable Support 
@@ -392,8 +244,6 @@ namespace Contensive.Processor.Controllers {
         ~GroupController() {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(false);
-            
-            
         }
         //
         //====================================================================================================

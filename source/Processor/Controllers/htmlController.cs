@@ -464,7 +464,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // Selection is too big
                         //
-                        LogController.handleError( core,new Exception("While building a group members list for group [" + GroupController.group_GetGroupName(core, GroupID) + "], too many rows were selected. [" + RowMax + "] records exceeds [" + core.siteProperties.selectFieldLimit + "], the current Site Property app.SiteProperty_SelectFieldLimit."));
+                        LogController.handleError( core,new Exception("While building a group members list for group [" + GroupController.getGroupName(core, GroupID) + "], too many rows were selected. [" + RowMax + "] records exceeds [" + core.siteProperties.selectFieldLimit + "], the current Site Property app.SiteProperty_SelectFieldLimit."));
                         result += inputHidden(MenuNameFPO, currentValue);
                         if (currentValue != 0) {
                             CSPointer = core.db.csOpenRecord("people", currentValue);
@@ -2338,7 +2338,7 @@ namespace Contensive.Processor.Controllers {
                             SQL = "update ccfields set caption=" + core.db.encodeSQLText(HelpCaption) + ",HelpMessage=" + core.db.encodeSQLText(HelpMessage) + " where id=" + RecordID;
                             core.db.executeQuery(SQL);
                             core.cache.invalidateAll();
-                            core.doc.clearMetaData();
+                            core.clearMetaData();
                         }
                     }
                     break;

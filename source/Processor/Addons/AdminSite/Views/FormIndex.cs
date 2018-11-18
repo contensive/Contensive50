@@ -1315,7 +1315,7 @@ namespace Contensive.Addons.AdminSite {
                                                 // Date
                                                 //
                                                 DateTime findDate = DateTime.MinValue;
-                                                if (DateController.IsDate(FindWordValue)) {
+                                                if (GenericController.IsDate(FindWordValue)) {
                                                     findDate = DateTime.Parse(FindWordValue);
                                                 }
                                                 switch (FindMatchOption) {

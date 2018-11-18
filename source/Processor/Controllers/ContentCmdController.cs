@@ -1,19 +1,13 @@
 ﻿
 using System;
-using System.Reflection;
-using System.Xml;
-using System.Diagnostics;
-using System.Text.RegularExpressions;
 using System.Collections.Generic;
-using Contensive.Processor;
-using Contensive.Processor.Models.Db;
-using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.Constants;
 using System.Linq;
 using System.Data;
 using Contensive.BaseClasses;
 using Contensive.Processor.Exceptions;
+using Contensive.Processor.Models.Db;
+using static Contensive.Processor.Controllers.GenericController;
+using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -186,7 +180,7 @@ namespace Contensive.Processor.Controllers {
         //
         //============================================================================================
         /// <summary>
-        /// 
+        /// Execute context commands in the source text
         /// </summary>
         /// <param name="core"></param>
         /// <param name="src"></param>
@@ -194,7 +188,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="personalizationPeopleId"></param>
         /// <param name="personalizationIsAuthenticated"></param>
         /// <returns></returns>
-        public static string executeContentCommands(CoreController core, string src, Contensive.BaseClasses.CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated) {
+        public static string executeContentCommands(CoreController core, string src, CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated) {
             //
             // -- exit if no src to process
             if (string.IsNullOrWhiteSpace(src)) return src;
@@ -343,7 +337,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// convert a single command in the command formats to call the execute
         /// </summary>
-        private static string executeSingleCommand(CoreController core, string cmdSrc, bool return_BadCmd, Contensive.BaseClasses.CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated) {
+        private static string executeSingleCommand(CoreController core, string cmdSrc, bool return_BadCmd, CPUtilsBaseClass.addonContext Context, int personalizationPeopleId, bool personalizationIsAuthenticated) {
             string returnValue = "";
             try {
                 //

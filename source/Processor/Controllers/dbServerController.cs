@@ -1,20 +1,9 @@
 ﻿
 using System;
-using System.Reflection;
-using System.Xml;
-using System.Diagnostics;
-using System.Text.RegularExpressions;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using Contensive.Processor;
-using Contensive.Processor.Models.Db;
-using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.Constants;
 using Contensive.Processor.Exceptions;
 //
-
 namespace Contensive.Processor.Controllers {
     //
     //==========================================================================================
@@ -26,10 +15,6 @@ namespace Contensive.Processor.Controllers {
         // objects passed in that are not disposed
         //
         private CoreController core;
-        //
-        // internal storage
-        //
-        private bool dbEnabled = true; // set true when configured and tested - else db calls are skipped
         //
         //==========================================================================================
         /// <summary>
@@ -88,7 +73,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="catalogName"></param>
         public void createCatalog(string catalogName) {
             try {
-                executeSql("create database " + catalogName);
+                executeQuery("create database " + catalogName);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
@@ -108,7 +93,7 @@ namespace Contensive.Processor.Controllers {
                 DataTable dt = null;
                 //
                 sql = string.Format("SELECT database_id FROM sys.databases WHERE Name = '{0}'", catalog);
-                dt = executeSql(sql);
+                dt = executeQuery(sql);
                 returnOk = (dt.Rows.Count > 0);
                 dt.Dispose();
             } catch (Exception ex) {
@@ -120,27 +105,24 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// Execute a command (sql statemwent) and return a dataTable object
+        /// Execute a command or sql statemwent and return a dataTable
         /// </summary>
         /// <param name="sql"></param>
         /// <param name="dataSourceName"></param>
         /// <param name="startRecord"></param>
         /// <param name="maxRecords"></param>
         /// <returns></returns>
-        private DataTable executeSql(string sql) {
+        private DataTable executeQuery(string sql) {
             DataTable returnData = new DataTable();
             try {
-                string connString = getConnectionStringADONET();
-                if (dbEnabled) {
-                    using (SqlConnection connSQL = new SqlConnection(connString)) {
-                        connSQL.Open();
-                        using (SqlCommand cmdSQL = new SqlCommand()) {
-                            cmdSQL.CommandType = CommandType.Text;
-                            cmdSQL.CommandText = sql;
-                            cmdSQL.Connection = connSQL;
-                            using (dynamic adptSQL = new System.Data.SqlClient.SqlDataAdapter(cmdSQL)) {
-                                adptSQL.Fill(returnData);
-                            }
+                using (SqlConnection connSQL = new SqlConnection(getConnectionStringADONET())) {
+                    connSQL.Open();
+                    using (SqlCommand cmdSQL = new SqlCommand()) {
+                        cmdSQL.CommandType = CommandType.Text;
+                        cmdSQL.CommandText = sql;
+                        cmdSQL.Connection = connSQL;
+                        using (dynamic adptSQL = new System.Data.SqlClient.SqlDataAdapter(cmdSQL)) {
+                            adptSQL.Fill(returnData);
                         }
                     }
                 }

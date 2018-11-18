@@ -89,6 +89,11 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
+        public static void deleteSelection(CoreController core, string sqlCriteria) {
+            deleteSelection<MemberRuleModel>(core, sqlCriteria);
+        }
+        //
+        //====================================================================================================
         public static List<MemberRuleModel> createList(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) {
             return createList<MemberRuleModel>(core, sqlCriteria, sqlOrderBy, callersCacheNameList);
         }

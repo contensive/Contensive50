@@ -96,8 +96,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Addons\AdminNavigator\common.cs" />
-    <Compile Include="Addons\AdminNavigator\Controllers\genericController.cs" />
-    <Compile Include="Addons\AdminNavigator\Controllers\keyPtrIndexClass.cs" />
     <Compile Include="Addons\AdminNavigator\Views\getFullClass.cs" />
     <Compile Include="Addons\AdminNavigator\Views\getNodeClass.cs" />
     <Compile Include="Addons\AdminSite\Constants.cs" />
@@ -106,6 +104,7 @@
     <Compile Include="Addons\Monitor\serverStatusClass.cs" />
     <Compile Include="Addons\Monitor\siteCheckClass.cs" />
     <Compile Include="Addons\Monitor\GetStatus.cs" />
+    <Compile Include="Controllers\PermissionController.cs" />
     <Compile Include="Exceptions\Exceptions.cs" />
     <Compile Include="Addons\AdminSite\Views\ControlEditor.cs" />
     <Compile Include="Addons\AdminSite\Views\EmailBounceEditor.cs" />
@@ -192,11 +191,8 @@
     <Compile Include="Controllers\KeyPtrIndexController.cs" />
     <Compile Include="Controllers\ContentCmdController.cs" />
     <Compile Include="Controllers\CsController.cs" />
-    <Compile Include="Controllers\DataTreeController.cs" />
-    <Compile Include="Controllers\DateController.cs" />
     <Compile Include="Controllers\DbController.cs" />
     <Compile Include="Controllers\DbServerController.cs" />
-    <Compile Include="Controllers\DebugController.cs" />
     <Compile Include="Controllers\LinkAliasController.cs" />
     <Compile Include="Controllers\DocController.cs" />
     <Compile Include="Controllers\DocPropertyController.cs" />
@@ -240,6 +236,8 @@
     <Compile Include="Models\Db\SitePropertyModel.cs" />
     <Compile Include="Models\Db\StateModel.cs" />
     <Compile Include="Models\Db\DownloadModel.cs" />
+    <Compile Include="Models\Db\RemoteQueryModel.cs" />
+    <Compile Include="Models\Db\AuthoringControlModel.cs" />
     <Compile Include="Models\Domain\AppConfigModel.cs" />
     <Compile Include="Models\Db\EmailQueueModel.cs" />
     <Compile Include="Models\Db\ConditionalEmailModel.cs" />
@@ -350,6 +348,7 @@
     <Content Include="Resources\DefaultTemplateHtml.txt" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Addons\AdminNavigator\Controllers\" />
     <Folder Include="Models\View\" />
   </ItemGroup>
   <ItemGroup>

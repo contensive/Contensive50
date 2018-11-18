@@ -1,20 +1,7 @@
 ﻿
 using System;
-using System.Reflection;
-using System.Xml;
-using System.Diagnostics;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
-using Contensive.Processor;
-using Contensive.Processor.Models.Db;
-using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
-//
-//
+
 namespace Contensive.Processor.Controllers {
     //
     //====================================================================================================
@@ -23,13 +10,7 @@ namespace Contensive.Processor.Controllers {
     /// </summary>
     public class ErrorController : IDisposable {
         //
-        // ----- constants
-        //
-        //Private Const invalidationDaysDefault As Double = 365
-        //
-        //==========================================================================
-        //   Add on to the common error message
-        //==========================================================================
+        //====================================================================================================
         //
         public static void addUserError(CoreController core, string Message) {
             if (!string.IsNullOrEmpty(Message)) {
@@ -39,10 +20,7 @@ namespace Contensive.Processor.Controllers {
             }
         }
         //
-        //==========================================================================
-        //   main_Get The user error messages
-        //       If there are none, return ""
-        //==========================================================================
+        //====================================================================================================
         //
         public static string getUserError(CoreController core) {
             string result = "";
@@ -52,9 +30,8 @@ namespace Contensive.Processor.Controllers {
             }
             return result;
         }
-
         //
-        //==========================================================================================
+        //====================================================================================================
         /// <summary>
         /// return an html ul list of each eception produced during this document.
         /// </summary>
@@ -76,9 +53,9 @@ namespace Contensive.Processor.Controllers {
             }
             return returnHtmlList;
         }
-
         //
         //====================================================================================================
+        //
         #region  IDisposable Support 
         //
         // this class must implement System.IDisposable

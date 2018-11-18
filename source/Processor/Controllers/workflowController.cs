@@ -1,18 +1,8 @@
 ﻿
 using System;
-using System.Reflection;
-using System.Xml;
-using System.Diagnostics;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
-using Contensive.Processor;
-using Contensive.Processor.Models.Db;
-using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
+using System.Collections.Generic;
 //
 namespace Contensive.Processor.Controllers {
     public class WorkflowController : IDisposable {
@@ -35,8 +25,6 @@ namespace Contensive.Processor.Controllers {
         //   appProperties has dynamic values and is serialized and saved when changed
         //   include properties saved in appConfig file, settings not editable online.
         //------------------------------------------------------------------------------------------------------------------------
-        //
-        public const bool csv_AllowAutocsv_ClearContentTimeStamp = true;
         //
         private struct EditLockType {
             public string Key;
@@ -885,83 +873,91 @@ namespace Contensive.Processor.Controllers {
         //   the Approved Authoring Control
         //=====================================================================================================
         //
-        public void getAuthoringStatus(string ContentName, int RecordID, ref bool IsSubmitted, ref bool IsApproved, ref string SubmittedName, ref string ApprovedName, ref bool IsInserted, ref bool IsDeleted, ref bool IsModified, ref string ModifiedName, ref DateTime ModifiedDate, ref DateTime SubmittedDate, ref DateTime ApprovedDate) {
+        public AuthoringStatusClass getAuthoringStatus(string ContentName, int RecordID) {
+            AuthoringStatusClass result = new AuthoringStatusClass() {
+                submittedMemberName = "",
+                isModified = false,
+                modifiedMemberName = "",
+                modifiedDate = DateTime.MinValue,
+                isSubmitted = false,
+                submittedDate = DateTime.MinValue,
+                isApproved = false,
+                approvedMemberName = "",
+                approvedDate = DateTime.MinValue,
+                isEditing = false,
+                editingMemberName = "",
+                editingDate = DateTime.MinValue,
+                isDeleted = false,
+                isInserted = false
+            };
             try {
-                int ContentID = 0;
-                Models.Domain.CDefModel CDef = null;
-                //
-                IsModified = false;
-                ModifiedName = "";
-                ModifiedDate = DateTime.MinValue;
-                IsSubmitted = false;
-                SubmittedName = "";
-                SubmittedDate = DateTime.MinValue;
-                IsApproved = false;
-                ApprovedName = "";
-                ApprovedDate = DateTime.MinValue;
-                IsInserted = false;
-                IsDeleted = false;
                 if (RecordID > 0) {
                     //
                     // Get Workflow Locks
-                    //
-                    CDef = Models.Domain.CDefModel.create(core, ContentName);
-                    ContentID = CDef.id;
-                    if (ContentID > 0) {
-                        //If false And core.siteProperties.allowWorkflowAuthoring Then
-                        //    '
-                        //    ' Check Authoring Controls record for Locks
-                        //    '
-                        //    'TableID = csv_GetContentTableID(ContentName)
-                        //    Criteria = getAuthoringControlCriteria(ContentName, RecordID)
-                        //    CSLocks = core.db.cs_open("Authoring Controls", Criteria, "DateAdded Desc", , , , , "DateAdded,ControlType,CreatedBy,ID,DateExpires")
-                        //    Do While core.db.cs_ok(CSLocks)
-                        //        ControlType = core.db.cs_getInteger(CSLocks, "ControlType")
-                        //        Select Case ControlType
-                        //            Case AuthoringControlsModified
-                        //                If Not IsModified Then
-                        //                    ModifiedDate = core.db.cs_getDate(CSLocks, "DateAdded")
-                        //                    ModifiedName = core.db.cs_get(CSLocks, "CreatedBy")
-                        //                    IsModified = True
-                        //                End If
-                        //            Case AuthoringControlsSubmitted
-                        //                If Not IsSubmitted Then
-                        //                    SubmittedDate = core.db.cs_getDate(CSLocks, "DateAdded")
-                        //                    SubmittedName = core.db.cs_get(CSLocks, "CreatedBy")
-                        //                    IsSubmitted = True
-                        //                End If
-                        //            Case AuthoringControlsApproved
-                        //                If Not IsApproved Then
-                        //                    ApprovedDate = core.db.cs_getDate(CSLocks, "DateAdded")
-                        //                    ApprovedName = core.db.cs_get(CSLocks, "CreatedBy")
-                        //                    IsApproved = True
-                        //                End If
-                        //        End Select
-                        //        core.db.cs_goNext(CSLocks)
-                        //    Loop
-                        //    Call core.db.cs_Close(CSLocks)
-                        //    '
-                        //    ContentTableName = CDef.ContentTableName
-                        //    AuthoringTableName = CDef.AuthoringTableName
-                        //    DataSourceName = CDef.ContentDataSourceName
-                        //    SQL = "Select ContentTableName.ID As LiveRecordID, AuthoringTableName.ID As EditRecordID, AuthoringTableName.EditBlank As IsDeleted, ContentTableName.EditBlank As IsInserted, AuthoringTableName.ModifiedDate As EditRecordModifiedDate, ContentTableName.ModifiedDate As LiveRecordModifiedDate" _
-                        //    & " FROM " & AuthoringTableName & " As AuthoringTableName RIGHT JOIN " & ContentTableName & " As ContentTableName On AuthoringTableName.EditSourceID = ContentTableName.ID" _
-                        //    & " Where (((ContentTableName.ID) = " & RecordID & "))" _
-                        //    & " ORDER BY AuthoringTableName.ID DESC;"
-                        //    rs = core.db.executeSql(SQL, DataSourceName)
-                        //    If isDataTableOk(rs) Then
-                        //        IsInserted = genericController.EncodeBoolean(core.db.getDataRowColumnName(rs.Rows[0], "IsInserted"))
-                        //        IsDeleted = genericController.EncodeBoolean(core.db.getDataRowColumnName(rs.Rows[0], "IsDeleted"))
-                        //        'IsModified = (getDataRowColumnName(RS.rows(0), "LiveRecordModifiedDate") <> getDataRowColumnName(RS.rows(0), "EditRecordModifiedDate"))
-                        //    End If
-                        //    Call closeDataTable(rs)
-                        //End If
+                    Models.Domain.CDefModel CDef = Models.Domain.CDefModel.create(core, ContentName);
+                    if (CDef.id > 0) {
+                        var nameDict = new Dictionary<int, string>();
+                        foreach (var recordLock in Models.Db.AuthoringControlModel.createList(core, getAuthoringControlCriteria(ContentName, RecordID))) {
+                            switch(recordLock.ControlType) {
+                                case AuthoringControlsEditing:
+                                    if (!result.isEditing) {
+                                        result.isEditing = true;
+                                        result.editingDate = recordLock.dateAdded;
+                                        if (nameDict.ContainsKey(recordLock.createdBy)) {
+                                            result.editingMemberName = nameDict[recordLock.createdBy];
+                                        } else {
+                                            result.editingMemberName = Models.Db.PersonModel.getRecordName(core, recordLock.createdBy);
+                                            nameDict.Add(recordLock.createdBy, result.modifiedMemberName);
+                                        }
+                                    }
+                                    break;
+                                case AuthoringControlsModified:
+                                    if (!result.isModified) {
+                                        result.isModified = true;
+                                        result.submittedDate = recordLock.dateAdded;
+                                        if (nameDict.ContainsKey(recordLock.createdBy)) {
+                                            result.modifiedMemberName = nameDict[recordLock.createdBy];
+                                        } else {
+                                            result.modifiedMemberName = Models.Db.PersonModel.getRecordName(core, recordLock.createdBy);
+                                            nameDict.Add(recordLock.createdBy, result.modifiedMemberName);
+                                        }
+                                    }
+                                    break;
+                                case AuthoringControlsSubmitted:
+                                    if (!result.isSubmitted) {
+                                        result.isSubmitted = true;
+                                        result.modifiedDate = recordLock.dateAdded;
+                                        if (nameDict.ContainsKey(recordLock.createdBy)) {
+                                            result.submittedMemberName = nameDict[recordLock.createdBy];
+                                        } else {
+                                            result.submittedMemberName = Models.Db.PersonModel.getRecordName(core, recordLock.createdBy);
+                                            nameDict.Add(recordLock.createdBy, result.submittedMemberName);
+                                        }
+                                    }
+                                    break;
+                                case AuthoringControlsApproved:
+                                    if (!result.isApproved) {
+                                        result.isApproved = true;
+                                        result.approvedDate = recordLock.dateAdded;
+                                        if (nameDict.ContainsKey(recordLock.createdBy)) {
+                                            result.approvedMemberName = nameDict[recordLock.createdBy];
+                                        } else {
+                                            result.approvedMemberName = Models.Db.PersonModel.getRecordName(core, recordLock.createdBy);
+                                            nameDict.Add(recordLock.createdBy, result.submittedMemberName);
+                                        }
+                                    }
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
                     }
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
             }
+            return result;
         }
         //
         //=================================================================================
@@ -1121,7 +1117,25 @@ namespace Contensive.Processor.Controllers {
             }
             return EditLock2;
         }
-
+        //
+        //=================================================================================
+        //
+        public class AuthoringStatusClass {
+            public string editingMemberName { get; set; }
+            public string submittedMemberName { get; set; }
+            public string approvedMemberName { get; set; }
+            public string modifiedMemberName { get; set; }
+            public bool isEditing { get; set; }
+            public bool isSubmitted { get; set; }
+            public bool isApproved { get; set; }
+            public bool isModified { get; set; }
+            public DateTime editingDate { get; set; }
+            public DateTime modifiedDate { get; set; }
+            public DateTime submittedDate { get; set; }
+            public DateTime approvedDate { get; set; }
+            public bool isInserted { get; set; }
+            public bool isDeleted { get; set; }
+        }
         //
         //==========================================================================================
         #region  IDisposable Support 

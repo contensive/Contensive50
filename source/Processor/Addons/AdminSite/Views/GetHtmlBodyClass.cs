@@ -644,7 +644,7 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 // Mark the record reviewed without making any changes
                                 //
-                                cp.core.doc.markRecordReviewed(adminData.adminContent.name, adminData.editRecord.id);
+                                Processor.Models.Db.PageContentModel.markReviewed(cp.core, adminData.editRecord.id);
                                 break;
                             case Constants.AdminActionDelete:
                                 if (adminData.editRecord.Read_Only) {
@@ -652,7 +652,7 @@ namespace Contensive.Addons.AdminSite {
                                 } else {
                                     adminData.LoadEditRecord(cp.core);
                                     cp.core.db.deleteTableRecord(adminData.editRecord.id,adminData.adminContent.tableName,  adminData.adminContent.dataSourceName);
-                                    cp.core.doc.processAfterSave(true, adminData.editRecord.contentControlId_Name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
+                                    cp.core.processAfterSave(true, adminData.editRecord.contentControlId_Name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
                                 }
                                 adminData.Admin_Action = Constants.AdminActionNop;
                                 break;
@@ -666,7 +666,7 @@ namespace Contensive.Addons.AdminSite {
                                     adminData.LoadEditRecord(cp.core);
                                     adminData.LoadEditRecord_Request(cp.core);
                                     ProcessActionSave(cp,adminData, UseContentWatchLink);
-                                    cp.core.doc.processAfterSave(false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
+                                    cp.core.processAfterSave(false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
                                 }
                                 adminData.Admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
                                                                                               //
@@ -681,7 +681,7 @@ namespace Contensive.Addons.AdminSite {
                                     adminData.LoadEditRecord(cp.core);
                                     adminData.LoadEditRecord_Request(cp.core);
                                     ProcessActionSave(cp,adminData, UseContentWatchLink);
-                                    cp.core.doc.processAfterSave(false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
+                                    cp.core.processAfterSave(false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
                                     adminData.editRecord.id = 0;
                                     adminData.editRecord.Loaded = false;
                                     //If adminContext.content.fields.Count > 0 Then
@@ -709,7 +709,7 @@ namespace Contensive.Addons.AdminSite {
                                     adminData.LoadEditRecord(cp.core);
                                     adminData.LoadEditRecord_Request(cp.core);
                                     ProcessActionSave(cp,adminData, UseContentWatchLink);
-                                    cp.core.doc.processAfterSave(false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
+                                    cp.core.processAfterSave(false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
                                     if (!(cp.core.doc.debug_iUserError != "")) {
                                         if (!CdefController.isWithinContent(cp.core, adminData.editRecord.contentControlId, CdefController.getContentId(cp.core, "Group Email"))) {
                                             Processor.Controllers.ErrorController.addUserError(cp.core, "The send action only supports Group Email.");
@@ -770,7 +770,7 @@ namespace Contensive.Addons.AdminSite {
                                     adminData.LoadEditRecord(cp.core);
                                     adminData.LoadEditRecord_Request(cp.core);
                                     ProcessActionSave(cp,adminData, UseContentWatchLink);
-                                    cp.core.doc.processAfterSave(false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
+                                    cp.core.processAfterSave(false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
                                     if (!(cp.core.doc.debug_iUserError != "")) {
                                         if (!CdefController.isWithinContent(cp.core, adminData.editRecord.contentControlId, CdefController.getContentId(cp.core, "Conditional Email"))) {
                                             Processor.Controllers.ErrorController.addUserError(cp.core, "The activate action only supports Conditional Email.");
@@ -800,7 +800,7 @@ namespace Contensive.Addons.AdminSite {
                                     adminData.LoadEditRecord(cp.core);
                                     adminData.LoadEditRecord_Request(cp.core);
                                     ProcessActionSave(cp,adminData, UseContentWatchLink);
-                                    cp.core.doc.processAfterSave(false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
+                                    cp.core.processAfterSave(false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
                                     //
                                     if (!(cp.core.doc.debug_iUserError != "")) {
                                         //
@@ -837,7 +837,7 @@ namespace Contensive.Addons.AdminSite {
                                                     //
                                                     ContentName = CdefController.getContentNameByID(cp.core, cp.core.db.csGetInteger(CSEditRecord, "ContentControlID"));
                                                     cp.core.cache.invalidateDbRecord(RecordID, adminData.adminContent.tableName);
-                                                    cp.core.doc.processAfterSave(true, ContentName, RecordID, "", 0, UseContentWatchLink);
+                                                    cp.core.processAfterSave(true, ContentName, RecordID, "", 0, UseContentWatchLink);
                                                 }
                                                 //
                                                 // Page Content special cases
@@ -868,7 +868,7 @@ namespace Contensive.Addons.AdminSite {
                                     adminData.LoadEditRecord_Request(cp.core);
                                     ProcessActionSave(cp,adminData, UseContentWatchLink);
                                     cp.core.cache.invalidateAll();
-                                    cp.core.doc.clearMetaData();
+                                    cp.core.clearMetaData();
                                 }
                                 adminData.Admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
                                 break;
@@ -1374,7 +1374,7 @@ namespace Contensive.Addons.AdminSite {
                                         // ----- make sure content watch expires before content expires
                                         //
                                         if (!GenericController.IsNull(fieldValueObject)) {
-                                            if (DateController.IsDate(fieldValueObject)) {
+                                            if (GenericController.IsDate(fieldValueObject)) {
                                                 DateTime saveValue = GenericController.encodeDate(fieldValueObject);
                                                 if (adminData.ContentWatchExpires <= DateTime.MinValue) {
                                                     adminData.ContentWatchExpires = saveValue;
@@ -1391,7 +1391,7 @@ namespace Contensive.Addons.AdminSite {
                                         // ----- make sure content watch expires before content archives
                                         //
                                         if (!GenericController.IsNull(fieldValueObject)) {
-                                            if (DateController.IsDate(fieldValueObject)) {
+                                            if (GenericController.IsDate(fieldValueObject)) {
                                                 DateTime saveValue = GenericController.encodeDate(fieldValueObject);
                                                 if ((adminData.ContentWatchExpires) <= DateTime.MinValue) {
                                                     adminData.ContentWatchExpires = saveValue;
@@ -2595,7 +2595,7 @@ namespace Contensive.Addons.AdminSite {
                             ButtonList = ButtonCancel;
                             BlockForm = true;
                         }
-                        cp.core.doc.clearMetaData();
+                        cp.core.clearMetaData();
                         cp.core.cache.invalidateAll();
                     }
                     //

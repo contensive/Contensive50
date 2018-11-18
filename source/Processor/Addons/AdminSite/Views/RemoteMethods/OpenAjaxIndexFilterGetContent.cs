@@ -23,9 +23,7 @@ namespace Contensive.Addons.AdminSite {
                 if (ContentID == 0) {
                     result = "No filter is available";
                 } else {
-                    //cdefModel cdef = cdefModel.getCdef(core, ContentID);
-                    var adminData = new AdminDataModel(core);
-                    result = FormIndex.getForm_IndexFilterContent(core, adminData);
+                    result = FormIndex.getForm_IndexFilterContent(core, new AdminDataModel(core));
                 }
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);

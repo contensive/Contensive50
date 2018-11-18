@@ -1,17 +1,8 @@
 ﻿
 using System;
-using System.Reflection;
-using System.Xml;
 using System.Diagnostics;
-using System.Linq;
-using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
-using Contensive.Processor;
-using Contensive.Processor.Models.Db;
-using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using System.Net;
 using System.Text;
@@ -323,7 +314,7 @@ namespace Contensive.Processor.Controllers {
             //int WorkLong = 0;
             ////
             //tempGetGMTFromDate = "";
-            //if (dateController.IsDate(DateValue)) {
+            //if (GenericController.IsDate(DateValue)) {
             //    switch ((int)DateValue.DayOfWeek) {
             //        case 0:
             //            tempGetGMTFromDate = "Sun, ";
@@ -769,9 +760,9 @@ namespace Contensive.Processor.Controllers {
             try {
                 if (!string.IsNullOrEmpty(GMTDate)) {
                     double HourPart = encodeNumber(GMTDate.Substring(5, 11));
-                    if (DateController.IsDate(HourPart)) {
+                    if (GenericController.IsDate(HourPart)) {
                         double YearPart = encodeNumber(GMTDate.Substring(17, 8));
-                        if (DateController.IsDate(YearPart)) {
+                        if (GenericController.IsDate(YearPart)) {
                             result = DateTime.FromOADate(YearPart + (HourPart + 4) / 24);
                         }
                     }
@@ -1513,7 +1504,7 @@ namespace Contensive.Processor.Controllers {
                     return result;
                 }
             }
-            if (DateController.IsDate(Expression)) {
+            if (GenericController.IsDate(Expression)) {
                 result = Convert.ToDateTime(Expression);
             }
             return result;
@@ -2062,9 +2053,9 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="srcDate"></param>
         /// <returns></returns>
-        public static int convertDateToDayPtr(DateTime srcDate) {
-            return encodeInteger(DateController.DateDiff(DateController.DateInterval.Day, srcDate, DateTime.MinValue));
-        }
+        //public static int convertDateToDayPtr(DateTime srcDate) {
+        //    return encodeInteger(DateController.DateDiff(DateController.DateInterval.Day, srcDate, DateTime.MinValue));
+        //}
         //
         //====================================================================================================
         /// <summary>
@@ -2504,6 +2495,12 @@ namespace Contensive.Processor.Controllers {
                 return (source1.ToLowerInvariant() == source2.ToLowerInvariant());
             }
         }
+        public static bool IsDate(object expression) {
+            if (expression == null)
+                return false;
 
+            DateTime testDate;
+            return DateTime.TryParse(expression.ToString(), out testDate);
+        }
     }
 }

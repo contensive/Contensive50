@@ -756,7 +756,7 @@ namespace Contensive.Processor.Models.Domain {
                             }
                         }
                     }
-                    core.doc.clearMetaData();
+                    core.clearMetaData();
                     core.cache.invalidateAll();
                 }
                 //
@@ -782,7 +782,7 @@ namespace Contensive.Processor.Models.Domain {
                         }
                     }
                 }
-                core.doc.clearMetaData();
+                core.clearMetaData();
                 core.cache.invalidateAll();
                 //
                 //----------------------------------------------------------------------------------------------------------------------
@@ -791,7 +791,7 @@ namespace Contensive.Processor.Models.Domain {
                 //
                 AppBuilderController.verifySortMethods(core);
                 AppBuilderController.verifyContentFieldTypes(core);
-                core.doc.clearMetaData();
+                core.clearMetaData();
                 core.cache.invalidateAll();
                 //
                 //----------------------------------------------------------------------------------------------------------------------
@@ -804,7 +804,7 @@ namespace Contensive.Processor.Models.Domain {
                         break;
                     }
                 }
-                core.doc.clearMetaData();
+                core.clearMetaData();
                 core.cache.invalidateAll();
                 //
                 //----------------------------------------------------------------------------------------------------------------------
@@ -824,7 +824,7 @@ namespace Contensive.Processor.Models.Domain {
                         installCDefMiniCollection_buildDb_saveCDefToDb(core, cdef, BuildVersion);
                     }
                 }
-                core.doc.clearMetaData();
+                core.clearMetaData();
                 core.cache.invalidateAll();
                 //
                 //----------------------------------------------------------------------------------------------------------------------
@@ -875,7 +875,7 @@ namespace Contensive.Processor.Models.Domain {
                         }
                     }
                 }
-                core.doc.clearMetaData();
+                core.clearMetaData();
                 core.cache.invalidateAll();
                 //
                 //----------------------------------------------------------------------------------------------------------------------
@@ -888,7 +888,7 @@ namespace Contensive.Processor.Models.Domain {
                         core.db.createSQLIndex(index.DataSourceName, index.TableName, index.IndexName, index.FieldNameList);
                     }
                 }
-                core.doc.clearMetaData();
+                core.clearMetaData();
                 core.cache.invalidateAll();
                 //
                 //----------------------------------------------------------------------------------------------------------------------

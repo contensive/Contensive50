@@ -179,7 +179,7 @@ namespace Contensive.Addons.Tools {
                                 }
                             }
                             core.cache.invalidateAll();
-                            core.doc.clearMetaData();
+                            core.clearMetaData();
                         }
                         if (ToolButton == ButtonAdd) {
                             //
@@ -199,7 +199,7 @@ namespace Contensive.Addons.Tools {
                         //
                         if (ToolButton == ButtonSaveandInvalidateCache) {
                             core.cache.invalidateAll();
-                            core.doc.clearMetaData();
+                            core.clearMetaData();
                         }
                         //
                         // ----- Restore Content Autoload site property

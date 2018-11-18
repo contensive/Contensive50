@@ -247,7 +247,7 @@ namespace Contensive.Processor {
             return cp.core.db.isSQLTableField("", TableName, FieldName);
         }
         public override DataTable ExecuteRemoteQuery(string remoteQueryKey) {
-            throw new NotImplementedException();
+            return cp.core.db.executeRemoteQuery(remoteQueryKey);
         }
         //
         //====================================================================================================

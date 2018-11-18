@@ -676,7 +676,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                                                 // Version
                                                                 //
                                                                 CollectionLastChangeDate = CollectionNode.InnerText;
-                                                                if (DateController.IsDate(CollectionLastChangeDate)) {
+                                                                if (GenericController.IsDate(CollectionLastChangeDate)) {
                                                                     DateValue = DateTime.Parse(CollectionLastChangeDate);
                                                                     CollectionLastChangeDate = DateValue.ToShortDateString();
                                                                 }
