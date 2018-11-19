@@ -489,7 +489,7 @@ namespace Contensive.Processor.Models.Db {
                         result = readRecordCacheByGuidPtr<T>(core, recordGuid);
                         if (result == null) {
                             using (var cs = new CsController(core)) {
-                                using (var dt = core.db.executeQuery(getSelectSql<T>(core, null, "(ccGuid=" + core.db.encodeSQLText(recordGuid) + ")", ""))) {
+                                using (var dt = core.db.executeQuery(getSelectSql<T>(core, null, "(ccGuid=" + DbController.encodeSQLText(recordGuid) + ")", ""))) {
                                     if (dt != null) {
                                         if (dt.Rows.Count > 0) {
                                             result = loadRecord<T>(core, dt.Rows[0], ref callersCacheNameList);
@@ -546,7 +546,7 @@ namespace Contensive.Processor.Models.Db {
                         // -- if allowCache, then this subclass is for a content that has a unique name. read the name pointer
                         result = (derivedNameFieldIsUnique(instanceType)) ? readRecordCacheByUniqueNamePtr<T>(core, recordName) : null;
                         if (result == null) {
-                            using ( var dt = core.db.executeQuery(getSelectSql<T>(core, null, "(name=" + core.db.encodeSQLText(recordName) + ")", ""))) {
+                            using ( var dt = core.db.executeQuery(getSelectSql<T>(core, null, "(name=" + DbController.encodeSQLText(recordName) + ")", ""))) {
                                 if ( dt != null ) {
                                     if ( dt.Rows.Count>0 ) {
                                         result = loadRecord<T>(core, dt.Rows[0], ref callersCacheNameList);
@@ -717,7 +717,7 @@ namespace Contensive.Processor.Models.Db {
                                     ccguid = Controllers.GenericController.getGUID();
                                 }
                                 //string value = instanceProperty.GetValue(this, null).ToString();
-                                sqlPairs.add(instanceProperty.Name, core.db.encodeSQLText(instanceProperty.GetValue(this, null).ToString()));
+                                sqlPairs.add(instanceProperty.Name, DbController.encodeSQLText(instanceProperty.GetValue(this, null).ToString()));
                                 //cs.setField(instanceProperty.Name, instanceProperty.GetValue(this, null).ToString());
                                 break;
                             default:
@@ -732,25 +732,25 @@ namespace Contensive.Processor.Models.Db {
                                     case "Int32":
                                         Int32 valueInt32;
                                         int.TryParse(instanceProperty.GetValue(this, null).ToString(), out valueInt32);
-                                        sqlPairs.add(instanceProperty.Name, core.db.encodeSQLNumber(valueInt32));
+                                        sqlPairs.add(instanceProperty.Name, DbController.encodeSQLNumber(valueInt32));
                                         //cs.setField(instanceProperty.Name, valueInt32);
                                         break;
                                     case "Boolean":
                                         bool valueBool;
                                         bool.TryParse(instanceProperty.GetValue(this, null).ToString(), out valueBool);
-                                        sqlPairs.add(instanceProperty.Name, core.db.encodeSQLBoolean( valueBool ) );
+                                        sqlPairs.add(instanceProperty.Name, DbController.encodeSQLBoolean( valueBool ) );
                                         //cs.setField(instanceProperty.Name, valueBool);
                                         break;
                                     case "DateTime":
                                         DateTime valueDate;
                                         DateTime.TryParse(instanceProperty.GetValue(this, null).ToString(), out valueDate);
-                                        sqlPairs.add(instanceProperty.Name, core.db.encodeSQLDate( valueDate ));
+                                        sqlPairs.add(instanceProperty.Name, DbController.encodeSQLDate( valueDate ));
                                         //cs.setField(instanceProperty.Name, valueDate);
                                         break;
                                     case "Double":
                                         double valueDbl;
                                         double.TryParse(instanceProperty.GetValue(this, null).ToString(), out valueDbl);
-                                        sqlPairs.add(instanceProperty.Name, core.db.encodeSQLNumber(valueDbl));
+                                        sqlPairs.add(instanceProperty.Name, DbController.encodeSQLNumber(valueDbl));
                                         //cs.setField(instanceProperty.Name, valueDbl);
                                         break;
                                     case "FieldTypeTextFile": {
@@ -822,7 +822,7 @@ namespace Contensive.Processor.Models.Db {
                                         //}
                                         //break;
                                     default:
-                                        sqlPairs.add(instanceProperty.Name, core.db.encodeSQLText(instanceProperty.GetValue(this, null).ToString()));
+                                        sqlPairs.add(instanceProperty.Name, DbController.encodeSQLText(instanceProperty.GetValue(this, null).ToString()));
                                         break;
                                 }
                                 if (fileContentUpdated) {
@@ -848,7 +848,7 @@ namespace Contensive.Processor.Models.Db {
                                             filename = FileController.getVirtualRecordUnixPathFilename(tableName, instanceProperty.Name.ToLowerInvariant(), id, fieldTypeId);
                                         }
                                         core.cdnFiles.saveFile(filename, content);
-                                        sqlPairs.add(instanceProperty.Name, core.db.encodeSQLText(filename));
+                                        sqlPairs.add(instanceProperty.Name, DbController.encodeSQLText(filename));
                                     }
                                 }
                                 break;

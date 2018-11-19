@@ -138,7 +138,7 @@ namespace Contensive.Processor.Controllers {
                             // Execute Processes
                             try {
                                 DateTime RightNow = DateTime.Now;
-                                string SQLNow = coreApp.db.encodeSQLDate(RightNow);
+                                string SQLNow = DbController.encodeSQLDate(RightNow);
                                 string sqlAddonsCriteria = ""
                                     + "(Active<>0)"
                                     + " and(name<>'')"

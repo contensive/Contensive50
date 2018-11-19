@@ -193,19 +193,19 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// If ContentId in this list, they are not a content manager
         /// </summary>
-        internal string contentAccessRights_NotList = "";
+        internal List<int> contentAccessRights_NotList { get; set; } = new List<int>();
         /// <summary>
         /// If ContentId in this list, they are a content manager
         /// </summary>
-        internal string contentAccessRights_List = "";
+        internal List<int> contentAccessRights_List { get; set; } = new List<int>();
         /// <summary>
         /// If in _List, test this for allowAdd
         /// </summary>
-        internal string contentAccessRights_AllowAddList = "";
+        internal List<int> contentAccessRights_AllowAddList { get; set; } = new List<int>();
         /// <summary>
         /// If in _List, test this for allowDelete
         /// </summary>
-        internal string contentAccessRights_AllowDeleteList = "";
+        internal List<int> contentAccessRights_AllowDeleteList { get; set; } = new List<int>();
         /// <summary>
         /// list of content names that have been verified editable by this user
         /// </summary>
@@ -308,7 +308,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // Lookup link in main_ContentWatch
                 //
-                CSPointer = core.db.csOpen("Content Watch", "ContentRecordKey=" + core.db.encodeSQLText(ContentRecordKey), "", false, 0, false, false, "Link,Clicks");
+                CSPointer = core.db.csOpen("Content Watch", "ContentRecordKey=" + DbController.encodeSQLText(ContentRecordKey), "", false, 0, false, false, "Link,Clicks");
                 if (core.db.csOk(CSPointer)) {
                     tempgetContentWatchLinkByKey = core.db.csGetText(CSPointer, "Link");
                     if (GenericController.encodeBoolean(IncrementClicks)) {
@@ -509,8 +509,8 @@ namespace Contensive.Processor.Controllers {
                 string GroupNameList = null;
                 string Copy = null;
                 //
-                core.db.deleteContentRecords("Form Pages", "name=" + core.db.encodeSQLText("Registration Form"));
-                CS = core.db.csOpen("Form Pages", "name=" + core.db.encodeSQLText("Registration Form"));
+                core.db.deleteContentRecords("Form Pages", "name=" + DbController.encodeSQLText("Registration Form"));
+                CS = core.db.csOpen("Form Pages", "name=" + DbController.encodeSQLText("Registration Form"));
                 if (!core.db.csOk(CS)) {
                     //
                     // create Version 1 template - just to main_Get it started
@@ -561,7 +561,7 @@ namespace Contensive.Processor.Controllers {
                     core.db.csSet(CS, "ccGuid", pageGuid);
                 }
                 core.db.csSave(CS);
-                //   Call core.workflow.publishEdit("Page Content", Id)
+                //   Call WorkflowController.publishEdit("Page Content", Id)
             }
             core.db.csClose(ref CS);
             //

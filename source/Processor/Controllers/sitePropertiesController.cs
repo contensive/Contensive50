@@ -305,13 +305,13 @@ namespace Contensive.Processor.Controllers {
                         } else {
                             //
                             // -- set value in Db
-                            string SQLNow = core.db.encodeSQLDate(DateTime.Now);
-                            string SQL = "UPDATE ccSetup Set FieldValue=" + core.db.encodeSQLText(Value) + ",ModifiedDate=" + SQLNow + " WHERE name=" + core.db.encodeSQLText(propertyName);
+                            string SQLNow = DbController.encodeSQLDate(DateTime.Now);
+                            string SQL = "UPDATE ccSetup Set FieldValue=" + DbController.encodeSQLText(Value) + ",ModifiedDate=" + SQLNow + " WHERE name=" + DbController.encodeSQLText(propertyName);
                             int recordsAffected = 0;
                             core.db.executeNonQuery(SQL, "", ref recordsAffected);
                             if (recordsAffected == 0) {
                                 SQL = "INSERT INTO ccSetup (ACTIVE,CONTENTCONTROLID,NAME,FIELDVALUE,ModifiedDate,DateAdded)VALUES("
-                            + SQLTrue + "," + core.db.encodeSQLNumber(CdefController.getContentId(core, "site properties")) + "," + core.db.encodeSQLText(propertyName.ToUpper()) + "," + core.db.encodeSQLText(Value) + "," + SQLNow + "," + SQLNow + ");";
+                            + SQLTrue + "," + DbController.encodeSQLNumber(CdefController.getContentId(core, "site properties")) + "," + DbController.encodeSQLText(propertyName.ToUpper()) + "," + DbController.encodeSQLText(Value) + "," + SQLNow + "," + SQLNow + ");";
                                 core.db.executeQuery(SQL);
                             }
                             //

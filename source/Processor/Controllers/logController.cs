@@ -359,8 +359,8 @@ namespace Contensive.Processor.Controllers {
             //
             warningId = 0;
             SQL = "select top 1 ID from ccSiteWarnings"
-                + " where (generalKey=" + core.db.encodeSQLText(generalKey) + ")"
-                + " and(specificKey=" + core.db.encodeSQLText(specificKey) + ")"
+                + " where (generalKey=" + DbController.encodeSQLText(generalKey) + ")"
+                + " and(specificKey=" + DbController.encodeSQLText(specificKey) + ")"
                 + "";
             DataTable dt = core.db.executeQuery(SQL);
             if (dt.Rows.Count > 0) {
@@ -371,7 +371,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // increment count for matching warning
                 //
-                SQL = "update ccsitewarnings set count=count+1,DateLastReported=" + core.db.encodeSQLDate(DateTime.Now) + " where id=" + warningId;
+                SQL = "update ccsitewarnings set count=count+1,DateLastReported=" + DbController.encodeSQLDate(DateTime.Now) + " where id=" + warningId;
                 core.db.executeQuery(SQL);
             } else {
                 //

@@ -6,6 +6,7 @@ using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Exceptions;
+using Contensive.Addons.AdminSite.Controllers;
 
 namespace Contensive.Addons.AdminSite {
     public class FormIndexExport {
@@ -41,15 +42,10 @@ namespace Contensive.Addons.AdminSite {
                 IndexConfigClass IndexConfig = null;
                 string SQL = null;
                 int CS = 0;
-                //Dim RecordTop As Integer
-                //Dim RecordsPerPage As Integer
                 bool IsRecordLimitSet = false;
                 string RecordLimitText = null;
-                bool allowContentEdit = false;
-                bool allowContentAdd = false;
-                bool allowContentDelete = false;
-                var tmpList = new List<string>();
-                DataSourceModel datasource = DataSourceModel.create(core, adminData.adminContent.dataSourceId, ref tmpList);
+                var cacheNameList = new List<string>();
+                DataSourceModel datasource = DataSourceModel.create(core, adminData.adminContent.dataSourceId, ref cacheNameList);
                 //
                 // ----- Process Input
                 //
@@ -63,8 +59,8 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // get content access rights
                     //
-                    core.session.getContentAccessRights(core, adminData.adminContent.name, ref allowContentEdit, ref allowContentAdd, ref allowContentDelete);
-                    if (!allowContentEdit) {
+                    var userContentPermissions = PermissionController.getUserContentPermissions(core, adminData.adminContent);
+                    if (!userContentPermissions.allowEdit) {
                         //If Not core.doc.authContext.user.main_IsContentManager2(adminContext.content.Name) Then
                         //
                         // You must be a content manager of this content to use this tool

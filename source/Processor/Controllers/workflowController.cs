@@ -3,777 +3,162 @@ using System;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using System.Collections.Generic;
+using System.Linq;
 //
 namespace Contensive.Processor.Controllers {
     public class WorkflowController : IDisposable {
-        //
-        //------------------------------------------------------------------------------------------------------------------------
-        // objects passed in that are not disposed
-        //------------------------------------------------------------------------------------------------------------------------
-        //
-        private CoreController core;
-        //
-        //------------------------------------------------------------------------------------------------------------------------
-        // objects created within class to dispose in dispose
-        //   typically used as app.meaData.method()
-        //------------------------------------------------------------------------------------------------------------------------
-        //
-        //------------------------------------------------------------------------------------------------------------------------
-        // internal storage
-        //   these objects is deserialized during constructor
-        //   appConfig has static setup values like file system endpoints and Db connection string
-        //   appProperties has dynamic values and is serialized and saved when changed
-        //   include properties saved in appConfig file, settings not editable online.
-        //------------------------------------------------------------------------------------------------------------------------
-        //
-        private struct EditLockType {
-            public string Key;
-            public int MemberID;
-            public DateTime DateExpires;
-        }
-        private EditLockType[] EditLockArray;
-        private int EditLockCount;
-        //
-        //-----------------------------------------------------------------------
-        // ----- Edit Lock info
-        //-----------------------------------------------------------------------
-        //
-        private string main_EditLockContentRecordKey_Local = "";
-        private bool main_EditLockStatus_Local = false;
-        private int main_EditLockMemberID_Local = 0;
-        private string main_EditLockMemberName_Local = "";
-        private DateTime main_EditLockDateExpires_Local = DateTime.MinValue;
+        /// <summary>
+        /// record is being edted
+        /// </summary>
+        internal const int AuthoringControlsEditing = 1;
+        /// <summary>
+        /// record workflow deprecated
+        /// </summary>
+        internal const int AuthoringControlsSubmitted = 2;
+        /// <summary>
+        /// record workflow deprecated
+        /// </summary>
+        internal const int AuthoringControlsApproved = 3;
+        /// <summary>
+        /// record workflow deprecated
+        /// </summary>
+        internal const int AuthoringControlsModified = 4;
         //
         //==========================================================================================
         /// <summary>
-        /// constructor
+        /// create the content record key
         /// </summary>
-        /// <param name="cp"></param>
-        /// <param name="cluster"></param>
-        /// <param name="appName"></param>
-        /// <remarks></remarks>
-        public WorkflowController(CoreController core) : base() {
+        /// <param name="tableId"></param>
+        /// <param name="recordId"></param>
+        /// <returns></returns>
+        public static string getContentRecordKey(int tableId, int recordId) => DbController.encodeSQLText(tableId.ToString() + "/" + recordId.ToString());
+        //
+        //=================================================================================
+        /// <summary>
+        /// Get a record lock status. If session.user is the lock holder, returns unlocked
+        /// </summary>
+        /// <param name="ContentName"></param>
+        /// <param name="recordId"></param>
+        /// <param name="ReturnMemberID"></param>
+        /// <param name="ReturnDateExpires"></param>
+        /// <returns></returns>
+        public static editLockClass getEditLock(CoreController core, int tableId, int recordId) {
             try {
-                //
-                this.core = core;
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-                throw;
-                throw (ex);
-            }
-        }
-        //
-        //==========================================================================================
-        //
-        //
-        //========================================================================
-        //   Returns true if the record is locked to the current member
-        //========================================================================
-        //
-        public bool GetEditLockStatus(string ContentName, int RecordID) {
-            try {
-                //
-                //If Not (true) Then Exit Function
-                //
-                int ReturnMemberID = 0;
-                DateTime ReturnDateExpires = default(DateTime);
-                //
-                main_EditLockContentRecordKey_Local = (ContentName + GenericController.encodeText(RecordID));
-                main_EditLockDateExpires_Local = DateTime.MinValue;
-                main_EditLockMemberID_Local = 0;
-                main_EditLockMemberName_Local = "";
-                main_EditLockStatus_Local = false;
-                //
-                main_EditLockStatus_Local = getEditLock(GenericController.encodeText(ContentName), GenericController.encodeInteger(RecordID), ref ReturnMemberID, ref ReturnDateExpires);
-                if (main_EditLockStatus_Local && (ReturnMemberID != core.session.user.id)) {
-                    main_EditLockStatus_Local = true;
-                    main_EditLockDateExpires_Local = ReturnDateExpires;
-                    main_EditLockMemberID_Local = ReturnMemberID;
-                    main_EditLockMemberName_Local = "";
-                }
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-                throw;
-            }
-            return main_EditLockStatus_Local;
-        }
-        //
-        //========================================================================
-        //   Edit Lock Handling
-        //========================================================================
-        //
-        public string GetEditLockMemberName(string ContentName, int RecordID) {
-            string tempGetEditLockMemberName = null;
-            try {
-                int CS = 0;
-                //
-                if (main_EditLockContentRecordKey_Local != (ContentName + GenericController.encodeText(RecordID))) {
-                    GetEditLockStatus(ContentName, RecordID);
-                }
-                if (main_EditLockStatus_Local) {
-                    if (string.IsNullOrEmpty(main_EditLockMemberName_Local)) {
-                        if (main_EditLockMemberID_Local != 0) {
-                            CS = core.db.csOpen2("people", main_EditLockMemberID_Local);
-                            if (core.db.csOk(CS)) {
-                                main_EditLockMemberName_Local = core.db.csGetText(CS, "name");
-                            }
-                            core.db.csClose(ref CS);
-                        }
-                        if (string.IsNullOrEmpty(main_EditLockMemberName_Local)) {
-                            main_EditLockMemberName_Local = "unknown";
-                        }
+                var table = Models.Db.TableModel.create(core, tableId);
+                if (table != null) {
+                    string criteria = "(createdby<>" + core.session.user.id + ")and(contentRecordKey=" + getContentRecordKey(table.id, recordId) + ")and((DateExpires>" + DbController.encodeSQLDate(DateTime.Now) + ")or(DateExpires Is null))";
+                    var authoringControlList = Models.Db.AuthoringControlModel.createList(core, criteria, "dateexpires desc");
+                    if (authoringControlList.Count > 0) {
+                        var person = Models.Db.PersonModel.create(core, authoringControlList.First().createdBy);
+                        return new editLockClass() {
+                            isEditLocked = true,
+                            editLockExpiresDate = authoringControlList.First().DateExpires,
+                            editLockByMemberId = (person == null) ? 0 : person.id,
+                            editLockByMemberName = (person == null) ? "" : person.name
+                        };                    
                     }
-                    tempGetEditLockMemberName = main_EditLockMemberName_Local;
-                }
+                };
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
-                throw;
+                LogController.handleError(core, ex);
             }
-            return main_EditLockMemberName_Local;
+            return new editLockClass() { isEditLocked = false };
         }
         //
         //========================================================================
-        //   Edit Lock Handling
-        //========================================================================
+        /// <summary>
+        /// Returns true if the record is locked to the current member
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="recordId"></param>
+        /// <returns></returns>
+        public static bool isRecordLocked(CoreController core, int tableId, int recordId) => getEditLock(core, tableId, recordId).isEditLocked;
         //
-        public DateTime GetEditLockDateExpires(string ContentName, int RecordID) {
-            DateTime returnDate = DateTime.MinValue;
-            try {
-                if (main_EditLockContentRecordKey_Local != (ContentName + GenericController.encodeText(RecordID))) {
-                    GetEditLockStatus(ContentName, RecordID);
-                }
-                if (main_EditLockStatus_Local) {
-                    returnDate = main_EditLockDateExpires_Local;
-                }
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-                throw;
-            }
-            return returnDate;
+        //========================================================================
+        /// <summary>
+        /// Edit Lock member name
+        /// </summary>
+        /// <param name="ContentName"></param>
+        /// <param name="RecordID"></param>
+        /// <returns></returns>
+        public static string getEditLockMemberName(CoreController core, int tableId, int recordId) => getEditLock(core, tableId, recordId).editLockByMemberName;
+        //
+        //========================================================================
+        /// <summary>
+        /// Edit Lock dat expires
+        /// </summary>
+        /// <param name="ContentName"></param>
+        /// <param name="RecordID"></param>
+        /// <returns></returns>
+        public static DateTime getEditLockDateExpires(CoreController core, int tableId, int recordId) => getEditLock(core, tableId, recordId).editLockExpiresDate;
+        //
+        //========================================================================
+        /// <summary>
+        /// Clears the edit lock for this record
+        /// </summary>
+        /// <param name="ContentName"></param>
+        /// <param name="RecordID"></param>
+        public static void clearEditLock(CoreController core, int tableId, int recordId) {
+            string criteria = "(contentRecordKey=" + getContentRecordKey(tableId, recordId) + ")";
+            Models.Db.AuthoringControlModel.deleteSelection(core, criteria);
         }
         //
         //========================================================================
-        //   Sets the edit lock for this record
-        //========================================================================
-        //
-        public void SetEditLock(string ContentName, int RecordID) {
-            setEditLock(GenericController.encodeText(ContentName), GenericController.encodeInteger(RecordID), core.session.user.id);
-        }
-        //
-        //========================================================================
-        //   Clears the edit lock for this record
-        //========================================================================
-        //
-        public void ClearEditLock(string ContentName, int RecordID) {
-            clearEditLock(GenericController.encodeText(ContentName), GenericController.encodeInteger(RecordID), core.session.user.id);
-        }
-        //
-        //========================================================================
-        //   Aborts any edits for this record
-        //========================================================================
-        //
-        //Public Sub publishEdit(ByVal ContentName As String, ByVal RecordID As Integer)
-        //    Call publishEdit(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), core.doc.authContext.user.id)
-        //End Sub
-        //
-        //========================================================================
-        //   Approves any edits for this record
-        //========================================================================
-        //
-        //Public Sub approveEdit(ByVal ContentName As String, ByVal RecordID As Integer)
-        //    Call approveEdit(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), core.doc.authContext.user.id)
-        //End Sub
-        //
-        //========================================================================
-        //   Submits any edits for this record
-        //========================================================================
-        //
-        //Public Sub main_SubmitEdit(ByVal ContentName As String, ByVal RecordID As Integer)
-        //    Call submitEdit2(genericController.encodeText(ContentName), genericController.EncodeInteger(RecordID), core.doc.authContext.user.id)
-        //End Sub
-        //
-        //=========================================================================================
-        //   Determine if this Content Definition is run on a table that supports
-        //   Workflow authoring. Only the ContentTable is checked, it is assumed that the
-        //   AuthoringTable is a copy of the ContentTable
-        //=========================================================================================
-        //
-        //Public Function isWorkflowAuthoringCompatible(ByVal ContentName As String) As Boolean
-        //    isWorkflowAuthoringCompatible = genericController.EncodeBoolean(core.metaData.GetContentProperty(genericController.encodeText(ContentName), "ALLOWWORKFLOWAUTHORING"))
-        //End Function
-        //
-        //==========================================================================================
-        //==========================================================================================
-        //
+        /// <summary>
+        /// Sets the edit lock for this record
+        /// </summary>
+        /// <param name="ContentName"></param>
+        /// <param name="RecordID"></param>
+        public static void setEditLock(CoreController core, int tableId, int recordId) => setEditLock(core, tableId, recordId, core.session.user.id);
         //
         //=================================================================================
-        //
-        //=================================================================================
-        //
-        //Public Sub publishEdit(ByVal ContentName As String, ByVal RecordID As Integer, ByVal MemberID As Integer)
-        //    Try
-        //        '
-        //        Dim RSLive As DataTable
-        //        Dim LiveRecordID As Integer
-        //        Dim LiveDataSourceName As String
-        //        Dim LiveTableName As String
-        //        Dim LiveSQLValue As String
-        //        Dim LiveRecordBlank As Boolean
-        //        '
-        //        Dim BlankSQLValue As String
-        //        '
-        //        Dim RSEdit As DataTable
-        //        Dim EditDataSourceName As String
-        //        Dim EditTableName As String
-        //        Dim EditRecordID As Integer
-        //        Dim EditSQLValue As String
-        //        Dim EditFilename As String
-        //        Dim EditRecordCID As Integer
-        //        Dim EditRecordBlank As Boolean
-        //        '
-        //        Dim NewEditRecordID As Integer
-        //        Dim NewEditFilename As String
-        //        '
-        //        Dim ContentID As Integer
-        //        '
-        //        Dim FieldNameArray() As String
-        //        Dim ArchiveSqlFieldList As New sqlFieldListClass
-        //        Dim NewEditSqlFieldList As New sqlFieldListClass
-        //        Dim PublishFieldNameArray() As String
-        //        Dim PublishSqlFieldList As New sqlFieldListClass
-        //        Dim BlankSqlFieldList As New sqlFieldListClass
-        //        '
-        //        Dim FieldPointer As Integer
-        //        Dim FieldCount As Integer
-        //        Dim FieldName As String
-        //        Dim fieldTypeId As Integer
-        //        Dim SQL As String
-        //        Dim MethodName As String
-        //        Dim FieldArraySize As Integer
-        //        Dim PublishingDelete As Boolean
-        //        Dim PublishingInactive As Boolean
-        //        Dim CDef As Models.Complex.cdefModel
-        //        Dim FieldList As String
-        //        '
-        //        MethodName = "csv_PublishEdit"
-        //        '
-        //        CDef = Models.Complex.cdefModel.getcdef(core,ContentName)
-        //        If CDef.Id > 0 Then
-        //            If false And core.siteProperties.allowWorkflowAuthoring Then
-        //                With CDef
-        //                    FieldList = .SelectCommaList
-        //                    LiveDataSourceName = .ContentDataSourceName
-        //                    LiveTableName = .ContentTableName
-        //                    EditDataSourceName = .AuthoringDataSourceName
-        //                    EditTableName = .AuthoringTableName
-        //                    FieldCount = .fields.Count
-        //                    ContentID = .Id
-        //                    ContentName = .Name
-        //                End With
-        //                FieldArraySize = FieldCount + 6
-        //                ReDim FieldNameArray(FieldArraySize)
-        //                'ReDim ArchiveSqlFieldList(FieldArraySize)
-        //                'ReDim NewEditSqlFieldList(FieldArraySize)
-        //                'ReDim BlankSqlFieldList(FieldArraySize)
-        //                'ReDim PublishSqlFieldList(FieldArraySize)
-        //                ReDim PublishFieldNameArray(FieldArraySize)
-        //                LiveRecordID = RecordID
-        //                '
-        //                ' ----- Open the live record
-        //                '
-        //                RSLive = core.db.executeSql("SELECT " & FieldList & " FROM " & LiveTableName & " WHERE ID=" & core.db.encodeSQLNumber(LiveRecordID) & ";", LiveDataSourceName)
-        //                'RSLive = appservices.core.db.executeSql(LiveDataSourceName, "SELECT " & FieldList & " FROM " & LiveTableName & " WHERE ID=" & encodeSQLNumber(LiveRecordID) & ";")
-        //                If RSLive.Rows.Count <= 0 Then
-        //                    '
-        //                    Throw (new GenericException("During record publishing, there was an error opening the live record, [ID=" & LiveRecordID & "] in table [" & LiveTableName & "] on datasource [" & LiveDataSourceName & " ]"))
-        //                Else
-        //                    If True Then
-        //                        LiveRecordID = genericController.EncodeInteger(core.db.getDataRowColumnName(RSLive.Rows[0], "ID"))
-        //                        LiveRecordBlank = genericController.EncodeBoolean(core.db.getDataRowColumnName(RSLive.Rows[0], "EditBlank"))
-        //                        '
-        //                        ' ----- Open the edit record
-        //                        '
-        //                        RSEdit = core.db.executeSql("SELECT " & FieldList & " FROM " & EditTableName & " WHERE (EditSourceID=" & core.db.encodeSQLNumber(LiveRecordID) & ")and(EditArchive=0) Order By ID DESC;", EditDataSourceName)
-        //                        'RSEdit = appservices.core.db.executeSql(EditDataSourceName, "SELECT " & FieldList & " FROM " & EditTableName & " WHERE (EditSourceID=" & encodeSQLNumber(LiveRecordID) & ")and(EditArchive=0) Order By ID DESC;")
-        //                        If RSEdit.Rows.Count <= 0 Then
-        //                            '
-        //                            Throw (new GenericException("During record publishing, there was an error opening the edit record [EditSourceID=" & LiveRecordID & "] in table [" & EditTableName & "] on datasource [" & EditDataSourceName & " ]"))
-        //                        Else
-        //                            If True Then
-        //                                EditRecordID = genericController.EncodeInteger(core.db.getDataRowColumnName(RSEdit.Rows[0], "ID"))
-        //                                EditRecordCID = genericController.EncodeInteger(core.db.getDataRowColumnName(RSEdit.Rows[0], "ContentControlID"))
-        //                                EditRecordBlank = genericController.EncodeBoolean(core.db.getDataRowColumnName(RSEdit.Rows[0], "EditBlank"))
-        //                                PublishingDelete = EditRecordBlank
-        //                                PublishingInactive = Not genericController.EncodeBoolean(core.db.getDataRowColumnName(RSEdit.Rows[0], "active"))
-        //                                '
-        //                                ' ----- Create new Edit record
-        //                                '
-        //                                If Not PublishingDelete Then
-        //                                    NewEditRecordID = core.db.insertTableRecordGetId(EditDataSourceName, EditTableName, SystemMemberID)
-        //                                    If NewEditRecordID < 1 Then
-        //                                        '
-        //                                        Throw (new GenericException("During record publishing, a new edit record could not be create, table [" & EditTableName & "] on datasource [" & EditDataSourceName & " ]"))
-        //                                    End If
-        //                                End If
-        //                                If True Then
-        //                                    '
-        //                                    ' ----- create update arrays
-        //                                    '
-        //                                    FieldPointer = 0
-        //                                    For Each keyValuePair As KeyValuePair(Of String, Models.Complex.CDefFieldModel) In CDef.fields
-        //                                        Dim field As Models.Complex.CDefFieldModel = keyValuePair.Value
-        //                                        With field
-        //                                            FieldName = .nameLc
-        //                                            fieldTypeId = .fieldTypeId
-        //                                            Select Case fieldTypeId
-        //                                                Case FieldTypeIdManyToMany, FieldTypeIdRedirect
-        //                                                    '
-        //                                                    ' These content fields have no Db Field
-        //                                                    '
-        //                                                Case Else
-        //                                                    '
-        //                                                    ' Process These field types
-        //                                                    '
-        //                                                    Select Case genericController.vbUCase(FieldName)
-        //                                                        Case "ID", "CONTENTCONTROLID"  
-        //                                                        '
-        //                                                        ' ----- control fields that should not be in any dataset
-        //                                                        '
-        //                                                        Case "MODIFIEDDATE", "MODIFIEDBY"
-        //                                                            '
-        //                                                            ' ----- non-content fields that need to be in all datasets
-        //                                                            '       add manually later, in case they are not in ContentDefinition
-        //                                                            '
-        //                                                        Case Else
-        //                                                            '
-        //                                                            ' ----- Content related field
-        //                                                            '
-        //                                                            LiveSQLValue = core.db.EncodeSQL(core.db.getDataRowColumnName(RSLive.Rows[0], FieldName), fieldTypeId)
-        //                                                            EditSQLValue = core.db.EncodeSQL(core.db.getDataRowColumnName(RSEdit.Rows[0], FieldName), fieldTypeId)
-        //                                                            BlankSQLValue = core.db.EncodeSQL(Nothing, fieldTypeId)
-        //                                                            FieldNameArray(FieldPointer) = FieldName
-        //                                                            '
-        //                                                            ' ----- New Edit Record value
-        //                                                            '
-        //                                                            If Not PublishingDelete Then
-        //                                                                Select Case fieldTypeId
-        //                                                                    Case FieldTypeIdFileCSS, FieldTypeIdFileXML, FieldTypeIdFileJavascript
-        //                                                                        '
-        //                                                                        ' ----- cdn files - create copy of File for neweditrecord
-        //                                                                        '
-        //                                                                        EditFilename = genericController.encodeText(core.db.getDataRowColumnName(RSEdit.Rows[0], FieldName))
-        //                                                                        If EditFilename = "" Then
-        //                                                                            NewEditSqlFieldList.add(FieldName, core.db.encodeSQLText(""))
-        //                                                                        Else
-        //                                                                            NewEditFilename = fileController.getVirtualRecordPathFilename(EditTableName, FieldName, NewEditRecordID, fieldTypeId)
-        //                                                                            'NewEditFilename = csv_GetVirtualFilename(ContentName, FieldName, NewEditRecordID)
-        //                                                                            Call core.cdnFiles.copyFile(EditFilename, NewEditFilename)
-        //                                                                            NewEditSqlFieldList.add(FieldName, core.db.encodeSQLText(NewEditFilename))
-        //                                                                        End If
-        //                                                                    Case FieldTypeIdFileText, FieldTypeIdFileHTML
-        //                                                                        '
-        //                                                                        ' ----- private files - create copy of File for neweditrecord
-        //                                                                        '
-        //                                                                        EditFilename = genericController.encodeText(core.db.getDataRowColumnName(RSEdit.Rows[0], FieldName))
-        //                                                                        If EditFilename = "" Then
-        //                                                                            NewEditSqlFieldList.add(FieldName, core.db.encodeSQLText(""))
-        //                                                                        Else
-        //                                                                            NewEditFilename = fileController.getVirtualRecordPathFilename(EditTableName, FieldName, NewEditRecordID, fieldTypeId)
-        //                                                                            'NewEditFilename = csv_GetVirtualFilename(ContentName, FieldName, NewEditRecordID)
-        //                                                                            Call core.cdnFiles.copyFile(EditFilename, NewEditFilename)
-        //                                                                            NewEditSqlFieldList.add(FieldName, core.db.encodeSQLText(NewEditFilename))
-        //                                                                        End If
-        //                                                                    Case Else
-        //                                                                        '
-        //                                                                        ' ----- put edit value in new edit record
-        //                                                                        '
-        //                                                                        NewEditSqlFieldList.add(FieldName, EditSQLValue)
-        //                                                                End Select
-        //                                                            End If
-        //                                                            '
-        //                                                            ' ----- set archive value
-        //                                                            '
-        //                                                            ArchiveSqlFieldList.add(FieldName, LiveSQLValue)
-        //                                                            '
-        //                                                            ' ----- set live record value (and name)
-        //                                                            '
-        //                                                            If PublishingDelete Then
-        //                                                                '
-        //                                                                ' ----- Record delete - fill the live record with null
-        //                                                                '
-        //                                                                PublishFieldNameArray(FieldPointer) = FieldName
-        //                                                                PublishSqlFieldList.add(FieldName, BlankSQLValue)
-        //                                                            Else
-        //                                                                PublishFieldNameArray(FieldPointer) = FieldName
-        //                                                                PublishSqlFieldList.add(FieldName, EditSQLValue)
-        //                                                            End If
-        //                                                    End Select
-        //                                            End Select
-        //                                        End With
-        //                                        FieldPointer += 1
-        //                                    Next
-        //                                    '
-        //                                    ' ----- create non-content control field entries
-        //                                    '
-        //                                    FieldName = "MODIFIEDDATE"
-        //                                    fieldTypeId = FieldTypeIdDate
-        //                                    FieldNameArray(FieldPointer) = FieldName
-        //                                    LiveSQLValue = core.db.EncodeSQL(core.db.getDataRowColumnName(RSLive.Rows[0], FieldName), fieldTypeId)
-        //                                    EditSQLValue = core.db.EncodeSQL(core.db.getDataRowColumnName(RSEdit.Rows[0], FieldName), fieldTypeId)
-        //                                    ArchiveSqlFieldList.add(FieldName, LiveSQLValue)
-        //                                    NewEditSqlFieldList.add(FieldName, EditSQLValue)
-        //                                    PublishFieldNameArray(FieldPointer) = FieldName
-        //                                    PublishSqlFieldList.add(FieldName, EditSQLValue)
-        //                                    FieldPointer = FieldPointer + 1
-        //                                    '
-        //                                    FieldName = "MODIFIEDBY"
-        //                                    fieldTypeId = FieldTypeIdLookup
-        //                                    FieldNameArray(FieldPointer) = FieldName
-        //                                    LiveSQLValue = core.db.EncodeSQL(core.db.getDataRowColumnName(RSLive.Rows[0], FieldName), fieldTypeId)
-        //                                    EditSQLValue = core.db.EncodeSQL(core.db.getDataRowColumnName(RSEdit.Rows[0], FieldName), fieldTypeId)
-        //                                    ArchiveSqlFieldList.add(FieldName, LiveSQLValue)
-        //                                    NewEditSqlFieldList.add(FieldName, EditSQLValue)
-        //                                    PublishFieldNameArray(FieldPointer) = FieldName
-        //                                    PublishSqlFieldList.add(FieldName, EditSQLValue)
-        //                                    FieldPointer = FieldPointer + 1
-        //                                    '
-        //                                    FieldName = "CONTENTCONTROLID"
-        //                                    fieldTypeId = FieldTypeIdLookup
-        //                                    FieldNameArray(FieldPointer) = FieldName
-        //                                    LiveSQLValue = core.db.EncodeSQL(core.db.getDataRowColumnName(RSLive.Rows[0], FieldName), fieldTypeId)
-        //                                    EditSQLValue = core.db.EncodeSQL(core.db.getDataRowColumnName(RSEdit.Rows[0], FieldName), fieldTypeId)
-        //                                    ArchiveSqlFieldList.add(FieldName, LiveSQLValue)
-        //                                    NewEditSqlFieldList.add(FieldName, EditSQLValue)
-        //                                    PublishFieldNameArray(FieldPointer) = FieldName
-        //                                    If PublishingDelete Then
-        //                                        PublishSqlFieldList.add(FieldName, core.db.encodeSQLNumber(0))
-        //                                    Else
-        //                                        PublishSqlFieldList.add(FieldName, EditSQLValue)
-        //                                    End If
-        //                                    FieldPointer = FieldPointer + 1
-        //                                    '
-        //                                    FieldName = "EDITBLANK"
-        //                                    fieldTypeId = FieldTypeIdBoolean
-        //                                    FieldNameArray(FieldPointer) = FieldName
-        //                                    LiveSQLValue = core.db.EncodeSQL(core.db.getDataRowColumnName(RSLive.Rows[0], FieldName), fieldTypeId)
-        //                                    EditSQLValue = core.db.EncodeSQL(core.db.getDataRowColumnName(RSEdit.Rows[0], FieldName), fieldTypeId)
-        //                                    ArchiveSqlFieldList.add(FieldName, LiveSQLValue)
-        //                                    NewEditSqlFieldList.add(FieldName, EditSQLValue)
-        //                                    PublishFieldNameArray(FieldPointer) = FieldName
-        //                                    If PublishingDelete Then
-        //                                        PublishSqlFieldList.add(FieldName, SQLFalse)
-        //                                    Else
-        //                                        PublishSqlFieldList.add(FieldName, EditSQLValue)
-        //                                    End If
-
-        //                                    '
-        //                                    ' ----- copy edit record to live record
-        //                                    '
-        //                                    Call core.db.updateTableRecord(LiveDataSourceName, LiveTableName, "ID=" & LiveRecordID, PublishSqlFieldList)
-        //                                    '
-        //                                    ' ----- copy live record to archive record and the edit to the new edit
-        //                                    '
-        //                                    Call core.db.updateTableRecord(EditDataSourceName, EditTableName, "ID=" & EditRecordID, ArchiveSqlFieldList)
-        //                                    If Not PublishingDelete Then
-        //                                        Call core.db.updateTableRecord(EditDataSourceName, EditTableName, "ID=" & NewEditRecordID, NewEditSqlFieldList)
-        //                                    End If
-        //                                    '
-        //                                    ' ----- Content Watch effects
-        //                                    '
-        //                                    If PublishingDelete Then
-        //                                        '
-        //                                        ' Record was deleted, delete contentwatch records also
-        //                                        '
-        //                                        Call core.db.deleteContentRules(ContentID, RecordID)
-        //                                    End If
-        //                                    '
-        //                                    ' ----- mark the SpiderDocs record not up-to-date
-        //                                    '
-        //                                    If (LCase(EditTableName) = "ccpagecontent") And (LiveRecordID <> 0) Then
-        //                                        If core.db.isSQLTableField("default", "ccSpiderDocs", "PageID") Then
-        //                                            SQL = "UPDATE ccspiderdocs SET UpToDate = 0 WHERE PageID=" & LiveRecordID
-        //                                            Call core.db.executeSql(SQL)
-        //                                        End If
-        //                                    End If
-        //                                    '
-        //                                    ' ----- Clear Time Stamp because a record changed
-        //                                    '
-        //                                    If csv_AllowAutocsv_ClearContentTimeStamp Then
-        //                                        Call core.cache.invalidateObject(ContentName)
-        //                                    End If
-        //                                End If
-        //                            End If
-        //                            'RSEdit.Close()
-        //                        End If
-        //                        'RSEdit = Nothing
-        //                    End If
-        //                    'RSLive.Close()
-        //                End If
-        //                RSLive.Dispose()
-        //                '
-        //                ' ----- Clear all Authoring Controls
-        //                '
-        //                Call clearAuthoringControl(ContentName, LiveRecordID, AuthoringControlsEditing, MemberID)
-        //                Call clearAuthoringControl(ContentName, LiveRecordID, AuthoringControlsModified, MemberID)
-        //                Call clearAuthoringControl(ContentName, LiveRecordID, AuthoringControlsApproved, MemberID)
-        //                Call clearAuthoringControl(ContentName, LiveRecordID, AuthoringControlsSubmitted, MemberID)
-        //                '
-        //                '
-        //                '
-        //                If PublishingDelete Or PublishingInactive Then
-        //                    Call core.db.deleteContentRules(ContentID, LiveRecordID)
-        //                End If
-        //            End If
-        //        End If
-        //    Catch ex As Exception
-        //        logController.handleException( core,ex); : Throw
-        //    End Try
-        //End Sub
-        //
-        //=================================================================================
-        //
-        //=================================================================================
-        //
-        //Public Sub abortEdit2(ByVal ContentName As String, ByVal RecordID As Integer, ByVal MemberID As Integer)
-        //    Try
-        //        '
-        //        Dim RSLive As DataTable
-        //        Dim LiveRecordID As Integer
-        //        Dim LiveDataSourceName As String
-        //        Dim LiveTableName As String
-        //        Dim LiveSQLValue As String
-        //        Dim LiveFilename As String
-        //        '
-        //        Dim RSEdit As DataTable
-        //        Dim EditDataSourceName As String
-        //        Dim EditTableName As String
-        //        Dim EditRecordID As Integer
-        //        Dim EditFilename As String
-        //        Dim ContentID As Integer
-        //        Dim FieldPointer As Integer
-        //        Dim FieldCount As Integer
-        //        Dim FieldName As String
-        //        Dim fieldTypeId As Integer
-        //        Dim CDef As Models.Complex.cdefModel
-        //        Dim sqlFieldList As New sqlFieldListClass
-        //        '
-        //        CDef = Models.Complex.cdefModel.getcdef(core,ContentName)
-        //        If CDef.Id > 0 Then
-        //            If false And core.siteProperties.allowWorkflowAuthoring Then
-        //                With CDef
-        //                    LiveDataSourceName = .ContentDataSourceName
-        //                    LiveTableName = .ContentTableName
-        //                    EditDataSourceName = .AuthoringDataSourceName
-        //                    EditTableName = .AuthoringTableName
-        //                    FieldCount = .fields.Count
-        //                    ContentID = .Id
-        //                    ContentName = .Name
-        //                End With
-        //                'ReDim sqlFieldList(FieldCount + 2)
-        //                'ReDim PublishFieldNameArray(FieldCount + 2)
-        //                LiveRecordID = RecordID
-        //                ' LiveRecordID = appservices.csv_cs_getField(CSPointer, "ID")
-        //                '
-        //                ' Open the live record
-        //                '
-        //                RSLive = core.db.executeSql("SELECT * FROM " & LiveTableName & " WHERE ID=" & core.db.encodeSQLNumber(LiveRecordID) & ";", LiveDataSourceName)
-        //                If (RSLive Is Nothing) Then
-        //                    '
-        //                    Throw (new GenericException("During record publishing, there was an error opening the live record, [ID=" & LiveRecordID & "] in table [" & LiveTableName & "] on datasource [" & LiveDataSourceName & " ]"))
-        //                Else
-        //                    If RSLive.Rows.Count <= 0 Then
-        //                        '
-        //                        Throw (new GenericException("During record publishing, the live record could not be found, [ID=" & LiveRecordID & "] in table [" & LiveTableName & "] on datasource [" & LiveDataSourceName & " ]"))
-        //                    Else
-        //                        LiveRecordID = genericController.EncodeInteger(core.db.getDataRowColumnName(RSLive.Rows[0], "ID"))
-        //                        '
-        //                        ' Open the edit record
-        //                        '
-        //                        RSEdit = core.db.executeSql("SELECT * FROM " & EditTableName & " WHERE (EditSourceID=" & core.db.encodeSQLNumber(LiveRecordID) & ")and(EditArchive=0) Order By ID DESC;", EditDataSourceName)
-        //                        If (RSEdit Is Nothing) Then
-        //                            '
-        //                            Throw (new GenericException("During record publishing, there was an error opening the edit record [EditSourceID=" & LiveRecordID & "] in table [" & EditTableName & "] on datasource [" & EditDataSourceName & " ]"))
-        //                        Else
-        //                            If RSEdit.Rows.Count <= 0 Then
-        //                                '
-        //                                Throw (new GenericException("During record publishing, the edit record could not be found, [EditSourceID=" & LiveRecordID & "] in table [" & EditTableName & "] on datasource [" & EditDataSourceName & " ]"))
-        //                            Else
-        //                                EditRecordID = genericController.EncodeInteger(core.db.getDataRowColumnName(RSEdit.Rows[0], "ID"))
-        //                                '
-        //                                ' create update arrays
-        //                                '
-        //                                FieldPointer = 0
-        //                                For Each keyValuePair As KeyValuePair(Of String, Models.Complex.CDefFieldModel) In CDef.fields
-        //                                    Dim field As Models.Complex.CDefFieldModel = keyValuePair.Value
-        //                                    With field
-        //                                        FieldName = .nameLc
-        //                                        If core.db.isSQLTableField(EditDataSourceName, EditTableName, FieldName) Then
-        //                                            fieldTypeId = .fieldTypeId
-        //                                            LiveSQLValue = core.db.EncodeSQL(core.db.getDataRowColumnName(RSLive.Rows[0], FieldName), fieldTypeId)
-        //                                            Select Case genericController.vbUCase(FieldName)
-        //                                                Case "ID"
-        //                                                    '
-        //                                                    '   block from dataset
-        //                                                    '
-        //                                                Case Else
-        //                                                    '
-        //                                                    ' allow only authorable fields
-        //                                                    '
-        //                                                    If (fieldTypeId = FieldTypeIdFileCSS) Or (fieldTypeId = FieldTypeIdFileJavascript) Or (fieldTypeId = FieldTypeIdFileXML) Then
-        //                                                        '
-        //                                                        '   cdnfiles - create copy of Live TextFile for Edit record
-        //                                                        '
-        //                                                        LiveFilename = genericController.encodeText(core.db.getDataRowColumnName(RSLive.Rows[0], FieldName))
-        //                                                        If LiveFilename <> "" Then
-        //                                                            EditFilename = fileController.getVirtualRecordPathFilename(EditTableName, FieldName, EditRecordID, fieldTypeId)
-        //                                                            Call core.cdnFiles.copyFile(LiveFilename, EditFilename)
-        //                                                            LiveSQLValue = core.db.encodeSQLText(EditFilename)
-        //                                                        End If
-        //                                                    End If
-        //                                                    If (fieldTypeId = FieldTypeIdFileText) Or (fieldTypeId = FieldTypeIdFileHTML) Then
-        //                                                        '
-        //                                                        '   pivatefiles - create copy of Live TextFile for Edit record
-        //                                                        '
-        //                                                        LiveFilename = genericController.encodeText(core.db.getDataRowColumnName(RSLive.Rows[0], FieldName))
-        //                                                        If LiveFilename <> "" Then
-        //                                                            EditFilename = fileController.getVirtualRecordPathFilename(EditTableName, FieldName, EditRecordID, fieldTypeId)
-        //                                                            Call core.cdnFiles.copyFile(LiveFilename, EditFilename)
-        //                                                            LiveSQLValue = core.db.encodeSQLText(EditFilename)
-        //                                                        End If
-        //                                                    End If
-        //                                                    '
-        //                                                    sqlFieldList.add(FieldName, LiveSQLValue)
-        //                                            End Select
-        //                                        End If
-        //                                    End With
-        //                                    FieldPointer += 1
-        //                                Next
-        //                            End If
-        //                            Call RSEdit.Dispose()
-        //                        End If
-        //                        RSEdit = Nothing
-        //                    End If
-        //                    RSLive.Dispose()
-        //                End If
-        //                RSLive = Nothing
-        //                '
-        //                ' ----- copy live record to editrecord
-        //                '
-        //                Call core.db.updateTableRecord(EditDataSourceName, EditTableName, "ID=" & EditRecordID, sqlFieldList)
-        //                '
-        //                ' ----- Clear all authoring controls
-        //                '
-        //                Call clearAuthoringControl(ContentName, RecordID, AuthoringControlsModified, MemberID)
-        //                Call clearAuthoringControl(ContentName, RecordID, AuthoringControlsSubmitted, MemberID)
-        //                Call clearAuthoringControl(ContentName, RecordID, AuthoringControlsApproved, MemberID)
-        //            End If
-        //        End If
-        //    Catch ex As Exception
-        //        logController.handleException( core,ex); : Throw
-        //    End Try
-        //End Sub
-        //
-        //=================================================================================
-        //
-        //=================================================================================
-        //
-        //Public Sub approveEdit(ByVal ContentName As String, ByVal RecordID As Integer, ByVal MemberID As Integer)
-        //    Try
-        //        '
-        //        Dim CDef As Models.Complex.cdefModel
-        //        '
-        //        CDef = Models.Complex.cdefModel.getcdef(core,ContentName)
-        //        If CDef.Id > 0 Then
-        //            If false And core.siteProperties.allowWorkflowAuthoring Then
-        //                Call setAuthoringControl(ContentName, RecordID, AuthoringControlsApproved, MemberID)
-        //            End If
-        //        End If
-        //    Catch ex As Exception
-        //        logController.handleException( core,ex); : Throw
-        //    End Try
-        //End Sub
-        //
-        //=================================================================================
-        //
-        //=================================================================================
-        //
-        //Public Sub submitEdit2(ByVal ContentName As String, ByVal RecordID As Integer, ByVal MemberID As Integer)
-        //    Try
-        //        '
-        //        Dim CDef As Models.Complex.cdefModel
-        //        '
-        //        CDef = Models.Complex.cdefModel.getcdef(core,ContentName)
-        //        If CDef.Id > 0 Then
-        //            If false And core.siteProperties.allowWorkflowAuthoring Then
-        //                Call setAuthoringControl(ContentName, RecordID, AuthoringControlsSubmitted, MemberID)
-        //            End If
-        //        End If
-        //    Catch ex As Exception
-        //        logController.handleException( core,ex); : Throw
-        //    End Try
-        //End Sub
-        //
-        //=====================================================================================================
-        //   returns true if another user has the record locked
-        //=====================================================================================================
-        //
-        public bool isRecordLocked(string ContentName, int RecordID, int MemberID) {
-            bool result = false;
-            try {
-                string Criteria = null;
-                int CS = 0;
-                //
-                Criteria = getAuthoringControlCriteria(ContentName, RecordID) + "and(CreatedBy<>" + core.db.encodeSQLNumber(MemberID) + ")";
-                CS = core.db.csOpen("Authoring Controls", Criteria,"", true, MemberID);
-                result = core.db.csOk(CS);
-                core.db.csClose(ref CS);
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-                throw;
-            }
-            return result;
+        /// <summary>
+        /// Set a record locked
+        /// </summary>
+        /// <param name="ContentName"></param>
+        /// <param name="RecordID"></param>
+        /// <param name="userId"></param>
+        public static void setEditLock(CoreController core, int tableId, int recordId, int userId) {
+            string contentRecordKey = getContentRecordKey(tableId, recordId);
+            var editLockList = Models.Db.AuthoringControlModel.createList(core, "(contentRecordKey=" + contentRecordKey + ")");
+            var editLock = (editLockList.Count > 0) ? editLockList.First() : Models.Db.AuthoringControlModel.addEmpty(core);
+            editLock.contentRecordKey = contentRecordKey;
+            editLock.ControlType = AuthoringControlsEditing;
+            editLock.createdBy = userId;
+            editLock.dateAdded = DateTime.Now;
+            editLock.save(core);
         }
         //
         //=====================================================================================================
-        //   returns true if another user has the record locked
-        //=====================================================================================================
-        //
-        private string getAuthoringControlCriteria(string ContentName, int RecordID) {
+        /// <summary>
+        /// Get the query to test the authoring control table if a record is locked
+        /// </summary>
+        /// <param name="cdef"></param>
+        /// <param name="recordId"></param>
+        /// <returns></returns>
+        private static string getAuthoringControlCriteria(CoreController core, Models.Domain.CDefModel cdef, int recordId) {
             string result = "";
             try {
-                int ContentCnt = 0;
-                int CS = 0;
-                string Criteria = "";
-                int TableID;
-                //
-                TableID = core.db.getContentTableID(ContentName);
                 //
                 // Authoring Control records are referenced by ContentID
+                var table = Models.Db.TableModel.createByUniqueName(core, cdef.tableName);
+                if (table == null) return "(1=0)";
                 //
-                ContentCnt = 0;
-                CS = core.db.csOpen("Content", "(contenttableid=" + TableID + ")");
-                while (core.db.csOk(CS)) {
-                    Criteria = Criteria + "," + core.db.csGetInteger(CS, "ID");
-                    ContentCnt = ContentCnt + 1;
-                    core.db.csGoNext(CS);
-                }
-                core.db.csClose(ref CS);
-                if (ContentCnt < 1) {
+                var contentList = Models.Db.ContentModel.createList(core, "(contenttableid=" + table.id + ")");
+                if (contentList.Count < 1) {
                     //
                     // No references to this table
-                    //
-                    //throw (new GenericException("TableID [" + TableID + "] could not be found in any ccContent.ContentTableID"));
                     result = "(1=0)";
-                } else if (ContentCnt == 1) {
+                } else if (contentList.Count == 1) {
                     //
                     // One content record
-                    //
-                    result = "(ContentID=" + core.db.encodeSQLNumber(encodeInteger(Criteria.Substring(1))) + ")And(RecordID=" + core.db.encodeSQLNumber(RecordID) + ")And((DateExpires>" + core.db.encodeSQLDate(DateTime.Now) + ")Or(DateExpires Is null))";
+                    result = "(ContentID=" + contentList.First().id + ")And(RecordID=" + recordId + ")And((DateExpires>" + DbController.encodeSQLDate(DateTime.Now) + ")Or(DateExpires Is null))";
                 } else {
                     //
                     // Multiple content records
                     //
-                    result = "(ContentID In (" + Criteria.Substring(1) + "))And(RecordID=" + core.db.encodeSQLNumber(RecordID) + ")And((DateExpires>" + core.db.encodeSQLDate(DateTime.Now) + ")Or(DateExpires Is null))";
+                    string contentIdList = "";
+                    foreach (var content in contentList) contentIdList += "," + content.id.ToString();
+                    result = "(contentid in (" + contentIdList.Substring(1) + "))and(recordid=" + recordId + ")and((dateexpires>" + DbController.encodeSQLDate(DateTime.Now) + ")or(dateexpires Is null))";
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -783,17 +168,28 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //=====================================================================================================
-        //   Clear the Approved Authoring Control
-        //=====================================================================================================
+        /// <summary>
+        /// Get the query to test the authoring control table if a record is locked
+        /// </summary>
+        /// <param name="contentName"></param>
+        /// <param name="recordId"></param>
+        /// <returns></returns>
+        private static string getAuthoringControlCriteria(CoreController core, string contentName, int recordId) => getAuthoringControlCriteria(core, Models.Domain.CDefModel.create(core, contentName), recordId);
         //
-        public void clearAuthoringControl(string ContentName, int RecordID, int AuthoringControl, int MemberID) {
+        //=====================================================================================================
+        /// <summary>
+        /// Clear the Approved Authoring Control
+        /// </summary>
+        /// <param name="ContentName"></param>
+        /// <param name="RecordID"></param>
+        /// <param name="AuthoringControl"></param>
+        /// <param name="MemberID"></param>
+        public static void clearAuthoringControl(CoreController core, string ContentName, int RecordID, int AuthoringControl, int MemberID) {
             try {
-                string Criteria;
-                //
-                Criteria = getAuthoringControlCriteria(ContentName, RecordID) + "And(ControlType=" + AuthoringControl + ")";
+                string Criteria = getAuthoringControlCriteria(core, ContentName, RecordID) + "And(ControlType=" + AuthoringControl + ")";
                 switch (AuthoringControl) {
                     case AuthoringControlsEditing:
-                        core.db.deleteContentRecords("Authoring Controls", Criteria + "And(CreatedBy=" + core.db.encodeSQLNumber(MemberID) + ")", MemberID);
+                        core.db.deleteContentRecords("Authoring Controls", Criteria + "And(CreatedBy=" + DbController.encodeSQLNumber(MemberID) + ")", MemberID);
                         break;
                     case AuthoringControlsSubmitted:
                     case AuthoringControlsApproved:
@@ -808,87 +204,28 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //=====================================================================================================
-        //   the Approved Authoring Control
-        //=====================================================================================================
-        //
-        public void setRecordLocking(string ContentName, int RecordID, int AuthoringControl, int MemberID) {
-            try {
-                int ContentID = 0;
-                string AuthoringCriteria = null;
-                int CSNewLock = 0;
-                int CSCurrentLock = 0;
-                string sqlCriteria = null;
-                double EditLockTimeoutDays = 0;
-                double EditLockTimeoutMinutes = 0;
-                Models.Domain.CDefModel CDef = null;
-                //
-                CDef = Models.Domain.CDefModel.create(core, ContentName);
-                ContentID = CDef.id;
-                if (ContentID != 0) {
-                    AuthoringCriteria = getAuthoringControlCriteria(ContentName, RecordID);
-                    switch (AuthoringControl) {
-                        case AuthoringControlsEditing:
-                            EditLockTimeoutMinutes = encodeNumber(core.siteProperties.getText("EditLockTimeout", "5"));
-                            if (EditLockTimeoutMinutes != 0) {
-                                sqlCriteria = AuthoringCriteria + "And(ControlType=" + AuthoringControlsEditing + ")";
-                                EditLockTimeoutDays = (EditLockTimeoutMinutes / 60 / 24);
-                                //
-                                // Delete expired locks
-                                core.db.deleteContentRecords("Authoring Controls", sqlCriteria + "And(DATEEXPIRES<" + core.db.encodeSQLDate(DateTime.Now) + ")");
-                                //
-                                // Select any lock left, only the newest counts
-                                CSCurrentLock = core.db.csOpen("Authoring Controls", sqlCriteria, "ID DESC", false, MemberID, false, false);
-                                if (!core.db.csOk(CSCurrentLock)) {
-                                    //
-                                    // No lock, create one
-                                    CSNewLock = core.db.csInsertRecord("Authoring Controls", MemberID);
-                                    if (core.db.csOk(CSNewLock)) {
-                                        core.db.csSet(CSNewLock, "RecordID", RecordID);
-                                        core.db.csSet(CSNewLock, "DateExpires", (DateTime.Now.AddDays(EditLockTimeoutDays)));
-                                        core.db.csSet(CSNewLock, "ControlType", AuthoringControlsEditing);
-                                        core.db.csSet(CSNewLock, "ContentRecordKey", GenericController.encodeText(ContentID + "." + RecordID));
-                                        core.db.csSet(CSNewLock, "ContentID", ContentID);
-                                    }
-                                    core.db.csClose(ref CSNewLock);
-                                } else {
-                                    if (core.db.csGetInteger(CSCurrentLock, "CreatedBy") == MemberID) {
-                                        //
-                                        // Record Locked by Member, update DateExpire
-                                        //
-                                        core.db.csSet(CSCurrentLock, "DateExpires", (DateTime.Now.AddDays(EditLockTimeoutDays)));
-                                    }
-                                }
-                                core.db.csClose(ref CSCurrentLock);
-                            }
-                            break;
-                    }
-                }
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-                throw;
-            }
-        }
-        //
-        //=====================================================================================================
-        //   the Approved Authoring Control
-        //=====================================================================================================
-        //
-        public AuthoringStatusClass getAuthoringStatus(string ContentName, int RecordID) {
-            AuthoringStatusClass result = new AuthoringStatusClass() {
-                submittedMemberName = "",
-                isModified = false,
-                modifiedMemberName = "",
-                modifiedDate = DateTime.MinValue,
-                isSubmitted = false,
-                submittedDate = DateTime.MinValue,
-                isApproved = false,
-                approvedMemberName = "",
-                approvedDate = DateTime.MinValue,
-                isEditing = false,
-                editingMemberName = "",
-                editingDate = DateTime.MinValue,
-                isDeleted = false,
-                isInserted = false
+        /// <summary>
+        /// the Approved Authoring Control
+        /// </summary>
+        /// <param name="ContentName"></param>
+        /// <param name="RecordID"></param>
+        /// <returns></returns>
+        public static recordWorkflowStatusClass getWorkflowStatus(CoreController core, string ContentName, int RecordID) {
+            recordWorkflowStatusClass result = new recordWorkflowStatusClass() {
+                isEditLocked = false,
+                editLockByMemberName = "",
+                editLockExpiresDate = DateTime.MinValue,
+                workflowSubmittedMemberName = "",
+                isWorkflowModified = false,
+                workflowModifiedByMemberName = "",
+                workflowModifiedDate = DateTime.MinValue,
+                isWorkflowSubmitted = false,
+                workflowSubmittedDate = DateTime.MinValue,
+                isWorkflowApproved = false,
+                workflowApprovedMemberName = "",
+                workflowApprovedDate = DateTime.MinValue,
+                isWorkflowDeleted = false,
+                isWorkflowInserted = false
             };
             try {
                 if (RecordID > 0) {
@@ -897,53 +234,53 @@ namespace Contensive.Processor.Controllers {
                     Models.Domain.CDefModel CDef = Models.Domain.CDefModel.create(core, ContentName);
                     if (CDef.id > 0) {
                         var nameDict = new Dictionary<int, string>();
-                        foreach (var recordLock in Models.Db.AuthoringControlModel.createList(core, getAuthoringControlCriteria(ContentName, RecordID))) {
+                        foreach (var recordLock in Models.Db.AuthoringControlModel.createList(core, getAuthoringControlCriteria(core, ContentName, RecordID))) {
                             switch(recordLock.ControlType) {
                                 case AuthoringControlsEditing:
-                                    if (!result.isEditing) {
-                                        result.isEditing = true;
-                                        result.editingDate = recordLock.dateAdded;
+                                    if (!result.isEditLocked) {
+                                        result.isEditLocked = true;
+                                        result.editLockExpiresDate = recordLock.dateAdded;
                                         if (nameDict.ContainsKey(recordLock.createdBy)) {
-                                            result.editingMemberName = nameDict[recordLock.createdBy];
+                                            result.editLockByMemberName = nameDict[recordLock.createdBy];
                                         } else {
-                                            result.editingMemberName = Models.Db.PersonModel.getRecordName(core, recordLock.createdBy);
-                                            nameDict.Add(recordLock.createdBy, result.modifiedMemberName);
+                                            result.editLockByMemberName = Models.Db.PersonModel.getRecordName(core, recordLock.createdBy);
+                                            nameDict.Add(recordLock.createdBy, result.workflowModifiedByMemberName);
                                         }
                                     }
                                     break;
                                 case AuthoringControlsModified:
-                                    if (!result.isModified) {
-                                        result.isModified = true;
-                                        result.submittedDate = recordLock.dateAdded;
+                                    if (!result.isWorkflowModified) {
+                                        result.isWorkflowModified = true;
+                                        result.workflowSubmittedDate = recordLock.dateAdded;
                                         if (nameDict.ContainsKey(recordLock.createdBy)) {
-                                            result.modifiedMemberName = nameDict[recordLock.createdBy];
+                                            result.workflowModifiedByMemberName = nameDict[recordLock.createdBy];
                                         } else {
-                                            result.modifiedMemberName = Models.Db.PersonModel.getRecordName(core, recordLock.createdBy);
-                                            nameDict.Add(recordLock.createdBy, result.modifiedMemberName);
+                                            result.workflowModifiedByMemberName = Models.Db.PersonModel.getRecordName(core, recordLock.createdBy);
+                                            nameDict.Add(recordLock.createdBy, result.workflowModifiedByMemberName);
                                         }
                                     }
                                     break;
                                 case AuthoringControlsSubmitted:
-                                    if (!result.isSubmitted) {
-                                        result.isSubmitted = true;
-                                        result.modifiedDate = recordLock.dateAdded;
+                                    if (!result.isWorkflowSubmitted) {
+                                        result.isWorkflowSubmitted = true;
+                                        result.workflowModifiedDate = recordLock.dateAdded;
                                         if (nameDict.ContainsKey(recordLock.createdBy)) {
-                                            result.submittedMemberName = nameDict[recordLock.createdBy];
+                                            result.workflowSubmittedMemberName = nameDict[recordLock.createdBy];
                                         } else {
-                                            result.submittedMemberName = Models.Db.PersonModel.getRecordName(core, recordLock.createdBy);
-                                            nameDict.Add(recordLock.createdBy, result.submittedMemberName);
+                                            result.workflowSubmittedMemberName = Models.Db.PersonModel.getRecordName(core, recordLock.createdBy);
+                                            nameDict.Add(recordLock.createdBy, result.workflowSubmittedMemberName);
                                         }
                                     }
                                     break;
                                 case AuthoringControlsApproved:
-                                    if (!result.isApproved) {
-                                        result.isApproved = true;
-                                        result.approvedDate = recordLock.dateAdded;
+                                    if (!result.isWorkflowApproved) {
+                                        result.isWorkflowApproved = true;
+                                        result.workflowApprovedDate = recordLock.dateAdded;
                                         if (nameDict.ContainsKey(recordLock.createdBy)) {
-                                            result.approvedMemberName = nameDict[recordLock.createdBy];
+                                            result.workflowApprovedMemberName = nameDict[recordLock.createdBy];
                                         } else {
-                                            result.approvedMemberName = Models.Db.PersonModel.getRecordName(core, recordLock.createdBy);
-                                            nameDict.Add(recordLock.createdBy, result.submittedMemberName);
+                                            result.workflowApprovedMemberName = Models.Db.PersonModel.getRecordName(core, recordLock.createdBy);
+                                            nameDict.Add(recordLock.createdBy, result.workflowSubmittedMemberName);
                                         }
                                     }
                                     break;
@@ -959,194 +296,126 @@ namespace Contensive.Processor.Controllers {
             }
             return result;
         }
+        ////
+        ////=================================================================================
+        ///// <summary>
+        ///// Set a record locked
+        ///// </summary>
+        ///// <param name="ContentName"></param>
+        ///// <param name="RecordID"></param>
+        ///// <param name="MemberID"></param>
+        //public void setEditLock(string ContentName, int RecordID, int MemberID) {
+        //    try {
+        //        setEditLock(ContentName, RecordID, MemberID, false);
+        //    } catch (Exception ex) {
+        //        LogController.handleError( core,ex);
+        //        throw;
+        //    }
+        //}
+        ////
+        ////=================================================================================
+        ///// <summary>
+        ///// Set a record locked
+        ///// </summary>
+        ///// <param name="ContentName"></param>
+        ///// <param name="RecordID"></param>
+        ///// <param name="MemberID"></param>
+        //public void clearEditLock(int tableId, int recordId, int userId) {
+        //    string criteria = "(contentRecordKey=" + getContentRecordKey(tableId, recordId) + ")and((DateExpires>" + DbController.encodeSQLDate(DateTime.Now) + ")or(DateExpires Is null))";
+        //    Models.Db.AuthoringControlModel.deleteSelection(core, criteria);
+        //}
         //
         //=================================================================================
-        //   Depricate this
-        //   Instead, use csv_IsRecordLocked2, which uses the Db
-        //=================================================================================
-        //
-        public void setEditLock(string ContentName, int RecordID, int MemberID) {
-            try {
-                setEditLock2(ContentName, RecordID, MemberID, false);
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-                throw;
-            }
+        /// <summary>
+        /// The workflow and edit locking status of the record.
+        /// </summary>
+        public class recordWorkflowStatusClass {
+            /// <summary>
+            /// The record is locked because it is being edited
+            /// </summary>
+            public bool isEditLocked { get; set; }
+            /// <summary>
+            /// The record is being editing by this user
+            /// </summary>
+            public string editLockByMemberName { get; set; }
+            /// <summary>
+            /// The date and time when the record will be released from editing lock
+            /// </summary>
+            public DateTime editLockExpiresDate { get; set; }
+            /// <summary>
+            /// For deprected workflow editing. This user has submitted this record for publication
+            /// </summary>
+            public string workflowSubmittedMemberName { get; set; }
+            /// <summary>
+            /// For deprected workflow editing. This user has approved this record for publication
+            /// </summary>
+            public string workflowApprovedMemberName { get; set; }
+            /// <summary>
+            /// For deprected workflow editing. This user last saved changes to this record
+            /// </summary>
+            public string workflowModifiedByMemberName { get; set; }
+            /// <summary>
+            /// For deprected workflow editing. The record is locked because it has been submitted for publication
+            /// </summary>
+            public bool isWorkflowSubmitted { get; set; }
+            /// <summary>
+            /// For deprected workflow editing. The record is locked because it has been approved for publication
+            /// </summary>
+            public bool isWorkflowApproved { get; set; }
+            /// <summary>
+            /// For deprected workflow editing. The record has been modified
+            /// </summary>
+            public bool isWorkflowModified { get; set; }
+            /// <summary>
+            /// For deprected workflow editing. The date and time when the record was modified
+            /// </summary>
+            public DateTime workflowModifiedDate { get; set; }
+            /// <summary>
+            /// For deprected workflow editing. The date and time when the record was submitted for publishing
+            /// </summary>
+            public DateTime workflowSubmittedDate { get; set; }
+            /// <summary>
+            /// For deprected workflow editing. The date and time when the record was approved for publishing
+            /// </summary>
+            public DateTime workflowApprovedDate { get; set; }
+            /// <summary>
+            /// For deprected workflow editing.  The record has been inserted but not published
+            /// </summary>
+            public bool isWorkflowInserted { get; set; }
+            /// <summary>
+            /// For deprected workflow editing. The record has been deleted but not published
+            /// </summary>
+            public bool isWorkflowDeleted { get; set; }
         }
+
         //
         //=================================================================================
-        //   Depricate this
-        //   Instead, use csv_IsRecordLocked, which uses the Db
-        //=================================================================================
-        //
-        public void clearEditLock(string ContentName, int RecordID, int MemberID) {
-            try {
-                setEditLock2(ContentName, RecordID, MemberID, true);
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-                throw;
-            }
-        }
-        //
-        //=================================================================================
-        //   Depricate this
-        //   Instead, use csv_IsRecordLocked, which uses the Db
-        //=================================================================================
-        //
-        public bool getEditLock(string ContentName, int RecordID, ref int ReturnMemberID, ref DateTime ReturnDateExpires) {
-            return getEditLock2(ContentName, RecordID, ref ReturnMemberID, ref ReturnDateExpires);
-        }
-        //
-        //=================================================================================
-        //
-        //=================================================================================
-        //
-        public void setEditLock2(string ContentName, int RecordID, int MemberID, bool ClearLock = false) {
-            try {
-                int SourcePointer = 0;
-                double EditLockTimeoutMinutes = 0;
-                bool LockFound = false;
-                DateTime EditLockDateExpires = default(DateTime);
-                string SourceKey = null;
-                DateTime SourceDateExpires = default(DateTime);
-                int DestinationPointer = 0;
-                string StringBuffer = null;
-                string EditLockKey2 = null;
-                //
-                if ((!string.IsNullOrEmpty(ContentName)) && (RecordID != 0)) {
-                    EditLockKey2 = GenericController.vbUCase(ContentName + "," + RecordID.ToString());
-                    StringBuffer = core.siteProperties.getText("EditLockTimeout", "5");
-                    EditLockTimeoutMinutes = encodeNumber(StringBuffer);
-                    EditLockDateExpires = DateTime.Now.AddMinutes(EditLockTimeoutMinutes);
-                    if (EditLockCount > 0) {
-                        for (SourcePointer = 0; SourcePointer < EditLockCount; SourcePointer++) {
-                            SourceKey = EditLockArray[SourcePointer].Key;
-                            SourceDateExpires = EditLockArray[SourcePointer].DateExpires;
-                            if (SourceKey == EditLockKey2) {
-                                //
-                                // This edit lock was found
-                                //
-                                LockFound = true;
-                                if (EditLockArray[SourcePointer].MemberID != MemberID) {
-                                    //
-                                    // This member did not create the lock, he can not change it either
-                                    //
-                                    if (SourcePointer != DestinationPointer) {
-                                        EditLockArray[DestinationPointer].Key = SourceKey;
-                                        EditLockArray[DestinationPointer].MemberID = MemberID;
-                                        EditLockArray[DestinationPointer].DateExpires = SourceDateExpires;
-                                    }
-                                    DestinationPointer = DestinationPointer + 1;
-                                } else if (!ClearLock) {
-                                    //
-                                    // This lock created by this member, he can change it
-                                    //
-                                    EditLockArray[DestinationPointer].Key = SourceKey;
-                                    EditLockArray[DestinationPointer].MemberID = MemberID;
-                                    EditLockArray[DestinationPointer].DateExpires = EditLockDateExpires;
-                                    DestinationPointer = DestinationPointer + 1;
-                                }
-                            } else if (SourceDateExpires >= EditLockDateExpires) {
-                                //
-                                // Lock not expired, move it if needed
-                                //
-                                if (SourcePointer != DestinationPointer) {
-                                    EditLockArray[DestinationPointer].Key = SourceKey;
-                                    EditLockArray[DestinationPointer].MemberID = MemberID;
-                                    EditLockArray[DestinationPointer].DateExpires = SourceDateExpires;
-                                }
-                                DestinationPointer = DestinationPointer + 1;
-                            }
-                            ///DoEvents()
-                        }
-                    }
-                    if ((!LockFound) && (!ClearLock)) {
-                        //
-                        // Lock not found, add it
-                        //
-                        if (EditLockCount > 0) {
-                            if (DestinationPointer > EditLockArray.GetUpperBound(0)) {
-                                Array.Resize(ref EditLockArray, DestinationPointer + 11);
-                            }
-                        } else {
-                            Array.Resize(ref EditLockArray, 11);
-                        }
-                        EditLockArray[DestinationPointer].Key = EditLockKey2;
-                        EditLockArray[DestinationPointer].MemberID = MemberID;
-                        EditLockArray[DestinationPointer].DateExpires = EditLockDateExpires;
-                        DestinationPointer = DestinationPointer + 1;
-                    }
-                    EditLockCount = DestinationPointer;
-                }
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-                throw;
-            }
-        }
-        //
-        //=================================================================================
-        //   Returns true if this content/record is locked
-        //       if true, the ReturnMemberID is the member that locked it
-        //           and ReturnDteExpires is the date when it will be released
-        //=================================================================================
-        //
-        public bool getEditLock2(string ContentName, int RecordID, ref int ReturnMemberID, ref DateTime ReturnDateExpires) {
-            bool EditLock2 = false;
-            try {
-                int SourcePointer = 0;
-                string EditLockKey2 = null;
-                DateTime DateNow = default(DateTime);
-                //
-                if ((!string.IsNullOrEmpty(ContentName)) && (RecordID != 0) && (EditLockCount > 0)) {
-                    EditLockKey2 = GenericController.vbUCase(ContentName + "," + RecordID.ToString());
-                    DateNow = DateTime.Now;
-                    for (SourcePointer = 0; SourcePointer < EditLockCount; SourcePointer++) {
-                        if (EditLockArray[SourcePointer].Key == EditLockKey2) {
-                            ReturnMemberID = EditLockArray[SourcePointer].MemberID;
-                            ReturnDateExpires = EditLockArray[SourcePointer].DateExpires;
-                            if (ReturnDateExpires > DateTime.Now) {
-                                EditLock2 = true;
-                            }
-                            break;
-                        }
-                    }
-                }
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-                throw;
-            }
-            return EditLock2;
-        }
-        //
-        //=================================================================================
-        //
-        public class AuthoringStatusClass {
-            public string editingMemberName { get; set; }
-            public string submittedMemberName { get; set; }
-            public string approvedMemberName { get; set; }
-            public string modifiedMemberName { get; set; }
-            public bool isEditing { get; set; }
-            public bool isSubmitted { get; set; }
-            public bool isApproved { get; set; }
-            public bool isModified { get; set; }
-            public DateTime editingDate { get; set; }
-            public DateTime modifiedDate { get; set; }
-            public DateTime submittedDate { get; set; }
-            public DateTime approvedDate { get; set; }
-            public bool isInserted { get; set; }
-            public bool isDeleted { get; set; }
+        /// <summary>
+        /// The workflow and edit locking status of the record.
+        /// </summary>
+        public class editLockClass {
+            /// <summary>
+            /// The record is locked because it is being edited
+            /// </summary>
+            public bool isEditLocked { get; set; }
+            /// <summary>
+            /// The record is being editing by this user
+            /// </summary>
+            public int editLockByMemberId { get; set; }
+            /// <summary>
+            /// The record is being editing by this user
+            /// </summary>
+            public string editLockByMemberName { get; set; }
+            /// <summary>
+            /// The date and time when the record will be released from editing lock
+            /// </summary>
+            public DateTime editLockExpiresDate { get; set; }
         }
         //
         //==========================================================================================
         #region  IDisposable Support 
         protected bool disposed = false;
         //
-        //==========================================================================================
-        /// <summary>
-        /// dispose
-        /// </summary>
-        /// <param name="disposing"></param>
-        /// <remarks></remarks>
         protected virtual void Dispose(bool disposing) {
             if (!this.disposed) {
                 if (disposing) {

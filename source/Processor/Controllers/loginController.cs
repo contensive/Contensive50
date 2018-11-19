@@ -314,9 +314,9 @@ namespace Contensive.Processor.Controllers {
                         //
                         allowEmailLogin = core.siteProperties.getBoolean("allowEmailLogin", false);
                         recordCnt = 0;
-                        sqlCriteria = "(email=" + core.db.encodeSQLText(workingEmail) + ")";
+                        sqlCriteria = "(email=" + DbController.encodeSQLText(workingEmail) + ")";
                         if (true) {
-                            sqlCriteria = sqlCriteria + "and((dateExpires is null)or(dateExpires>" + core.db.encodeSQLDate(DateTime.Now) + "))";
+                            sqlCriteria = sqlCriteria + "and((dateExpires is null)or(dateExpires>" + DbController.encodeSQLDate(DateTime.Now) + "))";
                         }
                         CS = core.db.csOpen("People", sqlCriteria, "ID", sqlSelectFieldList: "username,password", PageSize: 1);
                         if (!core.db.csOk(CS)) {
@@ -328,7 +328,7 @@ namespace Contensive.Processor.Controllers {
                                 // look for expired account to renew
                                 //
                                 core.db.csClose(ref CS);
-                                CS = core.db.csOpen("People", "((email=" + core.db.encodeSQLText(workingEmail) + "))", "ID", PageSize: 1);
+                                CS = core.db.csOpen("People", "((email=" + DbController.encodeSQLText(workingEmail) + "))", "ID", PageSize: 1);
                                 if (core.db.csOk(CS)) {
                                     //
                                     // renew this old record
@@ -481,7 +481,7 @@ namespace Contensive.Processor.Controllers {
                         ErrorController.addUserError(core, ErrorMessage);
                     } else {
                         if (!(core.doc.debug_iUserError != "")) {
-                            CS = core.db.csOpen("people", "ID=" + core.db.encodeSQLNumber(core.session.user.id));
+                            CS = core.db.csOpen("people", "ID=" + DbController.encodeSQLNumber(core.session.user.id));
                             if (!core.db.csOk(CS)) {
                                 LogController.handleError( core,new Exception("Could not open the current members account to set the username and password."));
                             } else {

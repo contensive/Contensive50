@@ -17,11 +17,18 @@ namespace Contensive.Processor.Models.Db {
         //====================================================================================================
         // -- instance properties
         //
-        public int ContentID { get; set; }
-        public string ContentRecordKey { get; set; }
+        /// <summary>
+        /// tableId/recordId
+        /// </summary>
+        public string contentRecordKey { get; set; }
+        /// <summary>
+        /// type of authoring control
+        /// </summary>
         public int ControlType { get; set; }
+        /// <summary>
+        /// date time when this lock expires
+        /// </summary>
         public DateTime DateExpires { get; set; }
-        public int RecordID { get; set; }
         //
         //====================================================================================================
         //

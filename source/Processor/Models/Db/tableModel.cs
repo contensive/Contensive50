@@ -135,5 +135,11 @@ namespace Contensive.Processor.Models.Db {
         public static string getTableInvalidationKey(CoreController core) {
             return getTableCacheKey<TableModel>(core);
         }
+        //
+        public static TableModel createByContentName( CoreController core, string contentName ) {
+            var content = ContentModel.createByUniqueName(core, contentName);
+            if (content != null) return create(core, content.contentTableID);
+            return null;
+        }
     }
 }

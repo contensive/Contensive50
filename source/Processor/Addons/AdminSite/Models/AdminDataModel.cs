@@ -7,7 +7,7 @@ using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
-using static Contensive.Processor.AdminUIController;
+using static Contensive.Addons.AdminSite.Controllers.AdminUIController;
 using Contensive.Processor.Exceptions;
 //
 namespace Contensive.Addons.AdminSite {
@@ -239,7 +239,7 @@ namespace Contensive.Addons.AdminSite {
                     // ----- Open the content watch record for this content record
                     //
                     ContentID = ((editRecord.contentControlId.Equals(0)) ? adminContent.id : editRecord.contentControlId);
-                    CSPointer = core.db.csOpen("Content Watch", "(ContentID=" + core.db.encodeSQLNumber(ContentID) + ")AND(RecordID=" + core.db.encodeSQLNumber(editRecord.id) + ")");
+                    CSPointer = core.db.csOpen("Content Watch", "(ContentID=" + DbController.encodeSQLNumber(ContentID) + ")AND(RecordID=" + DbController.encodeSQLNumber(editRecord.id) + ")");
                     if (core.db.csOk(CSPointer)) {
                         ContentWatchLoaded = true;
                         ContentWatchRecordID = (core.db.csGetInteger(CSPointer, "ID"));
@@ -380,17 +380,17 @@ namespace Contensive.Addons.AdminSite {
         /// <param name="ContentID"></param>
         /// <returns></returns>
         public static  bool userHasContentAccess(CoreController core, int ContentID) {
-            bool result = false;
             try {
-                string ContentName = CdefController.getContentNameByID(core, ContentID);
-                if (!string.IsNullOrEmpty(ContentName)) {
-                    result = core.session.isAuthenticatedContentManager(core, ContentName);
+                if (core.session.isAuthenticatedAdmin(core)) return true;
+                //
+                CDefModel cdef = CDefModel.create(core, ContentID);
+                if ( cdef != null ) {
+                    return core.session.isAuthenticatedContentManager(core, cdef.name );
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
-                throw;
             }
-            return result;
+            return false;
         }
         //
         //========================================================================
@@ -717,26 +717,30 @@ namespace Contensive.Addons.AdminSite {
                     }
                     //
                     // ----- Set the local global copy of Edit Record Locks
-                    WorkflowController.AuthoringStatusClass authoringStatus = core.workflow.getAuthoringStatus(adminContent.name, editRecord.id);
+                    var table = TableModel.createByContentName(core, adminContent.name);
+                    WorkflowController.recordWorkflowStatusClass authoringStatus = WorkflowController.getWorkflowStatus(core, adminContent.name, editRecord.id);
+                    editRecord.EditLock = WorkflowController.getEditLock( core, table.id, editRecord.id );
+                    editRecord.SubmitLock = authoringStatus.isWorkflowSubmitted;
+                    editRecord.SubmittedName = authoringStatus.workflowSubmittedMemberName;
+                    editRecord.SubmittedDate = authoringStatus.workflowSubmittedDate;
+                    editRecord.ApproveLock = authoringStatus.isWorkflowApproved;
+                    editRecord.ApprovedName = authoringStatus.workflowApprovedMemberName;
+                    editRecord.ApprovedDate = authoringStatus.workflowApprovedDate;
+                    editRecord.IsInserted = authoringStatus.isWorkflowInserted;
+                    editRecord.IsDeleted = authoringStatus.isWorkflowDeleted;
+                    editRecord.IsModified = authoringStatus.isWorkflowModified;
+                    editRecord.LockModifiedName = authoringStatus.workflowModifiedByMemberName;
+                    editRecord.LockModifiedDate = authoringStatus.workflowModifiedDate;
                     //
                     // ----- Set flags used to determine the Authoring State
-                    PermissionController.AuthoringPermissions authoringPermissions = PermissionController.getAuthoringPermissions(core, adminContent.name, editRecord.id);
-                    //
-                    // ----- Set Edit Lock
-                    //
-                    if (editRecord.id != 0) {
-                        editRecord.EditLock = core.workflow.GetEditLockStatus(adminContent.name, editRecord.id);
-                        if (editRecord.EditLock) {
-                            editRecord.EditLockMemberName = core.workflow.GetEditLockMemberName(adminContent.name, editRecord.id);
-                            editRecord.EditLockExpires = core.workflow.GetEditLockDateExpires(adminContent.name, editRecord.id);
-                        }
-                    }
+                    PermissionController.UserContentPermissions userPermissions = PermissionController.getUserContentPermissions(core, adminContent);
+                    editRecord.AllowUserAdd = userPermissions.allowAdd;
+                    editRecord.AllowUserSave = userPermissions.allowSave;
+                    editRecord.AllowUserDelete = userPermissions.allowDelete;
                     //
                     // ----- Set Read Only: for edit lock
                     //
-                    if (editRecord.EditLock) {
-                        editRecord.Read_Only = true;
-                    }
+                    editRecord.userReadOnly |= editRecord.EditLock.isEditLocked;
                     //
                     // ----- Set Read Only: if non-developer tries to edit a developer record
                     //
@@ -744,7 +748,7 @@ namespace Contensive.Addons.AdminSite {
                         if (!core.session.isAuthenticatedDeveloper(core)) {
                             if (editRecord.fieldsLc.ContainsKey("developer")) {
                                 if (GenericController.encodeBoolean(editRecord.fieldsLc["developer"].value)) {
-                                    editRecord.Read_Only = true;
+                                    editRecord.userReadOnly = true;
                                     Processor.Controllers.ErrorController.addUserError(core, "You Do Not have access rights To edit this record.");
                                     BlockEditForm = true;
                                 }
@@ -754,8 +758,8 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // ----- Now make sure this record is locked from anyone else
                     //
-                    if (!(editRecord.Read_Only)) {
-                        core.workflow.SetEditLock(adminContent.name, editRecord.id);
+                    if (!(editRecord.userReadOnly)) {
+                        WorkflowController.setEditLock(core, table.id, editRecord.id);
                     }
                     editRecord.Loaded = true;
                 }
@@ -781,7 +785,7 @@ namespace Contensive.Addons.AdminSite {
                 editRecord.active = true;
                 editRecord.contentControlId = adminContent.id;
                 editRecord.contentControlId_Name = adminContent.name;
-                editRecord.EditLock = false;
+                editRecord.EditLock = new WorkflowController.editLockClass() {editLockByMemberId=0, editLockByMemberName="", editLockExpiresDate=DateTime.MinValue, isEditLocked=false };
                 editRecord.Loaded = false;
                 editRecord.Saved = false;
                 foreach (var keyValuePair in adminContent.fields) {
@@ -1591,7 +1595,7 @@ namespace Contensive.Addons.AdminSite {
                                     //
                                     // ----- Do the unique check for this field
                                     //
-                                    string SQLUnique = "select id from " + adminContent.tableName + " where (" + field.nameLc + "=" + core.db.encodeSQL(ResponseFieldValueText, field.fieldTypeId) + ")and(" + CdefController.getContentControlCriteria(core, adminContent.name) + ")";
+                                    string SQLUnique = "select id from " + adminContent.tableName + " where (" + field.nameLc + "=" + DbController.encodeSQL(ResponseFieldValueText, field.fieldTypeId) + ")and(" + CdefController.getContentControlCriteria(core, adminContent.name) + ")";
                                     if (editRecord.id > 0) {
                                         //
                                         // --editing record

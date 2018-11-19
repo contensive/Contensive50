@@ -13,6 +13,7 @@ using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
+using Contensive.Addons.AdminSite.Controllers;
 //
 namespace Contensive.Addons.Tools {
     //
@@ -92,7 +93,7 @@ namespace Contensive.Addons.Tools {
                         if (ContentID == 0) {
                             Stream.Add("GetContentID failed. Fields were not changed.");
                         } else {
-                            core.db.deleteContentRecords("Content Fields", "ContentID=" + core.db.encodeSQLNumber(ContentID));
+                            core.db.deleteContentRecords("Content Fields", "ContentID=" + DbController.encodeSQLNumber(ContentID));
                             //
                             // todo -- looks like the tool code did not come with the migration ?
                             //

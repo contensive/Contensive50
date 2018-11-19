@@ -16,6 +16,7 @@ using static Contensive.Processor.Constants;
 //
 using Contensive.BaseClasses;
 using Contensive.Processor.Exceptions;
+using Contensive.Addons.AdminSite.Controllers;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -1097,10 +1098,10 @@ namespace Contensive.Processor.Controllers {
                         string LinkForwardCriteria = ""
                             + "(active<>0)"
                             + "and("
-                            + "(SourceLink=" + core.db.encodeSQLText(core.webServer.requestPathPage) + ")"
-                            + "or(SourceLink=" + core.db.encodeSQLText(LinkNoProtocol) + ")"
-                            + "or(SourceLink=" + core.db.encodeSQLText(LinkFullPath) + ")"
-                            + "or(SourceLink=" + core.db.encodeSQLText(LinkFullPathNoSlash) + ")"
+                            + "(SourceLink=" + DbController.encodeSQLText(core.webServer.requestPathPage) + ")"
+                            + "or(SourceLink=" + DbController.encodeSQLText(LinkNoProtocol) + ")"
+                            + "or(SourceLink=" + DbController.encodeSQLText(LinkFullPath) + ")"
+                            + "or(SourceLink=" + DbController.encodeSQLText(LinkFullPathNoSlash) + ")"
                             + ")";
                         Sql = core.db.getSQLSelect("", "ccLinkForwards", "ID,DestinationLink,Viewings,GroupID", LinkForwardCriteria, "ID", "", 1);
                         int CSPointer = core.db.csOpenSql(Sql);
@@ -1144,7 +1145,7 @@ namespace Contensive.Processor.Controllers {
                             // Test for Link Alias
                             //
                             if (!string.IsNullOrEmpty(linkAliasTest1 + linkAliasTest2)) {
-                                string sqlLinkAliasCriteria = "(name=" + core.db.encodeSQLText(linkAliasTest1) + ")or(name=" + core.db.encodeSQLText(linkAliasTest2) + ")";
+                                string sqlLinkAliasCriteria = "(name=" + DbController.encodeSQLText(linkAliasTest1) + ")or(name=" + DbController.encodeSQLText(linkAliasTest2) + ")";
                                 List<Models.Db.LinkAliasModel> linkAliasList = LinkAliasModel.createList(core, sqlLinkAliasCriteria, "id desc");
                                 if (linkAliasList.Count > 0) {
                                     LinkAliasModel linkAlias = linkAliasList.First();
@@ -1347,7 +1348,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 FormValue = core.docProperties.getText(IDontKnowWhat.PeopleField);
                                 if ((!string.IsNullOrEmpty(FormValue)) & GenericController.encodeBoolean(CdefController.getContentFieldProperty(core, "people", IDontKnowWhat.PeopleField, "uniquename"))) {
-                                    string SQL = "select count(*) from ccMembers where " + IDontKnowWhat.PeopleField + "=" + core.db.encodeSQLText(FormValue);
+                                    string SQL = "select count(*) from ccMembers where " + IDontKnowWhat.PeopleField + "=" + DbController.encodeSQLText(FormValue);
                                     CS = core.db.csOpenSql(SQL);
                                     if (core.db.csOk(CS)) {
                                         Success = core.db.csGetInteger(CS, "cnt") == 0;
@@ -1557,7 +1558,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 Main_FormPagetype f;
                 bool IsRetry =  (core.docProperties.getInteger("ContensiveFormPageID") != 0);
-                int CS = core.db.csOpen("Form Pages", "name=" + core.db.encodeSQLText(FormPageName));
+                int CS = core.db.csOpen("Form Pages", "name=" + DbController.encodeSQLText(FormPageName));
                 string Formhtml = "";
                 string FormInstructions = "";
                 int FormPageID = 0;
@@ -1697,12 +1698,12 @@ namespace Contensive.Processor.Controllers {
                             + " FROM (ccPageContentBlockRules"
                             + " LEFT JOIN ccgroups ON ccPageContentBlockRules.GroupID = ccgroups.ID)"
                             + " LEFT JOIN ccMemberRules ON ccgroups.ID = ccMemberRules.GroupID"
-                            + " WHERE (((ccMemberRules.MemberID)=" + core.db.encodeSQLNumber(core.session.user.id) + ")"
+                            + " WHERE (((ccMemberRules.MemberID)=" + DbController.encodeSQLNumber(core.session.user.id) + ")"
                             + " AND ((ccPageContentBlockRules.RecordID) In (" + BlockedRecordIDList + "))"
                             + " AND ((ccPageContentBlockRules.Active)<>0)"
                             + " AND ((ccgroups.Active)<>0)"
                             + " AND ((ccMemberRules.Active)<>0)"
-                            + " AND ((ccMemberRules.DateExpires) Is Null Or (ccMemberRules.DateExpires)>" + core.db.encodeSQLDate(core.doc.profileStartTime) + "));";
+                            + " AND ((ccMemberRules.DateExpires) Is Null Or (ccMemberRules.DateExpires)>" + DbController.encodeSQLDate(core.doc.profileStartTime) + "));";
                         CS = core.db.csOpenSql(SQL);
                         BlockedRecordIDList = "," + BlockedRecordIDList;
                         while (core.db.csOk(CS)) {
@@ -1725,7 +1726,7 @@ namespace Contensive.Processor.Controllers {
                                 + " AND ((ccGroupRules.Active)<>0)"
                                 + " AND ((ManagementGroups.Active)<>0)"
                                 + " AND ((ManagementMemberRules.Active)<>0)"
-                                + " AND ((ManagementMemberRules.DateExpires) Is Null Or (ManagementMemberRules.DateExpires)>" + core.db.encodeSQLDate(core.doc.profileStartTime) + ")"
+                                + " AND ((ManagementMemberRules.DateExpires) Is Null Or (ManagementMemberRules.DateExpires)>" + DbController.encodeSQLDate(core.doc.profileStartTime) + ")"
                                 + " AND ((ManagementMemberRules.MemberID)=" + core.session.user.id + " ));";
                             CS = core.db.csOpenSql(SQL);
                             while (core.db.csOk(CS)) {
@@ -2767,37 +2768,29 @@ namespace Contensive.Processor.Controllers {
         public static void processFormQuickEditing(CoreController core) {
             //
             int recordId = (core.docProperties.getInteger("ID"));
-            string Button = core.docProperties.getText("Button");
-            bool iIsAdmin = core.session.isAuthenticatedAdmin(core);
-            if ((!string.IsNullOrEmpty(Button)) && (recordId != 0) && (PageContentModel.contentName != "") && (core.session.isAuthenticatedContentManager(core, PageContentModel.contentName))) {
-                WorkflowController.AuthoringStatusClass authoringStatus = core.workflow.getAuthoringStatus(PageContentModel.contentName, recordId);
-                bool IsEditLocked = core.workflow.GetEditLockStatus(PageContentModel.contentName, recordId);
-                string main_EditLockMemberName = core.workflow.GetEditLockMemberName(PageContentModel.contentName, recordId);
-                DateTime main_EditLockDateExpires = default(DateTime);
-                main_EditLockDateExpires = core.workflow.GetEditLockDateExpires(PageContentModel.contentName, recordId);
-                core.workflow.ClearEditLock(PageContentModel.contentName, recordId);
+            string button = core.docProperties.getText("Button");
+            if ((!string.IsNullOrEmpty(button)) && (recordId != 0) && (core.session.isAuthenticatedContentManager(core, PageContentModel.contentName))) {
+                var pageCdef = Models.Domain.CDefModel.create(core, "page content");
+                var pageTable = Models.Db.TableModel.createByContentName(core, pageCdef.name);
+                WorkflowController.editLockClass editLock = WorkflowController.getEditLock(core, pageTable.id, recordId);
+                WorkflowController.clearEditLock(core, pageTable.id, recordId);
                 //
                 // tough case, in Quick mode, lets mark the record reviewed, no matter what button they push, except cancel
-                //
-                if (Button != ButtonCancel) {
+                if (button != ButtonCancel) {
                     PageContentModel.markReviewed(core, recordId);
                 }
                 bool allowSave = false;
                 //
                 // Determine is the record should be saved
                 //
-                if ((!authoringStatus.isApproved) && (!core.docProperties.getBoolean("RENDERMODE"))) {
-                    if (iIsAdmin) {
-                        //
-                        // cases that admin can save
-                        //
-                        allowSave = false || (Button == ButtonAddChildPage) || (Button == ButtonAddSiblingPage) || (Button == ButtonSave) || (Button == ButtonOK);
-                    } else {
-                        //
-                        // cases that CM can save
-                        //
-                        allowSave = false || (Button == ButtonAddChildPage) || (Button == ButtonAddSiblingPage) || (Button == ButtonSave) || (Button == ButtonOK);
-                    }
+                if (core.session.isAuthenticatedAdmin(core)) {
+                    //
+                    // cases that admin can save
+                    allowSave = (button == ButtonAddChildPage) || (button == ButtonAddSiblingPage) || (button == ButtonSave) || (button == ButtonOK);
+                } else {
+                    //
+                    // cases that CM can save
+                    allowSave = (button == ButtonAddChildPage) || (button == ButtonAddSiblingPage) || (button == ButtonSave) || (button == ButtonOK);
                 }
                 if (allowSave) {
                     //
@@ -2817,25 +2810,21 @@ namespace Contensive.Processor.Controllers {
                             LinkAliasController.addLinkAlias(core, RecordName, recordId, "");
                             SaveButNoChanges = false;
                         }
-                        //
-                        int RecordParentID = page.parentID;
                         page.save(core);
-                        //
-                        core.workflow.SetEditLock(PageContentModel.contentName, page.id);
-                        //
+                        WorkflowController.setEditLock(core, pageTable.id, page.id);
                         if (!SaveButNoChanges) {
-                            core.processAfterSave(false, PageContentModel.contentName, page.id, page.name, page.parentID, false);
+                            core.processAfterSave(false, pageCdef.name, page.id, page.name, page.parentID, false);
                             PageContentModel.invalidateRecordCache(core, page.id);
                         }
                     }
                 }
                 string Link = null;
                 int CSBlock = 0;
-                if (Button == ButtonAddChildPage) {
+                if (button == ButtonAddChildPage) {
                     //
                     //
                     //
-                    CSBlock = core.db.csInsertRecord(PageContentModel.contentName);
+                    CSBlock = core.db.csInsertRecord(pageCdef.name);
                     if (core.db.csOk(CSBlock)) {
                         core.db.csSet(CSBlock, "active", true);
                         core.db.csSet(CSBlock, "ParentID", recordId);
@@ -2860,17 +2849,17 @@ namespace Contensive.Processor.Controllers {
                     PageContentModel.invalidateRecordCache(core, recordId);
                 }
                 int ParentID = 0;
-                if (Button == ButtonAddSiblingPage) {
+                if (button == ButtonAddSiblingPage) {
                     //
                     //
                     //
-                    CSBlock = core.db.csOpenRecord(PageContentModel.contentName, recordId, false, false, "ParentID");
+                    CSBlock = core.db.csOpenRecord(pageCdef.name, recordId, false, false, "ParentID");
                     if (core.db.csOk(CSBlock)) {
                         ParentID = core.db.csGetInteger(CSBlock, "ParentID");
                     }
                     core.db.csClose(ref CSBlock);
                     if (ParentID != 0) {
-                        CSBlock = core.db.csInsertRecord(PageContentModel.contentName);
+                        CSBlock = core.db.csInsertRecord(pageCdef.name);
                         if (core.db.csOk(CSBlock)) {
                             core.db.csSet(CSBlock, "active", true);
                             core.db.csSet(CSBlock, "ParentID", ParentID);
@@ -2886,15 +2875,15 @@ namespace Contensive.Processor.Controllers {
                         core.db.csClose(ref CSBlock);
                     }
                 }
-                if (Button == ButtonDelete) {
-                    CSBlock = core.db.csOpenRecord(PageContentModel.contentName, recordId);
+                if (button == ButtonDelete) {
+                    CSBlock = core.db.csOpenRecord(pageCdef.name, recordId);
                     if (core.db.csOk(CSBlock)) {
                         ParentID = core.db.csGetInteger(CSBlock, "parentid");
                     }
                     core.db.csClose(ref CSBlock);
                     //
-                    core.db.deleteChildRecords(PageContentModel.contentName, recordId, false);
-                    core.db.deleteContentRecord(PageContentModel.contentName, recordId);
+                    core.db.deleteChildRecords(pageCdef.name, recordId, false);
+                    core.db.deleteContentRecord(pageCdef.name, recordId);
                     PageContentModel.invalidateRecordCache(core, recordId);
                     //
                     if (!false) {
@@ -2906,13 +2895,13 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 //If (Button = ButtonAbortEdit) Then
-                //    Call core.workflow.abortEdit2(pageContentModel.contentName, RecordID, core.doc.authContext.user.id)
+                //    Call WorkflowController.abortEdit2(pageCdef.name, RecordID, core.doc.authContext.user.id)
                 //End If
                 //If (Button = ButtonPublishSubmit) Then
-                //    Call core.workflow.main_SubmitEdit(pageContentModel.contentName, RecordID)
-                //    Call sendPublishSubmitNotice(pageContentModel.contentName, RecordID, "")
+                //    Call WorkflowController.main_SubmitEdit(pageCdef.name, RecordID)
+                //    Call sendPublishSubmitNotice(pageCdef.name, RecordID, "")
                 //End If
-                if ((!(core.doc.debug_iUserError != "")) && ((Button == ButtonOK) || (Button == ButtonCancel))) {
+                if ((!(core.doc.debug_iUserError != "")) && ((button == ButtonOK) || (button == ButtonCancel))) {
                     //
                     // ----- Turn off Quick Editor if not save or add child
                     //
@@ -3000,7 +2989,7 @@ namespace Contensive.Processor.Controllers {
                     + " AND ((ccPageContentBlockRules.Active)<>0)"
                     + " AND ((ccgroups.Active)<>0)"
                     + " AND ((ccMemberRules.Active)<>0)"
-                    + " AND ((ccMemberRules.DateExpires) Is Null Or (ccMemberRules.DateExpires)>" + core.db.encodeSQLDate(core.doc.profileStartTime) + ")"
+                    + " AND ((ccMemberRules.DateExpires) Is Null Or (ccMemberRules.DateExpires)>" + DbController.encodeSQLDate(core.doc.profileStartTime) + ")"
                     + " AND ((ccMemberRules.MemberID)=" + core.session.user.id + "));";
                 int recordsReturned = 0;
                 DataTable dt = core.db.executeQuery(sql,"",1,1, ref recordsReturned);

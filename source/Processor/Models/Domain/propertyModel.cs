@@ -157,11 +157,11 @@ namespace Contensive.Processor.Models.Domain {
                 } else if (propertyCache[1, Ptr] != PropertyValue) {
                     propertyCache[1, Ptr] = PropertyValue;
                     RecordID = GenericController.encodeInteger(propertyCache[2, Ptr]);
-                    SQLNow = db.encodeSQLDate(DateTime.Now);
+                    SQLNow = DbController.encodeSQLDate(DateTime.Now);
                     //
                     // save the value in the property that was found
                     //
-                    db.executeQuery("update ccProperties set FieldValue=" + db.encodeSQLText(PropertyValue) + ",ModifiedDate=" + SQLNow + " where id=" + RecordID);
+                    db.executeQuery("update ccProperties set FieldValue=" + DbController.encodeSQLText(PropertyValue) + ",ModifiedDate=" + SQLNow + " where id=" + RecordID);
                 }
                 //
 

@@ -41,42 +41,35 @@ namespace Contensive.Processor.Controllers {
                 core.html.addStyleLink("/quickEditor/styles.css", "Quick Editor");
                 //
                 // -- First Active Record - Output Quick Editor form
-                Models.Domain.CDefModel CDef = Models.Domain.CDefModel.create(core, PageContentModel.contentName);
-                bool IsEditLocked = core.workflow.GetEditLockStatus(PageContentModel.contentName, core.doc.pageController.page.id);
-                string editLockMemberName = "";
-                DateTime editLockDateExpires = default(DateTime);
-                if (IsEditLocked) {
-                    editLockMemberName = core.workflow.GetEditLockMemberName(PageContentModel.contentName, core.doc.pageController.page.id);
-                    editLockDateExpires = GenericController.encodeDate(core.workflow.GetEditLockMemberName(PageContentModel.contentName, core.doc.pageController.page.id));
-                }
-                WorkflowController.AuthoringStatusClass authoringStatus = core.workflow.getAuthoringStatus(PageContentModel.contentName, core.doc.pageController.page.id);
-                PermissionController.AuthoringPermissions authoringPermissions = PermissionController.getAuthoringPermissions(core, PageContentModel.contentName, core.doc.pageController.page.id);
+                Models.Domain.CDefModel cdef = Models.Domain.CDefModel.create(core, PageContentModel.contentName);
+                var pageContentTable = Models.Db.TableModel.create(core, cdef.id);
+                var editLock = WorkflowController.getEditLock(core, pageContentTable.id, core.doc.pageController.page.id);
+                WorkflowController.recordWorkflowStatusClass authoringStatus = WorkflowController.getWorkflowStatus(core, PageContentModel.contentName, core.doc.pageController.page.id);
+                PermissionController.UserContentPermissions userContentPermissions = PermissionController.getUserContentPermissions(core, cdef);
                 bool AllowMarkReviewed = CdefController.isContentFieldSupported(core, PageContentModel.contentName, "DateReviewed");
-                string OptionsPanelAuthoringStatus = core.session.getAuthoringStatusMessage(core, false, IsEditLocked, editLockMemberName, editLockDateExpires, authoringStatus.isApproved, authoringStatus.approvedMemberName, authoringStatus.isSubmitted, authoringStatus.submittedMemberName, authoringStatus.isDeleted, authoringStatus.isInserted, authoringStatus.isModified, authoringStatus.modifiedMemberName);
+                string OptionsPanelAuthoringStatus = core.session.getAuthoringStatusMessage(core, false, editLock.isEditLocked, editLock.editLockByMemberName, editLock.editLockExpiresDate, authoringStatus.isWorkflowApproved, authoringStatus.workflowApprovedMemberName, authoringStatus.isWorkflowSubmitted, authoringStatus.workflowSubmittedMemberName, authoringStatus.isWorkflowDeleted, authoringStatus.isWorkflowInserted, authoringStatus.isWorkflowModified, authoringStatus.workflowModifiedByMemberName);
                 //
                 // Set Editing Authoring Control
                 //
-                core.workflow.SetEditLock(PageContentModel.contentName, core.doc.pageController.page.id);
+                WorkflowController.setEditLock( core, pageContentTable.id, core.doc.pageController.page.id);
                 //
                 // SubPanel: Authoring Status
                 //
                 string ButtonList = "";
-                if (authoringPermissions.AllowCancel) {
-                    ButtonList = ButtonList + "," + ButtonCancel;
-                }
-                if (authoringPermissions.allowSave) {
+                ButtonList = ButtonList + "," + ButtonCancel;
+                if (userContentPermissions.allowSave) {
                     ButtonList = ButtonList + "," + ButtonSave + "," + ButtonOK;
                 }
-                if (authoringPermissions.AllowDelete && (core.doc.pageController.pageToRootList.Count==1)) {
+                if (userContentPermissions.allowDelete && (core.doc.pageController.pageToRootList.Count==1)) {
                     //
                     // -- allow delete and not root page
                     ButtonList = ButtonList + "," + ButtonDelete;
                 }
-                if (authoringPermissions.AllowInsert) {
+                if (userContentPermissions.allowAdd) {
                     ButtonList = ButtonList + "," + ButtonAddChildPage;
                 }
                 int page_ParentID = 0;
-                if ((page_ParentID != 0) && authoringPermissions.AllowInsert) {
+                if ((page_ParentID != 0) && userContentPermissions.allowAdd) {
                     ButtonList = ButtonList + "," + ButtonAddSiblingPage;
                 }
                 if (AllowMarkReviewed) {
@@ -98,20 +91,20 @@ namespace Contensive.Processor.Controllers {
                         + cr2 + "<td colspan=2 class=\"qeRow\"><div class=\"qeHeadCon\">" + ErrorController.getUserError(core) + "</div></td>"
                         + "\r</tr>";
                 }
-                if (authoringPermissions.readOnlyField) {
+                if (!userContentPermissions.allowSave) {
                     result += ""
                     + "\r<tr>"
-                    + cr2 + "<td colspan=\"2\" class=\"qeRow\">" + getQuickEditingBody(core, PageContentModel.contentName, OrderByClause, AllowPageList, true, rootPageId, authoringPermissions.readOnlyField, AllowReturnLink, PageContentModel.contentName, ArchivePages, contactMemberID) + "</td>"
+                    + cr2 + "<td colspan=\"2\" class=\"qeRow\">" + getQuickEditingBody(core, PageContentModel.contentName, OrderByClause, AllowPageList, true, rootPageId, !userContentPermissions.allowSave, AllowReturnLink, PageContentModel.contentName, ArchivePages, contactMemberID) + "</td>"
                     + "\r</tr>";
                 } else {
                     result += ""
                     + "\r<tr>"
-                    + cr2 + "<td colspan=\"2\" class=\"qeRow\">" + getQuickEditingBody(core, PageContentModel.contentName, OrderByClause, AllowPageList, true, rootPageId, authoringPermissions.readOnlyField, AllowReturnLink, PageContentModel.contentName, ArchivePages, contactMemberID) + "</td>"
+                    + cr2 + "<td colspan=\"2\" class=\"qeRow\">" + getQuickEditingBody(core, PageContentModel.contentName, OrderByClause, AllowPageList, true, rootPageId, !userContentPermissions.allowSave, AllowReturnLink, PageContentModel.contentName, ArchivePages, contactMemberID) + "</td>"
                     + "\r</tr>";
                 }
                 result += "\r<tr>"
                     + cr2 + "<td class=\"qeRow qeLeft\" style=\"padding-top:10px;\">Name</td>"
-                    + cr2 + "<td class=\"qeRow qeRight\">" + HtmlController.inputText(core, "name", core.doc.pageController.page.name, 1, 0, "", false, authoringPermissions.readOnlyField) + "</td>"
+                    + cr2 + "<td class=\"qeRow qeRight\">" + HtmlController.inputText(core, "name", core.doc.pageController.page.name, 1, 0, "", false, !userContentPermissions.allowSave) + "</td>"
                     + "\r</tr>"
                     + "";
                 string PageList = null;

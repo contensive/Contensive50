@@ -7,7 +7,8 @@ using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
-using static Contensive.Processor.AdminUIController;
+using Contensive.Addons.AdminSite.Controllers;
+using static Contensive.Addons.AdminSite.Controllers.AdminUIController;
 
 namespace Contensive.Addons.AdminSite {
     public class FormIndex {
@@ -29,32 +30,32 @@ namespace Contensive.Addons.AdminSite {
                 if (adminData.adminContent.id == 0) {
                     //
                     // Bad content id
-                    Stream.Add(ErrorController.get(core, "This form requires a valid content definition, and one was not found for content ID [" + adminData.adminContent.id + "].", "No content definition was specified [ContentID=0]. Please contact your application developer for more assistance."));
+                    Stream.Add(AdminErrorController.get(core, "This form requires a valid content definition, and one was not found for content ID [" + adminData.adminContent.id + "].", "No content definition was specified [ContentID=0]. Please contact your application developer for more assistance."));
                 } else if (string.IsNullOrEmpty(adminData.adminContent.name)) {
                     //
                     // Bad content name
-                    Stream.Add(ErrorController.get( core, "No content definition could be found for ContentID [" + adminData.adminContent.id + "]. This could be a menu error. Please contact your application developer for more assistance.", "No content definition for ContentID [" + adminData.adminContent.id + "] could be found."));
+                    Stream.Add(AdminErrorController.get( core, "No content definition could be found for ContentID [" + adminData.adminContent.id + "]. This could be a menu error. Please contact your application developer for more assistance.", "No content definition for ContentID [" + adminData.adminContent.id + "] could be found."));
                 } else if (adminData.adminContent.tableName == "") {
                     //
                     // No tablename
-                    Stream.Add(ErrorController.get( core, "The content definition [" + adminData.adminContent.name + "] is not associated with a valid database table. Please contact your application developer for more assistance.", "Content [" + adminData.adminContent.name + "] ContentTablename is empty."));
+                    Stream.Add(AdminErrorController.get( core, "The content definition [" + adminData.adminContent.name + "] is not associated with a valid database table. Please contact your application developer for more assistance.", "Content [" + adminData.adminContent.name + "] ContentTablename is empty."));
                 } else if (adminData.adminContent.fields.Count == 0) {
                     //
                     // No Fields
-                    Stream.Add(ErrorController.get( core, "This content [" + adminData.adminContent.name + "] cannot be accessed because it has no fields. Please contact your application developer for more assistance.", "Content [" + adminData.adminContent.name + "] has no field records."));
+                    Stream.Add(AdminErrorController.get( core, "This content [" + adminData.adminContent.name + "] cannot be accessed because it has no fields. Please contact your application developer for more assistance.", "Content [" + adminData.adminContent.name + "] has no field records."));
                 } else if (adminData.adminContent.developerOnly & (!core.session.isAuthenticatedDeveloper(core))) {
                     //
                     // Developer Content and not developer
-                    Stream.Add(ErrorController.get( core, "Access to this content [" + adminData.adminContent.name + "] requires developer permissions. Please contact your application developer for more assistance.", "Content [" + adminData.adminContent.name + "] has no field records."));
+                    Stream.Add(AdminErrorController.get( core, "Access to this content [" + adminData.adminContent.name + "] requires developer permissions. Please contact your application developer for more assistance.", "Content [" + adminData.adminContent.name + "] has no field records."));
                 } else {
                     List<string> tmp = new List<string> { };
                     DataSourceModel datasource = DataSourceModel.create(core, adminData.adminContent.dataSourceId, ref tmp);
                     //
                     // get access rights
-                    bool allowCMEdit = false;
-                    bool allowCMAdd = false;
-                    bool allowCMDelete = false;
-                    core.session.getContentAccessRights(core, adminData.adminContent.name, ref allowCMEdit, ref allowCMAdd, ref allowCMDelete);
+                    //bool allowCMEdit = false;
+                    //bool allowCMAdd = false;
+                    //bool allowCMDelete = false;
+                    var userContentPermissions = PermissionController.getUserContentPermissions(core, adminData.adminContent);
                     //
                     // detemine which subform to disaply
                     string Copy = "";
@@ -93,9 +94,9 @@ namespace Contensive.Addons.AdminSite {
                         Dictionary<string, bool> FieldUsedInColumns = new Dictionary<string, bool>(); // used to prevent select SQL from being sorted by a field that does not appear
                         Dictionary<string, bool> IsLookupFieldValid = new Dictionary<string, bool>();
                         setIndexSQL(core, adminData, IndexConfig, ref AllowAccessToContent, ref sqlFieldList, ref sqlFrom, ref sqlWhere, ref sqlOrderBy, ref IsLimitedToSubContent, ref ContentAccessLimitMessage, ref FieldUsedInColumns, IsLookupFieldValid);
-                        bool AllowAdd = adminData.adminContent.allowAdd & (!IsLimitedToSubContent) && (allowCMAdd);
-                        bool AllowDelete = (adminData.adminContent.allowDelete) && (allowCMDelete);
-                        if ((!allowCMEdit) || (!AllowAccessToContent)) {
+                        bool AllowAdd = adminData.adminContent.allowAdd & (!IsLimitedToSubContent) && (userContentPermissions.allowAdd);
+                        bool AllowDelete = (adminData.adminContent.allowDelete) && (userContentPermissions.allowDelete);
+                        if ((!userContentPermissions.allowEdit) || (!AllowAccessToContent)) {
                             //
                             // two conditions should be the same -- but not time to check - This user does not have access to this content
                             Processor.Controllers.ErrorController.addUserError(core, "Your account does not have access to any records in '" + adminData.adminContent.name + "'.");
@@ -1088,7 +1089,7 @@ namespace Contensive.Addons.AdminSite {
                 // Return_sqlFrom and Where Clause for Groups filter
                 //
                 DateTime rightNow = DateTime.Now;
-                string sqlRightNow = core.db.encodeSQLDate(rightNow);
+                string sqlRightNow = DbController.encodeSQLDate(rightNow);
                 if (adminData.adminContent.tableName.ToLowerInvariant() == "ccmembers") {
                     if (IndexConfig.GroupListCnt > 0) {
                         for (Ptr = 0; Ptr < IndexConfig.GroupListCnt; Ptr++) {
@@ -1178,19 +1179,19 @@ namespace Contensive.Addons.AdminSite {
                 // Where Clause: edited today
                 //
                 if (IndexConfig.LastEditedToday) {
-                    return_SQLWhere += "AND(" + adminData.adminContent.tableName + ".ModifiedDate>=" + core.db.encodeSQLDate(core.doc.profileStartTime.Date) + ")";
+                    return_SQLWhere += "AND(" + adminData.adminContent.tableName + ".ModifiedDate>=" + DbController.encodeSQLDate(core.doc.profileStartTime.Date) + ")";
                 }
                 //
                 // Where Clause: edited past week
                 //
                 if (IndexConfig.LastEditedPast7Days) {
-                    return_SQLWhere += "AND(" + adminData.adminContent.tableName + ".ModifiedDate>=" + core.db.encodeSQLDate(core.doc.profileStartTime.Date.AddDays(-7)) + ")";
+                    return_SQLWhere += "AND(" + adminData.adminContent.tableName + ".ModifiedDate>=" + DbController.encodeSQLDate(core.doc.profileStartTime.Date.AddDays(-7)) + ")";
                 }
                 //
                 // Where Clause: edited past month
                 //
                 if (IndexConfig.LastEditedPast30Days) {
-                    return_SQLWhere += "AND(" + adminData.adminContent.tableName + ".ModifiedDate>=" + core.db.encodeSQLDate(core.doc.profileStartTime.Date.AddDays(-30)) + ")";
+                    return_SQLWhere += "AND(" + adminData.adminContent.tableName + ".ModifiedDate>=" + DbController.encodeSQLDate(core.doc.profileStartTime.Date.AddDays(-30)) + ")";
                 }
                 //
                 // Where Clause: Where Pairs
@@ -1254,13 +1255,13 @@ namespace Contensive.Addons.AdminSite {
                                                         break;
                                                     case (int)FindWordMatchEnum.MatchEquals:
                                                     case (int)FindWordMatchEnum.matchincludes:
-                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "=" + core.db.encodeSQLNumber(FindWordValueInteger) + ")";
+                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "=" + DbController.encodeSQLNumber(FindWordValueInteger) + ")";
                                                         break;
                                                     case (int)FindWordMatchEnum.MatchGreaterThan:
-                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + ">" + core.db.encodeSQLNumber(FindWordValueInteger) + ")";
+                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + ">" + DbController.encodeSQLNumber(FindWordValueInteger) + ")";
                                                         break;
                                                     case (int)FindWordMatchEnum.MatchLessThan:
-                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "<" + core.db.encodeSQLNumber(FindWordValueInteger) + ")";
+                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "<" + DbController.encodeSQLNumber(FindWordValueInteger) + ")";
                                                         break;
                                                 }
                                                 //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
@@ -1282,13 +1283,13 @@ namespace Contensive.Addons.AdminSite {
                                                         break;
                                                     case (int)FindWordMatchEnum.MatchEquals:
                                                     case (int)FindWordMatchEnum.matchincludes:
-                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "=" + core.db.encodeSQLNumber(FindWordValueDouble) + ")";
+                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "=" + DbController.encodeSQLNumber(FindWordValueDouble) + ")";
                                                         break;
                                                     case (int)FindWordMatchEnum.MatchGreaterThan:
-                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + ">" + core.db.encodeSQLNumber(FindWordValueDouble) + ")";
+                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + ">" + DbController.encodeSQLNumber(FindWordValueDouble) + ")";
                                                         break;
                                                     case (int)FindWordMatchEnum.MatchLessThan:
-                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "<" + core.db.encodeSQLNumber(FindWordValueDouble) + ")";
+                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "<" + DbController.encodeSQLNumber(FindWordValueDouble) + ")";
                                                         break;
                                                 }
                                                 //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
@@ -1327,13 +1328,13 @@ namespace Contensive.Addons.AdminSite {
                                                         break;
                                                     case (int)FindWordMatchEnum.MatchEquals:
                                                     case (int)FindWordMatchEnum.matchincludes:
-                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "=" + core.db.encodeSQLDate(findDate) + ")";
+                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "=" + DbController.encodeSQLDate(findDate) + ")";
                                                         break;
                                                     case (int)FindWordMatchEnum.MatchGreaterThan:
-                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + ">" + core.db.encodeSQLDate(findDate) + ")";
+                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + ">" + DbController.encodeSQLDate(findDate) + ")";
                                                         break;
                                                     case (int)FindWordMatchEnum.MatchLessThan:
-                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "<" + core.db.encodeSQLDate(findDate) + ")";
+                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "<" + DbController.encodeSQLDate(findDate) + ")";
                                                         break;
                                                 }
                                                 //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
@@ -1356,10 +1357,10 @@ namespace Contensive.Addons.AdminSite {
                                                             return_SQLWhere += "AND(LookupTable" + FieldPtr + ".ID is not null)";
                                                             break;
                                                         case (int)FindWordMatchEnum.MatchEquals:
-                                                            return_SQLWhere += "AND(LookupTable" + FieldPtr + ".Name=" + core.db.encodeSQLText(FindWordValue) + ")";
+                                                            return_SQLWhere += "AND(LookupTable" + FieldPtr + ".Name=" + DbController.encodeSQLText(FindWordValue) + ")";
                                                             break;
                                                         case (int)FindWordMatchEnum.matchincludes:
-                                                            return_SQLWhere += "AND(LookupTable" + FieldPtr + ".Name LIKE " + core.db.encodeSQLText("%" + FindWordValue + "%") + ")";
+                                                            return_SQLWhere += "AND(LookupTable" + FieldPtr + ".Name LIKE " + DbController.encodeSQLText("%" + FindWordValue + "%") + ")";
                                                             break;
                                                     }
                                                 } else if (field.lookupList != "") {
@@ -1379,10 +1380,10 @@ namespace Contensive.Addons.AdminSite {
                                                             LookupQuery = "";
                                                             for (LookupPtr = 0; LookupPtr <= lookups.GetUpperBound(0); LookupPtr++) {
                                                                 if (!lookups[LookupPtr].Contains(FindWordValue)) {
-                                                                    LookupQuery = LookupQuery + "OR(" + adminData.adminContent.tableName + "." + FindWordName + "=" + core.db.encodeSQLNumber(LookupPtr + 1) + ")";
+                                                                    LookupQuery = LookupQuery + "OR(" + adminData.adminContent.tableName + "." + FindWordName + "=" + DbController.encodeSQLNumber(LookupPtr + 1) + ")";
                                                                 }
                                                                 //if (genericController.vbInstr(1, lookups[LookupPtr], FindWordValue, 1) != 0) {
-                                                                //    LookupQuery = LookupQuery + "OR(" + adminContext.adminContext.content.ContentTableName + "." + FindWordName + "=" + core.db.encodeSQLNumber(LookupPtr + 1) + ")";
+                                                                //    LookupQuery = LookupQuery + "OR(" + adminContext.adminContext.content.ContentTableName + "." + FindWordName + "=" + DbController.encodeSQLNumber(LookupPtr + 1) + ")";
                                                                 //}
                                                             }
                                                             if (!string.IsNullOrEmpty(LookupQuery)) {
@@ -1428,12 +1429,12 @@ namespace Contensive.Addons.AdminSite {
                                                         return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " is not null)";
                                                         break;
                                                     case (int)FindWordMatchEnum.matchincludes:
-                                                        FindWordValue = core.db.encodeSQLText(FindWordValue);
+                                                        FindWordValue = DbController.encodeSQLText(FindWordValue);
                                                         FindWordValue = FindWordValue.Substring(1, FindWordValue.Length - 2);
                                                         return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + " LIKE '%" + FindWordValue + "%')";
                                                         break;
                                                     case (int)FindWordMatchEnum.MatchEquals:
-                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "=" + core.db.encodeSQLText(FindWordValue) + ")";
+                                                        return_SQLWhere += "AND(" + adminData.adminContent.tableName + "." + FindWordName + "=" + DbController.encodeSQLText(FindWordValue) + ")";
                                                         break;
                                                 }
                                                 //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
@@ -1681,7 +1682,7 @@ namespace Contensive.Addons.AdminSite {
                 // Sub Content Definitions
                 //
                 SubFilterList = "";
-                var contentList = ContentModel.createList(core, "(contenttableid in (select id from cctables where name=" + core.db.encodeSQLText(adminData.adminContent.tableName) + "))");
+                var contentList = ContentModel.createList(core, "(contenttableid in (select id from cctables where name=" + DbController.encodeSQLText(adminData.adminContent.tableName) + "))");
                 if (contentList.Count>1) {
                     foreach ( var subContent in contentList ) {
                         Caption = "<span style=\"white-space:nowrap;\">" + subContent.name + "</span>";

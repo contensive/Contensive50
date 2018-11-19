@@ -33,7 +33,7 @@ namespace Contensive.Addons.Primitives {
                     //
                     string recipientEmailToBlock = core.docProperties.getText(rnEmailBlockRecipientEmail);
                     if (string.IsNullOrEmpty(recipientEmailToBlock)) {
-                        List<PersonModel> recipientList = PersonModel.createList(core, "(email=" + core.db.encodeSQLText(recipientEmailToBlock) + ")");
+                        List<PersonModel> recipientList = PersonModel.createList(core, "(email=" + DbController.encodeSQLText(recipientEmailToBlock) + ")");
                         foreach (var recipient in recipientList) {
                             recipient.AllowBulkEmail = false;
                             recipient.save(core);

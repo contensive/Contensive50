@@ -42,7 +42,7 @@ namespace Contensive.Processor.Controllers {
                 core.db.csSet(CS, "datasourceid", DataSourceID);
                 core.db.csSet(CS, "sqlquery", SQL);
                 core.db.csSet(CS, "maxRows", maxRows);
-                core.db.csSet(CS, "dateexpires", core.db.encodeSQLDate(core.doc.profileStartTime.AddDays(1)));
+                core.db.csSet(CS, "dateexpires", DbController.encodeSQLDate(core.doc.profileStartTime.AddDays(1)));
                 core.db.csSet(CS, "QueryTypeID", QueryTypeSQL);
                 core.db.csSet(CS, "VisitId", core.session.visit.id);
             }

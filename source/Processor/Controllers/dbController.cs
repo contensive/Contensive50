@@ -14,6 +14,7 @@ using Contensive.Processor.Models.Domain;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Exceptions;
+using Contensive.Addons.AdminSite.Controllers;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -54,7 +55,7 @@ namespace Contensive.Processor.Controllers {
         //
         public int sqlCommandTimeout { get; set; } = 30;
         //
-        private ContentSetClass[] dataSetStore = new ContentSetClass[] { };
+        private ContentSetClass[] contentSetStore = new ContentSetClass[] { };
         //
         /// <summary>
         /// number of elements being used
@@ -1347,7 +1348,7 @@ namespace Contensive.Processor.Controllers {
                         // ----- Open the csv_ContentSet
                         returnCs = csInit(memberId);
                         {
-                            DbController.ContentSetClass contentSet = dataSetStore[returnCs];
+                            DbController.ContentSetClass contentSet = contentSetStore[returnCs];
                             contentSet.readable = true;
                             contentSet.writeable = true;
                             contentSet.ContentName = ContentName;
@@ -1410,7 +1411,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // ----- Open the csv_ContentSet
                         returnCs = csInit(memberId);
-                        DbController.ContentSetClass contentSet = dataSetStore[returnCs];
+                        DbController.ContentSetClass contentSet = contentSetStore[returnCs];
                         contentSet.readable = false;
                         contentSet.writeable = true;
                         contentSet.ContentName = ContentName;
@@ -1450,14 +1451,14 @@ namespace Contensive.Processor.Controllers {
                 if (!csOk(CSPointer)) {
                     //
                     throw new ArgumentException("csv_ContentSet Is empty Or at End-Of-file");
-                } else if (!(dataSetStore[CSPointer].writeable)) {
+                } else if (!(contentSetStore[CSPointer].writeable)) {
                     //
                     throw new ArgumentException("Dataset is not writeable.");
                 } else {
-                    int ContentID = dataSetStore[CSPointer].CDef.id;
-                    string ContentName = dataSetStore[CSPointer].CDef.name;
-                    string ContentTableName = dataSetStore[CSPointer].CDef.tableName;
-                    string ContentDataSourceName = dataSetStore[CSPointer].CDef.dataSourceName;
+                    int ContentID = contentSetStore[CSPointer].CDef.id;
+                    string ContentName = contentSetStore[CSPointer].CDef.name;
+                    string ContentTableName = contentSetStore[CSPointer].CDef.tableName;
+                    string ContentDataSourceName = contentSetStore[CSPointer].CDef.dataSourceName;
                     if (string.IsNullOrEmpty(ContentName)) {
                         throw new ArgumentException("csv_ContentSet Is Not based On a Content Definition");
                     } else {
@@ -1468,9 +1469,9 @@ namespace Contensive.Processor.Controllers {
                         //
                         string fieldName = null;
                         Models.Domain.CDefFieldModel field = null;
-                        foreach (var selectedFieldName in dataSetStore[CSPointer].CDef.selectList) {
-                            if (dataSetStore[CSPointer].CDef.fields.ContainsKey(selectedFieldName.ToLowerInvariant())) {
-                                field = dataSetStore[CSPointer].CDef.fields[selectedFieldName.ToLowerInvariant()];
+                        foreach (var selectedFieldName in contentSetStore[CSPointer].CDef.selectList) {
+                            if (contentSetStore[CSPointer].CDef.fields.ContainsKey(selectedFieldName.ToLowerInvariant())) {
+                                field = contentSetStore[CSPointer].CDef.fields[selectedFieldName.ToLowerInvariant()];
                                 fieldName = field.nameLc;
                                 string Filename = null;
                                 switch (field.fieldTypeId) {
@@ -1536,7 +1537,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 returnCs = csInit(core.session.user.id);
                 {
-                    ContentSetClass contentSet = dataSetStore[returnCs];
+                    ContentSetClass contentSet = contentSetStore[returnCs];
                     contentSet.readable = true;
                     contentSet.writeable = false;
                     contentSet.ContentName = "";
@@ -1568,7 +1569,7 @@ namespace Contensive.Processor.Controllers {
                 // -- attempt to reuse space
                 if (contentSetStoreCount > 0) {
                     for (int ptr = 1; ptr <= contentSetStoreCount; ptr++) {
-                        if (!(dataSetStore[ptr].IsOpen)) {
+                        if (!(contentSetStore[ptr].IsOpen)) {
                             returnCs = ptr;
                             break;
                         }
@@ -1577,13 +1578,13 @@ namespace Contensive.Processor.Controllers {
                 if (returnCs == -1) {
                     if (contentSetStoreCount >= contentSetStoreSize) {
                         contentSetStoreSize = contentSetStoreSize + contentSetStoreChunk;
-                        Array.Resize(ref dataSetStore, contentSetStoreSize + 2);
+                        Array.Resize(ref contentSetStore, contentSetStoreSize + 2);
                     }
                     contentSetStoreCount += 1;
                     returnCs = contentSetStoreCount;
                 }
                 //
-                dataSetStore[returnCs] = new ContentSetClass() {
+                contentSetStore[returnCs] = new ContentSetClass() {
                     IsOpen = true,
                     NewRecord = true,
                     ContentName = "",
@@ -1625,7 +1626,7 @@ namespace Contensive.Processor.Controllers {
         public void csClose(ref int CSPointer, bool asyncSave = false) {
             try {
                 if ((CSPointer > 0) && (CSPointer <= contentSetStoreCount)) {
-                    ContentSetClass tmp = dataSetStore[CSPointer];
+                    ContentSetClass tmp = contentSetStore[CSPointer];
                     if (tmp.IsOpen) {
                         csSave(CSPointer, asyncSave);
                         tmp.readCache = new string[,] { { }, { } };
@@ -1658,27 +1659,29 @@ namespace Contensive.Processor.Controllers {
                 if (!csOk(CSPointer)) {
                     //
                     throw new GenericException("Dataset is not valid.");
-                } else if(!dataSetStore[CSPointer].readable) {
+                } else if(!contentSetStore[CSPointer].readable) {
                     //
                     // -- if not readable, cannot move rows
                     throw new GenericException("Cannot move to next row because dataset is not readable.");
                 } else {
                     csSave(CSPointer, AsyncSave);
-                    dataSetStore[CSPointer].writeCache = new Dictionary<string, string>();
+                    contentSetStore[CSPointer].writeCache = new Dictionary<string, string>();
                     //
                     // Move to next row
-                    dataSetStore[CSPointer].readCacheRowPtr = dataSetStore[CSPointer].readCacheRowPtr + 1;
-                    if (!csEOF(CSPointer)) {
-                        //
-                        // Not EOF, Set Workflow Edit Mode from Request and EditLock state
-                        if (dataSetStore[CSPointer].writeable) {
-                            ContentName = dataSetStore[CSPointer].ContentName;
-                            RecordID = csGetInteger(CSPointer, "ID");
-                            if (!core.workflow.isRecordLocked(ContentName, RecordID, dataSetStore[CSPointer].OwnerMemberID)) {
-                                core.workflow.setEditLock(ContentName, RecordID, dataSetStore[CSPointer].OwnerMemberID);
-                            }
-                        }
-                    }
+                    contentSetStore[CSPointer].readCacheRowPtr = contentSetStore[CSPointer].readCacheRowPtr + 1;
+                    //if (!csEOF(CSPointer)) {
+                    //    //
+                    //    // Not EOF, Set Workflow Edit Mode from Request and EditLock state
+                    //    if (contentSetStore[CSPointer].writeable) {
+                    //        WorkflowController.setEditLock(core, tableid, RecordID, contentSetStore[CSPointer].OwnerMemberID);
+
+
+                    //        ContentName = contentSetStore[CSPointer].ContentName;
+                    //        RecordID = csGetInteger(CSPointer, "ID");
+                    //        if (!WorkflowController.isRecordLocked(ContentName, RecordID, contentSetStore[CSPointer].OwnerMemberID)) {
+                    //        }
+                    //    }
+                    //}
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -1691,8 +1694,8 @@ namespace Contensive.Processor.Controllers {
         public void csGoFirst(int CSPointer, bool AsyncSave = false) {
             try {
                 csSave(CSPointer, AsyncSave);
-                dataSetStore[CSPointer].writeCache = new Dictionary<string, string>();
-                dataSetStore[CSPointer].readCacheRowPtr = 0;
+                contentSetStore[CSPointer].writeCache = new Dictionary<string, string>();
+                contentSetStore[CSPointer].readCacheRowPtr = 0;
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
@@ -1714,7 +1717,7 @@ namespace Contensive.Processor.Controllers {
                 if (!csOk(CSPointer)) {
                     throw new GenericException("Attempt To GetValue fieldname[" + fieldNameTrim + "], but the dataset Is empty Or does not point To a valid row");
                 } else {
-                    var contentSet = dataSetStore[CSPointer];
+                    var contentSet = contentSetStore[CSPointer];
                     bool fieldFound = false;
                     if (contentSet.writeCache.Count > 0) {
                         //
@@ -1769,7 +1772,7 @@ namespace Contensive.Processor.Controllers {
                 if (!csOk(CSPointer)) {
                     throw new GenericException("data set is not valid");
                 } else {
-                    dataSetStore[CSPointer].fieldPointer = 0;
+                    contentSetStore[CSPointer].fieldPointer = 0;
                     returnFieldName = csGetNextFieldName(CSPointer);
                 }
             } catch (Exception ex) {
@@ -1791,7 +1794,7 @@ namespace Contensive.Processor.Controllers {
                 if (!csOk(CSPointer)) {
                     throw new GenericException("data set is not valid");
                 } else {
-                    var tempVar = dataSetStore[CSPointer];
+                    var tempVar = contentSetStore[CSPointer];
                     while ((string.IsNullOrEmpty(returnFieldName)) && (tempVar.fieldPointer < tempVar.resultColumnCount)) {
                         returnFieldName = tempVar.fieldNames[tempVar.fieldPointer];
                         tempVar.fieldPointer = tempVar.fieldPointer + 1;
@@ -1815,9 +1818,9 @@ namespace Contensive.Processor.Controllers {
             int returnFieldTypeid = 0;
             try {
                 if (csOk(CSPointer)) {
-                    if (dataSetStore[CSPointer].writeable) {
-                        if (!string.IsNullOrEmpty(dataSetStore[CSPointer].CDef.name)) {
-                            returnFieldTypeid = dataSetStore[CSPointer].CDef.fields[FieldName.ToLowerInvariant()].fieldTypeId;
+                    if (contentSetStore[CSPointer].writeable) {
+                        if (!string.IsNullOrEmpty(contentSetStore[CSPointer].CDef.name)) {
+                            returnFieldTypeid = contentSetStore[CSPointer].CDef.fields[FieldName.ToLowerInvariant()].fieldTypeId;
                         }
                     }
                 }
@@ -1839,9 +1842,9 @@ namespace Contensive.Processor.Controllers {
             string returnResult = "";
             try {
                 if (csOk(CSPointer)) {
-                    if (dataSetStore[CSPointer].writeable) {
-                        if (!string.IsNullOrEmpty(dataSetStore[CSPointer].CDef.name)) {
-                            returnResult = dataSetStore[CSPointer].CDef.fields[FieldName.ToLowerInvariant()].caption;
+                    if (contentSetStore[CSPointer].writeable) {
+                        if (!string.IsNullOrEmpty(contentSetStore[CSPointer].CDef.name)) {
+                            returnResult = contentSetStore[CSPointer].CDef.fields[FieldName.ToLowerInvariant()].caption;
                             if (string.IsNullOrEmpty(returnResult)) {
                                 returnResult = FieldName;
                             }
@@ -1865,7 +1868,7 @@ namespace Contensive.Processor.Controllers {
             string returnResult = "";
             try {
                 if (csOk(CSPointer)) {
-                    returnResult = string.Join(",", dataSetStore[CSPointer].fieldNames);
+                    returnResult = string.Join(",", contentSetStore[CSPointer].fieldNames);
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -1953,7 +1956,7 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                     if (string.IsNullOrEmpty(returnFilename)) {
-                        var tempVar = dataSetStore[CSPointer];
+                        var tempVar = contentSetStore[CSPointer];
                         //
                         // ----- no filename present, get id field
                         //
@@ -2073,7 +2076,7 @@ namespace Contensive.Processor.Controllers {
                 } else if (string.IsNullOrEmpty(FieldName)) {
                     throw new ArgumentException("fieldName cannot be blank");
                 } else {
-                    var contentSet = dataSetStore[CSPointer];
+                    var contentSet = contentSetStore[CSPointer];
                     if (!contentSet.writeable) {
                         throw new GenericException("Cannot set fields for a dataset based on a query.");
                     } else if (contentSet.CDef == null) {
@@ -2115,7 +2118,7 @@ namespace Contensive.Processor.Controllers {
                 } else if (string.IsNullOrEmpty(ContentName)) {
                     throw new ArgumentException("contentName cannot be blank");
                 } else {
-                    var dataSet = dataSetStore[CSPointer];
+                    var dataSet = contentSetStore[CSPointer];
                     if (!dataSet.writeable) {
                         throw new GenericException("Cannot save this dataset because it is read-only.");
                     } else {
@@ -2461,12 +2464,12 @@ namespace Contensive.Processor.Controllers {
                     // todo
                     // 20171209 - appears csPtr starts at 1, not 0, so it can equal the count -- creates upper limit issue with array (refactor after conversion)
                     throw new ArgumentException("dateset is not valid");
-                } else if (dataSetStore[CSPointer].writeable & !dataSetStore[CSPointer].readable) {
+                } else if (contentSetStore[CSPointer].writeable & !contentSetStore[CSPointer].readable) {
                     //
                     // -- opened with openForUpdate. can be written but not read
-                    returnResult = dataSetStore[CSPointer].IsOpen;
+                    returnResult = contentSetStore[CSPointer].IsOpen;
                 } else {
-                    returnResult = dataSetStore[CSPointer].IsOpen & (dataSetStore[CSPointer].readCacheRowPtr >= 0) && (dataSetStore[CSPointer].readCacheRowPtr < dataSetStore[CSPointer].readCacheRowCnt);
+                    returnResult = contentSetStore[CSPointer].IsOpen & (contentSetStore[CSPointer].readCacheRowPtr >= 0) && (contentSetStore[CSPointer].readCacheRowPtr < contentSetStore[CSPointer].readCacheRowCnt);
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -2496,10 +2499,10 @@ namespace Contensive.Processor.Controllers {
                     throw new ArgumentException("source dataset is not valid");
                 } else if (!csOk(CSDestination)) {
                     throw new ArgumentException("destination dataset is not valid");
-                } else if (dataSetStore[CSDestination].CDef == null) {
+                } else if (contentSetStore[CSDestination].CDef == null) {
                     throw new ArgumentException("copyRecord requires the destination dataset to be created from a cs Open or Insert, not a query.");
                 } else {
-                    DestCDef = dataSetStore[CSDestination].CDef;
+                    DestCDef = contentSetStore[CSDestination].CDef;
                     DestContentName = DestCDef.name;
                     DestRecordID = csGetInteger(CSDestination, "ID");
                     FieldName = csGetFirstFieldName(CSSource);
@@ -2524,7 +2527,7 @@ namespace Contensive.Processor.Controllers {
                                         //
                                         // ----- cdn file
                                         //
-                                        SourceFilename = csGetFieldFilename(CSSource, FieldName, "", dataSetStore[CSDestination].CDef.name, sourceFieldTypeId);
+                                        SourceFilename = csGetFieldFilename(CSSource, FieldName, "", contentSetStore[CSDestination].CDef.name, sourceFieldTypeId);
                                         if (!string.IsNullOrEmpty(SourceFilename)) {
                                             DestFilename = csGetFieldFilename(CSDestination, FieldName, "", DestContentName, sourceFieldTypeId);
                                             csSet(CSDestination, FieldName, DestFilename);
@@ -2574,7 +2577,7 @@ namespace Contensive.Processor.Controllers {
                 if (!csOk(CSPointer)) {
                     throw new ArgumentException("the dataset is not valid");
                 } else {
-                    returnResult = dataSetStore[CSPointer].Source;
+                    returnResult = contentSetStore[CSPointer].Source;
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -2614,7 +2617,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // csv_ContentSet good
                     //
-                    var tempVar = dataSetStore[CSPointer];
+                    var tempVar = contentSetStore[CSPointer];
                     if (!tempVar.writeable) {
                         //
                         // Not updateable -- Just return what is there as a string
@@ -2825,7 +2828,7 @@ namespace Contensive.Processor.Controllers {
                 } else if (string.IsNullOrEmpty(FieldName.Trim())) {
                     throw new ArgumentException("fieldName cannnot be blank");
                 } else {
-                    var dataSet = dataSetStore[CSPointer];
+                    var dataSet = contentSetStore[CSPointer];
                     if (!dataSet.writeable) {
                         throw new GenericException("Cannot update a contentset created from a sql query.");
                     } else {
@@ -3044,7 +3047,7 @@ namespace Contensive.Processor.Controllers {
                 if (!csOk(CSPointer)) {
                     throw new ArgumentException("dataset is not valid");
                 } else {
-                    dataSetStore[CSPointer].writeCache.Clear();
+                    contentSetStore[CSPointer].writeCache.Clear();
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -3064,15 +3067,15 @@ namespace Contensive.Processor.Controllers {
                 if (!csOk(csPtr)) {
                     //
                     // -- already closed or not opened or not on a current row. No error so you can always call save(), it skips if nothing to save
-                } else if (dataSetStore[csPtr].writeCache.Count == 0) {
+                } else if (contentSetStore[csPtr].writeCache.Count == 0) {
                     //
                     // -- nothing to write, just exit
-                } else if (!(dataSetStore[csPtr].writeable)) {
+                } else if (!(contentSetStore[csPtr].writeable)) {
                     //
                     // -- dataset not updatable
                     throw new ArgumentException("The dataset cannot be updated because it was created with a query and not a content table.");
                 } else {
-                    var contentSet = dataSetStore[csPtr];
+                    var contentSet = contentSetStore[csPtr];
                     if (contentSet.CDef == null) {
                         //
                         // -- dataset not updatable
@@ -3181,7 +3184,7 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     // ----- Set the new value in the 
                                     //
-                                    var dataSet = dataSetStore[csPtr];
+                                    var dataSet = contentSetStore[csPtr];
                                     if (dataSet.resultColumnCount > 0) {
                                         for (int ColumnPtr = 0; ColumnPtr < dataSet.resultColumnCount; ColumnPtr++) {
                                             if (dataSet.fieldNames[ColumnPtr] == ucaseFieldName) {
@@ -3287,7 +3290,7 @@ namespace Contensive.Processor.Controllers {
         //
         private void csInitData(int CSPointer) {
             try {
-                ContentSetClass csStore = dataSetStore[CSPointer];
+                ContentSetClass csStore = contentSetStore[CSPointer];
                 csStore.resultColumnCount = 0;
                 csStore.readCacheRowCnt = 0;
                 csStore.readCacheRowPtr = -1;
@@ -3328,7 +3331,7 @@ namespace Contensive.Processor.Controllers {
                 if (CSPointer <= 0) {
                     throw new ArgumentException("dataset is not valid");
                 } else {
-                    returnResult = (dataSetStore[CSPointer].readCacheRowPtr >= dataSetStore[CSPointer].readCacheRowCnt);
+                    returnResult = (contentSetStore[CSPointer].readCacheRowPtr >= contentSetStore[CSPointer].readCacheRowCnt);
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -3344,7 +3347,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="expression"></param>
         /// <param name="fieldType"></param>
         /// <returns></returns>
-        public string encodeSQL(object expression, int fieldType = _fieldTypeIdText) {
+        public static string encodeSQL(object expression, int fieldType = _fieldTypeIdText) {
             string returnResult = "";
             try {
                 switch (fieldType) {
@@ -3383,12 +3386,9 @@ namespace Contensive.Processor.Controllers {
                         returnResult = encodeSQLText(GenericController.encodeText(expression));
                         break;
                     default:
-                        LogController.handleError( core,new GenericException("Unknown Field Type [" + fieldType + ""));
-                        returnResult = encodeSQLText(GenericController.encodeText(expression));
-                        break;
+                        throw new GenericException("Unknown Field Type [" + fieldType + "");
                 }
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
+            } catch (Exception) {
                 throw;
             }
             return returnResult;
@@ -3400,7 +3400,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
-        public string encodeSQLText(string expression) {
+        public static string encodeSQLText(string expression) {
             string returnResult = "";
             if (expression == null) {
                 returnResult = "null";
@@ -3422,7 +3422,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="source"></param>
         /// <returns></returns>
-        public string encodeSqlTextLike(CoreController core, string source) {
+        public static string encodeSqlTextLike( string source) {
             return encodeSQLText("%" + source + "%");
         }
         //
@@ -3433,7 +3433,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="expressionDate"></param>
         /// <returns></returns>
         //
-        public string encodeSQLDate(DateTime expressionDate) {
+        public static string encodeSQLDate(DateTime expressionDate) {
             string returnResult = "";
             try {
                 if (Convert.IsDBNull(expressionDate)) {
@@ -3448,8 +3448,7 @@ namespace Contensive.Processor.Controllers {
                         //returnResult = "'" + expressionDate.Year + ("0" + expressionDate.Month).Substring(("0" + expressionDate.Month).Length - 2) + ("0" + expressionDate.Day).Substring(("0" + expressionDate.Day).Length - 2) + " " + ("0" + expressionDate.Hour).Substring(("0" + expressionDate.Hour).Length - 2) + ":" + ("0" + expressionDate.Minute).Substring(("0" + expressionDate.Minute).Length - 2) + ":" + ("0" + expressionDate.Second).Substring(("0" + expressionDate.Second).Length - 2) + ":" + ("00" + expressionDate.Millisecond).Substring(("00" + expressionDate.Millisecond).Length - 3) + "'";
                     }
                 }
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
+            } catch (Exception ) {
                 throw;
             }
             return returnResult;
@@ -3462,13 +3461,13 @@ namespace Contensive.Processor.Controllers {
         /// <param name="expression"></param>
         /// <returns></returns>
         //
-        public string encodeSQLNumber(double expression) {
+        public static string encodeSQLNumber(double expression) {
             return expression.ToString();
         }
         //
         //========================================================================
         //
-        public string encodeSQLNumber(int expression) {
+        public static string encodeSQLNumber(int expression) {
             return expression.ToString();
         }
         //
@@ -3479,14 +3478,13 @@ namespace Contensive.Processor.Controllers {
         /// <param name="expression"></param>
         /// <returns></returns>
         //
-        public string encodeSQLBoolean(bool expression) {
+        public static string encodeSQLBoolean(bool expression) {
             string returnResult = SQLFalse;
             try {
                 if (expression) {
                     returnResult = SQLTrue;
                 }
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
+            } catch (Exception) {
                 throw;
             }
             return returnResult;
@@ -3785,7 +3783,7 @@ namespace Contensive.Processor.Controllers {
         public string[,] csGetRows(int CSPointer) {
             string[,] returnResult = { { } };
             try {
-                returnResult = dataSetStore[CSPointer].readCache;
+                returnResult = contentSetStore[CSPointer].readCache;
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
@@ -3804,7 +3802,7 @@ namespace Contensive.Processor.Controllers {
             int returnResult = 0;
             try {
                 if (csOk(CSPointer)) {
-                    returnResult = dataSetStore[CSPointer].readCacheRowCnt;
+                    returnResult = contentSetStore[CSPointer].readCacheRowCnt;
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -3852,7 +3850,7 @@ namespace Contensive.Processor.Controllers {
                 if (!csOk(CSPointer)) {
                     throw new ArgumentException("dataset is not valid");
                 } else {
-                    returnResult = dataSetStore[CSPointer].ContentName;
+                    returnResult = contentSetStore[CSPointer].ContentName;
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -3993,7 +3991,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 int CS = csOpen(ContentName, Criteria, SortFieldList, ActiveOnly, MemberID, WorkflowRenderingMode, WorkflowEditingMode, SelectFieldList, PageSize, PageNumber);
                 if (csOk(CS)) {
-                    returnRows = dataSetStore[CS].readCache;
+                    returnRows = contentSetStore[CS].readCache;
                 }
                 csClose(ref CS);
                 //
@@ -4186,9 +4184,9 @@ namespace Contensive.Processor.Controllers {
         //
         public void createContentFromSQLTable(DataSourceModel DataSource, string TableName, string ContentName) {
             try {
-                //string DateAddedString = core.db.encodeSQLDate(DateTime.Now);
+                //string DateAddedString = DbController.encodeSQLDate(DateTime.Now);
                 //string sqlGuid = encodeSQLText( createGuid());
-                //string CreateKeyString = core.db.encodeSQLNumber(genericController.GetRandomInteger(core));
+                //string CreateKeyString = DbController.encodeSQLNumber(genericController.GetRandomInteger(core));
                 //
                 // Read in a record from the table to get fields
                 DataTable dt = core.db.openTable(DataSource.name, TableName, "", "", "", 1);
@@ -4224,7 +4222,7 @@ namespace Contensive.Processor.Controllers {
                             name = ContentName,
                             active = true
                         });
-                        SQL = "Select ID from ccContent where name=" + core.db.encodeSQLText(ContentName);
+                        SQL = "Select ID from ccContent where name=" + DbController.encodeSQLText(ContentName);
                         dt = core.db.executeQuery(SQL);
                         if (dt.Rows.Count == 0) {
                             throw new GenericException("Content Definition [" + ContentName + "] could Not be selected by name after it was inserted");
@@ -4267,7 +4265,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // touch field so upgrade does not delete it
                             //
-                            core.db.executeQuery("update ccFields Set CreateKey=0 where (Contentid=" + ContentID + ") And (name = " + core.db.encodeSQLText(UcaseTableColumnName) + ")");
+                            core.db.executeQuery("update ccFields Set CreateKey=0 where (Contentid=" + ContentID + ") And (name = " + DbController.encodeSQLText(UcaseTableColumnName) + ")");
                         }
                     }
                 }
@@ -4760,7 +4758,7 @@ namespace Contensive.Processor.Controllers {
         public int getTableID(string TableName) {
             int result = 0;
             int CS = 0;
-            CS = core.db.csOpenSql("Select ID from ccTables where name=" + core.db.encodeSQLText(TableName), "", 1);
+            CS = core.db.csOpenSql("Select ID from ccTables where name=" + DbController.encodeSQLText(TableName), "", 1);
             if (core.db.csOk(CS)) {
                 result = core.db.csGetInteger(CS, "ID");
             }
@@ -4778,13 +4776,13 @@ namespace Contensive.Processor.Controllers {
         //       The rest are the archive records.
         //
         public int csOpenRecord(string ContentName, int RecordID, bool WorkflowAuthoringMode = false, bool WorkflowEditingMode = false, string SelectFieldList = "") {
-            return csOpen(GenericController.encodeText(ContentName), "(ID=" + core.db.encodeSQLNumber(RecordID) + ")", "", false, core.session.user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1);
+            return csOpen(GenericController.encodeText(ContentName), "(ID=" + DbController.encodeSQLNumber(RecordID) + ")", "", false, core.session.user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1);
         }
         //
         // ====================================================================================================
         //
         public int csOpen2(string ContentName, int RecordID, bool WorkflowAuthoringMode = false, bool WorkflowEditingMode = false, string SelectFieldList = "") {
-            return csOpen(ContentName, "(ID=" + core.db.encodeSQLNumber(RecordID) + ")", "", false, core.session.user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1);
+            return csOpen(ContentName, "(ID=" + DbController.encodeSQLNumber(RecordID) + ")", "", false, core.session.user.id, WorkflowAuthoringMode, WorkflowEditingMode, SelectFieldList, 1);
         }
         //
         // ====================================================================================================
@@ -5013,13 +5011,13 @@ namespace Contensive.Processor.Controllers {
                 + " FROM (ccContentWatchLists"
                     + " LEFT JOIN ccContentWatchListRules ON ccContentWatchLists.ID = ccContentWatchListRules.ContentWatchListID)"
                     + " LEFT JOIN ccContentWatch ON ccContentWatchListRules.ContentWatchID = ccContentWatch.ID"
-                + " WHERE (((ccContentWatchLists.Name)=" + this.core.db.encodeSQLText(ListName) + ")"
+                + " WHERE (((ccContentWatchLists.Name)=" + DbController.encodeSQLText(ListName) + ")"
                     + "AND ((ccContentWatchLists.Active)<>0)"
                     + "AND ((ccContentWatchListRules.Active)<>0)"
                     + "AND ((ccContentWatch.Active)<>0)"
                     + "AND (ccContentWatch.Link is not null)"
                     + "AND (ccContentWatch.LinkLabel is not null)"
-                    + "AND ((ccContentWatch.WhatsNewDateExpires is null)or(ccContentWatch.WhatsNewDateExpires>" + this.core.db.encodeSQLDate(core.doc.profileStartTime) + "))"
+                    + "AND ((ccContentWatch.WhatsNewDateExpires is null)or(ccContentWatch.WhatsNewDateExpires>" + DbController.encodeSQLDate(core.doc.profileStartTime) + "))"
                     + ")"
                 + " ORDER BY " + iSortFieldList + ";";
                 result = this.core.db.csOpenSql(SQL, "", PageSize, PageNumber);
@@ -5027,7 +5025,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // Check if listname exists
                     //
-                    CS = this.core.db.csOpen("Content Watch Lists", "name=" + this.core.db.encodeSQLText(ListName), "ID", false, 0, false, false, "ID");
+                    CS = this.core.db.csOpen("Content Watch Lists", "name=" + DbController.encodeSQLText(ListName), "ID", false, 0, false, false, "ID");
                     if (!this.core.db.csOk(CS)) {
                         this.core.db.csClose(ref CS);
                         CS = this.core.db.csInsertRecord("Content Watch Lists");
@@ -5141,8 +5139,8 @@ namespace Contensive.Processor.Controllers {
                     if (contentSetStoreCount > 0) {
                         for (int CSPointer = 1; CSPointer <= contentSetStoreCount; CSPointer++) {
                             int tmpPtr = CSPointer;
-                            if (dataSetStore[tmpPtr] != null) {
-                                if (dataSetStore[tmpPtr].IsOpen) {
+                            if (contentSetStore[tmpPtr] != null) {
+                                if (contentSetStore[tmpPtr].IsOpen) {
                                     csClose(ref tmpPtr);
                                 }
                             }

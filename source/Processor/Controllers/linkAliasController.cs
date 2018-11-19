@@ -142,7 +142,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // Make sure there is one here for this
                             //
-                            int CS = core.db.csOpen("Link Aliases", "name=" + core.db.encodeSQLText(WorkingLinkAlias), "", false, 0, false, false, "Name,PageID,QueryStringSuffix");
+                            int CS = core.db.csOpen("Link Aliases", "name=" + DbController.encodeSQLText(WorkingLinkAlias), "", false, 0, false, false, "Name,PageID,QueryStringSuffix");
                             if (!core.db.csOk(CS)) {
                                 //
                                 // Alias not found, create a Link Aliases

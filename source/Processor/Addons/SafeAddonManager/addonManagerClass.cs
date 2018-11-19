@@ -14,6 +14,7 @@ using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Exceptions;
+using Contensive.Addons.AdminSite.Controllers;
 //
 namespace Contensive.Addons.SafeAddonManager {
     public class AddonManagerClass {
@@ -530,7 +531,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                     }
                                 } else {
                                     foreach (string installedCollectionGuid in InstalledCollectionGuidList) {
-                                        CS = core.db.csOpen("Add-on Collections", GuidFieldName + "=" + core.db.encodeSQLText(installedCollectionGuid));
+                                        CS = core.db.csOpen("Add-on Collections", GuidFieldName + "=" + DbController.encodeSQLText(installedCollectionGuid));
                                         if (core.db.csOk(CS)) {
                                             InstalledCollectionIDList.Add(core.db.csGetInteger(CS, "ID"));
                                         }
@@ -715,7 +716,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                                             Cells3[RowPtr, 3] = CollectionDescription + "&nbsp;";
                                                         } else {
                                                             IsOnServer = GenericController.encodeBoolean(OnServerGuidList.IndexOf(CollectionGuid, System.StringComparison.OrdinalIgnoreCase) + 1);
-                                                            CS = core.db.csOpen("Add-on Collections", GuidFieldName + "=" + core.db.encodeSQLText(CollectionGuid));
+                                                            CS = core.db.csOpen("Add-on Collections", GuidFieldName + "=" + DbController.encodeSQLText(CollectionGuid));
                                                             IsOnSite = core.db.csOk(CS);
                                                             core.db.csClose(ref CS);
                                                             if (IsOnSite) {
@@ -908,9 +909,9 @@ namespace Contensive.Addons.SafeAddonManager {
                 int EntryID = 0;
                 //
                 if (EntryParentID == 0) {
-                    CS = core.db.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, "(name=" + core.db.encodeSQLText(EntryName) + ")and((parentID is null)or(parentid=0))");
+                    CS = core.db.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, "(name=" + DbController.encodeSQLText(EntryName) + ")and((parentID is null)or(parentid=0))");
                 } else {
-                    CS = core.db.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, "(name=" + core.db.encodeSQLText(EntryName) + ")and(parentID=" + core.db.encodeSQLNumber(EntryParentID) + ")");
+                    CS = core.db.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, "(name=" + DbController.encodeSQLText(EntryName) + ")and(parentID=" + DbController.encodeSQLNumber(EntryParentID) + ")");
                 }
                 if (core.db.csOk(CS)) {
                     EntryID = core.db.csGetInteger(CS, "ID");
@@ -918,7 +919,7 @@ namespace Contensive.Addons.SafeAddonManager {
                 core.db.csClose(ref CS);
                 //
                 if (EntryID != 0) {
-                    CS = core.db.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, "(parentID=" + core.db.encodeSQLNumber(EntryID) + ")");
+                    CS = core.db.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, "(parentID=" + DbController.encodeSQLNumber(EntryID) + ")");
                     while (core.db.csOk(CS)) {
                         GetForm_SafeModeAddonManager_DeleteNavigatorBranch(core.db.csGetText(CS, "name"), EntryID);
                         core.db.csGoNext(CS);
@@ -1011,14 +1012,14 @@ namespace Contensive.Addons.SafeAddonManager {
                         ParentNameSpace = menuNameSpace.Left( Pos - 1);
                     }
                     if (string.IsNullOrEmpty(ParentNameSpace)) {
-                        CS = core.db.csOpen(ContentName, "(name=" + core.db.encodeSQLText(ParentName) + ")and((parentid is null)or(parentid=0))", "ID", false, 0, false, false, "ID");
+                        CS = core.db.csOpen(ContentName, "(name=" + DbController.encodeSQLText(ParentName) + ")and((parentid is null)or(parentid=0))", "ID", false, 0, false, false, "ID");
                         if (core.db.csOk(CS)) {
                             tempGetParentIDFromNameSpace = core.db.csGetInteger(CS, "ID");
                         }
                         core.db.csClose(ref CS);
                     } else {
                         ParentID = getParentIDFromNameSpace(ContentName, ParentNameSpace);
-                        CS = core.db.csOpen(ContentName, "(name=" + core.db.encodeSQLText(ParentName) + ")and(parentid=" + ParentID + ")", "ID", false, 0, false, false, "ID");
+                        CS = core.db.csOpen(ContentName, "(name=" + DbController.encodeSQLText(ParentName) + ")and(parentid=" + ParentID + ")", "ID", false, 0, false, false, "ID");
                         if (core.db.csOk(CS)) {
                             tempGetParentIDFromNameSpace = core.db.csGetInteger(CS, "ID");
                         }

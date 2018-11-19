@@ -9,7 +9,7 @@ using Contensive.Processor.Models.Domain;
 using System.Text;
 using Contensive.Processor.Exceptions;
 
-namespace Contensive.Processor {
+namespace Contensive.Addons.AdminSite.Controllers {
     //
     //====================================================================================================
     /// <summary>
@@ -127,7 +127,7 @@ namespace Contensive.Processor {
             //public bool SetLandingPageID;
             public bool Loaded; // true/false - set true when the field array values are loaded
             public bool Saved; // true if edit record was saved during this page
-            public bool Read_Only; // set if this record can not be edited, for various reasons
+            public bool userReadOnly; // set if this record can not be edited, for various reasons
             public bool IsDeleted; // true means the edit record has been deleted
             public bool IsInserted; // set if Workflow authoring insert
             public bool IsModified; // record has been modified since last published
@@ -139,18 +139,27 @@ namespace Contensive.Processor {
             public bool ApproveLock; // set if an approve Lock
             public string ApprovedName; // member who approved the record
             public DateTime ApprovedDate; // Date when record was approved
-            public bool AllowInsert;
-            public bool AllowCancel;
-            public bool AllowSave;
-            public bool AllowDelete;
-            public bool AllowPublish;
-            public bool AllowAbort;
-            public bool AllowSubmit;
-            public bool AllowApprove;
-            public bool EditLock; // set if an edit Lock by anyone else besides the current user
-            public int EditLockMemberID; // Member who edit locked the record
-            public string EditLockMemberName; // Member who edit locked the record
-            public DateTime EditLockExpires; // Time when the edit lock expires
+            /// <summary>
+            /// This user can add records to this content
+            /// </summary>
+            public bool AllowUserAdd;
+            //public bool AllowUserCancel;
+            /// <summary>
+            /// This user can save the current record
+            /// </summary>
+            public bool AllowUserSave;
+            /// <summary>
+            /// This user can delete the current record
+            /// </summary>
+            public bool AllowUserDelete;
+            //public bool AllowUserPublish;
+            //public bool AllowUserAbort;
+            //public bool AllowUserSubmit;
+            //public bool AllowUserApprove;
+            /// <summary>
+            /// set if an edit Lock by anyone else besides the current user
+            /// </summary>
+            public WorkflowController.editLockClass EditLock; 
         }
         //
         //====================================================================================================
@@ -1475,8 +1484,8 @@ namespace Contensive.Processor {
         /// <param name="core"></param>
         /// <param name="cdef"></param>
         /// <returns></returns>
-        public static string getIconEditAdminLink(CoreController core, Models.Domain.CDefModel cdef) { return getIconEditLink("/" + core.appConfig.adminRoute + "?cid=" + cdef.id, "ccRecordEditLink");}
-        public static string getIconEditAdminLink(CoreController core, Models.Domain.CDefModel cdef, int recordId) {return getIconEditLink("/" + core.appConfig.adminRoute + "?af=4&aa=2&ad=1&cid=" + cdef.id + "&id=" + recordId, "ccRecordEditLink");}
+        public static string getIconEditAdminLink(CoreController core, CDefModel cdef) { return getIconEditLink("/" + core.appConfig.adminRoute + "?cid=" + cdef.id, "ccRecordEditLink");}
+        public static string getIconEditAdminLink(CoreController core, CDefModel cdef, int recordId) {return getIconEditLink("/" + core.appConfig.adminRoute + "?af=4&aa=2&ad=1&cid=" + cdef.id + "&id=" + recordId, "ccRecordEditLink");}
         //
         //====================================================================================================
         //
@@ -1563,7 +1572,7 @@ namespace Contensive.Processor {
                         throw (new GenericException("RecordID [" + recordID + "] is invalid"));
                     } else {
                         if (IsEditing) {
-                            var cdef = Models.Domain.CDefModel.create(core, contentName);
+                            var cdef = CDefModel.create(core, contentName);
                             if ( cdef==null) {
                                 throw new GenericException("getRecordEditLink called with contentName [" + contentName + "], but no content found with this name.");
                             } else {
@@ -1766,7 +1775,7 @@ namespace Contensive.Processor {
                         SQL = "SELECT ID as ContentID, AllowAdd as ContentAllowAdd, 1 as GroupRulesAllowAdd, null as MemberRulesDateExpires"
                             + " FROM ccContent"
                             + " WHERE ("
-                            + " (ccContent.Name=" + core.db.encodeSQLText(ContentName) + ")"
+                            + " (ccContent.Name=" + DbController.encodeSQLText(ContentName) + ")"
                             + " AND(ccContent.active<>0)"
                             + " );";
                         CS = core.db.csOpenSql(SQL);
@@ -1793,11 +1802,11 @@ namespace Contensive.Processor {
                                 + " LEFT JOIN ccMemberRules ON ccgroups.ID=ccMemberRules.GroupID)"
                                 + " LEFT JOIN ccMembers ON ccMemberRules.MemberID=ccMembers.ID"
                             + " WHERE ("
-                            + " (ccContent.Name=" + core.db.encodeSQLText(ContentName) + ")"
+                            + " (ccContent.Name=" + DbController.encodeSQLText(ContentName) + ")"
                             + " AND(ccContent.active<>0)"
                             + " AND(ccGroupRules.active<>0)"
                             + " AND(ccMemberRules.active<>0)"
-                            + " AND((ccMemberRules.DateExpires is Null)or(ccMemberRules.DateExpires>" + core.db.encodeSQLDate(core.doc.profileStartTime) + "))"
+                            + " AND((ccMemberRules.DateExpires is Null)or(ccMemberRules.DateExpires>" + DbController.encodeSQLDate(core.doc.profileStartTime) + "))"
                             + " AND(ccgroups.active<>0)"
                             + " AND(ccMembers.active<>0)"
                             + " AND(ccMembers.ID=" + core.session.user.id + ")"

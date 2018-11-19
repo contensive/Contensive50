@@ -26,7 +26,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 string AddonGuid = core.docProperties.getText("guid");
                 //$$$$$ cache this
-                int CS = core.db.csOpen(Processor.Models.Db.AddonModel.contentName, "ccguid=" + core.db.encodeSQLText(AddonGuid));
+                int CS = core.db.csOpen(Processor.Models.Db.AddonModel.contentName, "ccguid=" + DbController.encodeSQLText(AddonGuid));
                 string addonArgumentList = "";
                 bool addonIsInline = false;
                 if (core.db.csOk(CS)) {

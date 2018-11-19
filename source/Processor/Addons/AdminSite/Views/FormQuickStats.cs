@@ -50,7 +50,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // ----- All Visits Today
                 //
-                SQL = "SELECT Count(ccVisits.ID) AS VisitCount, Avg(ccVisits.PageVisits) AS PageCount FROM ccVisits WHERE ((ccVisits.StartTime)>" + core.db.encodeSQLDate(core.doc.profileStartTime.Date) + ");";
+                SQL = "SELECT Count(ccVisits.ID) AS VisitCount, Avg(ccVisits.PageVisits) AS PageCount FROM ccVisits WHERE ((ccVisits.StartTime)>" + DbController.encodeSQLDate(core.doc.profileStartTime.Date) + ");";
                 CS = core.db.csOpenSql(SQL);
                 if (core.db.csOk(CS)) {
                     VisitCount = core.db.csGetInteger(CS, "VisitCount");
@@ -65,7 +65,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // ----- Non-Bot Visits Today
                 //
-                SQL = "SELECT Count(ccVisits.ID) AS VisitCount, Avg(ccVisits.PageVisits) AS PageCount FROM ccVisits WHERE (ccVisits.CookieSupport=1)and((ccVisits.StartTime)>" + core.db.encodeSQLDate(core.doc.profileStartTime.Date) + ");";
+                SQL = "SELECT Count(ccVisits.ID) AS VisitCount, Avg(ccVisits.PageVisits) AS PageCount FROM ccVisits WHERE (ccVisits.CookieSupport=1)and((ccVisits.StartTime)>" + DbController.encodeSQLDate(core.doc.profileStartTime.Date) + ");";
                 CS = core.db.csOpenSql(SQL);
                 if (core.db.csOk(CS)) {
                     VisitCount = core.db.csGetInteger(CS, "VisitCount");
@@ -80,7 +80,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // ----- Visits Today by new visitors
                 //
-                SQL = "SELECT Count(ccVisits.ID) AS VisitCount, Avg(ccVisits.PageVisits) AS PageCount FROM ccVisits WHERE (ccVisits.CookieSupport=1)and(ccVisits.StartTime>" + core.db.encodeSQLDate(core.doc.profileStartTime.Date) + ")AND(ccVisits.VisitorNew<>0);";
+                SQL = "SELECT Count(ccVisits.ID) AS VisitCount, Avg(ccVisits.PageVisits) AS PageCount FROM ccVisits WHERE (ccVisits.CookieSupport=1)and(ccVisits.StartTime>" + DbController.encodeSQLDate(core.doc.profileStartTime.Date) + ")AND(ccVisits.VisitorNew<>0);";
                 CS = core.db.csOpenSql(SQL);
                 if (core.db.csOk(CS)) {
                     VisitCount = core.db.csGetInteger(CS, "VisitCount");
@@ -102,7 +102,7 @@ namespace Contensive.Addons.AdminSite {
                     Stream.Add("<h2>Current Visits</h2>");
                     SQL = "SELECT ccVisits.HTTP_REFERER as referer,ccVisits.remote_addr as Remote_Addr, ccVisits.LastVisitTime as LastVisitTime, ccVisits.PageVisits as PageVisits, ccMembers.Name as MemberName, ccVisits.ID as VisitID, ccMembers.ID as MemberID"
                         + " FROM ccVisits LEFT JOIN ccMembers ON ccVisits.MemberID = ccMembers.ID"
-                        + " WHERE (((ccVisits.LastVisitTime)>" + core.db.encodeSQLDate(core.doc.profileStartTime.AddHours(-1)) + "))"
+                        + " WHERE (((ccVisits.LastVisitTime)>" + DbController.encodeSQLDate(core.doc.profileStartTime.AddHours(-1)) + "))"
                         + " ORDER BY ccVisits.LastVisitTime DESC;";
                     CS = core.db.csOpenSql(SQL);
                     if (core.db.csOk(CS)) {

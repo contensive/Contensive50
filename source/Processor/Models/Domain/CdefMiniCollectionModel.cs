@@ -776,7 +776,7 @@ namespace Contensive.Processor.Models.Domain {
                     if (keypairvalue.Value.dataChanged) {
                         LogController.logInfo(core, "adding cdef name [" + keypairvalue.Value.name + "]");
                         if (!installedContentList.Contains(keypairvalue.Value.name.ToLowerInvariant())) {
-                            SQL = "Insert into ccContent (name,ccguid,active,createkey)values(" + core.db.encodeSQLText(keypairvalue.Value.name) + "," + core.db.encodeSQLText(keypairvalue.Value.guid) + ",1,0);";
+                            SQL = "Insert into ccContent (name,ccguid,active,createkey)values(" + DbController.encodeSQLText(keypairvalue.Value.name) + "," + DbController.encodeSQLText(keypairvalue.Value.guid) + ",1,0);";
                             core.db.executeQuery(SQL);
                             installedContentList.Add(keypairvalue.Value.name.ToLowerInvariant());
                         }
@@ -841,7 +841,7 @@ namespace Contensive.Processor.Models.Domain {
                         //var field2 = Collection.cdef[ContentName.ToLowerInvariant()].fields[((string)null).ToLowerInvariant()];
                         if (workingField.HelpChanged) {
                             int fieldId = 0;
-                            SQL = "select f.id from ccfields f left join cccontent c on c.id=f.contentid where (f.name=" + core.db.encodeSQLText(workingField.nameLc) + ")and(c.name=" + core.db.encodeSQLText(workingCdef.name) + ") order by f.id";
+                            SQL = "select f.id from ccfields f left join cccontent c on c.id=f.contentid where (f.name=" + DbController.encodeSQLText(workingField.nameLc) + ")and(c.name=" + DbController.encodeSQLText(workingCdef.name) + ") order by f.id";
                             rs = core.db.executeQuery(SQL);
                             if (DbController.isDataTableOk(rs)) {
                                 fieldId = GenericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "id"));
@@ -868,7 +868,7 @@ namespace Contensive.Processor.Models.Domain {
                                             //Copy = Copy;
                                         }
                                     }
-                                    SQL = "update ccfieldhelp set active=1,contentcontrolid=" + FieldHelpCID + ",fieldid=" + fieldId + ",helpdefault=" + core.db.encodeSQLText(Copy) + " where id=" + FieldHelpID;
+                                    SQL = "update ccfieldhelp set active=1,contentcontrolid=" + FieldHelpCID + ",fieldid=" + fieldId + ",helpdefault=" + DbController.encodeSQLText(Copy) + " where id=" + FieldHelpID;
                                     core.db.executeQuery(SQL);
                                 }
                             }

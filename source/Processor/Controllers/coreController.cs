@@ -387,17 +387,6 @@ namespace Contensive.Processor.Controllers {
         private System.Web.Script.Serialization.JavaScriptSerializer _json;
         //
         //===================================================================================================
-        public WorkflowController workflow {
-            get {
-                if (_workflow == null) {
-                    _workflow = new WorkflowController(this);
-                }
-                return _workflow;
-            }
-        }
-        private WorkflowController _workflow = null;
-        //
-        //===================================================================================================
         public Controllers.CacheController cache {
             get {
                 if (_cache == null) {
@@ -1007,7 +996,7 @@ namespace Contensive.Processor.Controllers {
                 //    string SortFieldList = "";
                 //    bool AllowInactiveRecords2 = false;
                 //    string SelectFieldList = "";
-                //    int CS = db.csOpen("Remote Queries", "((VisitId=" + doc.authContext.visit.id + ")and(remotekey=" + db.encodeSQLText(RemoteKey) + "))");
+                //    int CS = db.csOpen("Remote Queries", "((VisitId=" + doc.authContext.visit.id + ")and(remotekey=" + DbController.encodeSQLText(RemoteKey) + "))");
                 //    if (db.csOk(CS)) {
                 //        //
                 //        // Use user definied query
@@ -1565,22 +1554,22 @@ namespace Contensive.Processor.Controllers {
                                     string SQL = "insert into ccviewings ("
                                         + "Name,VisitId,MemberID,Host,Path,Page,QueryString,Form,Referer,DateAdded,StateOK,pagetime,Active,RecordID,ExcludeFromAnalytics,pagetitle"
                                         + ")values("
-                                        + " " + db.encodeSQLText(ViewingName)
+                                        + " " + DbController.encodeSQLText(ViewingName)
                                         + "," + session.visit.id.ToString()
                                         + "," + session.user.id.ToString()
-                                        + "," + db.encodeSQLText(webServer.requestDomain)
-                                        + "," + db.encodeSQLText(webServer.requestPath)
-                                        + "," + db.encodeSQLText(webServer.requestPage)
-                                        + "," + db.encodeSQLText(webServer.requestQueryString.Left(255))
-                                        + "," + db.encodeSQLText(requestFormSerialized.Left(255))
-                                        + "," + db.encodeSQLText(webServer.requestReferrer.Left(255))
-                                        + "," + db.encodeSQLDate(doc.profileStartTime)
-                                        + "," + db.encodeSQLBoolean(session.visit_stateOK)
+                                        + "," + DbController.encodeSQLText(webServer.requestDomain)
+                                        + "," + DbController.encodeSQLText(webServer.requestPath)
+                                        + "," + DbController.encodeSQLText(webServer.requestPage)
+                                        + "," + DbController.encodeSQLText(webServer.requestQueryString.Left(255))
+                                        + "," + DbController.encodeSQLText(requestFormSerialized.Left(255))
+                                        + "," + DbController.encodeSQLText(webServer.requestReferrer.Left(255))
+                                        + "," + DbController.encodeSQLDate(doc.profileStartTime)
+                                        + "," + DbController.encodeSQLBoolean(session.visit_stateOK)
                                         + "," + doc.appStopWatch.ElapsedMilliseconds.ToString()
                                         + ",1"
                                         + "," + PageID.ToString()
-                                        + "," + db.encodeSQLBoolean(webServer.pageExcludeFromAnalytics)
-                                        + "," + db.encodeSQLText(pagetitle);
+                                        + "," + DbController.encodeSQLBoolean(webServer.pageExcludeFromAnalytics)
+                                        + "," + DbController.encodeSQLText(pagetitle);
                                     SQL += ");";
                                     db.executeNonQueryAsync(SQL);
                                 }
@@ -1603,11 +1592,6 @@ namespace Contensive.Processor.Controllers {
                     if (_cache != null) {
                         _cache.Dispose();
                         _cache = null;
-                    }
-                    //
-                    if (_workflow != null) {
-                        _workflow.Dispose();
-                        _workflow = null;
                     }
                     //
                     if (_siteProperties != null) {

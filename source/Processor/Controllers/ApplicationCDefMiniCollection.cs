@@ -126,7 +126,7 @@ namespace Contensive.Processor.Controllers {
                 appName = core.appConfig.name;
                 iContentName = ContentName;
                 if (!string.IsNullOrEmpty(iContentName)) {
-                    SQL = "select id from cccontent where name=" + core.db.encodeSQLText(iContentName);
+                    SQL = "select id from cccontent where name=" + DbController.encodeSQLText(iContentName);
                     dt = core.db.executeQuery(SQL);
                     if (dt.Rows.Count > 0) {
                         ContentID = GenericController.encodeInteger(dt.Rows[0]["id"]);

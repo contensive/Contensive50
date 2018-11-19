@@ -62,7 +62,7 @@ namespace Contensive.Addons.Housekeeping {
                     //CPClass cp = new CPClass();
                     DateTime Yesterday = rightNow.AddDays(-1).Date;
                     DateTime ALittleWhileAgo = rightNow.AddDays(-90).Date;
-                    string SQLNow = core.db.encodeSQLDate(rightNow);
+                    string SQLNow = DbController.encodeSQLDate(rightNow);
                     //
                     // it is the next day, remove old log files
                     //
@@ -218,7 +218,7 @@ namespace Contensive.Addons.Housekeeping {
                         //
                         // Remote Query Expiration
                         //
-                        SQL = "delete from ccRemoteQueries where (DateExpires is not null)and(DateExpires<" + core.db.encodeSQLDate(DateTime.Now) + ")";
+                        SQL = "delete from ccRemoteQueries where (DateExpires is not null)and(DateExpires<" + DbController.encodeSQLDate(DateTime.Now) + ")";
                         core.db.executeQuery(SQL);
                         if (DataSourceType == DataSourceTypeODBCMySQL) {
                             SQL = "delete m from ccmenuEntries m left join ccAggregateFunctions a on a.id=m.AddonID where m.addonid<>0 and a.id is null";
@@ -273,7 +273,7 @@ namespace Contensive.Addons.Housekeeping {
                         // Set NextSummaryStartDate based on the last time we ran hourly summarization
                         //
                         DateTime LastTimeSummaryWasRun = VisitArchiveDate;
-                        SQL = core.db.getSQLSelect("default", "ccVisitSummary", "DateAdded", "(timeduration=1)and(Dateadded>" + core.db.encodeSQLDate(VisitArchiveDate) + ")", "id Desc", "", 1);
+                        SQL = core.db.getSQLSelect("default", "ccVisitSummary", "DateAdded", "(timeduration=1)and(Dateadded>" + DbController.encodeSQLDate(VisitArchiveDate) + ")", "id Desc", "", 1);
                         CS = core.db.csOpenSql(SQL,"Default");
                         if (core.db.csOk(CS)) {
                             LastTimeSummaryWasRun = core.db.csGetDate(CS, "DateAdded");
@@ -292,7 +292,7 @@ namespace Contensive.Addons.Housekeeping {
                         //
                         DateTime StartOfHour = (new DateTime(LastTimeSummaryWasRun.Year, LastTimeSummaryWasRun.Month, LastTimeSummaryWasRun.Day, LastTimeSummaryWasRun.Hour, 1, 1)).AddHours(-1); // (Int(24 * LastTimeSummaryWasRun) / 24) - PeriodStep
                         DateTime OldestDateAdded = StartOfHour;
-                        SQL = core.db.getSQLSelect("default", "ccVisits", "DateAdded", "LastVisitTime>" + core.db.encodeSQLDate(StartOfHour), "dateadded", "", 1);
+                        SQL = core.db.getSQLSelect("default", "ccVisits", "DateAdded", "LastVisitTime>" + DbController.encodeSQLDate(StartOfHour), "dateadded", "", 1);
                         //SQL = "select top 1 Dateadded from ccvisits where LastVisitTime>" & encodeSQLDate(StartOfHour) & " order by DateAdded"
                         CS = core.db.csOpenSql(SQL,"Default");
                         if (core.db.csOk(CS)) {
@@ -432,7 +432,7 @@ namespace Contensive.Addons.Housekeeping {
                 SQLTablePeople = CdefController.getContentTablename(core, "People");
                 SQLTableMemberRules = CdefController.getContentTablename(core, "Member Rules");
                 SQLTableGroups = CdefController.getContentTablename(core, "Groups");
-                SQLDateMidnightTwoDaysAgo = core.db.encodeSQLDate(MidnightTwoDaysAgo);
+                SQLDateMidnightTwoDaysAgo = DbController.encodeSQLDate(MidnightTwoDaysAgo);
                 //
                 // Any member records that were created outside contensive need to have CreatedByVisit=0 (past v4.1.152)
                 core.db.executeQuery("update ccmembers set CreatedByVisit=0 where createdbyvisit is null");
@@ -579,7 +579,7 @@ namespace Contensive.Addons.Housekeeping {
                 // Visits with no DateAdded
                 //
                 logHousekeeping(core, "Deleting visits with no DateAdded");
-                core.db.deleteTableRecordChunks("default", "ccvisits", "(DateAdded is null)or(DateAdded<=" + core.db.encodeSQLDate(new DateTime(1995, 1, 1)) + ")", 1000, 10000);
+                core.db.deleteTableRecordChunks("default", "ccvisits", "(DateAdded is null)or(DateAdded<=" + DbController.encodeSQLDate(new DateTime(1995, 1, 1)) + ")", 1000, 10000);
                 //
                 // Visits with no visitor
                 //
@@ -711,13 +711,13 @@ namespace Contensive.Addons.Housekeeping {
                 //
                 logHousekeeping(core, "Deleting email drops older then " + EmailDropArchiveAgeDays + " days");
                 ArchiveEmailDropDate = rightNow.AddDays(-EmailDropArchiveAgeDays).Date;
-                core.db.deleteContentRecords("Email drops", "(DateAdded is null)or(DateAdded<=" + core.db.encodeSQLDate(ArchiveEmailDropDate) + ")");
+                core.db.deleteContentRecords("Email drops", "(DateAdded is null)or(DateAdded<=" + DbController.encodeSQLDate(ArchiveEmailDropDate) + ")");
                 //
                 // delete email log entries not realted to a drop, older than archive.
                 //
                 logHousekeeping(core, "Deleting non-drop email logs older then " + EmailDropArchiveAgeDays + " days");
                 ArchiveEmailDropDate = rightNow.AddDays(-EmailDropArchiveAgeDays).Date;
-                core.db.deleteContentRecords("Email Log", "(emailDropId is null)and((DateAdded is null)or(DateAdded<=" + core.db.encodeSQLDate(ArchiveEmailDropDate) + "))");
+                core.db.deleteContentRecords("Email Log", "(emailDropId is null)and((DateAdded is null)or(DateAdded<=" + DbController.encodeSQLDate(ArchiveEmailDropDate) + "))");
                 //
                 // block duplicate redirect fields (match contentid+fieldtype+caption)
                 //
@@ -1140,11 +1140,11 @@ namespace Contensive.Addons.Housekeeping {
                                 VirtualLink = GenericController.vbReplace(VirtualFileName, "\\", "/");
                                 FileSize = file.Size;
                                 if (FileSize == 0) {
-                                    SQL = "update " + TableName + " set " + FieldName + "=null where (" + FieldName + "=" + core.db.encodeSQLText(VirtualFileName) + ")or(" + FieldName + "=" + core.db.encodeSQLText(VirtualLink) + ")";
+                                    SQL = "update " + TableName + " set " + FieldName + "=null where (" + FieldName + "=" + DbController.encodeSQLText(VirtualFileName) + ")or(" + FieldName + "=" + DbController.encodeSQLText(VirtualLink) + ")";
                                     core.db.executeQuery(SQL);
                                     core.cdnFiles.deleteFile(VirtualFileName);
                                 } else {
-                                    SQL = "SELECT ID FROM " + TableName + " WHERE (" + FieldName + "=" + core.db.encodeSQLText(VirtualFileName) + ")or(" + FieldName + "=" + core.db.encodeSQLText(VirtualLink) + ")";
+                                    SQL = "SELECT ID FROM " + TableName + " WHERE (" + FieldName + "=" + DbController.encodeSQLText(VirtualFileName) + ")or(" + FieldName + "=" + DbController.encodeSQLText(VirtualLink) + ")";
                                     CSTest = core.db.csOpenSql(SQL,"Default");
                                     if (!core.db.csOk(CSTest)) {
                                         core.cdnFiles.deleteFile(VirtualFileName);
@@ -1282,7 +1282,7 @@ namespace Contensive.Addons.Housekeeping {
                 SQLTablePeople = CdefController.getContentTablename(core, "People");
                 //
                 appName = core.appConfig.name;
-                DeleteBeforeDateSQL = core.db.encodeSQLDate(DeleteBeforeDate);
+                DeleteBeforeDateSQL = DbController.encodeSQLDate(DeleteBeforeDate);
                 //
                 // Visits older then archive age
                 //
@@ -1338,7 +1338,7 @@ namespace Contensive.Addons.Housekeeping {
                 // Set long timeout (30 min) needed for heavy work on big tables
                 core.db.sqlCommandTimeout = 1800;
                 string SQLTablePeople = CdefController.getContentTablename(core, "People");
-                string DeleteBeforeDateSQL = core.db.encodeSQLDate(DeleteBeforeDate);
+                string DeleteBeforeDateSQL = DbController.encodeSQLDate(DeleteBeforeDate);
                 //
                 logHousekeeping(core, "Deleting members with  LastVisit before DeleteBeforeDate [" + DeleteBeforeDate + "], exactly one total visit, a null username and a null email address.");
                 //
@@ -1457,8 +1457,8 @@ namespace Contensive.Addons.Housekeeping {
                         SQL = "select count(v.id) as NoCookieVisits"
                             + " from ccvisits v"
                             + " where (v.CookieSupport<>1)"
-                            + " and(v.dateadded>=" + core.db.encodeSQLDate(DateStart) + ")"
-                            + " and (v.dateadded<" + core.db.encodeSQLDate(DateEnd) + ")"
+                            + " and(v.dateadded>=" + DbController.encodeSQLDate(DateStart) + ")"
+                            + " and (v.dateadded<" + DbController.encodeSQLDate(DateEnd) + ")"
                             + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
                             + "";
                         CS = core.db.csOpenSql(SQL,"Default");
@@ -1472,8 +1472,8 @@ namespace Contensive.Addons.Housekeeping {
                         SQL = "select count(v.id) as VisitCnt ,Sum(v.PageVisits) as HitCnt ,sum(v.TimetoLastHit) as TimeOnSite"
                             + " from ccvisits v"
                             + " where (v.CookieSupport<>0)"
-                            + " and(v.dateadded>=" + core.db.encodeSQLDate(DateStart) + ")"
-                            + " and (v.dateadded<" + core.db.encodeSQLDate(DateEnd) + ")"
+                            + " and(v.dateadded>=" + DbController.encodeSQLDate(DateStart) + ")"
+                            + " and (v.dateadded<" + DbController.encodeSQLDate(DateEnd) + ")"
                             + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
                             + "";
                         CS = core.db.csOpenSql(SQL,"Default");
@@ -1490,8 +1490,8 @@ namespace Contensive.Addons.Housekeeping {
                             SQL = "select count(v.id) as NewVisitorVisits"
                                 + " from ccvisits v"
                                 + " where (v.CookieSupport<>0)"
-                                + " and(v.dateadded>=" + core.db.encodeSQLDate(DateStart) + ")"
-                                + " and (v.dateadded<" + core.db.encodeSQLDate(DateEnd) + ")"
+                                + " and(v.dateadded>=" + DbController.encodeSQLDate(DateStart) + ")"
+                                + " and (v.dateadded<" + DbController.encodeSQLDate(DateEnd) + ")"
                                 + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
                                 + " and(v.VisitorNew<>0)"
                                 + "";
@@ -1506,8 +1506,8 @@ namespace Contensive.Addons.Housekeeping {
                             SQL = "select count(v.id) as SinglePageVisits"
                                 + " from ccvisits v"
                                 + " where (v.CookieSupport<>0)"
-                                + " and(v.dateadded>=" + core.db.encodeSQLDate(DateStart) + ")"
-                                + " and (v.dateadded<" + core.db.encodeSQLDate(DateEnd) + ")"
+                                + " and(v.dateadded>=" + DbController.encodeSQLDate(DateStart) + ")"
+                                + " and (v.dateadded<" + DbController.encodeSQLDate(DateEnd) + ")"
                                 + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
                                 + " and(v.PageVisits=1)"
                                 + "";
@@ -1522,8 +1522,8 @@ namespace Contensive.Addons.Housekeeping {
                             SQL = "select count(v.id) as VisitCnt ,sum(v.PageVisits) as HitCnt ,sum(v.TimetoLastHit) as TimetoLastHitSum "
                                 + " from ccvisits v"
                                 + " where (v.CookieSupport<>0)"
-                                + " and(v.dateadded>=" + core.db.encodeSQLDate(DateStart) + ")"
-                                + " and (v.dateadded<" + core.db.encodeSQLDate(DateEnd) + ")"
+                                + " and(v.dateadded>=" + DbController.encodeSQLDate(DateStart) + ")"
+                                + " and (v.dateadded<" + DbController.encodeSQLDate(DateEnd) + ")"
                                 + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
                                 + " and(PageVisits>1)"
                                 + "";
@@ -1540,8 +1540,8 @@ namespace Contensive.Addons.Housekeeping {
                             SQL = "select count(v.id) as AuthenticatedVisits "
                                 + " from ccvisits v"
                                 + " where (v.CookieSupport<>0)"
-                                + " and(v.dateadded>=" + core.db.encodeSQLDate(DateStart) + ")"
-                                + " and (v.dateadded<" + core.db.encodeSQLDate(DateEnd) + ")"
+                                + " and(v.dateadded>=" + DbController.encodeSQLDate(DateStart) + ")"
+                                + " and (v.dateadded<" + DbController.encodeSQLDate(DateEnd) + ")"
                                 + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
                                 + " and(VisitAuthenticated<>0)"
                                 + "";
@@ -1557,8 +1557,8 @@ namespace Contensive.Addons.Housekeeping {
                             SQL = "select count(v.id) as cnt "
                                 + " from ccvisits v"
                                 + " where (v.CookieSupport<>0)"
-                                + " and(v.dateadded>=" + core.db.encodeSQLDate(DateStart) + ")"
-                                + " and (v.dateadded<" + core.db.encodeSQLDate(DateEnd) + ")"
+                                + " and(v.dateadded>=" + DbController.encodeSQLDate(DateStart) + ")"
+                                + " and (v.dateadded<" + DbController.encodeSQLDate(DateEnd) + ")"
                                 + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
                                 + " and(Mobile<>0)"
                                 + "";
@@ -1574,8 +1574,8 @@ namespace Contensive.Addons.Housekeeping {
                             SQL = "select count(v.id) as cnt "
                                 + " from ccvisits v"
                                 + " where (v.CookieSupport<>0)"
-                                + " and(v.dateadded>=" + core.db.encodeSQLDate(DateStart) + ")"
-                                + " and (v.dateadded<" + core.db.encodeSQLDate(DateEnd) + ")"
+                                + " and(v.dateadded>=" + DbController.encodeSQLDate(DateStart) + ")"
+                                + " and (v.dateadded<" + DbController.encodeSQLDate(DateEnd) + ")"
                                 + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
                                 + " and(Bot<>0)"
                                 + "";
@@ -1769,8 +1769,8 @@ namespace Contensive.Addons.Housekeeping {
                         //
                         SQL = "select distinct recordid,pagetitle from ccviewings h"
                             + " where (h.recordid<>0)"
-                            + " and(h.dateadded>=" + core.db.encodeSQLDate(DateStart) + ")"
-                            + " and (h.dateadded<" + core.db.encodeSQLDate(DateEnd) + ")"
+                            + " and(h.dateadded>=" + DbController.encodeSQLDate(DateStart) + ")"
+                            + " and (h.dateadded<" + DbController.encodeSQLDate(DateEnd) + ")"
                             + " and((h.ExcludeFromAnalytics is null)or(h.ExcludeFromAnalytics=0))"
                             + "order by recordid";
                         hint = 3;
@@ -1779,7 +1779,7 @@ namespace Contensive.Addons.Housekeeping {
                             //
                             // no hits found - add or update a single record for this day so we know it has been calculated
                             //
-                            CS = core.db.csOpen("Page View Summary", "(timeduration=" + HourDuration + ")and(DateNumber=" + DateNumber + ")and(TimeNumber=" + TimeNumber + ")and(pageid=" + PageID + ")and(pagetitle=" + core.db.encodeSQLText(PageTitle) + ")");
+                            CS = core.db.csOpen("Page View Summary", "(timeduration=" + HourDuration + ")and(DateNumber=" + DateNumber + ")and(TimeNumber=" + TimeNumber + ")and(pageid=" + PageID + ")and(pagetitle=" + DbController.encodeSQLText(PageTitle) + ")");
                             if (!core.db.csOk(CS)) {
                                 core.db.csClose(ref CS);
                                 CS = core.db.csInsertRecord("Page View Summary");
@@ -1813,13 +1813,13 @@ namespace Contensive.Addons.Housekeeping {
                                 baseCriteria = ""
                                     + " (h.recordid=" + PageID + ")"
                                     + " "
-                                    + " and(h.dateadded>=" + core.db.encodeSQLDate(DateStart) + ")"
-                                    + " and(h.dateadded<" + core.db.encodeSQLDate(DateEnd) + ")"
+                                    + " and(h.dateadded>=" + DbController.encodeSQLDate(DateStart) + ")"
+                                    + " and(h.dateadded<" + DbController.encodeSQLDate(DateEnd) + ")"
                                     + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
                                     + " and((h.ExcludeFromAnalytics is null)or(h.ExcludeFromAnalytics=0))"
                                     + "";
                                 if (!string.IsNullOrEmpty(PageTitle)) {
-                                    baseCriteria = baseCriteria + "and(h.pagetitle=" + core.db.encodeSQLText(PageTitle) + ")";
+                                    baseCriteria = baseCriteria + "and(h.pagetitle=" + DbController.encodeSQLText(PageTitle) + ")";
                                 }
                                 hint = 6;
                                 //
@@ -1895,7 +1895,7 @@ namespace Contensive.Addons.Housekeeping {
                                 //
                                 // Add or update the Visit Summary Record
                                 //
-                                CS = core.db.csOpen("Page View Summary", "(timeduration=" + HourDuration + ")and(DateNumber=" + DateNumber + ")and(TimeNumber=" + TimeNumber + ")and(pageid=" + PageID + ")and(pagetitle=" + core.db.encodeSQLText(PageTitle) + ")");
+                                CS = core.db.csOpen("Page View Summary", "(timeduration=" + HourDuration + ")and(DateNumber=" + DateNumber + ")and(TimeNumber=" + TimeNumber + ")and(pageid=" + PageID + ")and(pagetitle=" + DbController.encodeSQLText(PageTitle) + ")");
                                 if (!core.db.csOk(CS)) {
                                     core.db.csClose(ref CS);
                                     CS = core.db.csInsertRecord("Page View Summary");

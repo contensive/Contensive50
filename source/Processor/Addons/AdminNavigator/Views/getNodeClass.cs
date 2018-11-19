@@ -436,9 +436,9 @@ namespace Contensive.Addons.AdminNavigator {
                                                     // contentname,(id or guid)
                                                     //
                                                     if (dataRecordParts[1].Substring(0, 1) == "{") {
-                                                        sqlCriteria = "ccguid=" + cp.Db.EncodeSQLText(dataRecordParts[1]);
+                                                        sqlCriteria = "ccguid=" + DbController.encodeSQLText(dataRecordParts[1]);
                                                     } else {
-                                                        sqlCriteria = "name=" + cp.Db.EncodeSQLText(dataRecordParts[1]);
+                                                        sqlCriteria = "name=" + DbController.encodeSQLText(dataRecordParts[1]);
                                                     }
                                                 }
                                                 if (cs7.Open(dataRecordCdefName, sqlCriteria)) {

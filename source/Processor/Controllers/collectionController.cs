@@ -1296,9 +1296,9 @@ namespace Contensive.Processor.Controllers {
                                                                                         Models.Domain.CDefModel CDef = Models.Domain.CDefModel.create(core, ContentName);
                                                                                         int cs = -1;
                                                                                         if (!string.IsNullOrEmpty(ContentRecordGuid)) {
-                                                                                            cs = core.db.csOpen(ContentName, "ccguid=" + core.db.encodeSQLText(ContentRecordGuid));
+                                                                                            cs = core.db.csOpen(ContentName, "ccguid=" + DbController.encodeSQLText(ContentRecordGuid));
                                                                                         } else {
-                                                                                            cs = core.db.csOpen(ContentName, "name=" + core.db.encodeSQLText(ContentRecordName));
+                                                                                            cs = core.db.csOpen(ContentName, "name=" + DbController.encodeSQLText(ContentRecordName));
                                                                                         }
                                                                                         bool recordfound = true;
                                                                                         if (!core.db.csOk(cs)) {
@@ -1371,7 +1371,7 @@ namespace Contensive.Processor.Controllers {
                                                                 if (!string.IsNullOrEmpty(ChildCollectionGUID)) {
                                                                     int ChildCollectionID = 0;
                                                                     int cs = -1;
-                                                                    cs = core.db.csOpen("Add-on Collections", "ccguid=" + core.db.encodeSQLText(ChildCollectionGUID));
+                                                                    cs = core.db.csOpen("Add-on Collections", "ccguid=" + DbController.encodeSQLText(ChildCollectionGUID));
                                                                     if (core.db.csOk(cs)) {
                                                                         ChildCollectionID = core.db.csGetInteger(cs, "id");
                                                                     }
@@ -1402,7 +1402,7 @@ namespace Contensive.Processor.Controllers {
                                                                 //    If ScriptingGuid = "" Then
                                                                 //        ScriptingGuid = ScriptingName
                                                                 //    End If
-                                                                //    Criteria = "(ccguid=" & core.db.encodeSQLText(ScriptingGuid) & ")"
+                                                                //    Criteria = "(ccguid=" & DbController.encodeSQLText(ScriptingGuid) & ")"
                                                                 //    ScriptingModuleID = 0
                                                                 //    CS = core.db.cs_open("Scripting Modules", Criteria)
                                                                 //    If core.db.cs_ok(CS) Then
@@ -1415,7 +1415,7 @@ namespace Contensive.Processor.Controllers {
                                                                 //        ' not found by GUID - search name against name to update legacy Add-ons
                                                                 //        '
                                                                 //        Call core.db.cs_Close(CS)
-                                                                //        Criteria = "(name=" & core.db.encodeSQLText(ScriptingName) & ")and(ccguid is null)"
+                                                                //        Criteria = "(name=" & DbController.encodeSQLText(ScriptingName) & ")and(ccguid is null)"
                                                                 //        CS = core.db.cs_open("Scripting Modules", Criteria)
                                                                 //        If core.db.cs_ok(CS) Then
                                                                 //            Call logcontroller.appendInstallLog(core, "UpgradeAppFromLocalCollection, Scripting Module matched an existing Module that has no GUID, Updating to [" & ScriptingName & "], Guid [" & ScriptingGuid & "]")
@@ -1472,7 +1472,7 @@ namespace Contensive.Processor.Controllers {
                                                                 //    If nodeGuid = "" Then
                                                                 //        nodeGuid = NodeName
                                                                 //    End If
-                                                                //    Criteria = "(ccguid=" & core.db.encodeSQLText(nodeGuid) & ")"
+                                                                //    Criteria = "(ccguid=" & DbController.encodeSQLText(nodeGuid) & ")"
                                                                 //    ScriptingModuleID = 0
                                                                 //    CS = core.db.cs_open("Shared Styles", Criteria)
                                                                 //    If core.db.cs_ok(CS) Then
@@ -1485,7 +1485,7 @@ namespace Contensive.Processor.Controllers {
                                                                 //        ' not found by GUID - search name against name to update legacy Add-ons
                                                                 //        '
                                                                 //        Call core.db.cs_Close(CS)
-                                                                //        Criteria = "(name=" & core.db.encodeSQLText(NodeName) & ")and(ccguid is null)"
+                                                                //        Criteria = "(name=" & DbController.encodeSQLText(NodeName) & ")and(ccguid is null)"
                                                                 //        CS = core.db.cs_open("shared styles", Criteria)
                                                                 //        If core.db.cs_ok(CS) Then
                                                                 //            Call logcontroller.appendInstallLog(core, "UpgradeAppFromLocalCollection, shared style matched an existing Module that has no GUID, Updating to [" & NodeName & "], Guid [" & nodeGuid & "]")
@@ -1608,9 +1608,9 @@ namespace Contensive.Processor.Controllers {
                                                                                 Models.Domain.CDefModel CDef = Models.Domain.CDefModel.create(core, ContentName);
                                                                                 int cs = -1;
                                                                                 if (!string.IsNullOrEmpty(ContentRecordGuid)) {
-                                                                                    cs = core.db.csOpen(ContentName, "ccguid=" + core.db.encodeSQLText(ContentRecordGuid));
+                                                                                    cs = core.db.csOpen(ContentName, "ccguid=" + DbController.encodeSQLText(ContentRecordGuid));
                                                                                 } else {
-                                                                                    cs = core.db.csOpen(ContentName, "name=" + core.db.encodeSQLText(ContentRecordName));
+                                                                                    cs = core.db.csOpen(ContentName, "name=" + DbController.encodeSQLText(ContentRecordName));
                                                                                 }
                                                                                 if (core.db.csOk(cs)) {
                                                                                     //
@@ -1995,7 +1995,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 int CS;
                 //
-                CS = core.db.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, "ccguid=" + core.db.encodeSQLText(ccGuid), "ID",true,0,false,false, "ID");
+                CS = core.db.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, "ccguid=" + DbController.encodeSQLText(ccGuid), "ID",true,0,false,false, "ID");
                 if (core.db.csOk(CS)) {
                     navId = core.db.csGetInteger(CS, "id");
                 }
@@ -2130,7 +2130,7 @@ namespace Contensive.Processor.Controllers {
                     if (navTypeId == 0) {
                         navTypeId = NavTypeIDAddon;
                     }
-                    string Criteria = "(" + AddonGuidFieldName + "=" + core.db.encodeSQLText(addonGuid) + ")";
+                    string Criteria = "(" + AddonGuidFieldName + "=" + DbController.encodeSQLText(addonGuid) + ")";
                     int CS = core.db.csOpen(Models.Db.AddonModel.contentName, Criteria, "", false);
                     if (core.db.csOk(CS)) {
                         //
@@ -2142,7 +2142,7 @@ namespace Contensive.Processor.Controllers {
                         // not found by GUID - search name against name to update legacy Add-ons
                         //
                         core.db.csClose(ref CS);
-                        Criteria = "(name=" + core.db.encodeSQLText(addonName) + ")and(" + AddonGuidFieldName + " is null)";
+                        Criteria = "(name=" + DbController.encodeSQLText(addonName) + ")and(" + AddonGuidFieldName + " is null)";
                         CS = core.db.csOpen(Models.Db.AddonModel.contentName, Criteria,"", false);
                         if (core.db.csOk(CS)) {
                             LogController.logInfo(core, "UpgradeAppFromLocalCollection, Add-on name matched an existing Add-on that has no GUID, Updating legacy Aggregate Function to Add-on [" + addonName + "], Guid [" + addonGuid + "]");
@@ -2248,11 +2248,11 @@ namespace Contensive.Processor.Controllers {
                                                                 ContentNameorGuid = XmlController.GetXMLAttribute(core, IsFound, TriggerNode, "name", "");
                                                             }
                                                         }
-                                                        Criteria = "(ccguid=" + core.db.encodeSQLText(ContentNameorGuid) + ")";
+                                                        Criteria = "(ccguid=" + DbController.encodeSQLText(ContentNameorGuid) + ")";
                                                         CS2 = core.db.csOpen("Content", Criteria);
                                                         if (!core.db.csOk(CS2)) {
                                                             core.db.csClose(ref CS2);
-                                                            Criteria = "(ccguid is null)and(name=" + core.db.encodeSQLText(ContentNameorGuid) + ")";
+                                                            Criteria = "(ccguid is null)and(name=" + DbController.encodeSQLText(ContentNameorGuid) + ")";
                                                             CS2 = core.db.csOpen("content", Criteria);
                                                         }
                                                         if (core.db.csOk(CS2)) {
@@ -2373,11 +2373,11 @@ namespace Contensive.Processor.Controllers {
                                             //    If nodeNameOrGuid = "" Then
                                             //        nodeNameOrGuid =xmlController.GetXMLAttribute(core,IsFound, PageInterface, "name", "")
                                             //    End If
-                                            //    Criteria = "(ccguid=" & core.db.encodeSQLText(nodeNameOrGuid) & ")"
+                                            //    Criteria = "(ccguid=" & DbController.encodeSQLText(nodeNameOrGuid) & ")"
                                             //    CS2 = core.db.cs_open("shared styles", Criteria)
                                             //    If Not core.db.cs_ok(CS2) Then
                                             //        Call core.db.cs_Close(CS2)
-                                            //        Criteria = "(ccguid is null)and(name=" & core.db.encodeSQLText(nodeNameOrGuid) & ")"
+                                            //        Criteria = "(ccguid is null)and(name=" & DbController.encodeSQLText(nodeNameOrGuid) & ")"
                                             //        CS2 = core.db.cs_open("shared styles", Criteria)
                                             //    End If
                                             //    If core.db.cs_ok(CS2) Then
@@ -2592,11 +2592,11 @@ namespace Contensive.Processor.Controllers {
                     //                                                Criteria = ""
                     //                                                If TestGuid <> "" Then
                     //                                                    If TestGuid = addonGuid Then
-                    //                                                        Criteria = "(" & AddonGuidFieldName & "=" & core.db.encodeSQLText(SrcAddonGuid) & ")"
+                    //                                                        Criteria = "(" & AddonGuidFieldName & "=" & DbController.encodeSQLText(SrcAddonGuid) & ")"
                     //                                                    End If
                     //                                                ElseIf TestName <> "" Then
                     //                                                    If TestName = addonName Then
-                    //                                                        Criteria = "(name=" & core.db.encodeSQLText(SrcAddonName) & ")"
+                    //                                                        Criteria = "(name=" & DbController.encodeSQLText(SrcAddonName) & ")"
                     //                                                    End If
                     //                                                End If
                     //                                                If Criteria <> "" Then
@@ -2684,7 +2684,7 @@ namespace Contensive.Processor.Controllers {
                         AOGuid = AOName;
                     }
                     AddOnType =XmlController.GetXMLAttribute(core, IsFound, AddonNode, "type", "");
-                    Criteria = "(" + AddonGuidFieldName + "=" + core.db.encodeSQLText(AOGuid) + ")";
+                    Criteria = "(" + AddonGuidFieldName + "=" + DbController.encodeSQLText(AOGuid) + ")";
                     CS = core.db.csOpen(Models.Db.AddonModel.contentName, Criteria,"", false);
                     if (core.db.csOk(CS)) {
                         //
@@ -2696,7 +2696,7 @@ namespace Contensive.Processor.Controllers {
                         // not found by GUID - search name against name to update legacy Add-ons
                         //
                         core.db.csClose(ref CS);
-                        Criteria = "(name=" + core.db.encodeSQLText(AOName) + ")and(" + AddonGuidFieldName + " is null)";
+                        Criteria = "(name=" + DbController.encodeSQLText(AOName) + ")and(" + AddonGuidFieldName + " is null)";
                         CS = core.db.csOpen(Models.Db.AddonModel.contentName, Criteria,"", false);
                     }
                     if (!core.db.csOk(CS)) {
@@ -2723,12 +2723,12 @@ namespace Contensive.Processor.Controllers {
                                             IncludeAddonID = 0;
                                             Criteria = "";
                                             if (!string.IsNullOrEmpty(IncludeAddonGuid)) {
-                                                Criteria = AddonGuidFieldName + "=" + core.db.encodeSQLText(IncludeAddonGuid);
+                                                Criteria = AddonGuidFieldName + "=" + DbController.encodeSQLText(IncludeAddonGuid);
                                                 if (string.IsNullOrEmpty(IncludeAddonName)) {
                                                     IncludeAddonName = "Add-on " + IncludeAddonGuid;
                                                 }
                                             } else if (!string.IsNullOrEmpty(IncludeAddonName)) {
-                                                Criteria = "(name=" + core.db.encodeSQLText(IncludeAddonName) + ")";
+                                                Criteria = "(name=" + DbController.encodeSQLText(IncludeAddonName) + ")";
                                             }
                                             if (!string.IsNullOrEmpty(Criteria)) {
                                                 CS2 = core.db.csOpen(Models.Db.AddonModel.contentName, Criteria);

@@ -205,7 +205,7 @@ namespace Contensive.Processor.Models.Db {
                         if (!group.Equals(groupList.First<string>())) {
                             sqlGroups += "or";
                         }
-                        sqlGroups += "(ccgroups.Name=" + core.db.encodeSQLText(group) + ")";
+                        sqlGroups += "(ccgroups.Name=" + DbController.encodeSQLText(group) + ")";
                     }
                 }
                 string sqlCriteria = ""
@@ -216,7 +216,7 @@ namespace Contensive.Processor.Models.Db {
                     + " WHERE (ccMembers.Active>0)"
                     + " and(ccMemberRules.Active>0)"
                     + " and(ccgroups.Active>0)"
-                    + " and((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + core.db.encodeSQLDate(core.doc.profileStartTime) + "))";
+                    + " and((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + DbController.encodeSQLDate(core.doc.profileStartTime) + "))";
                 if (requireBulkEmail) {
                     sqlCriteria += "and(ccMembers.AllowBulkEmail>0)and(ccgroups.AllowBulkEmail>0)";
                 }
@@ -250,7 +250,7 @@ namespace Contensive.Processor.Models.Db {
                     + " and(mr.Active<>0)"
                     + " and(u.Active<>0)"
                     + " and(u.AllowBulkEmail<>0)"
-                    + " and((mr.DateExpires is null)OR(mr.DateExpires>" + core.db.encodeSQLDate(DateTime.Now)  + ")) "
+                    + " and((mr.DateExpires is null)OR(mr.DateExpires>" + DbController.encodeSQLDate(DateTime.Now)  + ")) "
                     + " "
                     + " group by "
                     + " u.ID, u.Name, u.Email "

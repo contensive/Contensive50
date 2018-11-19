@@ -453,15 +453,6 @@ namespace Contensive.Processor {
         //
         internal const string BR = "<br>";
         //
-        //-----------------------------------------------------------------------
-        // AuthoringControl Types
-        //-----------------------------------------------------------------------
-        //
-        internal const int AuthoringControlsEditing = 1;
-        internal const int AuthoringControlsSubmitted = 2;
-        internal const int AuthoringControlsApproved = 3;
-        internal const int AuthoringControlsModified = 4;
-        //
         /// <summary>
         /// An long number
         /// </summary>

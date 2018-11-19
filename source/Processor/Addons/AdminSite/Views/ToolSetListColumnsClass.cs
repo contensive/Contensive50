@@ -7,6 +7,7 @@ using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
+using Contensive.Addons.AdminSite.Controllers;
 
 namespace Contensive.Addons.AdminSite {
     public class ToolSetListColumnsClass {
@@ -78,7 +79,7 @@ namespace Contensive.Addons.AdminSite {
                                     if (field.inherited) {
                                         SourceContentID = field.contentId;
                                         SourceName = field.nameLc;
-                                        CSSource = core.db.csOpen("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + core.db.encodeSQLText(SourceName) + ")");
+                                        CSSource = core.db.csOpen("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + DbController.encodeSQLText(SourceName) + ")");
                                         if (core.db.csOk(CSSource)) {
                                             CSTarget = core.db.csInsertRecord("Content Fields");
                                             if (core.db.csOk(CSTarget)) {
@@ -102,7 +103,7 @@ namespace Contensive.Addons.AdminSite {
                             if (field.inherited) {
                                 SourceContentID = field.contentId;
                                 SourceName = field.nameLc;
-                                CSSource = core.db.csOpen("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + core.db.encodeSQLText(SourceName) + ")");
+                                CSSource = core.db.csOpen("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + DbController.encodeSQLText(SourceName) + ")");
                                 if (core.db.csOk(CSSource)) {
                                     CSTarget = core.db.csInsertRecord("Content Fields");
                                     if (core.db.csOk(CSTarget)) {

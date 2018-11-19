@@ -121,7 +121,7 @@
     <Compile Include="Addons\AdminSite\Views\EmailRuleEditor.cs" />
     <Compile Include="Addons\AdminSite\Views\ToolClearCache.cs" />
     <Compile Include="Addons\AdminSite\Models\AdminDataModel.cs" />
-    <Compile Include="Addons\AdminSite\Controllers\ErrorController.cs" />
+    <Compile Include="Addons\AdminSite\Controllers\AdminErrorController.cs" />
     <Compile Include="Addons\AdminSite\Views\FormIndexExport.cs" />
     <Compile Include="Addons\AdminSite\Views\FormIndexAdvancedSearch.cs" />
     <Compile Include="Addons\AdminSite\Models\IndexConfigClass.cs" />
@@ -185,7 +185,7 @@
     <Compile Include="Constants.cs" />
     <Compile Include="Controllers\AddonController.cs" />
     <Compile Include="Controllers\CollectionController.cs" />
-    <Compile Include="Controllers\AdminUIController.cs" />
+    <Compile Include="Addons\AdminSite\Controllers\AdminUIController.cs" />
     <Compile Include="Controllers\AppBuilderController.cs" />
     <Compile Include="Controllers\CacheController.cs" />
     <Compile Include="Controllers\KeyPtrIndexController.cs" />

@@ -152,7 +152,7 @@ namespace Contensive.Processor.Controllers {
                                     // for now run an sql to get processes, eventually cache in variant cache
                                     string sql = ""
                                         + "\r\n BEGIN TRANSACTION"
-                                        + "\r\n update cctasks set cmdRunner=" + cpApp.core.db.encodeSQLText(runnerGuid) + " where id in (select top 1 id from cctasks where (cmdRunner is null)and(datestarted is null))"
+                                        + "\r\n update cctasks set cmdRunner=" + DbController.encodeSQLText(runnerGuid) + " where id in (select top 1 id from cctasks where (cmdRunner is null)and(datestarted is null))"
                                         + "\r\n COMMIT TRANSACTION";
                                     cpApp.core.db.executeNonQuery(sql,"",ref recordsAffected);
                                     if (recordsAffected == 0) {
@@ -213,7 +213,7 @@ namespace Contensive.Processor.Controllers {
         public static void executeRunnerTasks(string appName, string runnerGuid) {
             try {
                 using (var cp = new Contensive.Processor.CPClass(appName)) {
-                    foreach (var task in TaskModel.createList(cp.core, "(cmdRunner=" + cp.core.db.encodeSQLText(runnerGuid) + ")and(datestarted is null)", "id")) {
+                    foreach (var task in TaskModel.createList(cp.core, "(cmdRunner=" + DbController.encodeSQLText(runnerGuid) + ")and(datestarted is null)", "id")) {
                         //
                         Console.WriteLine("runTask, runTask, task [" + task.name + "], cmdDetail [" + task.cmdDetail + "]");
                         LogController.logTrace(cp.core, "runTask, task [" + task.name + "], cmdDetail [" + task.cmdDetail + "]");

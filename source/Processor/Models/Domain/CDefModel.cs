@@ -36,7 +36,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// the name of the content table
         /// </summary>
-        public string tableName { get; set; } 
+        public string tableName { get; set; }
         //
         /// <summary>
         /// The name of the datasource that stores this content (the name of the database connection)

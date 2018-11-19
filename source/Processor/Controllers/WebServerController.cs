@@ -461,7 +461,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // set visited true
                         //
-                        core.db.executeQuery("update ccdomains set visited=1 where name=" + core.db.encodeSQLText(requestDomain));
+                        core.db.executeQuery("update ccdomains set visited=1 where name=" + DbController.encodeSQLText(requestDomain));
                         core.cache.invalidate("domainContentList");
                     }
                     if (core.domain.typeId == 1) {
@@ -781,7 +781,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         LogController.addSiteWarning(core, "Page Not Found Redirect", "Page Not Found Redirect", "", 0, "Page Not Found Redirect [" + requestUrlSource + "]", "Page Not Found Redirect", "Page Not Found Redirect");
                         if (!string.IsNullOrEmpty(ShortLink)) {
-                            core.db.executeNonQueryAsync("Update ccContentWatch set link=null where link=" + core.db.encodeSQLText(ShortLink));
+                            core.db.executeNonQueryAsync("Update ccContentWatch set link=null where link=" + DbController.encodeSQLText(ShortLink));
                         }
                         //
                         if (allowDebugMessage && core.doc.visitPropertyAllowDebugging) {

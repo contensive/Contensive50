@@ -1,5 +1,6 @@
 ﻿
 using System;
+using Contensive.Addons.AdminSite.Controllers;
 using Contensive.Processor;
 using Contensive.Processor.Controllers;
 
@@ -40,7 +41,7 @@ namespace Contensive.Addons.AdminSite {
                         adminData.LoadContentTrackingResponse(core);
                         //        Call LoadAndSaveCalendarEvents
                     }
-                    CSLists = core.db.csOpen("Content Watch Lists", "name<>" + core.db.encodeSQLText(""), "ID");
+                    CSLists = core.db.csOpen("Content Watch Lists", "name<>" + DbController.encodeSQLText(""), "ID");
                     if (core.db.csOk(CSLists)) {
                         //
                         // ----- Open the panel
@@ -62,14 +63,14 @@ namespace Contensive.Addons.AdminSite {
                             //
                             if (adminData.ContentWatchRecordID != 0) {
                                 CSRules = core.db.csOpen("Content Watch List Rules", "(ContentWatchID=" + adminData.ContentWatchRecordID + ")AND(ContentWatchListID=" + ContentWatchListID + ")");
-                                if (editRecord.Read_Only) {
+                                if (editRecord.userReadOnly) {
                                     HTMLFieldString = GenericController.encodeText(core.db.csOk(CSRules));
                                 } else {
                                     HTMLFieldString = HtmlController.checkbox("ContentWatchList." + core.db.csGet(CSLists, "ID"), core.db.csOk(CSRules));
                                 }
                                 core.db.csClose(ref CSRules);
                             } else {
-                                if (editRecord.Read_Only) {
+                                if (editRecord.userReadOnly) {
                                     HTMLFieldString = GenericController.encodeText(false);
                                 } else {
                                     HTMLFieldString = HtmlController.checkbox("ContentWatchList." + core.db.csGet(CSLists, "ID"), false);
@@ -83,7 +84,7 @@ namespace Contensive.Addons.AdminSite {
                         //
                         // ----- Whats New Headline (editable)
                         //
-                        if (editRecord.Read_Only) {
+                        if (editRecord.userReadOnly) {
                             HTMLFieldString = HtmlController.encodeHtml(adminData.ContentWatchLinkLabel);
                         } else {
                             HTMLFieldString = HtmlController.inputText(core, "ContentWatchLinkLabel", adminData.ContentWatchLinkLabel, 1, core.siteProperties.defaultFormInputWidth);
@@ -93,7 +94,7 @@ namespace Contensive.Addons.AdminSite {
                         //
                         // ----- Whats New Expiration
                         //
-                        if (editRecord.Read_Only) {
+                        if (editRecord.userReadOnly) {
                             HTMLFieldString = AdminUIController.getDefaultEditor_DateTime(core, "ContentWatchExpires", adminData.ContentWatchExpires, true, "", false, "");
                         } else {
                             HTMLFieldString = AdminUIController.getDefaultEditor_DateTime(core, "ContentWatchExpires", adminData.ContentWatchExpires, false, "", false, "");

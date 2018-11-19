@@ -15,14 +15,14 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
 using Contensive.Addons.Tools;
-using static Contensive.Processor.AdminUIController;
+using static Contensive.Addons.AdminSite.Controllers.AdminUIController;
 //
 namespace Contensive.Addons.AdminSite {
-    public class ErrorController {
+    public class AdminErrorController {
         //
         //===========================================================================
         //
-        public static string get( CoreController core, string UserError, string DeveloperError) {
+        public static string get(CoreController core, string UserError, string DeveloperError) {
             string result = "";
             try {
                 //

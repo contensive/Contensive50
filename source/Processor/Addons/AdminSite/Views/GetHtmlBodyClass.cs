@@ -8,8 +8,9 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
 using Contensive.Addons.Tools;
-using static Contensive.Processor.AdminUIController;
+using static Contensive.Addons.AdminSite.Controllers.AdminUIController;
 using Contensive.Processor.Exceptions;
+using Contensive.Addons.AdminSite.Controllers;
 
 namespace Contensive.Addons.AdminSite {
     public class GetHtmlBodyClass : Contensive.BaseClasses.AddonBaseClass {
@@ -110,7 +111,8 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // Normalize values to be needed
                     if (adminData.editRecord.id != 0) {
-                        cp.core.workflow.ClearEditLock(adminData.adminContent.name, adminData.editRecord.id);
+                        var pageContentTable = TableModel.createByContentName(cp.core, "page content");
+                        WorkflowController.clearEditLock(cp.core, pageContentTable.id, adminData.editRecord.id);
                     }
                     if (adminData.AdminForm < 1) {
                         //
@@ -565,7 +567,7 @@ namespace Contensive.Addons.AdminSite {
                 int ParentID = 0;
                 //
                 Found = false;
-                SQL = "select h.HelpDefault,h.HelpCustom from ccfieldhelp h left join ccfields f on f.id=h.fieldid where f.contentid=" + ContentID + " and f.name=" + cp.core.db.encodeSQLText(FieldName);
+                SQL = "select h.HelpDefault,h.HelpCustom from ccfieldhelp h left join ccfields f on f.id=h.fieldid where f.contentid=" + ContentID + " and f.name=" + DbController.encodeSQLText(FieldName);
                 CS = cp.core.db.csOpenSql(SQL);
                 if (cp.core.db.csOk(CS)) {
                     Found = true;
@@ -647,7 +649,7 @@ namespace Contensive.Addons.AdminSite {
                                 Processor.Models.Db.PageContentModel.markReviewed(cp.core, adminData.editRecord.id);
                                 break;
                             case Constants.AdminActionDelete:
-                                if (adminData.editRecord.Read_Only) {
+                                if (adminData.editRecord.userReadOnly) {
                                     Processor.Controllers.ErrorController.addUserError(cp.core, "Your request was blocked because the record you specified is now locked by another authcontext.user.");
                                 } else {
                                     adminData.LoadEditRecord(cp.core);
@@ -660,7 +662,7 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 // ----- Save Record
                                 //
-                                if (adminData.editRecord.Read_Only) {
+                                if (adminData.editRecord.userReadOnly) {
                                     Processor.Controllers.ErrorController.addUserError(cp.core, "Your request was blocked because the record you specified is now locked by another authcontext.user.");
                                 } else {
                                     adminData.LoadEditRecord(cp.core);
@@ -675,7 +677,7 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 // ----- Save and add a new record
                                 //
-                                if (adminData.editRecord.Read_Only) {
+                                if (adminData.editRecord.userReadOnly) {
                                     Processor.Controllers.ErrorController.addUserError(cp.core, "Your request was blocked because the record you specified is now locked by another authcontext.user.");
                                 } else {
                                     adminData.LoadEditRecord(cp.core);
@@ -703,7 +705,7 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 // ----- Send (Group Email Only)
                                 //
-                                if (adminData.editRecord.Read_Only) {
+                                if (adminData.editRecord.userReadOnly) {
                                     Processor.Controllers.ErrorController.addUserError(cp.core, "Your request was blocked because the record you specified is now locked by another authcontext.user.");
                                 } else {
                                     adminData.LoadEditRecord(cp.core);
@@ -739,7 +741,7 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 // ----- Deactivate (Conditional Email Only)
                                 //
-                                if (adminData.editRecord.Read_Only) {
+                                if (adminData.editRecord.userReadOnly) {
                                     Processor.Controllers.ErrorController.addUserError(cp.core, "Your request was blocked because the record you specified is now locked by another authcontext.user.");
                                 } else {
                                     // no save, page was read only - Call ProcessActionSave
@@ -764,7 +766,7 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 // ----- Activate (Conditional Email Only)
                                 //
-                                if (adminData.editRecord.Read_Only) {
+                                if (adminData.editRecord.userReadOnly) {
                                     Processor.Controllers.ErrorController.addUserError(cp.core, "Your request was blocked because the record you specified is now locked by another authcontext.user.");
                                 } else {
                                     adminData.LoadEditRecord(cp.core);
@@ -793,7 +795,7 @@ namespace Contensive.Addons.AdminSite {
                                 adminData.Admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
                                 break;
                             case Constants.AdminActionSendEmailTest:
-                                if (adminData.editRecord.Read_Only) {
+                                if (adminData.editRecord.userReadOnly) {
                                     Processor.Controllers.ErrorController.addUserError(cp.core, "Your request was blocked because the record you specified is now locked by another authcontext.user.");
                                 } else {
                                     //
@@ -811,7 +813,7 @@ namespace Contensive.Addons.AdminSite {
                                             //
                                             if (adminData.editRecord.fieldsLc.ContainsKey("lastsendtestdate")) {
                                                 adminData.editRecord.fieldsLc["lastsendtestdate"].value = cp.core.doc.profileStartTime;
-                                                cp.core.db.executeQuery("update ccemail Set lastsendtestdate=" + cp.core.db.encodeSQLDate(cp.core.doc.profileStartTime) + " where id=" + adminData.editRecord.id);
+                                                cp.core.db.executeQuery("update ccemail Set lastsendtestdate=" + DbController.encodeSQLDate(cp.core.doc.profileStartTime) + " where id=" + adminData.editRecord.id);
                                             }
                                         }
                                     }
@@ -861,7 +863,7 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 // ccContent - save changes and reload content definitions
                                 //
-                                if (adminData.editRecord.Read_Only) {
+                                if (adminData.editRecord.userReadOnly) {
                                     Processor.Controllers.ErrorController.addUserError(cp.core, "Your request was blocked because the record you specified Is now locked by another authcontext.user.");
                                 } else {
                                     adminData.LoadEditRecord(cp.core);
@@ -1141,7 +1143,7 @@ namespace Contensive.Addons.AdminSite {
                 int CSContentWatch = 0;
                 int ContentWatchID = 0;
                 //
-                if (adminData.adminContent.allowContentTracking & (!editRecord.Read_Only)) {
+                if (adminData.adminContent.allowContentTracking & (!editRecord.userReadOnly)) {
                     //
                     // ----- Set default content watch link label
                     //
@@ -1157,7 +1159,7 @@ namespace Contensive.Addons.AdminSite {
                     // ----- update/create the content watch record for this content record
                     //
                     ContentID = (editRecord.contentControlId.Equals(0)) ? adminData.adminContent.id : editRecord.contentControlId;
-                    CSContentWatch = cp.core.db.csOpen("Content Watch", "(ContentID=" + cp.core.db.encodeSQLNumber(ContentID) + ")And(RecordID=" + cp.core.db.encodeSQLNumber(editRecord.id) + ")");
+                    CSContentWatch = cp.core.db.csOpen("Content Watch", "(ContentID=" + DbController.encodeSQLNumber(ContentID) + ")And(RecordID=" + DbController.encodeSQLNumber(editRecord.id) + ")");
                     if (!cp.core.db.csOk(CSContentWatch)) {
                         cp.core.db.csClose(ref CSContentWatch);
                         CSContentWatch = cp.core.db.csInsertRecord("Content Watch");
@@ -1231,9 +1233,9 @@ namespace Contensive.Addons.AdminSite {
                     }
                     if (!string.IsNullOrEmpty(linkAlias)) {
                         if (OverRideDuplicate) {
-                            cp.core.db.executeQuery("update " + adminData.adminContent.tableName + " set linkalias=null where ( linkalias=" + cp.core.db.encodeSQLText(linkAlias) + ") and (id<>" + editRecord.id + ")");
+                            cp.core.db.executeQuery("update " + adminData.adminContent.tableName + " set linkalias=null where ( linkalias=" + DbController.encodeSQLText(linkAlias) + ") and (id<>" + editRecord.id + ")");
                         } else {
-                            int CS = cp.core.db.csOpen(adminData.adminContent.name, "( linkalias=" + cp.core.db.encodeSQLText(linkAlias) + ")and(id<>" + editRecord.id + ")");
+                            int CS = cp.core.db.csOpen(adminData.adminContent.name, "( linkalias=" + DbController.encodeSQLText(linkAlias) + ")and(id<>" + editRecord.id + ")");
                             if (cp.core.db.csOk(CS)) {
                                 isDupError = true;
                                 Processor.Controllers.ErrorController.addUserError(cp.core, "The Link Alias you entered can not be used because another record uses this value [" + linkAlias + "]. Enter a different Link Alias, or check the Override Duplicates checkbox in the Link Alias tab.");
@@ -1275,7 +1277,7 @@ namespace Contensive.Addons.AdminSite {
                 } else if (!cp.core.session.isAuthenticatedContentManager(cp.core, adminData.adminContent.name)) {
                     //
                     // -- must be content manager
-                } else if (editRecord.Read_Only) {
+                } else if (editRecord.userReadOnly) {
                     //
                     // -- read only block
                 } else {
@@ -1617,7 +1619,8 @@ namespace Contensive.Addons.AdminSite {
                         //
                         // ----- clear/set authoring controls
                         //
-                        cp.core.workflow.ClearEditLock(adminData.adminContent.name, editRecord.id);
+                        var contentTable = TableModel.createByUniqueName(cp.core, adminData.adminContent.tableName);
+                        if (contentTable != null) WorkflowController.clearEditLock(cp.core, contentTable.id, editRecord.id);
                         //
                         // ----- if admin content is changed, reload the adminContext.content data in case this is a save, and not an OK
                         //
@@ -2495,7 +2498,7 @@ namespace Contensive.Addons.AdminSite {
                             // Create Group and Rule
                             //
                             if (NewGroup && (!string.IsNullOrEmpty(NewGroupName))) {
-                                CS = cp.core.db.csOpen("Groups", "name=" + cp.core.db.encodeSQLText(NewGroupName));
+                                CS = cp.core.db.csOpen("Groups", "name=" + DbController.encodeSQLText(NewGroupName));
                                 if (cp.core.db.csOk(CS)) {
                                     Description = Description + "<div>Group [" + NewGroupName + "] already exists, using existing group.</div>";
                                     GroupID = cp.core.db.csGetInteger(CS, "ID");

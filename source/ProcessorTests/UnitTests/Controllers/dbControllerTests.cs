@@ -182,7 +182,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 cp.core.db.csClose(ref cs);
                 //
                 // act
-                cs = cp.core.db.csOpen("people", "name=" + cp.core.db.encodeSQLText(name),"id");
+                cs = cp.core.db.csOpen("people", "name=" + DbController.encodeSQLText(name),"id");
                 Assert.IsTrue(cp.core.db.csOk(cs), "csOpen");
                 Assert.AreEqual(id0, cp.core.db.csGetInteger(cs, "id"),"correct id0 after open");
                 cp.core.db.csGoNext(cs);
@@ -222,7 +222,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 cp.core.db.csClose(ref cs);
                 //
                 // act
-                cs = cp.core.db.csOpen("people", "name=" + cp.core.db.encodeSQLText(name), "id");
+                cs = cp.core.db.csOpen("people", "name=" + DbController.encodeSQLText(name), "id");
                 Assert.IsTrue(cp.core.db.csOk(cs), "csOpen");
                 cp.core.db.csGoNext(cs);
                 cp.core.db.csGoNext(cs);

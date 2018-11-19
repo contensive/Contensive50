@@ -494,10 +494,10 @@ namespace Contensive.Processor.Controllers {
         private static void verifyRecord(CoreController core, string contentName, string name, string sqlName = "", string sqlValue = "") {
             try {
                 var cdef = CDefModel.create(core, contentName);
-                DataTable dt = core.db.executeQuery("SELECT ID FROM " + cdef.tableName + " WHERE NAME=" + core.db.encodeSQLText(name) + ";");
+                DataTable dt = core.db.executeQuery("SELECT ID FROM " + cdef.tableName + " WHERE NAME=" + DbController.encodeSQLText(name) + ";");
                 if (dt.Rows.Count == 0) {
                     string sql1 = "insert into " + cdef.tableName + " (active,name";
-                    string sql2 = ") values (1," + core.db.encodeSQLText(name);
+                    string sql2 = ") values (1," + DbController.encodeSQLText(name);
                     string sql3 = ")";
                     if (!string.IsNullOrEmpty(sqlName)) {
                         sql1 += "," + sqlName;
@@ -808,7 +808,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 int CS;
                 //
-                CS = core.db.csOpen("Countries", "name=" + core.db.encodeSQLText(name));
+                CS = core.db.csOpen("Countries", "name=" + DbController.encodeSQLText(name));
                 if (!core.db.csOk(CS)) {
                     core.db.csClose(ref CS);
                     CS = core.db.csInsertRecord("Countries", SystemMemberID);
@@ -870,7 +870,7 @@ namespace Contensive.Processor.Controllers {
                 appendUpgradeLogAddStep(core, core.appConfig.name, "VerifyDefaultGroups", "Verify Default Groups");
                 //
                 GroupID = GroupController.add(core, "Site Managers");
-                SQL = "Update ccContent Set EditorGroupID=" + core.db.encodeSQLNumber(GroupID) + " where EditorGroupID is null;";
+                SQL = "Update ccContent Set EditorGroupID=" + DbController.encodeSQLNumber(GroupID) + " where EditorGroupID is null;";
                 core.db.executeQuery(SQL);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -1024,7 +1024,7 @@ namespace Contensive.Processor.Controllers {
                     int addonId = core.db.getRecordID(Models.Db.AddonModel.contentName, AddonName);
                     int parentId = verifyNavigatorEntry_getParentIdFromNameSpace(core, menuNameSpace);
                     int contentId = CdefController.getContentId(core, ContentName);
-                    string listCriteria = "(name=" + core.db.encodeSQLText(EntryName) + ")and(Parentid=" + parentId + ")";
+                    string listCriteria = "(name=" + DbController.encodeSQLText(EntryName) + ")and(Parentid=" + parentId + ")";
                     List<Models.Db.NavigatorEntryModel> entryList = NavigatorEntryModel.createList(core, listCriteria, "id");
                     NavigatorEntryModel entry = null;
                     if (entryList.Count == 0) {
@@ -1075,7 +1075,7 @@ namespace Contensive.Processor.Controllers {
                     foreach( var parent in parents ) {
                         string recordName = parent.Trim();
                         if (!string.IsNullOrEmpty(recordName)) {
-                            string Criteria = "(name=" + core.db.encodeSQLText(recordName) + ")";
+                            string Criteria = "(name=" + DbController.encodeSQLText(recordName) + ")";
                             if (parentRecordId == 0) {
                                 Criteria += "and((Parentid is null)or(Parentid=0))";
                             } else {
@@ -1117,13 +1117,13 @@ namespace Contensive.Processor.Controllers {
                 DataTable dt = null;
                 SqlFieldListClass sqlList = new SqlFieldListClass();
                 //
-                sqlList.add("name", core.db.encodeSQLText(Name));
+                sqlList.add("name", DbController.encodeSQLText(Name));
                 sqlList.add("CreatedBy", "0");
-                sqlList.add("OrderByClause", core.db.encodeSQLText(OrderByCriteria));
+                sqlList.add("OrderByClause", DbController.encodeSQLText(OrderByCriteria));
                 sqlList.add("active", SQLTrue);
                 sqlList.add("ContentControlID", CdefController.getContentId(core, "Sort Methods").ToString());
                 //
-                dt = core.db.openTable("Default", "ccSortMethods", "Name=" + core.db.encodeSQLText(Name), "ID", "ID", 1);
+                dt = core.db.openTable("Default", "ccSortMethods", "Name=" + DbController.encodeSQLText(Name), "ID", "ID", 1);
                 if (dt.Rows.Count > 0) {
                     //
                     // update sort method

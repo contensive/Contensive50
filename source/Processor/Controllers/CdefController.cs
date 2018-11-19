@@ -237,7 +237,7 @@ namespace Contensive.Processor.Controllers {
                 DateTime DateNow;
                 //
                 DateNow = DateTime.MinValue;
-                SQL = "select ID from ccContent where name=" + core.db.encodeSQLText(ChildContentName) + ";";
+                SQL = "select ID from ccContent where name=" + DbController.encodeSQLText(ChildContentName) + ";";
                 rs = core.db.executeQuery(SQL);
                 if (DbController.isDataTableOk(rs)) {
                     ChildContentID = GenericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "ID"));
@@ -251,7 +251,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // Get ContentID of parent
                     //
-                    SQL = "select ID from ccContent where name=" + core.db.encodeSQLText(ParentContentName) + ";";
+                    SQL = "select ID from ccContent where name=" + DbController.encodeSQLText(ParentContentName) + ";";
                     rs = core.db.executeQuery(SQL, dataSourceName);
                     if (DbController.isDataTableOk(rs)) {
                         ParentContentID = GenericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "ID"));
@@ -418,7 +418,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // get contentId, guid, IsBaseContent
                     //
-                    string SQL = "select ID,ccguid,IsBaseContent from ccContent where (name=" + core.db.encodeSQLText(cdef.name) + ") order by id;";
+                    string SQL = "select ID,ccguid,IsBaseContent from ccContent where (name=" + DbController.encodeSQLText(cdef.name) + ") order by id;";
                     DataTable dt = core.db.executeQuery(SQL);
                     if (dt.Rows.Count > 0) {
                         returnContentId = GenericController.encodeInteger(dt.Rows[0]["ID"]);
@@ -445,7 +445,7 @@ namespace Contensive.Processor.Controllers {
                     // get parentId
                     //
                     if (!string.IsNullOrEmpty(cdef.parentName)) {
-                        SQL = "select id from ccContent where (name=" + core.db.encodeSQLText(cdef.parentName) + ") order by id;";
+                        SQL = "select id from ccContent where (name=" + DbController.encodeSQLText(cdef.parentName) + ") order by id;";
                         dt = core.db.executeQuery(SQL);
                         if (dt.Rows.Count > 0) {
                             parentId = GenericController.encodeInteger(dt.Rows[0][0]);
@@ -457,7 +457,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     int InstalledByCollectionID = 0;
                     if (!string.IsNullOrEmpty(cdef.installedByCollectionGuid)) {
-                        SQL = "select id from ccAddonCollections where ccGuid=" + core.db.encodeSQLText(cdef.installedByCollectionGuid);
+                        SQL = "select id from ccAddonCollections where ccGuid=" + DbController.encodeSQLText(cdef.installedByCollectionGuid);
                         dt = core.db.executeQuery(SQL);
                         if (dt.Rows.Count > 0) {
                             InstalledByCollectionID = GenericController.encodeInteger(dt.Rows[0]["ID"]);
@@ -477,7 +477,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // ----- Get the Table Definition ID, create one if missing
                         //
-                        SQL = "SELECT ID from ccTables where (active<>0) and (name=" + core.db.encodeSQLText(cdef.tableName) + ");";
+                        SQL = "SELECT ID from ccTables where (active<>0) and (name=" + DbController.encodeSQLText(cdef.tableName) + ");";
                         dt = core.db.executeQuery(SQL);
                         int TableID = 0;
                         SqlFieldListClass sqlList = null;
@@ -501,10 +501,10 @@ namespace Contensive.Processor.Controllers {
                             TableID = core.db.insertTableRecordGetId("Default", "ccTables", SystemMemberID);
                             //
                             sqlList = new SqlFieldListClass();
-                            sqlList.add("name", core.db.encodeSQLText(cdef.tableName));
+                            sqlList.add("name", DbController.encodeSQLText(cdef.tableName));
                             sqlList.add("active", SQLTrue);
-                            sqlList.add("DATASOURCEID", core.db.encodeSQLNumber(cdef.dataSourceId));
-                            sqlList.add("CONTENTCONTROLID", core.db.encodeSQLNumber(CdefController.getContentId(core, "Tables")));
+                            sqlList.add("DATASOURCEID", DbController.encodeSQLNumber(cdef.dataSourceId));
+                            sqlList.add("CONTENTCONTROLID", DbController.encodeSQLNumber(CdefController.getContentId(core, "Tables")));
                             //
                             core.db.updateTableRecord("Default", "ccTables", "ID=" + TableID, sqlList);
                             TableModel.invalidateRecordCache(core, TableID);
@@ -521,7 +521,7 @@ namespace Contensive.Processor.Controllers {
                         if (string.IsNullOrEmpty(iDefaultSortMethod)) {
                             DefaultSortMethodID = 0;
                         } else {
-                            dt = core.db.openTable("Default", "ccSortMethods", "(name=" + core.db.encodeSQLText(iDefaultSortMethod) + ")and(active<>0)", "ID", "ID", 1, 1);
+                            dt = core.db.openTable("Default", "ccSortMethods", "(name=" + DbController.encodeSQLText(iDefaultSortMethod) + ")and(active<>0)", "ID", "ID", 1, 1);
                             if (dt.Rows.Count > 0) {
                                 DefaultSortMethodID = GenericController.encodeInteger(dt.Rows[0]["ID"]);
                             }
@@ -530,7 +530,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // fallback - maybe they put the orderbyclause in (common mistake)
                             //
-                            dt = core.db.openTable("Default", "ccSortMethods", "(OrderByClause=" + core.db.encodeSQLText(iDefaultSortMethod) + ")and(active<>0)", "ID", "ID", 1, 1);
+                            dt = core.db.openTable("Default", "ccSortMethods", "(OrderByClause=" + DbController.encodeSQLText(iDefaultSortMethod) + ")and(active<>0)", "ID", "ID", 1, 1);
                             if (dt.Rows.Count > 0) {
                                 DefaultSortMethodID = GenericController.encodeInteger(dt.Rows[0]["ID"]);
                             }
@@ -543,39 +543,39 @@ namespace Contensive.Processor.Controllers {
                         // ----- update record
                         //
                         sqlList = new SqlFieldListClass();
-                        sqlList.add("name", core.db.encodeSQLText(cdef.name));
+                        sqlList.add("name", DbController.encodeSQLText(cdef.name));
                         sqlList.add("CREATEKEY", "0");
-                        sqlList.add("active", core.db.encodeSQLBoolean(cdef.active));
-                        sqlList.add("ContentControlID", core.db.encodeSQLNumber(ContentIDofContent));
-                        sqlList.add("AllowAdd", core.db.encodeSQLBoolean(cdef.allowAdd));
-                        sqlList.add("AllowDelete", core.db.encodeSQLBoolean(cdef.allowDelete));
-                        sqlList.add("AllowWorkflowAuthoring", core.db.encodeSQLBoolean(false));
-                        sqlList.add("DeveloperOnly", core.db.encodeSQLBoolean(cdef.developerOnly));
-                        sqlList.add("AdminOnly", core.db.encodeSQLBoolean(cdef.adminOnly));
-                        sqlList.add("ParentID", core.db.encodeSQLNumber(parentId));
-                        sqlList.add("DefaultSortMethodID", core.db.encodeSQLNumber(DefaultSortMethodID));
-                        sqlList.add("DropDownFieldList", core.db.encodeSQLText(encodeEmpty(cdef.dropDownFieldList, "Name")));
-                        sqlList.add("ContentTableID", core.db.encodeSQLNumber(TableID));
-                        sqlList.add("AuthoringTableID", core.db.encodeSQLNumber(TableID));
-                        sqlList.add("ModifiedDate", core.db.encodeSQLDate(DateTime.Now));
-                        sqlList.add("CreatedBy", core.db.encodeSQLNumber(SystemMemberID));
-                        sqlList.add("ModifiedBy", core.db.encodeSQLNumber(SystemMemberID));
-                        sqlList.add("AllowCalendarEvents", core.db.encodeSQLBoolean(cdef.allowCalendarEvents));
-                        sqlList.add("AllowContentTracking", core.db.encodeSQLBoolean(cdef.allowContentTracking));
-                        sqlList.add("AllowTopicRules", core.db.encodeSQLBoolean(cdef.allowTopicRules));
-                        sqlList.add("AllowContentChildTool", core.db.encodeSQLBoolean(cdef.allowContentChildTool));
-                        //Call sqlList.add("AllowMetaContent", core.db.encodeSQLBoolean(ignore1))
-                        sqlList.add("IconLink", core.db.encodeSQLText(encodeEmpty(cdef.iconLink, "")));
-                        sqlList.add("IconHeight", core.db.encodeSQLNumber(cdef.iconHeight));
-                        sqlList.add("IconWidth", core.db.encodeSQLNumber(cdef.iconWidth));
-                        sqlList.add("IconSprites", core.db.encodeSQLNumber(cdef.iconSprites));
-                        sqlList.add("installedByCollectionid", core.db.encodeSQLNumber(InstalledByCollectionID));
+                        sqlList.add("active", DbController.encodeSQLBoolean(cdef.active));
+                        sqlList.add("ContentControlID", DbController.encodeSQLNumber(ContentIDofContent));
+                        sqlList.add("AllowAdd", DbController.encodeSQLBoolean(cdef.allowAdd));
+                        sqlList.add("AllowDelete", DbController.encodeSQLBoolean(cdef.allowDelete));
+                        sqlList.add("AllowWorkflowAuthoring", DbController.encodeSQLBoolean(false));
+                        sqlList.add("DeveloperOnly", DbController.encodeSQLBoolean(cdef.developerOnly));
+                        sqlList.add("AdminOnly", DbController.encodeSQLBoolean(cdef.adminOnly));
+                        sqlList.add("ParentID", DbController.encodeSQLNumber(parentId));
+                        sqlList.add("DefaultSortMethodID", DbController.encodeSQLNumber(DefaultSortMethodID));
+                        sqlList.add("DropDownFieldList", DbController.encodeSQLText(encodeEmpty(cdef.dropDownFieldList, "Name")));
+                        sqlList.add("ContentTableID", DbController.encodeSQLNumber(TableID));
+                        sqlList.add("AuthoringTableID", DbController.encodeSQLNumber(TableID));
+                        sqlList.add("ModifiedDate", DbController.encodeSQLDate(DateTime.Now));
+                        sqlList.add("CreatedBy", DbController.encodeSQLNumber(SystemMemberID));
+                        sqlList.add("ModifiedBy", DbController.encodeSQLNumber(SystemMemberID));
+                        sqlList.add("AllowCalendarEvents", DbController.encodeSQLBoolean(cdef.allowCalendarEvents));
+                        sqlList.add("AllowContentTracking", DbController.encodeSQLBoolean(cdef.allowContentTracking));
+                        sqlList.add("AllowTopicRules", DbController.encodeSQLBoolean(cdef.allowTopicRules));
+                        sqlList.add("AllowContentChildTool", DbController.encodeSQLBoolean(cdef.allowContentChildTool));
+                        //Call sqlList.add("AllowMetaContent", DbController.encodeSQLBoolean(ignore1))
+                        sqlList.add("IconLink", DbController.encodeSQLText(encodeEmpty(cdef.iconLink, "")));
+                        sqlList.add("IconHeight", DbController.encodeSQLNumber(cdef.iconHeight));
+                        sqlList.add("IconWidth", DbController.encodeSQLNumber(cdef.iconWidth));
+                        sqlList.add("IconSprites", DbController.encodeSQLNumber(cdef.iconSprites));
+                        sqlList.add("installedByCollectionid", DbController.encodeSQLNumber(InstalledByCollectionID));
                         if ((string.IsNullOrEmpty(contentGuid)) && (!string.IsNullOrEmpty(cdef.guid))) {
                             //
                             // hard one - only update guid if the tables supports it, and it the new guid is not blank
                             // if the new guid does no match te old guid
                             //
-                            sqlList.add("ccGuid", core.db.encodeSQLText(cdef.guid));
+                            sqlList.add("ccGuid", DbController.encodeSQLText(cdef.guid));
                         } else if ((!string.IsNullOrEmpty(cdef.guid)) && (contentGuid != GenericController.vbLCase(cdef.guid))) {
                             //
                             // installing content definition with matching name, but different guid -- this is an error that needs to be fixed
@@ -806,7 +806,7 @@ namespace Contensive.Processor.Controllers {
                         throw (new GenericException("Could not create field [" + field.nameLc + "] because Content Definition [" + ContentName + "] does not have a valid table."));
                     } else { 
                         bool RecordIsBaseField = false;
-                        var contentFieldList = ContentFieldModel.createList(core, "(ContentID=" + core.db.encodeSQLNumber(content.id) + ")and(name=" + core.db.encodeSQLText(field.nameLc) + ")");
+                        var contentFieldList = ContentFieldModel.createList(core, "(ContentID=" + DbController.encodeSQLNumber(content.id) + ")and(name=" + DbController.encodeSQLText(field.nameLc) + ")");
                         if (contentFieldList.Count > 0) {
                             returnId = contentFieldList.First().id;
                             RecordIsBaseField = contentFieldList.First().isBaseField;
@@ -852,37 +852,37 @@ namespace Contensive.Processor.Controllers {
                         //
                         // create or update the field
                         SqlFieldListClass sqlList = new SqlFieldListClass();
-                        sqlList.add("ACTIVE", core.db.encodeSQLBoolean(field.active));
-                        sqlList.add("MODIFIEDBY", core.db.encodeSQLNumber(SystemMemberID));
-                        sqlList.add("MODIFIEDDATE", core.db.encodeSQLDate(DateTime.Now));
-                        sqlList.add("TYPE", core.db.encodeSQLNumber(field.fieldTypeId));
-                        sqlList.add("CAPTION", core.db.encodeSQLText(field.caption));
-                        sqlList.add("ReadOnly", core.db.encodeSQLBoolean(field.readOnly));
-                        sqlList.add("REQUIRED", core.db.encodeSQLBoolean(field.required));
+                        sqlList.add("ACTIVE", DbController.encodeSQLBoolean(field.active));
+                        sqlList.add("MODIFIEDBY", DbController.encodeSQLNumber(SystemMemberID));
+                        sqlList.add("MODIFIEDDATE", DbController.encodeSQLDate(DateTime.Now));
+                        sqlList.add("TYPE", DbController.encodeSQLNumber(field.fieldTypeId));
+                        sqlList.add("CAPTION", DbController.encodeSQLText(field.caption));
+                        sqlList.add("ReadOnly", DbController.encodeSQLBoolean(field.readOnly));
+                        sqlList.add("REQUIRED", DbController.encodeSQLBoolean(field.required));
                         sqlList.add("TEXTBUFFERED", SQLFalse);
-                        sqlList.add("PASSWORD", core.db.encodeSQLBoolean(field.password));
-                        sqlList.add("EDITSORTPRIORITY", core.db.encodeSQLNumber(field.editSortPriority));
-                        sqlList.add("ADMINONLY", core.db.encodeSQLBoolean(field.adminOnly));
-                        sqlList.add("DEVELOPERONLY", core.db.encodeSQLBoolean(field.developerOnly));
-                        sqlList.add("CONTENTCONTROLID", core.db.encodeSQLNumber(CdefController.getContentId(core, "Content Fields")));
-                        sqlList.add("DefaultValue", core.db.encodeSQLText(field.defaultValue));
-                        sqlList.add("HTMLCONTENT", core.db.encodeSQLBoolean(field.htmlContent));
-                        sqlList.add("NOTEDITABLE", core.db.encodeSQLBoolean(field.notEditable));
-                        sqlList.add("AUTHORABLE", core.db.encodeSQLBoolean(field.authorable));
-                        sqlList.add("INDEXCOLUMN", core.db.encodeSQLNumber(field.indexColumn));
-                        sqlList.add("INDEXWIDTH", core.db.encodeSQLText(field.indexWidth));
-                        sqlList.add("INDEXSORTPRIORITY", core.db.encodeSQLNumber(field.indexSortOrder));
-                        sqlList.add("REDIRECTID", core.db.encodeSQLText(field.redirectID));
-                        sqlList.add("REDIRECTPATH", core.db.encodeSQLText(field.redirectPath));
-                        sqlList.add("UNIQUENAME", core.db.encodeSQLBoolean(field.uniqueName));
-                        sqlList.add("RSSTITLEFIELD", core.db.encodeSQLBoolean(field.RSSTitleField));
-                        sqlList.add("RSSDESCRIPTIONFIELD", core.db.encodeSQLBoolean(field.RSSDescriptionField));
-                        sqlList.add("MEMBERSELECTGROUPID", core.db.encodeSQLNumber(MemberSelectGroupID));
-                        sqlList.add("installedByCollectionId", core.db.encodeSQLNumber(InstalledByCollectionID));
-                        sqlList.add("EDITTAB", core.db.encodeSQLText(field.editTabName));
-                        sqlList.add("SCRAMBLE", core.db.encodeSQLBoolean(false));
-                        sqlList.add("ISBASEFIELD", core.db.encodeSQLBoolean(field.isBaseField));
-                        sqlList.add("LOOKUPLIST", core.db.encodeSQLText(LookupList));
+                        sqlList.add("PASSWORD", DbController.encodeSQLBoolean(field.password));
+                        sqlList.add("EDITSORTPRIORITY", DbController.encodeSQLNumber(field.editSortPriority));
+                        sqlList.add("ADMINONLY", DbController.encodeSQLBoolean(field.adminOnly));
+                        sqlList.add("DEVELOPERONLY", DbController.encodeSQLBoolean(field.developerOnly));
+                        sqlList.add("CONTENTCONTROLID", DbController.encodeSQLNumber(CdefController.getContentId(core, "Content Fields")));
+                        sqlList.add("DefaultValue", DbController.encodeSQLText(field.defaultValue));
+                        sqlList.add("HTMLCONTENT", DbController.encodeSQLBoolean(field.htmlContent));
+                        sqlList.add("NOTEDITABLE", DbController.encodeSQLBoolean(field.notEditable));
+                        sqlList.add("AUTHORABLE", DbController.encodeSQLBoolean(field.authorable));
+                        sqlList.add("INDEXCOLUMN", DbController.encodeSQLNumber(field.indexColumn));
+                        sqlList.add("INDEXWIDTH", DbController.encodeSQLText(field.indexWidth));
+                        sqlList.add("INDEXSORTPRIORITY", DbController.encodeSQLNumber(field.indexSortOrder));
+                        sqlList.add("REDIRECTID", DbController.encodeSQLText(field.redirectID));
+                        sqlList.add("REDIRECTPATH", DbController.encodeSQLText(field.redirectPath));
+                        sqlList.add("UNIQUENAME", DbController.encodeSQLBoolean(field.uniqueName));
+                        sqlList.add("RSSTITLEFIELD", DbController.encodeSQLBoolean(field.RSSTitleField));
+                        sqlList.add("RSSDESCRIPTIONFIELD", DbController.encodeSQLBoolean(field.RSSDescriptionField));
+                        sqlList.add("MEMBERSELECTGROUPID", DbController.encodeSQLNumber(MemberSelectGroupID));
+                        sqlList.add("installedByCollectionId", DbController.encodeSQLNumber(InstalledByCollectionID));
+                        sqlList.add("EDITTAB", DbController.encodeSQLText(field.editTabName));
+                        sqlList.add("SCRAMBLE", DbController.encodeSQLBoolean(false));
+                        sqlList.add("ISBASEFIELD", DbController.encodeSQLBoolean(field.isBaseField));
+                        sqlList.add("LOOKUPLIST", DbController.encodeSQLText(LookupList));
                         int RedirectContentID = 0;
                         int LookupContentID = 0;
                         //
@@ -898,7 +898,7 @@ namespace Contensive.Processor.Controllers {
                                         LogController.logError(core, "Could not create lookup field [" + field.nameLc + "] for content definition [" + ContentName + "] because no content definition was found For lookup-content [" + LookupContentName + "].");
                                     }
                                 }
-                                sqlList.add("LOOKUPCONTENTID", core.db.encodeSQLNumber(LookupContentID));
+                                sqlList.add("LOOKUPCONTENTID", DbController.encodeSQLNumber(LookupContentID));
                                 break;
                             case _fieldTypeIdManyToMany:
                                 //
@@ -910,7 +910,7 @@ namespace Contensive.Processor.Controllers {
                                     if (ManyToManyContentID <= 0) {
                                         LogController.logError(core, "Could not create many-to-many field [" + field.nameLc + "] for [" + ContentName + "] because no content definition was found For many-to-many-content [" + ManyToManyContent + "].");
                                     }
-                                    sqlList.add("MANYTOMANYCONTENTID", core.db.encodeSQLNumber(ManyToManyContentID));
+                                    sqlList.add("MANYTOMANYCONTENTID", DbController.encodeSQLNumber(ManyToManyContentID));
                                 }
                                 //
                                 string ManyToManyRuleContent = field.get_manyToManyRuleContentName(core);
@@ -919,10 +919,10 @@ namespace Contensive.Processor.Controllers {
                                     if (ManyToManyRuleContentID <= 0) {
                                         LogController.logError(core, "Could not create many-to-many field [" + field.nameLc + "] for [" + ContentName + "] because no content definition was found For many-to-many-rule-content [" + ManyToManyRuleContent + "].");
                                     }
-                                    sqlList.add("MANYTOMANYRULECONTENTID", core.db.encodeSQLNumber(ManyToManyRuleContentID));
+                                    sqlList.add("MANYTOMANYRULECONTENTID", DbController.encodeSQLNumber(ManyToManyRuleContentID));
                                 }
-                                sqlList.add("MANYTOMANYRULEPRIMARYFIELD", core.db.encodeSQLText(field.ManyToManyRulePrimaryField));
-                                sqlList.add("MANYTOMANYRULESECONDARYFIELD", core.db.encodeSQLText(field.ManyToManyRuleSecondaryField));
+                                sqlList.add("MANYTOMANYRULEPRIMARYFIELD", DbController.encodeSQLText(field.ManyToManyRulePrimaryField));
+                                sqlList.add("MANYTOMANYRULESECONDARYFIELD", DbController.encodeSQLText(field.ManyToManyRuleSecondaryField));
                                 break;
                             case _fieldTypeIdRedirect:
                                 //
@@ -933,16 +933,16 @@ namespace Contensive.Processor.Controllers {
                                         LogController.logError(core, "Could not create redirect field [" + field.nameLc + "] for Content Definition [" + ContentName + "] because no content definition was found For redirect-content [" + RedirectContentName + "].");
                                     }
                                 }
-                                sqlList.add("REDIRECTCONTENTID", core.db.encodeSQLNumber(RedirectContentID));
+                                sqlList.add("REDIRECTCONTENTID", DbController.encodeSQLNumber(RedirectContentID));
                                 break;
                         }
                         //
                         if (returnId == 0) {
-                            sqlList.add("NAME", core.db.encodeSQLText(field.nameLc));
-                            sqlList.add("CONTENTID", core.db.encodeSQLNumber(content.id));
+                            sqlList.add("NAME", DbController.encodeSQLText(field.nameLc));
+                            sqlList.add("CONTENTID", DbController.encodeSQLNumber(content.id));
                             sqlList.add("CREATEKEY", "0");
-                            sqlList.add("DATEADDED", core.db.encodeSQLDate(DateTime.Now));
-                            sqlList.add("CREATEDBY", core.db.encodeSQLNumber(SystemMemberID));
+                            sqlList.add("DATEADDED", DbController.encodeSQLDate(DateTime.Now));
+                            sqlList.add("CREATEDBY", DbController.encodeSQLNumber(SystemMemberID));
                             returnId = core.db.insertTableRecordGetId("Default", "ccFields");
                             //
                             if (!blockCacheClear) {

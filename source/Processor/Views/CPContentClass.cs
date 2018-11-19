@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using Contensive.BaseClasses;
+using Contensive.Addons.AdminSite.Controllers;
 
 namespace Contensive.Processor {
     public class CPContentClass : CPContentBaseClass, IDisposable {
@@ -140,8 +141,10 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override bool IsLocked(string ContentName, string RecordID) {
-            return core.workflow.isRecordLocked(ContentName, GenericController.encodeInteger(RecordID), 0);
+        public override bool IsLocked(string contentName, string recordId) {
+            var contentTable = TableModel.createByContentName(core, contentName);
+            if ( contentTable != null ) return WorkflowController.isRecordLocked( core, contentTable.id, GenericController.encodeInteger(recordId));
+            return false;
         }
         //
         //====================================================================================================
@@ -163,28 +166,28 @@ namespace Contensive.Processor {
         //
         [Obsolete("workflow editing is deprecated", false)]
         public override void PublishEdit(string ContentName, int RecordID) {
-            // Call core.workflow.publishEdit(ContentName, RecordID, 0)
+            // Call WorkflowController.publishEdit(ContentName, RecordID, 0)
         }
         //
         //====================================================================================================
         //
         [Obsolete("workflow editing is deprecated", false)]
         public override void SubmitEdit(string ContentName, int RecordID) {
-            //Call core.workflow.submitEdit2(ContentName, RecordID, 0)
+            //Call WorkflowController.submitEdit2(ContentName, RecordID, 0)
         }
         //
         //====================================================================================================
         //
         [Obsolete("workflow editing is deprecated", false)]
         public override void AbortEdit(string ContentName, int RecordId) {
-            // Call core.workflow.abortEdit2(ContentName, RecordId, 0)
+            // Call WorkflowController.abortEdit2(ContentName, RecordId, 0)
         }
         //
         //====================================================================================================
         //
         [Obsolete("workflow editing is deprecated", false)]
         public override void ApproveEdit(string ContentName, int RecordId) {
-            //Call core.workflow.approveEdit(ContentName, RecordId, 0)
+            //Call WorkflowController.approveEdit(ContentName, RecordId, 0)
         }
         //
         //====================================================================================================
@@ -193,7 +196,7 @@ namespace Contensive.Processor {
             string result = "";
             try {
                 CsController cs = new CsController(core);
-                cs.open("layouts", "name=" + cp.Db.EncodeSQLText(layoutName), "id", false, "layout");
+                cs.open("layouts", "name=" + DbController.encodeSQLText(layoutName), "id", false, "layout");
                 if (cs.ok()) {
                     result = cs.getText("layout");
                 }

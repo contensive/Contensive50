@@ -11,6 +11,7 @@ using System.IO;
 using System.Data;
 using System.Linq;
 using Contensive.Processor.Exceptions;
+using Contensive.Addons.AdminSite.Controllers;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -883,7 +884,7 @@ namespace Contensive.Processor.Controllers {
                                                                     FieldValue = core.docProperties.getText(FieldName);
                                                                 }
 
-                                                                CS = core.db.csOpen("Copy Content", "name=" + core.db.encodeSQLText(FieldName), "ID");
+                                                                CS = core.db.csOpen("Copy Content", "name=" + DbController.encodeSQLText(FieldName), "ID");
                                                                 if (!core.db.csOk(CS)) {
                                                                     core.db.csClose(ref CS);
                                                                     CS = core.db.csInsertRecord("Copy Content", core.session.user.id);
@@ -1168,7 +1169,7 @@ namespace Contensive.Processor.Controllers {
                                                             FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "");
                                                             FieldHTML = GenericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", ""));
                                                             //
-                                                            CS = core.db.csOpen("Copy Content", "Name=" + core.db.encodeSQLText(FieldName), "ID", false, 0, false, false, "id,name,Copy");
+                                                            CS = core.db.csOpen("Copy Content", "Name=" + DbController.encodeSQLText(FieldName), "ID", false, 0, false, false, "id,name,Copy");
                                                             if (!core.db.csOk(CS)) {
                                                                 core.db.csClose(ref CS);
                                                                 CS = core.db.csInsertRecord("Copy Content", core.session.user.id);
@@ -1177,7 +1178,7 @@ namespace Contensive.Processor.Controllers {
                                                                     core.db.csSet(CS, "name", FieldName);
                                                                     core.db.csSet(CS, "copy", GenericController.encodeText(TabNode.InnerText));
                                                                     core.db.csSave(CS);
-                                                                    // Call core.workflow.publishEdit("Copy Content", RecordID)
+                                                                    // Call WorkflowController.publishEdit("Copy Content", RecordID)
                                                                 }
                                                             }
                                                             if (core.db.csOk(CS)) {
@@ -2832,11 +2833,11 @@ namespace Contensive.Processor.Controllers {
                     + " left join ccAddonEventCatchers c on c.eventId=e.id)"
                     + " where ";
                 if (eventNameIdOrGuid.IsNumeric()) {
-                    sql += "e.id=" + core.db.encodeSQLNumber(double.Parse(eventNameIdOrGuid));
+                    sql += "e.id=" + DbController.encodeSQLNumber(double.Parse(eventNameIdOrGuid));
                 } else if (GenericController.isGuid(eventNameIdOrGuid)) {
-                    sql += "e.ccGuid=" + core.db.encodeSQLText(eventNameIdOrGuid);
+                    sql += "e.ccGuid=" + DbController.encodeSQLText(eventNameIdOrGuid);
                 } else {
-                    sql += "e.name=" + core.db.encodeSQLText(eventNameIdOrGuid);
+                    sql += "e.name=" + DbController.encodeSQLText(eventNameIdOrGuid);
                 }
                 if (!cs.openSQL(sql)) {
                     //

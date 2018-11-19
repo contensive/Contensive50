@@ -608,62 +608,95 @@ namespace Contensive.Processor.Controllers {
         //
         //========================================================================
         /// <summary>
+        /// true if the user is authenticated and has content editing rights to the content provided.
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="ContentName"></param>
+        /// <returns></returns>
+        public bool isAuthenticatedContentManager(CoreController core, CDefModel cdef) {
+            bool returnIsContentManager = false;
+            try {
+                if (core.session.isAuthenticatedAdmin(core)) return true;
+                if (!isAuthenticated) return false;
+                //
+                // -- for specific Content
+                returnIsContentManager = PermissionController.getUserContentPermissions(core, cdef).allowEdit;
+            } catch (Exception ex) {
+                LogController.handleError( core,ex);
+                return false;
+            }
+            return returnIsContentManager;
+        }
+        //
+        //========================================================================
+        /// <summary>
         /// true if the user is authenticated and has content editing rights to the content provided. If the content is blank, user must be admin or developer.
         /// </summary>
         /// <param name="core"></param>
         /// <param name="ContentName"></param>
         /// <returns></returns>
-        public bool isAuthenticatedContentManager(CoreController core, string ContentName = "") {
+        public bool isAuthenticatedContentManager(CoreController core, string ContentName) {
             bool returnIsContentManager = false;
             try {
-                string SQL = null;
-                int CS = 0;
-                bool notImplemented_allowAdd = false;
-                bool notImplemented_allowDelete = false;
+                if (core.session.isAuthenticatedAdmin(core)) return true;
+                if (!isAuthenticated) return false;
                 //
-                // REFACTOR -- add a private dictionary with contentname=>result, plus a authenticationChange flag that makes properties like this invalid
-                //
-                returnIsContentManager = false;
                 if (string.IsNullOrEmpty(ContentName)) {
-                    if (isAuthenticated) {
-                        if (isAuthenticatedAdmin(core)) {
-                            returnIsContentManager = true;
-                        } else {
-                            //
-                            // Is a CM for any content def
-                            //
-                            if ((!_isAuthenticatedContentManagerAnything_loaded) || (_isAuthenticatedContentManagerAnything_userId != user.id)) {
-                                SQL = "SELECT ccGroupRules.ContentID"
-                                    + " FROM ccGroupRules RIGHT JOIN ccMemberRules ON ccGroupRules.GroupID = ccMemberRules.GroupID"
-                                    + " WHERE ("
-                                        + "(ccMemberRules.MemberID=" + core.db.encodeSQLNumber(user.id) + ")"
-                                        + " AND(ccMemberRules.active<>0)"
-                                        + " AND(ccGroupRules.active<>0)"
-                                        + " AND(ccGroupRules.ContentID Is not Null)"
-                                        + " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + core.db.encodeSQLDate(core.doc.profileStartTime) + "))"
-                                        + ")";
-                                CS = core.db.csOpenSql(SQL);
-                                _isAuthenticatedContentManagerAnything = core.db.csOk(CS);
-                                core.db.csClose(ref CS);
-                                //
-                                _isAuthenticatedContentManagerAnything_userId = user.id;
-                                _isAuthenticatedContentManagerAnything_loaded = true;
-                            }
-                            returnIsContentManager = _isAuthenticatedContentManagerAnything;
-                        }
-                    }
+                    //
+                    // -- for anything
+                    return isAuthenticatedContentManager(core);
                 } else {
                     //
-                    // Specific Content called out
-                    //
-                    getContentAccessRights(core, ContentName, ref returnIsContentManager, ref notImplemented_allowAdd, ref notImplemented_allowDelete);
+                    // -- for specific Content
+                    CDefModel cdef = CDefModel.create(core, ContentName);
+                    returnIsContentManager = PermissionController.getUserContentPermissions(core, cdef).allowEdit;
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, ex);
+                return false;
+            }
+            return returnIsContentManager;
+        }
+        //
+        //========================================================================
+        /// <summary>
+        /// true if the user is authenticated and has content editing rights to the content provided. If the content is blank, user must be admin or developer.
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="ContentName"></param>
+        /// <returns></returns>
+        public bool isAuthenticatedContentManager(CoreController core) {
+            bool returnIsContentManager = false;
+            try {
+                if (core.session.isAuthenticatedAdmin(core)) return true;
+                if (!isAuthenticated) return false;
+                //
+                // Is a CM for any content def
+                if ((!_isAuthenticatedContentManagerAnything_loaded) || (_isAuthenticatedContentManagerAnything_userId != user.id)) {
+                    string SQL = "SELECT ccGroupRules.ContentID"
+                        + " FROM ccGroupRules RIGHT JOIN ccMemberRules ON ccGroupRules.GroupID = ccMemberRules.GroupID"
+                        + " WHERE ("
+                            + "(ccMemberRules.MemberID=" + DbController.encodeSQLNumber(user.id) + ")"
+                            + " AND(ccMemberRules.active<>0)"
+                            + " AND(ccGroupRules.active<>0)"
+                            + " AND(ccGroupRules.ContentID Is not Null)"
+                            + " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + DbController.encodeSQLDate(core.doc.profileStartTime) + "))"
+                            + ")";
+                    int CS = core.db.csOpenSql(SQL);
+                    _isAuthenticatedContentManagerAnything = core.db.csOk(CS);
+                    core.db.csClose(ref CS);
+                    //
+                    _isAuthenticatedContentManagerAnything_userId = user.id;
+                    _isAuthenticatedContentManagerAnything_loaded = true;
+                }
+                returnIsContentManager = _isAuthenticatedContentManagerAnything;
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
                 throw;
             }
             return returnIsContentManager;
         }
+
         private bool _isAuthenticatedContentManagerAnything_loaded = false;
         private int _isAuthenticatedContentManagerAnything_userId;
         private bool _isAuthenticatedContentManagerAnything;
@@ -744,15 +777,15 @@ namespace Contensive.Processor.Controllers {
                         //
                         // login by username or email
                         //
-                        Criteria = "((username=" + core.db.encodeSQLText(iLoginFieldValue) + ")or(email=" + core.db.encodeSQLText(iLoginFieldValue) + "))";
+                        Criteria = "((username=" + DbController.encodeSQLText(iLoginFieldValue) + ")or(email=" + DbController.encodeSQLText(iLoginFieldValue) + "))";
                     } else {
                         //
                         // login by username only
                         //
-                        Criteria = "(username=" + core.db.encodeSQLText(iLoginFieldValue) + ")";
+                        Criteria = "(username=" + DbController.encodeSQLText(iLoginFieldValue) + ")";
                     }
                     if (true) {
-                        Criteria = Criteria + "and((dateExpires is null)or(dateExpires>" + core.db.encodeSQLDate(DateTime.Now) + "))";
+                        Criteria = Criteria + "and((dateExpires is null)or(dateExpires>" + DbController.encodeSQLDate(DateTime.Now) + "))";
                     }
                     CS = core.db.csOpen("People", Criteria, "id", sqlSelectFieldList: "ID ,password,admin,developer", PageSize: 2);
                     if (!core.db.csOk(CS)) {
@@ -788,11 +821,11 @@ namespace Contensive.Processor.Controllers {
                                     SQL = "SELECT ccGroupRules.ContentID"
                                     + " FROM ccGroupRules RIGHT JOIN ccMemberRules ON ccGroupRules.GroupID = ccMemberRules.GroupID"
                                     + " WHERE ("
-                                        + "(ccMemberRules.MemberID=" + core.db.encodeSQLNumber(returnUserId) + ")"
+                                        + "(ccMemberRules.MemberID=" + DbController.encodeSQLNumber(returnUserId) + ")"
                                         + " AND(ccMemberRules.active<>0)"
                                         + " AND(ccGroupRules.active<>0)"
                                         + " AND(ccGroupRules.ContentID Is not Null)"
-                                        + " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + core.db.encodeSQLDate(core.doc.profileStartTime) + "))"
+                                        + " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + DbController.encodeSQLDate(core.doc.profileStartTime) + "))"
                                         + ");";
                                     CS = core.db.csOpenSql(SQL);
                                     if (core.db.csOk(CS)) {
@@ -862,7 +895,7 @@ namespace Contensive.Processor.Controllers {
                     //        errorMessage = "You currently have cookie support disabled in your browser. Without cookies, your browser can not support the level of security required to login."
                 } else {
 
-                    CSPointer = core.db.csOpen("People", "username=" + core.db.encodeSQLText(Username), "", false, sqlSelectFieldList: "ID", PageSize: 2);
+                    CSPointer = core.db.csOpen("People", "username=" + DbController.encodeSQLText(Username), "", false, sqlSelectFieldList: "ID", PageSize: 2);
                     if (core.db.csOk(CSPointer)) {
                         //
                         // ----- username was found, stop here
@@ -879,164 +912,6 @@ namespace Contensive.Processor.Controllers {
                 throw;
             }
             return returnOk;
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// returns if the user can edit, add or delete records from a content
-        /// </summary>
-        /// <param name="core"></param>
-        /// <param name="ContentName"></param>
-        /// <param name="returnAllowEdit"></param>
-        /// <param name="returnAllowAdd"></param>
-        /// <param name="returnAllowDelete"></param>
-        public void getContentAccessRights(CoreController core, string ContentName, ref bool returnAllowEdit, ref bool returnAllowAdd, ref bool returnAllowDelete) {
-            try {
-                int ContentID = 0;
-                returnAllowEdit = false;
-                returnAllowAdd = false;
-                returnAllowDelete = false;
-                if (true) {
-                    if (!isAuthenticated) {
-                        //
-                        // no authenticated, you are not a conent manager
-                        //
-                    } else if (string.IsNullOrEmpty(ContentName)) {
-                        //
-                        // no content given, do not handle the general case -- use authcontext.user.main_IsContentManager2()
-                        //
-                    } else if (isAuthenticatedDeveloper(core)) {
-                        //
-                        // developers are always content managers
-                        //
-                        returnAllowEdit = true;
-                        returnAllowAdd = true;
-                        returnAllowDelete = true;
-                    } else if (isAuthenticatedAdmin(core)) {
-                        //
-                        // admin is content manager if the CDef is not developer only
-                        //
-                        var CDef = CDefModel.create(core, ContentName);
-                        if (CDef.id != 0) {
-                            if (!CDef.developerOnly) {
-                                returnAllowEdit = true;
-                                returnAllowAdd = true;
-                                returnAllowDelete = true;
-                            }
-                        }
-                    } else {
-                        //
-                        // Authenticated and not admin or developer
-                        //
-                        ContentID = CdefController.getContentId(core, ContentName);
-                        getContentAccessRights_NonAdminByContentId(core, ContentID, ref returnAllowEdit, ref returnAllowAdd, ref returnAllowDelete, "");
-                    }
-                }
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-                throw;
-            }
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Checks if the member is a content manager for the specific content, Which includes transversing up the tree to find the next rule that applies. Member must be checked for authenticated and main_IsAdmin already
-        /// </summary>
-        /// <param name="core"></param>
-        /// <param name="ContentID"></param>
-        /// <param name="returnAllowEdit"></param>
-        /// <param name="returnAllowAdd"></param>
-        /// <param name="returnAllowDelete"></param>
-        /// <param name="usedContentIdList"></param>
-        //========================================================================
-        //
-        private void getContentAccessRights_NonAdminByContentId(CoreController core, int ContentID, ref bool returnAllowEdit, ref bool returnAllowAdd, ref bool returnAllowDelete, string usedContentIdList) {
-            try {
-                string SQL = null;
-                int CSPointer = 0;
-                int ParentID = 0;
-                string ContentName = null;
-                Models.Domain.CDefModel CDef = null;
-                //
-                returnAllowEdit = false;
-                returnAllowAdd = false;
-                returnAllowDelete = false;
-                if (GenericController.isInDelimitedString(usedContentIdList, ContentID.ToString(), ",")) {
-                    //
-                    // failed usedContentIdList test, this content id was in the child path
-                    //
-                    throw new ArgumentException("ContentID [" + ContentID + "] was found to be in it's own parentid path.");
-                } else if (ContentID < 1) {
-                    //
-                    // ----- not a valid contentname
-                    //
-                } else if (GenericController.isInDelimitedString(core.doc.contentAccessRights_NotList, ContentID.ToString(), ",")) {
-                    //
-                    // ----- was previously found to not be a Content Manager
-                    //
-                } else if (GenericController.isInDelimitedString(core.doc.contentAccessRights_List, ContentID.ToString(), ",")) {
-                    //
-                    // ----- was previously found to be a Content Manager
-                    //
-                    returnAllowEdit = true;
-                    returnAllowAdd = GenericController.isInDelimitedString(core.doc.contentAccessRights_AllowAddList, ContentID.ToString(), ",");
-                    returnAllowDelete = GenericController.isInDelimitedString(core.doc.contentAccessRights_AllowDeleteList, ContentID.ToString(), ",");
-                } else {
-                    //
-                    // ----- Must test it
-                    //
-                    SQL = "SELECT ccGroupRules.ContentID,allowAdd,allowDelete"
-                    + " FROM ccGroupRules RIGHT JOIN ccMemberRules ON ccGroupRules.GroupID = ccMemberRules.GroupID"
-                    + " WHERE ("
-                        + " (ccMemberRules.MemberID=" + core.db.encodeSQLNumber(user.id) + ")"
-                        + " AND(ccMemberRules.active<>0)"
-                        + " AND(ccGroupRules.active<>0)"
-                        + " AND(ccGroupRules.ContentID=" + ContentID + ")"
-                        + " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + core.db.encodeSQLDate(core.doc.profileStartTime) + "))"
-                        + ");";
-                    CSPointer = core.db.csOpenSql(SQL);
-                    if (core.db.csOk(CSPointer)) {
-                        returnAllowEdit = true;
-                        returnAllowAdd = core.db.csGetBoolean(CSPointer, "allowAdd");
-                        returnAllowDelete = core.db.csGetBoolean(CSPointer, "allowDelete");
-                    }
-                    core.db.csClose(ref CSPointer);
-                    //
-                    if (!returnAllowEdit) {
-                        //
-                        // ----- Not a content manager for this one, check the parent
-                        //
-                        ContentName = CdefController.getContentNameByID(core, ContentID);
-                        if (!string.IsNullOrEmpty(ContentName)) {
-                            CDef = CDefModel.create(core, ContentName);
-                            ParentID = CDef.parentID;
-                            if (ParentID > 0) {
-                                getContentAccessRights_NonAdminByContentId(core, ParentID, ref returnAllowEdit, ref returnAllowAdd, ref returnAllowDelete, usedContentIdList + "," + ContentID.ToString());
-                            }
-                        }
-                    }
-                    if (returnAllowEdit) {
-                        //
-                        // ----- Was found to be true
-                        //
-                        core.doc.contentAccessRights_List += "," + ContentID.ToString();
-                        if (returnAllowAdd) {
-                            core.doc.contentAccessRights_AllowAddList += "," + ContentID.ToString();
-                        }
-                        if (returnAllowDelete) {
-                            core.doc.contentAccessRights_AllowDeleteList += "," + ContentID.ToString();
-                        }
-                    } else {
-                        //
-                        // ----- Was found to be false
-                        //
-                        core.doc.contentAccessRights_NotList += "," + ContentID.ToString();
-                    }
-                }
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-                throw;
-            }
         }
         //
         //========================================================================
@@ -1284,7 +1159,7 @@ namespace Contensive.Processor.Controllers {
                         Criteria = ""
                             + "(" + Criteria + ")"
                             + " and(r.id is not null)"
-                            + " and((r.DateExpires is null)or(r.DateExpires>" + core.db.encodeSQLDate(DateTime.Now) + "))"
+                            + " and((r.DateExpires is null)or(r.DateExpires>" + DbController.encodeSQLDate(DateTime.Now) + "))"
                             + " ";
                         if (adminReturnsTrue) {
                             Criteria = "(" + Criteria + ")or(m.admin<>0)or(m.developer<>0)";

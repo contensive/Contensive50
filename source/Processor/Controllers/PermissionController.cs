@@ -1,5 +1,7 @@
 ﻿
+using Contensive.Processor.Models.Domain;
 using System;
+using System.Collections.Generic;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -11,75 +13,239 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// Get athoring permissions to determine what buttons we display, and what authoring actions we can take
+        /// Permissions this user has for this content.
         /// </summary>
-        /// <param name="ContentName"></param>
-        /// <param name="RecordID"></param>
-        /// <param name="AllowInsert"></param>
-        /// <param name="AllowCancel"></param>
-        /// <param name="allowSave"></param>
-        /// <param name="AllowDelete"></param>
-        /// <param name="ignore1"></param>
-        /// <param name="ignore2"></param>
-        /// <param name="ignore3"></param>
-        /// <param name="ignore4"></param>
-        /// <param name="readOnlyField"></param>
-        public static AuthoringPermissions getAuthoringPermissions(CoreController core, string ContentName, int RecordID) {
-            var result = new AuthoringPermissions() {
-                AllowCancel = false,
-                AllowDelete = false,
-                AllowInsert = false,
+        public static UserContentPermissions getUserContentPermissions(CoreController core, CDefModel cdef) {
+            var result = new UserContentPermissions() {
+                allowDelete = false,
+                allowAdd = false,
                 allowSave = false,
-                ignore1 = false,
-                ignore2 = false,
-                ignore3 = false,
-                ignore4 = false,
-                readOnlyField = false
+                allowEdit = false
             };
             try {
-                Models.Domain.CDefModel CDef = null;
-                if (RecordID != 0) {
-                    WorkflowController.AuthoringStatusClass authoringStatus = core.workflow.getAuthoringStatus(ContentName, RecordID);
+                if ((!core.session.isAuthenticated) || (cdef == null)) {
                     //
-                    // Set Buttons based on Status
-                    result.AllowCancel = true;
-                    if (authoringStatus.isEditing) {
-                        //
-                        // Edit Locked
-                        result.readOnlyField = true;
-                    } else {
-                        //
-                        // Not editing
-                        CDef = Models.Domain.CDefModel.create(core, ContentName);
-                        result.allowSave = true;
-                        if ((CDef.allowDelete) && (RecordID != 0)) {
-                            //
-                            // -- allow delete if not new record and cdef allows
-                            result.AllowDelete = true;
-                        }
-                        if (CDef.allowAdd) {
-                            //
-                            // -- allow delete if cdef allows
-                            result.AllowInsert = true;
-                        }
-                    }
+                    // -- exit with no rights
+                    return result;
                 }
+                if (core.session.isAuthenticatedDeveloper(core)) {
+                    //
+                    // developers are always content managers
+                    result.allowEdit = true;
+                    result.allowSave = true;
+                    result.allowAdd = cdef.allowAdd;
+                    result.allowDelete = cdef.allowDelete;
+                } else if (core.session.isAuthenticatedAdmin(core)) {
+                    //
+                    // admin is content manager if the CDef is not developer only
+                    if (!cdef.developerOnly) {
+                        result.allowEdit = true;
+                        result.allowSave = true;
+                        result.allowAdd = cdef.allowAdd;
+                        result.allowDelete = cdef.allowDelete;
+                    }
+                } else {
+                    //
+                    // Authenticated and not admin or developer
+                    result = getUserAuthoringPermissions_ContentManager(core, cdef, new List<int>());
+                }
+                //Models.Domain.CDefModel CDef = null;
+                //if (recordId == 0) {
+                //    //
+                //    // -- new record
+                //    result.allowSave = true;
+                //} else {
+                //    CDef = Models.Domain.CDefModel.create(core, contentName);
+                //    result.allowSave = true;
+                //    if ((CDef.allowDelete) && (recordId != 0)) {
+                //        //
+                //        // -- allow delete if not new record and cdef allows
+                //        result.allowDelete = true;
+                //    }
+                //    if (CDef.allowAdd) {
+                //        //
+                //        // -- allow delete if cdef allows
+                //        result.allowAdd = true;
+                //    }
+                //}
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
             }
             return result;
         }
+        ////
+        ////====================================================================================================
+        ///// <summary>
+        ///// returns if the user can edit, add or delete records from a content
+        ///// </summary>
+        ///// <param name="core"></param>
+        ///// <param name="contentName"></param>
+        ///// <param name="returnAllowEdit"></param>
+        ///// <param name="returnAllowAdd"></param>
+        ///// <param name="returnAllowDelete"></param>
+        //public static void getContentAccessRights(CoreController core, string contentName, ref bool returnAllowEdit, ref bool returnAllowAdd, ref bool returnAllowDelete) {
+        //    try {
+        //        returnAllowEdit = false;
+        //        returnAllowAdd = false;
+        //        returnAllowDelete = false;
+        //        if (!core.session.isAuthenticated) {
+        //            //
+        //            // no authenticated, you are not a conent manager
+        //            //
+        //        } else if (string.IsNullOrEmpty(contentName)) {
+        //            //
+        //            // no content given, do not handle the general case -- use authcontext.user.main_IsContentManager2()
+        //            //
+        //        } else if (core.session.isAuthenticatedDeveloper(core)) {
+        //            //
+        //            // developers are always content managers
+        //            //
+        //            returnAllowEdit = true;
+        //            returnAllowAdd = true;
+        //            returnAllowDelete = true;
+        //        } else if (core.session.isAuthenticatedAdmin(core)) {
+        //            //
+        //            // admin is content manager if the CDef is not developer only
+        //            //
+        //            var CDef = CDefModel.create(core, contentName);
+        //            if (CDef.id != 0) {
+        //                if (!CDef.developerOnly) {
+        //                    returnAllowEdit = true;
+        //                    returnAllowAdd = true;
+        //                    returnAllowDelete = true;
+        //                }
+        //            }
+        //        } else {
+        //            //
+        //            // Authenticated and not admin or developer
+        //            //
+        //            int ContentID = CdefController.getContentId(core, contentName);
+        //            getContentAccessRights_NonAdminByContentId(core, ContentID, ref returnAllowEdit, ref returnAllowAdd, ref returnAllowDelete, "");
+        //        }
+        //    } catch (Exception ex) {
+        //        LogController.handleError(core, ex);
+        //        throw;
+        //    }
+        //}
         //
-        public class AuthoringPermissions {
-            public bool AllowInsert { get; set; }
-            public bool AllowCancel { get; set; }
+        //====================================================================================================
+        /// <summary>
+        /// Checks if the member is a content manager for the specific content, Which includes transversing up the tree to find the next rule that applies. Member must be checked for authenticated and main_IsAdmin already
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="contentId"></param>
+        /// <param name="returnAllowEdit"></param>
+        /// <param name="returnAllowAdd"></param>
+        /// <param name="returnAllowDelete"></param>
+        /// <param name="usedContentIdList"></param>
+        //========================================================================
+        //
+        private static UserContentPermissions getUserAuthoringPermissions_ContentManager(CoreController core, CDefModel cdef, List<int> usedContentIdList) {
+            var result = new UserContentPermissions() {
+                allowAdd = false,
+                allowDelete = false,
+                allowEdit = false,
+                allowSave = false
+            };
+            try {
+                if (usedContentIdList.Contains(cdef.id)) {
+                    //
+                    // failed usedContentIdList test, this content id was in the child path
+                    //
+                    throw new ArgumentException("ContentID [" + cdef.id + "] was found to be in it's own parentid path.");
+                } else if (cdef.id < 1) {
+                    //
+                    // ----- not a valid contentname
+                    //
+                } else if (core.doc.contentAccessRights_NotList.Contains(cdef.id)) {
+                    //
+                    // ----- was previously found to not be a Content Manager
+                    //
+                } else if (core.doc.contentAccessRights_List.Contains(cdef.id)) {
+                    //
+                    // ----- was previously found to be a Content Manager
+                    //
+                    result.allowEdit = true;
+                    result.allowSave = true;
+                    result.allowAdd = core.doc.contentAccessRights_AllowAddList.Contains( cdef.id );
+                    result.allowDelete = core.doc.contentAccessRights_AllowDeleteList.Contains( cdef.id );
+                } else {
+                    //
+                    // ----- Must test it
+                    //
+                    string SQL = "SELECT ccGroupRules.ContentID,allowAdd,allowDelete"
+                    + " FROM ccGroupRules RIGHT JOIN ccMemberRules ON ccGroupRules.GroupID = ccMemberRules.GroupID"
+                    + " WHERE ("
+                        + " (ccMemberRules.MemberID=" + DbController.encodeSQLNumber(core.session.user.id) + ")"
+                        + " AND(ccMemberRules.active<>0)"
+                        + " AND(ccGroupRules.active<>0)"
+                        + " AND(ccGroupRules.ContentID=" + cdef.id + ")"
+                        + " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + DbController.encodeSQLDate(core.doc.profileStartTime) + "))"
+                        + ");";
+                    int CSPointer = core.db.csOpenSql(SQL);
+                    if (core.db.csOk(CSPointer)) {
+                        result.allowEdit = true;
+                        result.allowSave = true;
+                        result.allowAdd = core.db.csGetBoolean(CSPointer, "allowAdd");
+                        result.allowDelete = core.db.csGetBoolean(CSPointer, "allowDelete");
+                    }
+                    core.db.csClose(ref CSPointer);
+                    //
+                    if (!result.allowEdit) {
+                        //
+                        // ----- Not a content manager for this one, check the parent
+                        if (cdef.parentID > 0) {
+                            var parentCdef = CDefModel.create(core, cdef.parentID);
+                            usedContentIdList.Add(cdef.id);
+                            getUserAuthoringPermissions_ContentManager(core, cdef, usedContentIdList);
+                        }
+                    }
+                    if (result.allowEdit) {
+                        //
+                        // ----- Was found to be true
+                        //
+                        core.doc.contentAccessRights_List.Add(cdef.id);
+                        if (result.allowEdit) {
+                            core.doc.contentAccessRights_AllowAddList.Add( cdef.id );
+                        }
+                        if (result.allowDelete) {
+                            core.doc.contentAccessRights_AllowDeleteList.Add( cdef.id );
+                        }
+                    } else {
+                        //
+                        // ----- Was found to be false
+                        //
+                        core.doc.contentAccessRights_NotList.Add(cdef.id);
+                    }
+                }
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+                throw;
+            }
+            return result;
+        }
+        //
+        /// <summary>
+        /// generic permissions a user might have with content
+        /// </summary>
+        public class UserContentPermissions {
+            /// <summary>
+            /// this user can add new records to this content
+            /// </summary>
+            public bool allowAdd { get; set; }
+            /// <summary>
+            /// this user can edit records in this content
+            /// </summary>
+            public bool allowEdit { get; set; }
+            /// <summary>
+            /// this user can save the record
+            /// </summary>
             public bool allowSave { get; set; }
-            public bool AllowDelete { get; set; }
-            public bool ignore1 { get; set; }
-            public bool ignore2 { get; set; }
-            public bool ignore3 { get; set; }
-            public bool ignore4 { get; set; }
-            public bool readOnlyField { get; set;  }
+            /// <summary>
+            /// this user can delete the record
+            /// </summary>
+            public bool allowDelete { get; set; }
+            //public bool AllowCancel { get; set; }
         }
         //
         //

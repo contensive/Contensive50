@@ -118,25 +118,25 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override string EncodeSQLBoolean(bool SourceBoolean) {
-            return cp.core.db.encodeSQLBoolean(SourceBoolean);
+            return DbController.encodeSQLBoolean(SourceBoolean);
         }
         //
         //====================================================================================================
         //
         public override string EncodeSQLDate(DateTime SourceDate) {
-            return cp.core.db.encodeSQLDate(SourceDate);
+            return DbController.encodeSQLDate(SourceDate);
         }
         //
         //====================================================================================================
         //
         public override string EncodeSQLNumber(double SourceNumber) {
-            return cp.core.db.encodeSQLNumber(SourceNumber);
+            return DbController.encodeSQLNumber(SourceNumber);
         }
         //
         //====================================================================================================
         //
         public override string EncodeSQLText(string SourceText) {
-            return cp.core.db.encodeSQLText(SourceText);
+            return DbController.encodeSQLText(SourceText);
         }
         //
         //====================================================================================================
@@ -211,7 +211,7 @@ namespace Contensive.Processor {
             cp.core.db.deleteTableRecord(RecordId, TableName);
         }
         public override string EncodeSQLNumber(int SourceNumber) {
-            return cp.core.db.encodeSQLNumber(SourceNumber);
+            return DbController.encodeSQLNumber(SourceNumber);
         }
         public override void ExecuteNonQuery(string sql) {
             cp.core.db.executeNonQuery(sql);

@@ -670,7 +670,7 @@ namespace Contensive.Processor.Controllers {
                                     }
                                     if (!string.IsNullOrEmpty(ArgName)) {
                                         //CmdAccumulator = core.main_GetContentCopy(ArgName, "copy content")
-                                        DataTable dt = core.db.executeQuery("select layout from ccLayouts where name=" + core.db.encodeSQLText(ArgName));
+                                        DataTable dt = core.db.executeQuery("select layout from ccLayouts where name=" + DbController.encodeSQLText(ArgName));
                                         if (dt != null) {
                                             CmdAccumulator = GenericController.encodeText(dt.Rows[0]["layout"]);
                                         }

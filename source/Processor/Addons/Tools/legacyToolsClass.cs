@@ -16,6 +16,7 @@ using static Contensive.Processor.Constants;
 //
 using System.Threading;
 using Contensive.Processor.Exceptions;
+using Contensive.Addons.AdminSite.Controllers;
 //
 namespace Contensive.Addons.Tools {
     public class legacyToolsClass {
@@ -423,14 +424,14 @@ namespace Contensive.Addons.Tools {
                         ContentID = CdefController.getContentId(core, ContentName);
                         ParentNavID = core.db.getRecordID(Processor.Models.Db.NavigatorEntryModel.contentName, "Manage Site Content");
                         if (ParentNavID != 0) {
-                            CS = core.db.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, "(name=" + core.db.encodeSQLText("Advanced") + ")and(parentid=" + ParentNavID + ")");
+                            CS = core.db.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, "(name=" + DbController.encodeSQLText("Advanced") + ")and(parentid=" + ParentNavID + ")");
                             ParentNavID = 0;
                             if (core.db.csOk(CS)) {
                                 ParentNavID = core.db.csGetInteger(CS, "ID");
                             }
                             core.db.csClose(ref CS);
                             if (ParentNavID != 0) {
-                                CS = core.db.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, "(name=" + core.db.encodeSQLText(ContentName) + ")and(parentid=" + NavID + ")");
+                                CS = core.db.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, "(name=" + DbController.encodeSQLText(ContentName) + ")and(parentid=" + NavID + ")");
                                 if (!core.db.csOk(CS)) {
                                     core.db.csClose(ref CS);
                                     CS = core.db.csInsertRecord(Processor.Models.Db.NavigatorEntryModel.contentName);
@@ -545,7 +546,7 @@ namespace Contensive.Addons.Tools {
                                     if (field.inherited) {
                                         SourceContentID = field.contentId;
                                         SourceName = field.nameLc;
-                                        CSSource = core.db.csOpen("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + core.db.encodeSQLText(SourceName) + ")");
+                                        CSSource = core.db.csOpen("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + DbController.encodeSQLText(SourceName) + ")");
                                         if (core.db.csOk(CSSource)) {
                                             CSTarget = core.db.csInsertRecord("Content Fields");
                                             if (core.db.csOk(CSTarget)) {
@@ -571,7 +572,7 @@ namespace Contensive.Addons.Tools {
                             if (field.inherited) {
                                 SourceContentID = field.contentId;
                                 SourceName = field.nameLc;
-                                CSSource = core.db.csOpen("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + core.db.encodeSQLText(SourceName) + ")");
+                                CSSource = core.db.csOpen("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + DbController.encodeSQLText(SourceName) + ")");
                                 if (core.db.csOk(CSSource)) {
                                     CSTarget = core.db.csInsertRecord("Content Fields");
                                     if (core.db.csOk(CSTarget)) {
@@ -1132,7 +1133,7 @@ namespace Contensive.Addons.Tools {
                                 // ----- Set Field Type
                                 //
                                 ContentID = Local_GetContentID(DiagArgument(DiagAction, 1));
-                                CS = core.db.csOpen("Content Fields", "(ContentID=" + ContentID + ")and(Name=" + core.db.encodeSQLText(DiagArgument(DiagAction, 2)) + ")");
+                                CS = core.db.csOpen("Content Fields", "(ContentID=" + ContentID + ")and(Name=" + DbController.encodeSQLText(DiagArgument(DiagAction, 2)) + ")");
                                 if (core.db.csOk(CS)) {
                                     core.db.csSet(CS, "Type", DiagArgument(DiagAction, 3));
                                 }
@@ -1144,7 +1145,7 @@ namespace Contensive.Addons.Tools {
                                 // ----- Set Field Inactive
                                 //
                                 ContentID = Local_GetContentID(DiagArgument(DiagAction, 1));
-                                CS = core.db.csOpen("Content Fields", "(ContentID=" + ContentID + ")and(Name=" + core.db.encodeSQLText(DiagArgument(DiagAction, 2)) + ")");
+                                CS = core.db.csOpen("Content Fields", "(ContentID=" + ContentID + ")and(Name=" + DbController.encodeSQLText(DiagArgument(DiagAction, 2)) + ")");
                                 if (core.db.csOk(CS)) {
                                     core.db.csSet(CS, "active", 0);
                                 }
@@ -1162,7 +1163,7 @@ namespace Contensive.Addons.Tools {
                                 break;
                             case DiagActionContentDeDupe:
                                 ContentName = DiagArgument(DiagAction, 1);
-                                CS = core.db.csOpen("Content", "name=" + core.db.encodeSQLText(ContentName), "ID");
+                                CS = core.db.csOpen("Content", "name=" + DbController.encodeSQLText(ContentName), "ID");
                                 if (core.db.csOk(CS)) {
                                     core.db.csGoNext(CS);
                                     while (core.db.csOk(CS)) {
@@ -2045,7 +2046,7 @@ namespace Contensive.Addons.Tools {
             int tempLocal_GetContentID = 0;
             try {
                 tempLocal_GetContentID = 0;
-                DataTable dt = core.db.executeQuery("Select ID from ccContent where name=" + core.db.encodeSQLText(ContentName));
+                DataTable dt = core.db.executeQuery("Select ID from ccContent where name=" + DbController.encodeSQLText(ContentName));
                 if (dt.Rows.Count > 0) {
                     tempLocal_GetContentID = GenericController.encodeInteger(dt.Rows[0][0]);
                 }
@@ -2087,7 +2088,7 @@ namespace Contensive.Addons.Tools {
                 DataTable RS = null;
                 //
                 tempLocal_GetContentTableName = "";
-                RS = core.db.executeQuery("Select ccTables.Name as TableName from ccContent Left Join ccTables on ccContent.ContentTableID=ccTables.ID where ccContent.name=" + core.db.encodeSQLText(ContentName));
+                RS = core.db.executeQuery("Select ccTables.Name as TableName from ccContent Left Join ccTables on ccContent.ContentTableID=ccTables.ID where ccContent.name=" + DbController.encodeSQLText(ContentName));
                 if (RS.Rows.Count > 0) {
                     tempLocal_GetContentTableName = GenericController.encodeText(RS.Rows[0][0]);
                 }
@@ -2109,7 +2110,7 @@ namespace Contensive.Addons.Tools {
                     +"Select ccDataSources.Name"
                     + " from ( ccContent Left Join ccTables on ccContent.ContentTableID=ccTables.ID )"
                     + " Left Join ccDataSources on ccTables.DataSourceID=ccDataSources.ID"
-                    + " where ccContent.name=" + core.db.encodeSQLText(ContentName);
+                    + " where ccContent.name=" + DbController.encodeSQLText(ContentName);
                 DataTable RS = core.db.executeQuery(SQL);
                 if (DbController.isDataTableOk(RS)) {
                     tempLocal_GetContentDataSource = GenericController.encodeText(RS.Rows[0]["Name"]);
@@ -2966,7 +2967,7 @@ namespace Contensive.Addons.Tools {
 
         //                End If
         //                '
-        //                CS = core.db.cs_open("Page Templates", "Link=" & core.db.encodeSQLText(Link))
+        //                CS = core.db.cs_open("Page Templates", "Link=" & DbController.encodeSQLText(Link))
         //                If Not core.db.cs_ok(CS) Then
         //                    Call core.db.cs_Close(CS)
         //                    CS = core.db.cs_insertRecord("Page Templates")
@@ -2991,7 +2992,7 @@ namespace Contensive.Addons.Tools {
         //                '
         //                result = result & "<br>Create Soft Template from source [" & Link & "]"
         //                '
-        //                CS = core.db.cs_open("Page Templates", "Source=" & core.db.encodeSQLText(Link))
+        //                CS = core.db.cs_open("Page Templates", "Source=" & DbController.encodeSQLText(Link))
         //                If Not core.db.cs_ok(CS) Then
         //                    Call core.db.cs_Close(CS)
         //                    CS = core.db.cs_insertRecord("Page Templates")
@@ -3064,7 +3065,7 @@ namespace Contensive.Addons.Tools {
         //            Dim ParentContentName As String
         //            Dim ParentID As Integer
         //            '
-        //            CSContent = core.db.cs_open("Content", "name=" & core.db.encodeSQLText(ContentName))
+        //            CSContent = core.db.cs_open("Content", "name=" & DbController.encodeSQLText(ContentName))
         //            If core.db.cs_ok(CSContent) Then
         //                '
         //                ' Start with parent CDef

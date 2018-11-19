@@ -144,7 +144,7 @@ namespace Contensive.Processor.Models.Db {
         public static string getValue(CoreController core, string PropertyName, ref bool return_propertyFound) {
             string returnString = "";
             try {
-                using (DataTable dt = core.db.executeQuery("select FieldValue from ccSetup where (active>0)and(name=" + core.db.encodeSQLText(PropertyName) + ") order by id")) {
+                using (DataTable dt = core.db.executeQuery("select FieldValue from ccSetup where (active>0)and(name=" + DbController.encodeSQLText(PropertyName) + ") order by id")) {
                     if (dt.Rows.Count > 0) {
                         returnString = GenericController.encodeText(dt.Rows[0]["FieldValue"]);
                         return_propertyFound = true;

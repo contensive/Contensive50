@@ -18,6 +18,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using System.Net;
 using System.Text;
+using Contensive.Addons.AdminSite.Controllers;
 
 namespace Contensive.Processor.Controllers {
     /// <summary>
@@ -572,7 +573,7 @@ namespace Contensive.Processor.Controllers {
                             SQL = "select " + SelectFields + " from ccMemberRules R"
                                 + " inner join ccMembers P on R.MemberID=P.ID"
                                 + " where (R.GroupID=" + GroupID + ")"
-                                + " and((R.DateExpires is null)or(R.DateExpires>" + core.db.encodeSQLDate(DateTime.Now) + "))"
+                                + " and((R.DateExpires is null)or(R.DateExpires>" + DbController.encodeSQLDate(DateTime.Now) + "))"
                                 + " and(P.active<>0)"
                                 + " order by P." + SortFieldList;
                             CSPointer = core.db.csOpenSql(SQL);
@@ -2060,7 +2061,7 @@ namespace Contensive.Processor.Controllers {
                         }
 
                     }
-                    core.db.executeQuery("update ccpagecontent set ChildListInstanceOptions=" + core.db.encodeSQLText(addonOption_String) + " where id=" + RecordID);
+                    core.db.executeQuery("update ccpagecontent set ChildListInstanceOptions=" + DbController.encodeSQLText(addonOption_String) + " where id=" + RecordID);
                     needToClearCache = true;
                     //CS = main_OpenCSContentRecord("page content", RecordID)
                     //If app.csv_IsCSOK(CS) Then
@@ -2335,7 +2336,7 @@ namespace Contensive.Processor.Controllers {
                         if (RecordID > 0) {
                             HelpCaption = core.docProperties.getText("helpcaption");
                             HelpMessage = core.docProperties.getText("helptext");
-                            SQL = "update ccfields set caption=" + core.db.encodeSQLText(HelpCaption) + ",HelpMessage=" + core.db.encodeSQLText(HelpMessage) + " where id=" + RecordID;
+                            SQL = "update ccfields set caption=" + DbController.encodeSQLText(HelpCaption) + ",HelpMessage=" + DbController.encodeSQLText(HelpMessage) + " where id=" + RecordID;
                             core.db.executeQuery(SQL);
                             core.cache.invalidateAll();
                             core.clearMetaData();
@@ -2887,7 +2888,7 @@ namespace Contensive.Processor.Controllers {
                             //        ' Path blocking allowed
                             //        '
                             //        'OptionsPanel = OptionsPanel & SpanClassAdminSmall & "<LABEL for=""" & TagID & """>"
-                            //        CS = core.db.cs_open("Paths", "name=" & core.db.encodeSQLText(core.webServer.requestPath), , , , , , "ID")
+                            //        CS = core.db.cs_open("Paths", "name=" & DbController.encodeSQLText(core.webServer.requestPath), , , , , , "ID")
                             //        If core.db.cs_ok(CS) Then
                             //            PathID = (core.db.cs_getInteger(CS, "ID"))
                             //        End If
@@ -3401,7 +3402,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // honestly, not sure what to do with 'return_ErrorMessage'
                 //
-                CS = core.db.csOpen("copy content", "Name=" + core.db.encodeSQLText(CopyName), "ID", true, 0, false, false, "Name,ID,Copy,modifiedBy");
+                CS = core.db.csOpen("copy content", "Name=" + DbController.encodeSQLText(CopyName), "ID", true, 0, false, false, "Name,ID,Copy,modifiedBy");
                 if (!core.db.csOk(CS)) {
                     core.db.csClose(ref CS);
                     CS = core.db.csInsertRecord("copy content", 0);
@@ -3410,7 +3411,7 @@ namespace Contensive.Processor.Controllers {
                         core.db.csSet(CS, "name", CopyName);
                         core.db.csSet(CS, "copy", GenericController.encodeText(DefaultContent));
                         core.db.csSave(CS);
-                        //   Call core.workflow.publishEdit("copy content", RecordID)
+                        //   Call WorkflowController.publishEdit("copy content", RecordID)
                     }
                 }
                 if (core.db.csOk(CS)) {
@@ -3519,7 +3520,7 @@ namespace Contensive.Processor.Controllers {
                     if (SupportRuleCopy && RuleNeeded && (RuleFound)) {
                         //
                         // Record exists and is needed, update the rule copy
-                        SQL = "update " + rulesTablename + " set rulecopy=" + core.db.encodeSQLText(RuleCopy) + " where id=" + RuleId;
+                        SQL = "update " + rulesTablename + " set rulecopy=" + DbController.encodeSQLText(RuleCopy) + " where id=" + RuleId;
                         core.db.executeQuery(SQL);
                     } else if (RuleNeeded && (!RuleFound)) {
                         //

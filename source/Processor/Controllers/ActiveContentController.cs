@@ -5,6 +5,7 @@ using Contensive.Processor.Models.Db;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Exceptions;
+using Contensive.Addons.AdminSite.Controllers;
 
 namespace Contensive.Processor.Controllers {
     /// <summary>
@@ -286,9 +287,9 @@ namespace Contensive.Processor.Controllers {
                                                             string SrcOptionList = "";
                                                             string IconFilename = "";
                                                             if (!string.IsNullOrEmpty(ACGuid)) {
-                                                                Criteria = "ccguid=" + core.db.encodeSQLText(ACGuid);
+                                                                Criteria = "ccguid=" + DbController.encodeSQLText(ACGuid);
                                                             } else {
-                                                                Criteria = "name=" + core.db.encodeSQLText(ACName.ToUpper());
+                                                                Criteria = "name=" + DbController.encodeSQLText(ACName.ToUpper());
                                                             }
                                                             int CS = core.db.csOpen(AddonContentName, Criteria, "Name,ID", false, 0, false, false, SelectList);
                                                             if (core.db.csOk(CS)) {

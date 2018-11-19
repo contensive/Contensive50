@@ -142,7 +142,7 @@ namespace Contensive.Processor.Models.Db {
             if (string.IsNullOrEmpty(queryStringSuffix)) {
                 return createList<LinkAliasModel>(core, "(pageId=" + pageId + ")", "id desc");
             } else {
-                return createList<LinkAliasModel>(core, "(pageId=" + pageId + ")and(QueryStringSuffix=" + core.db.encodeSQLText(queryStringSuffix) + ")", "id desc");
+                return createList<LinkAliasModel>(core, "(pageId=" + pageId + ")and(QueryStringSuffix=" + DbController.encodeSQLText(queryStringSuffix) + ")", "id desc");
             }
         }
         //

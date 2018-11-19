@@ -50,7 +50,7 @@ namespace Contensive.Addons.Email {
             try {
                 //
                 // Open the email records
-                string SQLDateNow = core.db.encodeSQLDate(DateTime.Now);
+                string SQLDateNow = DbController.encodeSQLDate(DateTime.Now);
                 string Criteria = "(ccemail.active<>0)"
                     + " and ((ccemail.Sent is null)or(ccemail.Sent=0))"
                     + " and (ccemail.submitted<>0)"
@@ -164,7 +164,7 @@ namespace Contensive.Addons.Email {
                 string BounceAddress = core.siteProperties.getText("EmailBounceAddress", "");
                 DateTime rightNow = DateTime.Now;
                 DateTime rightNowDate = rightNow.Date;
-                string SQLDateNow = core.db.encodeSQLDate(DateTime.Now);
+                string SQLDateNow = DbController.encodeSQLDate(DateTime.Now);
                 //
                 // Send Conditional Email - Offset days after Joining
                 //   sends email between the condition period date and date +1. if a conditional email is setup and there are already
@@ -296,7 +296,7 @@ namespace Contensive.Addons.Email {
                         + " AND (ccMembers.AllowBulkEmail <> 0)"
                         + " AND (ccMembers.BirthdayMonth=" + DateTime.Now.Month + ")"
                         + " AND (ccMembers.BirthdayDay=" + DateTime.Now.Day + ")"
-                        + " AND (ccEmail.ID Not In (Select ccEmailLog.EmailID from ccEmailLog where ccEmailLog.MemberID=ccMembers.ID and ccEmailLog.DateAdded>=" + core.db.encodeSQLDate(DateTime.Now.Date) + "))";
+                        + " AND (ccEmail.ID Not In (Select ccEmailLog.EmailID from ccEmailLog where ccEmailLog.MemberID=ccMembers.ID and ccEmailLog.DateAdded>=" + DbController.encodeSQLDate(DateTime.Now.Date) + "))";
                     int CSEmailBig = core.db.csOpenSql(SQL,"Default");
                     while (core.db.csOk(CSEmailBig)) {
                         int emailID = core.db.csGetInteger(CSEmailBig, "EmailID");

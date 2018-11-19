@@ -195,7 +195,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="user"></param>
         public static void removeUser(CoreController core, Models.Db.GroupModel group, Models.Db.PersonModel user) {
             if ((group != null) && (user != null)) {
-                Models.Db.MemberRuleModel.deleteSelection(core, "(MemberID=" + core.db.encodeSQLNumber(user.id) + ")AND(groupid=" + core.db.encodeSQLNumber(group.id) + ")");
+                Models.Db.MemberRuleModel.deleteSelection(core, "(MemberID=" + DbController.encodeSQLNumber(user.id) + ")AND(groupid=" + DbController.encodeSQLNumber(group.id) + ")");
             }
         }
         //

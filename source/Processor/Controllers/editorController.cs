@@ -50,7 +50,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     ContentName = CdefController.getContentNameByID(core, ContentID);
                     if (!string.IsNullOrEmpty(ContentName)) {
-                        CS = core.db.csOpen(ContentName, "ID=" + core.db.encodeSQLNumber(RecordID), "", false);
+                        CS = core.db.csOpen(ContentName, "ID=" + DbController.encodeSQLNumber(RecordID), "", false);
                         if (core.db.csOk(CS)) {
                             core.db.csSet(CS, FieldName, ContentCopy);
                         }

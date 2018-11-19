@@ -13,6 +13,7 @@ using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
+using Contensive.Addons.AdminSite.Controllers;
 //
 namespace Contensive.Addons.Tools {
     //
@@ -79,7 +80,7 @@ namespace Contensive.Addons.Tools {
                                     if (!string.IsNullOrEmpty(Keyword)) {
                                         //Dim dt As DataTable
 
-                                        dt = core.db.executeQuery("select top 1 ID from ccMetaKeywords where name=" + core.db.encodeSQLText(Keyword));
+                                        dt = core.db.executeQuery("select top 1 ID from ccMetaKeywords where name=" + DbController.encodeSQLText(Keyword));
                                         if (dt.Rows.Count == 0) {
                                             CS = core.db.csInsertRecord("Meta Keywords");
                                             if (core.db.csOk(CS)) {
