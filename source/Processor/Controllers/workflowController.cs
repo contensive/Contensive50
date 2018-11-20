@@ -2,36 +2,95 @@
 using System;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
+using Contensive.Processor.Models.Db;
 using System.Collections.Generic;
 using System.Linq;
 //
 namespace Contensive.Processor.Controllers {
     public class WorkflowController : IDisposable {
-        /// <summary>
-        /// record is being edted
-        /// </summary>
-        internal const int AuthoringControlsEditing = 1;
-        /// <summary>
-        /// record workflow deprecated
-        /// </summary>
-        internal const int AuthoringControlsSubmitted = 2;
-        /// <summary>
-        /// record workflow deprecated
-        /// </summary>
-        internal const int AuthoringControlsApproved = 3;
-        /// <summary>
-        /// record workflow deprecated
-        /// </summary>
-        internal const int AuthoringControlsModified = 4;
+        public enum AuthoringControls {
+            /// <summary>
+            /// record is being edted
+            /// </summary>
+            Editing = 1,
+            /// <summary>
+            /// record workflow deprecated
+            /// </summary>
+            Submitted = 2,
+            /// <summary>
+            /// record workflow deprecated
+            /// </summary>
+            Approved = 3,
+            /// <summary>
+            /// record workflow deprecated
+            /// </summary>
+            Modified = 4
+        }
         //
         //==========================================================================================
         /// <summary>
-        /// create the content record key
+        /// create the key (contentrecordkey) for the authoring controls table. 
         /// </summary>
         /// <param name="tableId"></param>
         /// <param name="recordId"></param>
         /// <returns></returns>
-        public static string getContentRecordKey(int tableId, int recordId) => DbController.encodeSQLText(tableId.ToString() + "/" + recordId.ToString());
+        public static string getTableRecordKey(int tableId, int recordId) => DbController.encodeSQLText(tableId.ToString() + "/" + recordId.ToString());
+        //
+        //==========================================================================================
+        /// <summary>
+        /// create sql criteria for all authoring control records related to a tablerecordkey
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="tableRecordKey"></param>
+        /// <returns></returns>
+        public static string getAuthoringControlCriteria(string tableRecordKey)
+            => "(contentRecordKey=" + tableRecordKey + ")and((DateExpires>" + DbController.encodeSQLDate(DateTime.Now) + ")or(DateExpires Is null))";
+        //
+        //=================================================================================
+        /// <summary>
+        /// create sql criteria for all authoring control records related to a tableid and recordid
+        /// </summary>
+        /// <param name="tableId"></param>
+        /// <param name="recordId"></param>
+        /// <returns></returns>
+        private static string getAuthoringControlCriteria(int tableId, int recordId) {
+            return getAuthoringControlCriteria(getTableRecordKey(tableId, recordId));
+        }
+        //
+        //==========================================================================================
+        /// <summary>
+        /// create sql criteria for a specific type of authoring control records related to a table/record
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="tableRecordKey"></param>
+        /// <param name="ControlType"></param>
+        /// <returns></returns>
+        public static string getAuthoringControlCriteria(string tableRecordKey, AuthoringControls ControlType)
+            => "(controltype=" + (int)ControlType + ")and(" + getAuthoringControlCriteria(tableRecordKey) + ")";
+        //
+        //=====================================================================================================
+        /// <summary>
+        /// Get the query to test the authoring control table if a record is locked
+        /// </summary>
+        /// <param name="contentName"></param>
+        /// <param name="recordId"></param>
+        /// <returns></returns>
+        private static string getAuthoringControlCriteria(CoreController core, string contentName, int recordId) 
+            => getAuthoringControlCriteria(core, Models.Domain.CDefModel.create(core, contentName), recordId);
+        //
+        //=====================================================================================================
+        /// <summary>
+        /// Get the query to test the authoring control table if a record is locked
+        /// </summary>
+        /// <param name="cdef"></param>
+        /// <param name="recordId"></param>
+        /// <returns></returns>
+        private static string getAuthoringControlCriteria(CoreController core, Models.Domain.CDefModel cdef, int recordId) {
+            if (cdef == null) return "(1=0)";
+            var table = Models.Db.TableModel.createByUniqueName(core, cdef.tableName);
+            if (table == null) return "(1=0)";
+            return getAuthoringControlCriteria(getTableRecordKey(table.id, recordId));
+        }
         //
         //=================================================================================
         /// <summary>
@@ -46,8 +105,10 @@ namespace Contensive.Processor.Controllers {
             try {
                 var table = Models.Db.TableModel.create(core, tableId);
                 if (table != null) {
-                    string criteria = "(createdby<>" + core.session.user.id + ")and(contentRecordKey=" + getContentRecordKey(table.id, recordId) + ")and((DateExpires>" + DbController.encodeSQLDate(DateTime.Now) + ")or(DateExpires Is null))";
-                    var authoringControlList = Models.Db.AuthoringControlModel.createList(core, criteria, "dateexpires desc");
+                    //
+                    // -- get the edit control for this record (not by this person) with the oldest expiration date
+                    string criteria = "(createdby<>" + core.session.user.id + ")and" + getAuthoringControlCriteria(getTableRecordKey(table.id, recordId),AuthoringControls.Editing);
+                    var authoringControlList = AuthoringControlModel.createList(core, criteria, "dateexpires desc");
                     if (authoringControlList.Count > 0) {
                         var person = Models.Db.PersonModel.create(core, authoringControlList.First().createdBy);
                         return new editLockClass() {
@@ -98,7 +159,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="ContentName"></param>
         /// <param name="RecordID"></param>
         public static void clearEditLock(CoreController core, int tableId, int recordId) {
-            string criteria = "(contentRecordKey=" + getContentRecordKey(tableId, recordId) + ")";
+            string criteria = "(contentRecordKey=" + getTableRecordKey(tableId, recordId) + ")";
             Models.Db.AuthoringControlModel.deleteSelection(core, criteria);
         }
         //
@@ -118,11 +179,11 @@ namespace Contensive.Processor.Controllers {
         /// <param name="RecordID"></param>
         /// <param name="userId"></param>
         public static void setEditLock(CoreController core, int tableId, int recordId, int userId) {
-            string contentRecordKey = getContentRecordKey(tableId, recordId);
+            string contentRecordKey = getTableRecordKey(tableId, recordId);
             var editLockList = Models.Db.AuthoringControlModel.createList(core, "(contentRecordKey=" + contentRecordKey + ")");
             var editLock = (editLockList.Count > 0) ? editLockList.First() : Models.Db.AuthoringControlModel.addEmpty(core);
             editLock.contentRecordKey = contentRecordKey;
-            editLock.ControlType = AuthoringControlsEditing;
+            editLock.controlType = (int)AuthoringControls.Editing;
             editLock.createdBy = userId;
             editLock.dateAdded = DateTime.Now;
             editLock.save(core);
@@ -130,70 +191,22 @@ namespace Contensive.Processor.Controllers {
         //
         //=====================================================================================================
         /// <summary>
-        /// Get the query to test the authoring control table if a record is locked
-        /// </summary>
-        /// <param name="cdef"></param>
-        /// <param name="recordId"></param>
-        /// <returns></returns>
-        private static string getAuthoringControlCriteria(CoreController core, Models.Domain.CDefModel cdef, int recordId) {
-            string result = "";
-            try {
-                //
-                // Authoring Control records are referenced by ContentID
-                var table = Models.Db.TableModel.createByUniqueName(core, cdef.tableName);
-                if (table == null) return "(1=0)";
-                //
-                var contentList = Models.Db.ContentModel.createList(core, "(contenttableid=" + table.id + ")");
-                if (contentList.Count < 1) {
-                    //
-                    // No references to this table
-                    result = "(1=0)";
-                } else if (contentList.Count == 1) {
-                    //
-                    // One content record
-                    result = "(ContentID=" + contentList.First().id + ")And(RecordID=" + recordId + ")And((DateExpires>" + DbController.encodeSQLDate(DateTime.Now) + ")Or(DateExpires Is null))";
-                } else {
-                    //
-                    // Multiple content records
-                    //
-                    string contentIdList = "";
-                    foreach (var content in contentList) contentIdList += "," + content.id.ToString();
-                    result = "(contentid in (" + contentIdList.Substring(1) + "))and(recordid=" + recordId + ")and((dateexpires>" + DbController.encodeSQLDate(DateTime.Now) + ")or(dateexpires Is null))";
-                }
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-                throw;
-            }
-            return result;
-        }
-        //
-        //=====================================================================================================
-        /// <summary>
-        /// Get the query to test the authoring control table if a record is locked
-        /// </summary>
-        /// <param name="contentName"></param>
-        /// <param name="recordId"></param>
-        /// <returns></returns>
-        private static string getAuthoringControlCriteria(CoreController core, string contentName, int recordId) => getAuthoringControlCriteria(core, Models.Domain.CDefModel.create(core, contentName), recordId);
-        //
-        //=====================================================================================================
-        /// <summary>
         /// Clear the Approved Authoring Control
         /// </summary>
         /// <param name="ContentName"></param>
         /// <param name="RecordID"></param>
-        /// <param name="AuthoringControl"></param>
+        /// <param name="authoringControl"></param>
         /// <param name="MemberID"></param>
-        public static void clearAuthoringControl(CoreController core, string ContentName, int RecordID, int AuthoringControl, int MemberID) {
+        public static void clearAuthoringControl(CoreController core, string ContentName, int RecordID, AuthoringControls authoringControl, int MemberID) {
             try {
-                string Criteria = getAuthoringControlCriteria(core, ContentName, RecordID) + "And(ControlType=" + AuthoringControl + ")";
-                switch (AuthoringControl) {
-                    case AuthoringControlsEditing:
+                string Criteria = getAuthoringControlCriteria(core, ContentName, RecordID) + "And(ControlType=" + authoringControl + ")";
+                switch (authoringControl) {
+                    case AuthoringControls.Editing:
                         core.db.deleteContentRecords("Authoring Controls", Criteria + "And(CreatedBy=" + DbController.encodeSQLNumber(MemberID) + ")", MemberID);
                         break;
-                    case AuthoringControlsSubmitted:
-                    case AuthoringControlsApproved:
-                    case AuthoringControlsModified:
+                    case AuthoringControls.Submitted:
+                    case AuthoringControls.Approved:
+                    case AuthoringControls.Modified:
                         core.db.deleteContentRecords("Authoring Controls", Criteria, MemberID);
                         break;
                 }
@@ -235,8 +248,8 @@ namespace Contensive.Processor.Controllers {
                     if (CDef.id > 0) {
                         var nameDict = new Dictionary<int, string>();
                         foreach (var recordLock in Models.Db.AuthoringControlModel.createList(core, getAuthoringControlCriteria(core, ContentName, RecordID))) {
-                            switch(recordLock.ControlType) {
-                                case AuthoringControlsEditing:
+                            switch((AuthoringControls)recordLock.controlType) {
+                                case AuthoringControls.Editing:
                                     if (!result.isEditLocked) {
                                         result.isEditLocked = true;
                                         result.editLockExpiresDate = recordLock.dateAdded;
@@ -248,7 +261,7 @@ namespace Contensive.Processor.Controllers {
                                         }
                                     }
                                     break;
-                                case AuthoringControlsModified:
+                                case AuthoringControls.Modified:
                                     if (!result.isWorkflowModified) {
                                         result.isWorkflowModified = true;
                                         result.workflowSubmittedDate = recordLock.dateAdded;
@@ -260,7 +273,7 @@ namespace Contensive.Processor.Controllers {
                                         }
                                     }
                                     break;
-                                case AuthoringControlsSubmitted:
+                                case AuthoringControls.Submitted:
                                     if (!result.isWorkflowSubmitted) {
                                         result.isWorkflowSubmitted = true;
                                         result.workflowModifiedDate = recordLock.dateAdded;
@@ -272,7 +285,7 @@ namespace Contensive.Processor.Controllers {
                                         }
                                     }
                                     break;
-                                case AuthoringControlsApproved:
+                                case AuthoringControls.Approved:
                                     if (!result.isWorkflowApproved) {
                                         result.isWorkflowApproved = true;
                                         result.workflowApprovedDate = recordLock.dateAdded;

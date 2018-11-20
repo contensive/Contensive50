@@ -111,8 +111,10 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // Normalize values to be needed
                     if (adminData.editRecord.id != 0) {
-                        var pageContentTable = TableModel.createByContentName(cp.core, "page content");
-                        WorkflowController.clearEditLock(cp.core, pageContentTable.id, adminData.editRecord.id);
+                        var table = TableModel.createByUniqueName(cp.core, adminData.adminContent.tableName);
+                        if ( table != null ) {
+                            WorkflowController.clearEditLock(cp.core, table.id, adminData.editRecord.id);
+                        }
                     }
                     if (adminData.AdminForm < 1) {
                         //

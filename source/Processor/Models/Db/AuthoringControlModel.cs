@@ -24,7 +24,7 @@ namespace Contensive.Processor.Models.Db {
         /// <summary>
         /// type of authoring control
         /// </summary>
-        public int ControlType { get; set; }
+        public int controlType { get; set; }
         /// <summary>
         /// date time when this lock expires
         /// </summary>
