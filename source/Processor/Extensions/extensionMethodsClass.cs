@@ -200,4 +200,43 @@ public static class ExtensionMethods {
         }
         return sbData.ToString();
     }
+    //
+    //====================================================================================================
+    /// <summary>
+    /// add business days to DateTime
+    /// https://stackoverflow.com/questions/1044688/addbusinessdays-and-getbusinessdays
+    /// </summary>
+    /// <param name="startDate"></param>
+    /// <param name="businessDays"></param>
+    /// <returns></returns>
+    public static DateTime AddBusinessDays(this DateTime startDate, int businessDays) {
+        int direction = Math.Sign(businessDays);
+        if (direction == 1) {
+            if (startDate.DayOfWeek == DayOfWeek.Saturday) {
+                startDate = startDate.AddDays(2);
+                businessDays = businessDays - 1;
+            } else if (startDate.DayOfWeek == DayOfWeek.Sunday) {
+                startDate = startDate.AddDays(1);
+                businessDays = businessDays - 1;
+            }
+        } else {
+            if (startDate.DayOfWeek == DayOfWeek.Saturday) {
+                startDate = startDate.AddDays(-1);
+                businessDays = businessDays + 1;
+            } else if (startDate.DayOfWeek == DayOfWeek.Sunday) {
+                startDate = startDate.AddDays(-2);
+                businessDays = businessDays + 1;
+            }
+        }
+        int initialDayOfWeek = (int)startDate.DayOfWeek;
+        int weeksBase = (int)Math.Truncate((double)Math.Abs(businessDays / 5));
+        //int weeksBase = Math.Abs(businessDays / 5);
+        int addDays = Math.Abs(businessDays % 5);
+        if ((direction == 1 && addDays + initialDayOfWeek > 5) ||
+             (direction == -1 && addDays >= initialDayOfWeek)) {
+            addDays += 2;
+        }
+        int totalDays = (weeksBase * 7) + addDays;
+        return startDate.AddDays(totalDays * direction);
+    }
 }
