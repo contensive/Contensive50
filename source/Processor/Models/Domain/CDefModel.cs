@@ -613,24 +613,29 @@ namespace Contensive.Processor.Models.Domain {
             string returnCriteria = "";
             try {
                 //
-                {
-                    returnCriteria = "(1=0)";
-                    if (contentId >= 0) {
-                        if (!parentIdList.Contains(contentId)) {
-                            parentIdList.Add(contentId);
-                            returnCriteria = "(" + contentTableName + ".contentcontrolId=" + contentId + ")";
-                            foreach (var childContent in ContentModel.createList(core, "(parentid=" + contentId + ")")) {
-                                returnCriteria += "OR" + getLegacyContentControlCriteria(core, childContent.id, contentTableName, contentDAtaSourceName, parentIdList);
-                            }
-                            parentIdList.Remove(contentId);
-                            returnCriteria = "(" + returnCriteria + ")";
+                returnCriteria = "(1=0)";
+                if (contentId >= 0) {
+                    if (!parentIdList.Contains(contentId)) {
+                        returnCriteria = "";
+                        //
+                        // -- first contentid in list, include contentid 0
+                        if (parentIdList.Count == 0) returnCriteria += "(" + contentTableName + ".contentcontrolId=0)or";
+                        parentIdList.Add(contentId);
+                        //
+                        // -- add this content id to the list
+                        returnCriteria += "(" + contentTableName + ".contentcontrolId=" + contentId + ")";
+                        foreach (var childContent in ContentModel.createList(core, "(parentid=" + contentId + ")")) {
+                            returnCriteria += "or" + getLegacyContentControlCriteria(core, childContent.id, contentTableName, contentDAtaSourceName, parentIdList);
                         }
+                        parentIdList.Remove(contentId);
+                        returnCriteria = "(" + returnCriteria + ")";
                     }
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
                 throw;
             }
+            return returnCriteria;
             return returnCriteria;
         }
         //
