@@ -1063,41 +1063,18 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public string inputRadio(string TagName, string TagValue, string CurrentValue, string htmlId = "") {
-            string temphtml_GetFormInputRadioBox = null;
-            try {
-                string iTagName = null;
-                string iTagValue = null;
-                string iCurrentValue = null;
-                string ihtmlId = null;
-                string TagID = "";
-                //
-                iTagName = GenericController.encodeText(TagName);
-                iTagValue = GenericController.encodeText(TagValue);
-                iCurrentValue = GenericController.encodeText(CurrentValue);
-                ihtmlId = GenericController.encodeEmpty(htmlId, "");
-                if (!string.IsNullOrEmpty(ihtmlId)) {
-                    TagID = " ID=\"" + ihtmlId + "\"";
-                }
-                //
-                if (iTagValue == iCurrentValue) {
-                    temphtml_GetFormInputRadioBox = "<input TYPE=\"Radio\" NAME=\"" + iTagName + "\" VALUE=\"" + iTagValue + "\" checked" + TagID + ">";
-                } else {
-                    temphtml_GetFormInputRadioBox = "<input TYPE=\"Radio\" NAME=\"" + iTagName + "\" VALUE=\"" + iTagValue + "\"" + TagID + ">";
-                }
-                //
-                return temphtml_GetFormInputRadioBox;
-                //
-                // ----- Error Trap
-                //
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-            }
-            //ErrorTrap:
-            //throw new GenericException("Unexpected exception"); // Call core.handleLegacyError18(MethodName)
-            //
-            return temphtml_GetFormInputRadioBox;
+        public string inputRadio(string htmlName, string htmlValue, string CurrentValue, string htmlId, string htmlClass) {
+            string result = "<input type=radio name=\"" + htmlName + "\"";
+            result += (string.IsNullOrEmpty(htmlValue)) ? "" : " value=\"" + htmlValue + "\"";
+            result += (string.IsNullOrEmpty(htmlId)) ? "" : " id=\"" + htmlId + "\"";
+            result += (string.IsNullOrEmpty(htmlClass)) ? "" : " class=\"" + htmlClass + "\"";
+            result += (htmlValue == CurrentValue) ? "" : " checked";
+            return result + ">";
         }
+        //
+        public string inputRadio(string htmlName, string htmlValue, string CurrentValue, string htmlId) => inputRadio(htmlName, htmlValue, CurrentValue, htmlId, "");
+        //
+        public string inputRadio(string htmlName, string htmlValue, string CurrentValue) => inputRadio(htmlName, htmlValue, CurrentValue, "", "");
         //
         //====================================================================================================
         //

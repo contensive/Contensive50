@@ -138,7 +138,7 @@ namespace Contensive.Processor {
         // ==========================================================================================
         //
         public override string RadioBox(string HtmlName, int HtmlValue, int CurrentValue, string HtmlClass = "", string HtmlId = "") {
-            throw new NotImplementedException();
+            return core.html.inputRadio(HtmlName, HtmlValue.ToString(), CurrentValue.ToString(), HtmlId);
         }
         //
         // ==========================================================================================
