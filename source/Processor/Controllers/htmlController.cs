@@ -1068,7 +1068,7 @@ namespace Contensive.Processor.Controllers {
             result += (string.IsNullOrEmpty(htmlValue)) ? "" : " value=\"" + htmlValue + "\"";
             result += (string.IsNullOrEmpty(htmlId)) ? "" : " id=\"" + htmlId + "\"";
             result += (string.IsNullOrEmpty(htmlClass)) ? "" : " class=\"" + htmlClass + "\"";
-            result += (htmlValue == CurrentValue) ? "" : " checked";
+            result += (htmlValue != CurrentValue) ? "" : " checked";
             return result + ">";
         }
         //
