@@ -1418,33 +1418,29 @@ namespace Contensive.Processor.Controllers {
         // ====================================================================================================
         //
         public static int encodeInteger(object expression) {
-            if (expression == null) return 0;
+            if (expression == null) { return 0; }
             string trialString = expression.ToString();
-            if (Int32.TryParse(trialString, out int trialInt)) return trialInt;
-            if (Double.TryParse(trialString, out double trialDbl)) return (int)trialDbl;
-            if (Boolean.TryParse(trialString, out bool trialBool)) return (trialBool) ? 1 : 0;
+            if (Int32.TryParse(trialString, out int trialInt)) { return trialInt; }
+            if (Double.TryParse(trialString, out double trialDbl)) { return (int)trialDbl; }
+            if (Boolean.TryParse(trialString, out bool trialBool)) { return (trialBool) ? 1 : 0; }
             return 0;
         }
         //
         // ====================================================================================================
         //
         public static double encodeNumber(object expression) {
-            if (expression == null) return 0;
+            if (expression == null) { return 0; }
             string trialString = expression.ToString();
-            if (Double.TryParse(trialString, out double trialDbl)) return trialDbl;
-            if (Boolean.TryParse(trialString, out bool trialBool)) return (trialBool) ? 1 : 0;
+            if (Double.TryParse(trialString, out double trialDbl)) { return trialDbl; }
+            if (Boolean.TryParse(trialString, out bool trialBool)) { return (trialBool) ? 1 : 0; }
             return 0;
         }
         //
         //====================================================================================================
         //
         public static string encodeText(object Expression) {
-            if (!(Expression is DBNull)) {
-                if (Expression != null) {
-                    return Expression.ToString();
-                }
-            }
-            return string.Empty;
+            if ((Expression is DBNull) || (Expression == null)) { return string.Empty; }
+            return Expression.ToString();
         }
         //
         //====================================================================================================
