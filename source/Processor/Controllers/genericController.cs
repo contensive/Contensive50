@@ -1418,44 +1418,22 @@ namespace Contensive.Processor.Controllers {
         // ====================================================================================================
         //
         public static int encodeInteger(object expression) {
-            if (expression == null) {
-                return 0;
-            } else {
-                string tmpString = expression.ToString();
-                if (String.IsNullOrWhiteSpace(tmpString)) {
-                    return 0;
-                } else {
-                    int result = 0;
-                    //double number = 0;
-                    if (Int32.TryParse(tmpString, out result)) {
-                        return result;
-                    //} else if (Double.TryParse(tmpString, out number)) {
-                    //    if (Int32.TryParse(tmpString, out result)) {
-                    //        return result;
-                    //    } else {
-                    //        return 0;
-                    //    }
-                    } else {
-                        return 0;
-                    }
-                }
-            }
-
+            if (expression == null) return 0;
+            string trialString = expression.ToString();
+            if (Int32.TryParse(trialString, out int trialInt)) return trialInt;
+            if (Double.TryParse(trialString, out double trialDbl)) return (int)trialDbl;
+            if (Boolean.TryParse(trialString, out bool trialBool)) return (trialBool) ? 1 : 0;
+            return 0;
         }
         //
         // ====================================================================================================
         //
-        public static double encodeNumber(object Expression) {
-            double tempEncodeNumber = 0;
-            tempEncodeNumber = 0;
-            if (Expression.IsNumeric()) {
-                tempEncodeNumber = Convert.ToDouble(Expression);
-            } else if (Expression is bool) {
-                if ((bool)Expression) {
-                    tempEncodeNumber = 1;
-                }
-            }
-            return tempEncodeNumber;
+        public static double encodeNumber(object expression) {
+            if (expression == null) return 0;
+            string trialString = expression.ToString();
+            if (Double.TryParse(trialString, out double trialDbl)) return trialDbl;
+            if (Boolean.TryParse(trialString, out bool trialBool)) return (trialBool) ? 1 : 0;
+            return 0;
         }
         //
         //====================================================================================================
