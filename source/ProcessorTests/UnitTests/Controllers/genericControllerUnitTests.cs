@@ -489,5 +489,58 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             Assert.AreEqual(3, out4.Length);
             Assert.AreEqual(5, out5.Length);
         }
+        [TestMethod]
+        public void encodeBoolean_testReverse() {
+            bool in1 = true;
+            bool in2 = false;
+            // act
+            bool out1 = GenericController.encodeBoolean(GenericController.encodeText(in1));
+            bool out2 = GenericController.encodeBoolean(GenericController.encodeText(in2));
+            // assert
+            Assert.AreEqual(in1, out1);
+            Assert.AreEqual(in2, out2);
+        }
+        [TestMethod]
+        public void encodeDate_testReverse() {
+            DateTime in1 = DateTime.MinValue;
+            DateTime in2 = DateTime.Now;
+            DateTime in3 = new DateTime(1990, 8, 7, 6, 5, 4);
+            // act
+            DateTime out1 = GenericController.encodeDate(GenericController.encodeText(in1));
+            DateTime out2 = GenericController.encodeDate(GenericController.encodeText(in2));
+            DateTime out3 = GenericController.encodeDate(GenericController.encodeText(in3));
+            // assert
+            Assert.AreEqual(in1, out1);
+            Assert.AreEqual(in2, out2);
+            Assert.AreEqual(in3, out3);
+        }
+        [TestMethod]
+        public void encodeNumber_testReverse() {
+            double in1 = 0.0;
+            double in2 = 12345.6789;
+            double in3 = -12345.6789;
+            // act
+            double out1 = GenericController.encodeNumber(GenericController.encodeText(in1));
+            double out2 = GenericController.encodeNumber(GenericController.encodeText(in2));
+            double out3 = GenericController.encodeNumber(GenericController.encodeText(in3));
+            // assert
+            Assert.AreEqual(in1, out1);
+            Assert.AreEqual(in2, out2);
+            Assert.AreEqual(in3, out3);
+        }
+        [TestMethod]
+        public void encodeInteger_testReverse() {
+            int in1 = 0;
+            int in2 = 123456789;
+            int in3 = -123456789;
+            // act
+            int out1 = GenericController.encodeInteger(GenericController.encodeText(in1));
+            int out2 = GenericController.encodeInteger(GenericController.encodeText(in2));
+            int out3 = GenericController.encodeInteger(GenericController.encodeText(in3));
+            // assert
+            Assert.AreEqual(in1, out1);
+            Assert.AreEqual(in2, out2);
+            Assert.AreEqual(in3, out3);
+        }
     }
 }

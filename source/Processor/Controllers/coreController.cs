@@ -179,7 +179,7 @@ namespace Contensive.Processor.Controllers {
         public PropertyModelClass userProperty {
             get {
                 if (_userProperty == null) {
-                    _userProperty = new PropertyModelClass(this, PropertyTypeMember);
+                    _userProperty = new PropertyModelClass(this, PropertyModelClass.PropertyTypeEnum.user);
                 }
                 return _userProperty;
             }
@@ -190,7 +190,7 @@ namespace Contensive.Processor.Controllers {
         public PropertyModelClass visitorProperty {
             get {
                 if (_visitorProperty == null) {
-                    _visitorProperty = new PropertyModelClass(this, PropertyTypeVisitor);
+                    _visitorProperty = new PropertyModelClass(this, PropertyModelClass.PropertyTypeEnum.visitor);
                 }
                 return _visitorProperty;
             }
@@ -201,7 +201,7 @@ namespace Contensive.Processor.Controllers {
         public PropertyModelClass visitProperty {
             get {
                 if (_visitProperty == null) {
-                    _visitProperty = new PropertyModelClass(this, PropertyTypeVisit);
+                    _visitProperty = new PropertyModelClass(this, PropertyModelClass.PropertyTypeEnum.visit);
                 }
                 return _visitProperty;
             }

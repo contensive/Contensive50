@@ -1427,7 +1427,12 @@ namespace Contensive.Processor.Controllers {
         }
         //
         // ====================================================================================================
-        //
+        /// <summary>
+        /// convert an expression from boolean, double, text or date to a double number.
+        /// encodeNumber, encodeBoolean, encodeInteger, encodeDate work together with encodeText to be reversable. For example, the outcome matches the input of encodeBolean( encodeText( booleanValue ))
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
         public static double encodeNumber(object expression) {
             if (expression == null) { return 0; }
             string trialString = expression.ToString();

@@ -18,6 +18,7 @@ using static Contensive.Processor.Constants;
 using System.IO;
 using static Contensive.BaseClasses.CPFileSystemBaseClass;
 using Contensive.Processor.Exceptions;
+using Contensive.Processor.Models.Domain;
 //
 namespace Contensive.Addons.Housekeeping {
     /// <summary>
@@ -2154,7 +2155,7 @@ namespace Contensive.Addons.Housekeeping {
         //====================================================================================================
         //
         public void housekeep_userProperties(CoreController core) {
-            string sqlInner = "select p.id from ccProperties p left join ccmembers m on m.id=p.KeyID where (p.TypeID=" + PropertyTypeMember + ") and (m.ID is null)";
+            string sqlInner = "select p.id from ccProperties p left join ccmembers m on m.id=p.KeyID where (p.TypeID=" + PropertyModelClass.PropertyTypeEnum.user + ") and (m.ID is null)";
             string sql = "delete from ccProperties where id in (" + sqlInner + ")";
             core.db.executeNonQueryAsync(sql);
         }
@@ -2162,7 +2163,7 @@ namespace Contensive.Addons.Housekeeping {
         //====================================================================================================
         //
         public void housekeep_visitProperties(CoreController core) {
-            string sqlInner = "select p.id from ccProperties p left join ccvisits m on m.id=p.KeyID where (p.TypeID=" + PropertyTypeVisit + ") and (m.ID is null)";
+            string sqlInner = "select p.id from ccProperties p left join ccvisits m on m.id=p.KeyID where (p.TypeID=" + PropertyModelClass.PropertyTypeEnum.visit + ") and (m.ID is null)";
             string sql = "delete from ccProperties where id in (" + sqlInner + ")";
             core.db.executeNonQueryAsync(sql);
         }
@@ -2170,7 +2171,7 @@ namespace Contensive.Addons.Housekeeping {
         //====================================================================================================
         //
         public void housekeep_visitorProperties(CoreController core) {
-            string sqlInner = "select p.id from ccProperties p left join ccvisitors m on m.id=p.KeyID where (p.TypeID=" + PropertyTypeVisitor + ") and (m.ID is null)";
+            string sqlInner = "select p.id from ccProperties p left join ccvisitors m on m.id=p.KeyID where (p.TypeID=" + PropertyModelClass.PropertyTypeEnum.visitor + ") and (m.ID is null)";
             string sql = "delete from ccProperties where id in (" + sqlInner + ")";
             core.db.executeNonQueryAsync(sql);
         }

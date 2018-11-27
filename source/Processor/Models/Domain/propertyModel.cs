@@ -22,80 +22,46 @@ namespace Contensive.Processor.Models.Domain {
         //
         private CoreController core;
         //
+        public enum PropertyTypeEnum {
+            user=0,
+            visit=1,
+            visitor=2
+        }
+        /// <summary>
+        /// The propertyType for instance of PropertyModel 
+        /// </summary>
+        private PropertyTypeEnum propertyType;
+        /// <summary>
+        /// The key used for property references from this instance (visitId, visitorId, or memberId)
+        /// </summary>
+        private int propertyKeyId;
+        //
+        //
+        // todo change array to dictionary
         private string[,] propertyCache;
         private KeyPtrController propertyCache_nameIndex;
         private bool propertyCacheLoaded = false;
         private int propertyCacheCnt;
-        private int propertyTypeId;
         //
         //==============================================================================================
         /// <summary>
         /// constructor
         /// </summary>
         /// <param name="cp"></param>
-        /// <param name="propertyTypeId"></param>
+        /// <param name="propertyType"></param>
         /// <remarks></remarks>
-        public PropertyModelClass(CoreController core, int propertyTypeId) {
+        public PropertyModelClass(CoreController core, PropertyTypeEnum propertyType) {
             this.core = core;
-            this.propertyTypeId = propertyTypeId;
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// set property
-        /// </summary>
-        /// <param name="propertyName"></param>
-        /// <param name="PropertyValue"></param>
-        public void setProperty(string propertyName, double PropertyValue) {
-            setProperty(propertyName, PropertyValue.ToString());
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// set property
-        /// </summary>
-        /// <param name="propertyName"></param>
-        /// <param name="PropertyValue"></param>
-        public void setProperty(string propertyName, bool PropertyValue) {
-            setProperty(propertyName, PropertyValue.ToString());
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// set property
-        /// </summary>
-        /// <param name="propertyName"></param>
-        /// <param name="PropertyValue"></param>
-        public void setProperty(string propertyName, DateTime PropertyValue) {
-            setProperty(propertyName, PropertyValue.ToString());
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// set property
-        /// </summary>
-        /// <param name="propertyName"></param>
-        /// <param name="PropertyValue"></param>
-        public void setProperty(string propertyName, int PropertyValue) {
-            setProperty(propertyName, PropertyValue.ToString());
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// set property
-        /// </summary>
-        /// <param name="propertyName"></param>
-        /// <param name="PropertyValue"></param>
-        public void setProperty(string propertyName, string PropertyValue) {
-            switch (propertyTypeId) {
-                case PropertyTypeVisit:
-                    setProperty(propertyName, PropertyValue, core.session.visit.id);
+            this.propertyType = propertyType;
+            switch (propertyType) {
+                case PropertyTypeEnum.visit:
+                    propertyKeyId = core.session.visit.id;
                     break;
-                case PropertyTypeVisitor:
-                    setProperty(propertyName, PropertyValue, core.session.visitor.id);
+                case PropertyTypeEnum.visitor:
+                    propertyKeyId = core.session.visitor.id;
                     break;
-                case PropertyTypeMember:
-                    setProperty(propertyName, PropertyValue, core.session.user.id);
+                default:
+                    propertyKeyId = core.session.user.id;
                     break;
             }
         }
@@ -106,29 +72,57 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         /// <param name="propertyName"></param>
         /// <param name="PropertyValue"></param>
+        public void setProperty(string propertyName, double PropertyValue) => setProperty(propertyName, PropertyValue.ToString(), propertyKeyId);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// set property
+        /// </summary>
+        /// <param name="propertyName"></param>
+        /// <param name="PropertyValue"></param>
+        public void setProperty(string propertyName, bool PropertyValue) => setProperty(propertyName, PropertyValue.ToString(), propertyKeyId);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// set property
+        /// </summary>
+        /// <param name="propertyName"></param>
+        /// <param name="PropertyValue"></param>
+        public void setProperty(string propertyName, DateTime PropertyValue) => setProperty(propertyName, PropertyValue.ToString(), propertyKeyId);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// set property
+        /// </summary>
+        /// <param name="propertyName"></param>
+        /// <param name="PropertyValue"></param>
+        public void setProperty(string propertyName, int PropertyValue) => setProperty(propertyName, PropertyValue.ToString(), propertyKeyId);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// set property
+        /// </summary>
+        /// <param name="propertyName"></param>
+        /// <param name="PropertyValue"></param>
+        public void setProperty(string propertyName, string PropertyValue) => setProperty(propertyName, PropertyValue, propertyKeyId);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// set property
+        /// </summary>
+        /// <param name="propertyName"></param>
+        /// <param name="propertyValue"></param>
         /// <param name="keyId">keyId is like vistiId, vistorId, userId</param>
-        public void setProperty(string propertyName, string PropertyValue, int keyId) {
+        public void setProperty(string propertyName, string propertyValue, int keyId) {
             try {
-                //
-                int Ptr = 0;
-                int RecordID = 0;
-                int CS = 0;
-                string SQLNow = null;
-                DbController db = core.db;
-                //
-                Ptr = -1;
                 if (!propertyCacheLoaded) {
                     loadFromDb(keyId);
                 }
-                //
-                if (propertyCacheCnt > 0) {
-                    Ptr = propertyCache_nameIndex.getPtr(propertyName);
-                }
+                int Ptr = -1;
+                if (propertyCacheCnt > 0) { Ptr = propertyCache_nameIndex.getPtr(propertyName); }
                 if (Ptr < 0) {
                     Ptr = propertyCacheCnt;
-                    propertyCacheCnt = propertyCacheCnt + 1;
-                    //todo  NOTE: The following block reproduces what 'ReDim Preserve' does behind the scenes in VB:
-                    //ORIGINAL LINE: ReDim Preserve propertyCache(2, Ptr)
+                    propertyCacheCnt += 1;
                     string[,] tempVar = new string[3, Ptr + 1];
                     if (propertyCache != null) {
                         for (int Dimension0 = 0; Dimension0 < propertyCache.GetLength(0); Dimension0++) {
@@ -140,41 +134,32 @@ namespace Contensive.Processor.Models.Domain {
                     }
                     propertyCache = tempVar;
                     propertyCache[0, Ptr] = propertyName;
-                    propertyCache[1, Ptr] = PropertyValue;
+                    propertyCache[1, Ptr] = propertyValue;
                     propertyCache_nameIndex.setPtr(propertyName, Ptr);
                     //
                     // insert a new property record, get the ID back and save it in cache
                     //
-                    CS = db.csInsertRecord("Properties", SystemMemberID);
-                    if (db.csOk(CS)) {
-                        propertyCache[2, Ptr] = db.csGetText(CS, "ID");
-                        db.csSet(CS, "name", propertyName);
-                        db.csSet(CS, "FieldValue", PropertyValue);
-                        db.csSet(CS, "TypeID", propertyTypeId);
-                        db.csSet(CS, "KeyID", keyId.ToString());
+                    int CS = core.db.csInsertRecord("Properties", SystemMemberID);
+                    if (core.db.csOk(CS)) {
+                        propertyCache[2, Ptr] = core.db.csGetText(CS, "ID");
+                        core.db.csSet(CS, "name", propertyName);
+                        core.db.csSet(CS, "FieldValue", propertyValue);
+                        core.db.csSet(CS, "TypeID", (int)propertyType);
+                        core.db.csSet(CS, "KeyID", keyId.ToString());
                     }
-                    db.csClose(ref CS);
-                } else if (propertyCache[1, Ptr] != PropertyValue) {
-                    propertyCache[1, Ptr] = PropertyValue;
-                    RecordID = GenericController.encodeInteger(propertyCache[2, Ptr]);
-                    SQLNow = DbController.encodeSQLDate(DateTime.Now);
+                    core.db.csClose(ref CS);
+                } else if (propertyCache[1, Ptr] != propertyValue) {
+                    propertyCache[1, Ptr] = propertyValue;
+                    int RecordID = GenericController.encodeInteger(propertyCache[2, Ptr]);
+                    string SQLNow = DbController.encodeSQLDate(DateTime.Now);
                     //
                     // save the value in the property that was found
                     //
-                    db.executeQuery("update ccProperties set FieldValue=" + DbController.encodeSQLText(PropertyValue) + ",ModifiedDate=" + SQLNow + " where id=" + RecordID);
+                    core.db.executeQuery("update ccProperties set FieldValue=" + DbController.encodeSQLText(propertyValue) + ",ModifiedDate=" + SQLNow + " where id=" + RecordID);
                 }
-                //
-
-                //
-                return;
-                //
-                // ----- Error Trap
-                //
             } catch( Exception ex ) {
                 LogController.handleError( core,ex);
             }
-            //ErrorTrap:
-            LogController.handleError( core,new Exception("Unexpected exception"));
         }
         //
         //====================================================================================================
@@ -185,9 +170,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="defaultValue"></param>
         /// <param name="keyId"></param>
         /// <returns></returns>
-        public DateTime getDate(string propertyName) {
-            return getDate(propertyName, DateTime.MinValue);
-        }
+        public DateTime getDate(string propertyName) => encodeDate(getText(propertyName, encodeText(DateTime.MinValue), propertyKeyId)); 
         //
         //====================================================================================================
         /// <summary>
@@ -197,17 +180,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="defaultValue"></param>
         /// <param name="keyId"></param>
         /// <returns></returns>
-        public DateTime getDate(string propertyName, DateTime defaultValue) {
-            switch (propertyTypeId) {
-                case PropertyTypeVisit:
-                    return getDate(propertyName, defaultValue, core.session.visit.id);
-                case PropertyTypeVisitor:
-                    return getDate(propertyName, defaultValue, core.session.visitor.id);
-                case PropertyTypeMember:
-                    return getDate(propertyName, defaultValue, core.session.user.id);
-            }
-            return DateTime.MinValue;
-        }
+        public DateTime getDate(string propertyName, DateTime defaultValue) => encodeDate(getText(propertyName, encodeText(defaultValue), propertyKeyId)); 
         //
         //====================================================================================================
         /// <summary>
@@ -217,9 +190,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="defaultValue"></param>
         /// <param name="keyId"></param>
         /// <returns></returns>
-        public DateTime getDate(string propertyName, DateTime defaultValue, int keyId) {
-            return GenericController.encodeDate(getText(propertyName, GenericController.encodeText(defaultValue), keyId));
-        }
+        public double getNumber(string propertyName) => encodeNumber(getText(propertyName, encodeText(0), propertyKeyId)); 
         //
         //====================================================================================================
         /// <summary>
@@ -229,9 +200,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="defaultValue"></param>
         /// <param name="keyId"></param>
         /// <returns></returns>
-        public double getNumber(string propertyName) {
-            return getNumber(propertyName, 0);
-        }
+        public double getNumber(string propertyName, double defaultValue) => encodeNumber(getText(propertyName, encodeText(defaultValue), propertyKeyId));
         //
         //====================================================================================================
         /// <summary>
@@ -241,29 +210,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="defaultValue"></param>
         /// <param name="keyId"></param>
         /// <returns></returns>
-        public double getNumber(string propertyName, double defaultValue) {
-            switch (propertyTypeId) {
-                case PropertyTypeVisit:
-                    return getNumber(propertyName, defaultValue, core.session.visit.id);
-                case PropertyTypeVisitor:
-                    return getNumber(propertyName, defaultValue, core.session.visitor.id);
-                case PropertyTypeMember:
-                    return getNumber(propertyName, defaultValue, core.session.user.id);
-            }
-            return 0;
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// get a boolean property
-        /// </summary>
-        /// <param name="propertyName"></param>
-        /// <param name="defaultValue"></param>
-        /// <param name="keyId"></param>
-        /// <returns></returns>
-        public double getNumber(string propertyName, double defaultValue, int keyId) {
-            return encodeNumber(getText(propertyName, GenericController.encodeText(defaultValue), keyId));
-        }
+        public bool getBoolean(string propertyName) => encodeBoolean(getText(propertyName, encodeText(false), propertyKeyId));
         //
         //====================================================================================================
         /// <summary>
@@ -273,41 +220,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="defaultValue"></param>
         /// <param name="keyId"></param>
         /// <returns></returns>
-        public bool getBoolean(string propertyName) {
-            return getBoolean(propertyName, false);
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// get a property
-        /// </summary>
-        /// <param name="propertyName"></param>
-        /// <param name="defaultValue"></param>
-        /// <param name="keyId"></param>
-        /// <returns></returns>
-        public bool getBoolean(string propertyName, bool defaultValue) {
-            switch (propertyTypeId) {
-                case PropertyTypeVisit:
-                    return getBoolean(propertyName, defaultValue, core.session.visit.id);
-                case PropertyTypeVisitor:
-                    return getBoolean(propertyName, defaultValue, core.session.visitor.id);
-                case PropertyTypeMember:
-                    return getBoolean(propertyName, defaultValue, core.session.user.id);
-            }
-            return false;
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// get a boolean property
-        /// </summary>
-        /// <param name="propertyName"></param>
-        /// <param name="defaultValue"></param>
-        /// <param name="keyId"></param>
-        /// <returns></returns>
-        public bool getBoolean(string propertyName, bool defaultValue, int keyId) {
-            return GenericController.encodeBoolean(getText(propertyName, GenericController.encodeText(defaultValue), keyId));
-        }
+        public bool getBoolean(string propertyName, bool defaultValue) => encodeBoolean(getText(propertyName, encodeText(defaultValue), propertyKeyId));
         //
         //====================================================================================================
         /// <summary>
@@ -317,9 +230,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="defaultValue"></param>
         /// <param name="keyId"></param>
         /// <returns></returns>
-        public int getInteger(string propertyName) {
-            return getInteger(propertyName, 0);
-        }
+        public int getInteger(string propertyName)  => encodeInteger(getText(propertyName, encodeText(0), propertyKeyId));
         //
         //====================================================================================================
         /// <summary>
@@ -329,29 +240,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="defaultValue"></param>
         /// <param name="keyId"></param>
         /// <returns></returns>
-        public int getInteger(string propertyName, int defaultValue) {
-            switch (propertyTypeId) {
-                case PropertyTypeVisit:
-                    return getInteger(propertyName, defaultValue, core.session.visit.id);
-                case PropertyTypeVisitor:
-                    return getInteger(propertyName, defaultValue, core.session.visitor.id);
-                case PropertyTypeMember:
-                    return getInteger(propertyName, defaultValue, core.session.user.id);
-            }
-            return 0;
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// get an integer property
-        /// </summary>
-        /// <param name="propertyName"></param>
-        /// <param name="defaultValue"></param>
-        /// <param name="keyId"></param>
-        /// <returns></returns>
-        public int getInteger(string propertyName, int defaultValue, int keyId) {
-            return GenericController.encodeInteger(getText(propertyName, GenericController.encodeText(defaultValue), keyId));
-        }
+        public int getInteger(string propertyName, int defaultValue) => encodeInteger(getText(propertyName, encodeText(defaultValue), propertyKeyId));
         //
         //====================================================================================================
         /// <summary>
@@ -361,9 +250,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="defaultValue"></param>
         /// <param name="keyId"></param>
         /// <returns></returns>
-        public string getText(string propertyName) {
-            return getText(propertyName, "");
-        }
+        public string getText(string propertyName) => getText(propertyName, "", propertyKeyId);
         //
         //====================================================================================================
         /// <summary>
@@ -373,17 +260,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="defaultValue"></param>
         /// <param name="keyId"></param>
         /// <returns></returns>
-        public string getText(string propertyName, string defaultValue) {
-            switch (propertyTypeId) {
-                case PropertyTypeVisit:
-                    return getText(propertyName, defaultValue, core.session.visit.id);
-                case PropertyTypeVisitor:
-                    return getText(propertyName, defaultValue, core.session.visitor.id);
-                case PropertyTypeMember:
-                    return getText(propertyName, defaultValue, core.session.user.id);
-            }
-            return "";
-        }
+        public string getText(string propertyName, string defaultValue) => getText(propertyName, defaultValue, propertyKeyId );
         //
         //====================================================================================================
         /// <summary>
@@ -396,18 +273,15 @@ namespace Contensive.Processor.Models.Domain {
         public string getText(string propertyName, string defaultValue, int keyId) {
             string returnString = "";
             try {
-                int Ptr = 0;
+                //
+                if (!propertyCacheLoaded) { loadFromDb(keyId); }
+                //
+                int Ptr = -1;
                 bool Found = false;
-                //
-                Ptr = -1;
-                if (!propertyCacheLoaded) {
-                    loadFromDb(keyId);
-                }
-                //
                 if (propertyCacheCnt > 0) {
                     Ptr = propertyCache_nameIndex.getPtr(propertyName);
                     if (Ptr >= 0) {
-                        returnString = GenericController.encodeText(propertyCache[1, Ptr]);
+                        returnString = encodeText(propertyCache[1, Ptr]);
                         Found = true;
                     }
                 }
@@ -428,18 +302,14 @@ namespace Contensive.Processor.Models.Domain {
         private void loadFromDb(int keyId) {
             try {
                 //
-                string Name = null;
-                DbController db = core.db;
-                //
                 propertyCache_nameIndex = new KeyPtrController();
                 propertyCacheCnt = 0;
                 //
-                using (DataTable dt = db.executeQuery("select Name,FieldValue,ID from ccProperties where (active<>0)and(TypeID=" + propertyTypeId + ")and(KeyID=" + keyId + ")")) {
+                using (DataTable dt = core.db.executeQuery("select Name,FieldValue,ID from ccProperties where (active<>0)and(TypeID=" + propertyType + ")and(KeyID=" + keyId + ")")) {
                     if (dt.Rows.Count > 0) {
-                        propertyCacheCnt = 0;
                         propertyCache = new string[3, dt.Rows.Count];
                         foreach (DataRow dr in dt.Rows) {
-                            Name = GenericController.encodeText(dr[0]);
+                            string Name = GenericController.encodeText(dr[0]);
                             propertyCache[0, propertyCacheCnt] = Name;
                             propertyCache[1, propertyCacheCnt] = GenericController.encodeText(dr[1]);
                             propertyCache[2, propertyCacheCnt] = GenericController.encodeInteger(dr[2]).ToString();
@@ -449,18 +319,10 @@ namespace Contensive.Processor.Models.Domain {
                         propertyCacheCnt = dt.Rows.Count;
                     }
                 }
-                //
                 propertyCacheLoaded = true;
-                //
-                return;
-                //
-                // ----- Error Trap
-                //
             } catch( Exception ex ) {
                 LogController.handleError( core,ex);
             }
-            //ErrorTrap:
-            LogController.handleError( core,new Exception("Unexpected exception"));
         }
     }
 }

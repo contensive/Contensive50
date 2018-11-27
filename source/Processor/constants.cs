@@ -202,11 +202,6 @@ namespace Contensive.Processor {
         internal const string ACTypeTemplateContent = "CONTENT";
         internal const string ACTypeTemplateText = "TEXT";
         //
-        // ----- PropertyType Definitions
-        internal const int PropertyTypeMember = 0;
-        internal const int PropertyTypeVisit = 1;
-        internal const int PropertyTypeVisitor = 2;
-        //
         // ----- Port Assignments
         internal const int WinsockPortWebOut = 4000;
         internal const int WinsockPortServerFromWeb = 4001;
