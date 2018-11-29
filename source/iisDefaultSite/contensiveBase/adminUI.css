@@ -865,9 +865,11 @@ ul.ccFilterList {
 }
 
 .ccRecordLinkCon a.ccRecordEditLink {
+    padding-right: 5px;
 }
 
 .ccRecordLinkCon a.ccRecordCutLink {
+    padding-right: 5px;
 }
 
 .ccDisabledReason {

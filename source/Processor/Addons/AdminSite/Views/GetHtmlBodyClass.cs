@@ -348,7 +348,7 @@ namespace Contensive.Addons.AdminSite {
                             adminBody = cp.core.addon.execute(addon, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                 addonType = Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
                                 instanceGuid = adminSiteInstanceId,
-                                instanceArguments = GenericController.convertAddonArgumentstoDocPropertiesList(cp.core, InstanceOptionString),
+                                instanceArguments = GenericController.convertQSNVAArgumentstoDocPropertiesList(cp.core, InstanceOptionString),
                                 wrapperID = DefaultWrapperID,
                                 errorContextMessage = executeContextErrorCaption
                             });

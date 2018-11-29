@@ -32,6 +32,7 @@ namespace Contensive.Processor.Controllers {
             page = new PageContentModel();
             pageToRootList = new List<PageContentModel>();
             template = new PageTemplateModel();
+            ChildPageIdsListed = new List<int>();
         }
         /// <summary>
         /// current page to it's root. List.First is current page, List.Last is rootpage
@@ -49,6 +50,11 @@ namespace Contensive.Processor.Controllers {
         /// current page for website documents, blank for others
         /// </summary>
         public PageContentModel page { get; set; }
+        /// <summary>
+        /// Child pages can be listed on Child Page List addons.
+        /// If a page has has this page set 
+        /// </summary>
+        public List<int> ChildPageIdsListed { get; set; }
         //
         //========================================================================
         //
@@ -1910,6 +1916,28 @@ namespace Contensive.Processor.Controllers {
                             core.db.executeQuery("update ccpagecontent set viewings=" + (pageViewings + 1) + " where id=" + core.doc.pageController.page.id);
                         }
                         //
+                        // ----- Child pages
+                        bool allowChildListComposite = AllowChildPageList && core.doc.pageController.page.allowChildListDisplay;
+                        if (allowChildListComposite || core.session.isEditingAnything()) {
+                            if (!allowChildListComposite) {
+                                returnHtml = returnHtml + core.html.getAdminHintWrapper("Automatic Child List display is disabled for this page. It is displayed here because you are in editing mode. To enable automatic child list display, see the features tab for this page.");
+                            }
+                            AddonModel addon = AddonModel.create(core, addonGuidChildList);
+                            CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
+                                addonType = CPUtilsBaseClass.addonContext.ContextPage,
+                                hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
+                                    contentName = PageContentModel.contentName,
+                                    fieldName = "",
+                                    recordId = core.doc.pageController.page.id
+                                },
+                                instanceArguments = GenericController.convertQSNVAArgumentstoDocPropertiesList(core, core.doc.pageController.page.childListInstanceOptions),
+                                instanceGuid = PageChildListInstanceID,
+                                wrapperID = core.siteProperties.defaultWrapperID,
+                                errorContextMessage = "executing child list addon for page [" + core.doc.pageController.page.id + "]"
+                            };
+                            returnHtml += core.addon.execute(addon, executeContext);
+                        }
+                        //
                         // Page Hit Notification
                         //
                         if ((!core.session.visit.excludeFromAnalytics) && (core.doc.pageController.page.contactMemberID != 0) && (core.webServer.requestBrowser.IndexOf("kmahttp", System.StringComparison.OrdinalIgnoreCase)  == -1)) {
@@ -2081,6 +2109,14 @@ namespace Contensive.Processor.Controllers {
                     returnHtml = core.doc.bodyContent;
                     //
                 }
+                bool isRootPage = (core.doc.pageController.pageToRootList.Count == 1);
+                if (core.session.isAdvancedEditing(core, "")) {
+                    returnHtml = AdminUIController.getRecordEditLink(core, PageContentModel.contentName, core.doc.pageController.page.id, (!isRootPage)) + returnHtml;
+                    returnHtml = AdminUIController.getEditWrapper(core, "", returnHtml);
+                } else if (core.session.isEditing(PageContentModel.contentName)) {
+                    returnHtml = AdminUIController.getRecordEditLink(core, PageContentModel.contentName, core.doc.pageController.page.id, (!isRootPage)) + returnHtml;
+                    returnHtml = AdminUIController.getEditWrapper(core, "", returnHtml);
+                }
                 //
                 // -- title
                 core.html.addTitle(core.doc.pageController.page.name);
@@ -2127,18 +2163,19 @@ namespace Contensive.Processor.Controllers {
             try {
                 if (core.doc.continueProcessing) {
                     if (core.doc.redirectLink == "") {
-                        bool isEditing = core.session.isEditing(PageContentModel.contentName);
+                        //bool isEditing = core.session.isEditing(PageContentModel.contentName);
                         //
                         // ----- Render the Body
                         string LiveBody = getContentBox_content_Body(core, OrderByClause, AllowChildPageList, false, core.doc.pageController.pageToRootList.Last().id, AllowReturnLink, PageContentModel.contentName, ArchivePages);
-                        bool isRootPage = (core.doc.pageController.pageToRootList.Count == 1);
-                        if (core.session.isAdvancedEditing(core, "")) {
-                            result += AdminUIController.getRecordEditLink(core, PageContentModel.contentName, core.doc.pageController.page.id, (!isRootPage)) + LiveBody;
-                        } else if (isEditing) {
-                            result += AdminUIController.getEditWrapper( core, "", AdminUIController.getRecordEditLink(core, PageContentModel.contentName, core.doc.pageController.page.id, (!isRootPage)) + LiveBody);
-                        } else {
-                            result += LiveBody;
-                        }
+                        result = LiveBody;
+                        //bool isRootPage = (core.doc.pageController.pageToRootList.Count == 1);
+                        //if (core.session.isAdvancedEditing(core, "")) {
+                        //    result += AdminUIController.getRecordEditLink(core, PageContentModel.contentName, core.doc.pageController.page.id, (!isRootPage)) + LiveBody;
+                        //} else if (isEditing) {
+                        //    result += AdminUIController.getEditWrapper( core, "", AdminUIController.getRecordEditLink(core, PageContentModel.contentName, core.doc.pageController.page.id, (!isRootPage)) + LiveBody);
+                        //} else {
+                        //    result += LiveBody;
+                        //}
                     }
                 }
             } catch (Exception ex) {
@@ -2249,28 +2286,28 @@ namespace Contensive.Processor.Controllers {
                     // ----- Wrap content body
                     Cell = Cell + "\r<!-- ContentBoxBodyStart -->"
                         + GenericController.nop(bodyCopy) + "\r<!-- ContentBoxBodyEnd -->";
-                    //
-                    // ----- Child pages
-                    if (allowChildListComposite || core.session.isEditingAnything()) {
-                        if (!allowChildListComposite) {
-                            Cell = Cell + core.html.getAdminHintWrapper("Automatic Child List display is disabled for this page. It is displayed here because you are in editing mode. To enable automatic child list display, see the features tab for this page.");
-                        }
-                        AddonModel addon = AddonModel.create(core, addonGuidChildList);
-                        CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
-                            addonType = CPUtilsBaseClass.addonContext.ContextPage,
-                            hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
-                                contentName = PageContentModel.contentName,
-                                fieldName = "",
-                                recordId = core.doc.pageController.page.id
-                            },
-                            instanceArguments = GenericController.convertAddonArgumentstoDocPropertiesList(core, core.doc.pageController.page.childListInstanceOptions),
-                            instanceGuid = PageChildListInstanceID,
-                            wrapperID = core.siteProperties.defaultWrapperID,
-                            errorContextMessage = "executing child list addon for page [" + core.doc.pageController.page.id + "]"
-                        };
-                        Cell += core.addon.execute(addon, executeContext);
-                        //Cell = Cell & core.addon.execute_legacy2(core.siteProperties.childListAddonID, "", core.doc.pageController.page.ChildListInstanceOptions, CPUtilsBaseClass.addonContext.ContextPage, pageContentModel.contentName, core.doc.pageController.page.id, "", PageChildListInstanceID, False, core.siteProperties.defaultWrapperID, "", AddonStatusOK, Nothing)
-                    }
+                    ////
+                    //// ----- Child pages
+                    //if (allowChildListComposite || core.session.isEditingAnything()) {
+                    //    if (!allowChildListComposite) {
+                    //        Cell = Cell + core.html.getAdminHintWrapper("Automatic Child List display is disabled for this page. It is displayed here because you are in editing mode. To enable automatic child list display, see the features tab for this page.");
+                    //    }
+                    //    AddonModel addon = AddonModel.create(core, addonGuidChildList);
+                    //    CPUtilsBaseClass.addonExecuteContext executeContext = new CPUtilsBaseClass.addonExecuteContext() {
+                    //        addonType = CPUtilsBaseClass.addonContext.ContextPage,
+                    //        hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
+                    //            contentName = PageContentModel.contentName,
+                    //            fieldName = "",
+                    //            recordId = core.doc.pageController.page.id
+                    //        },
+                    //        instanceArguments = GenericController.convertAddonArgumentstoDocPropertiesList(core, core.doc.pageController.page.childListInstanceOptions),
+                    //        instanceGuid = PageChildListInstanceID,
+                    //        wrapperID = core.siteProperties.defaultWrapperID,
+                    //        errorContextMessage = "executing child list addon for page [" + core.doc.pageController.page.id + "]"
+                    //    };
+                    //    Cell += core.addon.execute(addon, executeContext);
+                    //    //Cell = Cell & core.addon.execute_legacy2(core.siteProperties.childListAddonID, "", core.doc.pageController.page.ChildListInstanceOptions, CPUtilsBaseClass.addonContext.ContextPage, pageContentModel.contentName, core.doc.pageController.page.id, "", PageChildListInstanceID, False, core.siteProperties.defaultWrapperID, "", AddonStatusOK, Nothing)
+                    //}
                 }
                 //
                 // ----- End Text Search
@@ -2597,13 +2634,16 @@ namespace Contensive.Processor.Controllers {
                         //
                     } else if ((string.IsNullOrEmpty(UcaseRequestedListName)) && (childPage.parentListName != "")) {
                         //
-                        // ----- Requested orphan list, and this record is in a named list, but authoring, list it
-                        //
-                        if (isAuthoring) {
-                            inactiveList = inactiveList + "\r<li name=\"page" + childPage.id + "\" name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItem\">";
-                            inactiveList = inactiveList + pageEditLink;
-                            inactiveList = inactiveList + "[from Child Page List '" + childPage.parentListName + "': " + LinkedText + "]";
-                            inactiveList = inactiveList + "</li>";
+                        // -- child page has a parentListName but this request does not
+                        if (!core.doc.pageController.ChildPageIdsListed.Contains(childPage.id)) {
+                            //
+                            // -- child page has not yet displays, if editing show it as an orphan page
+                            if (isAuthoring) {
+                                inactiveList = inactiveList + "\r<li name=\"page" + childPage.id + "\" name=\"page" + childPage.id + "\"  id=\"page" + childPage.id + "\" class=\"ccListItem\">";
+                                inactiveList = inactiveList + pageEditLink;
+                                inactiveList = inactiveList + "[from missing child page list '" + childPage.parentListName + "': " + LinkedText + "]";
+                                inactiveList = inactiveList + "</li>";
+                            }
                         }
                     } else if ((string.IsNullOrEmpty(UcaseRequestedListName)) && (!allowChildListDisplay) && (!isAuthoring)) {
                         //
@@ -2684,6 +2724,10 @@ namespace Contensive.Processor.Controllers {
                             }
                         }
                         activeList = activeList + "</li>";
+                        //activeList = activeList + "<i class=\"fas fa-grip - horizontal\" style=\"color:#222;\"></i></li>";
+                        //
+                        // -- add child page to childPagesListed list
+                        if (!core.doc.pageController.ChildPageIdsListed.Contains(childPage.id)) { core.doc.pageController.ChildPageIdsListed.Add(childPage.id); }
                         ChildListCount = ChildListCount + 1;
                         //.IsDisplayed = True
                     }
@@ -2701,12 +2745,13 @@ namespace Contensive.Processor.Controllers {
                 // ----- If there is a list, add the list start and list end
                 //
                 result = "";
-                if (!string.IsNullOrEmpty(activeList)) {
-                    result += "\r<ul id=\"childPageList_" + parentPageID + "_" + RequestedListName + "\" class=\"ccChildList\">" + GenericController.nop(activeList) + "\r</ul>";
+                if (!string.IsNullOrEmpty(activeList + inactiveList)) {
+                    result += "\r<ul id=\"childPageList_" + parentPageID + "_" + RequestedListName + "\" class=\"ccChildList\">" + activeList + inactiveList + "\r</ul>";
+                    //result += "\r<ul id=\"childPageList_" + parentPageID + "_" + RequestedListName + "\" class=\"ccChildList\">" + GenericController.nop(activeList) + "\r</ul>";
                 }
-                if (!string.IsNullOrEmpty(inactiveList)) {
-                    result += "\r<ul id=\"childPageList_" + parentPageID + "_" + RequestedListName + "\" class=\"ccChildListInactive\">" + GenericController.nop(inactiveList) + "\r</ul>";
-                }
+                //if (!string.IsNullOrEmpty(inactiveList)) {
+                //    result += "\r<ul id=\"childPageList_" + parentPageID + "_" + RequestedListName + "\" class=\"ccChildListInactive\">" + GenericController.nop(inactiveList) + "\r</ul>";
+                //}
                 //
                 // ----- if non-orphan list, authoring and none found, print none message
                 //

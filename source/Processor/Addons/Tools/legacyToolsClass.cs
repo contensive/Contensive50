@@ -3202,7 +3202,7 @@ namespace Contensive.Addons.Tools {
                 AddonModel addon = AddonModel.create(core, "{B966103C-DBF4-4655-856A-3D204DEF6B21}");
                 string Content = core.addon.execute(addon, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                     addonType = Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
-                    instanceArguments = GenericController.convertAddonArgumentstoDocPropertiesList(core, InstanceOptionString),
+                    instanceArguments = GenericController.convertQSNVAArgumentstoDocPropertiesList(core, InstanceOptionString),
                     instanceGuid = "-2",
                     errorContextMessage = "executing File Manager addon within Content File Manager"
                 });
@@ -3226,7 +3226,7 @@ namespace Contensive.Addons.Tools {
                 AddonModel addon = AddonModel.create(core, "{B966103C-DBF4-4655-856A-3D204DEF6B21}");
                 string Content = core.addon.execute(addon, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                     addonType = Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
-                    instanceArguments = GenericController.convertAddonArgumentstoDocPropertiesList(core, InstanceOptionString),
+                    instanceArguments = GenericController.convertQSNVAArgumentstoDocPropertiesList(core, InstanceOptionString),
                     instanceGuid = "-2",
                     errorContextMessage = "executing File Manager within website file manager"
                 });
@@ -3293,7 +3293,7 @@ namespace Contensive.Addons.Tools {
                         var cmdDetail = new TaskModel.CmdDetailClass();
                         cmdDetail.addonId = 0;
                         cmdDetail.addonName = "GetForm_FindAndReplace";
-                        cmdDetail.args = GenericController.convertAddonArgumentstoDocPropertiesList(core, QS);
+                        cmdDetail.args = GenericController.convertQSNVAArgumentstoDocPropertiesList(core, QS);
                         TaskSchedulerControllerx.addTaskToQueue(core, cmdDetail, false);
                         Stream.Add("Find and Replace has been requested for content definitions [" + CDefList + "], finding [" + FindText + "] and replacing with [" + ReplaceText + "]");
                     }
@@ -3378,7 +3378,7 @@ namespace Contensive.Addons.Tools {
                     var cmdDetail = new TaskModel.CmdDetailClass();
                     cmdDetail.addonId = 0;
                     cmdDetail.addonName = "GetForm_IISReset";
-                    cmdDetail.args = GenericController.convertAddonArgumentstoDocPropertiesList(core, "");
+                    cmdDetail.args = new Dictionary<string, string>();
                     TaskSchedulerControllerx.addTaskToQueue(core, cmdDetail, false );
                 }
                 //

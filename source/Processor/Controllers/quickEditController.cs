@@ -140,7 +140,7 @@ namespace Contensive.Processor.Controllers {
                         fieldName = "",
                         recordId = core.doc.pageController.page.id
                     },
-                    instanceArguments = GenericController.convertAddonArgumentstoDocPropertiesList(core, core.doc.pageController.page.childListInstanceOptions),
+                    instanceArguments = GenericController.convertQSNVAArgumentstoDocPropertiesList(core, core.doc.pageController.page.childListInstanceOptions),
                     instanceGuid = PageChildListInstanceID,
                     errorContextMessage = "calling child page addon in quick editing editor"
                 };

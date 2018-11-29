@@ -11,8 +11,8 @@
 */
 .ccEditWrapper .ccChildList li {
     border: 1px dashed #262;
-    padding-right: 40px !important;
-    background: white url(/pageManager/arrowUpDown.png) no-repeat right;
+    padding-left: 5px !important;
+    /* background: white url(/contensiveBase/arrowUpDown.png) no-repeat right; */
 }
 /*
     debug mode trace window

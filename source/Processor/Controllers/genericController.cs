@@ -9,6 +9,7 @@ using System.Text;
 using Contensive.Processor.Models.Domain;
 using System.Web;
 using Contensive.Processor.Exceptions;
+using System.Linq;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -2283,6 +2284,41 @@ namespace Contensive.Processor.Controllers {
                     return pathFilename.Left(slashpos + 1);
                 }
             }
+        }
+        //
+        //======================================================================================
+        /// <summary>
+        /// Convert QS tag argument list (a=1&b=2 with NVA encoding) to a doc property compatible dictionary of strings
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="ACArgumentString"></param>
+        /// <returns></returns>
+        public static Dictionary<string, string> convertQSNVAArgumentstoDocPropertiesList(CoreController core, string ACArgumentString) {
+            Dictionary<string, string> returnList = new Dictionary<string, string>();
+            try {
+                if (!string.IsNullOrEmpty(ACArgumentString)) {
+
+                    List<string> optionList = ACArgumentString.Split('&').ToList<string>();
+                    foreach (string option in optionList) {
+                        if (!string.IsNullOrWhiteSpace(option)) {
+                            string key = option;
+                            int firstPos = key.IndexOf('=');
+                            string value = string.Empty;
+                            if (firstPos >= 0) {
+                                key = key.Left(firstPos).Trim(' ');
+                                value = decodeNvaArgument(option.Substring(firstPos + 1).Trim(' '));
+                            }
+                            key = decodeNvaArgument(key);
+                            if (returnList.ContainsKey(key)) { returnList.Remove(key); }
+                            returnList.Add(key, value);
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+                throw;
+            }
+            return returnList;
         }
         //
         //======================================================================================

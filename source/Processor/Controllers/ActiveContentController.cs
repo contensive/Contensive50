@@ -257,7 +257,7 @@ namespace Contensive.Processor.Controllers {
                                                                         },
                                                                         personalizationAuthenticated = personalizationIsAuthenticated,
                                                                         personalizationPeopleId = personalizationPeopleId,
-                                                                        instanceArguments = GenericController.convertAddonArgumentstoDocPropertiesList(core, AddonOptionStringHTMLEncoded),
+                                                                        instanceArguments = GenericController.convertQSNVAArgumentstoDocPropertiesList(core, AddonOptionStringHTMLEncoded),
                                                                         instanceGuid = ACInstanceID,
                                                                         errorContextMessage = "rendering addon found in active content within an email"
                                                                     };
@@ -1622,7 +1622,7 @@ namespace Contensive.Processor.Controllers {
                                             personalizationAuthenticated = personalizationIsAuthenticated,
                                             personalizationPeopleId = personalizationPeopleId,
                                             instanceGuid = ACInstanceID,
-                                            instanceArguments = GenericController.convertAddonArgumentstoDocPropertiesList(core, addonOptionString),
+                                            instanceArguments = GenericController.convertQSNVAArgumentstoDocPropertiesList(core, addonOptionString),
                                             errorContextMessage = "rendering active content with guid [" + AddonGuid + "] or name [" + AddonName + "]"
                                         };
                                         if (!string.IsNullOrEmpty(AddonGuid)) {

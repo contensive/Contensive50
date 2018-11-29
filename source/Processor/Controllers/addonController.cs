@@ -1819,7 +1819,7 @@ namespace Contensive.Processor.Controllers {
                     var cmdDetail = new TaskModel.CmdDetailClass {
                         addonId = addon.id,
                         addonName = addon.name,
-                        args = GenericController.convertAddonArgumentstoDocPropertiesList(core, cmdQueryString)
+                        args = GenericController.convertQSNVAArgumentstoDocPropertiesList(core, cmdQueryString)
                     };
                     TaskSchedulerControllerx.addTaskToQueue(core, cmdDetail, false);
                     //
