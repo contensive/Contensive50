@@ -813,7 +813,9 @@ namespace Contensive.Addons.AdminSite {
                                             EmailToConfirmationMemberID = GenericController.encodeInteger(adminData.editRecord.fieldsLc["testmemberid"].value);
                                             EmailController.queueConfirmationTestEmail(cp.core, adminData.editRecord.id, EmailToConfirmationMemberID);
                                             //
-                                            if (adminData.editRecord.fieldsLc.ContainsKey("lastsendtestdate")) {
+                                            if ((core.doc.debug_iUserError.Count() == 0) && (adminData.editRecord.fieldsLc.ContainsKey("lastsendtestdate"))) {
+                                                //
+                                                // -- if there were no errors, and the table supports lastsendtestdate, update it
                                                 adminData.editRecord.fieldsLc["lastsendtestdate"].value = cp.core.doc.profileStartTime;
                                                 cp.core.db.executeQuery("update ccemail Set lastsendtestdate=" + DbController.encodeSQLDate(cp.core.doc.profileStartTime) + " where id=" + adminData.editRecord.id);
                                             }
@@ -2263,6 +2265,9 @@ namespace Contensive.Addons.AdminSite {
                                 }
                                 if (adminData.adminContent.fields.ContainsKey("sent")) {
                                     editRecord.fieldsLc["sent"].value = false;
+                                }
+                                if (adminData.adminContent.fields.ContainsKey("lastsendtestdate")) {
+                                    editRecord.fieldsLc["lastsendtestdate"].value = "";
                                 }
                                 //
                                 editRecord.id = 0;

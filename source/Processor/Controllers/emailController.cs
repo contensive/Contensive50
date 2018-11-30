@@ -245,11 +245,12 @@ namespace Contensive.Processor.Controllers {
                         htmlBody = core.html.convertTextToHtml(body);
                     } else {
                         textBody = NUglify.Uglify.HtmlToText("<body>" + body + "</body>").Code.Trim();
-                        string rootUrl = "http://" + core.appConfig.domainList[0] + "/";
-                        htmlBody = GenericController.convertLinksToAbsolute(body, rootUrl);
+                        htmlBody = body;
                         if (!string.IsNullOrWhiteSpace(template)) {
                             //
                             // -- encode template
+                            // hotfix - templates no longer have wysiwyg editors, so content may not be saved correctly - preprocess to convert wysiwyg content
+                            template = ActiveContentController.processWysiwygResponseForSave(core, template);
                             template = ActiveContentController.renderHtmlForEmail(core, template, person.id, queryStringForLinkAppend);
                             if (template.IndexOf(fpoContentBox) != -1) {
                                 htmlBody = GenericController.vbReplace(template, fpoContentBox, htmlBody);
@@ -257,6 +258,9 @@ namespace Contensive.Processor.Controllers {
                                 htmlBody = template + htmlBody;
                             }
                         }
+                        // -- hotfix - move template merge before link conversion to update template links also
+                        string rootUrl = "http://" + core.appConfig.domainList[0] + "/";
+                        htmlBody = GenericController.convertLinksToAbsolute(htmlBody, rootUrl);
                         htmlBody = ""
                             + "<html>"
                             + "<head>"
