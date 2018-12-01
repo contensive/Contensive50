@@ -236,9 +236,6 @@
     border-bottom: 1px solid #ddd;
 }
 
-.ccCon .ccEditFieldCon .ccEditorCon {
-}
-
     .ccCon .ccEditFieldCon .ccEditorCon .checkBox {
         border: 1px solid #ccc;
         padding: 4px;
@@ -385,12 +382,6 @@
     padding: 0px;
 }
 
-    .ccCon A.ccAdminListCaption:Hover {
-    }
-
-    .ccCon A.ccAdminListCaption:Visited {
-    }
-
 .ccCon .ccAdminListCaption input {
     vertical-align: middle;
 }
@@ -465,18 +456,12 @@
     background-color: black;
 }
 
-.ccCon .ccAdminTabBodyCollectionWrap {
-}
-
 .ccCon .ccAdminTabBodyWrapShow {
     display: block;
 }
 
 .ccCon .ccAdminTabBodyWrapHide {
     display: none;
-}
-
-.ccCon .ccAdminTabBodyWrap {
 }
 
 .ccCon .ccAdminTabBody {
@@ -551,12 +536,6 @@
     border: 1px solid #ccc;
 }
 
-    .ccCon .ccEditorPreferenceCon h1 {
-    }
-
-    .ccCon .ccEditorPreferenceCon p {
-    }
-
     .ccCon .ccEditorPreferenceCon .radioCon {
         padding: 0 0 0 10px
     }
@@ -591,12 +570,10 @@ div.ccJumpCon {
 
     .ccJumpCon ul li {
         display: inline;
-        width: 30px;
         vertical-align: middle;
         text-align: center;
         cursor: pointer;
         list-style: none inside none;
-        margin: 0;
         padding: 4px 5px !important;
         color: #233;
         background-color: #ccc;
@@ -733,9 +710,6 @@ div.ccJumpCon {
     overflow: auto;
 }
 
-.ccAddonAjaxCon {
-}
-
 .ccAddonEditCaption {
     white-space: nowrap;
     clear: left;
@@ -750,41 +724,59 @@ div.ccJumpCon {
 .ccHelpIcon a {
     cursor: help
 }
-
+/*
+    child lists
+*/
 ul.ccChildList {
     text-align: left
 }
 
-    ul.ccChildList li.ccListItem {
-        text-align: left
-    }
+ul.ccChildList li.ccListItem {
+    text-align: left
+}
 
-        ul.ccChildList li.ccListItem a {
-        }
 
-            ul.ccChildList li.ccListItem a:hover {
-            }
-
-            ul.ccChildList li.ccListItem a:visited {
-            }
+ul.ccChildList li.ccListItemNoBullet {
+    text-align: left;
+    list-style: none;
+}
 
 ul.ccChildListInactive {
     text-align: left;
     border-top: 1px solid #233;
 }
 
-    ul.ccChildListInactive li.ccListItem {
-        text-align: left
-    }
+ul.ccChildListInactive li.ccListItem {
+    text-align: left
+}
+/*
+    child list editing
+*/
+.ccEditWrapper .ccChildList li {
+    padding-left: 5px !important;
+    border-top: 1px dashed #262;
+    border-right: 1px dashed #262;
+    border-left: 1px dashed #262;
+}
 
-        ul.ccChildListInactive li.ccListItem a {
-        }
+.ccEditWrapper .ccChildList li:last-child, .ccEditWrapper .ccChildList li.ui-sortable-helper {
+    border-bottom: 1px dashed #262;
+}
 
-            ul.ccChildListInactive li.ccListItem a:hover {
-            }
+.ccListItemDragHandle {
+    display: none;
+}
 
-            ul.ccChildListInactive li.ccListItem a:visited {
-            }
+.ccEditWrapper .ccChildList .ccListItemDragHandle {
+    display: block;
+    float: right;
+    padding: 0 5px;
+}
+
+.ccEditWrapper .ccChildList .allowSort {
+    cursor: move;
+}
+
 
 .ccImgA {
     width: 18px;
@@ -793,15 +785,9 @@ ul.ccChildListInactive {
     vertical-align: middle;
 }
 
-.ccCategoryListCon {
-}
-
     .ccCategoryListCon .caption {
         padding-top: 5px;
     }
-
-        .ccCategoryListCon .caption a {
-        }
 
     .ccCategoryListCon UL {
         margin: 0;
@@ -831,7 +817,6 @@ ul.ccChildListInactive {
 }
 
 A.ccFilterLink {
-    !important;
     color: black !important;
 }
 
@@ -860,11 +845,13 @@ ul.ccFilterList {
     z-index: 999;
 }
 
+
+
 .ccListItem .ccRecordLinkCon {
     position: static;
 }
 
-.ccRecordLinkCon a.ccRecordEditLink {
+.ccRecordLinkCon a.ccRecordEditLink, .ccRecordLinkCon a.ccRecordCutLink, .ccRecordLinkCon a.ccRecordAddLink, .ccRecordLinkCon a.ccRecordPasteLink {
     padding-right: 5px;
 }
 
@@ -931,27 +918,6 @@ ul.ccFilterList {
 
 .ccNavLinkChild {
     margin-left: 19px;
-}
-
-.ccHeadline {
-}
-
-.ccList {
-}
-
-.ccWatchList {
-}
-
-.ccListCopy {
-}
-
-.ccSmall {
-}
-
-.ccNormal {
-}
-
-.ccLarge {
 }
 
 .ccSurveyHeadline {
@@ -1055,20 +1021,14 @@ ul.ccFilterList {
 }
 
 .ccFlyoutButton {
-    MARGIN: 0px;
-    PADDING-RIGHT: 0px;
-    PADDING-LEFT: 0px;
-    PADDING-BOTTOM: 4px;
-    PADDING-TOP: 4px;
+    margin: 0;
+    padding: 4px 0;
     white-space: nowrap;
 }
 
 A.ccFlyoutButton {
-    MARGIN: 0px;
-    PADDING-RIGHT: 6px;
-    PADDING-LEFT: 6px;
-    PADDING-BOTTOM: 4px;
-    PADDING-TOP: 4px;
+    margin: 0;
+    padding: 4px 6px;
     Z-INDEX: 100;
     color: black;
     white-space: nowrap;
@@ -1079,19 +1039,10 @@ A.ccFlyoutButton {
         background-color: #444;
     }
 
-    A.ccFlyoutButton:visited {
-    }
-
 A.ccFlyoutButtonDown {
     color: white;
     background-color: #444;
 }
-
-    A.ccFlyoutButtonDown:hover {
-    }
-
-    A.ccFlyoutButtonDown:visited {
-    }
 
 .ccFlyoutDelimiter {
     color: #808080;
@@ -1120,9 +1071,6 @@ A.ccFlyoutPanelButton {
     A.ccFlyoutPanelButton:hover {
         color: white;
         background-color: #444;
-    }
-
-    A.ccFlyoutPanelButton:visited {
     }
 
 A.ccFlyoutPanelButtonDown {
@@ -1387,11 +1335,6 @@ for hints created with getAdminHintWrapper
     padding: 10px;
     background-color: #80E080;
     color: black;
-}
-/*
-help dialog for addon options, etc.
-*/
-.helpDialogCon { /* blows advanced edit page out - width:420px; */
 }
 /*
 Container for the login panel when the section is blocked

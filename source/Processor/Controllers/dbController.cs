@@ -4926,7 +4926,7 @@ namespace Contensive.Processor.Controllers {
                     if (string.IsNullOrEmpty(ContentName)) {
                         LogController.logWarn(core, "getRecordAddLink was called with a ContentSet that was created with an SQL statement. The function requires a ContentSet opened with an OpenCSContent.");
                     } else {
-                        result = AdminUIController.getRecordAddLink(core,ContentName, PresetNameValueList, AllowPaste);
+                        foreach (var AddLink in AdminUIController.getRecordAddLink(core, ContentName, PresetNameValueList, AllowPaste)) { result += AddLink; }
                     }
                 }
             } catch (Exception ex) {

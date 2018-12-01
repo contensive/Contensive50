@@ -3835,7 +3835,17 @@ namespace Contensive.Processor.Controllers {
         //
         // ====================================================================================================
         //
-        public static string a(string innerHtml, string href) => "<a href=\"" + encodeHtml( href ) + "\">" + innerHtml + "</a>";
-        public static string a(string innerHtml, string href, string htmlClass) => "<a href=\"" + encodeHtml(href) + "\" class=\"" + htmlClass + "\">" + innerHtml + "</a>";
+        public static string a(string innerHtml, string href) => a(innerHtml, href, "", "", "");
+        public static string a(string innerHtml, string href, string htmlClass) => a(innerHtml, href, htmlClass, "", "");
+        public static string a(string innerHtml, string href, string htmlClass, string htmlId) => a(innerHtml, href, htmlClass, htmlId, "");
+        public static string a(string innerHtml, string href, string htmlClass, string htmlId, string tabIndex) {
+            var tag = new StringBuilder("<a");
+            if (!String.IsNullOrWhiteSpace(href)) { tag.Append(" href=\"").Append(href).Append("\""); }
+            if (!String.IsNullOrWhiteSpace(htmlClass)) { tag.Append(" class=\"").Append(htmlClass).Append("\""); }
+            if (!String.IsNullOrWhiteSpace(htmlId)) { tag.Append(" id=\"").Append(htmlId).Append("\""); }
+            if (!String.IsNullOrWhiteSpace(tabIndex)) { tag.Append(" tabindex=\"").Append(tabIndex).Append("\""); }
+            tag.Append(">").Append(innerHtml).Append("</a>");
+            return tag.ToString();
+        }
     }
 }

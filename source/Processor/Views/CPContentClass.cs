@@ -47,7 +47,9 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override string GetAddLink(string ContentName, string PresetNameValueList, bool AllowPaste, bool IsEditing) {
-            return AdminUIController.getRecordAddLink2(core, ContentName, PresetNameValueList, AllowPaste, IsEditing);
+            string result = "";
+            foreach (var link in AdminUIController.getRecordAddLink(core, ContentName, PresetNameValueList, AllowPaste, IsEditing)) { result += link; }
+            return result;
         }
         //
         //====================================================================================================

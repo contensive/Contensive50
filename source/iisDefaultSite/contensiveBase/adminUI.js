@@ -3081,8 +3081,9 @@ function saveSortable(listId) {
     }
     cj.ajax.addon('savePageManagerChildListSort', 'sortlist=' + s)
 }
-jQuery(document).ready(function () {
+$(function () {
     jQuery(".ccEditWrapper .ccChildList").sortable({
+        items: "li.allowSort",
         stop: function (event, ui) {
             saveSortable(jQuery(this).attr('id'));
         }

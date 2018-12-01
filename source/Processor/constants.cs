@@ -57,6 +57,8 @@ namespace Contensive.Processor {
         public const string iconClose_Red = "<span style=\"color:#f00\">" + iconClose + "</span>";
         public const string iconOpen = "<i title=\"open\" class=\"fas fa-angle-double-right\"></i>";
         public const string iconOpen_White = "<span style=\"color:#fff\">" + iconOpen + "</span>";
+        public const string iconGrip = "<i title=\"paste content\" class=\"fas fa-grip-horizontal\"></i>";
+        public const string iconContentPaste_Green = "<span style=\"color:#0c0\">" + iconContentPaste + "</span>";
         //
         /// <summary>
         /// deprecated. legacy was "/" and it was used in path in front of path. Path now includes a leading slash

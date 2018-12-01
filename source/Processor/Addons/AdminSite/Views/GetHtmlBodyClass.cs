@@ -813,7 +813,7 @@ namespace Contensive.Addons.AdminSite {
                                             EmailToConfirmationMemberID = GenericController.encodeInteger(adminData.editRecord.fieldsLc["testmemberid"].value);
                                             EmailController.queueConfirmationTestEmail(cp.core, adminData.editRecord.id, EmailToConfirmationMemberID);
                                             //
-                                            if ((core.doc.debug_iUserError.Count() == 0) && (adminData.editRecord.fieldsLc.ContainsKey("lastsendtestdate"))) {
+                                            if ((cp.core.doc.debug_iUserError.Count() == 0) && (adminData.editRecord.fieldsLc.ContainsKey("lastsendtestdate"))) {
                                                 //
                                                 // -- if there were no errors, and the table supports lastsendtestdate, update it
                                                 adminData.editRecord.fieldsLc["lastsendtestdate"].value = cp.core.doc.profileStartTime;
