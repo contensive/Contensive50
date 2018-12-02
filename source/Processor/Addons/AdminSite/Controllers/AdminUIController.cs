@@ -1624,7 +1624,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                                     if (ClipBoardArray.GetUpperBound(0) > 0) {
                                         int ClipboardContentID = GenericController.encodeInteger(ClipBoardArray[0]);
                                         int ClipChildRecordID = GenericController.encodeInteger(ClipBoardArray[1]);
-                                        if (Processor.Models.Domain.CDefModel.isWithinContent(core, ClipboardContentID, content.id)) {
+                                        if (CdefController.isWithinContent(core, ClipboardContentID, content.id)) {
                                             int ParentID = 0;
                                             if (GenericController.vbInstr(1, presetNameValueList, "PARENTID=", 1) != 0) {
                                                 //
