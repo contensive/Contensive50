@@ -1790,6 +1790,35 @@ namespace Contensive.Processor.Controllers {
             }
             return returnValue;
         }
+        //
+        //====================================================================================================================
+        //
+        public string executeAsync(AddonModel addon, Dictionary<string, string> arguments) {
+            string result = "";
+            try {
+                if (addon == null) {
+                    //
+                    // -- addon not found
+                    LogController.logError(core, "executeAsync, addon not valid");
+                } else {
+                    //
+                    // -- build arguments from the execute context on top of docProperties
+                    var compositeArgs = new Dictionary<string, string>(arguments);
+                    foreach (var key in core.docProperties.getKeyList()) {
+                        if (!compositeArgs.ContainsKey(key)) { compositeArgs.Add(key, core.docProperties.getText(key)); }
+                    }
+                    var cmdDetail = new TaskModel.CmdDetailClass {
+                        addonId = addon.id,
+                        addonName = addon.name,
+                        args = compositeArgs
+                    };
+                    TaskSchedulerControllerx.addTaskToQueue(core, cmdDetail, false);
+                }
+            } catch (Exception ex) {
+                LogController.handleError(core, ex, "executeAsync");
+            }
+            return result;
+        }
         // todo Convert signature to match execute() methods (model + context)
         //====================================================================================================================
         /// <summary>
@@ -1810,20 +1839,7 @@ namespace Contensive.Processor.Controllers {
                     addon = core.addonCache.getAddonByName(AddonIDGuidOrName);
                 }
                 if (addon != null) {
-                    //
-                    // -- addon found
-                    LogController.logTrace(core, "start: add process to background cmd queue, addon [" + addon.name + "/" + addon.id + "], optionstring [" + OptionString + "]");
-                    //
-                    string cmdQueryString = ""
-                        + "appname=" + encodeNvaArgument(encodeRequestVariable(core.appConfig.name)) + "&AddonID=" + encodeText(addon.id) + "&OptionString=" + encodeNvaArgument(encodeRequestVariable(OptionString));
-                    var cmdDetail = new TaskModel.CmdDetailClass {
-                        addonId = addon.id,
-                        addonName = addon.name,
-                        args = GenericController.convertQSNVAArgumentstoDocPropertiesList(core, cmdQueryString)
-                    };
-                    TaskSchedulerControllerx.addTaskToQueue(core, cmdDetail, false);
-                    //
-                    LogController.logTrace(core, "end: add process to background cmd queue, addon [" + addon.name + "/" + addon.id + "], optionstring [" + OptionString + "]");
+                    executeAsync(addon, GenericController.convertQSNVAArgumentstoDocPropertiesList(core, OptionString));
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
