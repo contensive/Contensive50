@@ -13,6 +13,7 @@ using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
+using System.Globalization;
 //
 namespace Contensive.Processor.Models.Domain {
     /// <summary>
@@ -30,11 +31,11 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// The propertyType for instance of PropertyModel 
         /// </summary>
-        private PropertyTypeEnum propertyType;
+        private readonly PropertyTypeEnum propertyType;
         /// <summary>
         /// The key used for property references from this instance (visitId, visitorId, or memberId)
         /// </summary>
-        private int propertyKeyId;
+        private readonly int propertyKeyId;
         //
         //
         // todo change array to dictionary
@@ -72,7 +73,7 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         /// <param name="propertyName"></param>
         /// <param name="PropertyValue"></param>
-        public void setProperty(string propertyName, double PropertyValue) => setProperty(propertyName, PropertyValue.ToString(), propertyKeyId);
+        public void setProperty(string propertyName, double PropertyValue) => setProperty(propertyName, PropertyValue.ToString(CultureInfo.InvariantCulture), propertyKeyId);
         //
         //====================================================================================================
         /// <summary>
@@ -88,7 +89,7 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         /// <param name="propertyName"></param>
         /// <param name="PropertyValue"></param>
-        public void setProperty(string propertyName, DateTime PropertyValue) => setProperty(propertyName, PropertyValue.ToString(), propertyKeyId);
+        public void setProperty(string propertyName, DateTime PropertyValue) => setProperty(propertyName, PropertyValue.ToString(CultureInfo.InvariantCulture), propertyKeyId);
         //
         //====================================================================================================
         /// <summary>

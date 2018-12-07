@@ -407,12 +407,12 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             // assert
             Assert.AreEqual(1, test1);
             Assert.AreEqual(2, test2);
-            Assert.AreEqual(0, test3);
+            Assert.AreEqual(3, test3);
             Assert.AreEqual(0, test4);
         }
         //
         [TestMethod]
-        public void Controllers_encodeEmpty_test() {
+        public static void controllers_encodeEmpty_test() {
             // arrange
             // act
             string test1 = GenericController.encodeEmpty("1", "2");
@@ -425,7 +425,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         }
         //
         [TestMethod]
-        public void Controllers_isGUID_test() {
+        public static void controllers_isGUID_test() {
             // arrange
             // act
             // assert
@@ -438,7 +438,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         }
         //
         [TestMethod]
-        public void Controllers_getGUID_test() {
+        public static void controllers_getGUID_test() {
             // arrange
             // act
             string test1 = GenericController.getGUID();
@@ -458,7 +458,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         }
         //
         [TestMethod]
-        public void Controllers_span_test1() {
+        public static void controllers_span_test1() {
             // arrange
             // act
             string result = HtmlController.span("test", "testClass");
@@ -469,7 +469,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         }
         //
         [TestMethod]
-        public void Controllers_SplitDelimited_test1() {
+        public static void controllers_SplitDelimited_test1() {
             // arrange
             string in1 = "this and that";
             string in2 = "this and \"that and another\"";
@@ -490,7 +490,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             Assert.AreEqual(5, out5.Length);
         }
         [TestMethod]
-        public void encodeBoolean_testReverse() {
+        public static void encodeBoolean_testReverse() {
             bool in1 = true;
             bool in2 = false;
             // act
@@ -501,7 +501,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             Assert.AreEqual(in2, out2);
         }
         [TestMethod]
-        public void encodeDate_testReverse() {
+        public static void encodeDate_testReverse() {
             DateTime in1 = DateTime.MinValue;
             DateTime in2 = DateTime.Now;
             DateTime in3 = new DateTime(1990, 8, 7, 6, 5, 4);
@@ -515,7 +515,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             Assert.AreEqual(in3, out3);
         }
         [TestMethod]
-        public void encodeNumber_testReverse() {
+        public static void encodeNumber_testReverse() {
             double in1 = 0.0;
             double in2 = 12345.6789;
             double in3 = -12345.6789;
@@ -529,7 +529,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             Assert.AreEqual(in3, out3);
         }
         [TestMethod]
-        public void encodeInteger_testReverse() {
+        public static void encodeInteger_testReverse() {
             int in1 = 0;
             int in2 = 123456789;
             int in3 = -123456789;
