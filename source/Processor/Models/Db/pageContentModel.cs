@@ -86,6 +86,7 @@ namespace Contensive.Processor.Models.Db {
         public int TriggerRemoveGroupID { get; set; }
         public int TriggerSendSystemEmailID { get; set; }
         public int Viewings { get; set; }
+        public string link { get; set; }
         //
         //====================================================================================================
         public static PageContentModel addEmpty(CoreController core) {

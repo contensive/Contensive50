@@ -332,6 +332,15 @@ namespace Contensive.Processor.Controllers {
                         // -- use the Landing Page
                         requestedPage = getLandingPage(core, domain);
                     }
+                    //
+                    // -- if page has a link override, exit with redirect now.
+                    if (!string.IsNullOrWhiteSpace(requestedPage.link)) {
+                        core.doc.redirectLink = requestedPage.link;
+                        core.doc.redirectReason = "Redirecting because page includes a link override.";
+                        core.doc.redirectBecausePageNotFound = false;
+                        core.webServer.redirect(core.doc.redirectLink, core.doc.redirectReason, core.doc.redirectBecausePageNotFound);
+                        return;
+                    }
                     core.doc.addRefreshQueryString(rnPageId, encodeText(requestedPage.id));
                     //
                     // -- build parentpageList (first = current page, last = root)
