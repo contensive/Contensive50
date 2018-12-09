@@ -816,42 +816,44 @@ namespace Contensive.Addons.AdminSite.Controllers {
         //
         // ====================================================================================================
         //
-        public static string getFormBodyAdminOnly() {
-            return HtmlController.div("This page requires administrator permissions.", "ccError").Replace(">", " style=\"margin:10px;padding:10px;background-color:white;\">");
-        }
+        public static string getFormBodyAdminOnly() => HtmlController.div("This page requires administrator permissions.", "ccError").Replace(">", " style=\"margin:10px;padding:10px;background-color:white;\">");
         //
         // ====================================================================================================
         //
-        public static string getButtonPrimary(string buttonValue, string onclick = "", bool disabled = false, string htmlId = "", string htmlName = "button") {
-            return HtmlController.getHtmlInputSubmit(buttonValue, htmlName, htmlId, onclick, disabled, "btn btn-primary mr-1 btn-sm");
-        }
+        public static string getButtonPrimary(string buttonValue, string onclick, bool disabled, string htmlId, string htmlName) => HtmlController.getHtmlInputSubmit(buttonValue, htmlName, htmlId, onclick, disabled, "btn btn-primary mr-1 btn-sm");
+        //
+        public static string getButtonPrimary(string buttonValue, string onclick, bool disabled, string htmlId) => HtmlController.getHtmlInputSubmit(buttonValue, "button", htmlId, onclick, disabled, "btn btn-primary mr-1 btn-sm");
+        //
+        public static string getButtonPrimary(string buttonValue, string onclick, bool disabled) => HtmlController.getHtmlInputSubmit(buttonValue, "button", "", onclick, disabled, "btn btn-primary mr-1 btn-sm");
+        //
+        public static string getButtonPrimary(string buttonValue, string onclick) => HtmlController.getHtmlInputSubmit(buttonValue, "button", "", onclick, false, "btn btn-primary mr-1 btn-sm");
+        //
+        public static string getButtonPrimary(string buttonValue) => HtmlController.getHtmlInputSubmit(buttonValue, "button", "", "", false, "btn btn-primary mr-1 btn-sm");
         //
         // ====================================================================================================
         //
-        public static string getButtonDanger(string buttonValue, string onclick = "", bool disabled = false, string htmlId = "") {
-            return HtmlController.getHtmlInputSubmit(buttonValue, "button", htmlId, onclick, disabled, "btn btn-danger mr-1 btn-sm");
-        }
+        public static string getButtonDanger(string buttonValue, string onclick, bool disabled, string htmlId) => HtmlController.getHtmlInputSubmit(buttonValue, "button", htmlId, onclick, disabled, "btn btn-danger mr-1 btn-sm");
+        //
+        public static string getButtonDanger(string buttonValue, string onclick, bool disabled) => HtmlController.getHtmlInputSubmit(buttonValue, "button", "", onclick, disabled, "btn btn-danger mr-1 btn-sm");
+        //
+        public static string getButtonDanger(string buttonValue, string onclick) => HtmlController.getHtmlInputSubmit(buttonValue, "button", "", onclick, false, "btn btn-danger mr-1 btn-sm");
+        //
+        public static string getButtonDanger(string buttonValue) => HtmlController.getHtmlInputSubmit(buttonValue, "button", "", "", false, "btn btn-danger mr-1 btn-sm");
         //
         // ====================================================================================================
         //
-        public static string getButtonPrimaryAnchor(string buttonCaption, string href) {
-            return HtmlController.a(buttonCaption, href, "btn btn-primary mr-1 btn-sm");
-        }
+        public static string getButtonPrimaryAnchor(string buttonCaption, string href) =>  HtmlController.a(buttonCaption, href, "btn btn-primary mr-1 btn-sm");
         //
         // ====================================================================================================
         //
-        public static string getButtonDangerAnchor(string buttonCaption, string href) {
-            return HtmlController.a(buttonCaption, href, "btn btn-danger mr-1 btn-sm");
-        }
+        public static string getButtonDangerAnchor(string buttonCaption, string href) => HtmlController.a(buttonCaption, href, "btn btn-danger mr-1 btn-sm");
         //
         // ====================================================================================================
         //
         public static List<ButtonMetadata> buttonStringToButtonList(string ButtonList) {
             var result = new List<ButtonMetadata>();
-            string[] Buttons = null;
             if (!string.IsNullOrEmpty(ButtonList.Trim(' '))) {
-                Buttons = ButtonList.Split(',');
-                foreach (string buttonValue in Buttons) {
+                foreach (string buttonValue in ButtonList.Split(',')) {
                     string buttonValueTrim = buttonValue.Trim();
                     result.Add(new ButtonMetadata() {
                         name = "button",
@@ -865,17 +867,17 @@ namespace Contensive.Addons.AdminSite.Controllers {
             return result;
         }
         //
+        // ====================================================================================================
+        //
         public static string getEditForm_TitleBarDetails_EditorString(DateTime editDate, PersonModel editor, string notEditedMessage) {
-            string result = "";
             if (editDate < new DateTime(1990, 1, 1)) {
-                result += "unknown date";
+                return "unknown date";
+            }
+            string result = editDate.ToString() + ", by ";
+            if (editor == null) {
+                result += "unknown user";
             } else {
-                result += editDate.ToString() + ", by ";
-                if (editor == null) {
-                    result += "unknown user";
-                } else {
-                    result += editor.getDisplayName();
-                }
+                result += editor.getDisplayName();
             }
             return result;
         }
