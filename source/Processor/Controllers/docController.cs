@@ -126,7 +126,7 @@ namespace Contensive.Processor.Controllers {
         public int inputDateCnt { get; set; } = 0;
         //
         // -- todo
-        public List<CacheInputSelectClass> inputSelectCache = new List<CacheInputSelectClass>() { };
+        public List<CacheInputSelectClass> inputSelectCache = new List<CacheInputSelectClass>();
         //
         // -- todo
         public int formInputTextCnt { get; set; } = 0;
@@ -162,7 +162,7 @@ namespace Contensive.Processor.Controllers {
         public int errorCount { get; set; } = 0;
         //
         // -- todo
-        internal List<string> userErrorList = new List<string>() { };
+        internal List<string> userErrorList = new List<string>();
         //
         // -- todo
         public string debug_iUserError { get; set; } = ""; // User Error String

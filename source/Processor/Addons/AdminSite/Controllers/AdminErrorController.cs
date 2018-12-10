@@ -18,7 +18,7 @@ using Contensive.Addons.Tools;
 using static Contensive.Addons.AdminSite.Controllers.AdminUIController;
 //
 namespace Contensive.Addons.AdminSite {
-    public class AdminErrorController {
+    public static class AdminErrorController {
         //
         //===========================================================================
         //

@@ -143,7 +143,7 @@ namespace Contensive.Addons.AdminNavigator {
                     string NavIconTitleHtmlEncoded = null;
                     int ContentControlID = 0;
                     CPCSBaseClass csChildList = cp.CSNew();
-                    var linkSuffixList = new List<string>() { };
+                    var linkSuffixList = new List<string>();
                     string NodeIDString = "";
                     switch (parentNodeStack[0]) {
                         //
@@ -172,7 +172,7 @@ namespace Contensive.Addons.AdminNavigator {
                             //
                             NodeIDString = "";
                             addonid = cp.Content.GetRecordID("Add-ons", "Add-on Manager");
-                            s = s + GetNode(cp, env, 0, 0, 0, 0, 0, "?addonguid=" + common.AddonManagerGuid, addonid, 0, "Add-on Manager", LegacyMenuControlID, EmptyNodeList, "", common.NavIconTypeAddon, "Add-on Manager", AutoManageAddons, common.NodeTypeEnum.NodeTypeAddon, false, false, OpenNodeList, NodeIDString, ref NodeNavigatorJS, new List<string>() { });
+                            s = s + GetNode(cp, env, 0, 0, 0, 0, 0, "?addonguid=" + common.AddonManagerGuid, addonid, 0, "Add-on Manager", LegacyMenuControlID, EmptyNodeList, "", common.NavIconTypeAddon, "Add-on Manager", AutoManageAddons, common.NodeTypeEnum.NodeTypeAddon, false, false, OpenNodeList, NodeIDString, ref NodeNavigatorJS, new List<string>());
                             Return_NavigatorJS = Return_NavigatorJS + NodeNavigatorJS;
                             //
                             // List Collections

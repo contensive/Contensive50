@@ -154,7 +154,7 @@ namespace Contensive.Addons.AdminSite {
                                     //
                                     // Remove a field to the index form
                                     int columnWidthTotal = 0;
-                                    var dstColumns = new List<IndexConfigClass.IndexConfigColumnClass>() { };
+                                    var dstColumns = new List<IndexConfigClass.IndexConfigColumnClass>();
                                     foreach (var column in IndexConfig.columns) {
                                         if (column.Name != TargetFieldName.ToLowerInvariant()) {
                                             dstColumns.Add(column);

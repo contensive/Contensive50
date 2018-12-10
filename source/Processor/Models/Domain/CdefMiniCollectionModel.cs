@@ -40,14 +40,14 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// Name dictionary of content definitions in the collection
         /// </summary>
-        public Dictionary<string, Models.Domain.CDefModel> cdef = new Dictionary<string, Models.Domain.CDefModel>() { };
+        public Dictionary<string, Models.Domain.CDefModel> cdef = new Dictionary<string, Models.Domain.CDefModel>();
         //
         //====================================================================================================
         /// <summary>
         /// 20181026 - no longer needed
         /// Name dictionary of all addons in the miniCollection
         /// </summary>
-        //public Dictionary<string, miniCollectionAddOnModel> legacyAddOns = new Dictionary<string, miniCollectionAddOnModel>() { };
+        //public Dictionary<string, miniCollectionAddOnModel> legacyAddOns = new Dictionary<string, miniCollectionAddOnModel>();
         //
         //====================================================================================================
         /// <summary>
@@ -149,7 +149,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// List of collections that must be installed before this collection can be installed
         /// </summary>
-        //public List<ImportCollectionType> collectionImports = new List<ImportCollectionType>() { };
+        //public List<ImportCollectionType> collectionImports = new List<ImportCollectionType>();
         //
         //====================================================================================================
         /// <summary>
@@ -1304,7 +1304,7 @@ namespace Contensive.Processor.Models.Domain {
                     // Search for this name in the Dst
                     bool indexFound = false;
                     bool indexChanged = false;
-                    CDefMiniCollectionModel.MiniCollectionSQLIndexModel indexToUpdate = new CDefMiniCollectionModel.MiniCollectionSQLIndexModel() { };
+                    CDefMiniCollectionModel.MiniCollectionSQLIndexModel indexToUpdate = new CDefMiniCollectionModel.MiniCollectionSQLIndexModel();
                     foreach (CDefMiniCollectionModel.MiniCollectionSQLIndexModel dstSqlIndex in dstCollection.sqlIndexes) {
                         dstName = (dstSqlIndex.DataSourceName + "-" + dstSqlIndex.TableName + "-" + dstSqlIndex.IndexName).ToLowerInvariant();
                         if (textMatch(dstName, srcName)) {
@@ -1348,7 +1348,7 @@ namespace Contensive.Processor.Models.Domain {
                     updateDst = false;
                     //
                     // Search for match using guid
-                    CDefMiniCollectionModel.MiniCollectionMenuModel dstMenuMatch = new CDefMiniCollectionModel.MiniCollectionMenuModel() { };
+                    CDefMiniCollectionModel.MiniCollectionMenuModel dstMenuMatch = new CDefMiniCollectionModel.MiniCollectionMenuModel();
                     bool IsMatch = false;
                     string DstKey = null;
                     bool DstIsNavigator = false;

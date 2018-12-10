@@ -19,19 +19,27 @@ namespace Contensive.Processor.Controllers {
     public class SessionController {
         //
         //====================================================================================================
-        // -- this class stores state, so it can hold a pointer to the core instance
+        /// <summary>
+        /// this class stores state, so it can hold a pointer to the core instance
+        /// </summary>
         private CoreController core { get; set; }
         //
         //====================================================================================================
-        // -- the visit is the collection of pages, constructor creates default non-authenticated instance
+        /// <summary>
+        /// the visit is the collection of pages, constructor creates default non-authenticated instance
+        /// </summary>
         public VisitModel visit { get; set; }
         //
         //====================================================================================================
-        // -- visitor represents the browser, constructor creates default non-authenticated instance
+        /// <summary>
+        /// visitor represents the browser, constructor creates default non-authenticated instance
+        /// </summary>
         public VisitorModel visitor { get; set; }
         //
         //====================================================================================================
-        // -- user is the person at the keyboad, constructor creates default non-authenticated instance
+        /// <summary>
+        /// user is the person at the keyboad, constructor creates default non-authenticated instance
+        /// </summary>
         public PersonModel user { get; set; }
         //
         //====================================================================================================
@@ -85,7 +93,9 @@ namespace Contensive.Processor.Controllers {
         } private LanguageModel _language = null;
         //
         //====================================================================================================
-        // -- is this user authenticated in this visit
+        /// <summary>
+        /// is this user authenticated in this visit
+        /// </summary>
         public bool isAuthenticated {
             get {
                 return visit.visitAuthenticated;
@@ -98,9 +108,9 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public bool visit_isBadBot = false;
         /// <summary>
-        /// The current request carries a cookie from the last request (use to detect back-button)
+        /// The current request carries a cookie from the last request (use to detect back-button). if false, page is out of state (sequence)
         /// </summary>
-        public bool visit_stateOK = false; // if false, page is out of state (sequence)
+        public bool visit_stateOK = false;
         //
         //====================================================================================================
         /// <summary>

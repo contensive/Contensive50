@@ -34,7 +34,7 @@ namespace Contensive.Addons.AdminSite {
         public Dictionary<string, IndexConfigSortClass> Sorts = new Dictionary<string, IndexConfigSortClass>();
         public int GroupListCnt;
         public string[] GroupList;
-        public List<IndexConfigColumnClass> columns = new List<IndexConfigColumnClass>() { };
+        public List<IndexConfigColumnClass> columns = new List<IndexConfigColumnClass>();
         public int SubCDefID;
         //
         //=================================================================================
