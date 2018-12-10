@@ -106,11 +106,13 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// browser is identified as a bot, and is not on the friendly-bot list
         /// </summary>
-        public bool visit_isBadBot = false;
+        public bool visitBadBot { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// The current request carries a cookie from the last request (use to detect back-button). if false, page is out of state (sequence)
         /// </summary>
-        public bool visit_stateOK = false;
+        public bool visitStateOk { get; set; }
         //
         //====================================================================================================
         /// <summary>
@@ -238,7 +240,7 @@ namespace Contensive.Processor.Controllers {
                                     }
                                     if (((visitToken.timeStamp - resultSessionContext.visit.lastVisitTime).TotalSeconds) > 2) {
                                         LogController.logTrace(core, "SessionController.create(), visit cookie timestamp [" + visitToken.timeStamp + "] does not match lastvisittime [" + resultSessionContext.visit.lastVisitTime + "]");
-                                        resultSessionContext.visit_stateOK = false;
+                                        resultSessionContext.visitStateOk = false;
                                     }
                                 }
                             }
@@ -344,7 +346,7 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     resultSessionContext.visit.name = "Blank-Browser-Bot";
                                     resultSessionContext.visit.bot = true;
-                                    resultSessionContext.visit_isBadBot = false;
+                                    resultSessionContext.visitBadBot = false;
                                     resultSessionContext.visit.mobile = false;
                                 } else {
                                     //
@@ -363,7 +365,7 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     // -- bot and badBot detect
                                     resultSessionContext.visit.bot = false;
-                                    resultSessionContext.visit_isBadBot = false;
+                                    resultSessionContext.visitBadBot = false;
                                     string botFileContent = core.cache.getObject<string>("DefaultBotNameList");
                                     if (string.IsNullOrEmpty(botFileContent)) {
                                         string Filename = "config\\VisitNameList.txt";
@@ -430,10 +432,10 @@ namespace Contensive.Processor.Controllers {
                                                             }
                                                             if (Args.GetUpperBound(0) <= 2) {
                                                                 resultSessionContext.visit.bot = true;
-                                                                resultSessionContext.visit_isBadBot = false;
+                                                                resultSessionContext.visitBadBot = false;
                                                             } else {
-                                                                resultSessionContext.visit_isBadBot = (Args[3].ToLowerInvariant() == "b");
-                                                                resultSessionContext.visit.bot = resultSessionContext.visit_isBadBot || (Args[3].ToLowerInvariant() == "r");
+                                                                resultSessionContext.visitBadBot = (Args[3].ToLowerInvariant() == "b");
+                                                                resultSessionContext.visit.bot = resultSessionContext.visitBadBot || (Args[3].ToLowerInvariant() == "r");
                                                             }
                                                         }
                                                     }
@@ -1327,8 +1329,6 @@ namespace Contensive.Processor.Controllers {
         }
         //
         // ================================================================================================
-        //   conversion pass 2
-        // ================================================================================================
         //
         public string getAuthoringStatusMessage(CoreController core, bool IsContentWorkflowAuthoring, bool RecordEditLocked, string main_EditLockName, DateTime main_EditLockExpires, bool RecordApproved, string ApprovedBy, bool RecordSubmitted, string SubmittedBy, bool RecordDeleted, bool RecordInserted, bool RecordModified, string ModifiedBy) {
             string result = "";
@@ -1352,10 +1352,10 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //========================================================================
-        // main_IsWorkflowRendering()
-        //   True if the current visitor is a content manager in workflow rendering mode
-        //========================================================================
-        //
+        /// <summary>
+        /// True if the current visitor is a content manager in workflow rendering mode
+        /// </summary>
+        /// <returns></returns>
         public bool isWorkflowRendering() {
             bool tempisWorkflowRendering = false;
             bool result = false;
