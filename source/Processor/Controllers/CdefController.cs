@@ -27,9 +27,9 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static string getContentProperty(CoreController core, string ContentName, string PropertyName) {
             string result = "";
-            Models.Domain.CDefModel Contentdefinition;
+            Models.Domain.CDefDomainModel Contentdefinition;
             //
-            Contentdefinition = CDefModel.create(core, GenericController.encodeText(ContentName));
+            Contentdefinition = CDefDomainModel.create(core, GenericController.encodeText(ContentName));
             switch (GenericController.vbUCase(GenericController.encodeText(PropertyName))) {
                 case "CONTENTCONTROLCRITERIA":
                     result = Contentdefinition.legacyContentControlCriteria;
@@ -148,11 +148,11 @@ namespace Contensive.Processor.Controllers {
         public static bool isWithinContent(CoreController core, int ChildContentID, int ParentContentID) {
             bool returnOK = false;
             try {
-                Models.Domain.CDefModel cdef = null;
+                Models.Domain.CDefDomainModel cdef = null;
                 if (ChildContentID == ParentContentID) {
                     returnOK = true;
                 } else {
-                    cdef = CDefModel.create(core, ParentContentID);
+                    cdef = CDefDomainModel.create(core, ParentContentID);
                     if (cdef != null) {
                         if (cdef.get_childIdList(core).Count > 0) {
                             returnOK = cdef.get_childIdList(core).Contains(ChildContentID);
@@ -186,7 +186,7 @@ namespace Contensive.Processor.Controllers {
                 DataTable cidDataTable = null;
                 int CIDCount = 0;
                 int CIDPointer = 0;
-                Models.Domain.CDefModel CDef = null;
+                Models.Domain.CDefDomainModel CDef = null;
                 int ContentID = 0;
                 //
                 SQL = "Select ccGroupRules.ContentID as ID"
@@ -203,7 +203,7 @@ namespace Contensive.Processor.Controllers {
                 for (CIDPointer = 0; CIDPointer < CIDCount; CIDPointer++) {
                     ContentID = GenericController.encodeInteger(cidDataTable.Rows[CIDPointer][0]);
                     returnList.Add(ContentID);
-                    CDef = CDefModel.create(core, ContentID);
+                    CDef = CDefDomainModel.create(core, ContentID);
                     if (CDef != null) {
                         returnList.AddRange(CDef.get_childIdList(core));
                     }
@@ -339,7 +339,7 @@ namespace Contensive.Processor.Controllers {
         public static string getContentTablename(CoreController core, string ContentName) {
             string returnTableName = "";
             try {
-                var CDef = CDefModel.create(core, ContentName);
+                var CDef = CDefDomainModel.create(core, ContentName);
                 if (CDef != null) {
                     returnTableName = CDef.tableName;
                 }
@@ -356,9 +356,9 @@ namespace Contensive.Processor.Controllers {
         public static string getContentDataSource(CoreController core, string ContentName) {
             string returnDataSource = "";
             try {
-                Models.Domain.CDefModel CDef;
+                Models.Domain.CDefDomainModel CDef;
                 //
-                CDef = CDefModel.create(core, ContentName);
+                CDef = CDefDomainModel.create(core, ContentName);
                 if (CDef == null) {
                     //
                 } else {
@@ -379,9 +379,9 @@ namespace Contensive.Processor.Controllers {
         public static string getContentNameByID(CoreController core, int ContentID) {
             string returnName = "";
             try {
-                Models.Domain.CDefModel cdef;
+                Models.Domain.CDefDomainModel cdef;
                 //
-                cdef = CDefModel.create(core, ContentID);
+                cdef = CDefDomainModel.create(core, ContentID);
                 if (cdef != null) {
                     returnName = cdef.name;
                 }
@@ -399,7 +399,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="cdef"></param>
         /// <returns></returns>
-        public static int verifyContent_returnId(CoreController core, CDefModel cdef) { // bool Active, DataSourceModel datasource, string TableName, string contentName, bool AdminOnly = false, bool DeveloperOnly = false, bool AllowAdd = true, bool AllowDelete = true, string ParentName = "", string DefaultSortMethod = "", string DropDownFieldList = "", bool AllowWorkflowAuthoring = false, bool AllowCalendarEvents = false, bool AllowContentTracking = false, bool AllowTopicRules = false, bool AllowContentChildTool = false, bool ignore1 = false, string IconLink = "", int IconWidth = 0, int IconHeight = 0, int IconSprites = 0, string ccGuid = "", bool IsBaseContent = false, string installedByCollectionGuid = "", bool clearMetaCache = false) {
+        public static int verifyContent_returnId(CoreController core, CDefDomainModel cdef) { // bool Active, DataSourceModel datasource, string TableName, string contentName, bool AdminOnly = false, bool DeveloperOnly = false, bool AllowAdd = true, bool AllowDelete = true, string ParentName = "", string DefaultSortMethod = "", string DropDownFieldList = "", bool AllowWorkflowAuthoring = false, bool AllowCalendarEvents = false, bool AllowContentTracking = false, bool AllowTopicRules = false, bool AllowContentChildTool = false, bool ignore1 = false, string IconLink = "", int IconWidth = 0, int IconHeight = 0, int IconSprites = 0, string ccGuid = "", bool IsBaseContent = false, string installedByCollectionGuid = "", bool clearMetaCache = false) {
             int returnContentId = 0;
             try {
                 //
@@ -972,9 +972,9 @@ namespace Contensive.Processor.Controllers {
         public static bool isContentFieldSupported(CoreController core, string ContentName, string FieldName) {
             bool returnOk = false;
             try {
-                Models.Domain.CDefModel cdef;
+                Models.Domain.CDefDomainModel cdef;
                 //
-                cdef = CDefModel.create(core, ContentName);
+                cdef = CDefDomainModel.create(core, ContentName);
                 if (cdef != null) {
                     returnOk = cdef.fields.ContainsKey(FieldName.ToLowerInvariant());
                 }
@@ -1010,7 +1010,7 @@ namespace Contensive.Processor.Controllers {
         //========================================================================
         //
         public static string getContentControlCriteria(CoreController core, string ContentName) {
-            return CDefModel.create(core, ContentName).legacyContentControlCriteria;
+            return CDefDomainModel.create(core, ContentName).legacyContentControlCriteria;
         }
         //   
         //============================================================================================================
@@ -1075,7 +1075,7 @@ namespace Contensive.Processor.Controllers {
         public static string getContentFieldProperty(CoreController core, string ContentName, string FieldName, string PropertyName) {
             string result = "";
             try {
-                CDefModel Contentdefinition = CDefModel.create(core, ContentName);
+                CDefDomainModel Contentdefinition = CDefDomainModel.create(core, ContentName);
                 if ((string.IsNullOrEmpty(FieldName)) || (Contentdefinition.fields.Count < 1)) {
                     throw (new GenericException("Content Name [" + GenericController.encodeText(ContentName) + "] or FieldName [" + FieldName + "] was not valid"));
                 } else {

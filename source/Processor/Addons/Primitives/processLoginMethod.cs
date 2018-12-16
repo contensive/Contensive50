@@ -36,7 +36,7 @@ namespace Contensive.Addons.Primitives {
                 addonArguments.Add("Force Default Login", "false");
                 return core.addon.execute(AddonModel.create(core, addonGuidLoginPage), new CPUtilsBaseClass.addonExecuteContext() {
                     addonType = CPUtilsBaseClass.addonContext.ContextPage,
-                    instanceArguments = addonArguments,
+                    argumentKeyValuePairs = addonArguments,
                     forceHtmlDocument = true,
                      errorContextMessage = "get field editor preference remote"
                 });

@@ -493,7 +493,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="inActive"></param>
         private static void verifyRecord(CoreController core, string contentName, string name, string sqlName = "", string sqlValue = "") {
             try {
-                var cdef = CDefModel.create(core, contentName);
+                var cdef = CDefDomainModel.create(core, contentName);
                 DataTable dt = core.db.executeQuery("SELECT ID FROM " + cdef.tableName + " WHERE NAME=" + DbController.encodeSQLText(name) + ";");
                 if (dt.Rows.Count == 0) {
                     string sql1 = "insert into " + cdef.tableName + " (active,name";

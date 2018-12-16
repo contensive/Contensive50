@@ -34,12 +34,12 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static SortMethodModel addDefault(CoreController core, Domain.CDefModel cdef) {
+        public static SortMethodModel addDefault(CoreController core, Domain.CDefDomainModel cdef) {
             return addDefault<SortMethodModel>(core, cdef);
         }
         //
         //====================================================================================================
-        public static SortMethodModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefModel cdef) {
+        public static SortMethodModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefDomainModel cdef) {
             return addDefault<SortMethodModel>(core, cdef, ref callersCacheNameList);
         }
         //

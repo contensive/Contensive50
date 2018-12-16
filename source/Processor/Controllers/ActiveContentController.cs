@@ -257,7 +257,7 @@ namespace Contensive.Processor.Controllers {
                                                                         },
                                                                         personalizationAuthenticated = personalizationIsAuthenticated,
                                                                         personalizationPeopleId = personalizationPeopleId,
-                                                                        instanceArguments = GenericController.convertQSNVAArgumentstoDocPropertiesList(core, AddonOptionStringHTMLEncoded),
+                                                                        argumentKeyValuePairs = GenericController.convertQSNVAArgumentstoDocPropertiesList(core, AddonOptionStringHTMLEncoded),
                                                                         instanceGuid = ACInstanceID,
                                                                         errorContextMessage = "rendering addon found in active content within an email"
                                                                     };
@@ -1622,7 +1622,7 @@ namespace Contensive.Processor.Controllers {
                                             personalizationAuthenticated = personalizationIsAuthenticated,
                                             personalizationPeopleId = personalizationPeopleId,
                                             instanceGuid = ACInstanceID,
-                                            instanceArguments = GenericController.convertQSNVAArgumentstoDocPropertiesList(core, addonOptionString),
+                                            argumentKeyValuePairs = GenericController.convertQSNVAArgumentstoDocPropertiesList(core, addonOptionString),
                                             errorContextMessage = "rendering active content with guid [" + AddonGuid + "] or name [" + AddonName + "]"
                                         };
                                         if (!string.IsNullOrEmpty(AddonGuid)) {
@@ -1817,7 +1817,9 @@ namespace Contensive.Processor.Controllers {
                                                             // look back in the FilePrefixSegment to find the character before the link
                                                             //
                                                             int EndPos = 0;
+                                                            bool exitFor = false;
                                                             for (int Ptr = FilePrefixSegment.Length; Ptr >= 1; Ptr--) {
+                                                                if (exitFor) break;
                                                                 string TestChr = FilePrefixSegment.Substring(Ptr - 1, 1);
                                                                 switch (TestChr) {
                                                                     case "=":
@@ -1839,17 +1841,15 @@ namespace Contensive.Processor.Controllers {
                                                                         } else {
                                                                             EndPos = 0;
                                                                         }
-                                                                        //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
-                                                                        //ORIGINAL LINE: Exit For
-                                                                        goto ExitLabel1;
+                                                                        exitFor = true;
+                                                                        break;
                                                                     case "\"":
                                                                         //
                                                                         // Quoted, ends is '"'
                                                                         //
                                                                         EndPos = GenericController.vbInstr(1, FilenameSegment, "\"");
-                                                                        //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
-                                                                        //ORIGINAL LINE: Exit For
-                                                                        goto ExitLabel1;
+                                                                        exitFor = true;
+                                                                        break;
                                                                     case "(":
                                                                         //
                                                                         // url() style, ends in ')' or a ' '
@@ -1863,32 +1863,27 @@ namespace Contensive.Processor.Controllers {
                                                                         } else {
                                                                             EndPos = GenericController.vbInstr(1, FilenameSegment, ")");
                                                                         }
-                                                                        //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
-                                                                        //ORIGINAL LINE: Exit For
-                                                                        goto ExitLabel1;
+                                                                        exitFor = true;
+                                                                        break;
                                                                     case "'":
                                                                         //
                                                                         // Delimited within a javascript pair of apostophys
                                                                         //
                                                                         EndPos = GenericController.vbInstr(1, FilenameSegment, "'");
-                                                                        //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
-                                                                        //ORIGINAL LINE: Exit For
-                                                                        goto ExitLabel1;
+                                                                        exitFor = true;
+                                                                        break;
                                                                     case ">":
                                                                     case "<":
                                                                         //
                                                                         // Skip this link
                                                                         //
                                                                         ParseError = true;
-                                                                        //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
-                                                                        //ORIGINAL LINE: Exit For
-                                                                        goto ExitLabel1;
+                                                                        exitFor = true;
+                                                                        break;
                                                                 }
                                                             }
-                                                            ExitLabel1:
                                                             //
                                                             // check link
-                                                            //
                                                             if (EndPos == 0) {
                                                                 ParseError = true;
                                                                 break;

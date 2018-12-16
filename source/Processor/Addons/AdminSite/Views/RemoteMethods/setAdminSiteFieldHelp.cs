@@ -23,14 +23,14 @@ namespace Contensive.Addons.AdminSite {
                     int fieldId = cp.Doc.GetInteger("fieldId");
                     ContentFieldHelpModel help = ContentFieldHelpModel.createByFieldId(core, fieldId);
                     if (help == null) {
-                        help = ContentFieldHelpModel.addDefault(core, Processor.Models.Domain.CDefModel.create(core, ContentFieldHelpModel.contentName));
+                        help = ContentFieldHelpModel.addDefault(core, Processor.Models.Domain.CDefDomainModel.create(core, ContentFieldHelpModel.contentName));
                         help.fieldID = fieldId;
                     }
                     help.helpCustom = cp.Doc.GetText("helpcustom");
                     help.save(core);
                     ContentFieldModel contentField = ContentFieldModel.create(core, fieldId);
                     if (contentField != null) {
-                        CDefModel.invalidateCache(core, contentField.contentID);
+                        CDefDomainModel.invalidateCache(core, contentField.contentID);
                     }
                 }
             } catch (Exception ex) {

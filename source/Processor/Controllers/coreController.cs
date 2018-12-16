@@ -76,7 +76,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Dictionary of cdef, index by name
         /// </summary>
-        internal Dictionary<string, Models.Domain.CDefModel> cdefDictionary { get; set; }
+        internal Dictionary<string, Models.Domain.CDefDomainModel> cdefDictionary { get; set; }
         //
         /// <summary>
         /// Dictionary of tableschema, index by name
@@ -436,7 +436,7 @@ namespace Contensive.Processor.Controllers {
             cp_forAddonExecutionOnly = cp;
             LogController.forceNLog( "CoreController constructor-0, enter", LogController.logLevel.Trace);
             //
-            cdefDictionary = new Dictionary<string, Models.Domain.CDefModel>();
+            cdefDictionary = new Dictionary<string, Models.Domain.CDefDomainModel>();
             tableSchemaDictionary = null;
             //
             // -- create default auth objects for non-user methods, or until auth is available
@@ -459,7 +459,7 @@ namespace Contensive.Processor.Controllers {
             this.cp_forAddonExecutionOnly = cp;
             LogController.forceNLog( "CoreController constructor-1, enter", LogController.logLevel.Trace);
             //
-            cdefDictionary = new Dictionary<string, Models.Domain.CDefModel>();
+            cdefDictionary = new Dictionary<string, Models.Domain.CDefDomainModel>();
             tableSchemaDictionary = null;
             //
             // -- create default auth objects for non-user methods, or until auth is available
@@ -509,7 +509,7 @@ namespace Contensive.Processor.Controllers {
             cp_forAddonExecutionOnly = cp;
             LogController.forceNLog( "CoreController constructor-2, enter", LogController.logLevel.Trace);
             //
-            cdefDictionary = new Dictionary<string, Models.Domain.CDefModel>();
+            cdefDictionary = new Dictionary<string, Models.Domain.CDefDomainModel>();
             tableSchemaDictionary = null;
             //
             // -- create default auth objects for non-user methods, or until auth is available
@@ -553,7 +553,7 @@ namespace Contensive.Processor.Controllers {
             this.cp_forAddonExecutionOnly = cp;
             LogController.forceNLog( "CoreController constructor-4, enter", LogController.logLevel.Trace);
             //
-            cdefDictionary = new Dictionary<string, Models.Domain.CDefModel>();
+            cdefDictionary = new Dictionary<string, Models.Domain.CDefDomainModel>();
             tableSchemaDictionary = null;
             //
             // -- create default auth objects for non-user methods, or until auth is available
@@ -1478,7 +1478,7 @@ namespace Contensive.Processor.Controllers {
                     if (onChangeAddonsAsync) {
                         //
                         // -- execute addon async
-                        addon.executeAsync(addonId.ToString(), Option_String);
+                        addon.executeAsync(AddonModel.create(this, addonId), instanceArguments);
                     } else {
                         //
                         // -- execute addon
@@ -1486,7 +1486,7 @@ namespace Contensive.Processor.Controllers {
                             addonType = CPUtilsBaseClass.addonContext.ContextOnContentChange,
                             backgroundProcess = false,
                             errorContextMessage = "",
-                            instanceArguments = instanceArguments,
+                            argumentKeyValuePairs = instanceArguments,
                             personalizationPeopleId = session.user.id
                         });
                     }
@@ -1564,7 +1564,7 @@ namespace Contensive.Processor.Controllers {
                                         + "," + DbController.encodeSQLText(requestFormSerialized.Left(255))
                                         + "," + DbController.encodeSQLText(webServer.requestReferrer.Left(255))
                                         + "," + DbController.encodeSQLDate(doc.profileStartTime)
-                                        + "," + DbController.encodeSQLBoolean(session.visit_stateOK)
+                                        + "," + DbController.encodeSQLBoolean(session.visitStateOk)
                                         + "," + doc.appStopWatch.ElapsedMilliseconds.ToString()
                                         + ",1"
                                         + "," + PageID.ToString()

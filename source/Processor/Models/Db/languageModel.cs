@@ -34,12 +34,12 @@ namespace Contensive.Processor.Models.Db {
         public string http_Accept_Language { get; set; }
         //
         //====================================================================================================
-        public static LanguageModel addDefault(CoreController core, Domain.CDefModel cdef) {
+        public static LanguageModel addDefault(CoreController core, Domain.CDefDomainModel cdef) {
             return addDefault<LanguageModel>(core, cdef);
         }
         //
         //====================================================================================================
-        public static LanguageModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefModel cdef) {
+        public static LanguageModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefDomainModel cdef) {
             return addDefault<LanguageModel>(core, cdef, ref callersCacheNameList);
         }
         //

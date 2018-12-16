@@ -213,7 +213,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 int downloadId = 0;
                 if (!string.IsNullOrEmpty(downloadName)) {
-                    var download = BaseModel.addDefault<DownloadModel>(core, CDefModel.create(core, DownloadModel.contentName));
+                    var download = BaseModel.addDefault<DownloadModel>(core, CDefDomainModel.create(core, DownloadModel.contentName));
                     download.name = downloadName;
                     download.dateRequested = DateTime.Now;
                     download.requestedBy = core.session.user.id;

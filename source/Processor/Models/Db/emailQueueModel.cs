@@ -26,12 +26,12 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static EmailQueueModel addDefault(CoreController core, Domain.CDefModel cdef) {
+        public static EmailQueueModel addDefault(CoreController core, Domain.CDefDomainModel cdef) {
             return addDefault<EmailQueueModel>(core, cdef);
         }
         //
         //====================================================================================================
-        public static EmailQueueModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefModel cdef) {
+        public static EmailQueueModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefDomainModel cdef) {
             return addDefault<EmailQueueModel>(core, cdef, ref callersCacheNameList);
         }
         //

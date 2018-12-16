@@ -20,7 +20,7 @@ namespace Contensive.Addons.AdminSite {
             string result = "";
             try {
                 // todo refactor out
-                CDefModel adminContent = adminData.adminContent;
+                CDefDomainModel adminContent = adminData.adminContent;
                 string Button = core.docProperties.getText(RequestNameButton);
                 if (Button == ButtonOK) {
                     //
@@ -55,7 +55,7 @@ namespace Contensive.Addons.AdminSite {
                 //--------------------------------------------------------------------------------
                 //
                 if (adminContent.id != 0) {
-                    var CDef = CDefModel.create(core, adminContent.id);
+                    var CDef = CDefDomainModel.create(core, adminContent.id);
                     int ColumnWidthTotal = 0;
                     if (ToolsAction != 0) {
                         //
@@ -222,7 +222,7 @@ namespace Contensive.Addons.AdminSite {
                         if (reloadMetadata) {
                             core.clearMetaData();
                             core.cache.invalidateAll();
-                            CDef = CDefModel.create(core, adminContent.name);
+                            CDef = CDefDomainModel.create(core, adminContent.name);
                         }
                         //
                         // save indexconfig

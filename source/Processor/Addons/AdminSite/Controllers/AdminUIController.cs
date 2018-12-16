@@ -536,39 +536,29 @@ namespace Contensive.Addons.AdminSite.Controllers {
         private static string getReport_CellHeader(CoreController core, int ColumnPtr, string Title, string Width, string Align, string ClassStyle, string RefreshQueryString, SortingStateEnum SortingState) {
             string result = "";
             try {
-                string Style = null;
-                string Copy = null;
-                string QS = null;
-                int WidthTest = 0;
-                //
-                if (string.IsNullOrEmpty(Title)) {
-                    Copy = "&nbsp;";
-                } else {
-                    Copy = GenericController.vbReplace(Title, " ", "&nbsp;");
-                    //Copy = "<nobr>" & Title & "</nobr>"
-                }
-                Style = "VERTICAL-ALIGN:bottom;";
-                if (string.IsNullOrEmpty(Align)) {
-                } else {
-                    Style = Style + "TEXT-ALIGN:" + Align + ";";
-                }
-                //
+                string Copy = "&nbsp;";
+                if (!string.IsNullOrEmpty(Title)) { Copy = GenericController.vbReplace(Title, " ", "&nbsp;"); }
+                string Style = "VERTICAL-ALIGN:bottom;";
+                if (!string.IsNullOrEmpty(Align)) { Style +="TEXT-ALIGN:" + Align + ";"; }
                 switch (SortingState) {
-                    case SortingStateEnum.SortableNotSet:
-                        QS = GenericController.modifyQueryString(RefreshQueryString, "ColSort", ((int)SortingStateEnum.SortableSetAZ).ToString(), true);
+                    case SortingStateEnum.SortableNotSet: {
+                        string QS = GenericController.modifyQueryString(RefreshQueryString, "ColSort", ((int)SortingStateEnum.SortableSetAZ).ToString(), true);
                         QS = GenericController.modifyQueryString(QS, "ColPtr", ColumnPtr.ToString(), true);
                         Copy = "<a href=\"?" + QS + "\" title=\"Sort A-Z\" class=\"ccAdminListCaption\">" + Copy + "</a>";
                         break;
-                    case SortingStateEnum.SortableSetza:
-                        QS = GenericController.modifyQueryString(RefreshQueryString, "ColSort", ((int)SortingStateEnum.SortableSetAZ).ToString(), true);
+                    }
+                    case SortingStateEnum.SortableSetza: {
+                        string QS = GenericController.modifyQueryString(RefreshQueryString, "ColSort", ((int)SortingStateEnum.SortableSetAZ).ToString(), true);
                         QS = GenericController.modifyQueryString(QS, "ColPtr", ColumnPtr.ToString(), true);
                         Copy = "<a href=\"?" + QS + "\" title=\"Sort A-Z\" class=\"ccAdminListCaption\">" + Copy + "<img src=\"/ContensiveBase/images/arrowup.gif\" width=8 height=8 border=0></a>";
                         break;
-                    case SortingStateEnum.SortableSetAZ:
-                        QS = GenericController.modifyQueryString(RefreshQueryString, "ColSort", ((int)SortingStateEnum.SortableSetza).ToString(), true);
+                    }
+                    case SortingStateEnum.SortableSetAZ: {
+                        string QS = GenericController.modifyQueryString(RefreshQueryString, "ColSort", ((int)SortingStateEnum.SortableSetza).ToString(), true);
                         QS = GenericController.modifyQueryString(QS, "ColPtr", ColumnPtr.ToString(), true);
                         Copy = "<a href=\"?" + QS + "\" title=\"Sort Z-A\" class=\"ccAdminListCaption\">" + Copy + "<img src=\"/ContensiveBase/images/arrowdown.gif\" width=8 height=8 border=0></a>";
                         break;
+                    }
                 }
                 //
                 if (!string.IsNullOrEmpty(Width)) {
@@ -1486,8 +1476,8 @@ namespace Contensive.Addons.AdminSite.Controllers {
         /// <param name="core"></param>
         /// <param name="cdef"></param>
         /// <returns></returns>
-        public static string getIconEditAdminLink(CoreController core, CDefModel cdef) { return getIconEditLink("/" + core.appConfig.adminRoute + "?cid=" + cdef.id, "ccRecordEditLink");}
-        public static string getIconEditAdminLink(CoreController core, CDefModel cdef, int recordId) {return getIconEditLink("/" + core.appConfig.adminRoute + "?af=4&aa=2&ad=1&cid=" + cdef.id + "&id=" + recordId, "ccRecordEditLink");}
+        public static string getIconEditAdminLink(CoreController core, CDefDomainModel cdef) { return getIconEditLink("/" + core.appConfig.adminRoute + "?cid=" + cdef.id, "ccRecordEditLink");}
+        public static string getIconEditAdminLink(CoreController core, CDefDomainModel cdef, int recordId) {return getIconEditLink("/" + core.appConfig.adminRoute + "?af=4&aa=2&ad=1&cid=" + cdef.id + "&id=" + recordId, "ccRecordEditLink");}
         //
         //====================================================================================================
         //
@@ -1574,7 +1564,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                         throw (new GenericException("RecordID [" + recordID + "] is invalid"));
                     } else {
                         if (IsEditing) {
-                            var cdef = CDefModel.create(core, contentName);
+                            var cdef = CDefDomainModel.create(core, contentName);
                             if ( cdef==null) {
                                 throw new GenericException("getRecordEditLink called with contentName [" + contentName + "], but no content found with this name.");
                             } else {

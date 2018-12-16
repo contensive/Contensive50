@@ -76,7 +76,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="recordId"></param>
         /// <returns></returns>
         private static string getAuthoringControlCriteria(CoreController core, string contentName, int recordId) 
-            => getAuthoringControlCriteria(core, Models.Domain.CDefModel.create(core, contentName), recordId);
+            => getAuthoringControlCriteria(core, Models.Domain.CDefDomainModel.create(core, contentName), recordId);
         //
         //=====================================================================================================
         /// <summary>
@@ -85,7 +85,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="cdef"></param>
         /// <param name="recordId"></param>
         /// <returns></returns>
-        private static string getAuthoringControlCriteria(CoreController core, Models.Domain.CDefModel cdef, int recordId) {
+        private static string getAuthoringControlCriteria(CoreController core, Models.Domain.CDefDomainModel cdef, int recordId) {
             if (cdef == null) return "(1=0)";
             var table = Models.Db.TableModel.createByUniqueName(core, cdef.tableName);
             if (table == null) return "(1=0)";
@@ -244,7 +244,7 @@ namespace Contensive.Processor.Controllers {
                 if (RecordID > 0) {
                     //
                     // Get Workflow Locks
-                    Models.Domain.CDefModel CDef = Models.Domain.CDefModel.create(core, ContentName);
+                    Models.Domain.CDefDomainModel CDef = Models.Domain.CDefDomainModel.create(core, ContentName);
                     if (CDef.id > 0) {
                         var nameDict = new Dictionary<int, string>();
                         foreach (var recordLock in Models.Db.AuthoringControlModel.createList(core, getAuthoringControlCriteria(core, ContentName, RecordID))) {

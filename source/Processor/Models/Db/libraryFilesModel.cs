@@ -43,12 +43,12 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static LibraryFilesModel addDefault(CoreController core, Domain.CDefModel cdef) {
+        public static LibraryFilesModel addDefault(CoreController core, Domain.CDefDomainModel cdef) {
             return addDefault<LibraryFilesModel>(core, cdef);
         }
         //
         //====================================================================================================
-        public static LibraryFilesModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefModel cdef) {
+        public static LibraryFilesModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefDomainModel cdef) {
             return addDefault<LibraryFilesModel>(core, cdef, ref callersCacheNameList);
         }
         //

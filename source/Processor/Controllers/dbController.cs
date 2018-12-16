@@ -107,7 +107,7 @@ namespace Contensive.Processor.Controllers {
             /// <summary>
             /// 
             /// </summary>
-            public Models.Domain.CDefModel CDef;
+            public Models.Domain.CDefDomainModel CDef;
             /// <summary>
             /// ID of the member who opened the csv_ContentSet
             /// </summary>
@@ -1268,7 +1268,7 @@ namespace Contensive.Processor.Controllers {
                 if (string.IsNullOrEmpty(ContentName)) {
                     throw new ArgumentException("ContentName cannot be blank");
                 } else {
-                    var CDef = CDefModel.create(core, ContentName);
+                    var CDef = CDefDomainModel.create(core, ContentName);
                     if (CDef == null) {
                         throw (new GenericException("No content found For [" + ContentName + "]"));
                     } else if (CDef.id <= 0) {
@@ -1402,7 +1402,7 @@ namespace Contensive.Processor.Controllers {
                 if (string.IsNullOrEmpty(ContentName)) {
                     throw new ArgumentException("ContentName cannot be blank");
                 } else {
-                    var CDef = CDefModel.create(core, ContentName);
+                    var CDef = CDefDomainModel.create(core, ContentName);
                     if (CDef == null) {
                         throw (new GenericException("No content found For [" + ContentName + "]"));
                     } else if (CDef.id <= 0) {
@@ -1652,10 +1652,6 @@ namespace Contensive.Processor.Controllers {
         //
         public void csGoNext(int CSPointer, bool AsyncSave = false) {
             try {
-                //
-                string ContentName = null;
-                int RecordID = 0;
-                //
                 if (!csOk(CSPointer)) {
                     //
                     throw new GenericException("Dataset is not valid.");
@@ -2237,14 +2233,14 @@ namespace Contensive.Processor.Controllers {
             try {
                 //
                 int CSPointer = 0;
-                Models.Domain.CDefModel CDef = null;
+                Models.Domain.CDefDomainModel CDef = null;
                 //
                 if (string.IsNullOrEmpty(ContentName.Trim())) {
                     throw new ArgumentException("contentName cannot be blank");
                 } else if (string.IsNullOrEmpty(Criteria.Trim())) {
                     throw new ArgumentException("criteria cannot be blank");
                 } else {
-                    CDef = CDefModel.create(core, ContentName);
+                    CDef = CDefDomainModel.create(core, ContentName);
                     if (CDef == null) {
                         throw new ArgumentException("ContentName [" + ContentName + "] was not found");
                     } else if (CDef.id == 0) {
@@ -2286,7 +2282,7 @@ namespace Contensive.Processor.Controllers {
                 string DataSourceName = null;
                 string FieldName = null;
                 string TableName = null;
-                Models.Domain.CDefModel CDef = null;
+                Models.Domain.CDefDomainModel CDef = null;
                 string DefaultValueText = null;
                 string LookupContentName = null;
                 int Ptr = 0;
@@ -2297,7 +2293,7 @@ namespace Contensive.Processor.Controllers {
                 if (string.IsNullOrEmpty(ContentName.Trim())) {
                     throw new ArgumentException("ContentName cannot be blank");
                 } else {
-                    CDef = Models.Domain.CDefModel.create(core, ContentName);
+                    CDef = Models.Domain.CDefDomainModel.create(core, ContentName);
                     if (CDef == null) {
                         throw new GenericException("content [" + ContentName + "] could Not be found.");
                     } else if (CDef.id <= 0) {
@@ -2493,7 +2489,7 @@ namespace Contensive.Processor.Controllers {
                 int DestRecordID = 0;
                 string DestFilename = null;
                 string SourceFilename = null;
-                Models.Domain.CDefModel DestCDef = null;
+                Models.Domain.CDefDomainModel DestCDef = null;
                 //
                 if (!csOk(CSSource)) {
                     throw new ArgumentException("source dataset is not valid");
@@ -3507,7 +3503,7 @@ namespace Contensive.Processor.Controllers {
                 int fieldTypeId = 0;
                 string TableName = null;
                 //Dim iOriginalFilename As String
-                Models.Domain.CDefModel CDef = null;
+                Models.Domain.CDefDomainModel CDef = null;
                 //
                 if (string.IsNullOrEmpty(ContentName.Trim())) {
                     throw new ArgumentException("contentname cannot be blank");
@@ -3516,7 +3512,7 @@ namespace Contensive.Processor.Controllers {
                 } else if (RecordID <= 0) {
                     throw new ArgumentException("recordid is not valid");
                 } else {
-                    CDef = Models.Domain.CDefModel.create(core, ContentName);
+                    CDef = Models.Domain.CDefDomainModel.create(core, ContentName);
                     if (CDef.id == 0) {
                         throw new GenericException("contentname [" + ContentName + "] is not a valid content");
                     } else {
@@ -4216,7 +4212,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // ----- Content definition not found, create it
                         //
-                        CdefController.verifyContent_returnId(core, new Models.Domain.CDefModel() {
+                        CdefController.verifyContent_returnId(core, new Models.Domain.CDefDomainModel() {
                             dataSourceName = DataSource.name,
                             tableName = TableName,
                             name = ContentName,

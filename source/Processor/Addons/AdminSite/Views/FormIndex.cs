@@ -490,7 +490,7 @@ namespace Contensive.Addons.AdminSite {
         /// <param name="recordCnt"></param>
         /// <param name="ContentAccessLimitMessage"></param>
         /// <returns></returns>
-        public static string getForm_Index_Header(CoreController core, IndexConfigClass IndexConfig, CDefModel content, int recordCnt, string ContentAccessLimitMessage) {
+        public static string getForm_Index_Header(CoreController core, IndexConfigClass IndexConfig, CDefDomainModel content, int recordCnt, string ContentAccessLimitMessage) {
             //
             // ----- TitleBar
             //

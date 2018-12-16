@@ -105,7 +105,7 @@ namespace Contensive.BaseClasses {
             /// Optional. Name value pairs added to the document environment during execution so they be read by addon programming during and after execution with cp.doc.getText(), etc.
             /// </summary>
             /// <returns></returns>
-            public Dictionary<string, string> instanceArguments { get; set; } = new Dictionary<string, string>();
+            public Dictionary<string, string> argumentKeyValuePairs { get; set; } = new Dictionary<string, string>();
             /// <summary>
             /// Optional. If this addon is run automatically because it was included in content, this is the contentName, recordId and fieldName of the record that held that content.
             /// </summary>
@@ -155,57 +155,215 @@ namespace Contensive.BaseClasses {
             /// </summary>
             public bool forceJavascriptToHead { get; set; } = false;
         }
-
+        //
+        //====================================================================================================
+        //
         public abstract string ConvertHTML2Text(string Source);
+        //
+        //====================================================================================================
+        //
         public abstract string ConvertText2HTML(string Source);
+        //
+        //====================================================================================================
+        //
         public abstract string CreateGuid();
+        //
+        //====================================================================================================
+        //
         public abstract string DecodeUrl(string Url);
+        //
+        //====================================================================================================
+        //
         public abstract string EncodeContentForWeb(string Source, string ContextContentName = "", int ContextRecordID = 0, int WrapperID = 0);
+        //
+        //====================================================================================================
+        //
         public abstract string EncodeHtmlForWysiwygEditor(string Source);
+        //
+        //====================================================================================================
+        //
         public abstract string DecodeHtmlFromWysiwygEditor(string Source);
+        //
+        //====================================================================================================
+        //
         public abstract string DecodeHTML(string Source);
+        //
+        //====================================================================================================
+        //
         public abstract string EncodeHTML(string Source);
+        //
+        //====================================================================================================
+        //
         public abstract string EncodeUrl(string Source);
+        //
+        //====================================================================================================
+        //
         public abstract string GetPleaseWaitEnd();
+        //
+        //====================================================================================================
+        //
         public abstract string GetPleaseWaitStart();
+        //
+        //====================================================================================================
+        //
         public abstract void IISReset();
+        //
+        //====================================================================================================
+        //
         public abstract int EncodeInteger(object Expression);
+        //
+        //====================================================================================================
+        //
         public abstract double EncodeNumber(object Expression);
+        //
+        //====================================================================================================
+        //
         public abstract string EncodeText(object Expression);
+        //
+        //====================================================================================================
+        //
         public abstract bool EncodeBoolean(object Expression);
+        //
+        //====================================================================================================
+        //
         public abstract DateTime EncodeDate(object Expression);
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated. use cp.addon.execute()", false)]
         public abstract string ExecuteAddon(string IdGuidOrName);
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated. use cp.addon.execute() and manage the wrapper manually.", false)]
         public abstract string ExecuteAddon(string IdGuidOrName, int WrapperId);
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated. use cp.addon.execute()", false)]
         public abstract string ExecuteAddon(string IdGuidOrName, addonContext context);
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated. use cp.addon.executeAsync()", false)]
         public abstract string ExecuteAddonAsProcess(string IdGuidOrName);
-        [Obsolete("Deprecated, use AppendLog", false)] public abstract void AppendLogFile(string Text);
-        [Obsolete("Deprecated, file logging is no longer supported. Use AppendLog(message) to log Info level messages", false)] public abstract void AppendLog(string pathFilename, string logText);
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated, use AppendLog", false)]
+        public abstract void AppendLogFile(string Text);
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated, file logging is no longer supported. Use AppendLog(message) to log Info level messages", false)]
+        public abstract void AppendLog(string pathFilename, string logText);
+        //
+        //====================================================================================================
+        //
         public abstract void AppendLog(string logText);
+        //
+        //====================================================================================================
+        //
         [Obsolete("Deprecated", false)] public abstract string ConvertLinkToShortLink(string URL, string ServerHost, string ServerVirtualPath);
+        //
+        //====================================================================================================
+        //
         [Obsolete("Deprecated", false)] public abstract string ConvertShortLinkToLink(string URL, string PathPagePrefix);
+        //
+        //====================================================================================================
+        //
         [Obsolete("Deprecated. Use native methods to convert date formats.", false)] public abstract DateTime DecodeGMTDate(string GMTDate);
+        //
+        //====================================================================================================
+        //
         public abstract string DecodeResponseVariable(string Source);
+        //
+        //====================================================================================================
+        //
         public abstract string EncodeJavascript(string Source);
+        //
+        //====================================================================================================
+        //
         public abstract string EncodeQueryString(string Source);
+        //
+        //====================================================================================================
+        //
         public abstract string EncodeRequestVariable(string Source);
+        //
+        //====================================================================================================
+        //
         public abstract string GetArgument(string Name, string ArgumentString, string DefaultValue = "", string Delimiter = "");
+        //
+        //====================================================================================================
+        //
         public abstract string GetFilename(string PathFilename);
+        //
+        //====================================================================================================
+        //
         public abstract DateTime GetFirstNonZeroDate(DateTime Date0, DateTime Date1);
+        //
+        //====================================================================================================
+        //
         public abstract int GetFirstNonZeroInteger(int Integer0, int Integer1);
+        //
+        //====================================================================================================
+        //
         public abstract string GetIntegerString(int Value, int DigitCount);
+        //
+        //====================================================================================================
+        //
         public abstract string GetLine(string Body);
+        //
+        //====================================================================================================
+        //
         public abstract int GetListIndex(string Item, string ListOfItems);
+        //
+        //====================================================================================================
+        //
         public abstract int GetProcessID();
+        //
+        //====================================================================================================
+        //
         public abstract int GetRandomInteger();
+        //
+        //====================================================================================================
+        //
         public abstract bool IsInDelimitedString(string DelimitedString, string TestString, string Delimiter);
+        //
+        //====================================================================================================
+        //
         public abstract string ModifyLinkQueryString(string Link, string QueryName, string QueryValue, bool AddIfMissing = true);
+        //
+        //====================================================================================================
+        //
         public abstract string ModifyQueryString(string WorkingQuery, string QueryName, string QueryValue, bool AddIfMissing = true);
+        //
+        //====================================================================================================
+        //
         public abstract void ParseURL(string SourceURL, ref string Protocol, ref string Host, ref string Port, ref string Path, ref string Page, ref string QueryString);
+        //
+        //====================================================================================================
+        //
         public abstract void SeparateURL(string SourceURL, ref string Protocol, ref string Host, ref string Path, ref string Page, ref string QueryString);
+        //
+        //====================================================================================================
+        //
         public abstract object SplitDelimited(string WordList, string Delimiter);
+        //
+        //====================================================================================================
+        //
         public abstract void Sleep(int timeMSec);
+        //
+        //====================================================================================================
+        //
         public abstract string hashMd5(string source);
+        //
+        //====================================================================================================
+        //
         public abstract bool isGuid(string guid);
+        //
+        //====================================================================================================
+        //
         public abstract void Upgrade(bool isNewApp);
         //
         //====================================================================================================

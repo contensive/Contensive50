@@ -904,7 +904,7 @@ namespace Contensive.Processor.Controllers {
                                         },
                                         personalizationAuthenticated = personalizationIsAuthenticated,
                                         personalizationPeopleId = personalizationPeopleId,
-                                        instanceArguments = addonArgDict,
+                                        argumentKeyValuePairs = addonArgDict,
                                         errorContextMessage = "calling Addon [" + addonName + "] during content cmd execution"
                                     };
                                     if (addon == null) {
@@ -947,7 +947,7 @@ namespace Contensive.Processor.Controllers {
                                         },
                                         personalizationAuthenticated = personalizationIsAuthenticated,
                                         personalizationPeopleId = personalizationPeopleId,
-                                        instanceArguments = addonArgDict,
+                                        argumentKeyValuePairs = addonArgDict,
                                         errorContextMessage = "calling Addon [" + addonName + "] during content cmd execution"
                                     };
                                     AddonModel addon = AddonModel.createByUniqueName(core, addonName);

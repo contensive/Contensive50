@@ -1,5 +1,7 @@
 ﻿
 using System;
+using System.Collections.Generic;
+using Contensive.BaseClasses;
 
 namespace Contensive.Processor {
     //
@@ -16,13 +18,374 @@ namespace Contensive.Processor {
         #endregion
         //
         private CPClass cp;
-        //private bool UpgradeOK { get; set; }
         //
         // ====================================================================================================
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="cp"></param>
+        public CPAddonClass(CPClass cp) : base() => this.cp = cp;
         //
-        public CPAddonClass(CPClass cp) : base() {
-            this.cp = cp;
+        //====================================================================================================
+        /// <summary>
+        /// The id of the addon currently executing
+        /// </summary>
+        public override int ID => cp.core.doc.addonModelStack.Peek().id;
+        //
+        //====================================================================================================
+        /// <summary>
+        /// The guid of the addon currently executing
+        /// </summary>
+        public override string ccGuid => cp.core.doc.addonModelStack.Peek().ccguid;
+        //
+        //====================================================================================================
+        //
+        public override object Execute(string addonGuid) {
+            return cp.core.addon.execute(Models.Db.AddonModel.create(cp.core, addonGuid), new BaseClasses.CPUtilsBaseClass.addonExecuteContext());
         }
+        //
+        //====================================================================================================
+        //
+        public override object Execute(string addonGuid, Dictionary<string, string> argumentKeyValuePairs) {
+            return cp.core.addon.execute(Models.Db.AddonModel.create(cp.core, addonGuid), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
+                 argumentKeyValuePairs = argumentKeyValuePairs
+            });
+        }
+        //
+        //====================================================================================================
+        //
+        public override object Execute(string addonGuid, CPUtilsBaseClass.addonExecuteContext executeContext) {
+            return cp.core.addon.execute(Models.Db.AddonModel.create(cp.core, addonGuid), executeContext);
+        }
+        //
+        //====================================================================================================
+        //
+        public override object Execute(int addonId) {
+            return cp.core.addon.execute(Models.Db.AddonModel.create(cp.core, addonId), new BaseClasses.CPUtilsBaseClass.addonExecuteContext());
+        }
+        //
+        //====================================================================================================
+        //
+        public override object Execute(int addonId, Dictionary<string, string> argumentKeyValuePairs) {
+            return cp.core.addon.execute(Models.Db.AddonModel.create(cp.core, addonId), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
+                argumentKeyValuePairs = argumentKeyValuePairs
+            });
+        }
+        //
+        //====================================================================================================
+        //
+        public override object Execute(int addonId, CPUtilsBaseClass.addonExecuteContext executeContext) {
+            return cp.core.addon.execute(Models.Db.AddonModel.create(cp.core, addonId), executeContext);
+        }
+        //
+        //====================================================================================================
+        //
+        public override object ExecuteByUniqueName(string addonName) {
+            return cp.core.addon.execute(Models.Db.AddonModel.createByUniqueName(cp.core, addonName), new BaseClasses.CPUtilsBaseClass.addonExecuteContext());
+        }
+        //
+        //====================================================================================================
+        //
+        public override object ExecuteByUniqueName(string addonName, Dictionary<string, string> argumentKeyValuePairs) {
+            return cp.core.addon.execute(Models.Db.AddonModel.createByUniqueName(cp.core, addonName), new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
+                argumentKeyValuePairs = argumentKeyValuePairs
+            });
+        }
+        //
+        //====================================================================================================
+        //
+        public override object ExecuteByUniqueName(string addonName, CPUtilsBaseClass.addonExecuteContext executeContext) {
+            return cp.core.addon.execute(Models.Db.AddonModel.createByUniqueName(cp.core, addonName), executeContext);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// execute an addon asyncronously. The session environment will include the same user, visit, doc. Include argument keyValuePairs available to the addon through cp.doc.get
+        /// </summary>
+        /// <param name="Addonid"></param>
+        /// <param name="keyValuePairs"></param>
+        public override void ExecuteAsync(int Addonid, Dictionary<string, string> keyValuePairs) {
+            cp.core.addon.executeAsync(Models.Db.AddonModel.create(cp.core, Addonid), keyValuePairs);
+        }
+        //
+        //====================================================================================================
+        //
+        public override void ExecuteAsync(int Addonid) {
+            cp.core.addon.executeAsync(Models.Db.AddonModel.create(cp.core, Addonid), new Dictionary<string, string>());
+        }
+        //
+        //====================================================================================================
+        //
+        public override void ExecuteAsync(string guid, Dictionary<string, string> keyValuePairs) {
+            cp.core.addon.executeAsync(Models.Db.AddonModel.create(cp.core, guid), keyValuePairs);
+        }
+        //
+        //====================================================================================================
+        //
+        public override void ExecuteAsync(string guid) {
+            cp.core.addon.executeAsync(Models.Db.AddonModel.create(cp.core, guid), new Dictionary<string, string>());
+        }
+        //
+        //====================================================================================================
+        //
+        public override void ExecuteAsyncByUniqueName(string name, Dictionary<string, string> keyValuePairs) {
+            cp.core.addon.executeAsync(Models.Db.AddonModel.createByUniqueName(cp.core, name), keyValuePairs);
+        }
+        //
+        //====================================================================================================
+        //
+        public override void ExecuteAsyncByUniqueName(string name) {
+            cp.core.addon.executeAsync(Models.Db.AddonModel.createByUniqueName(cp.core, name), new Dictionary<string, string>());
+        }
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override bool Admin => cp.core.doc.addonModelStack.Peek().admin;
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override string ArgumentList => cp.core.doc.addonModelStack.Peek().argumentList;
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override bool AsAjax => cp.core.doc.addonModelStack.Peek().admin;
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override string BlockDefaultStyles => "";
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override int CollectionID => cp.core.doc.addonModelStack.Peek().collectionID;
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override bool Content => cp.core.doc.addonModelStack.Peek().content;
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override string Copy => cp.core.doc.addonModelStack.Peek().copy;
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override string CopyText => cp.core.doc.addonModelStack.Peek().copyText;
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override string CustomStyles => "";
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override string DefaultStyles => cp.core.doc.addonModelStack.Peek().stylesFilename.content;
+        //
+        //====================================================================================================
+        // 
+        [Obsolete("Deprecated", true)]
+        public override string Description => "";
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override string DotNetClass => cp.core.doc.addonModelStack.Peek().dotNetClass;
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override string FormXML => cp.core.doc.addonModelStack.Peek().formXML;
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override string Help => cp.core.doc.addonModelStack.Peek().help;
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override string HelpLink => cp.core.doc.addonModelStack.Peek().helpLink;
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override string IconFilename => cp.core.doc.addonModelStack.Peek().iconFilename;
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override int IconHeight => cp.core.doc.addonModelStack.Peek().iconHeight;
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override int IconSprites => cp.core.doc.addonModelStack.Peek().iconSprites;
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override int IconWidth => cp.core.doc.addonModelStack.Peek().iconWidth;
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override bool InFrame => cp.core.doc.addonModelStack.Peek().inFrame;
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override bool IsInline => cp.core.doc.addonModelStack.Peek().isInline;
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override string JavaScriptBodyEnd => "";
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override string JavascriptInHead => "";
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override string JavaScriptOnLoad => "";
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override string Link => cp.core.doc.addonModelStack.Peek().link;
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override string MetaDescription => cp.core.doc.addonModelStack.Peek().metaDescription;
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override string MetaKeywordList => cp.core.doc.addonModelStack.Peek().metaKeywordList;
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override string Name => cp.core.doc.addonModelStack.Peek().name;
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override string NavIconType => "";
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override string ObjectProgramID => cp.core.doc.addonModelStack.Peek().objectProgramID;
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override bool OnBodyEnd => cp.core.doc.addonModelStack.Peek().onBodyEnd;
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override bool OnBodyStart => cp.core.doc.addonModelStack.Peek().onBodyStart;
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override bool OnContentEnd => cp.core.doc.addonModelStack.Peek().onPageEndEvent;
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override bool OnContentStart => cp.core.doc.addonModelStack.Peek().onPageStartEvent;
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override bool Open(int AddonId) => false;
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override bool Open(string AddonNameOrGuid) => false;
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override string OtherHeadTags => cp.core.doc.addonModelStack.Peek().otherHeadTags;
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override string PageTitle => cp.core.doc.addonModelStack.Peek().pageTitle;
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override string ProcessInterval => cp.core.doc.addonModelStack.Peek().processInterval.ToString();
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override DateTime ProcessNextRun => cp.core.doc.addonModelStack.Peek().processNextRun;
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override bool ProcessRunOnce => cp.core.doc.addonModelStack.Peek().processRunOnce;
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override string RemoteAssetLink => cp.core.doc.addonModelStack.Peek().remoteAssetLink;
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override bool RemoteMethod => cp.core.doc.addonModelStack.Peek().remoteMethod;
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override string RobotsTxt => cp.core.doc.addonModelStack.Peek().robotsTxt;
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override string ScriptCode => cp.core.doc.addonModelStack.Peek().scriptingCode;
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override string ScriptEntryPoint => cp.core.doc.addonModelStack.Peek().scriptingEntryPoint;
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override string ScriptLanguage => "";
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override string SharedStyles => "";
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", true)]
+        public override bool Template => cp.core.doc.addonModelStack.Peek().template;
+        //
+        #region  IDisposable Support 
+        // Do not change or add Overridable to these methods.
+        // Put cleanup code in Dispose(ByVal disposing As Boolean).
         //
         // ====================================================================================================
         /// <summary>
@@ -42,455 +405,15 @@ namespace Contensive.Processor {
             }
             this.disposed = true;
         }
+        //
         protected bool disposed = false;
-        //
-        //====================================================================================================
-        //
-        public override bool Admin {
-            get {
-                return cp.core.doc.addonModelStack.Peek().admin;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override string ArgumentList {
-            get {
-                return cp.core.doc.addonModelStack.Peek().argumentList;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override bool AsAjax {
-            get {
-                return cp.core.doc.addonModelStack.Peek().admin;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        [Obsolete("This is no longer supported. Add a overriding style in another stylesheet instead of modifying", true)]
-        public override string BlockDefaultStyles {
-            get {
-                return "";
-
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override string ccGuid {
-            get {
-                return cp.core.doc.addonModelStack.Peek().ccguid;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override int CollectionID {
-            get {
-                return cp.core.doc.addonModelStack.Peek().collectionID;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override bool Content {
-            get {
-                return cp.core.doc.addonModelStack.Peek().content;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override string Copy {
-            get {
-                return cp.core.doc.addonModelStack.Peek().copy;
-
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override string CopyText {
-            get {
-                return cp.core.doc.addonModelStack.Peek().copyText;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        [Obsolete("This is no longer supported.", true)]
-        public override string CustomStyles {
-            get {
-                return "";
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        [Obsolete("This is no longer supported.", true)]
-        public override string DefaultStyles {
-            get {
-                return cp.core.doc.addonModelStack.Peek().stylesFilename.content;
-            }
-        }
-        //
-        //====================================================================================================
-        // 
-        [Obsolete("This is no longer supported.", true)]
-        public override string Description {
-            get {
-                return "";
-            }
-        }
-        //
-        //====================================================================================================
-        // todo finish the methods -- read from doc addonmodelstack peak
-        public override string DotNetClass {
-            get {
-                return cp.core.doc.addonModelStack.Peek().dotNetClass;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override string FormXML {
-            get {
-                return cp.core.doc.addonModelStack.Peek().formXML;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override string Help {
-            get {
-                return cp.core.doc.addonModelStack.Peek().help;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override string HelpLink {
-            get {
-                return cp.core.doc.addonModelStack.Peek().helpLink;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override string IconFilename {
-            get {
-                return cp.core.doc.addonModelStack.Peek().iconFilename;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override int IconHeight {
-            get {
-                return cp.core.doc.addonModelStack.Peek().iconHeight;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override int IconSprites {
-            get {
-                return cp.core.doc.addonModelStack.Peek().iconSprites;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override int IconWidth {
-            get {
-                return cp.core.doc.addonModelStack.Peek().iconWidth;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override int ID {
-            get {
-                return cp.core.doc.addonModelStack.Peek().id;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override bool InFrame {
-            get {
-                return cp.core.doc.addonModelStack.Peek().inFrame;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override bool IsInline {
-            get {
-                return cp.core.doc.addonModelStack.Peek().isInline;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        [Obsolete("This is no longer supported.", true)]
-        public override string JavaScriptBodyEnd {
-            get {
-                return "";
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        [Obsolete("This is no longer supported.", true)]
-        public override string JavascriptInHead {
-            get {
-                return "";
-
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        [Obsolete("Create onready or onload events within your javascript. This method will be deprecated.", false)]
-        public override string JavaScriptOnLoad {
-            get {
-                return "";
-
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override string Link {
-            get {
-                return cp.core.doc.addonModelStack.Peek().link;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override string MetaDescription {
-            get {
-                return cp.core.doc.addonModelStack.Peek().metaDescription;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override string MetaKeywordList {
-            get {
-                return cp.core.doc.addonModelStack.Peek().metaKeywordList;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override string Name {
-            get {
-                return cp.core.doc.addonModelStack.Peek().name;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override string NavIconType {
-            get {
-                string result = "";
-                switch(cp.core.doc.addonModelStack.Peek().navTypeID) {
-                    case 2:
-                        result = "Report";
-                        break;
-                    case 3:
-                        result = "Setting";
-                        break;
-                    case 4:
-                        result = "Tool";
-                        break;
-                    default:
-                        result = "Add-on";
-                        break;
-                }
-                return result ;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override string ObjectProgramID {
-            get {
-                return cp.core.doc.addonModelStack.Peek().objectProgramID;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override bool OnBodyEnd {
-            get {
-                return cp.core.doc.addonModelStack.Peek().onBodyEnd;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override bool OnBodyStart {
-            get {
-                return cp.core.doc.addonModelStack.Peek().onBodyStart;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override bool OnContentEnd {
-            get {
-                return cp.core.doc.addonModelStack.Peek().onPageEndEvent;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override bool OnContentStart {
-            get {
-                return cp.core.doc.addonModelStack.Peek().onPageStartEvent;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        [Obsolete("Deprecated", true)]
-        public override bool Open(int AddonId) {
-            return false;
-        }
-        //
-        //====================================================================================================
-        //
-        [Obsolete("Deprecated", true)]
-        public override bool Open(string AddonNameOrGuid) {
-            return false;
-        }
-        //
-        //====================================================================================================
-        //
-        public override string OtherHeadTags {
-            get {
-                return cp.core.doc.addonModelStack.Peek().otherHeadTags;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override string PageTitle {
-            get {
-                return cp.core.doc.addonModelStack.Peek().pageTitle;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override string ProcessInterval {
-            get {
-                return cp.core.doc.addonModelStack.Peek().processInterval.ToString();
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override DateTime ProcessNextRun {
-            get {
-                return cp.core.doc.addonModelStack.Peek().processNextRun;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override bool ProcessRunOnce {
-            get {
-                return cp.core.doc.addonModelStack.Peek().processRunOnce;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override string RemoteAssetLink {
-            get {
-                return cp.core.doc.addonModelStack.Peek().remoteAssetLink;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override bool RemoteMethod {
-            get {
-                return cp.core.doc.addonModelStack.Peek().remoteMethod;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override string RobotsTxt {
-            get {
-                return cp.core.doc.addonModelStack.Peek().robotsTxt;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override string ScriptCode {
-            get {
-                return cp.core.doc.addonModelStack.Peek().scriptingCode;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override string ScriptEntryPoint {
-            get {
-                return cp.core.doc.addonModelStack.Peek().scriptingEntryPoint;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override string ScriptLanguage {
-            get {
-                if (cp.core.doc.addonModelStack.Peek().scriptingLanguageID.Equals(2)) {
-                    return "javascript";
-                } else {
-                    return "vbscript";
-                }
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        [Obsolete("Deprecated", true)]
-        public override string SharedStyles {
-            get {
-                return "";
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override bool Template {
-            get {
-                return cp.core.doc.addonModelStack.Peek().template;
-            }
-        }
-        #region  IDisposable Support 
-        // Do not change or add Overridable to these methods.
-        // Put cleanup code in Dispose(ByVal disposing As Boolean).
         public void Dispose() {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+        //
         ~CPAddonClass() {
             Dispose(false);
-            
-            
         }
         #endregion
     }

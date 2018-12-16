@@ -1293,7 +1293,7 @@ namespace Contensive.Processor.Controllers {
                                                                                         //
                                                                                         // create or update the record
                                                                                         //
-                                                                                        Models.Domain.CDefModel CDef = Models.Domain.CDefModel.create(core, ContentName);
+                                                                                        Models.Domain.CDefDomainModel CDef = Models.Domain.CDefDomainModel.create(core, ContentName);
                                                                                         int cs = -1;
                                                                                         if (!string.IsNullOrEmpty(ContentRecordGuid)) {
                                                                                             cs = core.db.csOpen(ContentName, "ccguid=" + DbController.encodeSQLText(ContentRecordGuid));
@@ -1605,7 +1605,7 @@ namespace Contensive.Processor.Controllers {
                                                                             string ContentRecordGuid =XmlController.GetXMLAttribute(core, IsFound, ContentNode, "guid", "");
                                                                             string ContentRecordName =XmlController.GetXMLAttribute(core, IsFound, ContentNode, "name", "");
                                                                             if ((!string.IsNullOrEmpty(ContentRecordGuid)) || (!string.IsNullOrEmpty(ContentRecordName))) {
-                                                                                Models.Domain.CDefModel CDef = Models.Domain.CDefModel.create(core, ContentName);
+                                                                                Models.Domain.CDefDomainModel CDef = Models.Domain.CDefDomainModel.create(core, ContentName);
                                                                                 int cs = -1;
                                                                                 if (!string.IsNullOrEmpty(ContentRecordGuid)) {
                                                                                     cs = core.db.csOpen(ContentName, "ccguid=" + DbController.encodeSQLText(ContentRecordGuid));

@@ -181,6 +181,7 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         //
+        [Obsolete("Deprecated, use cp.addon.Execute",true)]
         public override string ExecuteAddon(string IdGuidOrName, int WrapperId) => ExecuteAddon(
             IdGuidOrName,
             new addonExecuteContext() {
@@ -192,6 +193,7 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         //
+        [Obsolete("Deprecated, use cp.addon.Execute", true)]
         public override string ExecuteAddon(string IdGuidOrName) => ExecuteAddon(
             IdGuidOrName,
             new addonExecuteContext() {
@@ -202,6 +204,7 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         //
+        [Obsolete("Deprecated, use cp.addon.Execute", true)]
         public override string ExecuteAddon(string IdGuidOrName, addonContext context) => ExecuteAddon(
             IdGuidOrName,
             new addonExecuteContext() {
@@ -212,10 +215,30 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         //
-        public override string ExecuteAddonAsProcess(string IdGuidOrName) {
-            return CP.core.addon.executeAsync(IdGuidOrName, CP.core.docProperties.getLegacyOptionStringFromVar());
+        [Obsolete("Deprecated, use cp.addon.Execute", true)]
+        public override string ExecuteAddonAsProcess(string AddonIDGuidOrName) {
+            try {
+                Models.Db.AddonModel addon = null;
+                if (EncodeInteger(AddonIDGuidOrName) > 0) {
+                    addon = CP.core.addonCache.getAddonById(EncodeInteger(AddonIDGuidOrName));
+                } else if (GenericController.isGuid(AddonIDGuidOrName)) {
+                    addon = CP.core.addonCache.getAddonByGuid(AddonIDGuidOrName);
+                } else {
+                    addon = CP.core.addonCache.getAddonByName(AddonIDGuidOrName);
+                }
+                if (addon != null) {
+                    CP.core.addon.executeAsync(addon);
+                }
+            } catch (Exception ex) {
+                LogController.handleError(CP.core, ex);
+            }
+            return string.Empty;
         }
-        [Obsolete("Deprecated, use AppendLog")] public override void AppendLogFile(string Text) {
+        //
+        // ====================================================================================================
+        //
+        [Obsolete("Deprecated, use AppendLog")]
+        public override void AppendLogFile(string Text) {
             LogController.logInfo(CP.core, Text);
         }
         //

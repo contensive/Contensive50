@@ -46,7 +46,7 @@ namespace Contensive.Addons.AdminSite {
             IndexConfigClass returnIndexConfig = new IndexConfigClass();
             try {
                 // refactor this out
-                CDefModel content = adminData.adminContent;
+                CDefDomainModel content = adminData.adminContent;
                 //
                 // Setup defaults
                 returnIndexConfig.ContentID = adminData.adminContent.id;

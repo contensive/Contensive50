@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Contensive.BaseClasses {
     /// <summary>
-    /// CP.CS - The primary interface to the database. This object is similar to a recordset. It includes features of the content meta data. When a record is inserted, the default values of the record are available to read.
+    /// CP.CS - The secondary interface to execute queries on a sql database. Use dbModels when possible (does not use cdef metadata). To run queries, use executeQuery, executeNonQuery and executeNonQueryAsync.
     /// </summary>
     /// <remarks></remarks>
     public abstract class CPCSBaseClass {

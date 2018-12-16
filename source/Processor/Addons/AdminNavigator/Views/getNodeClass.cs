@@ -273,11 +273,9 @@ namespace Contensive.Addons.AdminNavigator {
                                     //Criteria = Criteria & "and((template<>0)or(page<>0)or(admin<>0))"
                                 }
                                 CPCSBaseClass cs4 = cp.CSNew();
-                                string NameSuffix = null;
                                 if (cs4.Open("add-ons", Criteria, "name", true, FieldList)) {
                                     do {
                                         Name = Convert.ToString(cs4.GetText("name")).Trim(' ');
-                                        NameSuffix = "";
                                         linkSuffixList = new List<string>();
                                         if (env.isDeveloper) {
                                             linkSuffixList.Add("<a href=\"" + env.addonEditAddonUrlPrefix + cs4.GetInteger("id") + "\">edit</a>");
@@ -395,7 +393,6 @@ namespace Contensive.Addons.AdminNavigator {
                                             }
                                             NavIconTitleHtmlEncoded = cp.Utils.EncodeHTML(Name);
                                             ContentControlID = cs7.GetInteger("ContentControlID");
-                                            NameSuffix = "";
                                             nodeHtml += GetNode(cp, env, 0, ContentControlID, 0, 0, ContentID, "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, "", common.NavIconTypeContent, NavIconTitleHtmlEncoded, AutoManageAddons, common.NodeTypeEnum.NodeTypeContent, false, true, OpenNodeList, NodeIDString, ref NodeNavigatorJS, linkSuffixList);
                                             Return_NavigatorJS = Return_NavigatorJS + NodeNavigatorJS;
                                         }
@@ -685,14 +682,11 @@ namespace Contensive.Addons.AdminNavigator {
                             //
                             // numeric node (default case) - list navigator records with parent=TopParentNode
                             //
-                            int CS = -1;
                             if (TopParentNode.IsNumeric()) {
                                 if (EmptyNodeList.Contains(TopParentNode)) {
-                                    EmptyNodeList = EmptyNodeList;
                                 } else {
                                     //
                                     // Navigator Entries, child under TopParentNode
-                                    //
                                     SQL = GetMenuSQL(cp, "parentid=" + TopParentNode, "");
                                     BlockSubNodes = false;
                                     if (!csChildList.OpenSQL(SQL)) {
@@ -736,7 +730,6 @@ namespace Contensive.Addons.AdminNavigator {
                             //    ContentID = csx.getInteger("ContentID")
                             //End If
                             if (ContentID != 0) {
-                                ContentID = ContentID;
                                 string ContentName = cp.Content.GetRecordName("content", ContentID);
                                 if (!string.IsNullOrEmpty(ContentName)) {
                                     //ContentTableName =cp.Content.GetTable(ContentName)
@@ -1405,30 +1398,15 @@ namespace Contensive.Addons.AdminNavigator {
         //====================================================================================================
         //
         private string GetMenuSQL(CPBaseClass cp, string ParentCriteria, string MenuContentName) {
-            string tempGetMenuSQL = null;
             try {
-                //
-                string CMCriteria = null;
-                //Dim ParentCriteria As String
-                string Criteria = null;
-                string SQL = null;
-                string ContentControlCriteria = null;
-                string SelectList = null;
-                string ContentManagementList = null;
-                //
-                Criteria = "(Active<>0)";
-                if (!string.IsNullOrEmpty(MenuContentName)) {
-                    Criteria = Criteria + "AND" + cp.Content.GetContentControlCriteria(MenuContentName);
-                }
-                //ParentCriteria = KmaEncodeMissingText(ParentCriteria, "")
+                string Criteria = "(Active<>0)";
+                if (!string.IsNullOrEmpty(MenuContentName)) { Criteria = Criteria + "AND" + cp.Content.GetContentControlCriteria(MenuContentName); }
                 if (cp.User.IsDeveloper) {
                     //
                     // ----- Developer
-                    //
                 } else if (cp.User.IsAdmin) {
                     //
                     // ----- Administrator
-                    //
                     Criteria = Criteria + "AND((DeveloperOnly is null)or(DeveloperOnly=0))"
                         + "AND(ID in ("
                         + " SELECT AllowedEntries.ID"
@@ -1439,19 +1417,17 @@ namespace Contensive.Addons.AdminNavigator {
                 } else {
                     //
                     // ----- Content Manager
-                    //
-                    ContentManagementList = GetContentManagementList(cp);
+                    string ContentManagementList = GetContentManagementList(cp);
+                    string CMCriteria = null;
                     if (string.IsNullOrEmpty(ContentManagementList)) {
                         CMCriteria = "(1=0)";
                     } else {
-                        //ContentManagementList = Mid(ContentManagementList, 2, Len(ContentManagementList) - 2)
                         if (ContentManagementList.IndexOf(",") + 1 == 0) {
                             CMCriteria = "(ccContent.ID=" + ContentManagementList + ")";
                         } else {
                             CMCriteria = "(ccContent.ID in (" + ContentManagementList + "))";
                         }
                     }
-
                     Criteria = Criteria + "AND((DeveloperOnly is null)or(DeveloperOnly=0))"
                         + "AND((AdminOnly is null)or(AdminOnly=0))"
                         + "AND(ID in ("
@@ -1461,23 +1437,15 @@ namespace Contensive.Addons.AdminNavigator {
                             + "OR(ccContent.ID Is Null)"
                         + "))";
                 }
-                if (!string.IsNullOrEmpty(ParentCriteria)) {
-                    Criteria = "(" + ParentCriteria + ")AND" + Criteria;
-                }
-                SelectList = "ccMenuEntries.contentcontrolid, ccMenuEntries.Name, ccMenuEntries.ID, ccMenuEntries.LinkPage, ccMenuEntries.ContentID, ccMenuEntries.NewWindow, ccMenuEntries.ParentID, ccMenuEntries.AddonID, ccMenuEntries.NavIconType, ccMenuEntries.NavIconTitle, HelpAddonID,HelpCollectionID,0 as collectionid";
-                tempGetMenuSQL = "select " + SelectList + " from ccMenuEntries where " + Criteria + " order by ccMenuEntries.Name";
-                cp.Site.TestPoint("adminNavigator, getmenuSql=" + tempGetMenuSQL);
-                return tempGetMenuSQL;
-                //
-                // ----- Error Trap
-                //
+                if (!string.IsNullOrEmpty(ParentCriteria)) { Criteria = "(" + ParentCriteria + ")AND" + Criteria; }
+                string SelectList = "ccMenuEntries.contentcontrolid, ccMenuEntries.Name, ccMenuEntries.ID, ccMenuEntries.LinkPage, ccMenuEntries.ContentID, ccMenuEntries.NewWindow, ccMenuEntries.ParentID, ccMenuEntries.AddonID, ccMenuEntries.NavIconType, ccMenuEntries.NavIconTitle, HelpAddonID,HelpCollectionID,0 as collectionid";
+                return "select " + SelectList + " from ccMenuEntries where " + Criteria + " order by ccMenuEntries.Name";
             } catch {
-                goto ErrorTrap;
+                cp.Site.ErrorReport("Trap");
             }
-            ErrorTrap:
-            cp.Site.ErrorReport("Trap");
             //
-            return tempGetMenuSQL;
+            // -- should be unreachable
+            return "";
         }
         //
         //====================================================================================================
@@ -1539,8 +1507,7 @@ namespace Contensive.Addons.AdminNavigator {
             try {
                 string errMsg = className + "." + methodName + ", cause=[" + cause + "], ex=[" + ex.ToString() + "]";
                 cp.Site.ErrorReport(ex, errMsg);
-            } catch (Exception exIgnore) {
-                //
+            } catch (Exception) {
             }
         }
         //

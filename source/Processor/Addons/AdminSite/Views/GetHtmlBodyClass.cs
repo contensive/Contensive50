@@ -348,7 +348,7 @@ namespace Contensive.Addons.AdminSite {
                             adminBody = cp.core.addon.execute(addon, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                 addonType = Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
                                 instanceGuid = adminSiteInstanceId,
-                                instanceArguments = GenericController.convertQSNVAArgumentstoDocPropertiesList(cp.core, InstanceOptionString),
+                                argumentKeyValuePairs = GenericController.convertQSNVAArgumentstoDocPropertiesList(cp.core, InstanceOptionString),
                                 wrapperID = DefaultWrapperID,
                                 errorContextMessage = executeContextErrorCaption
                             });
@@ -1631,7 +1631,7 @@ namespace Contensive.Addons.AdminSite {
                         if (recordChanged && SaveCCIDValue != 0) {
                             CdefController.setContentControlId(cp.core, (editRecord.contentControlId.Equals(0)) ? adminData.adminContent.id : editRecord.contentControlId, editRecord.id, SaveCCIDValue);
                             editRecord.contentControlId_Name = CdefController.getContentNameByID(cp.core, SaveCCIDValue);
-                            adminData.adminContent = CDefModel.create(cp.core, editRecord.contentControlId_Name);
+                            adminData.adminContent = CDefDomainModel.create(cp.core, editRecord.contentControlId_Name);
                             adminData.adminContent.id = adminData.adminContent.id;
                             adminData.adminContent.name = adminData.adminContent.name;
                         }
@@ -1855,12 +1855,12 @@ namespace Contensive.Addons.AdminSite {
                                 case ButtonCancel:
                                     adminData.Admin_Action = Constants.AdminActionNop;
                                     adminData.AdminForm = AdminFormRoot;
-                                    adminData.adminContent = new CDefModel();
+                                    adminData.adminContent = new CDefDomainModel();
                                     break;
                                 case ButtonClose:
                                     adminData.Admin_Action = Constants.AdminActionNop;
                                     adminData.AdminForm = AdminFormRoot;
-                                    adminData.adminContent = new CDefModel();
+                                    adminData.adminContent = new CDefDomainModel();
                                     break;
                                 case ButtonAdd:
                                     adminData.Admin_Action = Constants.AdminActionNop;

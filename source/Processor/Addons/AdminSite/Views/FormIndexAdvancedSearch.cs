@@ -24,7 +24,7 @@ namespace Contensive.Addons.AdminSite {
                 FindWordMatchEnum MatchOption = 0;
                 int FormFieldPtr = 0;
                 int FormFieldCnt = 0;
-                CDefModel CDef = null;
+                CDefDomainModel CDef = null;
                 string FieldName = null;
                 StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 int FieldPtr = 0;
@@ -129,7 +129,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // ----- List out all fields
                 //
-                CDef = CDefModel.create(core, adminData.adminContent.name);
+                CDef = CDefDomainModel.create(core, adminData.adminContent.name);
                 FieldSize = 100;
                 Array.Resize(ref FieldNames, FieldSize + 1);
                 Array.Resize(ref FieldCaption, FieldSize + 1);

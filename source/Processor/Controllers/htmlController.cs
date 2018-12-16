@@ -119,7 +119,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 const string MenuNameFPO = "<MenuName>";
                 const string NoneCaptionFPO = "<NoneCaption>";
-                Models.Domain.CDefModel CDef = null;
+                Models.Domain.CDefDomainModel CDef = null;
                 string ContentControlCriteria = null;
                 string LcaseCriteria = null;
                 int CSPointer = 0;
@@ -178,7 +178,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // This was commented out -- I really do not know why -- seems like the best way
                     //
-                    CDef = Models.Domain.CDefModel.create(core, ContentName);
+                    CDef = Models.Domain.CDefDomainModel.create(core, ContentName);
                     TableName = CDef.tableName;
                     DataSource = CDef.dataSourceName;
                     ContentControlCriteria = CDef.legacyContentControlCriteria;
@@ -480,7 +480,7 @@ namespace Contensive.Processor.Controllers {
                         // ----- Generate Drop Down Field Names
                         //
                         string DropDownFieldList = "name";
-                        var peopleCdef = Models.Domain.CDefModel.create(core, "people");
+                        var peopleCdef = Models.Domain.CDefDomainModel.create(core, "people");
                         if ( peopleCdef != null ) DropDownFieldList = peopleCdef.dropDownFieldList;
                         int DropDownFieldCount = 0;
                         string CharAllowed = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -1123,14 +1123,14 @@ namespace Contensive.Processor.Controllers {
                 int FieldLookupContentID = 0;
                 int FieldMemberSelectGroupID = 0;
                 string FieldLookupContentName = null;
-                Models.Domain.CDefModel Contentdefinition = null;
+                Models.Domain.CDefDomainModel Contentdefinition = null;
                 bool FieldHTMLContent = false;
                 int CSLookup = 0;
                 string FieldLookupList = "";
                 //
                 if (true) {
                     fieldFound = false;
-                    Contentdefinition = Models.Domain.CDefModel.create(core, ContentName);
+                    Contentdefinition = Models.Domain.CDefDomainModel.create(core, ContentName);
                     foreach (KeyValuePair<string, Models.Domain.CDefFieldModel> keyValuePair in Contentdefinition.fields) {
                         Models.Domain.CDefFieldModel field = keyValuePair.Value;
                         if (GenericController.vbUCase(field.nameLc) == GenericController.vbUCase(FieldName)) {
@@ -1436,7 +1436,7 @@ namespace Contensive.Processor.Controllers {
                         // Personalization Tag
                         //
                         string selectOptions = "";
-                        var peopleCdef = Models.Domain.CDefModel.create(core, "people");
+                        var peopleCdef = Models.Domain.CDefDomainModel.create(core, "people");
                         if (peopleCdef != null) selectOptions = string.Join("|", peopleCdef.selectList);
                         IconIDControlString = "AC,PERSONALIZATION,0,Personalization,field=[" + selectOptions + "]";
                         IconImg = AddonController.getAddonIconImg("/" + core.appConfig.adminRoute, 0, 0, 0, true, IconIDControlString, "", core.appConfig.cdnFileUrl, "Any Personalization Field", "Renders as any Personalization Field", "", 0);
@@ -1873,7 +1873,7 @@ namespace Contensive.Processor.Controllers {
                     };
                     returnHtml = core.addon.execute(AddonModel.create(core, FieldTypeDefaultEditorAddonId), new CPUtilsBaseClass.addonExecuteContext() {
                         addonType = CPUtilsBaseClass.addonContext.ContextEditor,
-                        instanceArguments = arguments,
+                        argumentKeyValuePairs = arguments,
                         errorContextMessage = "calling editor addon for text field type, addon [" + FieldTypeDefaultEditorAddonId  + "]"
                     });
                 }
@@ -2360,7 +2360,7 @@ namespace Contensive.Processor.Controllers {
             string returnHtml = "";
             try {
                 bool CanSeeHiddenFields = false;
-                Models.Domain.CDefModel SecondaryCDef = null;
+                Models.Domain.CDefDomainModel SecondaryCDef = null;
                 List<int> ContentIDList = new List<int>();
                 bool Found = false;
                 int RecordID = 0;
@@ -2390,7 +2390,7 @@ namespace Contensive.Processor.Controllers {
                     // ----- Gather all the SecondaryContent that associates to the PrimaryContent
                     //
                     int PrimaryContentID = CdefController.getContentId(core, PrimaryContentName);
-                    SecondaryCDef = Models.Domain.CDefModel.create(core, SecondaryContentName);
+                    SecondaryCDef = Models.Domain.CDefDomainModel.create(core, SecondaryContentName);
                     string SecondaryTablename = SecondaryCDef.tableName;
                     int SecondaryContentID = SecondaryCDef.id;
                     ContentIDList.Add(SecondaryContentID);
@@ -3428,7 +3428,7 @@ namespace Contensive.Processor.Controllers {
             };
             return core.addon.execute(AddonModel.create(core, addonGuidResourceLibrary), new CPUtilsBaseClass.addonExecuteContext() {
                 addonType = CPUtilsBaseClass.addonContext.ContextAdmin,
-                instanceArguments = arguments,
+                argumentKeyValuePairs = arguments,
                 errorContextMessage = "calling resource library addon [" + addonGuidResourceLibrary + "] from internal method"
             });
        }

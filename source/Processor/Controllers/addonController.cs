@@ -213,7 +213,7 @@ namespace Contensive.Processor.Controllers {
                             // -- add instance properties to doc properties
                             string ContainerCssID = "";
                             string ContainerCssClass = "";
-                            foreach (var kvp in executeContext.instanceArguments) {
+                            foreach (var kvp in executeContext.argumentKeyValuePairs) {
                                 switch (kvp.Key.ToLowerInvariant()) {
                                     case "wrapper":
                                         executeContext.wrapperID = GenericController.encodeInteger(kvp.Value);
@@ -519,7 +519,7 @@ namespace Contensive.Processor.Controllers {
                                     foreach (var key in core.docProperties.getKeyList()) {
                                         callBackLink = modifyLinkQuery(callBackLink, encodeRequestVariable(key), encodeRequestVariable(core.docProperties.getText(key)), true);
                                     }
-                                    foreach (var kvp in executeContext.instanceArguments) {
+                                    foreach (var kvp in executeContext.argumentKeyValuePairs) {
                                         callBackLink = modifyLinkQuery(callBackLink, encodeRequestVariable(kvp.Key), encodeRequestVariable(core.docProperties.getText(kvp.Value)), true);
                                     }
                                     result += "<SCRIPT LANGUAGE=\"JAVASCRIPT\" SRC=\"" + callBackLink + "\"></SCRIPT>";
@@ -692,6 +692,7 @@ namespace Contensive.Processor.Controllers {
         private string execute_formContent(object nothingObject, string FormXML, ref bool return_ExitAddonBlankWithResponse, string contextErrorMessage) {
             string result = "";
             try {
+                // todo - move locals
                 string fieldfilename = null;
                 string FieldDataSource = null;
                 string FieldSQL = null;
@@ -716,10 +717,6 @@ namespace Contensive.Processor.Controllers {
                 string Name = "";
                 string Description = "";
                 XmlDocument Doc = new XmlDocument();
-                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
-                //				XmlNode TabNode = null;
-                //todo  NOTE: Commented this declaration since looping variables in 'foreach' loops are declared in the 'foreach' header in C#:
-                //				XmlNode SettingNode = null;
                 int CS = 0;
                 string FieldName = null;
                 string FieldCaption = null;
@@ -1000,7 +997,7 @@ namespace Contensive.Processor.Controllers {
                                                                 AddonModel addon = AddonModel.createByUniqueName(core, FieldAddon);
                                                                 Copy = core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() {
                                                                     addonType = CPUtilsBaseClass.addonContext.ContextAdmin,
-                                                                    instanceArguments = arguments,
+                                                                    argumentKeyValuePairs = arguments,
                                                                     errorContextMessage = "executing field addon [" + FieldAddon + "] for " + contextErrorMessage
                                                                 });
                                                                 //Copy = execute_legacy5(0, FieldAddon, OptionString, CPUtilsBaseClass.addonContext.ContextAdmin, "", 0, "", 0)
@@ -1416,11 +1413,10 @@ namespace Contensive.Processor.Controllers {
         private string execute_Script_VBScript(ref AddonModel addon) {
             string returnText = "";
             try {
-                //var engine = new Microsoft.ClearScript.Windows.JScriptEngine();
+                // todo - move locals
                 var engine = new Microsoft.ClearScript.Windows.VBScriptEngine();
                 string[] Args = { };
                 string WorkingCode = addon.scriptingCode;
-                //
                 string entryPoint = addon.scriptingEntryPoint;
                 if (string.IsNullOrEmpty(entryPoint)) {
                     //
@@ -1493,8 +1489,8 @@ namespace Contensive.Processor.Controllers {
         private string execute_Script_JScript(ref AddonModel addon) {
             string returnText = "";
             try {
+                // todo - move locals
                 var engine = new Microsoft.ClearScript.Windows.JScriptEngine();
-                //var engine = new Microsoft.ClearScript.Windows.VBScriptEngine();
                 string[] Args = { };
                 string WorkingCode = addon.scriptingCode;
                 //
@@ -1571,6 +1567,7 @@ namespace Contensive.Processor.Controllers {
             string result = "";
             try {
                 LogController.logTrace(core, "execute_assembly dotNetClass [" + addon.dotNetClass + "], enter");
+                // todo - move locals
                 bool AddonFound = false;
                 string warningMessage = "The addon [" + addon.name + "] dotnet code could not be executed because no assembly was found with namespace [" + addon.dotNetClass + "].";
                 //
@@ -1793,8 +1790,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================================
         //
-        public string executeAsync(AddonModel addon, Dictionary<string, string> arguments) {
-            string result = "";
+        public void executeAsync(AddonModel addon, Dictionary<string, string> arguments) {
             try {
                 if (addon == null) {
                     //
@@ -1817,34 +1813,25 @@ namespace Contensive.Processor.Controllers {
             } catch (Exception ex) {
                 LogController.handleError(core, ex, "executeAsync");
             }
-            return result;
         }
-        // todo Convert signature to match execute() methods (model + context)
+        //
         //====================================================================================================================
         /// <summary>
-        /// add an addon to the task queue for execution in a different process
+        /// execute an addon with the default context
         /// </summary>
-        /// <param name="AddonIDGuidOrName"></param>
-        /// <param name="OptionString"></param>
-        /// <returns></returns>
-        public string executeAsync(string AddonIDGuidOrName, string OptionString = "") {
-            string result = "";
-            try {
-                AddonModel addon = null;
-                if (encodeInteger(AddonIDGuidOrName) > 0) {
-                    addon = core.addonCache.getAddonById(encodeInteger(AddonIDGuidOrName));
-                } else if (GenericController.isGuid(AddonIDGuidOrName)) {
-                    addon = core.addonCache.getAddonByGuid(AddonIDGuidOrName);
-                } else {
-                    addon = core.addonCache.getAddonByName(AddonIDGuidOrName);
-                }
-                if (addon != null) {
-                    executeAsync(addon, GenericController.convertQSNVAArgumentstoDocPropertiesList(core, OptionString));
-                }
-            } catch (Exception ex) {
-                LogController.handleError(core, ex);
-            }
-            return result;
+        /// <param name="addon"></param>
+        public void executeAsync(AddonModel addon) => executeAsync(addon, new Dictionary<string, string>());
+        //
+        //====================================================================================================================
+        //
+        public void executeAsync(string addonGuid, string OptionString = "") {
+            executeAsync(core.addonCache.getAddonByGuid(addonGuid), convertQSNVAArgumentstoDocPropertiesList(core, OptionString));
+        }
+        //
+        //====================================================================================================================
+        //
+        public void executeAsyncByName(string addonName, string OptionString = "") {
+            executeAsync(core.addonCache.getAddonByName(addonName), convertQSNVAArgumentstoDocPropertiesList(core, OptionString));
         }
         //
         //===============================================================================================================================================

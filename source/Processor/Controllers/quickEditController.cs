@@ -41,7 +41,7 @@ namespace Contensive.Processor.Controllers {
                 core.html.addStyleLink("/quickEditor/styles.css", "Quick Editor");
                 //
                 // -- First Active Record - Output Quick Editor form
-                Models.Domain.CDefModel cdef = Models.Domain.CDefModel.create(core, PageContentModel.contentName);
+                Models.Domain.CDefDomainModel cdef = Models.Domain.CDefDomainModel.create(core, PageContentModel.contentName);
                 var pageContentTable = Models.Db.TableModel.create(core, cdef.id);
                 var editLock = WorkflowController.getEditLock(core, pageContentTable.id, core.doc.pageController.page.id);
                 WorkflowController.recordWorkflowStatusClass authoringStatus = WorkflowController.getWorkflowStatus(core, PageContentModel.contentName, core.doc.pageController.page.id);
@@ -140,7 +140,7 @@ namespace Contensive.Processor.Controllers {
                         fieldName = "",
                         recordId = core.doc.pageController.page.id
                     },
-                    instanceArguments = GenericController.convertQSNVAArgumentstoDocPropertiesList(core, core.doc.pageController.page.childListInstanceOptions),
+                    argumentKeyValuePairs = GenericController.convertQSNVAArgumentstoDocPropertiesList(core, core.doc.pageController.page.childListInstanceOptions),
                     instanceGuid = PageChildListInstanceID,
                     errorContextMessage = "calling child page addon in quick editing editor"
                 };

@@ -63,12 +63,12 @@ namespace Contensive.Processor.Models.Db {
         //public string sqlQuery { get; set; }
         //
         //====================================================================================================
-        public static TaskModel addDefault(CoreController core, Domain.CDefModel cdef) {
+        public static TaskModel addDefault(CoreController core, Domain.CDefDomainModel cdef) {
             return addDefault<TaskModel>(core, cdef);
         }
         //
         //====================================================================================================
-        public static TaskModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefModel cdef) {
+        public static TaskModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefDomainModel cdef) {
             return addDefault<TaskModel>(core, cdef, ref callersCacheNameList);
         }
         //

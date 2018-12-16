@@ -15,10 +15,10 @@ namespace Contensive.Processor.Models.Domain {
     /// content definitions - meta data
     /// </summary>
     [Serializable]
-    public class CDefModel {
+    public class CDefDomainModel {
         //
         // -- constructor to setup defaults for fields required
-        public CDefModel() {
+        public CDefDomainModel() {
             // set defaults, create methods require name, table
             active = true;
         }
@@ -271,8 +271,8 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="loadInvalidFields"></param>
         /// <param name="forceDbLoad"></param>
         /// <returns></returns>
-        public static CDefModel create(CoreController core, int contentId, bool loadInvalidFields = false, bool forceDbLoad = false) {
-            CDefModel result = null;
+        public static CDefDomainModel create(CoreController core, int contentId, bool loadInvalidFields = false, bool forceDbLoad = false) {
+            CDefDomainModel result = null;
             try {
                 if (contentId <= 0) {
                     //
@@ -335,7 +335,7 @@ namespace Contensive.Processor.Models.Domain {
                                 // cdef not found
                                 //
                             } else {
-                                result = new Models.Domain.CDefModel();
+                                result = new Models.Domain.CDefDomainModel();
                                 result.fields = new Dictionary<string, Models.Domain.CDefFieldModel>();
                                 result.set_childIdList(core, new List<int>());
                                 result.selectList = new List<string>();
@@ -377,7 +377,7 @@ namespace Contensive.Processor.Models.Domain {
                                 if (result.parentID == 0) {
                                     result.parentID = -1;
                                 } else {
-                                    Models.Domain.CDefModel parentCdef = create(core, result.parentID, loadInvalidFields, forceDbLoad);
+                                    Models.Domain.CDefDomainModel parentCdef = create(core, result.parentID, loadInvalidFields, forceDbLoad);
                                     foreach (var keyvaluepair in parentCdef.fields) {
                                         Models.Domain.CDefFieldModel parentField = keyvaluepair.Value;
                                         Models.Domain.CDefFieldModel childField = new Models.Domain.CDefFieldModel();
@@ -636,12 +636,11 @@ namespace Contensive.Processor.Models.Domain {
                 throw;
             }
             return returnCriteria;
-            return returnCriteria;
         }
         //
         //====================================================================================================
         //
-        private static void create_setAdminColumns(CoreController core, Models.Domain.CDefModel cdef) {
+        private static void create_setAdminColumns(CoreController core, Models.Domain.CDefDomainModel cdef) {
             try {
                 bool FieldActive = false;
                 int FieldWidth = 0;
@@ -706,8 +705,8 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         /// <param name="contentName"></param>
         /// <returns></returns>
-        public static CDefModel create(CoreController core, string contentName) {
-            CDefModel returnCdef = null;
+        public static CDefDomainModel create(CoreController core, string contentName) {
+            CDefDomainModel returnCdef = null;
             try {
                 int ContentId = CdefController.getContentId(core, contentName);
                 if (ContentId > 0) {
@@ -747,7 +746,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="core"></param>
         /// <param name="contentId"></param>
         /// <param name="cdef"></param>
-        public static void setCache(CoreController core, int contentId, CDefModel cdef) {
+        public static void setCache(CoreController core, int contentId, CDefDomainModel cdef) {
             List<string> dependantList = new List<string>();
             core.cache.storeObject(getCacheKey(contentId), cdef, dependantList);
         }
@@ -759,11 +758,11 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="core"></param>
         /// <param name="contentId"></param>
         /// <returns></returns>
-        public static CDefModel getCache(CoreController core, int contentId) {
-            CDefModel result = null;
+        public static CDefDomainModel getCache(CoreController core, int contentId) {
+            CDefDomainModel result = null;
             try {
                 try {
-                    result = core.cache.getObject<Models.Domain.CDefModel>(getCacheKey(contentId));
+                    result = core.cache.getObject<Models.Domain.CDefDomainModel>(getCacheKey(contentId));
                 } catch (Exception ex) {
                     LogController.handleError(core, ex);
                 }

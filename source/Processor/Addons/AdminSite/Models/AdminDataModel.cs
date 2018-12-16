@@ -15,11 +15,10 @@ namespace Contensive.Addons.AdminSite {
     /// object that contains the context for the admin site, like recordsPerPage, etc. Should eventually include the loadContext and be its own document
     /// </summary>
     public class AdminDataModel {
-        //
         /// <summary>
-        /// the content being edited
+        /// the content metadata being edited
         /// </summary>
-        public CDefModel adminContent { get; set; }
+        public CDefDomainModel adminContent { get; set; }
         /// <summary>
         /// the record being edited
         /// </summary>
@@ -383,7 +382,7 @@ namespace Contensive.Addons.AdminSite {
             try {
                 if (core.session.isAuthenticatedAdmin(core)) return true;
                 //
-                CDefModel cdef = CDefModel.create(core, ContentID);
+                CDefDomainModel cdef = CDefDomainModel.create(core, ContentID);
                 if ( cdef != null ) {
                     return core.session.isAuthenticatedContentManager(core, cdef.name );
                 }
@@ -435,16 +434,16 @@ namespace Contensive.Addons.AdminSite {
                 // adminContext.content init
                 requestedContentId = core.docProperties.getInteger("cid");
                 if (requestedContentId != 0) {
-                    adminContent = CDefModel.create(core, requestedContentId);
+                    adminContent = CDefDomainModel.create(core, requestedContentId);
                     if (adminContent == null) {
-                        adminContent = new CDefModel();
+                        adminContent = new CDefDomainModel();
                         adminContent.id = 0;
                         Processor.Controllers.ErrorController.addUserError(core, "There is no content with the requested id [" + requestedContentId + "]");
                         requestedContentId = 0;
                     }
                 }
                 if (adminContent == null) {
-                    adminContent = new CDefModel();
+                    adminContent = new CDefDomainModel();
                 }
                 //
                 // determine user rights to this content
@@ -471,7 +470,7 @@ namespace Contensive.Addons.AdminSite {
                         int recordContentId = core.db.csGetInteger(CS, "ContentControlID");
                         //adminContent.id = core.db.csGetInteger(CS, "ContentControlID");
                         if ((recordContentId > 0) && (recordContentId != adminContent.id)) {
-                            adminContent = CDefModel.create(core, recordContentId);
+                            adminContent = CDefDomainModel.create(core, recordContentId);
                         }
                     }
                     core.db.csClose(ref CS);

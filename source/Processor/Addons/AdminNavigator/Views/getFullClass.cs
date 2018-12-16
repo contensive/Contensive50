@@ -157,7 +157,7 @@ return tempGetFullNavigator;
 		private void errorReport(CPBaseClass cp, Exception ex, string method) {
 			try {
 				cp.Site.ErrorReport(ex, "Unexpected error in sampleClass." + method);
-			} catch (Exception exLost) {
+			} catch (Exception) {
 				//
 				// stop anything thrown from cp errorReport
 				//

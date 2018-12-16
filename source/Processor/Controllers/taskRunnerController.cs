@@ -228,7 +228,7 @@ namespace Contensive.Processor.Controllers {
                                 var context = new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
                                     backgroundProcess = true,
                                     addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple,
-                                    instanceArguments = cmdDetail.args,
+                                    argumentKeyValuePairs = cmdDetail.args,
                                     errorContextMessage = "running task, addon [" + cmdDetail.addonId + "]"
                                 };
                                 string result = cp.core.addon.execute(addon, context);

@@ -23,12 +23,12 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static EmailTemplateModel addDefault(CoreController core, Domain.CDefModel cdef) {
+        public static EmailTemplateModel addDefault(CoreController core, Domain.CDefDomainModel cdef) {
             return addDefault<EmailTemplateModel>(core, cdef);
         }
         //
         //====================================================================================================
-        public static EmailTemplateModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefModel cdef) {
+        public static EmailTemplateModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefDomainModel cdef) {
             return addDefault<EmailTemplateModel>(core, cdef, ref callersCacheNameList);
         }
         //

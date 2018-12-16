@@ -323,7 +323,7 @@ namespace Contensive.Processor {
         public override int AddContent(string ContentName, string sqlTableName, string dataSourceName) {
             var tmpList = new List<string> { };
             DataSourceModel dataSource = DataSourceModel.createByUniqueName(core, dataSourceName, ref tmpList);
-            return CdefController.verifyContent_returnId(core, new Models.Domain.CDefModel() {
+            return CdefController.verifyContent_returnId(core, new Models.Domain.CDefDomainModel() {
                 dataSourceName = dataSource.name,
                 tableName = sqlTableName,
                 name = ContentName
@@ -333,7 +333,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override string GetListLink(string ContentName) {
-            return AdminUIController.getIconEditAdminLink(core, Models.Domain.CDefModel.create(core, ContentName));
+            return AdminUIController.getIconEditAdminLink(core, Models.Domain.CDefDomainModel.create(core, ContentName));
         }
         //
         //====================================================================================================

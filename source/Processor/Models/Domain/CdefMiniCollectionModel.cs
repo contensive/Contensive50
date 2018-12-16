@@ -40,7 +40,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// Name dictionary of content definitions in the collection
         /// </summary>
-        public Dictionary<string, Models.Domain.CDefModel> cdef = new Dictionary<string, Models.Domain.CDefModel>();
+        public Dictionary<string, Models.Domain.CDefDomainModel> cdef = new Dictionary<string, Models.Domain.CDefDomainModel>();
         //
         //====================================================================================================
         /// <summary>
@@ -222,7 +222,7 @@ namespace Contensive.Processor.Models.Domain {
         private static CDefMiniCollectionModel installCDefMiniCollection_LoadXml(CoreController core, string srcCollecionXml, bool IsccBaseFile, bool setAllDataChanged, bool IsNewBuild, CDefMiniCollectionModel defaultCollection, string logPrefix, ref List<string> installedCollections) {
             CDefMiniCollectionModel result = null;
             try {
-                Models.Domain.CDefModel DefaultCDef = null;
+                Models.Domain.CDefDomainModel DefaultCDef = null;
                 Models.Domain.CDefFieldModel DefaultCDefField = null;
                 string contentNameLc = null;
                 string Collectionname = null;
@@ -315,7 +315,7 @@ namespace Contensive.Processor.Models.Domain {
                                         if (defaultCollection.cdef.ContainsKey(contentNameLc)) {
                                             DefaultCDef = defaultCollection.cdef[contentNameLc];
                                         } else {
-                                            DefaultCDef = new Models.Domain.CDefModel() {
+                                            DefaultCDef = new Models.Domain.CDefDomainModel() {
                                                 active = true,
                                                 activeOnly = true,
                                                 aliasID = "id",
@@ -344,12 +344,12 @@ namespace Contensive.Processor.Models.Domain {
                                             // ----- Add CDef if not already there
                                             //
                                             if (!result.cdef.ContainsKey(ContentName.ToLowerInvariant())) {
-                                                result.cdef.Add(ContentName.ToLowerInvariant(), new Models.Domain.CDefModel());
+                                                result.cdef.Add(ContentName.ToLowerInvariant(), new Models.Domain.CDefDomainModel());
                                             }
                                             //
                                             // Get CDef attributes
                                             //
-                                            Models.Domain.CDefModel targetCdef = result.cdef[ContentName.ToLowerInvariant()];
+                                            Models.Domain.CDefDomainModel targetCdef = result.cdef[ContentName.ToLowerInvariant()];
                                             string activeDefaultText = "1";
                                             if (!(DefaultCDef.active)) {
                                                 activeDefaultText = "0";
@@ -737,7 +737,7 @@ namespace Contensive.Processor.Models.Domain {
                 if (true) {
                     string UsedTables = "";
                     foreach (var keypairvalue in Collection.cdef) {
-                        Models.Domain.CDefModel workingCdef = keypairvalue.Value;
+                        Models.Domain.CDefDomainModel workingCdef = keypairvalue.Value;
                         ContentName = workingCdef.name;
                         if (workingCdef.dataChanged) {
                             LogController.logInfo(core, "creating sql table [" + workingCdef.tableName + "], datasource [" + workingCdef.dataSourceName + "]");
@@ -812,7 +812,7 @@ namespace Contensive.Processor.Models.Domain {
                 //----------------------------------------------------------------------------------------------------------------------
                 //
                 foreach (var keypairvalue in Collection.cdef) {
-                    CDefModel cdef = keypairvalue.Value;
+                    CDefDomainModel cdef = keypairvalue.Value;
                     bool fieldChanged = false;
                     if (!cdef.dataChanged) {
                         foreach (var field in cdef.fields) {
@@ -833,7 +833,7 @@ namespace Contensive.Processor.Models.Domain {
                 //
                 int FieldHelpCID = core.db.getRecordID("content", "Content Field Help");
                 foreach (var keypairvalue in Collection.cdef) {
-                    Models.Domain.CDefModel workingCdef = keypairvalue.Value;
+                    Models.Domain.CDefDomainModel workingCdef = keypairvalue.Value;
                     //ContentName = workingCdef.name;
                     foreach (var fieldKeyValuePair in workingCdef.fields) {
                         Models.Domain.CDefFieldModel workingField = fieldKeyValuePair.Value;
@@ -1020,14 +1020,14 @@ namespace Contensive.Processor.Models.Domain {
             try {
                 string SrcFieldName = null;
                 bool updateDst = false;
-                Models.Domain.CDefModel srcCdef = null;
+                Models.Domain.CDefDomainModel srcCdef = null;
                 //
                 // If the Src is the BaseCollection, the Dst must be the Application Collectio
                 //   in this case, reset any BaseContent or BaseField attributes in the application that are not in the base
                 //
                 if (srcCollection.isBaseCollection) {
                     foreach (var dstKeyValuePair in dstCollection.cdef) {
-                        Models.Domain.CDefModel dstWorkingCdef = dstKeyValuePair.Value;
+                        Models.Domain.CDefDomainModel dstWorkingCdef = dstKeyValuePair.Value;
                         string contentName = dstWorkingCdef.name;
                         if (dstCollection.cdef[contentName.ToLowerInvariant()].isBaseContent) {
                             //
@@ -1071,12 +1071,12 @@ namespace Contensive.Processor.Models.Domain {
                     // Search for this cdef in the Dst
                     //
                     updateDst = false;
-                    Models.Domain.CDefModel dstCdef = null;
+                    Models.Domain.CDefDomainModel dstCdef = null;
                     if (!dstCollection.cdef.ContainsKey(srcName.ToLowerInvariant())) {
                         //
                         // add src to dst
                         //
-                        dstCdef = new Models.Domain.CDefModel();
+                        dstCdef = new Models.Domain.CDefDomainModel();
                         dstCollection.cdef.Add(srcName.ToLowerInvariant(), dstCdef);
                         updateDst = true;
                     } else {
@@ -1566,7 +1566,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// Update a table from a collection cdef node
         /// </summary>
-        internal static void installCDefMiniCollection_buildDb_saveCDefToDb(CoreController core, Models.Domain.CDefModel cdef, string BuildVersion) {
+        internal static void installCDefMiniCollection_buildDb_saveCDefToDb(CoreController core, Models.Domain.CDefDomainModel cdef, string BuildVersion) {
             try {
                 //
                 LogController.logInfo(core, "Update db cdef [" + cdef.name + "]");
@@ -1581,7 +1581,7 @@ namespace Contensive.Processor.Models.Domain {
                     }
                     //
                     // -- update Content Field Records and Content Field Help records
-                    CDefModel cdefFieldHelp = CDefModel.create(core, ContentFieldHelpModel.contentName);
+                    CDefDomainModel cdefFieldHelp = CDefDomainModel.create(core, ContentFieldHelpModel.contentName);
                     foreach (var nameValuePair in cdef.fields) {
                         CDefFieldModel field = nameValuePair.Value;
                         int fieldId = 0;

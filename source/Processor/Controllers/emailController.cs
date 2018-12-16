@@ -324,7 +324,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 SystemEmailModel email = SystemEmailModel.createByUniqueName(core, emailName );
                 if (email == null) {
-                    email = SystemEmailModel.addDefault(core, Models.Domain.CDefModel.create( core, SystemEmailModel.contentName));
+                    email = SystemEmailModel.addDefault(core, Models.Domain.CDefDomainModel.create( core, SystemEmailModel.contentName));
                     email.name = emailName;
                     email.subject = emailName;
                     email.fromAddress = core.siteProperties.getText("EmailAdmin", "webmaster@" + core.appConfig.domainList[0]);

@@ -36,12 +36,12 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static LinkAliasModel addDefault(CoreController core, Domain.CDefModel cdef) {
+        public static LinkAliasModel addDefault(CoreController core, Domain.CDefDomainModel cdef) {
             return addDefault<LinkAliasModel>(core, cdef);
         }
         //
         //====================================================================================================
-        public static LinkAliasModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefModel cdef) {
+        public static LinkAliasModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefDomainModel cdef) {
             return addDefault<LinkAliasModel>(core, cdef, ref callersCacheNameList);
         }
         //

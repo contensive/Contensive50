@@ -44,14 +44,14 @@ namespace Contensive.Addons.Tools {
                 int ContentID = cp.Doc.GetInteger("" + RequestNameToolContentID + "");
                 string dataSourceName = "default";
                 string ContentName = "";
-                Processor.Models.Domain.CDefModel CDef = null;
+                Processor.Models.Domain.CDefDomainModel CDef = null;
                 string TableName = "";
                 if (ContentID > 0) {
                     ContentName = cp.Content.GetRecordName("content", ContentID);
                     if (!string.IsNullOrEmpty(ContentName)) {
                         TableName = cp.Content.GetTable(ContentName);
                         dataSourceName = cp.Content.GetDataSource(ContentName);
-                        CDef = Processor.Models.Domain.CDefModel.create(core, ContentID, true, true);
+                        CDef = Processor.Models.Domain.CDefDomainModel.create(core, ContentID, true, true);
                     }
                 }
                 int RecordCount = 0;
@@ -234,7 +234,7 @@ namespace Contensive.Addons.Tools {
                     Stream.Add( HtmlController.div( "There was a problem saving these changes" + "<UL>" + ErrorMessage + "</UL>","ccError"));
                 }
                 if (ReloadCDef) {
-                    CDef = Processor.Models.Domain.CDefModel.create(core, ContentID, true, true);
+                    CDef = Processor.Models.Domain.CDefDomainModel.create(core, ContentID, true, true);
                 }
                 if (ContentID == 0) {
                     //
@@ -256,13 +256,13 @@ Stream.Add(core.html.getPanelTop());
                     //
                     int ParentContentID = CDef.parentID;
                     bool AllowCDefInherit = false;
-                    Processor.Models.Domain.CDefModel ParentCDef = null;
+                    Processor.Models.Domain.CDefDomainModel ParentCDef = null;
                     if (ParentContentID == -1) {
                         AllowCDefInherit = false;
                     } else {
                         AllowCDefInherit = true;
                         string ParentContentName = CdefController.getContentNameByID(core, ParentContentID);
-                        ParentCDef = Processor.Models.Domain.CDefModel.create(core, ParentContentID, true, true);
+                        ParentCDef = Processor.Models.Domain.CDefDomainModel.create(core, ParentContentID, true, true);
                     }
                     bool NeedFootNote1 = false;
                     bool NeedFootNote2 = false;
@@ -327,7 +327,7 @@ Stream.Add(core.html.getPanelTop());
                         }
                         fieldList.Sort((p1, p2) => p1.sort.CompareTo(p2.sort));
                         StringBuilderLegacyController StreamValidRows = new StringBuilderLegacyController();
-                        var contentFieldsCdef = Processor.Models.Domain.CDefModel.create(core, "content fields");
+                        var contentFieldsCdef = Processor.Models.Domain.CDefDomainModel.create(core, "content fields");
                         foreach (fieldSortClass fieldsort in fieldList) {
                             StringBuilderLegacyController streamRow = new StringBuilderLegacyController();
                             bool rowValid = true;

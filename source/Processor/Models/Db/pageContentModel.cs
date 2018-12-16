@@ -94,12 +94,12 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static PageContentModel addDefault(CoreController core, Domain.CDefModel cdef) {
+        public static PageContentModel addDefault(CoreController core, Domain.CDefDomainModel cdef) {
             return addDefault<PageContentModel>(core, cdef);
         }
         //
         //====================================================================================================
-        public static PageContentModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefModel cdef) {
+        public static PageContentModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefDomainModel cdef) {
             return addDefault<PageContentModel>(core, cdef, ref callersCacheNameList);
         }
         //

@@ -249,13 +249,13 @@ namespace Contensive.Processor.Controllers {
         //
         public void sendPublishSubmitNotice(string ContentName, int RecordID, string RecordName) {
             try {
-                Models.Domain.CDefModel CDef = null;
+                Models.Domain.CDefDomainModel CDef = null;
                 string Copy = null;
                 string Link = null;
                 string FromAddress = null;
                 //
                 FromAddress = core.siteProperties.getText("EmailPublishSubmitFrom", core.siteProperties.emailAdmin);
-                CDef = Models.Domain.CDefModel.create(core, ContentName);
+                CDef = Models.Domain.CDefDomainModel.create(core, ContentName);
                 Link = "/" + core.appConfig.adminRoute + "?af=" + AdminFormPublishing;
                 Copy = Msg_AuthoringSubmittedNotification;
                 Copy = GenericController.vbReplace(Copy, "<DOMAINNAME>", "<a href=\"" + HtmlController.encodeHtml(Link) + "\">" + core.webServer.requestDomain + "</a>");

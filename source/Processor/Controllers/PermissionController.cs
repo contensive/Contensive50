@@ -15,7 +15,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Permissions this user has for this content.
         /// </summary>
-        public static UserContentPermissions getUserContentPermissions(CoreController core, CDefModel cdef) {
+        public static UserContentPermissions getUserContentPermissions(CoreController core, CDefDomainModel cdef) {
             var result = new UserContentPermissions() {
                 allowDelete = false,
                 allowAdd = false,
@@ -140,7 +140,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="usedContentIdList"></param>
         //========================================================================
         //
-        private static UserContentPermissions getUserAuthoringPermissions_ContentManager(CoreController core, CDefModel cdef, List<int> usedContentIdList) {
+        private static UserContentPermissions getUserAuthoringPermissions_ContentManager(CoreController core, CDefDomainModel cdef, List<int> usedContentIdList) {
             var result = new UserContentPermissions() {
                 allowAdd = false,
                 allowDelete = false,
@@ -195,7 +195,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // ----- Not a content manager for this one, check the parent
                         if (cdef.parentID > 0) {
-                            var parentCdef = CDefModel.create(core, cdef.parentID);
+                            var parentCdef = CDefDomainModel.create(core, cdef.parentID);
                             usedContentIdList.Add(cdef.id);
                             getUserAuthoringPermissions_ContentManager(core, cdef, usedContentIdList);
                         }

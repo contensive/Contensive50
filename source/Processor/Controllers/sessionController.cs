@@ -80,7 +80,7 @@ namespace Contensive.Processor.Controllers {
                     if (_language == null) {
                         //
                         // -- add english to the table
-                        _language = LanguageModel.addDefault(core, Models.Domain.CDefModel.create( core, LanguageModel.contentName));
+                        _language = LanguageModel.addDefault(core, Models.Domain.CDefDomainModel.create( core, LanguageModel.contentName));
                         _language.name = "English";
                         _language.http_Accept_Language = "en";
                         _language.save(core);
@@ -625,7 +625,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="ContentName"></param>
         /// <returns></returns>
-        public bool isAuthenticatedContentManager(CoreController core, CDefModel cdef) {
+        public bool isAuthenticatedContentManager(CoreController core, CDefDomainModel cdef) {
             bool returnIsContentManager = false;
             try {
                 if (core.session.isAuthenticatedAdmin(core)) return true;
@@ -660,7 +660,7 @@ namespace Contensive.Processor.Controllers {
                 } else {
                     //
                     // -- for specific Content
-                    CDefModel cdef = CDefModel.create(core, ContentName);
+                    CDefDomainModel cdef = CDefDomainModel.create(core, ContentName);
                     returnIsContentManager = PermissionController.getUserContentPermissions(core, cdef).allowEdit;
                 }
             } catch (Exception ex) {
@@ -723,7 +723,7 @@ namespace Contensive.Processor.Controllers {
                 LogController.addSiteActivity(core, "logout", user.id, user.OrganizationID);
                 //
                 // new guest
-                user = PersonModel.addDefault(core, CDefModel.create( core, PersonModel.contentName));
+                user = PersonModel.addDefault(core, CDefDomainModel.create( core, PersonModel.contentName));
                 visit.memberID = user.id;
                 visit.visitAuthenticated = false;
                 visit.save(core);
