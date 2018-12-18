@@ -75,12 +75,12 @@ namespace Contensive.Addons.AdminSite {
                                             SearchValue = "";
                                             break;
                                     }
-                                    if (!IndexConfig.FindWords.ContainsKey(FieldName)) {
+                                    if (!IndexConfig.findWords.ContainsKey(FieldName)) {
                                         //
                                         // fieldname not found, save if not FindWordMatchEnum.MatchIgnore
                                         //
                                         if (MatchOption != FindWordMatchEnum.MatchIgnore) {
-                                            IndexConfig.FindWords.Add(FieldName, new IndexConfigClass.IndexConfigFindWordClass {
+                                            IndexConfig.findWords.Add(FieldName, new IndexConfigClass.IndexConfigFindWordClass {
                                                 Name = FieldName,
                                                 MatchOption = MatchOption,
                                                 Value = SearchValue
@@ -90,8 +90,8 @@ namespace Contensive.Addons.AdminSite {
                                         //
                                         // fieldname was found
                                         //
-                                        IndexConfig.FindWords[FieldName].MatchOption = MatchOption;
-                                        IndexConfig.FindWords[FieldName].Value = SearchValue;
+                                        IndexConfig.findWords[FieldName].MatchOption = MatchOption;
+                                        IndexConfig.findWords[FieldName].Value = SearchValue;
                                     }
                                 }
                             }
@@ -167,9 +167,9 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // set prepoplate value from indexconfig
                     //
-                    if (IndexConfig.FindWords.ContainsKey(FieldName)) {
-                        FieldValue[FieldPtr] = IndexConfig.FindWords[FieldName].Value;
-                        FieldMatchOptions[FieldPtr] = (int)IndexConfig.FindWords[FieldName].MatchOption;
+                    if (IndexConfig.findWords.ContainsKey(FieldName)) {
+                        FieldValue[FieldPtr] = IndexConfig.findWords[FieldName].Value;
+                        FieldMatchOptions[FieldPtr] = (int)IndexConfig.findWords[FieldName].MatchOption;
                     }
                     FieldPtr += 1;
                 }

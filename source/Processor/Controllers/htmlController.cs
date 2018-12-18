@@ -990,7 +990,7 @@ namespace Contensive.Processor.Controllers {
                 core.doc.formInputTextCnt += 1;
                 core.doc.inputDateCnt = core.doc.inputDateCnt + 1;
                 result = "<input type=\"date\"  name=\"" + HtmlController.encodeHtml(htmlName) + "\"";
-                if ((htmlValue != null) & (htmlValue > DateTime.MinValue)) result += " value=\"" + String.Format("{0:s}", htmlValue) + "\"";
+                if ((htmlValue != null) && (htmlValue > DateTime.MinValue)) result += " value=\"" + String.Format("{0:s}", htmlValue) + "\"";
                 result += (string.IsNullOrEmpty(htmlId)) ? "" : " id=\"" + htmlId + "\"";
                 result += (string.IsNullOrEmpty(htmlClass)) ? "" : " class=\"" + htmlClass + "\"";
                 result += (!readOnly) ? "" : " readonly";
@@ -999,7 +999,7 @@ namespace Contensive.Processor.Controllers {
                 result += ">";
 
                 result += "<input type=\"time\"  name=\"" + HtmlController.encodeHtml(htmlName + "_time") + "\"";
-                if ((htmlValue != null) & (htmlValue > DateTime.MinValue)) result += " value=\"" + String.Format("{0:s}", htmlValue) + "\"";
+                if ((htmlValue != null) && (htmlValue > DateTime.MinValue)) result += " value=\"" + String.Format("{0:s}", htmlValue) + "\"";
                 result += (!readOnly) ? "" : " readonly";
                 result += (!disabled) ? "" : " disabled";
                 result += ">";

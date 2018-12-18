@@ -24,7 +24,7 @@ namespace Contensive.Processor {
         /// Constructor
         /// </summary>
         /// <param name="cp"></param>
-        public CPAddonClass(CPClass cp) : base() => this.cp = cp;
+        public CPAddonClass(CPClass cp) => this.cp = cp;
         //
         //====================================================================================================
         /// <summary>

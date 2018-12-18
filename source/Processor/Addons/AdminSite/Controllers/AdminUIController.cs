@@ -1628,7 +1628,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                                                 BufferString = BufferString.Replace(",", "&");
                                                 ParentID = encodeInteger(GenericController.main_GetNameValue_Internal(core, BufferString, "Parentid"));
                                             }
-                                            if ((ParentID != 0) & (!PageContentController.isChildRecord(core, contentName, ParentID, ClipChildRecordID))) {
+                                            if ((ParentID != 0) && (!PageContentController.isChildRecord(core, contentName, ParentID, ClipChildRecordID))) {
                                                 //
                                                 // Can not paste as child of itself
                                                 //

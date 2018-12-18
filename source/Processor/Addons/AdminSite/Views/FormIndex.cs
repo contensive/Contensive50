@@ -118,7 +118,7 @@ namespace Contensive.Addons.AdminSite {
                             //
                             SQL = "select";
                             if (datasource.type != DataSourceTypeODBCMySQL) {
-                                SQL += " Top " + (IndexConfig.RecordTop + IndexConfig.RecordsPerPage);
+                                SQL += " Top " + (IndexConfig.recordTop + IndexConfig.recordsPerPage);
                             }
                             SQL += " " + sqlFieldList + " From " + sqlFrom;
                             if (!string.IsNullOrEmpty(sqlWhere)) {
@@ -128,12 +128,12 @@ namespace Contensive.Addons.AdminSite {
                                 SQL += " Order By" + sqlOrderBy;
                             }
                             if (datasource.type == DataSourceTypeODBCMySQL) {
-                                SQL += " Limit " + (IndexConfig.RecordTop + IndexConfig.RecordsPerPage);
+                                SQL += " Limit " + (IndexConfig.recordTop + IndexConfig.recordsPerPage);
                             }
                             //
                             // Refresh Query String
                             //
-                            core.doc.addRefreshQueryString("tr", IndexConfig.RecordTop.ToString());
+                            core.doc.addRefreshQueryString("tr", IndexConfig.recordTop.ToString());
                             core.doc.addRefreshQueryString("asf", adminData.AdminForm.ToString());
                             core.doc.addRefreshQueryString("cid", adminData.adminContent.id.ToString());
                             core.doc.addRefreshQueryString(RequestNameTitleExtension, GenericController.encodeRequestVariable(adminData.TitleExtension));
@@ -245,14 +245,14 @@ namespace Contensive.Addons.AdminSite {
                                 //if this is a current sort ,add the reverse flag
                                 //
                                 string ButtonHref = "/" + core.appConfig.adminRoute + "?" + rnAdminForm + "=" + AdminFormIndex + "&SetSortField=" + FieldName + "&RT=0&" + RequestNameTitleExtension + "=" + GenericController.encodeRequestVariable(adminData.TitleExtension) + "&cid=" + adminData.adminContent.id + "&ad=" + adminData.ignore_legacyMenuDepth;
-                                foreach (var sortKvp in IndexConfig.Sorts) {
+                                foreach (var sortKvp in IndexConfig.sorts) {
                                     IndexConfigClass.IndexConfigSortClass sort = sortKvp.Value;
 
                                 }
-                                if (!IndexConfig.Sorts.ContainsKey(FieldName)) {
+                                if (!IndexConfig.sorts.ContainsKey(FieldName)) {
                                     ButtonHref += "&SetSortDirection=1";
                                 } else {
-                                    switch (IndexConfig.Sorts[FieldName].direction) {
+                                    switch (IndexConfig.sorts[FieldName].direction) {
                                         case 1:
                                             ButtonHref += "&SetSortDirection=2";
                                             break;
@@ -278,9 +278,9 @@ namespace Contensive.Addons.AdminSite {
                                 ButtonFace = GenericController.vbReplace(ButtonFace, " ", "&nbsp;");
                                 string SortTitle = "Sort A-Z";
                                 //
-                                if (IndexConfig.Sorts.ContainsKey(FieldName)) {
-                                    string sortSuffix = ((IndexConfig.Sorts.Count < 2) ? "" : IndexConfig.Sorts[FieldName].order.ToString());
-                                    switch (IndexConfig.Sorts[FieldName].direction) {
+                                if (IndexConfig.sorts.ContainsKey(FieldName)) {
+                                    string sortSuffix = ((IndexConfig.sorts.Count < 2) ? "" : IndexConfig.sorts[FieldName].order.ToString());
+                                    switch (IndexConfig.sorts[FieldName].direction) {
                                         case 1:
                                             ButtonFace = iconArrowDown + sortSuffix + "&nbsp;" + ButtonFace;
                                             SortTitle = "Sort Z-A";
@@ -305,10 +305,10 @@ namespace Contensive.Addons.AdminSite {
                             string RowColor = "";
                             int RecordPointer = 0;
                             int RecordLast = 0;
-                            CS = core.db.csOpenSql(SQL, datasource.name, IndexConfig.RecordsPerPage, IndexConfig.PageNumber);
+                            CS = core.db.csOpenSql(SQL, datasource.name, IndexConfig.recordsPerPage, IndexConfig.pageNumber);
                             if (core.db.csOk(CS)) {
-                                RecordPointer = IndexConfig.RecordTop;
-                                RecordLast = IndexConfig.RecordTop + IndexConfig.RecordsPerPage;
+                                RecordPointer = IndexConfig.recordTop;
+                                RecordLast = IndexConfig.recordTop + IndexConfig.recordsPerPage;
                                 //
                                 // --- Print out the records
                                 while ((core.db.csOk(CS)) && (RecordPointer < RecordLast)) {
@@ -362,11 +362,11 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 // --- print out the stuff at the bottom
                                 //
-                                int RecordTop_NextPage = IndexConfig.RecordTop;
+                                int RecordTop_NextPage = IndexConfig.recordTop;
                                 if (core.db.csOk(CS)) {
                                     RecordTop_NextPage = RecordPointer;
                                 }
-                                int RecordTop_PreviousPage = IndexConfig.RecordTop - IndexConfig.RecordsPerPage;
+                                int RecordTop_PreviousPage = IndexConfig.recordTop - IndexConfig.recordsPerPage;
                                 if (RecordTop_PreviousPage < 0) {
                                     RecordTop_PreviousPage = 0;
                                 }
@@ -409,8 +409,8 @@ namespace Contensive.Addons.AdminSite {
                                 int ColumnWidth = column.Width;
                                 string FieldName = GenericController.vbLCase(column.Name);
                                 string FindWordValue = "";
-                                if (IndexConfig.FindWords.ContainsKey(FieldName)) {
-                                    var tempVar = IndexConfig.FindWords[FieldName];
+                                if (IndexConfig.findWords.ContainsKey(FieldName)) {
+                                    var tempVar = IndexConfig.findWords[FieldName];
                                     if ((tempVar.MatchOption == FindWordMatchEnum.matchincludes) || (tempVar.MatchOption == FindWordMatchEnum.MatchEquals)) {
                                         FindWordValue = tempVar.Value;
                                     } else if (tempVar.MatchOption == FindWordMatchEnum.MatchTrue) {
@@ -451,7 +451,7 @@ namespace Contensive.Addons.AdminSite {
                             //
                             // ----- ButtonBar
                             //
-                            string ButtonBar = AdminUIController.getForm_Index_ButtonBar(core, AllowAdd, AllowDelete, IndexConfig.PageNumber, IndexConfig.RecordsPerPage, recordCnt, adminData.adminContent.name);
+                            string ButtonBar = AdminUIController.getForm_Index_ButtonBar(core, AllowAdd, AllowDelete, IndexConfig.pageNumber, IndexConfig.recordsPerPage, recordCnt, adminData.adminContent.name);
                             string titleRow = FormIndex.getForm_Index_Header(core, IndexConfig, adminData.adminContent, recordCnt, ContentAccessLimitMessage);
                             //
                             // Assemble LiveWindowTable
@@ -496,26 +496,26 @@ namespace Contensive.Addons.AdminSite {
             //
             string Title = "";
             string filterLine = "";
-            if (IndexConfig.ActiveOnly) {
+            if (IndexConfig.activeOnly) {
                 filterLine = filterLine + ", active records";
             }
             string filterLastEdited = "";
-            if (IndexConfig.LastEditedByMe) {
+            if (IndexConfig.lastEditedByMe) {
                 filterLastEdited = filterLastEdited + " by " + core.session.user.name;
             }
-            if (IndexConfig.LastEditedPast30Days) {
+            if (IndexConfig.lastEditedPast30Days) {
                 filterLastEdited = filterLastEdited + " in the past 30 days";
             }
-            if (IndexConfig.LastEditedPast7Days) {
+            if (IndexConfig.lastEditedPast7Days) {
                 filterLastEdited = filterLastEdited + " in the week";
             }
-            if (IndexConfig.LastEditedToday) {
+            if (IndexConfig.lastEditedToday) {
                 filterLastEdited = filterLastEdited + " today";
             }
             if (!string.IsNullOrEmpty(filterLastEdited)) {
                 filterLine = filterLine + ", last edited" + filterLastEdited;
             }
-            foreach (var kvp in IndexConfig.FindWords) {
+            foreach (var kvp in IndexConfig.findWords) {
                 IndexConfigClass.IndexConfigFindWordClass findWord = kvp.Value;
                 if (!string.IsNullOrEmpty(findWord.Name)) {
                     string FieldCaption = CdefController.getContentFieldProperty(core, content.name, findWord.Name, "caption");
@@ -548,8 +548,8 @@ namespace Contensive.Addons.AdminSite {
 
                 }
             }
-            if (IndexConfig.SubCDefID > 0) {
-                string ContentName = CdefController.getContentNameByID(core, IndexConfig.SubCDefID);
+            if (IndexConfig.subCDefID > 0) {
+                string ContentName = CdefController.getContentNameByID(core, IndexConfig.subCDefID);
                 if (!string.IsNullOrEmpty(ContentName)) {
                     filterLine = filterLine + ", in Sub-content '" + ContentName + "'";
                 }
@@ -557,11 +557,11 @@ namespace Contensive.Addons.AdminSite {
             //
             // add groups to caption
             //
-            if ((content.tableName.ToLowerInvariant() == "ccmembers") && (IndexConfig.GroupListCnt > 0)) {
+            if ((content.tableName.ToLowerInvariant() == "ccmembers") && (IndexConfig.groupListCnt > 0)) {
                 string GroupList = "";
-                for (int Ptr = 0; Ptr < IndexConfig.GroupListCnt; Ptr++) {
-                    if (IndexConfig.GroupList[Ptr] != "") {
-                        GroupList += "\t" + IndexConfig.GroupList[Ptr];
+                for (int Ptr = 0; Ptr < IndexConfig.groupListCnt; Ptr++) {
+                    if (IndexConfig.groupList[Ptr] != "") {
+                        GroupList += "\t" + IndexConfig.groupList[Ptr];
                     }
                 }
                 if (!string.IsNullOrEmpty(GroupList)) {
@@ -585,7 +585,7 @@ namespace Contensive.Addons.AdminSite {
             // add sort details to caption
             //
             string sortLine = "";
-            foreach (var kvp in IndexConfig.Sorts) {
+            foreach (var kvp in IndexConfig.sorts) {
                 IndexConfigClass.IndexConfigSortClass sort = kvp.Value;
                 if (sort.direction > 0) {
                     sortLine = sortLine + ", then " + content.fields[sort.fieldName].caption;
@@ -594,7 +594,7 @@ namespace Contensive.Addons.AdminSite {
                     }
                 }
             }
-            string pageNavigation = getForm_index_pageNavigation(core, IndexConfig.PageNumber, IndexConfig.RecordsPerPage, recordCnt, content.name);
+            string pageNavigation = getForm_index_pageNavigation(core, IndexConfig.pageNumber, IndexConfig.recordsPerPage, recordCnt, content.name);
             Title = HtmlController.div("<strong>" + content.name + "</strong><div style=\"float:right;\">" + pageNavigation + "</div>");
             int TitleRows = 0;
             if (!string.IsNullOrEmpty(filterLine)) {
@@ -632,7 +632,7 @@ namespace Contensive.Addons.AdminSite {
                 int ColumnCnt = 0;
                 int ColumnPtr = 0;
                 string Button = null;
-                if (!IndexConfig.Loaded) {
+                if (!IndexConfig.loaded) {
                     IndexConfig = IndexConfigClass.get(core, adminData);
                 }
                 //
@@ -640,24 +640,24 @@ namespace Contensive.Addons.AdminSite {
                 //
                 VarText = core.docProperties.getText("rt");
                 if (!string.IsNullOrEmpty(VarText)) {
-                    IndexConfig.RecordTop = GenericController.encodeInteger(VarText);
+                    IndexConfig.recordTop = GenericController.encodeInteger(VarText);
                 }
                 //
                 VarText = core.docProperties.getText("RS");
                 if (!string.IsNullOrEmpty(VarText)) {
-                    IndexConfig.RecordsPerPage = GenericController.encodeInteger(VarText);
+                    IndexConfig.recordsPerPage = GenericController.encodeInteger(VarText);
                 }
-                if (IndexConfig.RecordsPerPage <= 0) {
-                    IndexConfig.RecordsPerPage = Constants.RecordsPerPageDefault;
+                if (IndexConfig.recordsPerPage <= 0) {
+                    IndexConfig.recordsPerPage = Constants.RecordsPerPageDefault;
                 }
-                IndexConfig.PageNumber = encodeInteger(1 + Math.Floor(IndexConfig.RecordTop / (double)IndexConfig.RecordsPerPage));
+                IndexConfig.pageNumber = encodeInteger(1 + Math.Floor(IndexConfig.recordTop / (double)IndexConfig.recordsPerPage));
                 //
                 // ----- Process indexGoToPage value
                 //
                 TestInteger = core.docProperties.getInteger("indexGoToPage");
                 if (TestInteger > 0) {
-                    IndexConfig.PageNumber = TestInteger;
-                    IndexConfig.RecordTop = ((IndexConfig.PageNumber - 1) * IndexConfig.RecordsPerPage);
+                    IndexConfig.pageNumber = TestInteger;
+                    IndexConfig.recordTop = ((IndexConfig.pageNumber - 1) * IndexConfig.recordsPerPage);
                 } else {
                     //
                     // ----- Read filter changes and First/Next/Previous from form
@@ -669,32 +669,32 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 // Force to first page
                                 //
-                                IndexConfig.PageNumber = 1;
-                                IndexConfig.RecordTop = ((IndexConfig.PageNumber - 1) * IndexConfig.RecordsPerPage);
+                                IndexConfig.pageNumber = 1;
+                                IndexConfig.recordTop = ((IndexConfig.pageNumber - 1) * IndexConfig.recordsPerPage);
                                 break;
                             case ButtonNext:
                                 //
                                 // Go to next page
                                 //
-                                IndexConfig.PageNumber = IndexConfig.PageNumber + 1;
-                                IndexConfig.RecordTop = ((IndexConfig.PageNumber - 1) * IndexConfig.RecordsPerPage);
+                                IndexConfig.pageNumber = IndexConfig.pageNumber + 1;
+                                IndexConfig.recordTop = ((IndexConfig.pageNumber - 1) * IndexConfig.recordsPerPage);
                                 break;
                             case ButtonPrevious:
                                 //
                                 // Go to previous page
                                 //
-                                IndexConfig.PageNumber = IndexConfig.PageNumber - 1;
-                                if (IndexConfig.PageNumber <= 0) {
-                                    IndexConfig.PageNumber = 1;
+                                IndexConfig.pageNumber = IndexConfig.pageNumber - 1;
+                                if (IndexConfig.pageNumber <= 0) {
+                                    IndexConfig.pageNumber = 1;
                                 }
-                                IndexConfig.RecordTop = ((IndexConfig.PageNumber - 1) * IndexConfig.RecordsPerPage);
+                                IndexConfig.recordTop = ((IndexConfig.pageNumber - 1) * IndexConfig.recordsPerPage);
                                 break;
                             case ButtonFind:
                                 //
                                 // Find (change search criteria and go to first page)
                                 //
-                                IndexConfig.PageNumber = 1;
-                                IndexConfig.RecordTop = ((IndexConfig.PageNumber - 1) * IndexConfig.RecordsPerPage);
+                                IndexConfig.pageNumber = 1;
+                                IndexConfig.recordTop = ((IndexConfig.pageNumber - 1) * IndexConfig.recordsPerPage);
                                 ColumnCnt = core.docProperties.getInteger("ColumnCnt");
                                 if (ColumnCnt > 0) {
                                     for (ColumnPtr = 0; ColumnPtr < ColumnCnt; ColumnPtr++) {
@@ -705,14 +705,14 @@ namespace Contensive.Addons.AdminSite {
                                                 if (string.IsNullOrEmpty(FindValue)) {
                                                     //
                                                     // -- find blank, if name in list, remove it
-                                                    if (IndexConfig.FindWords.ContainsKey(FindName)) {
-                                                        IndexConfig.FindWords.Remove(FindName);
+                                                    if (IndexConfig.findWords.ContainsKey(FindName)) {
+                                                        IndexConfig.findWords.Remove(FindName);
                                                     }
                                                 } else {
                                                     //
                                                     // -- nonblank find, store it
-                                                    if (IndexConfig.FindWords.ContainsKey(FindName)) {
-                                                        IndexConfig.FindWords[FindName].Value = FindValue;
+                                                    if (IndexConfig.findWords.ContainsKey(FindName)) {
+                                                        IndexConfig.findWords[FindName].Value = FindValue;
                                                     } else {
                                                         CDefFieldModel field = adminData.adminContent.fields[FindName.ToLowerInvariant()];
                                                         var findWord = new IndexConfigClass.IndexConfigFindWordClass {
@@ -739,7 +739,7 @@ namespace Contensive.Addons.AdminSite {
                                                                 findWord.MatchOption = FindWordMatchEnum.matchincludes;
                                                                 break;
                                                         }
-                                                        IndexConfig.FindWords.Add(FindName, findWord);
+                                                        IndexConfig.findWords.Add(FindName, findWord);
                                                     }
                                                 }
                                             }
@@ -757,14 +757,14 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // Remove all filters
                     //
-                    IndexConfig.FindWords = new Dictionary<string, IndexConfigClass.IndexConfigFindWordClass>();
-                    IndexConfig.GroupListCnt = 0;
-                    IndexConfig.SubCDefID = 0;
-                    IndexConfig.ActiveOnly = false;
-                    IndexConfig.LastEditedByMe = false;
-                    IndexConfig.LastEditedToday = false;
-                    IndexConfig.LastEditedPast7Days = false;
-                    IndexConfig.LastEditedPast30Days = false;
+                    IndexConfig.findWords = new Dictionary<string, IndexConfigClass.IndexConfigFindWordClass>();
+                    IndexConfig.groupListCnt = 0;
+                    IndexConfig.subCDefID = 0;
+                    IndexConfig.activeOnly = false;
+                    IndexConfig.lastEditedByMe = false;
+                    IndexConfig.lastEditedToday = false;
+                    IndexConfig.lastEditedPast7Days = false;
+                    IndexConfig.lastEditedPast30Days = false;
                 } else {
                     int VarInteger;
                     //
@@ -772,8 +772,8 @@ namespace Contensive.Addons.AdminSite {
                     //
                     VarInteger = core.docProperties.getInteger("IndexFilterAddCDef");
                     if (VarInteger != 0) {
-                        IndexConfig.SubCDefID = VarInteger;
-                        IndexConfig.PageNumber = 1;
+                        IndexConfig.subCDefID = VarInteger;
+                        IndexConfig.pageNumber = 1;
                         //                If .SubCDefCnt > 0 Then
                         //                    For Ptr = 0 To .SubCDefCnt - 1
                         //                        If VarInteger = .SubCDefs[Ptr] Then
@@ -793,8 +793,8 @@ namespace Contensive.Addons.AdminSite {
                     //
                     VarInteger = core.docProperties.getInteger("IndexFilterRemoveCDef");
                     if (VarInteger != 0) {
-                        IndexConfig.SubCDefID = 0;
-                        IndexConfig.PageNumber = 1;
+                        IndexConfig.subCDefID = 0;
+                        IndexConfig.pageNumber = 1;
                         //                If .SubCDefCnt > 0 Then
                         //                    For Ptr = 0 To .SubCDefCnt - 1
                         //                        If .SubCDefs[Ptr] = VarInteger Then
@@ -810,18 +810,18 @@ namespace Contensive.Addons.AdminSite {
                     //
                     VarText = core.docProperties.getText("IndexFilterAddGroup").ToLowerInvariant();
                     if (!string.IsNullOrEmpty(VarText)) {
-                        if (IndexConfig.GroupListCnt > 0) {
-                            for (Ptr = 0; Ptr < IndexConfig.GroupListCnt; Ptr++) {
-                                if (VarText == IndexConfig.GroupList[Ptr]) {
+                        if (IndexConfig.groupListCnt > 0) {
+                            for (Ptr = 0; Ptr < IndexConfig.groupListCnt; Ptr++) {
+                                if (VarText == IndexConfig.groupList[Ptr]) {
                                     break;
                                 }
                             }
                         }
-                        if (Ptr == IndexConfig.GroupListCnt) {
-                            Array.Resize(ref IndexConfig.GroupList, IndexConfig.GroupListCnt + 1);
-                            IndexConfig.GroupList[IndexConfig.GroupListCnt] = VarText;
-                            IndexConfig.GroupListCnt = IndexConfig.GroupListCnt + 1;
-                            IndexConfig.PageNumber = 1;
+                        if (Ptr == IndexConfig.groupListCnt) {
+                            Array.Resize(ref IndexConfig.groupList, IndexConfig.groupListCnt + 1);
+                            IndexConfig.groupList[IndexConfig.groupListCnt] = VarText;
+                            IndexConfig.groupListCnt = IndexConfig.groupListCnt + 1;
+                            IndexConfig.pageNumber = 1;
                         }
                     }
                     //
@@ -829,11 +829,11 @@ namespace Contensive.Addons.AdminSite {
                     //
                     VarText = core.docProperties.getText("IndexFilterRemoveGroup").ToLowerInvariant();
                     if (!string.IsNullOrEmpty(VarText)) {
-                        if (IndexConfig.GroupListCnt > 0) {
-                            for (Ptr = 0; Ptr < IndexConfig.GroupListCnt; Ptr++) {
-                                if (IndexConfig.GroupList[Ptr] == VarText) {
-                                    IndexConfig.GroupList[Ptr] = "";
-                                    IndexConfig.PageNumber = 1;
+                        if (IndexConfig.groupListCnt > 0) {
+                            for (Ptr = 0; Ptr < IndexConfig.groupListCnt; Ptr++) {
+                                if (IndexConfig.groupList[Ptr] == VarText) {
+                                    IndexConfig.groupList[Ptr] = "";
+                                    IndexConfig.pageNumber = 1;
                                     break;
                                 }
                             }
@@ -844,8 +844,8 @@ namespace Contensive.Addons.AdminSite {
                     //
                     VarText = core.docProperties.getText("IndexFilterRemoveFind").ToLowerInvariant();
                     if (!string.IsNullOrEmpty(VarText)) {
-                        if (IndexConfig.FindWords.ContainsKey(VarText)) {
-                            IndexConfig.FindWords.Remove(VarText);
+                        if (IndexConfig.findWords.ContainsKey(VarText)) {
+                            IndexConfig.findWords.Remove(VarText);
                         }
                         //If .FindWords.Count > 0 Then
                         //    For Ptr = 0 To .FindWords.Count - 1
@@ -863,46 +863,46 @@ namespace Contensive.Addons.AdminSite {
                     //
                     VarText = core.docProperties.getText("IndexFilterActiveOnly");
                     if (!string.IsNullOrEmpty(VarText)) {
-                        IndexConfig.ActiveOnly = GenericController.encodeBoolean(VarText);
-                        IndexConfig.PageNumber = 1;
+                        IndexConfig.activeOnly = GenericController.encodeBoolean(VarText);
+                        IndexConfig.pageNumber = 1;
                     }
                     //
                     // Read LastEditedByMe
                     //
                     VarText = core.docProperties.getText("IndexFilterLastEditedByMe");
                     if (!string.IsNullOrEmpty(VarText)) {
-                        IndexConfig.LastEditedByMe = GenericController.encodeBoolean(VarText);
-                        IndexConfig.PageNumber = 1;
+                        IndexConfig.lastEditedByMe = GenericController.encodeBoolean(VarText);
+                        IndexConfig.pageNumber = 1;
                     }
                     //
                     // Last Edited Past 30 Days
                     //
                     VarText = core.docProperties.getText("IndexFilterLastEditedPast30Days");
                     if (!string.IsNullOrEmpty(VarText)) {
-                        IndexConfig.LastEditedPast30Days = GenericController.encodeBoolean(VarText);
-                        IndexConfig.LastEditedPast7Days = false;
-                        IndexConfig.LastEditedToday = false;
-                        IndexConfig.PageNumber = 1;
+                        IndexConfig.lastEditedPast30Days = GenericController.encodeBoolean(VarText);
+                        IndexConfig.lastEditedPast7Days = false;
+                        IndexConfig.lastEditedToday = false;
+                        IndexConfig.pageNumber = 1;
                     } else {
                         //
                         // Past 7 Days
                         //
                         VarText = core.docProperties.getText("IndexFilterLastEditedPast7Days");
                         if (!string.IsNullOrEmpty(VarText)) {
-                            IndexConfig.LastEditedPast30Days = false;
-                            IndexConfig.LastEditedPast7Days = GenericController.encodeBoolean(VarText);
-                            IndexConfig.LastEditedToday = false;
-                            IndexConfig.PageNumber = 1;
+                            IndexConfig.lastEditedPast30Days = false;
+                            IndexConfig.lastEditedPast7Days = GenericController.encodeBoolean(VarText);
+                            IndexConfig.lastEditedToday = false;
+                            IndexConfig.pageNumber = 1;
                         } else {
                             //
                             // Read LastEditedToday
                             //
                             VarText = core.docProperties.getText("IndexFilterLastEditedToday");
                             if (!string.IsNullOrEmpty(VarText)) {
-                                IndexConfig.LastEditedPast30Days = false;
-                                IndexConfig.LastEditedPast7Days = false;
-                                IndexConfig.LastEditedToday = GenericController.encodeBoolean(VarText);
-                                IndexConfig.PageNumber = 1;
+                                IndexConfig.lastEditedPast30Days = false;
+                                IndexConfig.lastEditedPast7Days = false;
+                                IndexConfig.lastEditedToday = GenericController.encodeBoolean(VarText);
+                                IndexConfig.pageNumber = 1;
                             }
                         }
                     }
@@ -911,32 +911,32 @@ namespace Contensive.Addons.AdminSite {
                     //
                     VarText = core.docProperties.getText("IndexFilterOpen");
                     if (!string.IsNullOrEmpty(VarText)) {
-                        IndexConfig.Open = GenericController.encodeBoolean(VarText);
-                        IndexConfig.PageNumber = 1;
+                        IndexConfig.open = GenericController.encodeBoolean(VarText);
+                        IndexConfig.pageNumber = 1;
                     }
                     if (core.docProperties.getBoolean("IndexSortRemoveAll")) {
                         //
                         // Remove all filters
-                        IndexConfig.Sorts = new Dictionary<string, IndexConfigClass.IndexConfigSortClass>();
+                        IndexConfig.sorts = new Dictionary<string, IndexConfigClass.IndexConfigSortClass>();
                     } else {
                         //
                         // SortField
                         string setSortField = core.docProperties.getText("SetSortField").ToLowerInvariant();
                         if (!string.IsNullOrEmpty(setSortField)) {
-                            bool sortFound = IndexConfig.Sorts.ContainsKey(setSortField);
+                            bool sortFound = IndexConfig.sorts.ContainsKey(setSortField);
                             int sortDirection = core.docProperties.getInteger("SetSortDirection");
                             if (!sortFound) {
-                                IndexConfig.Sorts.Add(setSortField, new IndexConfigClass.IndexConfigSortClass {
+                                IndexConfig.sorts.Add(setSortField, new IndexConfigClass.IndexConfigSortClass {
                                     fieldName = setSortField,
                                     direction = 1,
-                                    order = IndexConfig.Sorts.Count + 1
+                                    order = IndexConfig.sorts.Count + 1
                                 });
                             } else if (sortDirection > 0) {
-                                IndexConfig.Sorts[setSortField].direction = sortDirection;
+                                IndexConfig.sorts[setSortField].direction = sortDirection;
                             } else {
-                                IndexConfig.Sorts.Remove(setSortField);
+                                IndexConfig.sorts.Remove(setSortField);
                                 int sortOrder = 1;
-                                foreach (var kvp in IndexConfig.Sorts) {
+                                foreach (var kvp in IndexConfig.sorts) {
                                     kvp.Value.order = sortOrder++;
                                 }
                             }
@@ -1039,21 +1039,21 @@ namespace Contensive.Addons.AdminSite {
                             JoinTablename = CdefController.getContentTablename(core, LookupContentName);
                         }
                         IncludedInLeftJoin = IncludedInColumns;
-                        if (IndexConfig.FindWords.Count > 0) {
+                        if (IndexConfig.findWords.Count > 0) {
                             //
                             // test findwords
                             //
-                            if (IndexConfig.FindWords.ContainsKey(field.nameLc)) {
-                                if (IndexConfig.FindWords[field.nameLc].MatchOption != FindWordMatchEnum.MatchIgnore) {
+                            if (IndexConfig.findWords.ContainsKey(field.nameLc)) {
+                                if (IndexConfig.findWords[field.nameLc].MatchOption != FindWordMatchEnum.MatchIgnore) {
                                     IncludedInLeftJoin = true;
                                 }
                             }
                         }
-                        if ((!IncludedInLeftJoin) && IndexConfig.Sorts.Count > 0) {
+                        if ((!IncludedInLeftJoin) && IndexConfig.sorts.Count > 0) {
                             //
                             // test sorts
                             //
-                            if (IndexConfig.Sorts.ContainsKey(field.nameLc.ToLowerInvariant())) {
+                            if (IndexConfig.sorts.ContainsKey(field.nameLc.ToLowerInvariant())) {
                                 IncludedInLeftJoin = true;
                             }
                         }
@@ -1081,8 +1081,8 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // Sub CDef filter
                 //
-                if (IndexConfig.SubCDefID > 0) {
-                    ContentName = CdefController.getContentNameByID(core, IndexConfig.SubCDefID);
+                if (IndexConfig.subCDefID > 0) {
+                    ContentName = CdefController.getContentNameByID(core, IndexConfig.subCDefID);
                     return_SQLWhere += "AND(" + CdefController.getContentControlCriteria(core, ContentName) + ")";
                 }
                 //
@@ -1091,9 +1091,9 @@ namespace Contensive.Addons.AdminSite {
                 DateTime rightNow = DateTime.Now;
                 string sqlRightNow = DbController.encodeSQLDate(rightNow);
                 if (adminData.adminContent.tableName.ToLowerInvariant() == "ccmembers") {
-                    if (IndexConfig.GroupListCnt > 0) {
-                        for (Ptr = 0; Ptr < IndexConfig.GroupListCnt; Ptr++) {
-                            GroupName = IndexConfig.GroupList[Ptr];
+                    if (IndexConfig.groupListCnt > 0) {
+                        for (Ptr = 0; Ptr < IndexConfig.groupListCnt; Ptr++) {
+                            GroupName = IndexConfig.groupList[Ptr];
                             if (!string.IsNullOrEmpty(GroupName)) {
                                 GroupID = core.db.getRecordID("Groups", GroupName);
                                 if (GroupID == 0 && GroupName.IsNumeric()) {
@@ -1166,31 +1166,31 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // Where Clause: Active Only
                 //
-                if (IndexConfig.ActiveOnly) {
+                if (IndexConfig.activeOnly) {
                     return_SQLWhere += "AND(" + adminData.adminContent.tableName + ".active<>0)";
                 }
                 //
                 // Where Clause: edited by me
                 //
-                if (IndexConfig.LastEditedByMe) {
+                if (IndexConfig.lastEditedByMe) {
                     return_SQLWhere += "AND(" + adminData.adminContent.tableName + ".ModifiedBy=" + core.session.user.id + ")";
                 }
                 //
                 // Where Clause: edited today
                 //
-                if (IndexConfig.LastEditedToday) {
+                if (IndexConfig.lastEditedToday) {
                     return_SQLWhere += "AND(" + adminData.adminContent.tableName + ".ModifiedDate>=" + DbController.encodeSQLDate(core.doc.profileStartTime.Date) + ")";
                 }
                 //
                 // Where Clause: edited past week
                 //
-                if (IndexConfig.LastEditedPast7Days) {
+                if (IndexConfig.lastEditedPast7Days) {
                     return_SQLWhere += "AND(" + adminData.adminContent.tableName + ".ModifiedDate>=" + DbController.encodeSQLDate(core.doc.profileStartTime.Date.AddDays(-7)) + ")";
                 }
                 //
                 // Where Clause: edited past month
                 //
-                if (IndexConfig.LastEditedPast30Days) {
+                if (IndexConfig.lastEditedPast30Days) {
                     return_SQLWhere += "AND(" + adminData.adminContent.tableName + ".ModifiedDate>=" + DbController.encodeSQLDate(core.doc.profileStartTime.Date.AddDays(-30)) + ")";
                 }
                 //
@@ -1223,8 +1223,8 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // Where Clause: findwords
                 //
-                if (IndexConfig.FindWords.Count > 0) {
-                    foreach (var kvp in IndexConfig.FindWords) {
+                if (IndexConfig.findWords.Count > 0) {
+                    foreach (var kvp in IndexConfig.findWords) {
                         IndexConfigClass.IndexConfigFindWordClass findword = kvp.Value;
                         FindMatchOption = (int)findword.MatchOption;
                         if (FindMatchOption != (int)FindWordMatchEnum.MatchIgnore) {
@@ -1455,7 +1455,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 return_SQLOrderBy = "";
                 string orderByDelim = " ";
-                foreach (var kvp in IndexConfig.Sorts) {
+                foreach (var kvp in IndexConfig.sorts) {
                     IndexConfigClass.IndexConfigSortClass sort = kvp.Value;
                     SortFieldName = GenericController.vbLCase(sort.fieldName);
                     //
@@ -1516,7 +1516,7 @@ namespace Contensive.Addons.AdminSite {
                 // Remove filters
                 //-------------------------------------------------------------------------------------
                 //
-                if ((IndexConfig.SubCDefID > 0) || (IndexConfig.GroupListCnt != 0) || (IndexConfig.FindWords.Count != 0) || IndexConfig.ActiveOnly || IndexConfig.LastEditedByMe || IndexConfig.LastEditedToday || IndexConfig.LastEditedPast7Days || IndexConfig.LastEditedPast30Days) {
+                if ((IndexConfig.subCDefID > 0) || (IndexConfig.groupListCnt != 0) || (IndexConfig.findWords.Count != 0) || IndexConfig.activeOnly || IndexConfig.lastEditedByMe || IndexConfig.lastEditedToday || IndexConfig.lastEditedPast7Days || IndexConfig.lastEditedPast30Days) {
                     //
                     // Remove Filters
                     //
@@ -1527,23 +1527,23 @@ namespace Contensive.Addons.AdminSite {
                     // Last Edited Edited by me
                     //
                     SubFilterList = "";
-                    if (IndexConfig.LastEditedByMe) {
+                    if (IndexConfig.lastEditedByMe) {
                         Link = "/" + core.appConfig.adminRoute + "?" + GenericController.modifyQueryString(RQS, "IndexFilterLastEditedByMe", 0.ToString(), true);
                         SubFilterList += HtmlController.div(getIconDeleteLink(Link) + "&nbsp;By&nbsp;Me", "ccFilterIndent ccFilterList");
                     }
-                    if (IndexConfig.LastEditedToday) {
+                    if (IndexConfig.lastEditedToday) {
                         QS = RQS;
                         QS = GenericController.modifyQueryString(QS, "IndexFilterLastEditedToday", 0.ToString(), true);
                         Link = "/" + core.appConfig.adminRoute + "?" + QS;
                         SubFilterList += HtmlController.div(getIconDeleteLink(Link) + "&nbsp;Today", "ccFilterIndent ccFilterList");
                     }
-                    if (IndexConfig.LastEditedPast7Days) {
+                    if (IndexConfig.lastEditedPast7Days) {
                         QS = RQS;
                         QS = GenericController.modifyQueryString(QS, "IndexFilterLastEditedPast7Days", 0.ToString(), true);
                         Link = "/" + core.appConfig.adminRoute + "?" + QS;
                         SubFilterList += HtmlController.div(getIconDeleteLink(Link) + "&nbsp;Past Week", "ccFilterIndent ccFilterList");
                     }
-                    if (IndexConfig.LastEditedPast30Days) {
+                    if (IndexConfig.lastEditedPast30Days) {
                         QS = RQS;
                         QS = GenericController.modifyQueryString(QS, "IndexFilterLastEditedPast30Days", 0.ToString(), true);
                         Link = "/" + core.appConfig.adminRoute + "?" + QS;
@@ -1557,10 +1557,10 @@ namespace Contensive.Addons.AdminSite {
                     //
                     string SubContentName = null;
                     SubFilterList = "";
-                    if (IndexConfig.SubCDefID > 0) {
-                        SubContentName = CdefController.getContentNameByID(core, IndexConfig.SubCDefID);
+                    if (IndexConfig.subCDefID > 0) {
+                        SubContentName = CdefController.getContentNameByID(core, IndexConfig.subCDefID);
                         QS = RQS;
-                        QS = GenericController.modifyQueryString(QS, "IndexFilterRemoveCDef", encodeText(IndexConfig.SubCDefID));
+                        QS = GenericController.modifyQueryString(QS, "IndexFilterRemoveCDef", encodeText(IndexConfig.subCDefID));
                         Link = "/" + core.appConfig.adminRoute + "?" + QS;
                         SubFilterList += HtmlController.div(getIconDeleteLink(Link) + "&nbsp;" + SubContentName + "", "ccFilterIndent");
                     }
@@ -1572,15 +1572,15 @@ namespace Contensive.Addons.AdminSite {
                     //
                     string GroupName = null;
                     SubFilterList = "";
-                    if (IndexConfig.GroupListCnt > 0) {
-                        for (Ptr = 0; Ptr < IndexConfig.GroupListCnt; Ptr++) {
-                            GroupName = IndexConfig.GroupList[Ptr];
-                            if (IndexConfig.GroupList[Ptr] != "") {
+                    if (IndexConfig.groupListCnt > 0) {
+                        for (Ptr = 0; Ptr < IndexConfig.groupListCnt; Ptr++) {
+                            GroupName = IndexConfig.groupList[Ptr];
+                            if (IndexConfig.groupList[Ptr] != "") {
                                 if (GroupName.Length > 30) {
                                     GroupName = GroupName.Left(15) + "..." + GroupName.Substring(GroupName.Length - 15);
                                 }
                                 QS = RQS;
-                                QS = GenericController.modifyQueryString(QS, "IndexFilterRemoveGroup", IndexConfig.GroupList[Ptr]);
+                                QS = GenericController.modifyQueryString(QS, "IndexFilterRemoveGroup", IndexConfig.groupList[Ptr]);
                                 Link = "/" + core.appConfig.adminRoute + "?" + QS;
                                 SubFilterList += HtmlController.div(getIconDeleteLink(Link) + "&nbsp;" + GroupName + "", "ccFilterIndent");
                             }
@@ -1593,7 +1593,7 @@ namespace Contensive.Addons.AdminSite {
                     // Other Filter List
                     //
                     SubFilterList = "";
-                    if (IndexConfig.ActiveOnly) {
+                    if (IndexConfig.activeOnly) {
                         QS = RQS;
                         QS = GenericController.modifyQueryString(QS, "IndexFilterActiveOnly", 0.ToString(), true);
                         Link = "/" + core.appConfig.adminRoute + "?" + QS;
@@ -1605,7 +1605,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // FindWords
                     //
-                    foreach (var findWordKvp in IndexConfig.FindWords) {
+                    foreach (var findWordKvp in IndexConfig.findWords) {
                         IndexConfigClass.IndexConfigFindWordClass findWord = findWordKvp.Value;
                         FieldCaption = GenericController.encodeText(CdefController.getContentFieldProperty(core, ContentName, findWord.Name, "caption"));
                         QS = RQS;
@@ -1651,25 +1651,25 @@ namespace Contensive.Addons.AdminSite {
                 // Last Edited
                 //
                 SubFilterList = "";
-                if (!IndexConfig.LastEditedByMe) {
+                if (!IndexConfig.lastEditedByMe) {
                     QS = RQS;
                     QS = GenericController.modifyQueryString(QS, "IndexFilterLastEditedByMe", "1", true);
                     Link = "/" + core.appConfig.adminRoute + "?" + QS;
                     SubFilterList = SubFilterList + "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\">By&nbsp;Me</a></div>";
                 }
-                if (!IndexConfig.LastEditedToday) {
+                if (!IndexConfig.lastEditedToday) {
                     QS = RQS;
                     QS = GenericController.modifyQueryString(QS, "IndexFilterLastEditedToday", "1", true);
                     Link = "/" + core.appConfig.adminRoute + "?" + QS;
                     SubFilterList = SubFilterList + "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\">Today</a></div>";
                 }
-                if (!IndexConfig.LastEditedPast7Days) {
+                if (!IndexConfig.lastEditedPast7Days) {
                     QS = RQS;
                     QS = GenericController.modifyQueryString(QS, "IndexFilterLastEditedPast7Days", "1", true);
                     Link = "/" + core.appConfig.adminRoute + "?" + QS;
                     SubFilterList = SubFilterList + "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\">Past Week</a></div>";
                 }
-                if (!IndexConfig.LastEditedPast30Days) {
+                if (!IndexConfig.lastEditedPast30Days) {
                     QS = RQS;
                     QS = GenericController.modifyQueryString(QS, "IndexFilterLastEditedPast30Days", "1", true);
                     Link = "/" + core.appConfig.adminRoute + "?" + QS;
@@ -1704,14 +1704,14 @@ namespace Contensive.Addons.AdminSite {
                     while (core.db.csOk(CS)) {
                         string Name = core.db.csGetText(CS, "Name");
                         Ptr = 0;
-                        if (IndexConfig.GroupListCnt > 0) {
-                            for (Ptr = 0; Ptr < IndexConfig.GroupListCnt; Ptr++) {
-                                if (Name == IndexConfig.GroupList[Ptr]) {
+                        if (IndexConfig.groupListCnt > 0) {
+                            for (Ptr = 0; Ptr < IndexConfig.groupListCnt; Ptr++) {
+                                if (Name == IndexConfig.groupList[Ptr]) {
                                     break;
                                 }
                             }
                         }
-                        if (Ptr == IndexConfig.GroupListCnt) {
+                        if (Ptr == IndexConfig.groupListCnt) {
                             int RecordID = core.db.csGetInteger(CS, "ID");
                             Caption = core.db.csGetText(CS, "Caption");
                             if (string.IsNullOrEmpty(Caption)) {
@@ -1743,7 +1743,7 @@ namespace Contensive.Addons.AdminSite {
                 // Active Only
                 //
                 SubFilterList = "";
-                if (!IndexConfig.ActiveOnly) {
+                if (!IndexConfig.activeOnly) {
                     QS = RQS;
                     QS = GenericController.modifyQueryString(QS, "IndexFilterActiveOnly", "1", true);
                     Link = "/" + core.appConfig.adminRoute + "?" + QS;

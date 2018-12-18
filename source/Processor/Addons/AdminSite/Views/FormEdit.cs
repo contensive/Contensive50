@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
@@ -13,7 +12,7 @@ using Contensive.Processor.Exceptions;
 using Contensive.Addons.AdminSite.Controllers;
 
 namespace Contensive.Addons.AdminSite {
-    public class FormEdit {
+    public static class FormEdit {
         //
         // ====================================================================================================
         /// <summary>
@@ -49,33 +48,15 @@ namespace Contensive.Addons.AdminSite {
                     //
                     foreach (var keyValuePair in adminData.adminContent.fields) {
                         CDefFieldModel field = keyValuePair.Value;
-                        switch (field.fieldTypeId) {
-                            case _fieldTypeIdFile:
-                            case _fieldTypeIdFileImage:
-                                adminData.editRecord.fieldsLc[field.nameLc].value = adminData.editRecord.fieldsLc[field.nameLc].dbValue;
-                                break;
+                        if ((keyValuePair.Value.fieldTypeId== _fieldTypeIdFile) || (keyValuePair.Value.fieldTypeId == _fieldTypeIdFileImage)) {
+                            adminData.editRecord.fieldsLc[field.nameLc].value = adminData.editRecord.fieldsLc[field.nameLc].dbValue;
                         }
                     }
                 } else {
                     //
                     // otherwise, load the record, even if it was loaded during a previous form process
                     adminData.LoadEditRecord(core,true);
-                    // -- allow for record to have no content control id
-                    //if (adminInfo.editRecord.contentControlId == 0) {
-                    //    if (core.doc.debug_iUserError != "") {
-                    //        //
-                    //        // known user error, just return
-                    //    } else {
-                    //        //
-                    //        // unknown error, set userError and return
-                    //        ErrorController.addUserError(core, "There was an unknown error in your request for data. Please let the site administrator know.");
-                    //    }
-                    //    return "";
-                    //}
                 }
-                //
-                // Test if this editors has access to this record
-
                 if (!AdminDataModel.userHasContentAccess(core, ((adminData.editRecord.contentControlId.Equals(0)) ? adminData.adminContent.id : adminData.editRecord.contentControlId))) {
                     Processor.Controllers.ErrorController.addUserError(core, "Your account on this system does not have access rights to edit this content.");
                     return "";

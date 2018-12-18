@@ -2969,7 +2969,7 @@ namespace Contensive.Addons.AdminSite {
             //
             // --Find words
             string SubList = "";
-            foreach (var kvp in IndexConfig.FindWords) {
+            foreach (var kvp in IndexConfig.findWords) {
                 IndexConfigClass.IndexConfigFindWordClass findWord = kvp.Value;
                 if ((!string.IsNullOrEmpty(findWord.Name)) && (findWord.MatchOption != FindWordMatchEnum.MatchIgnore)) {
                     SubList = SubList + "\r\n" + findWord.Name + "\t" + findWord.Value + "\t" + (int)findWord.MatchOption;
@@ -2981,18 +2981,18 @@ namespace Contensive.Addons.AdminSite {
             }
             //
             // --CDef List
-            if (IndexConfig.SubCDefID > 0) {
-                FilterText += "\r\nCDefList\r\n" + IndexConfig.SubCDefID + "\r\n";
+            if (IndexConfig.subCDefID > 0) {
+                FilterText += "\r\nCDefList\r\n" + IndexConfig.subCDefID + "\r\n";
             }
             //
             // -- Group List
             SubList = "";
-            if (IndexConfig.GroupListCnt > 0) {
+            if (IndexConfig.groupListCnt > 0) {
                 //
                 int Ptr = 0;
-                for (Ptr = 0; Ptr < IndexConfig.GroupListCnt; Ptr++) {
-                    if (!string.IsNullOrEmpty(IndexConfig.GroupList[Ptr])) {
-                        SubList = SubList + "\r\n" + IndexConfig.GroupList[Ptr];
+                for (Ptr = 0; Ptr < IndexConfig.groupListCnt; Ptr++) {
+                    if (!string.IsNullOrEmpty(IndexConfig.groupList[Ptr])) {
+                        SubList = SubList + "\r\n" + IndexConfig.groupList[Ptr];
                     }
                 }
             }
@@ -3003,38 +3003,38 @@ namespace Contensive.Addons.AdminSite {
             // PageNumber and Records Per Page
             FilterText += "\r\n"
                 + "\r\npagenumber"
-                + "\r\n" + IndexConfig.PageNumber;
+                + "\r\n" + IndexConfig.pageNumber;
             FilterText += "\r\n"
                 + "\r\nrecordsperpage"
-                + "\r\n" + IndexConfig.RecordsPerPage;
+                + "\r\n" + IndexConfig.recordsPerPage;
             //
             // misc filters
-            if (IndexConfig.ActiveOnly) {
+            if (IndexConfig.activeOnly) {
                 FilterText += "\r\n"
                     + "\r\nIndexFilterActiveOnly";
             }
-            if (IndexConfig.LastEditedByMe) {
+            if (IndexConfig.lastEditedByMe) {
                 FilterText += "\r\n"
                     + "\r\nIndexFilterLastEditedByMe";
             }
-            if (IndexConfig.LastEditedToday) {
+            if (IndexConfig.lastEditedToday) {
                 FilterText += "\r\n"
                     + "\r\nIndexFilterLastEditedToday";
             }
-            if (IndexConfig.LastEditedPast7Days) {
+            if (IndexConfig.lastEditedPast7Days) {
                 FilterText += "\r\n"
                     + "\r\nIndexFilterLastEditedPast7Days";
             }
-            if (IndexConfig.LastEditedPast30Days) {
+            if (IndexConfig.lastEditedPast30Days) {
                 FilterText += "\r\n"
                     + "\r\nIndexFilterLastEditedPast30Days";
             }
-            if (IndexConfig.Open) {
+            if (IndexConfig.open) {
                 FilterText += "\r\n"
                     + "\r\nIndexFilterOpen";
             }
             //
-            cp.core.visitProperty.setProperty(AdminDataModel.IndexConfigPrefix + encodeText(IndexConfig.ContentID), FilterText);
+            cp.core.visitProperty.setProperty(AdminDataModel.IndexConfigPrefix + encodeText(IndexConfig.contentID), FilterText);
             //
             //   Member Properties (persistant)
             //
@@ -3053,7 +3053,7 @@ namespace Contensive.Addons.AdminSite {
             // Sorts
             //
             SubList = "";
-            foreach (var kvp in IndexConfig.Sorts) {
+            foreach (var kvp in IndexConfig.sorts) {
                 IndexConfigClass.IndexConfigSortClass sort = kvp.Value;
                 if (!string.IsNullOrEmpty(sort.fieldName)) {
                     SubList = SubList + "\r\n" + sort.fieldName + "\t" + sort.direction;
@@ -3062,7 +3062,7 @@ namespace Contensive.Addons.AdminSite {
             if (!string.IsNullOrEmpty(SubList)) {
                 FilterText += "\r\nSorts" + SubList + "\r\n";
             }
-            cp.core.userProperty.setProperty(AdminDataModel.IndexConfigPrefix + encodeText(IndexConfig.ContentID), FilterText);
+            cp.core.userProperty.setProperty(AdminDataModel.IndexConfigPrefix + encodeText(IndexConfig.contentID), FilterText);
             //
 
         }
