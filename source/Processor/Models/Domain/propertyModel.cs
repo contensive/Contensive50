@@ -306,7 +306,7 @@ namespace Contensive.Processor.Models.Domain {
                 propertyCache_nameIndex = new KeyPtrController();
                 propertyCacheCnt = 0;
                 //
-                using (DataTable dt = core.db.executeQuery("select Name,FieldValue,ID from ccProperties where (active<>0)and(TypeID=" + propertyType + ")and(KeyID=" + keyId + ")")) {
+                using (DataTable dt = core.db.executeQuery("select Name,FieldValue,ID from ccProperties where (active<>0)and(TypeID=" + (int)propertyType + ")and(KeyID=" + keyId + ")")) {
                     if (dt.Rows.Count > 0) {
                         propertyCache = new string[3, dt.Rows.Count];
                         foreach (DataRow dr in dt.Rows) {

@@ -2259,19 +2259,9 @@ namespace Contensive.Processor.Controllers {
                                                             TriggerContentID = core.db.csGetInteger(CS2, "ID");
                                                         }
                                                         core.db.csClose(ref CS2);
-                                                        //If TriggerContentID = 0 Then
-                                                        //    CS2 = core.db.cs_insertRecord("Scripting Modules", 0)
-                                                        //    If core.db.cs_ok(CS2) Then
-                                                        //        Call core.db.cs_set(CS2, "name", ScriptingNameorGuid)
-                                                        //        Call core.db.cs_set(CS2, "ccguid", ScriptingNameorGuid)
-                                                        //        TriggerContentID = core.db.cs_getInteger(CS2, "ID")
-                                                        //    End If
-                                                        //    Call core.db.cs_Close(CS2)
-                                                        //End If
                                                         if (TriggerContentID == 0) {
                                                             //
                                                             // could not find the content
-                                                            //
                                                         } else {
                                                             Criteria = "(addonid=" + addonId + ")and(contentid=" + TriggerContentID + ")";
                                                             CS2 = core.db.csOpen("Add-on Content Trigger Rules", Criteria);
@@ -2364,46 +2354,6 @@ namespace Contensive.Processor.Controllers {
                                                 NewValue = NewValue + "}";
                                             }
                                             StyleSheet = StyleSheet + "\r\n" + NodeName + " " + NewValue;
-                                            //Case "includesharedstyle"
-                                            //    '
-                                            //    ' added 9/3/2012
-                                            //    '
-                                            //    sharedStyleId = 0
-                                            //    nodeNameOrGuid =xmlController.GetXMLAttribute(core,IsFound, PageInterface, "guid", "")
-                                            //    If nodeNameOrGuid = "" Then
-                                            //        nodeNameOrGuid =xmlController.GetXMLAttribute(core,IsFound, PageInterface, "name", "")
-                                            //    End If
-                                            //    Criteria = "(ccguid=" & DbController.encodeSQLText(nodeNameOrGuid) & ")"
-                                            //    CS2 = core.db.cs_open("shared styles", Criteria)
-                                            //    If Not core.db.cs_ok(CS2) Then
-                                            //        Call core.db.cs_Close(CS2)
-                                            //        Criteria = "(ccguid is null)and(name=" & DbController.encodeSQLText(nodeNameOrGuid) & ")"
-                                            //        CS2 = core.db.cs_open("shared styles", Criteria)
-                                            //    End If
-                                            //    If core.db.cs_ok(CS2) Then
-                                            //        sharedStyleId = core.db.cs_getInteger(CS2, "ID")
-                                            //    End If
-                                            //    Call core.db.cs_Close(CS2)
-                                            //    If sharedStyleId = 0 Then
-                                            //        CS2 = core.db.cs_insertRecord("shared styles", 0)
-                                            //        If core.db.cs_ok(CS2) Then
-                                            //            Call core.db.cs_set(CS2, "name", nodeNameOrGuid)
-                                            //            Call core.db.cs_set(CS2, "ccguid", nodeNameOrGuid)
-                                            //            sharedStyleId = core.db.cs_getInteger(CS2, "ID")
-                                            //        End If
-                                            //        Call core.db.cs_Close(CS2)
-                                            //    End If
-                                            //    Criteria = "(addonid=" & addonId & ")and(StyleId=" & sharedStyleId & ")"
-                                            //    CS2 = core.db.cs_open("Shared Styles Add-on Rules", Criteria)
-                                            //    If Not core.db.cs_ok(CS2) Then
-                                            //        Call core.db.cs_Close(CS2)
-                                            //        CS2 = core.db.cs_insertRecord("Shared Styles Add-on Rules", 0)
-                                            //        If core.db.cs_ok(CS2) Then
-                                            //            Call core.db.cs_set(CS2, "addonid", addonId)
-                                            //            Call core.db.cs_set(CS2, "StyleId", sharedStyleId)
-                                            //        End If
-                                            //    End If
-                                            //    Call core.db.cs_Close(CS2)
                                             break;
                                         case "stylesheet":
                                         case "styles":
