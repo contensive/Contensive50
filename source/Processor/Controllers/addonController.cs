@@ -1732,6 +1732,7 @@ namespace Contensive.Processor.Controllers {
                                                 }
                                             } catch (Exception Ex) {
                                                 string detailedErrorMessage = addon.name + " could not be executed because there was an error creating an object from the assembly, DLL [" + addonType.FullName + "]. The error was [" + Ex.ToString() + "]";
+                                                LogController.handleError(core, Ex, detailedErrorMessage);
                                                 throw new GenericException(detailedErrorMessage);
                                             }
                                             //

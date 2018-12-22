@@ -2567,7 +2567,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="CSPointer"></param>
         /// <returns></returns>
-        public string csGetSource(int CSPointer) {
+        public string csGetSql(int CSPointer) {
             string returnResult = "";
             try {
                 if (!csOk(CSPointer)) {

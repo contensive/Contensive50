@@ -250,13 +250,13 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CPBase51\CPBase51.csproj">
+      <Project>{29b26629-df94-4e7c-9f83-7e76cb4f342e}</Project>
+      <Name>CPBase51</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Processor\Processor.csproj">
       <Project>{46657d07-74bc-4ddc-8fdd-9078eb1a1cd2}</Project>
       <Name>Processor</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\CPBase50\CPBase501.csproj">
-      <Project>{0619e0e6-1565-47e7-b8fe-f8bd1c8eb48b}</Project>
-      <Name>CPBase501</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

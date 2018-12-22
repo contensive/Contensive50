@@ -325,12 +325,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CPBase50\CPBase501.csproj">
-      <Project>{0619e0e6-1565-47e7-b8fe-f8bd1c8eb48b}</Project>
-      <Name>CPBase501</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Addons\AdminSite\Resources\GroupRuleEditorRow2.html" />
     <Content Include="Addons\AdminSite\Resources\GroupRuleEditorRow.html" />
     <Content Include="aoBase5.xml">
@@ -367,6 +361,12 @@
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\packages\AWSSDK.S3.3.3.24.2\analyzers\dotnet\cs\AWSSDK.S3.CodeAnalysis.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CPBase51\CPBase51.csproj">
+      <Project>{29b26629-df94-4e7c-9f83-7e76cb4f342e}</Project>
+      <Name>CPBase51</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

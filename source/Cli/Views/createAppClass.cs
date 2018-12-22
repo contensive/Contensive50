@@ -45,7 +45,7 @@ namespace Contensive.CLI {
                         Assembly myAssembly = Assembly.GetAssembly(myType);
                         AssemblyName myAssemblyname = myAssembly.GetName();
                         Version myVersion = myAssemblyname.Version;
-                        string appNameDefault = "app" + rightNow.Year + rightNow.Month.ToString().PadLeft(2, '0') + rightNow.Day.ToString().PadLeft(2, '0') + "v" + myVersion.Major.ToString("0") + myVersion.Minor.ToString("00");
+                        string appNameDefault = "app" + rightNow.Year + rightNow.Month.ToString().PadLeft(2, '0') + rightNow.Day.ToString().PadLeft(2, '0') + "v" + myVersion.Major.ToString("0") + myVersion.Minor.ToString("0");
                         appName = cliController.promptForReply("Application Name", appNameDefault).ToLowerInvariant();
                         appNameOk = !cp.core.serverConfig.apps.ContainsKey(appName.ToLowerInvariant());
                         if (!appNameOk) { Console.Write("\n\nThere is already an application with this name. To get the current server configuration, use cc -s"); }
