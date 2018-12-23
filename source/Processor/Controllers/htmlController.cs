@@ -1074,6 +1074,8 @@ namespace Contensive.Processor.Controllers {
         //
         public string inputRadio(string htmlName, string htmlValue, string CurrentValue, string htmlId) => inputRadio(htmlName, htmlValue, CurrentValue, htmlId, "");
         //
+        //====================================================================================================
+        //
         public string inputRadio(string htmlName, string htmlValue, string CurrentValue) => inputRadio(htmlName, htmlValue, CurrentValue, "", "");
         //
         //====================================================================================================
@@ -3845,6 +3847,14 @@ namespace Contensive.Processor.Controllers {
             if (!String.IsNullOrWhiteSpace(htmlId)) { tag.Append(" id=\"").Append(htmlId).Append("\""); }
             if (!String.IsNullOrWhiteSpace(tabIndex)) { tag.Append(" tabindex=\"").Append(tabIndex).Append("\""); }
             tag.Append(">").Append(innerHtml).Append("</a>");
+            return tag.ToString();
+        }
+        //
+        // ====================================================================================================
+        //
+        public static string style( string innerStyleSheet ) {
+            var tag = new StringBuilder("<style type=\"text/css\">");
+            tag.Append(innerStyleSheet).Append("</style>");
             return tag.ToString();
         }
     }

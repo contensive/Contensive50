@@ -3,53 +3,181 @@ using System;
 
 namespace Contensive.BaseClasses {
     public abstract class CPDocBaseClass {
-        public abstract string Content { get; set; }
-        [Obsolete("Use addon navigation.", true)] public abstract string NavigationStructure { get; }
-        public abstract bool NoFollow { get; set; }
-        public abstract int PageId { get; }
-        public abstract string PageName { get; }
-        public abstract string RefreshQueryString { get; }
-        [Obsolete("Section is no longer supported", true)] public abstract int SectionId { get; }
-        public abstract DateTime StartTime { get; }
-        public abstract int TemplateId { get; }
-        public abstract string Type { get; }
-        public abstract void AddHeadStyle(string StyleSheet);
-        public abstract void AddHeadStyleLink(string StyleSheetLink);
-        public abstract void AddHeadJavascript(string NewCode);
-        public abstract void AddHeadTag(string HeadTag);
-        public abstract void AddMetaDescription(string MetaDescription);
-        public abstract void AddMetaKeywordList(string MetaKeywordList);
-        public abstract void AddOnLoadJavascript(string NewCode);
-        public abstract void AddTitle(string PageTitle);
-        public abstract void AddBodyEnd(string html);
-        public abstract string Body { get; set; }
-        [Obsolete("Site styles are no longer supported. Include styles and javascript in addons.", true)] public abstract string SiteStylesheet { get; }
-        public abstract void SetProperty(string FieldName, string FieldValue);
-        public abstract string GetProperty(string PropertyName, string DefaultValue = "");
-        public abstract string GetText(string PropertyName, string DefaultValue = "");
-        public abstract bool GetBoolean(string PropertyName, string DefaultValue = "");
-        public abstract DateTime GetDate(string PropertyName, string DefaultValue = "");
-        public abstract int GetInteger(string PropertyName, string DefaultValue = "");
-        public abstract double GetNumber(string PropertyName, string DefaultValue = "");
-        public abstract bool IsProperty(string PropertyName);
-        public abstract bool IsAdminSite { get; }
-        public abstract string get_GlobalVar(string Index);
-        public abstract void set_GlobalVar(string Index, string Value);
-        public abstract bool get_IsGlobalVar(string Index);
-        public abstract bool get_IsVar(string Index);
-        public abstract string get_Var(string Index);
-        public abstract void set_Var(string Index, string Value);
         //
-        public abstract void AddRefreshQueryString(string Name, string Value);
-        public abstract void AddRefreshQueryString(string Name, int Value);
-        public abstract void AddRefreshQueryString(string Name, Double Value);
-        public abstract void AddRefreshQueryString(string Name, bool Value);
-        public abstract void AddRefreshQueryString(string Name, DateTime Value);
+        //====================================================================================================
+        //
+        public abstract bool NoFollow { get; set; }
+        //
+        //====================================================================================================
+        //
+        public abstract int PageId { get; }
+        //
+        //====================================================================================================
+        //
+        public abstract string PageName { get; }
+        //
+        //====================================================================================================
+        //
+        public abstract string RefreshQueryString { get; }
+        //
+        //====================================================================================================
+        //
+        public abstract DateTime StartTime { get; }
+        //
+        //====================================================================================================
+        //
+        public abstract int TemplateId { get; }
+        //
+        //====================================================================================================
+        //
+        public abstract string Type { get; }
+        //
+        //====================================================================================================
+        //
+        public abstract void AddHeadStyle(string styleSheet);
+        //
+        //====================================================================================================
+        //
+        public abstract void AddHeadStyleLink(string styleSheetLink);
+        //
+        //====================================================================================================
+        //
+        public abstract void AddHeadJavascript(string code);
+        //
+        //====================================================================================================
+        //
+        public abstract void AddHeadTag(string htmlTag);
+        //
+        //====================================================================================================
+        //
+        public abstract void AddMetaDescription(string metaDescription);
+        //
+        //====================================================================================================
+        //
+        public abstract void AddMetaKeywordList(string metaKeywordList);
+        //
+        //====================================================================================================
+        //
+        public abstract void AddOnLoadJavascript(string code);
+        //
+        //====================================================================================================
+        //
+        public abstract void AddTitle(string pageTitle);
+        //
+        //====================================================================================================
+        //
+        public abstract void AddBodyEnd(string html);
+        //
+        //====================================================================================================
+        //
+        public abstract string Body { get; set; }
+        //
+        //====================================================================================================
+        //
+        public abstract void SetProperty(string key, string FieldValue);
+        //
+        //====================================================================================================
+        //
+        public abstract string GetProperty(string key, string DefaultValue);
+        public abstract string GetProperty(string key);
+        //
+        //====================================================================================================
+        //
+        public abstract string GetText(string key, string DefaultValue);
+        public abstract string GetText(string key );
+        //
+        //====================================================================================================
+        //
+        public abstract bool GetBoolean(string key, bool defaultValue);
+        public abstract bool GetBoolean(string key);
+        //
+        //====================================================================================================
+        //
+        public abstract DateTime GetDate(string key, DateTime defaultValue);
+        public abstract DateTime GetDate(string key);
+        //
+        //====================================================================================================
+        //
+        public abstract int GetInteger(string key, int defaultValue);
+        public abstract int GetInteger(string key);
+        //
+        //====================================================================================================
+        //
+        public abstract double GetNumber(string key, double defaultValue);
+        public abstract double GetNumber(string key);
+        //
+        //====================================================================================================
+        //
+        public abstract bool IsProperty(string key);
+        //
+        //====================================================================================================
+        //
+        public abstract bool IsAdminSite { get; }
+        //
+        //====================================================================================================
+        //
+        public abstract void AddRefreshQueryString(string key, string value);
+        //
+        //====================================================================================================
+        //
+        public abstract void AddRefreshQueryString(string key, int value);
+        //
+        //====================================================================================================
+        //
+        public abstract void AddRefreshQueryString(string key, Double value);
+        //
+        //====================================================================================================
+        //
+        public abstract void AddRefreshQueryString(string key, bool value);
+        //
+        //====================================================================================================
+        //
+        public abstract void AddRefreshQueryString(string key, DateTime value);
         //
         //====================================================================================================
         // deprecated
         //
-
+        [Obsolete("Use addon navigation.", true)]
+        public abstract string NavigationStructure { get; }
+        //
+        [Obsolete("Section is no longer supported", true)]
+        public abstract int SectionId { get; }
+        //
+        [Obsolete("Site styles are no longer supported. Include styles and javascript in addons.", true)]
+        public abstract string SiteStylesheet { get; }
+        //
+        [Obsolete("Use GetText().", true)]
+        public abstract string get_GlobalVar(string Index);
+        //
+        [Obsolete("Use SetProperty().", true)]
+        public abstract void set_GlobalVar(string Index, string Value);
+        //
+        [Obsolete("Use IsProperty().", true)]
+        public abstract bool get_IsGlobalVar(string Index);
+        //
+        [Obsolete("Use IsProperty().", true)]
+        public abstract bool get_IsVar(string Index);
+        //
+        [Obsolete("Use GetText().", true)]
+        public abstract string get_Var(string Index);
+        //
+        [Obsolete("Use SetProperty().", true)]
+        public abstract void set_Var(string Index, string Value);
+        //
+        [Obsolete("Filter addons are deprecated", true)]
+        public abstract string Content { get; set; }
+        //
+        [Obsolete("Use GetBoolean(string,bool)", true)]
+        public abstract bool GetBoolean(string key, string defaultValue);
+        //
+        [Obsolete("Use GetDate(string,DateTime)", true)]
+        public abstract DateTime GetDate(string key, string defaultValue);
+        //
+        [Obsolete("Use GetInteger(string,int)", true)]
+        public abstract int GetInteger(string key, string defaultValue);
+        //
+        [Obsolete("Use GetNumber(string,double)", true)]
+        public abstract double GetNumber(string key, string defaultValue);
     }
 }
 

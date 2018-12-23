@@ -646,7 +646,7 @@ namespace Contensive.Processor.Controllers {
                 path = normalizeDosPath(path);
                 if (!isLocal) {
                     // todo implement remote
-                    throw new NotImplementedException("remote mode not implemented");
+                    throw new NotImplementedException("getFolderNameList, remote mode not implemented");
                 } else {
                     List<FolderDetail> di = getFolderList(path);
                     foreach (FolderDetail d in di) {
@@ -863,7 +863,7 @@ namespace Contensive.Processor.Controllers {
                 } else {
                     if (!isLocal) {
                         // todo remote file case
-                        throw new NotImplementedException("remote rename file not implemented yet");
+                        throw new NotImplementedException("renameFile, remote not implemented yet");
                     } else {
                         string srcFullPathFilename = joinPath(localAbsRootPath, srcPathFilename);
                         int Pos = srcPathFilename.LastIndexOf("\\") + 1;
@@ -901,7 +901,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 if (!isLocal) {
                     // todo remote file case
-                    throw new NotImplementedException();
+                    throw new NotImplementedException("getDriveFreeSpace, remotePathPrefix mode not implemented");
                 } else {
                     DriveInfo scriptingDrive = null;
                     string driveLetter;
@@ -1359,7 +1359,7 @@ namespace Contensive.Processor.Controllers {
                 pathFilename = normalizeDosPathFilename(pathFilename);
                 if (!isLocal) {
                     // todo implement remote getFileList
-                    throw new NotImplementedException("remote getFileSize not implemented");
+                    throw new NotImplementedException("getFileSize, remote mode not implemented");
                 } else {
                     List<FileDetail> files = getFileList(pathFilename);
                     if (files.Count>0) {

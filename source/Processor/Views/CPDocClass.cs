@@ -9,10 +9,10 @@ namespace Contensive.Processor {
         public const string InterfaceId = "347D06BC-4D68-4DBE-82FE-B72115E24A56";
         public const string EventsId = "95E8786B-E778-4617-96BA-B45C53E4AFD1";
         #endregion
-        //
+        /// <summary>
+        /// dependencies
+        /// </summary>
         private CPClass cp;
-        private Contensive.Processor.Controllers.CoreController core;
-        protected bool disposed = false;
         //
         //====================================================================================================
         /// <summary>
@@ -21,55 +21,6 @@ namespace Contensive.Processor {
         /// <param name="cpParent"></param>
         public CPDocClass(CPClass cpParent) : base() {
             cp = cpParent;
-            core = cp.core;
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// destructor
-        /// </summary>
-        /// <param name="disposing"></param>
-        protected virtual void Dispose(bool disposing) {
-            if (!this.disposed) {
-                appendDebugLog(".dispose, dereference main, csv");
-                if (disposing) {
-                    //
-                    // call .dispose for managed objects
-                    //
-                    core = null;
-                    cp = null;
-                }
-                //
-                // Add code here to release the unmanaged resource.
-                //
-            }
-            this.disposed = true;
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Returns the page content
-        /// </summary>
-        /// <returns></returns>
-        public override string Content {
-            get {
-                return core.doc.bodyContent;
-            }
-            set {
-                core.doc.bodyContent = value;
-            }
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// deprecated.
-        /// </summary>
-        /// <returns></returns>
-        [Obsolete("Use addon navigation.", true)]
-        public override string NavigationStructure {
-            get {
-                return string.Empty ;
-            }
         }
         //
         //====================================================================================================
@@ -79,10 +30,10 @@ namespace Contensive.Processor {
         /// <returns></returns>
         public override bool NoFollow {
             get {
-                return core.webServer.response_NoFollow;
+                return cp.core.webServer.response_NoFollow;
             }
             set {
-                core.webServer.response_NoFollow = value;
+                cp.core.webServer.response_NoFollow = value;
             }
         }
         //
@@ -93,11 +44,10 @@ namespace Contensive.Processor {
         /// <returns></returns>
         public override int PageId {
             get {
-                if (core.doc.pageController.page == null) {
-                    return 0;
-                } else {
-                    return core.doc.pageController.page.id;
-                }
+                if (cp.core.doc == null) { return 0; }
+                if (cp.core.doc.pageController == null) { return 0; }
+                if (cp.core.doc.pageController.page == null) { return 0; }
+                return cp.core.doc.pageController.page.id;
             }
         }
         //
@@ -108,11 +58,10 @@ namespace Contensive.Processor {
         /// <returns></returns>
         public override string PageName {
             get {
-                if (core.doc.pageController.page == null) {
-                    return string.Empty;
-                } else {
-                    return core.doc.pageController.page.name;
-                }
+                if (cp.core.doc == null) { return string.Empty; }
+                if (cp.core.doc.pageController == null) { return string.Empty; }
+                if (cp.core.doc.pageController.page == null) {return string.Empty; }
+                return cp.core.doc.pageController.page.name;
             }
         }
         //
@@ -123,18 +72,8 @@ namespace Contensive.Processor {
         /// <returns></returns>
         public override string RefreshQueryString {
             get {
-                return core.doc.refreshQueryString;
-            }
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Returns the value of sectionId
-        /// </summary>
-        [Obsolete("Section is no longer supported", true)]
-        public override int SectionId {
-            get {
-                return 0;
+                if (cp.core.doc == null) { return String.Empty; }
+                return cp.core.doc.refreshQueryString;
             }
         }
         //
@@ -145,7 +84,8 @@ namespace Contensive.Processor {
         /// <returns></returns>
         public override DateTime StartTime {
             get {
-                return core.doc.profileStartTime;
+                if (cp.core.doc == null) { return default( DateTime ); }
+                return cp.core.doc.profileStartTime;
             }
         }
         //
@@ -156,12 +96,10 @@ namespace Contensive.Processor {
         /// <returns></returns>
         public override int TemplateId {
             get {
-                if (core.doc != null) {
-                    if (core.doc.pageController.template != null) {
-                        return core.doc.pageController.template.id;
-                    }
-                }
-                return 0;
+                if (cp.core.doc == null) { return 0; }
+                if (cp.core.doc.pageController == null) { return 0; }
+                if (cp.core.doc.pageController.template == null) { return 0; }
+                return cp.core.doc.pageController.template.id;
             }
         }
         //
@@ -172,7 +110,8 @@ namespace Contensive.Processor {
         /// <returns></returns>
         public override string Type {
             get {
-                return core.siteProperties.docTypeDeclaration;
+                if (cp.core.siteProperties == null) { return Constants.DTDDefault; }
+                return cp.core.siteProperties.docTypeDeclaration;
             }
         }
         //
@@ -180,83 +119,183 @@ namespace Contensive.Processor {
         /// <summary>
         /// adds javascript code to the head of the document
         /// </summary>
-        /// <param name="NewCode"></param>
-        public override void AddHeadJavascript(string NewCode) {
-            core.html.addScriptCode(NewCode, "");
+        /// <param name="code"></param>
+        public override void AddHeadJavascript(string code) {
+            cp.core.html.addScriptCode(code, "");
         }
         //
         //====================================================================================================
         /// <summary>
         /// adds a javascript tag to the head of the document
         /// </summary>
-        /// <param name="HeadTag"></param>
-        public override void AddHeadTag(string HeadTag) {
-            core.html.addHeadTag(HeadTag);
+        /// <param name="htmlTag"></param>
+        public override void AddHeadTag(string htmlTag) {
+            cp.core.html.addHeadTag(htmlTag);
         }
         //
         //====================================================================================================
         //
-        public override void AddMetaDescription(string MetaDescription) {
-            core.html.addMetaDescription(MetaDescription);
+        public override void AddMetaDescription(string metaDescription) {
+            cp.core.html.addMetaDescription(metaDescription);
         }
         //
         //====================================================================================================
         //
-        public override void AddMetaKeywordList(string MetaKeywordList) {
-            core.html.addMetaKeywordList(MetaKeywordList);
+        public override void AddMetaKeywordList(string metaKeywordList) {
+            cp.core.html.addMetaKeywordList(metaKeywordList);
         }
         //
         //====================================================================================================
         //
-        public override void AddOnLoadJavascript(string NewCode) {
-            core.html.addScriptCode_onLoad(NewCode, "");
+        public override void AddOnLoadJavascript(string code) {
+            cp.core.html.addScriptCode_onLoad(code, "");
         }
         //
         //====================================================================================================
         //
-        public override void AddTitle(string PageTitle) {
-            core.html.addTitle(PageTitle);
+        public override void AddTitle(string pageTitle) {
+            cp.core.html.addTitle(pageTitle);
         }
         //
         //====================================================================================================
         //
-        public override void AddRefreshQueryString(string Name, string Value) => core.doc.addRefreshQueryString(Name, Value);
-        public override void AddRefreshQueryString(string Name, int Value) => core.doc.addRefreshQueryString(Name, GenericController.encodeText(Value));
-        public override void AddRefreshQueryString(string Name, double Value) => core.doc.addRefreshQueryString(Name, GenericController.encodeText(Value));
-        public override void AddRefreshQueryString(string Name, bool Value) => core.doc.addRefreshQueryString(Name, GenericController.encodeText(Value));
-        public override void AddRefreshQueryString(string Name, DateTime Value) => core.doc.addRefreshQueryString(Name, GenericController.encodeText(Value));
+        public override void AddRefreshQueryString(string key, string Value) => cp.core.doc.addRefreshQueryString(key, Value);
+        public override void AddRefreshQueryString(string key, int Value) => cp.core.doc.addRefreshQueryString(key, GenericController.encodeText(Value));
+        public override void AddRefreshQueryString(string key, double Value) => cp.core.doc.addRefreshQueryString(key, GenericController.encodeText(Value));
+        public override void AddRefreshQueryString(string key, bool Value) => cp.core.doc.addRefreshQueryString(key, GenericController.encodeText(Value));
+        public override void AddRefreshQueryString(string key, DateTime Value) => cp.core.doc.addRefreshQueryString(key, GenericController.encodeText(Value));
         //
         //====================================================================================================
         //
-        public override void AddHeadStyle(string StyleSheet) {
-            AddHeadTag("\r\n\t<style type=\"text/css\">\r\n\t\t" + StyleSheet + "\r\n\t</style>");
+        public override void AddHeadStyle(string styleSheet) {
+            cp.core.html.addHeadTag(HtmlController.style(styleSheet));
         }
         //
         //====================================================================================================
         //
-        public override void AddHeadStyleLink(string StyleSheetLink) {
-            core.html.addStyleLink(StyleSheetLink, "");
+        public override void AddHeadStyleLink(string styleSheetLink) {
+            cp.core.html.addStyleLink(styleSheetLink, "");
         }
         //
         //====================================================================================================
         //
         public override void AddBodyEnd(string html) {
-            core.doc.htmlForEndOfBody += html;
+            cp.core.doc.htmlForEndOfBody += html;
         }
         //
         //====================================================================================================
         //
         public override string Body {
             get {
-                return core.doc.docBodyFilter;
+                return cp.core.doc.docBodyFilter;
             }
             set {
-                core.doc.docBodyFilter = value;
+                cp.core.doc.docBodyFilter = value;
             }
         }
-
         //
         //====================================================================================================
+        /// <summary>
+        /// Decodes an argument parsed from an AddonOptionString for all non-allowed characters
+        /// </summary>
+        /// <param name="encodedArgument"></param>
+        /// <returns></returns>
+        public string decodeLegacyOptionStringArgument(string encodedArgument) {
+            return GenericController.decodeNvaArgument(encodedArgument);
+        }
+        //
+        //=======================================================================================================
+        //
+        public override string GetProperty(string key, string defaultValue) {
+            if (cp.core.docProperties.containsKey(key)) { return cp.core.docProperties.getText(key); }
+            return defaultValue;
+        }
+        public override string GetProperty(string key) => GetProperty(key, "");
+        //
+        //=======================================================================================================
+        //
+        public override bool GetBoolean(string key, bool defaultValue) {
+            return GenericController.encodeBoolean(GetProperty(key, GenericController.encodeText( defaultValue)));
+        }
+        public override bool GetBoolean(string key) => GetBoolean(key, false);
+        //
+        //=======================================================================================================
+        //
+        public override DateTime GetDate(string key, DateTime defaultValue) {
+            return GenericController.encodeDate(GetProperty(key, GenericController.encodeText( defaultValue)));
+        }
+        public override DateTime GetDate(string key) => GetDate(key, default(DateTime));
+        //
+        //=======================================================================================================
+        //
+        public override int GetInteger(string key, int defaultValue) {
+            return cp.Utils.EncodeInteger(GetProperty(key, GenericController.encodeText( defaultValue )));
+        }
+        public override int GetInteger(string key) => GetInteger(key, 0);
+        //
+        //=======================================================================================================
+        //
+        public override double GetNumber(string key, double defaultValue) {
+            return cp.Utils.EncodeNumber(GetProperty(key, GenericController.encodeText( defaultValue )));
+        }
+        public override double GetNumber(string key) => GetNumber(key, 0);
+        //
+        //=======================================================================================================
+        //
+        public override string GetText(string key, string defaultValue) {
+            return GetProperty(key, defaultValue);
+        }
+        //
+        public override string GetText(string key) {
+            return GetProperty(key, default(string));
+        }
+        //
+        //=======================================================================================================
+        //
+        public override bool IsProperty(string key) {
+            return cp.core.docProperties.containsKey(key);
+        }
+        //
+        //=======================================================================================================
+        //
+        public override void SetProperty(string key, string value) {
+            cp.core.docProperties.setProperty(key, value);
+        }
+        //
+        //=======================================================================================================
+        //
+        public override bool IsAdminSite {
+            get {
+                return !cp.Request.PathPage.IndexOf(cp.Site.GetText("adminUrl"), System.StringComparison.OrdinalIgnoreCase).Equals(-1);
+            }
+        }
+        //
+        //=======================================================================================================
+        // Deprecated
+        //
+        [Obsolete("Filter addons are deprecated", true)]
+        public override string Content {
+            get {
+                return cp.core.doc.bodyContent;
+            }
+            set {
+                cp.core.doc.bodyContent = value;
+            }
+        }
+        //
+        [Obsolete("Use addon navigation.", true)]
+        public override string NavigationStructure {
+            get {
+                return string.Empty;
+            }
+        }
+        //
+        [Obsolete("Section is no longer supported", true)]
+        public override int SectionId {
+            get {
+                return 0;
+            }
+        }
         //
         [Obsolete("Site styles are no longer supported. Include styles and javascript in addons.", true)]
         public override string SiteStylesheet {
@@ -265,163 +304,47 @@ namespace Contensive.Processor {
             }
         }
         //
-        //====================================================================================================
-        //   Decodes an argument parsed from an AddonOptionString for all non-allowed characters
-        //       AddonOptionString is a & delimited string of name=value[selector]descriptor
-        //
-        //       to get a value from an AddonOptionString, first use getargument() to get the correct value[selector]descriptor
-        //       then remove everything to the right of any '['
-        //
-        //       call encodeaddonoptionargument before parsing them together
-        //       call decodeAddonOptionArgument after parsing them apart
-        //
-        //       Arg0,Arg1,Arg2,Arg3,Name=Value&Name=VAlue[Option1|Option2]
-        //
-        //       This routine is needed for all Arg, Name, Value, Option values
-        //
-        //------------------------------------------------------------------------------------------------------------
-        //
-        public string decodeLegacyOptionStringArgument(string EncodedArg) {
-            string tempdecodeLegacyOptionStringArgument = null;
-            string a = null;
-            //
-            tempdecodeLegacyOptionStringArgument = "";
-            if (!string.IsNullOrEmpty(EncodedArg)) {
-                a = EncodedArg;
-                a = GenericController.vbReplace(a, "#0058#", ":");
-                a = GenericController.vbReplace(a, "#0093#", "]");
-                a = GenericController.vbReplace(a, "#0091#", "[");
-                a = GenericController.vbReplace(a, "#0124#", "|");
-                a = GenericController.vbReplace(a, "#0039#", "'");
-                a = GenericController.vbReplace(a, "#0034#", "\"");
-                a = GenericController.vbReplace(a, "#0044#", ",");
-                a = GenericController.vbReplace(a, "#0061#", "=");
-                a = GenericController.vbReplace(a, "#0038#", "&");
-                a = GenericController.vbReplace(a, "#0013#", "\r\n");
-                tempdecodeLegacyOptionStringArgument = a;
-            }
-            return tempdecodeLegacyOptionStringArgument;
-        }
-        //
-        //=======================================================================================================
-        //
-        public override string GetProperty(string PropertyName, string DefaultValue = "") {
-            if (core.docProperties.containsKey(PropertyName)) {
-                return core.docProperties.getText(PropertyName);
-            } else {
-                return DefaultValue;
-            }
-        }
-        //
-        //=======================================================================================================
-        //
-        public override bool GetBoolean(string PropertyName, string DefaultValue = "") {
-            return GenericController.encodeBoolean(GetProperty(PropertyName, DefaultValue));
-        }
-        //
-        //=======================================================================================================
-        //
-        public override DateTime GetDate(string PropertyName, string DefaultValue = "") {
-            return GenericController.encodeDate(GetProperty(PropertyName, DefaultValue));
-        }
-        //
-        //=======================================================================================================
-        //
-        public override int GetInteger(string PropertyName, string DefaultValue = "") {
-            return cp.Utils.EncodeInteger(GetProperty(PropertyName, DefaultValue));
-        }
-        //
-        //=======================================================================================================
-        //
-        public override double GetNumber(string PropertyName, string DefaultValue = "") {
-            return cp.Utils.EncodeNumber(GetProperty(PropertyName, DefaultValue));
-        }
-        //
-        //=======================================================================================================
-        //
-        public override string GetText(string FieldName, string DefaultValue = "") {
-            return GetProperty(FieldName, DefaultValue);
-        }
-        //
-        //=======================================================================================================
-        //
-        public override bool IsProperty(string FieldName) {
-            return core.docProperties.containsKey(FieldName);
-        }
-        //
-        //=======================================================================================================
-        //
-        public override void SetProperty(string FieldName, string FieldValue) {
-            core.docProperties.setProperty(FieldName, FieldValue);
-        }
-        // 20171229 - converted to getter and setter
-        //=======================================================================================================
-        //
-        //public override void Var(string Index, string Value) {
-        //    SetProperty( Index, Value);
-        //}
-        //
-        //=======================================================================================================
-        //
+        [Obsolete("var is deprecated.", true)]
         public override string get_GlobalVar(string Index) {
-            return get_Var( Index );
+            return get_Var(Index);
         }
         //
-        //=======================================================================================================
-        //
+        [Obsolete("var is deprecated.", true)]
         public override bool get_IsGlobalVar(string Index) {
-            return get_IsVar( Index );
+            return get_IsVar(Index);
         }
         //
-        //=======================================================================================================
-        //
+        [Obsolete("var is deprecated.", true)]
         public override bool get_IsVar(string Index) {
-            return core.docProperties.containsKey(Index);
+            return cp.core.docProperties.containsKey(Index);
         }
         //
-        //=======================================================================================================
-        //
+        [Obsolete("var is deprecated.", true)]
         public override string get_Var(string Index) {
-            return core.docProperties.getText(Index);
+            return cp.core.docProperties.getText(Index);
         }
         //
-        //=======================================================================================================
-        //
+        [Obsolete("var is deprecated.", true)]
         public override void set_Var(string Index, string Value) {
-            core.docProperties.setProperty(Index, Value);
+            cp.core.docProperties.setProperty(Index, Value);
         }
         //
-        //=======================================================================================================
-        //
+        [Obsolete("var is deprecated.", true)]
         public override void set_GlobalVar(string Index, string Value) {
-            //
+            cp.core.docProperties.setProperty(Index, Value);
         }
         //
-        //=======================================================================================================
+        [Obsolete("Use GetBoolean(string,bool).", true)]
+        public override bool GetBoolean(string key, string defaultValue) => GetBoolean(key, GenericController.encodeBoolean(defaultValue));
         //
-        public override bool IsAdminSite {
-            get {
-                bool returnIsAdmin = false;
-                try {
-                    returnIsAdmin = (cp.Request.PathPage.IndexOf(cp.Site.GetText("adminUrl"), System.StringComparison.OrdinalIgnoreCase)  != -1);
-                } catch (Exception ex) {
-                    LogController.handleError( core,ex); 
-                    throw;
-                }
-                return returnIsAdmin;
-            }
-        }
+        [Obsolete("Use GetDate(string,DateTime).", true)]
+        public override DateTime GetDate(string key, string defaultValue) => GetDate(key, GenericController.encodeDate(defaultValue));
         //
-        //=======================================================================================================
+        [Obsolete("Use GetInteger(string,int).", true)]
+        public override int GetInteger(string key, string defaultValue) => GetInteger(key, GenericController.encodeInteger(defaultValue));
         //
-        private void appendDebugLog(string copy) {
-        }
-        //
-        //=======================================================================================================
-        // debugging -- testpoint
-        //
-        private void tp(string msg) {
-        }
+        [Obsolete("Use GetNumber(string,double).", true)]
+        public override double GetNumber(string key, string defaultValue) => GetNumber(key, GenericController.encodeNumber(defaultValue));
         //
         //=======================================================================================================
         // IDisposable support
@@ -435,9 +358,27 @@ namespace Contensive.Processor {
         }
         ~CPDocClass() {
             Dispose(false);
-            
-            
         }
-        #endregion
+        protected bool disposed = false;
+        //
+        //====================================================================================================
+        /// <summary>
+        /// destructor
+        /// </summary>
+        /// <param name="disposing"></param>
+        protected virtual void Dispose(bool disposing) {
+            if (!this.disposed) {
+                if (disposing) {
+                    //
+                    // call .dispose for managed objects
+                    //
+                }
+                //
+                // Add code here to release the unmanaged resource.
+                //
+            }
+            this.disposed = true;
+        }
+       #endregion
     }
 }

@@ -16,10 +16,10 @@ namespace Contensive.BaseClasses {
         /// <summary>
         /// Insert a record, leaving the dataset open in this object. Call cs.close() to close the data
         /// </summary>
-        /// <param name="ContentName"></param>
+        /// <param name="contentName"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public abstract bool Insert(string ContentName);
+        public abstract bool Insert(string contentName);
         //
         //====================================================================================================
         /// <summary>

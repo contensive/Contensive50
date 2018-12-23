@@ -555,19 +555,17 @@ namespace Contensive.Processor {
         }
         //
         [Obsolete("Use GetFormInput(string,string,int,int,string)", true)]
-        public override object GetFormInput(string ContentName, string FieldName, string Height = "", string Width = "", string HtmlId = "") {
-            return cp.core.html.inputCs(cs, ContentName, FieldName, GenericController.encodeInteger(Height), GenericController.encodeInteger(Width), HtmlId);
-        }
+        public override object GetFormInput(string contentName, string fieldName, string height, string width, string htmlId)
+            => GetFormInput(contentName, fieldName, GenericController.encodeInteger(height), GenericController.encodeInteger(width), htmlId);
         //
         [Obsolete("Use GetFormInput(string,string,int,int)", true)]
-        public override object GetFormInput(string contentName, string fieldName, string height, string width) {
-            throw new NotImplementedException();
-        }
+        public override object GetFormInput(string contentName, string fieldName, string height, string width)
+            => GetFormInput(contentName, fieldName, GenericController.encodeInteger(height), GenericController.encodeInteger(width));
+        //
         //
         [Obsolete("Use GetFormInput(string,string,int)", true)]
-        public override object GetFormInput(string contentName, string fieldName, string height) {
-            throw new NotImplementedException();
-        }
+        public override object GetFormInput(string contentName, string fieldName, string height)
+            => GetFormInput(contentName, fieldName, GenericController.encodeInteger(height));
         //
         [Obsolete("Use SetField for all field types that store data in files (textfile, cssfile, etc)")]
         public override void SetFile(string FieldName, string Copy, string ContentName) {

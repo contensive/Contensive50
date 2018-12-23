@@ -426,7 +426,7 @@ namespace Contensive.Processor {
         // ====================================================================================================
         //
         public override string hashMd5(string source) {
-            throw new NotImplementedException("hashMd5 not implemented yet");
+            throw new NotImplementedException("hashMd5 not implemented");
             //Return HashPasswordForStoringInConfigFile(source, "md5")
         }
         //
@@ -502,7 +502,7 @@ namespace Contensive.Processor {
         /// <param name="deleteFolderWhenDone"></param>
         /// <returns></returns>
         public override int installCollectionFromLink(string link) {
-            throw new NotImplementedException();
+            throw new NotImplementedException("installCollectionFromLink not implemented");
         }
         //
         //====================================================================================================

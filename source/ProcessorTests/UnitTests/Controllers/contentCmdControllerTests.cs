@@ -30,7 +30,6 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 string result = Contensive.Processor.Controllers.ContentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
                 // assert
                 Assert.AreEqual("<div>foo</div>", result);
-                //throw new NotImplementedException();
             }
         }
         //

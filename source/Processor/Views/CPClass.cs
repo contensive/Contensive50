@@ -364,7 +364,7 @@ namespace Contensive.Processor {
         public override CPEmailBaseClass Email {
             get {
                 if (_emailObj == null) {
-                    _emailObj = new CPEmailClass(core);
+                    _emailObj = new CPEmailClass(this);
                 }
                 return _emailObj;
             }

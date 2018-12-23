@@ -13,110 +13,110 @@ namespace Contensive.BaseClasses {
         /// <summary>
         /// Delete the record specified by tablename and recordId
         /// </summary>
-        /// <param name="DataSourcename"></param>
-        /// <param name="TableName"></param>
-        /// <param name="RecordId"></param>
-		public abstract void Delete(string DataSourcename, string TableName, int RecordId);
+        /// <param name="dataSourcename"></param>
+        /// <param name="tableName"></param>
+        /// <param name="recordId"></param>
+		public abstract void Delete(string dataSourcename, string tableName, int recordId);
         //
         //====================================================================================================
         /// <summary>
         /// Delete the record specified by tablename and recordId
         /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="RecordId"></param>
-        public abstract void Delete(string TableName, int RecordId);
+        /// <param name="tableName"></param>
+        /// <param name="recordId"></param>
+        public abstract void Delete(string tableName, int recordId);
         //
         //====================================================================================================
         /// <summary>
         /// get the connection string for his 
         /// </summary>
-        /// <param name="DataSourcename"></param>
+        /// <param name="dataSourcename"></param>
         /// <returns></returns>
-        public abstract string GetConnectionString(string DataSourcename);
+        public abstract string GetConnectionString(string dataSourcename);
         //
         //====================================================================================================
         /// <summary>
         /// Return the recordId in the ccTables table for this table
         /// </summary>
-        /// <param name="TableName"></param>
+        /// <param name="tableName"></param>
         /// <returns></returns>
-		public abstract int GetTableID(string TableName);
+		public abstract int GetTableID(string tableName);
         //
         //====================================================================================================
         /// <summary>
         /// Return true if this is a valid database table in the current application
         /// </summary>
-        /// <param name="DataSourcename"></param>
-        /// <param name="TableName"></param>
+        /// <param name="dataSourcename"></param>
+        /// <param name="tableName"></param>
         /// <returns></returns>
-		public abstract bool IsTable(string DataSourcename, string TableName);
+		public abstract bool IsTable(string dataSourcename, string tableName);
         //
         //====================================================================================================
         /// <summary>
         /// Return true if this is a valid database table in the current application
         /// </summary>
-        /// <param name="TableName"></param>
+        /// <param name="tableName"></param>
         /// <returns></returns>
-        public abstract bool IsTable(string TableName);
+        public abstract bool IsTable(string tableName);
         //
         //====================================================================================================
         /// <summary>
         /// Return true if this is a valid database field in a valid table in the current application
         /// </summary>
-        /// <param name="DataSourcename"></param>
-        /// <param name="TableName"></param>
-        /// <param name="FieldName"></param>
+        /// <param name="dataSourcename"></param>
+        /// <param name="tableName"></param>
+        /// <param name="fieldName"></param>
         /// <returns></returns>
-        public abstract bool IsTableField(string DataSourcename, string TableName, string FieldName);
+        public abstract bool IsTableField(string dataSourcename, string tableName, string fieldName);
         //
         //====================================================================================================
         /// <summary>
         /// Return true if this is a valid database field in a valid table in the current application
         /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="FieldName"></param>
+        /// <param name="tableName"></param>
+        /// <param name="fieldName"></param>
         /// <returns></returns>
-        public abstract bool IsTableField(string TableName, string FieldName);
+        public abstract bool IsTableField(string tableName, string fieldName);
         //
         //====================================================================================================
         /// <summary>
         /// Encode a boolean value to be used in an sql Query for this application. Boolean fields are stored as integers in Contensive. Example 'select id from ccmembers where active='+EncodeSqlBoolean(true)
         /// </summary>
-        /// <param name="SourceBoolean"></param>
+        /// <param name="sourceBoolean"></param>
         /// <returns></returns>
-        public abstract string EncodeSQLBoolean(bool SourceBoolean);
+        public abstract string EncodeSQLBoolean(bool sourceBoolean);
         //
         //====================================================================================================
         /// <summary>
         /// Encode a date value to be used in an sql Query for this application. Example 'select id from ccmembers where dateadded>'+EncodeSqlDate( myBirthday )
         /// </summary>
-        /// <param name="SourceDate"></param>
+        /// <param name="sourceDate"></param>
         /// <returns></returns>
-		public abstract string EncodeSQLDate(DateTime SourceDate);
+		public abstract string EncodeSQLDate(DateTime sourceDate);
         //
         //====================================================================================================
         /// <summary>
         /// Encode a numeric value (integer or double) to be used in an sql Query for this application. Example 'select id from orders where totalAmount>'+EncodeSqlNumber( 1000.00 )
         /// </summary>
-        /// <param name="SourceNumber"></param>
+        /// <param name="sourceNumber"></param>
         /// <returns></returns>
-		public abstract string EncodeSQLNumber(double SourceNumber);
+		public abstract string EncodeSQLNumber(double sourceNumber);
         //
         //====================================================================================================
         /// <summary>
         /// Encode a numeric value (integer or double) to be used in an sql Query for this application. Example 'select id where id>'+EncodeSqlNumber( 1000 )
         /// </summary>
-        /// <param name="SourceNumber"></param>
+        /// <param name="sourceNumber"></param>
         /// <returns></returns>
-        public abstract string EncodeSQLNumber(int SourceNumber);
+        public abstract string EncodeSQLNumber(int sourceNumber);
         //
         //====================================================================================================
         /// <summary>
         /// Encode a text string value to be used in an sql Query for this application. Example 'select id where name='+EncodeSqlText( 'bob' )
         /// </summary>
-        /// <param name="SourceText"></param>
+        /// <param name="sourceText"></param>
         /// <returns></returns>
-        public abstract string EncodeSQLText(string SourceText);
+        public abstract string EncodeSQLText(string sourceText);
         //
         //====================================================================================================
         /// <summary>

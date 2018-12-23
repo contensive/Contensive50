@@ -178,11 +178,6 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        //public static PersonModel createDefault(CoreController core) {
-        //    return createDefault<PersonModel>(core);
-        //}
-        //
-        //====================================================================================================
         //
         public static string getTableInvalidationKey(CoreController core) {
             return getTableCacheKey<PersonModel>(core);
@@ -193,21 +188,49 @@ namespace Contensive.Processor.Models.Db {
         /// return a list of people in a any one of a list of groups. If requireBuldEmail true, the list only includes those with allowBulkEmail.
         /// </summary>
         /// <param name="core"></param>
-        /// <param name="groupList"></param>
+        /// <param name="groupNameList"></param>
         /// <param name="requireBulkEmail"></param>
         /// <returns></returns>
-        public static List<PersonModel> createListFromGroupList( CoreController core, List<string> groupList, bool requireBulkEmail ) {
-            var personList = new List<PersonModel> { };
+        public static List<PersonModel> createListFromGroupNameList(CoreController core, List<string> groupNameList, bool requireBulkEmail) {
             try {
                 string sqlGroups = "";
-                foreach (string group in groupList) {
+                foreach (string group in groupNameList) {
                     if (!string.IsNullOrWhiteSpace(group)) {
-                        if (!group.Equals(groupList.First<string>())) {
+                        if (!group.Equals(groupNameList.First<string>())) {
                             sqlGroups += "or";
                         }
                         sqlGroups += "(ccgroups.Name=" + DbController.encodeSQLText(group) + ")";
                     }
                 }
+                return createListFromGroupSql(core, sqlGroups, requireBulkEmail);
+            } catch (Exception) {
+                throw;
+            }
+        }
+        //
+        //====================================================================================================
+        //
+        public static List<PersonModel> createListFromGroupIdList(CoreController core, List<int> groupIdList, bool requireBulkEmail) {
+            try {
+                string sqlGroups = "";
+                foreach (int groupId in groupIdList) {
+                    if (groupId>0) {
+                        if (!groupId.Equals(groupIdList.First<int>())) {
+                            sqlGroups += "or";
+                        }
+                        sqlGroups += "(ccgroups.id=" + groupId + ")";
+                    }
+                }
+                return createListFromGroupSql(core, sqlGroups, requireBulkEmail);
+            } catch (Exception) {
+                throw;
+            }
+        }
+        //
+        //====================================================================================================
+        //
+        internal static List<PersonModel> createListFromGroupSql(CoreController core, string sqlGroups, bool requireBulkEmail) {
+            try {
                 string sqlCriteria = ""
                     + "SELECT DISTINCT ccMembers.ID"
                     + " FROM ((ccMembers"
@@ -223,12 +246,13 @@ namespace Contensive.Processor.Models.Db {
                 if (!string.IsNullOrEmpty(sqlGroups)) {
                     sqlCriteria += "and(" + sqlGroups + ")";
                 }
-                personList = createList(core, "(id in (" + sqlCriteria + "))");
+                return createList(core, "(id in (" + sqlCriteria + "))");
             } catch (Exception) {
                 throw;
             }
-            return personList;
         }
+        //
+        //====================================================================================================
         //
         public static List<int> createidListForEmail(CoreController core, int emailId) {
             var result = new List<int> { };
