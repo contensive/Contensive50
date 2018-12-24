@@ -361,13 +361,13 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Creates a file folder if it does not exist
         /// </summary>
-        /// <param name="path"></param>
-        public void createPath(string path) {
+        /// <param name="pathFolder"></param>
+        public void createPath(string pathFolder) {
             try {
                 if (isLocal) {
-                    createPath_local(path);
+                    createPath_local(pathFolder);
                 } else {
-                    verifyPath_remote(path);
+                    verifyPath_remote(pathFolder);
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -479,16 +479,13 @@ namespace Contensive.Processor.Controllers {
         //
         //==============================================================================================================
         /// <summary>
-        /// Copies a file to another location
+        /// Copies a file to a different file system (wwwFiles, tempFiles, cdnFiles, privateFiles)
         /// </summary>
         /// <param name="srcPathFilename"></param>
         /// <param name="dstPathFilename"></param>
         /// <param name="dstFileSystem"></param>
-        public void copyFile(string srcPathFilename, string dstPathFilename, FileController dstFileSystem = null) {
+        public void copyFile(string srcPathFilename, string dstPathFilename, FileController dstFileSystem) {
             try {
-                if (dstFileSystem == null) {
-                    dstFileSystem = this;
-                }
                 if (string.IsNullOrEmpty(srcPathFilename)) {
                     throw new ArgumentException("Invalid source file.");
                 } else if (string.IsNullOrEmpty(dstPathFilename)) {
@@ -561,6 +558,16 @@ namespace Contensive.Processor.Controllers {
                 LogController.handleError( core,ex);
                 throw;
             }
+        }
+        //
+        //==============================================================================================================
+        /// <summary>
+        /// Copy a file within the same filesystem (wwwFiles, tempFiles, cdnFiles, privateFiles)
+        /// </summary>
+        /// <param name="srcPathFilename"></param>
+        /// <param name="dstPathFilename"></param>
+        public void copyFile(string srcPathFilename, string dstPathFilename) {
+            copyFile(srcPathFilename, dstPathFilename, this);
         }
         //
         //==============================================================================================================

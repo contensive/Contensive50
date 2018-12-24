@@ -919,7 +919,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static string inputText( CoreController core, string htmlName, string defaultValue, int heightRows = 1, int widthCharacters = 20, string htmlId = "", bool passwordField = false, bool readOnly = false, string htmlClass = "", int maxLength = -1, bool disabled = false, string placeholder = "" ) {
+        public static string inputText( CoreController core, string htmlName, string defaultValue = "", int heightRows = 1, int widthCharacters = 20, string htmlId = "", bool passwordField = false, bool readOnly = false, string htmlClass = "", int maxLength = -1, bool disabled = false, string placeholder = "" ) {
             string result = "";
             try {
                 if ((heightRows>1) & !passwordField) {
@@ -1399,7 +1399,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="contentType"></param>
         /// <returns></returns>
-        public string getWysiwygAddonList(ContentTypeEnum contentType) {
+        public string getWysiwygAddonList( BaseClasses.CPHtmlBaseClass.EditorContentType contentType) {
             string result = "";
             try {
                 if (core.doc.wysiwygAddonList.ContainsKey(contentType)) {
@@ -1429,7 +1429,7 @@ namespace Contensive.Processor.Controllers {
                     Index.setPtr("Block Text", ItemsCnt);
                     ItemsCnt += 1;
                     //
-                    if ((contentType == ContentTypeEnum.contentTypeEmail) || (contentType == ContentTypeEnum.contentTypeEmailTemplate)) {
+                    if ((contentType == CPHtmlBaseClass.EditorContentType.contentTypeEmail) || (contentType == CPHtmlBaseClass.EditorContentType.contentTypeEmailTemplate)) {
                         //
                         // ----- Email Only AC tags
                         //
@@ -1447,7 +1447,7 @@ namespace Contensive.Processor.Controllers {
                         Index.setPtr("Personalization", ItemsCnt);
                         ItemsCnt += 1;
                         //
-                        if (contentType == ContentTypeEnum.contentTypeEmailTemplate) {
+                        if (contentType == CPHtmlBaseClass.EditorContentType.contentTypeEmailTemplate) {
                             //
                             // Editing Email Templates
                             //   This is a special case
@@ -1504,13 +1504,13 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- addons
                     string Criteria = "(1=1)";
-                    if (contentType == ContentTypeEnum.contentTypeEmail) {
+                    if (contentType == CPHtmlBaseClass.EditorContentType.contentTypeEmail) {
                         //
                         // select only addons with email placement (dont need to check main_version bc if email, must be >4.0.325
                         //
                         Criteria = Criteria + "and(email<>0)";
                     } else {
-                        if (contentType == ContentTypeEnum.contentTypeWeb) {
+                        if (contentType == CPHtmlBaseClass.EditorContentType.contentTypeWeb) {
                             //
                             // Non Templates
                             Criteria = Criteria + "and(content<>0)";
@@ -1528,7 +1528,7 @@ namespace Contensive.Processor.Controllers {
                         while (core.db.csOk(CSAddons)) {
                             string addonGuid = core.db.csGetText(CSAddons, "ccguid");
                             string ObjectProgramID2 = core.db.csGetText(CSAddons, "ObjectProgramID");
-                            if ((contentType == ContentTypeEnum.contentTypeEmail) && (!string.IsNullOrEmpty(ObjectProgramID2))) {
+                            if ((contentType == CPHtmlBaseClass.EditorContentType.contentTypeEmail) && (!string.IsNullOrEmpty(ObjectProgramID2))) {
                                 //
                                 // Block activex addons from email
                                 //
@@ -3857,5 +3857,64 @@ namespace Contensive.Processor.Controllers {
             tag.Append(innerStyleSheet).Append("</style>");
             return tag.ToString();
         }
+        //
+        // ====================================================================================================
+        //
+        public static string indent(string sourceHtml, int tabCnt) {
+            string result = "";
+            //
+            //   Indent every line by 1 tab
+            int posStart = GenericController.vbInstr(1, sourceHtml, "<![CDATA[", 1);
+            if (posStart == 0) {
+                //
+                // no cdata
+                //
+                posStart = GenericController.vbInstr(1, sourceHtml, "<textarea", 1);
+                if (posStart == 0) {
+                    //
+                    // no textarea
+                    //
+                    if (tabCnt > 0 && tabCnt < 99) {
+                        result = sourceHtml.Replace("\r\n", "\r\n" + new string(Convert.ToChar("\t"), tabCnt));
+                    } else {
+                        result = sourceHtml.Replace("\r\n", "\r\n\t");
+                    }
+                    //Indent = genericController.vbReplace(SourceHtml, vbCrLf & vbTab, vbCrLf & vbTab & vbTab)
+                } else {
+                    //
+                    // text area found, isolate it and indent before and after
+                    //
+                    int posEnd = GenericController.vbInstr(posStart, sourceHtml, "</textarea>", 1);
+                    string pre = sourceHtml.Left(posStart - 1);
+                    string post = "";
+                    string target = "";
+                    if (posEnd == 0) {
+                        target = sourceHtml.Substring(posStart - 1);
+                    } else {
+                        target = sourceHtml.Substring(posStart - 1, posEnd - posStart + ((string)("</textarea>")).Length);
+                        post = sourceHtml.Substring((posEnd + ((string)("</textarea>")).Length) - 1);
+                    }
+                    result = indent(pre, tabCnt) + target + indent(post, tabCnt);
+                }
+            } else {
+                //
+                // cdata found, isolate it and indent before and after
+                //
+                int posEnd = GenericController.vbInstr(posStart, sourceHtml, "]]>", 1);
+                string pre = sourceHtml.Left(posStart - 1);
+                string post = "";
+                string target = "";
+                if (posEnd == 0) {
+                    target = sourceHtml.Substring(posStart - 1);
+                } else {
+                    target = sourceHtml.Substring(posStart - 1, posEnd - posStart + ((string)("]]>")).Length);
+                    post = sourceHtml.Substring(posEnd + 2);
+                }
+                result = indent(pre, tabCnt) + target + indent(post, tabCnt);
+            }
+            return result;
+        }
+        //
+        public static string indent(string sourceHtml) => indent(sourceHtml, 1);
     }
 }

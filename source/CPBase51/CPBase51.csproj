@@ -68,11 +68,10 @@
     <Compile Include="CPUtilsBaseClass.cs" />
     <Compile Include="CPVisitBaseClass.cs" />
     <Compile Include="CPVisitorBaseClass.cs" />
+    <Compile Include="Model\SimplestDataModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Model\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="CPBase2.snk" />
   </ItemGroup>

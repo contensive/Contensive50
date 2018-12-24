@@ -204,15 +204,15 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // ----- determine contentType for editor
                 //
-                ContentTypeEnum ContentType;
+                CPHtmlBaseClass.EditorContentType ContentType;
                 if (GenericController.vbLCase(adminData.adminContent.name) == "email templates") {
-                    ContentType = ContentTypeEnum.contentTypeEmailTemplate;
+                    ContentType = CPHtmlBaseClass.EditorContentType.contentTypeEmailTemplate;
                 } else if (GenericController.vbLCase(adminData.adminContent.tableName) == "cctemplates") {
-                    ContentType = ContentTypeEnum.contentTypeWebTemplate;
+                    ContentType = CPHtmlBaseClass.EditorContentType.contentTypeWebTemplate;
                 } else if (GenericController.vbLCase(adminData.adminContent.tableName) == "ccemail") {
-                    ContentType = ContentTypeEnum.contentTypeEmail;
+                    ContentType = CPHtmlBaseClass.EditorContentType.contentTypeEmail;
                 } else {
-                    ContentType = ContentTypeEnum.contentTypeWeb;
+                    ContentType = CPHtmlBaseClass.EditorContentType.contentTypeWeb;
                 }
                 //
                 //-----Create edit page
@@ -608,7 +608,7 @@ namespace Contensive.Addons.AdminSite {
         /// <param name="IsTemplateTable"></param>
         /// <param name="editorAddonListJSON"></param>
         /// <returns></returns>
-        public static string getTab(CoreController core, AdminDataModel adminData, int RecordID, int ContentID, bool record_readOnly, bool IsLandingPage, bool IsRootPage, string EditTab, ContentTypeEnum EditorContext, ref string return_NewFieldList, int TemplateIDForStyles, int HelpCnt, int[] HelpIDCache, string[] helpDefaultCache, string[] HelpCustomCache, bool AllowHelpMsgCustom, KeyPtrController helpIdIndex, string[] fieldTypeDefaultEditors, string fieldEditorPreferenceList, string styleList, string styleOptionList, int emailIdForStyles, bool IsTemplateTable, string editorAddonListJSON) {
+        public static string getTab(CoreController core, AdminDataModel adminData, int RecordID, int ContentID, bool record_readOnly, bool IsLandingPage, bool IsRootPage, string EditTab, CPHtmlBaseClass.EditorContentType EditorContext, ref string return_NewFieldList, int TemplateIDForStyles, int HelpCnt, int[] HelpIDCache, string[] helpDefaultCache, string[] HelpCustomCache, bool AllowHelpMsgCustom, KeyPtrController helpIdIndex, string[] fieldTypeDefaultEditors, string fieldEditorPreferenceList, string styleList, string styleOptionList, int emailIdForStyles, bool IsTemplateTable, string editorAddonListJSON) {
             string returnHtml = "";
             try {
                 // todo
@@ -1544,7 +1544,7 @@ namespace Contensive.Addons.AdminSite {
         /// <param name="IsTemplateTable"></param>
         /// <param name="editorAddonListJSON"></param>
         /// <returns></returns>
-        public static string getTabs(CoreController core, AdminDataModel adminData, TabController adminMenu, bool readOnlyField, bool IsLandingPage, bool IsRootPage, ContentTypeEnum EditorContext, bool allowAjaxTabs, int TemplateIDForStyles, string[] fieldTypeDefaultEditors, string fieldEditorPreferenceList, string styleList, string styleOptionList, int emailIdForStyles, bool IsTemplateTable, string editorAddonListJSON) {
+        public static string getTabs(CoreController core, AdminDataModel adminData, TabController adminMenu, bool readOnlyField, bool IsLandingPage, bool IsRootPage, CPHtmlBaseClass.EditorContentType EditorContext, bool allowAjaxTabs, int TemplateIDForStyles, string[] fieldTypeDefaultEditors, string fieldEditorPreferenceList, string styleList, string styleOptionList, int emailIdForStyles, bool IsTemplateTable, string editorAddonListJSON) {
             string returnHtml = "";
             try {
                 // todo

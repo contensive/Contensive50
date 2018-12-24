@@ -219,5 +219,12 @@ namespace Contensive.BaseClasses {
         /// <returns></returns>
         public abstract CPFileSystemBaseClass PrivateFiles { get; }
         //
+        //====================================================================================================
+        /// <summary>
+        /// read and write files in a temporary location.
+        /// </summary>
+        /// <returns></returns>
+        public abstract CPFileSystemBaseClass TempFiles { get; }
+        //
     }
 }

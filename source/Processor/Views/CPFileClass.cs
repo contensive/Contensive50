@@ -7,8 +7,7 @@ using Contensive.Processor.Exceptions;
 
 namespace Contensive.Processor {
     //
-    // comVisible to be activeScript and compatible
-    //
+    //==========================================================================================
     /// <summary>
     /// cpFileClass is a legacy implementation replaced with cdnFiles, appRootFiles and privateFiles. Non-Virtual calls do not limit file destination so are not scale-mode compatible
     /// </summary>
@@ -22,35 +21,14 @@ namespace Contensive.Processor {
         #endregion
         //
         private Contensive.Processor.Controllers.CoreController core;
-        protected bool disposed = false;
         //
         //==========================================================================================
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="core"></param>
-        public CPFileClass(Contensive.Processor.Controllers.CoreController core) : base() {
-            this.core = core;
-        }
-        //
-        //==========================================================================================
-        /// <summary>
-        /// dispose
-        /// </summary>
-        /// <param name="disposing"></param>
-        protected virtual void Dispose(bool disposing) {
-            if (!this.disposed) {
-                if (disposing) {
-                    //
-                    // call .dispose for managed objects
-                    //
-                    core = null;
-                }
-                //
-                // Add code here to release the unmanaged resource.
-                //
-            }
-            this.disposed = true;
+        public CPFileClass(CPClass cp) : base() {
+            this.core = cp.core;
         }
         //
         //==========================================================================================
@@ -304,14 +282,32 @@ namespace Contensive.Processor {
         #region  IDisposable Support 
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
+        protected bool disposed = false;
+        //
+        //==========================================================================================
+        /// <summary>
+        /// dispose
+        /// </summary>
+        /// <param name="disposing"></param>
+        protected virtual void Dispose(bool disposing) {
+            if (!this.disposed) {
+                if (disposing) {
+                    //
+                    // call .dispose for managed objects
+                    //
+                }
+                //
+                // Add code here to release the unmanaged resource.
+                //
+            }
+            disposed = true;
+        }
         public void Dispose() {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
         ~CPFileClass() {
             Dispose(false);
-            
-            
         }
         #endregion
     }

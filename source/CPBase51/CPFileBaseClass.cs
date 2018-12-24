@@ -2,7 +2,12 @@
 using System;
 
 namespace Contensive.BaseClasses {
+    /// <summary>
+    /// This class has been deprecated. use cp.File.cdn, cp.File.private, cp.File.appRoot, or cp.File.server instead.
+    /// </summary>
     public abstract class CPFileBaseClass {
+        //
+        //====================================================================================================
         //
         /// <summary>
         /// Append content to a text file in the content files. If the file does not exist it will be created.
@@ -131,10 +136,6 @@ namespace Contensive.BaseClasses {
         /// <returns></returns>
         [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", false)]
         public abstract string getVirtualFileLink(string virtualFilename);
-        //
-        //====================================================================================================
-        // deprecated
-        //
     }
 
 }

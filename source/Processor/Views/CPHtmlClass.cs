@@ -1,5 +1,7 @@
 ﻿
 using System;
+using System.Collections.Generic;
+using Contensive.BaseClasses;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 
@@ -11,165 +13,319 @@ namespace Contensive.Processor {
         public const string InterfaceId = "24267471-9CE4-44F9-B4BD-8E9CE357D6E6";
         public const string EventsId = "4021B791-0F55-4841-90AE-64C7FAFB9756";
         #endregion
-        //
+        /// <summary>
+        /// dependencies
+        /// </summary>
         private CPClass cp;
-        private Contensive.Processor.Controllers.CoreController core;
-        protected bool disposed = false;
         //
-        // Constructor
+        // ====================================================================================================
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="cpParent"></param>
         //
         public CPHtmlClass(CPClass cpParent) : base() {
             cp = cpParent;
-            core = cp.core;
         }
         //
         // ====================================================================================================
-        // dispose
-        protected virtual void Dispose(bool disposing) {
-            if (!this.disposed) {
-                appendDebugLog(".dispose, dereference cp, main, csv");
-                if (disposing) {
-                    //
-                    // call .dispose for managed objects
-                    //
-                    cp = null;
-                }
-                //
-                // Add code here to release the unmanaged resource.
-                //
+        //
+        public override void AddEvent(string htmlId, string domEvent, string javaScript) {
+            cp.core.html.javascriptAddEvent(htmlId, domEvent, javaScript);
+        }
+        //
+        // ====================================================================================================
+        //
+        public override string AdminHint(string innerHtml) {
+            if (cp.core.session.isEditingAnything() || cp.core.session.user.Admin) {
+                return ""
+                    + "<div class=\"ccHintWrapper\">"
+                        + "<div  class=\"ccHintWrapperContent\">"
+                        + "<b>Administrator</b>"
+                        + "<br>"
+                        + "<br>" + GenericController.encodeText(innerHtml) + "</div>"
+                    + "</div>";
             }
-            this.disposed = true;
+            return string.Empty;
         }
         //
         // ====================================================================================================
         //
-        public override string div(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") {
-            return HtmlController.genericBlockTag("div", InnerHtml, HtmlClass, HtmlId, HtmlName);
+        public override string Button(string htmlName, string htmlValue, string htmlClass, string htmlId) {
+            return HtmlController.getHtmlInputSubmit(htmlValue, htmlName, htmlId, "", false, htmlClass);
+        }
+        //
+        public override string Button(string htmlName, string htmlValue, string htmlClass) => Button(htmlName, htmlValue, htmlClass, "");
+        //
+        public override string Button(string htmlName, string htmlValue) => Button(htmlName, htmlValue, "", "");
+        //
+        public override string Button(string htmlName) => Button(htmlName, "", "", "");
+        //
+        // ====================================================================================================
+        //
+        public override string CheckBox(string htmlName, bool htmlValue, string htmlClass, string htmlId) {
+            return HtmlController.checkbox(htmlName, htmlValue, htmlId, false, htmlClass);
+        }
+        //
+        public override string CheckBox(string htmlName, bool htmlValue, string htmlClass) => CheckBox(htmlName, htmlValue, htmlClass, "");
+        //
+        public override string CheckBox(string htmlName, bool htmlValue) => CheckBox(htmlName, htmlValue, "", "");
+        //
+        public override string CheckBox(string htmlName) => CheckBox(htmlName, false, "", "");
+        //
+        // ====================================================================================================
+        //
+        public override string Div(string innerHtml, string htmlClass, string htmlId) => HtmlController.div(innerHtml, htmlClass, htmlId);
+        //
+        public override string Div(string innerHtml, string htmlClass) => HtmlController.div(innerHtml, htmlClass);
+        //
+        public override string Div(string innerHtml) => HtmlController.div(innerHtml);
+        //
+        // ====================================================================================================
+        //
+        //public override string Form(string innerHtml, string htmlName = "", string htmlClass = "", string htmlId = "", string actionQueryString = "", string method = "post")
+        public override string Form(string innerHtml, string htmlName, string htmlClass, string htmlId, string actionQueryString, string method ) {
+            if (method.ToLowerInvariant() == "get") {
+                return HtmlController.form(cp.core, innerHtml, actionQueryString, htmlName, htmlId, method);
+            } else {
+                return HtmlController.formMultipart(cp.core, innerHtml, actionQueryString, htmlName, htmlClass, htmlId);
+            }
+        }
+        //
+        public override string Form(string innerHtml, string htmlName, string htmlClass, string htmlId, string actionQueryString) => Form(innerHtml, htmlName, htmlClass, htmlId, actionQueryString, "post");
+        //
+        public override string Form(string innerHtml, string htmlName, string htmlClass, string htmlId) => Form(innerHtml, htmlName, htmlClass, htmlId, "", "post");
+        //
+        public override string Form(string innerHtml, string htmlName, string htmlClass) => Form(innerHtml, htmlName, htmlClass, "", "", "post");
+        //
+        public override string Form(string innerHtml, string htmlName) => Form(innerHtml, htmlName, "", "", "", "post");
+        //
+        public override string Form(string innerHtml) => Form(innerHtml, "", "", "", "", "post");
+        //
+        // ==========================================================================================
+        //
+        public override string H1(string innerHtml, string htmlClass, string htmlId) => HtmlController.h1(innerHtml, htmlClass, htmlId);
+        //
+        public override string H1(string innerHtml, string htmlClass) => HtmlController.h1(innerHtml, htmlClass);
+        //
+        public override string H1(string innerHtml) => HtmlController.h1(innerHtml);
+        //
+        // ==========================================================================================
+        //
+        public override string H2(string innerHtml, string htmlClass, string htmlId) => HtmlController.genericBlockTag("h2", innerHtml, htmlClass, htmlId);
+        //
+        public override string H2(string innerHtml, string htmlClass) => HtmlController.genericBlockTag("h2", innerHtml, htmlClass);
+        //
+        public override string H2(string innerHtml) => HtmlController.genericBlockTag("h2", innerHtml);
+        //
+        // ==========================================================================================
+        //
+        public override string H3(string innerHtml, string htmlClass, string htmlId) => HtmlController.genericBlockTag("h3", innerHtml, htmlClass, htmlId);
+        //
+        public override string H3(string innerHtml, string htmlClass) => HtmlController.genericBlockTag("h3", innerHtml, htmlClass);
+        //
+        public override string H3(string innerHtml) => HtmlController.genericBlockTag("h3", innerHtml);
+        //
+        // ==========================================================================================
+        //
+        public override string H4(string innerHtml, string htmlClass, string htmlId) => HtmlController.genericBlockTag("h4", innerHtml, htmlClass, htmlId);
+        //
+        public override string H4(string innerHtml, string htmlClass) => HtmlController.genericBlockTag("h4", innerHtml, htmlClass);
+        //
+        public override string H4(string innerHtml) => HtmlController.genericBlockTag("h4", innerHtml);
+        //
+        // ==========================================================================================
+        //
+        public override string H5(string innerHtml, string htmlClass, string htmlId) => HtmlController.genericBlockTag("h5", innerHtml, htmlClass, htmlId);
+        //
+        public override string H5(string innerHtml, string htmlClass) => HtmlController.genericBlockTag("h5", innerHtml, htmlClass);
+        //
+        public override string H5(string innerHtml) => HtmlController.genericBlockTag("h5", innerHtml);
+        //
+        // ==========================================================================================
+        //
+        public override string H6(string innerHtml, string htmlClass, string htmlId) => HtmlController.genericBlockTag("h6", innerHtml, htmlClass, htmlId);
+        //
+        public override string H6(string innerHtml, string htmlClass) => HtmlController.genericBlockTag("h6", innerHtml, htmlClass);
+        //
+        public override string H6(string innerHtml) => HtmlController.genericBlockTag("h6", innerHtml);
+        //
+        // ====================================================================================================
+        //
+        public override string Hidden(string htmlName, string htmlValue, string htmlClass, string htmlId) => HtmlController.inputHidden(htmlName, htmlValue, htmlClass, htmlId);
+        public override string Hidden(string htmlName, string htmlValue, string htmlClass) => HtmlController.inputHidden(htmlName, htmlValue, htmlClass);
+        public override string Hidden(string htmlName, string htmlValue) => HtmlController.inputHidden(htmlName, htmlValue);
+        //
+        public override string Hidden(string htmlName, int htmlValue, string htmlClass, string htmlId) => HtmlController.inputHidden(htmlName, htmlValue, htmlClass, htmlId);
+        public override string Hidden(string htmlName, int htmlValue, string htmlClass) => HtmlController.inputHidden(htmlName, htmlValue, htmlClass);
+        public override string Hidden(string htmlName, int htmlValue) => HtmlController.inputHidden(htmlName, htmlValue);
+        //
+        public override string Hidden(string htmlName, bool htmlValue, string htmlClass, string htmlId) => HtmlController.inputHidden(htmlName, htmlValue, htmlClass, htmlId);
+        public override string Hidden(string htmlName, bool htmlValue, string htmlClass) => HtmlController.inputHidden(htmlName, htmlValue, htmlClass);
+        public override string Hidden(string htmlName, bool htmlValue) => HtmlController.inputHidden(htmlName, htmlValue);
+        //
+        public override string Hidden(string htmlName, DateTime htmlValue, string htmlClass, string htmlId) => HtmlController.inputHidden(htmlName, htmlValue, htmlClass, htmlId);
+        public override string Hidden(string htmlName, DateTime htmlValue, string htmlClass) => HtmlController.inputHidden(htmlName, htmlValue, htmlClass);
+        public override string Hidden(string htmlName, DateTime htmlValue) => HtmlController.inputHidden(htmlName, htmlValue);
+        //
+        // ====================================================================================================
+        //
+        public override string Indent(string sourceHtml, int tabCnt) => HtmlController.indent(sourceHtml, tabCnt);
+        public override string Indent(string sourceHtml) => HtmlController.indent(sourceHtml);
+        //
+        // ====================================================================================================
+        //
+        public override string InputDate(string htmlName, DateTime htmlValue, string htmlClass, string htmlId) => HtmlController.inputDate(cp.core, htmlName, htmlValue, "", htmlId, htmlClass);
+        public override string InputDate(string htmlName, DateTime htmlValue, string htmlClass) => HtmlController.inputDate(cp.core, htmlName, htmlValue, "", "", htmlClass);
+        public override string InputDate(string htmlName, DateTime htmlValue) => HtmlController.inputDate(cp.core, htmlName, htmlValue);
+        public override string InputDate(string htmlName) => HtmlController.inputDate(cp.core, htmlName, null);
+        //
+        // ====================================================================================================
+        //
+        public override string InputFile(string htmlName, string htmlClass, string htmlId) => cp.core.html.inputFile(htmlName, htmlId, htmlClass);
+        public override string InputFile(string htmlName, string htmlClass) => cp.core.html.inputFile(htmlName, "", htmlClass);
+        public override string InputFile(string htmlName) => cp.core.html.inputFile(htmlName);
+        //
+        // ====================================================================================================
+        //
+        // todo implement wysiwyg features
+        public override string InputHtml(string htmlName, int maxLength, string HtmlValue, string htmlClass, string htmlId, List<SimplestDataModel> addonList) {
+            string addonListJSON = cp.core.html.getWysiwygAddonList(CPHtmlBaseClass.EditorContentType.contentTypeWeb);
+            return cp.core.html.getFormInputHTML(htmlName, HtmlValue, "", "", false, true, addonListJSON, "", "", false);
+        }
+        // todo implement wysiwyg features
+        public override string InputHtml(string htmlName, int maxLength, string HtmlValue, string htmlClass, string htmlId, bool viewAsHtmlCode) {
+            string addonListJSON = cp.core.html.getWysiwygAddonList(CPHtmlBaseClass.EditorContentType.contentTypeWeb);
+            return cp.core.html.getFormInputHTML(htmlName, HtmlValue, "", "", false, true, addonListJSON, "", "", false);
+        }
+        // todo implement wysiwyg features
+        public override string InputHtml(string htmlName, int maxLength, string HtmlValue, string htmlClass, string htmlId) {
+            string addonListJSON = cp.core.html.getWysiwygAddonList(CPHtmlBaseClass.EditorContentType.contentTypeWeb);
+            return cp.core.html.getFormInputHTML(htmlName, HtmlValue, "", "", false, true, addonListJSON, "", "", false);
+        }
+        // todo implement wysiwyg features
+        public override string InputHtml(string htmlName, int maxLength, string HtmlValue, string htmlClass) {
+            string addonListJSON = cp.core.html.getWysiwygAddonList(CPHtmlBaseClass.EditorContentType.contentTypeWeb);
+            return cp.core.html.getFormInputHTML(htmlName, HtmlValue, "", "", false, true, addonListJSON, "", "", false);
+        }
+        // todo implement wysiwyg features
+        public override string InputHtml(string htmlName, int maxLength, string HtmlValue) {
+            string addonListJSON = cp.core.html.getWysiwygAddonList(CPHtmlBaseClass.EditorContentType.contentTypeWeb);
+            return cp.core.html.getFormInputHTML(htmlName, HtmlValue, "", "", false, true, addonListJSON, "", "", false);
+        }
+        // todo implement wysiwyg features
+        public override string InputHtml(string htmlName, int maxLength) {
+            string addonListJSON = cp.core.html.getWysiwygAddonList(CPHtmlBaseClass.EditorContentType.contentTypeWeb);
+            return cp.core.html.getFormInputHTML(htmlName, "", "", "", false, true, addonListJSON, "", "", false);
         }
         //
         // ====================================================================================================
         //
-        public override string p(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") {
-            return HtmlController.genericBlockTag("p", InnerHtml, HtmlClass, HtmlId, HtmlName);
-        }
+        public override string InputPassword(string htmlName, int maxLength, string htmlValue, string htmlClass, string htmlId) => HtmlController.inputText(cp.core, htmlName, htmlValue, -1, 20, htmlId, true, false, htmlClass, maxLength);
+        public override string InputPassword(string htmlName, int maxLength, string htmlValue, string htmlClass) => HtmlController.inputText(cp.core, htmlName, htmlValue, -1, 20, "", true, false, htmlClass, maxLength);
+        public override string InputPassword(string htmlName, int maxLength, string htmlValue) => HtmlController.inputText(cp.core, htmlName, htmlValue, -1, 20, "", true, false, "", maxLength);
+        public override string InputPassword(string htmlName, int maxLength) => HtmlController.inputText(cp.core, htmlName, "", -1, 20, "", true, false, "", maxLength);
         //
         // ====================================================================================================
         //
-        public override string li(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") {
-            return HtmlController.genericBlockTag("li", InnerHtml, HtmlClass, HtmlId, HtmlName);
-        }
+        public override string InputText(string htmlName, int maxLength, string htmlValue, string htmlClass, string htmlId) => HtmlController.inputText(cp.core, htmlName, htmlValue, -1, 20, htmlId, false, false, htmlClass, maxLength);
+        public override string InputText(string htmlName, int maxLength, string htmlValue, string htmlClass) => HtmlController.inputText(cp.core, htmlName, htmlValue, -1, 20, "", false, false, htmlClass, maxLength);
+        public override string InputText(string htmlName, int maxLength, string htmlValue) => HtmlController.inputText(cp.core, htmlName, htmlValue, -1, 20, "", false, false, "", maxLength);
+        public override string InputText(string htmlName, int maxLength) => HtmlController.inputText(cp.core, htmlName, "", -1, 20, "", false, false, "", maxLength);
         //
         // ====================================================================================================
         //
-        public override string ul(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") {
-            return HtmlController.genericBlockTag("ul", InnerHtml, HtmlClass, HtmlId, HtmlName);
-        }
+        public override string Li(string innerHtml, string htmlClass, string htmlId) => HtmlController.li(innerHtml, htmlClass, htmlId);
+        public override string Li(string innerHtml, string htmlClass) => HtmlController.li(innerHtml, htmlClass);
+        public override string Li(string innerHtml) => HtmlController.li(innerHtml);
         //
         // ====================================================================================================
         //
-        public override string ol(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") {
-            return HtmlController.genericBlockTag("ol", InnerHtml, HtmlClass, HtmlId, HtmlName);
-        }
+        public override string Ol(string innerHtml, string htmlClass, string htmlId) => HtmlController.ol(innerHtml, htmlClass, htmlId);
+        public override string Ol(string innerHtml, string htmlClass) => HtmlController.ol(innerHtml, htmlClass);
+        public override string Ol(string innerHtml) => HtmlController.ol(innerHtml);
         //
         // ====================================================================================================
         //
-        public override string CheckBox(string HtmlName, bool HtmlValue = false, string HtmlClass = "", string HtmlId = "") {
-            return HtmlController.checkbox(HtmlName, HtmlValue, HtmlId, false, HtmlClass);
+        public override string P(string innerHtml, string htmlClass, string htmlId) => HtmlController.p(innerHtml, htmlClass, htmlId);
+        public override string P(string innerHtml, string htmlClass) => HtmlController.p(innerHtml, htmlClass);
+        public override string P(string innerHtml) => HtmlController.p(innerHtml);
+        //
+        // ====================================================================================================
+        //
+        public override string Ul(string innerHtml, string htmlClass, string htmlId) => HtmlController.ul(innerHtml, htmlClass, htmlId);
+        public override string Ul(string innerHtml, string htmlClass) => HtmlController.ul(innerHtml, htmlClass);
+        public override string Ul(string innerHtml) => HtmlController.ul(innerHtml);
+
+
+
+
+
+
+
+
+
+
+
+
+        //
+        //
+        // ====================================================================================================
+        //
+        public override void ProcessCheckList(string htmlName, string PrimaryContentName, string PrimaryRecordID, string SecondaryContentName, string RulesContentName, string RulesPrimaryFieldname, string RulesSecondaryFieldName) {
+            cp.core.html.processCheckList(htmlName, PrimaryContentName, PrimaryRecordID, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName);
         }
+
+
+
+
+
+
+
+
+
         //
         // ====================================================================================================
         //Inherits BaseClasses.CPHtmlBaseClass.CheckBox
-        public override string CheckList(string HtmlName, string PrimaryContentName, int PrimaryRecordId, string SecondaryContentName, string RulesContentName, string RulesPrimaryFieldname, string RulesSecondaryFieldName, string SecondaryContentSelectSQLCriteria = "", string CaptionFieldName = "", bool IsReadOnly = false, string HtmlClass = "", string HtmlId = "") {
-            return core.html.getCheckList2(HtmlName, PrimaryContentName, PrimaryRecordId, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName, SecondaryContentSelectSQLCriteria, CaptionFieldName, IsReadOnly);
-        }
-        //
-        // ====================================================================================================
-        //Inherits BaseClasses.CPHtmlBaseClass.CheckBox 
-        public override string Form(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "", string ActionQueryString = "", string Method = "post") {
-            if (Method.ToLowerInvariant() == "get") {
-                return HtmlController.form(core, InnerHtml, ActionQueryString, HtmlName, HtmlId, Method);
-            } else {
-                return HtmlController.formMultipart(core, InnerHtml, ActionQueryString, HtmlName, HtmlClass, HtmlId);
-            }
+        public override string CheckList(string htmlName, string PrimaryContentName, int PrimaryRecordId, string SecondaryContentName, string RulesContentName, string RulesPrimaryFieldname, string RulesSecondaryFieldName, string SecondaryContentSelectSQLCriteria = "", string CaptionFieldName = "", bool IsReadOnly = false, string htmlClass = "", string htmlId = "") {
+            return cp.core.html.getCheckList2(htmlName, PrimaryContentName, PrimaryRecordId, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName, SecondaryContentSelectSQLCriteria, CaptionFieldName, IsReadOnly);
         }
         //
         // ==========================================================================================
         //
-        public override string h1(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") {
-            return HtmlController.genericBlockTag("h1", InnerHtml, HtmlClass, HtmlId, HtmlName);
+        public override string RadioBox(string htmlName, string HtmlValue, string CurrentValue, string htmlClass = "", string htmlId = "") {
+            return cp.core.html.inputRadio(htmlName, HtmlValue, CurrentValue, htmlId,htmlClass);
         }
         //
         // ==========================================================================================
         //
-        public override string h2(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") {
-            return HtmlController.genericBlockTag("h2", InnerHtml, HtmlClass, HtmlId, HtmlName);
+        public override string RadioBox(string htmlName, int HtmlValue, int CurrentValue, string htmlClass = "", string htmlId = "") {
+            return cp.core.html.inputRadio(htmlName, HtmlValue.ToString(), CurrentValue.ToString(), htmlId, htmlClass);
         }
         //
         // ==========================================================================================
         //
-        public override string h3(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") {
-            return HtmlController.genericBlockTag("h3", InnerHtml, HtmlClass, HtmlId, HtmlName);
-        }
-        //
-        // ==========================================================================================
-        //
-        public override string h4(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") {
-            return HtmlController.genericBlockTag("h4", InnerHtml, HtmlClass, HtmlId, HtmlName);
-        }
-        //
-        // ==========================================================================================
-        //
-        public override string h5(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") {
-            return HtmlController.genericBlockTag("h5", InnerHtml, HtmlClass, HtmlId, HtmlName);
-        }
-        //
-        // ====================================================================================================
-        //
-        public override string h6(string InnerHtml, string HtmlName = "", string HtmlClass = "", string HtmlId = "") {
-            return HtmlController.genericBlockTag("h6", InnerHtml, HtmlClass, HtmlId, HtmlName);
-        }
-        //
-        // ==========================================================================================
-        //
-        public override string RadioBox(string HtmlName, string HtmlValue, string CurrentValue, string HtmlClass = "", string HtmlId = "") {
-            return core.html.inputRadio(HtmlName, HtmlValue, CurrentValue, HtmlId);
-        }
-        //
-        // ==========================================================================================
-        //
-        public override string RadioBox(string HtmlName, int HtmlValue, int CurrentValue, string HtmlClass = "", string HtmlId = "") {
-            return core.html.inputRadio(HtmlName, HtmlValue.ToString(), CurrentValue.ToString(), HtmlId);
-        }
-        //
-        // ==========================================================================================
-        //
-        public override string SelectContent(string HtmlName, string HtmlValue, string ContentName, string SQLCriteria = "", string NoneCaption = "", string HtmlClass = "", string HtmlId = "") {
+        public override string SelectContent(string htmlName, string HtmlValue, string ContentName, string SQLCriteria = "", string NoneCaption = "", string htmlClass = "", string htmlId = "") {
             string tempSelectContent = null;
-            tempSelectContent = core.html.selectFromContent(HtmlName, GenericController.encodeInteger(HtmlValue), ContentName, SQLCriteria, NoneCaption);
-            if (!string.IsNullOrEmpty(HtmlClass)) {
-                tempSelectContent = tempSelectContent.Replace("<select ", "<select class=\"" + HtmlClass + "\" ");
+            tempSelectContent = cp.core.html.selectFromContent(htmlName, GenericController.encodeInteger(HtmlValue), ContentName, SQLCriteria, NoneCaption);
+            if (!string.IsNullOrEmpty(htmlClass)) {
+                tempSelectContent = tempSelectContent.Replace("<select ", "<select class=\"" + htmlClass + "\" ");
             }
-            if (!string.IsNullOrEmpty(HtmlId)) {
-                tempSelectContent = tempSelectContent.Replace("<select ", "<select id=\"" + HtmlId + "\" ");
+            if (!string.IsNullOrEmpty(htmlId)) {
+                tempSelectContent = tempSelectContent.Replace("<select ", "<select id=\"" + htmlId + "\" ");
             }
             return tempSelectContent;
         }
         //
         // ==========================================================================================
         //
-        public override string SelectList(string HtmlName, string HtmlValue, string OptionList, string NoneCaption = "", string HtmlClass = "", string HtmlId = "") {
+        public override string SelectList(string htmlName, string HtmlValue, string OptionList, string NoneCaption = "", string htmlClass = "", string htmlId = "") {
             string tempSelectList = null;
-            tempSelectList = HtmlController.selectFromList( core, HtmlName, GenericController.encodeInteger( HtmlValue ), OptionList.Split(','), NoneCaption, HtmlId);
-            if (!string.IsNullOrEmpty(HtmlClass)) {
-                tempSelectList = tempSelectList.Replace("<select ", "<select class=\"" + HtmlClass + "\" ");
+            tempSelectList = HtmlController.selectFromList( cp.core, htmlName, GenericController.encodeInteger( HtmlValue ), OptionList.Split(','), NoneCaption, htmlId);
+            if (!string.IsNullOrEmpty(htmlClass)) {
+                tempSelectList = tempSelectList.Replace("<select ", "<select class=\"" + htmlClass + "\" ");
             }
             return tempSelectList;
-        }
-        //
-        // ====================================================================================================
-        //
-        public override void ProcessCheckList(string HtmlName, string PrimaryContentName, string PrimaryRecordID, string SecondaryContentName, string RulesContentName, string RulesPrimaryFieldname, string RulesSecondaryFieldName) {
-            core.html.processCheckList(HtmlName, PrimaryContentName, PrimaryRecordID, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName);
         }
         //
         //====================================================================================================
@@ -177,53 +333,15 @@ namespace Contensive.Processor {
         /// process an html file element to cdnFiles to the optional path. If the path is ommitted, the path "upload"
         /// </summary>
         [Obsolete("Instead, use cp.cdeFiles.saveUpload() or similar fileSystem object.")]
-        public override void ProcessInputFile(string HtmlName, string VirtualFilePath = "") {
+        public override void ProcessInputFile(string htmlName, string VirtualFilePath = "") {
             string ignoreFilename = "";
-            core.cdnFiles.upload(HtmlName, VirtualFilePath, ref ignoreFilename);
+            cp.core.cdnFiles.upload(htmlName, VirtualFilePath, ref ignoreFilename);
         }
         //
         // ====================================================================================================
         //
-        public override string Hidden(string HtmlName, string HtmlValue) => HtmlController.inputHidden(HtmlName, HtmlValue);
-        public override string Hidden(string HtmlName, string HtmlValue, string HtmlClass) => HtmlController.inputHidden(HtmlName, HtmlValue, HtmlClass);
-        public override string Hidden(string HtmlName, string HtmlValue, string HtmlClass, string HtmlId) => HtmlController.inputHidden(HtmlName, HtmlValue, HtmlClass, HtmlId);
-        //
-        public override string Hidden(string HtmlName, int HtmlValue) => HtmlController.inputHidden(HtmlName, HtmlValue);
-        public override string Hidden(string HtmlName, int HtmlValue, string HtmlClass) => HtmlController.inputHidden(HtmlName, HtmlValue, HtmlClass);
-        public override string Hidden(string HtmlName, int HtmlValue, string HtmlClass, string HtmlId) => HtmlController.inputHidden(HtmlName, HtmlValue, HtmlClass, HtmlId);
-        //
-        public override string Hidden(string HtmlName, bool HtmlValue) => HtmlController.inputHidden(HtmlName, HtmlValue);
-        public override string Hidden(string HtmlName, bool HtmlValue, string HtmlClass) => HtmlController.inputHidden(HtmlName, HtmlValue, HtmlClass);
-        public override string Hidden(string HtmlName, bool HtmlValue, string HtmlClass, string HtmlId) => HtmlController.inputHidden(HtmlName, HtmlValue, HtmlClass, HtmlId);
-        //
-        public override string Hidden(string HtmlName, DateTime HtmlValue) => HtmlController.inputHidden(HtmlName, HtmlValue);
-        public override string Hidden(string HtmlName, DateTime HtmlValue, string HtmlClass) => HtmlController.inputHidden(HtmlName, HtmlValue, HtmlClass);
-        public override string Hidden(string HtmlName, DateTime HtmlValue, string HtmlClass, string HtmlId) => HtmlController.inputHidden(HtmlName, HtmlValue, HtmlClass, HtmlId);
-        //
-        // ====================================================================================================
-        //
-        public override string InputDate(string HtmlName, string HtmlValue = "", string Width = "", string HtmlClass = "", string HtmlId = "") {
-            return HtmlController.inputDate(core, HtmlName, encodeDate(HtmlValue), Width, HtmlId, HtmlClass);
-        }
-        //
-        // ====================================================================================================
-        //
-        public override string InputFile(string HtmlName, string HtmlClass = "", string HtmlId = "") {
-            return core.html.inputFile(HtmlName, HtmlId, HtmlClass);
-        }
-        //
-        // ====================================================================================================
-        //
-        public override string InputText(string HtmlName, string HtmlValue = "", string Height = "", string Width = "", bool IsPassword = false, string HtmlClass = "", string HtmlId = "") {
-            string returnValue = HtmlController.inputText( core,HtmlName, HtmlValue, GenericController.encodeInteger(Height), GenericController.encodeInteger(Width), HtmlId, IsPassword, false, HtmlClass);
-            returnValue = returnValue.Replace(" SIZE=\"60\"", "");
-            return returnValue;
-        }
-        //
-        // ====================================================================================================
-        //
-        public override string InputTextExpandable(string HtmlName, string HtmlValue = "", int Rows = 0, string StyleWidth = "", bool ignore = false, string HtmlClass = "", string HtmlId = "") {
-            string result = HtmlController.inputTextarea( core,HtmlName, HtmlValue, Rows, 20, HtmlId, ignore,false,HtmlClass);
+        public override string InputTextExpandable(string htmlName, string HtmlValue = "", int Rows = 0, string StyleWidth = "", bool ignore = false, string htmlClass = "", string htmlId = "") {
+            string result = HtmlController.inputTextarea( cp.core,htmlName, HtmlValue, Rows, 20, htmlId, ignore,false,htmlClass);
             if (!string.IsNullOrEmpty(StyleWidth)) {
                 result = result.Replace(">", " style=\"width:" + StyleWidth + "\">");
             }
@@ -232,121 +350,180 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         //
-        public override string SelectUser(string HtmlName, int HtmlValue, int GroupId, string NoneCaption = "", string HtmlClass = "", string HtmlId = "") {
-            return core.html.selectUserFromGroup(HtmlName, HtmlValue, GroupId, NoneCaption, HtmlId);
+        public override string SelectUser(string htmlName, int HtmlValue, int GroupId, string NoneCaption = "", string htmlClass = "", string htmlId = "") {
+            return cp.core.html.selectUserFromGroup(htmlName, HtmlValue, GroupId, NoneCaption, htmlId);
         }
         //
         // ====================================================================================================
+        // deprecated
+        [Obsolete("Use uppercase methods", true)]
+        public override string div(string innerHtml, string htmlName, string htmlClass, string htmlId) => Div(innerHtml, htmlClass, htmlId);
         //
-        public override string Indent(string SourceHtml, int TabCnt = 1) {
-            string tempIndent = null;
-            //
-            //   Indent every line by 1 tab
-            //
-            int posStart = 0;
-            int posEnd = 0;
-            string pre = null;
-            string post = null;
-            string target = null;
-            //
-            posStart = GenericController.vbInstr(1, SourceHtml, "<![CDATA[", 1);
-            if (posStart == 0) {
-                //
-                // no cdata
-                //
-                posStart = GenericController.vbInstr(1, SourceHtml, "<textarea", 1);
-                if (posStart == 0) {
-                    //
-                    // no textarea
-                    //
-                    if (TabCnt > 0 && TabCnt < 99) {
-                        tempIndent = SourceHtml.Replace("\r\n", "\r\n" + new string(Convert.ToChar("\t"), TabCnt));
-                    } else {
-                        tempIndent = SourceHtml.Replace("\r\n", "\r\n\t");
-                    }
-                    //Indent = genericController.vbReplace(SourceHtml, vbCrLf & vbTab, vbCrLf & vbTab & vbTab)
-                } else {
-                    //
-                    // text area found, isolate it and indent before and after
-                    //
-                    posEnd = GenericController.vbInstr(posStart, SourceHtml, "</textarea>", 1);
-                    pre = SourceHtml.Left(posStart - 1);
-                    if (posEnd == 0) {
-                        target = SourceHtml.Substring(posStart - 1);
-                        post = "";
-                    } else {
-                        target = SourceHtml.Substring(posStart - 1, posEnd - posStart + ((string)("</textarea>")).Length);
-                        post = SourceHtml.Substring((posEnd + ((string)("</textarea>")).Length) - 1);
-                    }
-                    tempIndent = Indent(pre, TabCnt) + target + Indent(post, TabCnt);
-                }
-            } else {
-                //
-                // cdata found, isolate it and indent before and after
-                //
-                posEnd = GenericController.vbInstr(posStart, SourceHtml, "]]>", 1);
-                pre = SourceHtml.Left(posStart - 1);
-                if (posEnd == 0) {
-                    target = SourceHtml.Substring(posStart - 1);
-                    post = "";
-                } else {
-                    target = SourceHtml.Substring(posStart - 1, posEnd - posStart + ((string)("]]>")).Length);
-                    post = SourceHtml.Substring(posEnd + 2);
-                }
-                tempIndent = Indent(pre, TabCnt) + target + Indent(post, TabCnt);
-            }
-            return tempIndent;
-        }
+        [Obsolete("Use uppercase methods", true)]
+        public override string div(string innerHtml, string htmlName, string htmlClass) => Div(innerHtml, htmlClass);
         //
-        // ====================================================================================================
+        [Obsolete("Use uppercase methods", true)]
+        public override string div(string innerHtml, string htmlName) => Div(innerHtml);
         //
-        public override string InputWysiwyg(string HtmlName, string HtmlValue = "", BaseClasses.CPHtmlBaseClass.EditorUserScope UserScope = BaseClasses.CPHtmlBaseClass.EditorUserScope.CurrentUser, BaseClasses.CPHtmlBaseClass.EditorContentScope ContentScope = BaseClasses.CPHtmlBaseClass.EditorContentScope.Page, string Height = "", string Width = "", string HtmlClass = "", string HtmlId = "") {
-            return core.html.getFormInputHTML(HtmlName, HtmlValue, Height, Width);
-        }
+        [Obsolete("Use uppercase methods", true)]
+        public override string div(string innerHtml) => Div(innerHtml);
         //
-        // ====================================================================================================
+        [Obsolete("Use uppercase methods", true)]
+        public override string adminHint(string innerHtml) => AdminHint(innerHtml);
         //
-        public override void AddEvent(string HtmlId, string DOMEvent, string JavaScript) {
-            core.html.javascriptAddEvent(HtmlId, DOMEvent, JavaScript);
-        }
+        [Obsolete("Use uppercase methods", true)]
+        public override string h1(string innerHtml, string htmlName, string htmlClass, string htmlId) => H1(innerHtml, htmlClass, htmlId);
         //
-        // ====================================================================================================
+        [Obsolete("Use uppercase methods", true)]
+        public override string h1(string innerHtml, string htmlName, string htmlClass) => H1(innerHtml, htmlClass);
         //
-        public override string Button(string HtmlName, string HtmlValue = "", string HtmlClass = "", string HtmlId = "") {
-            return HtmlController.getHtmlInputSubmit(HtmlValue, HtmlName, HtmlId,"",false, HtmlClass);
-        }
+        [Obsolete("Use uppercase methods", true)]
+        public override string h1(string innerHtml, string htmlName) => H1(innerHtml);
         //
-        // ====================================================================================================
+        [Obsolete("Use uppercase methods", true)]
+        public override string h1(string innerHtml) => H1(innerHtml);
         //
-        public override string adminHint(string innerHtml) {
-            string returnString = innerHtml;
-            try {
-                if (core.session.isEditingAnything() || core.session.user.Admin) {
-                    returnString = ""
-                        + "<div class=\"ccHintWrapper\">"
-                            + "<div  class=\"ccHintWrapperContent\">"
-                            + "<b>Administrator</b>"
-                            + "<BR>"
-                            + "<BR>" + GenericController.encodeText(innerHtml) + "</div>"
-                        + "</div>";
-                }
-            } catch (Exception ex) {
-                LogController.handleError( core,ex, "Unexpected error in cp.html.adminHint()");
-            }
-            return returnString;
-        }
+        [Obsolete("Use uppercase methods", true)]
+        public override string h2(string innerHtml, string htmlName, string htmlClass, string htmlId) => H2(innerHtml, htmlClass, htmlId);
         //
-        // ====================================================================================================
+        [Obsolete("Use uppercase methods", true)]
+        public override string h2(string innerHtml, string htmlName, string htmlClass) => H2(innerHtml, htmlClass);
         //
-        private void appendDebugLog(string copy) {
-        }
+        [Obsolete("Use uppercase methods", true)]
+        public override string h2(string innerHtml, string htmlName) => H2(innerHtml);
         //
-        // ====================================================================================================
+        [Obsolete("Use uppercase methods", true)]
+        public override string h2(string innerHtml) => H2(innerHtml);
         //
-        private void tp(string msg) {
-            //Call appendDebugLog(msg)
-        }
+        [Obsolete("Use uppercase methods", true)]
+        public override string h3(string innerHtml, string htmlName, string htmlClass, string htmlId) => H3(innerHtml, htmlClass, htmlId);
+        //
+        [Obsolete("Use uppercase methods", true)]
+        public override string h3(string innerHtml, string htmlName, string htmlClass) => H3(innerHtml, htmlClass);
+        //
+        [Obsolete("Use uppercase methods", true)]
+        public override string h3(string innerHtml, string htmlName) => H3(innerHtml);
+        //
+        [Obsolete("Use uppercase methods", true)]
+        public override string h3(string innerHtml) => H3(innerHtml);
+        //
+        [Obsolete("Use uppercase methods", true)]
+        public override string h4(string innerHtml, string htmlName, string htmlClass, string htmlId) => H4(innerHtml, htmlClass, htmlId);
+        //
+        [Obsolete("Use uppercase methods", true)]
+        public override string h4(string innerHtml, string htmlName, string htmlClass) => H4(innerHtml, htmlClass);
+        //
+        [Obsolete("Use uppercase methods", true)]
+        public override string h4(string innerHtml, string htmlName) => H4(innerHtml);
+        //
+        [Obsolete("Use uppercase methods", true)]
+        public override string h4(string innerHtml) => H4(innerHtml);
+        //
+        [Obsolete("Use uppercase methods", true)]
+        public override string h5(string innerHtml, string htmlName, string htmlClass, string htmlId) => H5(innerHtml, htmlClass, htmlId);
+        //
+        [Obsolete("Use uppercase methods", true)]
+        public override string h5(string innerHtml, string htmlName, string htmlClass) => H5(innerHtml, htmlClass);
+        //
+        [Obsolete("Use uppercase methods", true)]
+        public override string h5(string innerHtml, string htmlName) => H5(innerHtml);
+        //
+        [Obsolete("Use uppercase methods", true)]
+        public override string h5(string innerHtml) => H5(innerHtml);
+        //
+        [Obsolete("Use uppercase methods", true)]
+        public override string h6(string innerHtml, string htmlName, string htmlClass, string htmlId) => H6(innerHtml, htmlClass, htmlId);
+        //
+        [Obsolete("Use uppercase methods", true)]
+        public override string h6(string innerHtml, string htmlName, string htmlClass) => H6(innerHtml, htmlClass);
+        //
+        [Obsolete("Use uppercase methods", true)]
+        public override string h6(string innerHtml, string htmlName) => H6(innerHtml);
+        //
+        [Obsolete("Use uppercase methods", true)]
+        public override string h6(string innerHtml) => H6(innerHtml);
+        //
+        [Obsolete("Use uppercase methods", true)]
+        public override string p(string innerHtml, string htmlName, string htmlClass, string htmlId) => P(innerHtml, htmlClass, htmlId );
+        //
+        [Obsolete("Use uppercase methods", true)]
+        public override string p(string innerHtml, string htmlName, string htmlClass) => P(innerHtml, htmlClass);
+        //
+        [Obsolete("Use uppercase methods", true)]
+        public override string p(string innerHtml, string htmlName) => P(innerHtml);
+        //
+        [Obsolete("Use uppercase methods", true)]
+        public override string p(string innerHtml) => P(innerHtml);
+        //
+        [Obsolete("Use uppercase methods", true)]
+        public override string li(string innerHtml, string htmlName, string htmlClass, string htmlId) => Li( innerHtml, htmlClass, htmlId );
+        //
+        [Obsolete("Use uppercase methods", true)]
+        public override string li(string innerHtml, string htmlName, string htmlClass) => Li(innerHtml, htmlClass);
+        //
+        [Obsolete("Use uppercase methods", true)]
+        public override string li(string innerHtml, string htmlName) => Li(innerHtml);
+        //
+        [Obsolete("Use uppercase methods", true)]
+        public override string li(string innerHtml) => Li(innerHtml);
+        //
+        [Obsolete("Use uppercase methods", true)]
+        public override string ul(string innerHtml, string htmlName, string htmlClass, string htmlId) => Ul(innerHtml, htmlClass, htmlId);
+        //
+        [Obsolete("Use uppercase methods", true)]
+        public override string ul(string innerHtml, string htmlName, string htmlClass) => Ul(innerHtml, htmlClass);
+        //
+        [Obsolete("Use uppercase methods", true)]
+        public override string ul(string innerHtml, string htmlName) => Ul(innerHtml);
+        //
+        [Obsolete("Use uppercase methods", true)]
+        public override string ul(string innerHtml) => Ul(innerHtml);
+        //
+        [Obsolete("Use uppercase methods", true)]
+        public override string ol(string innerHtml, string htmlName, string htmlClass, string htmlId) => HtmlController.genericBlockTag("ol", innerHtml, htmlClass, htmlId);
+        //
+        [Obsolete("Use uppercase methods", true)]
+        public override string ol(string innerHtml, string htmlName, string htmlClass) => HtmlController.genericBlockTag("ol", innerHtml, htmlClass, "");
+        //
+        [Obsolete("Use uppercase methods", true)]
+        public override string ol(string innerHtml, string htmlName) => HtmlController.genericBlockTag("ol", innerHtml, "", "");
+        //
+        [Obsolete("Use uppercase methods", true)]
+        public override string ol(string innerHtml) => HtmlController.genericBlockTag("ol", innerHtml);
+        //
+        [Obsolete("Use InputText( string, string, string, string, int, bool", true)]
+        public override string InputText(string htmlName, string htmlValue, string Height, string Width, bool IsPassword, string htmlClass, string htmlId) => HtmlController.inputText(cp.core, htmlName, htmlValue, GenericController.encodeInteger(Height), GenericController.encodeInteger(Width), htmlId, IsPassword, false, htmlClass);
+        //
+        [Obsolete("Use InputText( string, string, string, string, int, bool", true)]
+        public override string InputText(string htmlName, string htmlValue, string Height, string Width, bool IsPassword, string htmlClass) => HtmlController.inputText(cp.core, htmlName, htmlValue, GenericController.encodeInteger(Height), GenericController.encodeInteger(Width), "", IsPassword, false, htmlClass);
+        //
+        [Obsolete("Use InputText( string, string, string, string, int, bool", true)]
+        public override string InputText(string htmlName, string htmlValue, string Height, string Width, bool IsPassword) => HtmlController.inputText(cp.core, htmlName, htmlValue, GenericController.encodeInteger(Height), GenericController.encodeInteger(Width), "", IsPassword);
+        //
+        [Obsolete("Use InputText( string, string, string, string, int, bool", true)]
+        public override string InputText(string htmlName, string htmlValue, string Height, string Width) => HtmlController.inputText(cp.core, htmlName, htmlValue, GenericController.encodeInteger(Height), GenericController.encodeInteger(Width));
+        //
+        [Obsolete("Use InputText( string, string, string, string, int, bool", true)]
+        public override string InputWysiwyg(string htmlName, string HtmlValue, EditorUserRole UserScope, EditorContentType ContentScope, string Height, string Width, string htmlClass, string htmlId)
+           => cp.core.html.getFormInputHTML(htmlName, HtmlValue, Height, Width);
+        //
+        //
+        //
         #region  IDisposable Support 
+        protected bool disposed = false;
+        protected virtual void Dispose(bool disposing) {
+            if (!this.disposed) {
+                if (disposing) {
+                    //
+                    // call .dispose for managed objects
+                    //
+                }
+                //
+                // Add code here to release the unmanaged resource.
+                //
+            }
+            this.disposed = true;
+        }
         //
         // ====================================================================================================
         // Do not change or add Overridable to these methods.

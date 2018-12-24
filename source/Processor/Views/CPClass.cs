@@ -285,7 +285,7 @@ namespace Contensive.Processor {
         public override CPFileSystemBaseClass CdnFiles {
             get {
                 if (_cdnFiles == null) {
-                    _cdnFiles = new CPFileSystemClass(core, core.cdnFiles);
+                    _cdnFiles = new CPFileSystemClass(this, core.cdnFiles);
                 }
                 return _cdnFiles;
             }
@@ -378,7 +378,7 @@ namespace Contensive.Processor {
         [Obsolete()] public override CPFileBaseClass File {
             get {
                 if (_fileObj == null) {
-                    _fileObj = new CPFileClass(core);
+                    _fileObj = new CPFileClass(this);
                 }
                 return _fileObj;
             }
@@ -430,7 +430,7 @@ namespace Contensive.Processor {
         public override CPFileSystemBaseClass PrivateFiles {
             get {
                 if (_privateFiles == null) {
-                    _privateFiles = new CPFileSystemClass(core, core.privateFiles);
+                    _privateFiles = new CPFileSystemClass(this, core.privateFiles);
                 }
                 return _privateFiles;
             }
@@ -481,6 +481,21 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         /// <summary>
+        /// Temporary file storarge
+        /// </summary>
+        public override CPFileSystemBaseClass TempFiles {
+            get {
+                if (_tempFiles == null) {
+                    _wwwFiles = new CPFileSystemClass(this, core.tempFiles);
+                }
+                return _tempFiles;
+            }
+        }
+        private CPFileSystemClass _tempFiles;
+ 
+        //
+        //====================================================================================================
+        /// <summary>
         /// An object that provides basic methods helpful is application execute.
         /// </summary>
         public override CPUtilsBaseClass Utils {
@@ -528,7 +543,7 @@ namespace Contensive.Processor {
         public override CPFileSystemBaseClass WwwFiles {
             get {
                 if (_wwwFiles == null) {
-                    _wwwFiles = new CPFileSystemClass(core, core.appRootFiles);
+                    _wwwFiles = new CPFileSystemClass(this, core.appRootFiles);
                 }
                 return _wwwFiles;
             }

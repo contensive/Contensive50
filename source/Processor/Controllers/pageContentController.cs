@@ -177,7 +177,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     //
                     // -- if fpo_QuickEdit it there, replace it out
-                    string addonListJSON = core.html.getWysiwygAddonList(ContentTypeEnum.contentTypeWeb);
+                    string addonListJSON = core.html.getWysiwygAddonList(CPHtmlBaseClass.EditorContentType.contentTypeWeb);
                     string Editor = core.html.getFormInputHTML("copyFilename", core.doc.quickEditCopy, FieldRows.ToString(), "100%", false, true, addonListJSON, "", "");
                     returnHtml = GenericController.vbReplace(returnHtml, html_quickEdit_fpo, Editor);
                 }

@@ -13,19 +13,126 @@ namespace Contensive.Processor {
         #endregion
         //
         private Contensive.Processor.Controllers.CoreController core;
-        protected bool disposed = false;
-        //
-        private FileController fileSystem;
+        /// <summary>
+        /// The instance of the controller used to implement this instance. Either core.TempFiles, core.wwwFiles, core.cdnFiles, or core.appRootFiles
+        /// </summary>
+        private FileController fileSystemController;
         //
         //==========================================================================================
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="core"></param>
-        public CPFileSystemClass(Contensive.Processor.Controllers.CoreController core, FileController fileSystem) : base() {
-            this.core = core;
-            this.fileSystem = fileSystem;
+        public CPFileSystemClass(CPClass cp, FileController fileSystemController) : base() {
+            core = cp.core;
+            this.fileSystemController = fileSystemController;
         }
+        //
+        //==========================================================================================
+        /// <summary>
+        /// Append a file with content. NOTE: avoid with all remote file systems
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <param name="fileContent"></param>
+        public override void Append(string filename, string fileContent) {
+            fileSystemController.appendFile(filename, fileContent);
+        }
+        //
+        //==========================================================================================
+        /// <summary>
+        /// Copy a file within the same filesystem
+        /// </summary>
+        /// <param name="sourceFilename"></param>
+        /// <param name="destinationFilename"></param>
+        public override void Copy(string sourceFilename, string destinationFilename) {
+            fileSystemController.copyFile(sourceFilename, destinationFilename);
+        }
+        //
+        //==========================================================================================
+        /// <summary>
+        /// Copy a file to another file system
+        /// </summary>
+        /// <param name="sourceFilename"></param>
+        /// <param name="destinationFilename"></param>
+        /// <param name="destinationFileSystem"></param>
+        public override void Copy(string sourceFilename, string destinationFilename, BaseClasses.CPFileSystemBaseClass destinationFileSystem) {
+            fileSystemController.copyFile(sourceFilename, destinationFilename, ((CPFileSystemClass)destinationFileSystem).fileSystemController);
+        }
+        //
+        //==========================================================================================
+        /// <summary>
+        /// Create a folder in a path. Path arguments should have no leading slash.
+        /// </summary>
+        /// <param name="pathFolder"></param>
+        public override void CreateFolder(string pathFolder) {
+            fileSystemController.createPath(pathFolder);
+        }
+        //
+        //==========================================================================================
+        public override void DeleteFile(string filename) {
+            fileSystemController.deleteFile(filename);
+        }
+        //
+        //==========================================================================================
+        public override string Read(string filename) {
+            return fileSystemController.readFileText(filename);
+        }
+        //
+        //==========================================================================================
+        public override byte[] ReadBinary(string filename) {
+            return fileSystemController.readFileBinary(filename);
+        }
+        //
+        //==========================================================================================
+        public override void Save(string filename, string fileContent) {
+            fileSystemController.saveFile(filename, fileContent);
+        }
+        //
+        //==========================================================================================
+        public override void SaveBinary(string filename, byte[] fileContent) {
+            fileSystemController.saveFile(filename, fileContent);
+        }
+        //
+        //==========================================================================================
+        public override bool FileExists(string pathFileName) {
+            return fileSystemController.fileExists(pathFileName);
+        }
+        //
+        //==========================================================================================
+        public override bool FolderExists(string folderName) {
+            return fileSystemController.pathExists(folderName);
+        }
+        //
+        //==========================================================================================
+        public override List<FileDetail> FileList(string folderName, int pageSize = 0, int pageNumber = 1) {
+            return fileSystemController.getFileList(folderName);
+        }
+        //
+        //==========================================================================================
+        public override List<FolderDetail> FolderList(string folderName) {
+            return fileSystemController.getFolderList(folderName);
+        }
+        //
+        //==========================================================================================
+        public override void DeleteFolder(string folderPath) {
+            fileSystemController.deleteFolder(folderPath);
+        }
+        //
+        //==========================================================================================
+        //
+        public override bool SaveUpload(string htmlformName, ref string returnFilename) {
+            return fileSystemController.upload(htmlformName, "\\upload", ref returnFilename);
+        }
+        //
+        //==========================================================================================
+        //
+        public override bool SaveUpload(string htmlformName, string folderpath, ref string returnFilename) {
+            return fileSystemController.upload(htmlformName, folderpath, ref  returnFilename);
+        }
+        #region  IDisposable Support 
+        // Do not change or add Overridable to these methods.
+        // Put cleanup code in Dispose(ByVal disposing As Boolean).
+        protected bool disposed = false;
         //
         //==========================================================================================
         /// <summary>
@@ -38,94 +145,13 @@ namespace Contensive.Processor {
                     //
                     // call .dispose for managed objects
                     //
-                    core = null;
                 }
                 //
                 // Add code here to release the unmanaged resource.
                 //
             }
-            this.disposed = true;
+            disposed = true;
         }
-        //
-        //==========================================================================================
-        public override void Append(string filename, string fileContent) {
-            fileSystem.appendFile(filename, fileContent);
-        }
-        //
-        //==========================================================================================
-        public override void Copy(string sourceFilename, string destinationFilename) {
-            fileSystem.copyFile(sourceFilename, destinationFilename);
-        }
-        //
-        //==========================================================================================
-        public override void CreateFolder(string folderPath) {
-            fileSystem.createPath(folderPath);
-        }
-        //
-        //==========================================================================================
-        public override void DeleteFile(string filename) {
-            fileSystem.deleteFile(filename);
-        }
-        //
-        //==========================================================================================
-        public override string Read(string filename) {
-            return fileSystem.readFileText(filename);
-        }
-        //
-        //==========================================================================================
-        public override byte[] ReadBinary(string filename) {
-            return fileSystem.readFileBinary(filename);
-        }
-        //
-        //==========================================================================================
-        public override void Save(string filename, string fileContent) {
-            fileSystem.saveFile(filename, fileContent);
-        }
-        //
-        //==========================================================================================
-        public override void SaveBinary(string filename, byte[] fileContent) {
-            fileSystem.saveFile(filename, fileContent);
-        }
-        //
-        //==========================================================================================
-        public override bool FileExists(string pathFileName) {
-            return fileSystem.fileExists(pathFileName);
-        }
-        //
-        //==========================================================================================
-        public override bool FolderExists(string folderName) {
-            return fileSystem.pathExists(folderName);
-        }
-        //
-        //==========================================================================================
-        public override List<FileDetail> FileList(string folderName, int pageSize = 0, int pageNumber = 1) {
-            return fileSystem.getFileList(folderName);
-        }
-        //
-        //==========================================================================================
-        public override List<FolderDetail> FolderList(string folderName) {
-            return fileSystem.getFolderList(folderName);
-        }
-        //
-        //==========================================================================================
-        public override void DeleteFolder(string folderPath) {
-            fileSystem.deleteFolder(folderPath);
-        }
-        //
-        //==========================================================================================
-        //
-        public override bool SaveUpload(string htmlformName, ref string returnFilename) {
-            return fileSystem.upload(htmlformName, "\\upload", ref returnFilename);
-        }
-        //
-        //==========================================================================================
-        //
-        public override bool SaveUpload(string htmlformName, string folderpath, ref string returnFilename) {
-            return fileSystem.upload(htmlformName, folderpath, ref  returnFilename);
-        }
-        #region  IDisposable Support 
-        // Do not change or add Overridable to these methods.
-        // Put cleanup code in Dispose(ByVal disposing As Boolean).
         public void Dispose() {
             Dispose(true);
             GC.SuppressFinalize(this);

@@ -1231,13 +1231,7 @@ namespace Contensive.Processor {
         internal const string kmaEndTable = "</table >";
         internal const string tableCellEnd = "</td>";
         internal const string kmaEndTableRow = "</tr>";
-        //
-        public enum ContentTypeEnum {
-            contentTypeWeb = 1,
-            contentTypeEmail = 2,
-            contentTypeWebTemplate = 3,
-            contentTypeEmailTemplate = 4
-        }
+
         //
         //-----------------------------------------------------------------------
         //   Messages

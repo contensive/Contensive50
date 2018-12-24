@@ -8,13 +8,37 @@ namespace Contensive.BaseClasses {
         /// argument details for file and folder methods
         /// </summary>
         public class FileDetail {
+            /// <summary>
+            /// file name
+            /// </summary>
             public string Name { get; set; }
+            /// <summary>
+            /// 
+            /// </summary>
             public int Attributes { get; set; }
+            /// <summary>
+            /// 
+            /// </summary>
             public DateTime DateCreated { get; set; }
+            /// <summary>
+            /// 
+            /// </summary>
             public DateTime DateLastAccessed { get; set; }
+            /// <summary>
+            /// 
+            /// </summary>
             public DateTime DateLastModified { get; set; }
+            /// <summary>
+            /// 
+            /// </summary>
             public long Size { get; set; }
+            /// <summary>
+            /// 
+            /// </summary>
             public string Type { get; set; }
+            /// <summary>
+            /// 
+            /// </summary>
             public string Extension {
                 get {
                     if (string.IsNullOrEmpty(_extension)) {
@@ -30,6 +54,8 @@ namespace Contensive.BaseClasses {
             }
             string _extension = "";
         }
+        //
+        //==========================================================================================
         /// <summary>
         /// argument details for file and folder methods
         /// </summary>
@@ -42,23 +68,138 @@ namespace Contensive.BaseClasses {
             public string Type { get; set; }
         }
         //
-        public abstract void Append(string Filename, string FileContent);
-        public abstract void Copy(string SourceFilename, string DestinationFilename);
-        public abstract void CreateFolder(string FolderPath);
-        public abstract void DeleteFile(string Filename);
-        public abstract void DeleteFolder(string folderPath);
-        public abstract string Read(string Filename);
-        public abstract byte[] ReadBinary(string Filename);
-        public abstract void Save(string Filename, string FileContent);
-        public abstract void SaveBinary(string Filename, byte[] FileContent);
-        public abstract List<FileDetail> FileList(string folderName, int pageSize = 0, int pageNumber = 1);
-        public abstract List<FolderDetail> FolderList(string folderName);
-        public abstract bool FileExists(string pathFileName);
-        public abstract bool FolderExists(string folderName);
-        public abstract bool SaveUpload(string htmlformName, ref string returnFilename);
-        public abstract bool SaveUpload(string htmlformName, string folderpath, ref string returnFilename);
+        //==========================================================================================
+        /// <summary>
+        /// Append content to end of a text file
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <param name="fileContent"></param>
+        public abstract void Append(string filename, string fileContent);
         //
-        //====================================================================================================
+        //==========================================================================================
+        /// <summary>
+        /// Copy a file within the same filesystem (TempFiles, cndFiles, wwwFiles, privateFiles)
+        /// </summary>
+        /// <param name="sourceFilename"></param>
+        /// <param name="destinationFilename"></param>
+        public abstract void Copy(string sourceFilename, string destinationFilename);
+        //
+        //==========================================================================================
+        /// <summary>
+        /// Copy a file to a different filesystem (TempFiles, cndFiles, wwwFiles, privateFiles)
+        /// </summary>
+        /// <param name="sourceFilename"></param>
+        /// <param name="destinationFilename"></param>
+        /// <param name="destinationFileSystem"></param>
+        public abstract void Copy(string sourceFilename, string destinationFilename, CPFileSystemBaseClass destinationFileSystem);
+        //
+        //==========================================================================================
+        /// <summary>
+        /// Create a folder in a path. Path arguments should have no leading slash. (ex ParentFolder/NewFolder )
+        /// </summary>
+        /// <param name="pathFolder"></param>
+        public abstract void CreateFolder(string pathFolder);
+        //
+        //==========================================================================================
+        /// <summary>
+        /// Delete a file in a path. Path arguments should have no leading slash. (ex ParentFolder/FileToDelete.txt )
+        /// </summary>
+        /// <param name="pathFilename"></param>
+        public abstract void DeleteFile(string pathFilename);
+        //
+        //==========================================================================================
+        /// <summary>
+        /// Delete a folder and all files and subfolders. Path arguments should have no leading slash. (ex ParentFolder/FolderToDelete )
+        /// </summary>
+        /// <param name="folderPath"></param>
+        public abstract void DeleteFolder(string folderPath);
+        //
+        //==========================================================================================
+        /// <summary>
+        /// Read a text file. Path arguments should have no leading slash. (ex ParentFolder/FileToRead.txt )
+        /// </summary>
+        /// <param name="pathFilename"></param>
+        /// <returns></returns>
+        public abstract string Read(string pathFilename);
+        //
+        //==========================================================================================
+        /// <summary>
+        /// Read a file to a byte array. Path arguments should have no leading slash. (ex ParentFolder/FileToRead.bin )
+        /// </summary>
+        /// <param name="pathFilename"></param>
+        /// <returns></returns>
+        public abstract byte[] ReadBinary(string pathFilename);
+        //
+        //==========================================================================================
+        /// <summary>
+        /// Save content to a text file. Path arguments should have no leading slash. (ex ParentFolder/FileToSave.txt )
+        /// </summary>
+        /// <param name="pathFilename"></param>
+        /// <param name="fileContent"></param>
+        public abstract void Save(string pathFilename, string fileContent);
+        //
+        //==========================================================================================
+        /// <summary>
+        /// Save a byte array to a file. Path arguments should have no leading slash. (ex ParentFolder/FileToSave.bin )
+        /// </summary>
+        /// <param name="pathFilename"></param>
+        /// <param name="fileContent"></param>
+        public abstract void SaveBinary(string pathFilename, byte[] fileContent);
+        //
+        //==========================================================================================
+        /// <summary>
+        /// Get the details of all files in a folder. Path arguments should have no leading slash. (ex ParentFolder/FolderToDelete )
+        /// </summary>
+        /// <param name="folderPath"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="pageNumber"></param>
+        /// <returns></returns>
+        public abstract List<FileDetail> FileList(string folderPath, int pageSize = 0, int pageNumber = 1);
+        //
+        //==========================================================================================
+        /// <summary>
+        /// Get the details of all folders in a path. Path arguments should have no leading slash. (ex ParentFolder )
+        /// </summary>
+        /// <param name="folderPath"></param>
+        /// <returns></returns>
+        public abstract List<FolderDetail> FolderList(string folderPath);
+        //
+        //==========================================================================================
+        /// <summary>
+        /// Returns true if a file exists in this path
+        /// </summary>
+        /// <param name="pathFilename"></param>
+        /// <returns></returns>
+        public abstract bool FileExists(string pathFilename);
+        //
+        //==========================================================================================
+        /// <summary>
+        /// Returns true if a folder exists in this path
+        /// </summary>
+        /// <param name="folderName"></param>
+        /// <returns></returns>
+        public abstract bool FolderExists(string folderName);
+        //
+        //==========================================================================================
+        /// <summary>
+        /// Handle a file upload from a submitted post. If successful, return true and the filename.
+        /// </summary>
+        /// <param name="htmlformName"></param>
+        /// <param name="returnFilename"></param>
+        /// <returns></returns>
+        public abstract bool SaveUpload(string htmlformName, ref string returnFilename);
+        //
+        //==========================================================================================
+        /// <summary>
+        /// Handle a file upload to a path from a submitted post. If successful, return true and the filename.
+        /// </summary>
+        /// <param name="htmlFormName"></param>
+        /// <param name="folderPath"></param>
+        /// <param name="returnFilename"></param>
+        /// <returns></returns>
+        public abstract bool SaveUpload(string htmlFormName, string folderPath, ref string returnFilename);
+        //
+        //==========================================================================================
         // deprecated
         //
     }
