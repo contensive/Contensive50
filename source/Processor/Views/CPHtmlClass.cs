@@ -75,6 +75,27 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         //
+        public override string CheckList(string htmlName, string primaryContentName, int primaryRecordId, string secondaryContentName, string rulesContentName, string rulesPrimaryFieldname, string rulesSecondaryFieldName, string secondaryContentSelectSQLCriteria, string captionFieldName, bool isReadOnly, string htmlClass, string htmlId) {
+            return cp.core.html.getCheckList2(htmlName, primaryContentName, primaryRecordId, secondaryContentName, rulesContentName, rulesPrimaryFieldname, rulesSecondaryFieldName, secondaryContentSelectSQLCriteria, captionFieldName, isReadOnly);
+        }
+        public override string CheckList(string htmlName, string primaryContentName, int primaryRecordId, string secondaryContentName, string rulesContentName, string rulesPrimaryFieldname, string rulesSecondaryFieldName, string secondaryContentSelectSQLCriteria, string captionFieldName, bool isReadOnly, string htmlClass) {
+            return cp.core.html.getCheckList2(htmlName, primaryContentName, primaryRecordId, secondaryContentName, rulesContentName, rulesPrimaryFieldname, rulesSecondaryFieldName, secondaryContentSelectSQLCriteria, captionFieldName, isReadOnly);
+        }
+        public override string CheckList(string htmlName, string primaryContentName, int primaryRecordId, string secondaryContentName, string rulesContentName, string rulesPrimaryFieldname, string rulesSecondaryFieldName, string secondaryContentSelectSQLCriteria, string captionFieldName, bool isReadOnly) {
+            return cp.core.html.getCheckList2(htmlName, primaryContentName, primaryRecordId, secondaryContentName, rulesContentName, rulesPrimaryFieldname, rulesSecondaryFieldName, secondaryContentSelectSQLCriteria, captionFieldName, isReadOnly);
+        }
+        public override string CheckList(string htmlName, string primaryContentName, int primaryRecordId, string secondaryContentName, string rulesContentName, string rulesPrimaryFieldname, string rulesSecondaryFieldName, string secondaryContentSelectSQLCriteria, string captionFieldName) {
+            return cp.core.html.getCheckList2(htmlName, primaryContentName, primaryRecordId, secondaryContentName, rulesContentName, rulesPrimaryFieldname, rulesSecondaryFieldName, secondaryContentSelectSQLCriteria, captionFieldName);
+        }
+        public override string CheckList(string htmlName, string primaryContentName, int primaryRecordId, string secondaryContentName, string rulesContentName, string rulesPrimaryFieldname, string rulesSecondaryFieldName, string secondaryContentSelectSQLCriteria) {
+            return cp.core.html.getCheckList2(htmlName, primaryContentName, primaryRecordId, secondaryContentName, rulesContentName, rulesPrimaryFieldname, rulesSecondaryFieldName, secondaryContentSelectSQLCriteria);
+        }
+        public override string CheckList(string htmlName, string primaryContentName, int primaryRecordId, string secondaryContentName, string rulesContentName, string rulesPrimaryFieldname, string rulesSecondaryFieldName) {
+            return cp.core.html.getCheckList2(htmlName, primaryContentName, primaryRecordId, secondaryContentName, rulesContentName, rulesPrimaryFieldname, rulesSecondaryFieldName);
+        }
+        //
+        // ====================================================================================================
+        //
         public override string Div(string innerHtml, string htmlClass, string htmlId) => HtmlController.div(innerHtml, htmlClass, htmlId);
         //
         public override string Div(string innerHtml, string htmlClass) => HtmlController.div(innerHtml, htmlClass);
@@ -189,29 +210,34 @@ namespace Contensive.Processor {
         // ====================================================================================================
         //
         // todo implement wysiwyg features
-        public override string InputHtml(string htmlName, int maxLength, string HtmlValue, string htmlClass, string htmlId, List<SimplestDataModel> addonList) {
+        public override string InputHtml(string htmlName, int maxLength, string htmlValue, string htmlClass, string htmlId, EditorContentType contentType) {
             string addonListJSON = cp.core.html.getWysiwygAddonList(CPHtmlBaseClass.EditorContentType.contentTypeWeb);
-            return cp.core.html.getFormInputHTML(htmlName, HtmlValue, "", "", false, true, addonListJSON, "", "", false);
+            return cp.core.html.getFormInputHTML(htmlName, htmlValue, "", "", false, true, addonListJSON, "", "", false);
         }
         // todo implement wysiwyg features
-        public override string InputHtml(string htmlName, int maxLength, string HtmlValue, string htmlClass, string htmlId, bool viewAsHtmlCode) {
+        public override string InputHtml(string htmlName, int maxLength, string htmlValue, string htmlClass, string htmlId, List<SimplestDataModel> addonList) {
             string addonListJSON = cp.core.html.getWysiwygAddonList(CPHtmlBaseClass.EditorContentType.contentTypeWeb);
-            return cp.core.html.getFormInputHTML(htmlName, HtmlValue, "", "", false, true, addonListJSON, "", "", false);
+            return cp.core.html.getFormInputHTML(htmlName, htmlValue, "", "", false, true, addonListJSON, "", "", false);
         }
         // todo implement wysiwyg features
-        public override string InputHtml(string htmlName, int maxLength, string HtmlValue, string htmlClass, string htmlId) {
+        public override string InputHtml(string htmlName, int maxLength, string htmlValue, string htmlClass, string htmlId, bool viewAsHtmlCode) {
             string addonListJSON = cp.core.html.getWysiwygAddonList(CPHtmlBaseClass.EditorContentType.contentTypeWeb);
-            return cp.core.html.getFormInputHTML(htmlName, HtmlValue, "", "", false, true, addonListJSON, "", "", false);
+            return cp.core.html.getFormInputHTML(htmlName, htmlValue, "", "", false, true, addonListJSON, "", "", false);
         }
         // todo implement wysiwyg features
-        public override string InputHtml(string htmlName, int maxLength, string HtmlValue, string htmlClass) {
+        public override string InputHtml(string htmlName, int maxLength, string htmlValue, string htmlClass, string htmlId) {
             string addonListJSON = cp.core.html.getWysiwygAddonList(CPHtmlBaseClass.EditorContentType.contentTypeWeb);
-            return cp.core.html.getFormInputHTML(htmlName, HtmlValue, "", "", false, true, addonListJSON, "", "", false);
+            return cp.core.html.getFormInputHTML(htmlName, htmlValue, "", "", false, true, addonListJSON, "", "", false);
         }
         // todo implement wysiwyg features
-        public override string InputHtml(string htmlName, int maxLength, string HtmlValue) {
+        public override string InputHtml(string htmlName, int maxLength, string htmlValue, string htmlClass) {
             string addonListJSON = cp.core.html.getWysiwygAddonList(CPHtmlBaseClass.EditorContentType.contentTypeWeb);
-            return cp.core.html.getFormInputHTML(htmlName, HtmlValue, "", "", false, true, addonListJSON, "", "", false);
+            return cp.core.html.getFormInputHTML(htmlName, htmlValue, "", "", false, true, addonListJSON, "", "", false);
+        }
+        // todo implement wysiwyg features
+        public override string InputHtml(string htmlName, int maxLength, string htmlValue) {
+            string addonListJSON = cp.core.html.getWysiwygAddonList(CPHtmlBaseClass.EditorContentType.contentTypeWeb);
+            return cp.core.html.getFormInputHTML(htmlName, htmlValue, "", "", false, true, addonListJSON, "", "", false);
         }
         // todo implement wysiwyg features
         public override string InputHtml(string htmlName, int maxLength) {
@@ -232,6 +258,13 @@ namespace Contensive.Processor {
         public override string InputText(string htmlName, int maxLength, string htmlValue, string htmlClass) => HtmlController.inputText(cp.core, htmlName, htmlValue, -1, 20, "", false, false, htmlClass, maxLength);
         public override string InputText(string htmlName, int maxLength, string htmlValue) => HtmlController.inputText(cp.core, htmlName, htmlValue, -1, 20, "", false, false, "", maxLength);
         public override string InputText(string htmlName, int maxLength) => HtmlController.inputText(cp.core, htmlName, "", -1, 20, "", false, false, "", maxLength);
+        //
+        // ====================================================================================================
+        //
+        public override string InputTextArea(string htmlName, int maxLength, string htmlValue, string htmlClass, string htmlId) =>  HtmlController.inputTextarea(cp.core, htmlName, htmlValue, 4, -1, htmlId, false, false, htmlClass, false, maxLength);
+        public override string InputTextArea(string htmlName, int maxLength, string htmlValue, string htmlClass) => HtmlController.inputTextarea(cp.core, htmlName, htmlValue, 4, -1, "", false, false, htmlClass, false, maxLength);
+        public override string InputTextArea(string htmlName, int maxLength, string htmlValue) => HtmlController.inputTextarea(cp.core, htmlName, htmlValue, 4, -1, "", false, false, "", false, maxLength);
+        public override string InputTextArea(string htmlName, int maxLength) => HtmlController.inputTextarea(cp.core, htmlName, "", 4, -1, "", false, false, "", false, maxLength);
         //
         // ====================================================================================================
         //
@@ -256,102 +289,91 @@ namespace Contensive.Processor {
         public override string Ul(string innerHtml, string htmlClass, string htmlId) => HtmlController.ul(innerHtml, htmlClass, htmlId);
         public override string Ul(string innerHtml, string htmlClass) => HtmlController.ul(innerHtml, htmlClass);
         public override string Ul(string innerHtml) => HtmlController.ul(innerHtml);
-
-
-
-
-
-
-
-
-
-
-
-
-        //
         //
         // ====================================================================================================
         //
         public override void ProcessCheckList(string htmlName, string PrimaryContentName, string PrimaryRecordID, string SecondaryContentName, string RulesContentName, string RulesPrimaryFieldname, string RulesSecondaryFieldName) {
             cp.core.html.processCheckList(htmlName, PrimaryContentName, PrimaryRecordID, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName);
         }
-
-
-
-
-
-
-
-
-
         //
-        // ====================================================================================================
-        //Inherits BaseClasses.CPHtmlBaseClass.CheckBox
-        public override string CheckList(string htmlName, string PrimaryContentName, int PrimaryRecordId, string SecondaryContentName, string RulesContentName, string RulesPrimaryFieldname, string RulesSecondaryFieldName, string SecondaryContentSelectSQLCriteria = "", string CaptionFieldName = "", bool IsReadOnly = false, string htmlClass = "", string htmlId = "") {
-            return cp.core.html.getCheckList2(htmlName, PrimaryContentName, PrimaryRecordId, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName, SecondaryContentSelectSQLCriteria, CaptionFieldName, IsReadOnly);
+        // ==========================================================================================
+        //
+        //
+        public override string RadioBox(string htmlName, int htmlValue, int currentValue, string htmlClass, string htmlId) {
+            return cp.core.html.inputRadio(htmlName, htmlValue.ToString(), currentValue.ToString(), htmlId, htmlClass);
+        }
+        public override string RadioBox(string htmlName, int htmlValue, int currentValue, string htmlClass) {
+            throw new NotImplementedException();
+        }
+
+        public override string RadioBox(string htmlName, int htmlValue, int currentValue) {
+            throw new NotImplementedException();
+        }
+        public override string RadioBox(string htmlName, string htmlValue, string currentValue, string htmlClass, string htmlId) {
+            return cp.core.html.inputRadio(htmlName, htmlValue, currentValue, htmlId, htmlClass);
+        }
+        //
+        public override string RadioBox(string htmlName, string htmlValue, string currentValue, string htmlClass) {
+            throw new NotImplementedException();
+        }
+        //
+        public override string RadioBox(string htmlName, string htmlValue, string currentValue) {
+            throw new NotImplementedException();
         }
         //
         // ==========================================================================================
         //
-        public override string RadioBox(string htmlName, string HtmlValue, string CurrentValue, string htmlClass = "", string htmlId = "") {
-            return cp.core.html.inputRadio(htmlName, HtmlValue, CurrentValue, htmlId,htmlClass);
-        }
-        //
-        // ==========================================================================================
-        //
-        public override string RadioBox(string htmlName, int HtmlValue, int CurrentValue, string htmlClass = "", string htmlId = "") {
-            return cp.core.html.inputRadio(htmlName, HtmlValue.ToString(), CurrentValue.ToString(), htmlId, htmlClass);
-        }
-        //
-        // ==========================================================================================
-        //
-        public override string SelectContent(string htmlName, string HtmlValue, string ContentName, string SQLCriteria = "", string NoneCaption = "", string htmlClass = "", string htmlId = "") {
-            string tempSelectContent = null;
-            tempSelectContent = cp.core.html.selectFromContent(htmlName, GenericController.encodeInteger(HtmlValue), ContentName, SQLCriteria, NoneCaption);
+        public override string SelectContent(string htmlName, string htmlValue, string contentName, string sqlCriteria, string noneCaption, string htmlClass, string htmlId) {
+            string result = cp.core.html.selectFromContent(htmlName, GenericController.encodeInteger(htmlValue), contentName, sqlCriteria, noneCaption);
             if (!string.IsNullOrEmpty(htmlClass)) {
-                tempSelectContent = tempSelectContent.Replace("<select ", "<select class=\"" + htmlClass + "\" ");
+                result = result.Replace("<select ", "<select class=\"" + htmlClass + "\" ");
             }
             if (!string.IsNullOrEmpty(htmlId)) {
-                tempSelectContent = tempSelectContent.Replace("<select ", "<select id=\"" + htmlId + "\" ");
-            }
-            return tempSelectContent;
-        }
-        //
-        // ==========================================================================================
-        //
-        public override string SelectList(string htmlName, string HtmlValue, string OptionList, string NoneCaption = "", string htmlClass = "", string htmlId = "") {
-            string tempSelectList = null;
-            tempSelectList = HtmlController.selectFromList( cp.core, htmlName, GenericController.encodeInteger( HtmlValue ), OptionList.Split(','), NoneCaption, htmlId);
-            if (!string.IsNullOrEmpty(htmlClass)) {
-                tempSelectList = tempSelectList.Replace("<select ", "<select class=\"" + htmlClass + "\" ");
-            }
-            return tempSelectList;
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// process an html file element to cdnFiles to the optional path. If the path is ommitted, the path "upload"
-        /// </summary>
-        [Obsolete("Instead, use cp.cdeFiles.saveUpload() or similar fileSystem object.")]
-        public override void ProcessInputFile(string htmlName, string VirtualFilePath = "") {
-            string ignoreFilename = "";
-            cp.core.cdnFiles.upload(htmlName, VirtualFilePath, ref ignoreFilename);
-        }
-        //
-        // ====================================================================================================
-        //
-        public override string InputTextExpandable(string htmlName, string HtmlValue = "", int Rows = 0, string StyleWidth = "", bool ignore = false, string htmlClass = "", string htmlId = "") {
-            string result = HtmlController.inputTextarea( cp.core,htmlName, HtmlValue, Rows, 20, htmlId, ignore,false,htmlClass);
-            if (!string.IsNullOrEmpty(StyleWidth)) {
-                result = result.Replace(">", " style=\"width:" + StyleWidth + "\">");
+                result = result.Replace("<select ", "<select id=\"" + htmlId + "\" ");
             }
             return result;
         }
         //
+        public override string SelectContent(string htmlName, string htmlValue, string contentName, string sqlCriteria, string noneCaption, string htmlClass)
+            => SelectContent(htmlName, htmlValue, contentName, sqlCriteria, noneCaption, htmlClass, "");
+        //
+        public override string SelectContent(string htmlName, string htmlValue, string contentName, string sqlCriteria, string noneCaption)
+            => SelectContent(htmlName, htmlValue, contentName, sqlCriteria, noneCaption, "", "");
+        //
+        public override string SelectContent(string htmlName, string htmlValue, string contentName, string sqlCriteria)
+            => SelectContent(htmlName, htmlValue, contentName, sqlCriteria, "", "", "");
+        //
+        public override string SelectContent(string htmlName, string htmlValue, string contentName)
+            => SelectContent(htmlName, htmlValue, contentName, "", "", "", "");
+        //
+        // ==========================================================================================
+        //
+        public override string SelectList(string htmlName, string htmlValue, string optionList, string noneCaption, string htmlClass, string htmlId) {
+            return HtmlController.selectFromList( cp.core, htmlName, GenericController.encodeInteger( htmlValue ), optionList.Split(','), noneCaption, htmlId, htmlClass);
+        }
+        public override string SelectList(string htmlName, string htmlValue, string optionList, string noneCaption, string htmlClass) {
+            return HtmlController.selectFromList(cp.core, htmlName, GenericController.encodeInteger(htmlValue), optionList.Split(','), noneCaption, "", htmlClass);
+        }
+        public override string SelectList(string htmlName, string htmlValue, string optionList, string noneCaption) {
+            return HtmlController.selectFromList(cp.core, htmlName, GenericController.encodeInteger(htmlValue), optionList.Split(','), noneCaption, "");
+        }
+        public override string SelectList(string htmlName, string htmlValue, string optionList) {
+            return HtmlController.selectFromList(cp.core, htmlName, GenericController.encodeInteger(htmlValue), optionList.Split(','), "", "");
+        }
+        //
         // ====================================================================================================
         //
-        public override string SelectUser(string htmlName, int HtmlValue, int GroupId, string NoneCaption = "", string htmlClass = "", string htmlId = "") {
-            return cp.core.html.selectUserFromGroup(htmlName, HtmlValue, GroupId, NoneCaption, htmlId);
+        public override string SelectUser(string htmlName, int htmlValue, int groupId, string noneCaption, string htmlClass, string htmlId) {
+            return cp.core.html.selectUserFromGroup(htmlName, htmlValue, groupId, noneCaption, htmlId);
+        }
+        public override string SelectUser(string htmlName, int htmlValue, int groupId, string noneCaption, string htmlClass) {
+            return cp.core.html.selectUserFromGroup(htmlName, htmlValue, groupId, noneCaption);
+        }
+        public override string SelectUser(string htmlName, int htmlValue, int groupId, string noneCaption) {
+            return cp.core.html.selectUserFromGroup(htmlName, htmlValue, groupId, noneCaption);
+        }
+        public override string SelectUser(string htmlName, int htmlValue, int groupId) {
+            return cp.core.html.selectUserFromGroup(htmlName, htmlValue, groupId);
         }
         //
         // ====================================================================================================
@@ -491,6 +513,18 @@ namespace Contensive.Processor {
         [Obsolete("Use uppercase methods", true)]
         public override string ol(string innerHtml) => HtmlController.genericBlockTag("ol", innerHtml);
         //
+        [Obsolete("Use DateTime htmlValue version", true)]
+        public override string InputDate(string htmlName, string htmlValue, string width, string htmlClass, string htmlId) => InputDate(htmlName, encodeDate(htmlValue), htmlClass, htmlId);
+        //
+        [Obsolete("Use DateTime htmlValue version", true)]
+        public override string InputDate(string htmlName, string htmlValue, string width, string htmlClass) => InputDate(htmlName, encodeDate(htmlValue), htmlClass);
+        //
+        [Obsolete("Use DateTime htmlValue version", true)]
+        public override string InputDate(string htmlName, string htmlValue, string width) => InputDate(htmlName, encodeDate(htmlValue));
+        //
+        [Obsolete("Use DateTime htmlValue version", true)]
+        public override string InputDate(string htmlName, string htmlValue) => InputDate(htmlName, encodeDate(htmlValue));
+        //
         [Obsolete("Use InputText( string, string, string, string, int, bool", true)]
         public override string InputText(string htmlName, string htmlValue, string Height, string Width, bool IsPassword, string htmlClass, string htmlId) => HtmlController.inputText(cp.core, htmlName, htmlValue, GenericController.encodeInteger(Height), GenericController.encodeInteger(Width), htmlId, IsPassword, false, htmlClass);
         //
@@ -504,10 +538,74 @@ namespace Contensive.Processor {
         public override string InputText(string htmlName, string htmlValue, string Height, string Width) => HtmlController.inputText(cp.core, htmlName, htmlValue, GenericController.encodeInteger(Height), GenericController.encodeInteger(Width));
         //
         [Obsolete("Use InputText( string, string, string, string, int, bool", true)]
-        public override string InputWysiwyg(string htmlName, string HtmlValue, EditorUserRole UserScope, EditorContentType ContentScope, string Height, string Width, string htmlClass, string htmlId)
-           => cp.core.html.getFormInputHTML(htmlName, HtmlValue, Height, Width);
+        public override string InputText(string htmlName, string htmlValue, string height) => HtmlController.inputText(cp.core, htmlName, htmlValue);
         //
+        [Obsolete("Use InputHtml", true)]
+        public override string InputWysiwyg(string htmlName, string htmlValue, EditorUserRole userScope, EditorContentType contentScope, string height, string width, string htmlClass, string htmlId) 
+            => cp.core.html.getFormInputHTML(htmlName, htmlValue, height, width);
         //
+        [Obsolete("Use InputHtml", true)]
+        public override string InputWysiwyg(string htmlName, string htmlValue, EditorUserRole userScope, EditorContentType contentScope, string height, string width, string htmlClass)
+            => cp.core.html.getFormInputHTML(htmlName, htmlValue, height, width);
+        //
+        [Obsolete("Use InputHtml", true)]
+        public override string InputWysiwyg(string htmlName, string htmlValue, EditorUserRole userScope, EditorContentType contentScope, string height, string width)
+            => cp.core.html.getFormInputHTML(htmlName, htmlValue, height, width);
+        //
+        [Obsolete("Use InputHtml", true)]
+        public override string InputWysiwyg(string htmlName, string htmlValue, EditorUserRole userScope, EditorContentType contentScope, string height)
+            => cp.core.html.getFormInputHTML(htmlName, htmlValue, height);
+        //
+        [Obsolete("Use InputHtml", true)]
+        public override string InputWysiwyg(string htmlName, string htmlValue, EditorUserRole userScope, EditorContentType contentScope)
+            => cp.core.html.getFormInputHTML(htmlName, htmlValue);
+        //
+        [Obsolete("Use InputHtml", true)]
+        public override string InputWysiwyg(string htmlName, string htmlValue, EditorUserRole userScope)
+            => cp.core.html.getFormInputHTML(htmlName, htmlValue);
+        //
+        [Obsolete("Use InputTextArea", true)]
+        public override string InputTextExpandable(string htmlName, string htmlValue, int rows, string styleWidth, bool isPassword, string htmlClass) => HtmlController.inputTextarea(cp.core, htmlName, htmlValue, rows, -1, "", false, false, htmlClass, false, -1);
+        //
+        [Obsolete("Use InputTextArea", true)]
+        public override string InputTextExpandable(string htmlName, string htmlValue, int rows, string styleWidth, bool isPassword) => HtmlController.inputTextarea(cp.core, htmlName, htmlValue, rows, -1, "", false, false, "", false, -1);
+        //
+        [Obsolete("Use InputTextArea", true)]
+        public override string InputTextExpandable(string htmlName, string htmlValue, int rows, string styleWidth) => HtmlController.inputTextarea(cp.core, htmlName, htmlValue, rows, -1, "", false, false, "", false, -1);
+        //
+        [Obsolete("Use InputTextArea", true)]
+        public override string InputTextExpandable(string htmlName, string htmlValue, int rows) => HtmlController.inputTextarea(cp.core, htmlName, htmlValue, rows, -1, "", false, false, "", false, -1);
+        //
+        [Obsolete("Use InputTextArea", true)]
+        public override string InputTextExpandable(string htmlName, string htmlValue) => HtmlController.inputTextarea(cp.core, htmlName, htmlValue, 4, -1, "", false, false, "", false, -1);
+        //
+        [Obsolete("Use InputTextArea", true)]
+        public override string InputTextExpandable(string htmlName) => HtmlController.inputTextarea(cp.core, htmlName, "", 4, -1, "", false, false, "", false, -1);
+        //
+        [Obsolete("Instead, use cp.cdeFiles.saveUpload() or similar fileSystem object.")]
+        public override void ProcessInputFile(string htmlName, string VirtualFilePath) {
+            string ignoreFilename = "";
+            cp.core.cdnFiles.upload(htmlName, VirtualFilePath, ref ignoreFilename);
+        }
+        //
+        [Obsolete("Instead, use cp.cdeFiles.saveUpload() or similar fileSystem object.")]
+        public override void ProcessInputFile(string htmlName) {
+            string ignoreFilename = "";
+            cp.core.cdnFiles.upload(htmlName, "upload", ref ignoreFilename);
+        }
+        //
+        // ====================================================================================================
+        //
+        [Obsolete("Instead, InputTextArea().", true )]
+        public override string InputTextExpandable(string htmlName, string HtmlValue = "", int Rows = 0, string StyleWidth = "", bool ignore = false, string htmlClass = "", string htmlId = "") {
+            string result = HtmlController.inputTextarea(cp.core, htmlName, HtmlValue, Rows, 20, htmlId, ignore, false, htmlClass);
+            if (!string.IsNullOrEmpty(StyleWidth)) {
+                result = result.Replace(">", " style=\"width:" + StyleWidth + "\">");
+            }
+            return result;
+        }
+        //
+        // ====================================================================================================
         //
         #region  IDisposable Support 
         protected bool disposed = false;

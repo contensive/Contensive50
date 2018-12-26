@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 namespace Contensive.BaseClasses {
     public abstract class CPHtmlBaseClass {
+        //
+        // ====================================================================================================
         /// <summary>
         /// The type of content being edited with the html editor. Used to determine types of addons that can be included
         /// </summary>
@@ -13,6 +15,8 @@ namespace Contensive.BaseClasses {
             contentTypeWebTemplate = 3,
             contentTypeEmailTemplate = 4
         }
+        //
+        // ====================================================================================================
         /// <summary>
         /// The role of the user
         /// </summary>
@@ -23,6 +27,7 @@ namespace Contensive.BaseClasses {
             PublicUser = 4,
             CurrentUser = 5
         }
+        //
         public abstract string Div(string innerHtml, string htmlClass, string htmlId);
         public abstract string Div(string innerHtml, string htmlClass);
         public abstract string Div(string innerHtml);
@@ -48,6 +53,23 @@ namespace Contensive.BaseClasses {
         public abstract string CheckBox(string htmlName, bool htmlValue);
         public abstract string CheckBox(string htmlName);
         //
+        // ====================================================================================================
+        /// <summary>
+        /// A list of checkboxes representing a many to many relationship. Process input with ProcessChecklist
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="primaryContentName">The table being presented. ex. a list of groups that a person may join, this is the People content.</param>
+        /// <param name="primaryRecordId">The id of the record in the primary content. ex. a list of groups that a person may join, this is the peraon's id.</param>
+        /// <param name="secondaryContentName">The table being related. ex. a list of groups that a person may join, this is the group content.</param>
+        /// <param name="rulesContentName">The table holding the relationship in a many to many connection. ex. a list of groups that a person may join, this is a table with a personid and a groupId.</param>
+        /// <param name="rulesPrimaryFieldname">The field in the relationship table that identifies the record in the primary content. ex. a list of groups that a person may join, this the field in the raltionship table that points to the person record, like personId.</param>
+        /// <param name="rulesSecondaryFieldName">The field in the relationship table that identifies the record in the secondary content. ex. a list of groups that a person may join, this the field in the raltionship table that points to the group record, like groupId.</param>
+        /// <param name="secondaryContentSelectSQLCriteria">The checklist includes all the possible rlationships of the secondary content to the primary. This is the criteria part of a query (where clause) that limits the selection. ex. a list of groups that a person may join, this criteria limits the groups listed for a person to join, like only that tah ae enabled.</param>
+        /// <param name="captionFieldName"></param>
+        /// <param name="isReadOnly"></param>
+        /// <param name="htmlClass"></param>
+        /// <param name="htmlId"></param>
+        /// <returns></returns>
         public abstract string CheckList(string htmlName, string primaryContentName, int primaryRecordId, string secondaryContentName, string rulesContentName, string rulesPrimaryFieldname, string rulesSecondaryFieldName, string secondaryContentSelectSQLCriteria, string captionFieldName, bool isReadOnly, string htmlClass, string htmlId);
         public abstract string CheckList(string htmlName, string primaryContentName, int primaryRecordId, string secondaryContentName, string rulesContentName, string rulesPrimaryFieldname, string rulesSecondaryFieldName, string secondaryContentSelectSQLCriteria, string captionFieldName, bool isReadOnly, string htmlClass);
         public abstract string CheckList(string htmlName, string primaryContentName, int primaryRecordId, string secondaryContentName, string rulesContentName, string rulesPrimaryFieldname, string rulesSecondaryFieldName, string secondaryContentSelectSQLCriteria, string captionFieldName, bool isReadOnly);
@@ -117,7 +139,16 @@ namespace Contensive.BaseClasses {
         public abstract string InputHtml(string htmlName, int maxLength, string htmlValue, string htmlClass);
         public abstract string InputHtml(string htmlName, int maxLength, string htmlValue);
         public abstract string InputHtml(string htmlName, int maxLength);
-        //
+        /// <summary>
+        /// Process and input checklist
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="primaryContentName"></param>
+        /// <param name="primaryRecordID"></param>
+        /// <param name="secondaryContentName"></param>
+        /// <param name="rulesContentName"></param>
+        /// <param name="rulesPrimaryFieldname"></param>
+        /// <param name="rulesSecondaryFieldName"></param>
         public abstract void ProcessCheckList(string htmlName, string primaryContentName, string primaryRecordID, string secondaryContentName, string rulesContentName, string rulesPrimaryFieldname, string rulesSecondaryFieldName);
         //
         public abstract string RadioBox(string htmlName, string htmlValue, string currentValue, string htmlClass, string htmlId);
@@ -375,7 +406,12 @@ namespace Contensive.BaseClasses {
         //
         [Obsolete("Use InputHtml(string,string,string,string,string)", true)]
         public abstract string InputWysiwyg(string htmlName, string htmlValue, EditorUserRole userScope);
-        //public abstract string InputWysiwyg(string HtmlName, string HtmlValue = "", BaseClasses.CPHtmlBaseClass.EditorUserScope UserScope = BaseClasses.CPHtmlBaseClass.EditorUserScope.CurrentUser, BaseClasses.CPHtmlBaseClass.EditorContentScope ContentScope = BaseClasses.CPHtmlBaseClass.EditorContentScope.Page, string Height = "", string Width = "", string HtmlClass = "", string HtmlId = "");
+        //
+        [Obsolete("Instead, use cp.cdeFiles.saveUpload() or similar fileSystem object.")]
+        public abstract void ProcessInputFile(string HtmlName, string VirtualFilePath);
+        //
+        [Obsolete("Instead, use cp.cdeFiles.saveUpload() or similar fileSystem object.")]
+        public abstract void ProcessInputFile(string HtmlName);
     }
 }
 

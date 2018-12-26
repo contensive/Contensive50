@@ -10,6 +10,7 @@ using Contensive.Processor.Models.Domain;
 using static Contensive.Addons.AdminSite.Controllers.AdminUIController;
 using Contensive.Processor.Exceptions;
 using Contensive.Addons.AdminSite.Controllers;
+using Contensive.BaseClasses;
 
 namespace Contensive.Addons.AdminSite {
     public static class FormEdit {
@@ -613,6 +614,7 @@ namespace Contensive.Addons.AdminSite {
             try {
                 // todo
                 AdminUIController.EditRecordClass editRecord = adminData.editRecord;
+
                 //
                 //
                 string AjaxQS = null;

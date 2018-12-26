@@ -162,7 +162,7 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         //
-        public abstract string ConvertText2HTML(string Source);
+        public abstract string ConvertText2HTML(string source);
         //
         //====================================================================================================
         //
@@ -174,27 +174,27 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         //
-        public abstract string EncodeContentForWeb(string Source, string ContextContentName = "", int ContextRecordID = 0, int WrapperID = 0);
+        public abstract string EncodeContentForWeb(string source, string contextContentName = "", int contextRecordID = 0, int wrapperID = 0);
         //
         //====================================================================================================
         //
-        public abstract string EncodeHtmlForWysiwygEditor(string Source);
+        public abstract string EncodeHtmlForWysiwygEditor(string source);
         //
         //====================================================================================================
         //
-        public abstract string DecodeHtmlFromWysiwygEditor(string Source);
+        public abstract string DecodeHtmlFromWysiwygEditor(string source);
         //
         //====================================================================================================
         //
-        public abstract string DecodeHTML(string Source);
+        public abstract string DecodeHTML(string source);
         //
         //====================================================================================================
         //
-        public abstract string EncodeHTML(string Source);
+        public abstract string EncodeHTML(string source);
         //
         //====================================================================================================
         //
-        public abstract string EncodeUrl(string Source);
+        public abstract string EncodeUrl(string source);
         //
         //====================================================================================================
         //
@@ -210,69 +210,27 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         //
-        public abstract int EncodeInteger(object Expression);
+        public abstract int EncodeInteger(object expression);
         //
         //====================================================================================================
         //
-        public abstract double EncodeNumber(object Expression);
+        public abstract double EncodeNumber(object expression);
         //
         //====================================================================================================
         //
-        public abstract string EncodeText(object Expression);
+        public abstract string EncodeText(object expression);
         //
         //====================================================================================================
         //
-        public abstract bool EncodeBoolean(object Expression);
+        public abstract bool EncodeBoolean(object expression);
         //
         //====================================================================================================
         //
-        public abstract DateTime EncodeDate(object Expression);
-        //
-        //====================================================================================================
-        //
-        [Obsolete("Deprecated. use cp.addon.execute()", false)]
-        public abstract string ExecuteAddon(string IdGuidOrName);
-        //
-        //====================================================================================================
-        //
-        [Obsolete("Deprecated. use cp.addon.execute() and manage the wrapper manually.", false)]
-        public abstract string ExecuteAddon(string IdGuidOrName, int WrapperId);
-        //
-        //====================================================================================================
-        //
-        [Obsolete("Deprecated. use cp.addon.execute()", false)]
-        public abstract string ExecuteAddon(string IdGuidOrName, addonContext context);
-        //
-        //====================================================================================================
-        //
-        [Obsolete("Deprecated. use cp.addon.executeAsync()", false)]
-        public abstract string ExecuteAddonAsProcess(string IdGuidOrName);
-        //
-        //====================================================================================================
-        //
-        [Obsolete("Deprecated, use AppendLog", false)]
-        public abstract void AppendLogFile(string Text);
-        //
-        //====================================================================================================
-        //
-        [Obsolete("Deprecated, file logging is no longer supported. Use AppendLog(message) to log Info level messages", false)]
-        public abstract void AppendLog(string pathFilename, string logText);
+        public abstract DateTime EncodeDate(object expression);
         //
         //====================================================================================================
         //
         public abstract void AppendLog(string logText);
-        //
-        //====================================================================================================
-        //
-        [Obsolete("Deprecated", false)] public abstract string ConvertLinkToShortLink(string URL, string ServerHost, string ServerVirtualPath);
-        //
-        //====================================================================================================
-        //
-        [Obsolete("Deprecated", false)] public abstract string ConvertShortLinkToLink(string URL, string PathPagePrefix);
-        //
-        //====================================================================================================
-        //
-        [Obsolete("Deprecated. Use native methods to convert date formats.", false)] public abstract DateTime DecodeGMTDate(string GMTDate);
         //
         //====================================================================================================
         //
@@ -410,6 +368,51 @@ namespace Contensive.BaseClasses {
         //====================================================================================================
         // deprecated
         //
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated. use cp.addon.execute()", false)]
+        public abstract string ExecuteAddon(string idGuidOrName);
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated. use cp.addon.execute() and manage the wrapper manually.", false)]
+        public abstract string ExecuteAddon(string IdGuidOrName, int WrapperId);
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated. use cp.addon.execute()", false)]
+        public abstract string ExecuteAddon(string IdGuidOrName, addonContext context);
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated. use cp.addon.executeAsync()", false)]
+        public abstract string ExecuteAddonAsProcess(string IdGuidOrName);
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated, use AppendLog", false)]
+        public abstract void AppendLogFile(string Text);
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated, file logging is no longer supported. Use AppendLog(message) to log Info level messages", false)]
+        public abstract void AppendLog(string pathFilename, string logText);
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", false)]
+        public abstract string ConvertLinkToShortLink(string URL, string ServerHost, string ServerVirtualPath);
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated", false)]
+        public abstract string ConvertShortLinkToLink(string URL, string PathPagePrefix);
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Deprecated. Use native methods to convert date formats.", false)]
+        public abstract DateTime DecodeGMTDate(string GMTDate);
     }
 }
 

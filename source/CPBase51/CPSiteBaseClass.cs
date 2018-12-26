@@ -15,35 +15,35 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         //
-        public abstract void SetProperty(string FieldName, string FieldValue);
+        public abstract void SetProperty(string key, string value);
         //
         //====================================================================================================
         //
-        public abstract string GetProperty(string FieldName, string DefaultValue = "");
+        public abstract string GetProperty(string key, string value = "");
         //
         //====================================================================================================
         //
-        public abstract string GetText(string PropertyName, string DefaultValue = "");
+        public abstract string GetText(string key, string value = "");
         //
         //====================================================================================================
         //
-        public abstract bool GetBoolean(string PropertyName, string DefaultValue = "");
-        public abstract bool GetBoolean(string PropertyName, bool DefaultValue);
+        public abstract bool GetBoolean(string key, string defaultValue = "");
+        public abstract bool GetBoolean(string key, bool defaultValue);
         //
         //====================================================================================================
         //
-        public abstract DateTime GetDate(string PropertyName, string DefaultValue = "");
-        public abstract DateTime GetDate(string PropertyName, DateTime DefaultValue);
+        public abstract DateTime GetDate(string key, string defaultValue = "");
+        public abstract DateTime GetDate(string key, DateTime defaultValue);
         //
         //====================================================================================================
         //
-        public abstract int GetInteger(string PropertyName, string DefaultValue = "");
-        public abstract int GetInteger(string PropertyName, int DefaultValue);
+        public abstract int GetInteger(string key, string defaultValue = "");
+        public abstract int GetInteger(string key, int defaultValue);
         //
         //====================================================================================================
         //
-        public abstract double GetNumber(string PropertyName, string DefaultValue = "");
-        public abstract double GetNumber(string PropertyName, double DefaultValue);
+        public abstract double GetNumber(string key, string defaultValue = "");
+        public abstract double GetNumber(string key, double defaultValue);
         //
         //====================================================================================================
         //
@@ -110,15 +110,15 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         //
-        public abstract void LogActivity(string Message, int UserID, int OrganizationID);
+        public abstract void LogActivity(string message, int userID, int organizationId);
         //
         //====================================================================================================
         //
-        public abstract void ErrorReport(string Message);
+        public abstract void ErrorReport(string message);
         //
         //====================================================================================================
         //
-        public abstract void ErrorReport(System.Exception Ex, string Message = "");
+        public abstract void ErrorReport(System.Exception Ex, string message = "");
         //
         //====================================================================================================
         //
@@ -133,11 +133,11 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         //
-        public abstract void TestPoint(string Message);
+        public abstract void TestPoint(string message);
         //
         //====================================================================================================
         //
-        public abstract int LandingPageId(string DomainName = "");
+        public abstract int LandingPageId(string domainName = "");
         //
         //====================================================================================================
         //

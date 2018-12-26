@@ -1074,9 +1074,19 @@ namespace Contensive.Processor.Controllers {
         //
         public string inputRadio(string htmlName, string htmlValue, string CurrentValue, string htmlId) => inputRadio(htmlName, htmlValue, CurrentValue, htmlId, "");
         //
-        //====================================================================================================
-        //
         public string inputRadio(string htmlName, string htmlValue, string CurrentValue) => inputRadio(htmlName, htmlValue, CurrentValue, "", "");
+        //
+        public string inputRadio(string htmlName, int htmlValue, int CurrentValue, string htmlId, string htmlClass) {
+            string result = "<input type=radio name=\"" + htmlName + "\" value=\"" + htmlValue + "\"";
+            result += (string.IsNullOrEmpty(htmlId)) ? "" : " id=\"" + htmlId + "\"";
+            result += (string.IsNullOrEmpty(htmlClass)) ? "" : " class=\"" + htmlClass + "\"";
+            result += (htmlValue != CurrentValue) ? "" : " checked";
+            return result + ">";
+        }
+        //
+        public string inputRadio(string htmlName, int htmlValue, int CurrentValue, string htmlId) => inputRadio(htmlName, htmlValue, CurrentValue, htmlId, "");
+        //
+        public string inputRadio(string htmlName, int htmlValue, int CurrentValue) => inputRadio(htmlName, htmlValue, CurrentValue, "", "");
         //
         //====================================================================================================
         //
