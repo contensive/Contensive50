@@ -372,7 +372,6 @@ namespace Contensive.Processor.Models.Domain {
                                             targetCdef.allowTopicRules = XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "AllowTopicRules", DefaultCDef.allowTopicRules);
                                             targetCdef.guid = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "guid", DefaultCDef.guid);
                                             targetCdef.dataChanged = setAllDataChanged;
-                                            targetCdef.set_childIdList(core, new List<int>());
                                             targetCdef.legacyContentControlCriteria = "";
                                             targetCdef.dataSourceName = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "ContentDataSourceName", DefaultCDef.dataSourceName);
                                             targetCdef.tableName = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "ContentTableName", DefaultCDef.tableName);

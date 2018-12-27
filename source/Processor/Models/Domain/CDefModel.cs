@@ -17,12 +17,16 @@ namespace Contensive.Processor.Models.Domain {
     [Serializable]
     public class CDefDomainModel {
         //
-        // -- constructor to setup defaults for fields required
+        //====================================================================================================
+        /// <summary>
+        /// constructor to setup defaults for fields required
+        /// </summary>
         public CDefDomainModel() {
             // set defaults, create methods require name, table
             active = true;
         }
         //
+        //====================================================================================================
         /// <summary>
         /// index in content table
         /// </summary>
@@ -205,6 +209,7 @@ namespace Contensive.Processor.Models.Domain {
         //
         /// <summary>
         /// metadata for admin site editing columns
+        /// !!!!! changed to string because dotnet json cannot serialize an integer key
         /// </summary>
         public SortedList<string, CDefAdminColumnClass> adminColumns { get; set; } = new SortedList<string, CDefAdminColumnClass>();
         //
@@ -239,9 +244,6 @@ namespace Contensive.Processor.Models.Domain {
                 }
             }
             return _childIdList;
-        }
-        public void set_childIdList(CoreController core, List<int> value) {
-            _childIdList = value;
         }
         private List<int> _childIdList = null;
         //
@@ -334,9 +336,7 @@ namespace Contensive.Processor.Models.Domain {
                             } else {
                                 result = new Models.Domain.CDefDomainModel();
                                 result.fields = new Dictionary<string, Models.Domain.CDefFieldModel>();
-                                result.set_childIdList(core, new List<int>());
                                 result.selectList = new List<string>();
-                                // -- !!!!! changed to string because dotnet json cannot serialize an integer key
                                 result.adminColumns = new SortedList<string, CDefAdminColumnClass>();
                                 //
                                 // ----- save values in definition
@@ -607,10 +607,8 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="parentIdList"></param>
         /// <returns></returns>
         private static string getLegacyContentControlCriteria(CoreController core, int contentId, string contentTableName, string contentDAtaSourceName, List<int> parentIdList) {
-            string returnCriteria = "";
             try {
-                //
-                returnCriteria = "(1=0)";
+                string returnCriteria = "(1=0)";
                 if (contentId >= 0) {
                     if (!parentIdList.Contains(contentId)) {
                         returnCriteria = "";
@@ -628,28 +626,25 @@ namespace Contensive.Processor.Models.Domain {
                         returnCriteria = "(" + returnCriteria + ")";
                     }
                 }
+                return returnCriteria;
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
                 throw;
             }
-            return returnCriteria;
         }
         //
         //====================================================================================================
         //
-        private static void create_setAdminColumns(CoreController core, Models.Domain.CDefDomainModel cdef) {
+        private static void create_setAdminColumns(CoreController core, CDefDomainModel cdef) {
             try {
-                bool FieldActive = false;
-                int FieldWidth = 0;
-                int FieldWidthTotal = 0;
-                CDefAdminColumnClass adminColumn = null;
-                //
                 if (cdef.id > 0) {
                     int cnt = 0;
+                    int FieldWidthTotal = 0;
+                    CDefAdminColumnClass adminColumn = null;
                     foreach (KeyValuePair<string, Models.Domain.CDefFieldModel> keyValuePair in cdef.fields) {
                         CDefFieldModel field = keyValuePair.Value;
-                        FieldActive = field.active;
-                        FieldWidth = GenericController.encodeInteger(field.indexWidth);
+                        bool FieldActive = field.active;
+                        int FieldWidth = GenericController.encodeInteger(field.indexWidth);
                         if (FieldActive && (FieldWidth > 0)) {
                             FieldWidthTotal = FieldWidthTotal + FieldWidth;
                             adminColumn = new CDefAdminColumnClass();

@@ -427,9 +427,6 @@ namespace Contensive.Addons.Housekeeping {
                 TimeoutSave = core.db.sqlCommandTimeout;
                 core.db.sqlCommandTimeout = 1800;
                 //
-                SQLTablePeople = CdefController.getContentTablename(core, "People");
-                SQLTableMemberRules = CdefController.getContentTablename(core, "Member Rules");
-                SQLTableGroups = CdefController.getContentTablename(core, "Groups");
                 SQLDateMidnightTwoDaysAgo = DbController.encodeSQLDate(MidnightTwoDaysAgo);
                 //
                 // Any member records that were created outside contensive need to have CreatedByVisit=0 (past v4.1.152)

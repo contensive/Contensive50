@@ -7,7 +7,7 @@ namespace Contensive.BaseClasses {
     /// CP.CS - The secondary interface to execute queries on a sql database. Use dbModels when possible (does not use cdef metadata). To run queries, use executeQuery, executeNonQuery and executeNonQueryAsync.
     /// </summary>
     /// <remarks></remarks>
-    public abstract class CPCSBaseClass {
+    public abstract class CPCSBaseClass : IDisposable {
         // todo cs.openRecord -- very important as it will use the cdef model + dbmodels so it will be cached - cs.open() cannot be cached.
         // todo in collection file, in cdef for each text field, include a maxtextlength that will be used throughout to prevent db truncation
         //public Sub New(ByVal cmcObj As Contensive.Processor.cpCoreClass, ByRef CPParent As CPBaseClass)
@@ -372,6 +372,8 @@ namespace Contensive.BaseClasses {
         //
         [Obsolete("Use GetFormInput(string,string,int)", true)]
         public abstract object GetFormInput(string contentName, string fieldName, string height);
+
+        public abstract void Dispose();
         ////
         ////====================================================================================================
         //// Disposable support

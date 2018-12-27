@@ -30,10 +30,10 @@ namespace Contensive.Processor {
         /// constructor
         /// </summary>
         /// <param name="cp"></param>
-        public CPCSClass(CPClass cp) {
-            this.cp = cp;
+        public CPCSClass(CPBaseClass cp) {
+            this.cp = (CPClass)cp;
             cs = -1;
-            openingMemberID = cp.core.session.user.id;
+            openingMemberID = this.cp.core.session.user.id;
         }
         //
         //====================================================================================================
@@ -616,7 +616,7 @@ namespace Contensive.Processor {
         #region  IDisposable Support 
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
-        public void Dispose() {
+        public override void Dispose() {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
