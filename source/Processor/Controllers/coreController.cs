@@ -432,7 +432,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="cp"></param>
         /// <remarks></remarks>
-        public CoreController(CPClass cp) : base() {
+        public CoreController(CPClass cp) {
             cp_forAddonExecutionOnly = cp;
             LogController.forceNLog( "CoreController constructor-0, enter", LogController.logLevel.Trace);
             //
@@ -1657,13 +1657,6 @@ namespace Contensive.Processor.Controllers {
                     if (_db != null) {
                         _db.Dispose();
                         _db = null;
-                    }
-                    //
-                    if (useNlog) {
-                        // flush all the logs used
-                        foreach (var kvp in doc.logList) {
-                            kvp.Value.Flush();
-                        }
                     }
                 }
                 //

@@ -8,7 +8,7 @@ namespace Contensive.Processor {
     // todo implement or deprecate. might be nice to have this convenient api, but a model does the same, costs one query but will
     // always have the model at the save version as the addon code - this cp interface will match the database, but not the addon.
     // not sure which is better
-    public class CPAddonClass : BaseClasses.CPAddonBaseClass, IDisposable {
+    public class CPAddonClass : CPAddonBaseClass, IDisposable {
         //
         // todo remove all com guid references
         #region COM GUIDs
@@ -17,6 +17,10 @@ namespace Contensive.Processor {
         public const string EventsId = "70B800AA-148A-4338-9EDB-70C85E1ADBDD";
         #endregion
         //
+        // ====================================================================================================
+        /// <summary>
+        /// dependencies
+        /// </summary>
         private CPClass cp;
         //
         // ====================================================================================================
@@ -137,8 +141,39 @@ namespace Contensive.Processor {
         public override void ExecuteAsyncByUniqueName(string name) {
             cp.core.addon.executeAsync(Models.Db.AddonModel.createByUniqueName(cp.core, name), new Dictionary<string, string>());
         }
+        //==========================================================================================
+        /// <summary>
+        /// Install an uploaded collection file from a private folder. Return true if successful, else the issue is in the returnUserError
+        /// </summary>
+        /// <param name="privatePathFilename"></param>
+        /// <param name="returnUserError"></param>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public override bool InstallCollectionFile(string privatePathFilename, ref string returnUserError) {
+            bool returnOk = false;
+            try {
+                string ignoreReturnedCollectionGuid = "";
+                var tmpList = new List<string> { };
+                string logPrefix = "CPSiteClass.installCollectionFile";
+                var installedCollections = new List<string>();
+                returnOk = Controllers.CollectionController.installCollectionsFromPrivateFile(cp.core, privatePathFilename, ref returnUserError, ref ignoreReturnedCollectionGuid, false, true, ref tmpList, logPrefix, ref installedCollections);
+            } catch (Exception ex) {
+                Controllers.LogController.handleError(cp.core, ex);
+                if (!cp.core.siteProperties.trapErrors) {
+                    throw;
+                }
+            }
+            return returnOk;
+        }
         //
         //====================================================================================================
+        // todo - complete this method
+        public override bool InstallCollectionFromLibrary(string collectionGuid, ref string returnUserError) {
+            return false;
+        }
+        //
+        //====================================================================================================
+        // Deprecated methods
         //
         [Obsolete("Deprecated", true)]
         public override bool Admin => cp.core.doc.addonModelStack.Peek().admin;

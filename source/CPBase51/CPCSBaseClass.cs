@@ -48,7 +48,6 @@ namespace Contensive.BaseClasses {
         /// <param name="pageNumber"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        //public abstract bool Open(string ContentName, string SQLCriteria = "", string SortFieldList = "", bool ActiveOnly = true, string SelectFieldList = "", int PageSize = 10, int PageNumber = 1);
         public abstract bool Open(string contentName, string sqlCriteria, string sortFieldList, bool activeOnly, string selectFieldList, int pageSize, int pageNumber);
         public abstract bool Open(string contentName, string sqlCriteria, string sortFieldList, bool activeOnly, string selectFieldList, int pageSize);
         public abstract bool Open(string contentName, string sqlCriteria, string sortFieldList, bool activeOnly, string selectFieldList);
@@ -69,15 +68,14 @@ namespace Contensive.BaseClasses {
         /// <param name="PageNumber"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        //
-        //====================================================================================================
-        //public abstract bool OpenGroupUsers(string GroupName, string SQLCriteria = "", string SortFieldList = "", bool ActiveOnly = true, int PageSize = 10, int PageNumber = 1);
         public abstract bool OpenGroupUsers(string groupName, string sqlCriteria, string sortFieldList, bool activeOnly, int pageSize, int pageNumber);
         public abstract bool OpenGroupUsers(string groupName, string sqlCriteria, string sortFieldList, bool activeOnly, int pageSize);
         public abstract bool OpenGroupUsers(string groupName, string sqlCriteria, string sortFieldList, bool activeOnly);
         public abstract bool OpenGroupUsers(string groupName, string sqlCriteria, string sortFieldList);
         public abstract bool OpenGroupUsers(string groupName, string sqlCriteria);
         public abstract bool OpenGroupUsers(string groupName);
+        //
+        //====================================================================================================
         /// <summary>
         /// Opens a record set with user records that are in a Group
         /// </summary>
@@ -89,9 +87,6 @@ namespace Contensive.BaseClasses {
         /// <param name="pageNumber"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        //
-        //====================================================================================================
-        //public abstract bool OpenGroupUsers(List<string> GroupList, string SQLCriteria = "", string SortFieldList = "", bool ActiveOnly = true, int PageSize = 10, int PageNumber = 1);
         public abstract bool OpenGroupUsers(List<string> groupList, string sqlCriteria, string sortFieldList, bool activeOnly, int pageSize, int pageNumber);
         public abstract bool OpenGroupUsers(List<string> groupList, string sqlCriteria, string sortFieldList, bool activeOnly, int pageSize);
         public abstract bool OpenGroupUsers(List<string> groupList, string sqlCriteria, string sortFieldList, bool activeOnly);
@@ -133,7 +128,6 @@ namespace Contensive.BaseClasses {
         /// <param name="htmlId"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        //public abstract object GetFormInput(string ContentName, string FieldName, string Height = "", string Width = "", string HtmlId = "");
         public abstract object GetFormInput(string contentName, string fieldName, int height, int width, string htmlId);
         public abstract object GetFormInput(string contentName, string fieldName, int height, int width);
         public abstract object GetFormInput(string contentName, string fieldName, int height);
@@ -170,7 +164,6 @@ namespace Contensive.BaseClasses {
         /// <param name="allowPaste"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        //public abstract string GetAddLink(string PresetNameValueList = "", bool AllowPaste = false);
         public abstract string GetAddLink(string presetNameValueList, bool allowPaste);
         public abstract string GetAddLink(string presetNameValueList);
         public abstract string GetAddLink();
@@ -379,6 +372,36 @@ namespace Contensive.BaseClasses {
         //
         [Obsolete("Use GetFormInput(string,string,int)", true)]
         public abstract object GetFormInput(string contentName, string fieldName, string height);
+        ////
+        ////====================================================================================================
+        //// Disposable support
+        ////
+        //#region IDisposable Support
+        //private bool disposedValue = false; // To detect redundant calls
+        ////
+        //protected virtual void Dispose(bool disposing) {    
+        //    if (!disposedValue) {
+        //        if (disposing) {
+        //            // TODO: dispose managed state (managed objects).
+        //        }
+        //        // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+        //        // TODO: set large fields to null.
+        //        disposedValue = true;
+        //    }
+        //}
+        //// TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
+        //// ~CPCSBaseClass() {
+        ////   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+        ////   Dispose(false);
+        //// }
+        //// This code added to correctly implement the disposable pattern.
+        //public void Dispose() {
+        //    // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+        //    Dispose(true);
+        //    // TODO: uncomment the following line if the finalizer is overridden above.
+        //    // GC.SuppressFinalize(this);
+        //}
+        //#endregion
     }
 
 }

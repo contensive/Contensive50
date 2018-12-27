@@ -411,9 +411,6 @@ namespace Contensive.Addons.Housekeeping {
                 int CSTest = 0;
                 string Filename = null;
                 string appName = null;
-                string SQLTablePeople = null;
-                string SQLTableMemberRules = null;
-                string SQLTableGroups = null;
                 bool ArchiveDeleteNoCookie = false;
                 DateTime MidnightTwoDaysAgo = default(DateTime);
                 string SQLDateMidnightTwoDaysAgo = null;
@@ -450,7 +447,7 @@ namespace Contensive.Addons.Housekeeping {
                     switch (DataSourceType) {
                         case DataSourceTypeODBCAccess:
                             SQL = "delete m.*"
-                                + " from " + SQLTablePeople + " m,ccvisits v"
+                                + " from ccmembers m,ccvisits v"
                                 + " where v.memberid=m.id"
                                 + " and(m.Visits=1)"
                                 + " and(m.createdbyvisit=1)"
@@ -460,7 +457,7 @@ namespace Contensive.Addons.Housekeeping {
                             break;
                         case DataSourceTypeODBCMySQL:
                             SQL = "delete m"
-                                + " from " + SQLTablePeople + " m,ccvisits v"
+                                + " from ccmembers m,ccvisits v"
                                 + " where v.memberid=m.id"
                                 + " and(m.Visits=1)"
                                 + " and(m.createdbyvisit=1)"
@@ -469,7 +466,7 @@ namespace Contensive.Addons.Housekeeping {
                                 + " and(v.CookieSupport=0)and(v.LastVisitTime<" + SQLDateMidnightTwoDaysAgo + ")";
                             break;
                         default:
-                            SQL = "delete from " + SQLTablePeople + " from " + SQLTablePeople + " m,ccvisits v"
+                            SQL = "delete from ccmembers from ccmembers m,ccvisits v"
                                 + " where v.memberid=m.id"
                                 + " and(m.Visits=1)"
                                 + " and(m.createdbyvisit=1)"
@@ -639,7 +636,7 @@ namespace Contensive.Addons.Housekeeping {
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
                         SQL = "delete m.*"
-                            + " from " + SQLTablePeople + " m,ccvisits v"
+                            + " from ccmembers m,ccvisits v"
                             + " where v.memberid=m.id"
                             + " and(m.createdbyvisit=1)"
                             + " and(m.Visits=1)"
@@ -650,7 +647,7 @@ namespace Contensive.Addons.Housekeeping {
                         break;
                     case DataSourceTypeODBCMySQL:
                         SQL = "delete m"
-                            + " from " + SQLTablePeople + " m,ccvisits v"
+                            + " from ccmembers m,ccvisits v"
                             + " where v.memberid=m.id"
                             + " and(m.createdbyvisit=1)"
                             + " and(m.Visits=1)"
@@ -660,7 +657,7 @@ namespace Contensive.Addons.Housekeeping {
                             + " and(v.id is null)";
                         break;
                     default:
-                        SQL = "delete from " + SQLTablePeople + " from " + SQLTablePeople + " m,ccvisits v"
+                        SQL = "delete from ccmembers from ccmembers m,ccvisits v"
                             + " where v.memberid=m.id"
                             + " and(m.createdbyvisit=1)"
                             + " and(m.Visits=1)"
@@ -678,7 +675,7 @@ namespace Contensive.Addons.Housekeeping {
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
                         SQL = "delete m.*"
-                            + " from " + SQLTablePeople + " m left join ccvisits v on v.memberid=m.id"
+                            + " from ccmembers m left join ccvisits v on v.memberid=m.id"
                             + " where(m.createdbyvisit=1)"
                             + " and(m.Visits=1)"
                             + " and(m.Username is null)"
@@ -688,7 +685,7 @@ namespace Contensive.Addons.Housekeeping {
                         break;
                     case DataSourceTypeODBCMySQL:
                         SQL = "delete m"
-                            + " from " + SQLTablePeople + " m left join ccvisits v on v.memberid=m.id"
+                            + " from ccmembers m left join ccvisits v on v.memberid=m.id"
                             + " where(m.createdbyvisit=1)"
                             + " and(m.Visits=1)"
                             + " and(m.Username is null)"
@@ -697,7 +694,7 @@ namespace Contensive.Addons.Housekeeping {
                             + " and(v.id is null)";
                         break;
                     default:
-                        SQL = "delete from " + SQLTablePeople + " from " + SQLTablePeople + " m left join ccvisits v on v.memberid=m.id"
+                        SQL = "delete from ccmembers from ccmembers m left join ccvisits v on v.memberid=m.id"
                             + " where(m.createdbyvisit=1)"
                             + " and(m.Visits=1)"
                             + " and(m.Username is null)"
@@ -764,20 +761,20 @@ namespace Contensive.Addons.Housekeeping {
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
                         SQL = "delete ccactivitylog.*"
-                            + " From ccactivitylog LEFT JOIN " + SQLTablePeople + " on " + SQLTablePeople + ".ID=ccactivitylog.memberid"
-                            + " WHERE (" + SQLTablePeople + ".ID is null)";
+                            + " From ccactivitylog LEFT JOIN ccmembers on ccmembers.ID=ccactivitylog.memberid"
+                            + " WHERE (ccmembers.ID is null)";
                         core.db.executeQuery(SQL);
                         break;
                     case DataSourceTypeODBCSQLServer:
                         SQL = "delete from ccactivitylog"
-                            + " From ccactivitylog LEFT JOIN " + SQLTablePeople + " on " + SQLTablePeople + ".ID=ccactivitylog.memberid"
-                            + " WHERE (" + SQLTablePeople + ".ID is null)";
+                            + " From ccactivitylog LEFT JOIN ccmembers on ccmembers.ID=ccactivitylog.memberid"
+                            + " WHERE (ccmembers.ID is null)";
                         core.db.executeQuery(SQL);
                         break;
                     default:
                         SQL = "delete ccactivitylog"
-                            + " From ccactivitylog LEFT JOIN " + SQLTablePeople + " on " + SQLTablePeople + ".ID=ccactivitylog.memberid"
-                            + " WHERE (" + SQLTablePeople + ".ID is null)";
+                            + " From ccactivitylog LEFT JOIN ccmembers on ccmembers.ID=ccactivitylog.memberid"
+                            + " WHERE (ccmembers.ID is null)";
                         core.db.executeQuery(SQL);
                         break;
                 }
@@ -788,23 +785,23 @@ namespace Contensive.Addons.Housekeeping {
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
                         SQL = "delete ccProperties.*"
-                            + " From ccProperties LEFT JOIN " + SQLTablePeople + " on " + SQLTablePeople + ".ID=ccProperties.KeyID"
+                            + " From ccProperties LEFT JOIN ccmembers on ccmembers.ID=ccProperties.KeyID"
                             + " WHERE (ccProperties.TypeID=0)"
-                            + " AND (" + SQLTablePeople + ".ID is null)";
+                            + " AND (ccmembers.ID is null)";
                         core.db.executeQuery(SQL);
                         break;
                     case DataSourceTypeODBCSQLServer:
                         SQL = "delete From ccProperties"
-                            + " From ccProperties LEFT JOIN " + SQLTablePeople + " on " + SQLTablePeople + ".ID=ccProperties.KeyID"
+                            + " From ccProperties LEFT JOIN ccmembers on ccmembers.ID=ccProperties.KeyID"
                             + " WHERE (ccProperties.TypeID=0)"
-                            + " AND (" + SQLTablePeople + ".ID is null)";
+                            + " AND (ccmembers.ID is null)";
                         core.db.executeQuery(SQL);
                         break;
                     default:
                         SQL = "delete ccProperties"
-                            + " From ccProperties LEFT JOIN " + SQLTablePeople + " on " + SQLTablePeople + ".ID=ccProperties.KeyID"
+                            + " From ccProperties LEFT JOIN ccmembers on ccmembers.ID=ccProperties.KeyID"
                             + " WHERE (ccProperties.TypeID=0)"
-                            + " AND (" + SQLTablePeople + ".ID is null)";
+                            + " AND (ccmembers.ID is null)";
                         core.db.executeQuery(SQL);
                         break;
                 }
@@ -868,24 +865,24 @@ namespace Contensive.Addons.Housekeeping {
                 logHousekeeping(core, "Deleting Member Rules with bad MemberID.");
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
-                        SQL = "delete " + SQLTableMemberRules + ".*"
-                            + " From " + SQLTableMemberRules + ""
-                            + " LEFT JOIN " + SQLTablePeople + " on " + SQLTablePeople + ".ID=" + SQLTableMemberRules + ".MemberID"
-                            + " WHERE (" + SQLTablePeople + ".ID is null)";
+                        SQL = "delete ccmemberrules.*"
+                            + " From ccmemberrules"
+                            + " LEFT JOIN ccmembers on ccmembers.ID=ccmemberrules.MemberID"
+                            + " WHERE (ccmembers.ID is null)";
                         core.db.executeQuery(SQL);
                         break;
                     case DataSourceTypeODBCSQLServer:
-                        SQL = "delete From " + SQLTableMemberRules + ""
-                            + " From " + SQLTableMemberRules + ""
-                            + " LEFT JOIN " + SQLTablePeople + " on " + SQLTablePeople + ".ID=" + SQLTableMemberRules + ".MemberID"
-                            + " WHERE (" + SQLTablePeople + ".ID is null)";
+                        SQL = "delete From ccmemberrules"
+                            + " From ccmemberrules"
+                            + " LEFT JOIN ccmembers on ccmembers.ID=ccmemberrules.MemberID"
+                            + " WHERE (ccmembers.ID is null)";
                         core.db.executeQuery(SQL);
                         break;
                     default:
-                        SQL = "delete " + SQLTableMemberRules + ""
-                            + " From " + SQLTableMemberRules + ""
-                            + " LEFT JOIN " + SQLTablePeople + " on " + SQLTablePeople + ".ID=" + SQLTableMemberRules + ".MemberID"
-                            + " WHERE (" + SQLTablePeople + ".ID is null)";
+                        SQL = "delete ccmemberrules"
+                            + " From ccmemberrules"
+                            + " LEFT JOIN ccmembers on ccmembers.ID=ccmemberrules.MemberID"
+                            + " WHERE (ccmembers.ID is null)";
                         core.db.executeQuery(SQL);
                         break;
                 }
@@ -895,24 +892,24 @@ namespace Contensive.Addons.Housekeeping {
                 logHousekeeping(core, "Deleting Member Rules with bad GroupID.");
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
-                        SQL = "delete " + SQLTableMemberRules + ".*"
-                            + " From " + SQLTableMemberRules + ""
-                            + " LEFT JOIN " + SQLTableGroups + " on " + SQLTableGroups + ".ID=" + SQLTableMemberRules + ".GroupID"
-                            + " WHERE (" + SQLTableGroups + ".ID is null)";
+                        SQL = "delete ccmemberrules.*"
+                            + " From ccmemberrules"
+                            + " LEFT JOIN ccgroups on ccgroups.ID=ccmemberrules.GroupID"
+                            + " WHERE (ccgroups.ID is null)";
                         core.db.executeQuery(SQL);
                         break;
                     case DataSourceTypeODBCSQLServer:
-                        SQL = "delete From " + SQLTableMemberRules + ""
-                            + " From " + SQLTableMemberRules + ""
-                            + " LEFT JOIN " + SQLTableGroups + " on " + SQLTableGroups + ".ID=" + SQLTableMemberRules + ".GroupID"
-                            + " WHERE (" + SQLTableGroups + ".ID is null)";
+                        SQL = "delete From ccmemberrules"
+                            + " From ccmemberrules"
+                            + " LEFT JOIN ccgroups on ccgroups.ID=ccmemberrules.GroupID"
+                            + " WHERE (ccgroups.ID is null)";
                         core.db.executeQuery(SQL);
                         break;
                     default:
-                        SQL = "delete " + SQLTableMemberRules + ""
-                            + " From " + SQLTableMemberRules + ""
-                            + " LEFT JOIN " + SQLTableGroups + " on " + SQLTableGroups + ".ID=" + SQLTableMemberRules + ".GroupID"
-                            + " WHERE (" + SQLTableGroups + ".ID is null)";
+                        SQL = "delete ccmemberrules"
+                            + " From ccmemberrules"
+                            + " LEFT JOIN ccgroups on ccgroups.ID=ccmemberrules.GroupID"
+                            + " WHERE (ccgroups.ID is null)";
                         core.db.executeQuery(SQL);
                         break;
                 }
@@ -938,22 +935,22 @@ namespace Contensive.Addons.Housekeeping {
                     case DataSourceTypeODBCAccess:
                         SQL = "delete ccGroupRules.*"
                             + " From ccGroupRules"
-                            + " LEFT JOIN " + SQLTableGroups + " on " + SQLTableGroups + ".ID=ccGroupRules.GroupID"
-                            + " WHERE (" + SQLTableGroups + ".ID is null)";
+                            + " LEFT JOIN ccgroups on ccgroups.ID=ccGroupRules.GroupID"
+                            + " WHERE (ccgroups.ID is null)";
                         core.db.executeQuery(SQL);
                         break;
                     case DataSourceTypeODBCSQLServer:
                         SQL = "delete from ccGroupRules"
                             + " From ccGroupRules"
-                            + " LEFT JOIN " + SQLTableGroups + " on " + SQLTableGroups + ".ID=ccGroupRules.GroupID"
-                            + " WHERE (" + SQLTableGroups + ".ID is null)";
+                            + " LEFT JOIN ccgroups on ccgroups.ID=ccGroupRules.GroupID"
+                            + " WHERE (ccgroups.ID is null)";
                         core.db.executeQuery(SQL);
                         break;
                     default:
                         SQL = "delete ccGroupRules"
                             + " From ccGroupRules"
-                            + " LEFT JOIN " + SQLTableGroups + " on " + SQLTableGroups + ".ID=ccGroupRules.GroupID"
-                            + " WHERE (" + SQLTableGroups + ".ID is null)";
+                            + " LEFT JOIN ccgroups on ccgroups.ID=ccGroupRules.GroupID"
+                            + " WHERE (ccgroups.ID is null)";
                         core.db.executeQuery(SQL);
                         break;
                 }
@@ -1349,7 +1346,7 @@ namespace Contensive.Addons.Housekeeping {
                     + " and(Visits=1)"
                     + " and(Username is null)"
                     + " and(email is null)";
-                core.db.deleteTableRecordChunks("default", "" + SQLTablePeople + "", SQLCriteria, 1000, 10000);
+                core.db.deleteTableRecordChunks("default", "ccmembers", SQLCriteria, 1000, 10000);
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
             }  finally { 

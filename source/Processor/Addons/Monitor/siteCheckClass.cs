@@ -438,7 +438,7 @@
 //        /// constructor
 //        /// </summary>
 //        /// <param name="cpCore"></param>
-//        public siteCheckClass(CoreController cpCore) : base() {
+//        public siteCheckClass(CoreController cpCore) {
 //            this.cpCore = cpCore;
 //            version = Assembly.GetEntryAssembly().GetName().Version.ToString();
 //            processTimer.Elapsed += ProcessTimerTick;

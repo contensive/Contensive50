@@ -12,7 +12,9 @@ namespace Contensive.BaseClasses {
         /// <param name="DefaultContent"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public abstract string GetCopy(string CopyName, string DefaultContent = "");
+        public abstract string GetCopy(string CopyName, string DefaultContent);
+        //
+        public abstract string GetCopy(string CopyName);
         //
         //====================================================================================================
         /// <summary>
@@ -77,16 +79,6 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
-        /// Returns a named content property. Valid values for PropertyName are the field names of the 'Content' content definition, also found as the columns in the ccfields table.
-        /// </summary>
-        /// <param name="ContentName"></param>
-        /// <param name="PropertyName"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public abstract string GetProperty(string ContentName, string PropertyName);
-        //
-        //====================================================================================================
-        /// <summary>
         /// Returns the datasource name of the content given.
         /// </summary>
         /// <param name="ContentName"></param>
@@ -127,7 +119,9 @@ namespace Contensive.BaseClasses {
         /// <param name="AllowLinkAlias"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public abstract string GetPageLink(int PageID, string QueryStringSuffix = "", bool AllowLinkAlias = true);
+        public abstract string GetPageLink(int PageID, string QueryStringSuffix, bool AllowLinkAlias);
+        public abstract string GetPageLink(int PageID, string QueryStringSuffix);
+        public abstract string GetPageLink(int PageID);
         //
         //====================================================================================================
         /// <summary>
@@ -284,23 +278,26 @@ namespace Contensive.BaseClasses {
         [Obsolete("Deprecated, template link is not supported", true)]
         public abstract string GetTemplateLink(int TemplateID);
         //
-        [Obsolete("workflow editing is deprecated", false)]
+        [Obsolete("workflow editing is deprecated", true)]
         public abstract bool IsWorkflow(string ContentName);
         //
-        [Obsolete("workflow editing is deprecated", false)]
+        [Obsolete("workflow editing is deprecated", true)]
         public abstract void PublishEdit(string ContentName, int RecordID);
         //
-        [Obsolete("workflow editing is deprecated", false)]
+        [Obsolete("workflow editing is deprecated", true)]
         public abstract void SubmitEdit(string ContentName, int RecordID);
         //
-        [Obsolete("workflow editing is deprecated", false)]
+        [Obsolete("workflow editing is deprecated", true)]
         public abstract void AbortEdit(string ContentName, int RecordId);
         //
-        [Obsolete("workflow editing is deprecated", false)]
-        public abstract void ApproveEdit(string ContentName, int RecordId); //Implements BaseClasses.CPContentBaseClass.ApproveEdit
+        [Obsolete("workflow editing is deprecated", true)]
+        public abstract void ApproveEdit(string ContentName, int RecordId);
         //
         [Obsolete("Please use AddRecord(ContentName as String)", true)]
         public abstract int AddRecord(object ContentName);
+        //
+        [Obsolete("Use models to access record fields)", true)]
+        public abstract string GetProperty(string ContentName, string PropertyName);
     }
 
 }

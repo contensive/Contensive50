@@ -45,7 +45,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 //
                 // -- content extras like tool panel
-                if (core.session.isAuthenticatedContentManager(core) && (core.session.user.AllowToolsPanel)) {
+                if (core.session.isAuthenticatedContentManager(core) && (core.session.user.allowToolsPanel)) {
                     if (AllowTools) {
                         result.Add(core.html.getToolsPanel());
                     }
@@ -2761,7 +2761,7 @@ namespace Contensive.Processor.Controllers {
                 bool ShowLegacyToolsPanel = false;
                 string QS = null;
                 //
-                if (core.session.user.AllowToolsPanel) {
+                if (core.session.user.allowToolsPanel) {
                     ShowLegacyToolsPanel = core.siteProperties.getBoolean("AllowLegacyToolsPanel", true);
                     //
                     // --- Link Panel - used for both Legacy Tools Panel, and without it

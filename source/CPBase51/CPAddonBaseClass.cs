@@ -139,6 +139,24 @@ namespace Contensive.BaseClasses
         //
         //====================================================================================================
         /// <summary>
+        /// Install addon collection from a file in private files
+        /// </summary>
+        /// <param name="privatePathFilename"></param>
+        /// <param name="returnUserError"></param>
+        /// <returns></returns>
+        public abstract bool InstallCollectionFile(string privatePathFilename, ref string returnUserError);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Install addon collection by its guid from the addon collection library
+        /// </summary>
+        /// <param name="collectionGuid"></param>
+        /// <param name="returnUserError"></param>
+        /// <returns></returns>
+        public abstract bool InstallCollectionFromLibrary(string collectionGuid, ref string returnUserError);
+        //
+        //====================================================================================================
+        /// <summary>
         /// The id of the addon currently executing.
         /// </summary>
         public abstract int ID { get; }

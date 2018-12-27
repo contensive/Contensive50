@@ -30,7 +30,7 @@ namespace Contensive.Processor {
         /// constructor
         /// </summary>
         /// <param name="cp"></param>
-        public CPCSClass(CPClass cp) : base() {
+        public CPCSClass(CPClass cp) {
             this.cp = cp;
             cs = -1;
             openingMemberID = cp.core.session.user.id;
@@ -75,15 +75,17 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override bool OpenRecord(string contentName, int recordId) => OpenRecord(contentName, recordId, "", true);
+        public override bool OpenRecord(string contentName, int recordId) 
+            => OpenRecord(contentName, recordId, "", true);
         //
         //====================================================================================================
         //
-        public override bool OpenRecord(string contentName, int recordId, string SelectFieldList) => OpenRecord(contentName, recordId, SelectFieldList, true);
+        public override bool OpenRecord(string contentName, int recordId, string SelectFieldList) 
+            => OpenRecord(contentName, recordId, SelectFieldList, true);
         //
         //====================================================================================================
         //
-        public override bool Open(string ContentName, string SQLCriteria = "", string SortFieldList = "", bool ActiveOnly = true, string SelectFieldList = "", int pageSize = 10, int PageNumber = 1) {
+        public override bool Open(string contentName, string sqlCriteria, string sortFieldList, bool activeOnly, string selectFieldList, int pageSize, int pageNumber) {
             try {
                 if (cs != -1) { cp.core.db.csClose(ref cs); }
                 if ((pageSize == 0) || (pageSize == 10)) {
@@ -93,13 +95,14 @@ namespace Contensive.Processor {
                     // -- when I changed new cpbase to pagesize default 0, and compiled code against it, it would not run on c41 because pagesize=0 is passed
                     pageSize = 9999;
                 }
-                cs = cp.core.db.csOpen(ContentName, SQLCriteria, SortFieldList, ActiveOnly, 0, false, false, SelectFieldList, pageSize, PageNumber);
+                cs = cp.core.db.csOpen(contentName, sqlCriteria, sortFieldList, activeOnly, 0, false, false, selectFieldList, pageSize, pageNumber);
                 return cp.core.db.csOk(cs);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
             }
         }
+        //
         //
         //====================================================================================================
         //
@@ -597,7 +600,7 @@ namespace Contensive.Processor {
             return success;
         }
         //
-        [Obsolete("Use getText for copy. getFilename for filename", false)]
+        [Obsolete("Use getText for copy. getFilename for filename", true)]
         public override string GetTextFile(string FieldName) {
             try {
                 return cp.core.db.csGetText(cs, FieldName);
@@ -606,7 +609,10 @@ namespace Contensive.Processor {
                 throw;
             }
         }
-
+        //
+        //====================================================================================================
+        // Disposable
+        //
         #region  IDisposable Support 
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
@@ -621,13 +627,10 @@ namespace Contensive.Processor {
             if (!this.disposed) {
                 if (disposing) {
                     try {
-                        if (cs != -1 && true) {
-                            cp.core.db.csClose(ref cs);
-                        }
-                    } catch (Exception) {
+                        if (cs > -1) { cp.core.db.csClose(ref cs); }
+                    } catch( Exception ) {
+                        //
                     }
-                    cp.core = null;
-                    cp = null;
                 }
             }
             this.disposed = true;

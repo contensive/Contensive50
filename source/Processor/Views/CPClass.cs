@@ -14,8 +14,7 @@ namespace Contensive.Processor {
         public const string EventsId = "4FADD1C2-6A89-4A8E-ADD0-9850D3EB6DBC";
         #endregion
         //
-        public Contensive.Processor.Controllers.CoreController core { get; set; }
-        private int MyAddonID { get; set; }
+        public CoreController core { get; set; }
         //
         //=========================================================================================================
         /// <summary>
@@ -65,7 +64,9 @@ namespace Contensive.Processor {
         }
         //
         //=========================================================================================================
-        //
+        /// <summary>
+        /// return ok if the application is running correctly. Use statusMessage to display the status
+        /// </summary>
         public AppConfigModel.AppStatusEnum status {
             get {
                 return core.appConfig.appStatus;
@@ -73,7 +74,9 @@ namespace Contensive.Processor {
         }
         //
         //=========================================================================================================
-        //
+        /// <summary>
+        /// return a message that can be used to display status
+        /// </summary>
         public string statusMessage {
                 get {
                     return GenericController.GetApplicationStatusMessage(core.appConfig.appStatus);
@@ -118,18 +121,32 @@ namespace Contensive.Processor {
         //
         //==========================================================================================
         /// <summary>
-        /// Executes a specific route. The route can be a remote method, link alias, admin route, etc. If the route is not provided, the default route set in the admin settings is used.
+        /// Executes a specific route. The route can be a remote method, link alias, admin route, etc.
         /// </summary>
         /// <param name="route"></param>
         /// <returns></returns>
-        public string executeRoute(string route = "") {
-            string result = "";
+        public string executeRoute(string route) {
             try {
-                result = core.executeRoute(route);
+                return core.executeRoute(route);
             } catch (Exception ex) {
                 Site.ErrorReport(ex);
             }
-            return result;
+            return String.Empty;
+        }
+        //
+        //==========================================================================================
+        /// <summary>
+        /// Executes the default route set in the admin settings is used.
+        /// </summary>
+        /// <param name="route"></param>
+        /// <returns></returns>
+        public string executeRoute() {
+            try {
+                return core.executeRoute();
+            } catch (Exception ex) {
+                Site.ErrorReport(ex);
+            }
+            return String.Empty;
         }
         //
         //====================================================================================================
@@ -140,7 +157,6 @@ namespace Contensive.Processor {
         /// <param name="addonContext"></param>
         /// <returns></returns>
         public string executeAddon(string addonNameOrGuid, CPUtilsBaseClass.addonContext addonContext = CPUtilsBaseClass.addonContext.ContextSimple) {
-            string result = "";
             try {
                 if (GenericController.isGuid(addonNameOrGuid)) {
                     //
@@ -149,7 +165,7 @@ namespace Contensive.Processor {
                     if ( addon == null ) {
                         throw new GenericException("Addon [" + addonNameOrGuid + "] could not be found.");
                     } else {
-                        result = core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext {
+                        return core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext {
                             addonType = addonContext,
                             errorContextMessage = "external call to execute addon [" + addonNameOrGuid + "]"
                         });
@@ -159,23 +175,22 @@ namespace Contensive.Processor {
                     if ( addon != null ) {
                         //
                         // -- call by name
-                        result = core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext {
+                        return core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext {
                             addonType = addonContext,
                             errorContextMessage = "external call to execute addon [" + addonNameOrGuid + "]"
                         });
                     } else if (addonNameOrGuid.IsNumeric() ) {
                         //
                         // -- compatibility - call by id
-                        result = executeAddon(GenericController.encodeInteger(addonNameOrGuid), addonContext);
+                        return executeAddon(GenericController.encodeInteger(addonNameOrGuid), addonContext);
                     } else {
                         throw new GenericException("Addon [" + addonNameOrGuid + "] could not be found.");
                     }
                 }
-                //result = core.addon.execute_legacy4(addonNameOrGuid, core.docProperties.getLegacyOptionStringFromVar(), addonContext, Nothing)
             } catch (Exception ex) {
                 Site.ErrorReport(ex);
             }
-            return result;
+            return string.Empty;
         }
         //
         //====================================================================================================
@@ -186,13 +201,12 @@ namespace Contensive.Processor {
         /// <param name="addonContext"></param>
         /// <returns></returns>
         public string executeAddon(int addonId, Contensive.BaseClasses.CPUtilsBaseClass.addonContext addonContext = Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple) {
-            string result = "";
             try {
                 AddonModel addon = AddonModel.create(core, addonId);
                 if ( addon == null) {
                     throw new GenericException("Addon [#" + addonId.ToString() + "] could not be found.");
                 } else {
-                    result = core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext {
+                    return core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext {
                         addonType = addonContext,
                         errorContextMessage = "external call to execute addon [" + addonId + "]"
                     });
@@ -200,36 +214,31 @@ namespace Contensive.Processor {
             } catch (Exception ex) {
                 Site.ErrorReport(ex);
             }
-            return result;
+            return string.Empty;
         }
         //
         //=========================================================================================================
-        //
-        public void AddVar(string OptionName, string OptionValue) {
-            try {
-                if (!string.IsNullOrEmpty(OptionName)) {
-                    this.Doc.SetProperty(OptionName, OptionValue);
-                }
-            } catch (Exception ex) {
-                Site.ErrorReport(ex);
-            }
-        }
-        //
-        //=========================================================================================================
-        //
+        /// <summary>
+        /// Create a new block object, used to manipulate html elements using htmlClass and htmlId. Alternatively create a block object with its constructor.
+        /// </summary>
+        /// <returns></returns>
         public override CPBlockBaseClass BlockNew() {
-            CPClass tempVar = this;
-            return new CPBlockClass( tempVar);
+            return new CPBlockClass(this);
         }
         //
         //=========================================================================================================
-        //
+        /// <summary>
+        /// Create a new data set object used to run queries and open tables with soft table names (determined run-time). Alternatively create a data set object with its constructor
+        /// </summary>
+        /// <returns></returns>
         public override CPCSBaseClass CSNew() {
             return new CPCSClass(this);
         }
         //
         //=========================================================================================================
-        //
+        /// <summary>
+        /// system version
+        /// </summary>
         public override string Version {
             get {
                 return core.codeVersion();
@@ -237,11 +246,13 @@ namespace Contensive.Processor {
         }
         //
         //=========================================================================================================
-        //
+        /// <summary>
+        /// expose the user error object
+        /// </summary>
         public override CPUserErrorBaseClass UserError {
             get {
                 if (_userErrorObj == null) {
-                    _userErrorObj = new CPUserErrorClass(core);
+                    _userErrorObj = new CPUserErrorClass(this);
                 }
                 return _userErrorObj;
             }
@@ -249,11 +260,13 @@ namespace Contensive.Processor {
         private CPUserErrorClass _userErrorObj;
         //
         //=========================================================================================================
-        //
+        /// <summary>
+        /// expose the user object
+        /// </summary>
         public override CPUserBaseClass User {
             get {
                 if (_userObj == null) {
-                    _userObj = new CPUserClass(core, this);
+                    _userObj = new CPUserClass(this);
                 }
                 return _userObj;
             }
@@ -261,27 +274,23 @@ namespace Contensive.Processor {
         private CPUserClass _userObj;
         //
         //=========================================================================================================
-        //
+        /// <summary>
+        /// expose object for managing addons
+        /// </summary>
         public override CPAddonBaseClass Addon {
             get {
-                if (core.doc.addonModelStack.Count == 0) {
-                    //
-                    // -- if no addon running, return null
-                    return null;
-                } else {
-                    //
-                    // -- return class
-                    if (_addonObj == null) {
-                        _addonObj = new CPAddonClass(this);
-                    }
-                    return _addonObj;
+                if (_addonObj == null) {
+                    _addonObj = new CPAddonClass(this);
                 }
+                return _addonObj;
             }
         }
         private CPAddonClass _addonObj;
         //
         //=========================================================================================================
-        //
+        /// <summary>
+        /// expose object for managing content delivery files. This is a publically accessable location that holds content contributed. If remote file mode, this is an AWS S3 bucket
+        /// </summary>
         public override CPFileSystemBaseClass CdnFiles {
             get {
                 if (_cdnFiles == null) {
@@ -293,12 +302,13 @@ namespace Contensive.Processor {
         private CPFileSystemClass _cdnFiles;
         //
         //=========================================================================================================
-        //
+        /// <summary>
+        /// expose object for managing cache. This cache designed to cache Db record objects and Domain Objects
+        /// </summary>
         public override CPCacheBaseClass Cache {
             get {
                 if (_cacheObj == null) {
-                    CPClass tempVar = this;
-                    _cacheObj = new CPCacheClass(tempVar);
+                    _cacheObj = new CPCacheClass(this);
                 }
                 return _cacheObj;
             }
@@ -306,7 +316,9 @@ namespace Contensive.Processor {
         private CPCacheClass _cacheObj;
         //
         //=========================================================================================================
-        //
+        /// <summary>
+        /// expose an object for managing content
+        /// </summary>
         public override CPContentBaseClass Content {
             get {
                 if (_contentObj == null) {
@@ -318,7 +330,9 @@ namespace Contensive.Processor {
         private CPContentClass _contentObj;
         //
         //=========================================================================================================
-        //
+        /// <summary>
+        /// expose object that can be used to configure the web environment if IIS is not used.
+        /// </summary>
         public CPContextClass Context {
             get {
                 if (_contextObj == null) {
@@ -375,7 +389,7 @@ namespace Contensive.Processor {
         /// <summary>
         /// Legacy method that provides access the current application server. AS of v5, access is limited to that provided by privatefiles, wwwRoot, temp and cdnFiles
         /// </summary>
-        [Obsolete()] public override CPFileBaseClass File {
+        [Obsolete("deprecated",true)] public override CPFileBaseClass File {
             get {
                 if (_fileObj == null) {
                     _fileObj = new CPFileClass(this);
@@ -413,10 +427,7 @@ namespace Contensive.Processor {
         }
         private CPHtmlClass _htmlObj;
         //
-        //====================================================================================================
-        /// <summary>
-        /// Valid during the execution of an addon. This object provides access to the addon currently executing.
-        /// </summary>
+        [Obsolete("Deprecated. To access addon details of the addon running, create a model with the cp.addon.id",true)]
         public override CPAddonBaseClass MyAddon {
             get {
                 return Addon;
@@ -444,7 +455,7 @@ namespace Contensive.Processor {
         public override CPRequestBaseClass Request {
             get {
                 if (_requestObj == null) {
-                    _requestObj = new CPRequestClass(core);
+                    _requestObj = new CPRequestClass(this);
                 }
                 return _requestObj;
             }
@@ -458,7 +469,7 @@ namespace Contensive.Processor {
         public override CPResponseBaseClass Response {
             get {
                 if (_responseObj == null) {
-                    _responseObj = new CPResponseClass(core);
+                    _responseObj = new CPResponseClass(this);
                 }
                 return _responseObj;
             }
@@ -472,7 +483,7 @@ namespace Contensive.Processor {
         public override CPSiteBaseClass Site {
             get {
                 if (_siteObj == null) {
-                    _siteObj = new CPSiteClass(core, this);
+                    _siteObj = new CPSiteClass(this);
                 }
                 return _siteObj;
             }
@@ -515,7 +526,7 @@ namespace Contensive.Processor {
         public override CPVisitBaseClass Visit {
             get {
                 if (_visitObj == null) {
-                    _visitObj = new CPVisitClass(core, this);
+                    _visitObj = new CPVisitClass(this);
                 }
                 return _visitObj;
             }
@@ -529,7 +540,7 @@ namespace Contensive.Processor {
         public override CPVisitorBaseClass Visitor {
             get {
                 if (_visitorObj == null) {
-                    _visitorObj = new CPVisitorClass(core, this);
+                    _visitorObj = new CPVisitorClass(this);
                 }
                 return _visitorObj;
             }
@@ -557,7 +568,21 @@ namespace Contensive.Processor {
             get {
                 return core.routeMap;
             }
-        } 
+        }
+        //
+        //=========================================================================================================
+        // deprecated
+        //
+        [Obsolete("Use cp.Doc.SetProperty.", true)]
+        public void AddVar(string key, string value) {
+            try {
+                if (!string.IsNullOrEmpty(key)) {
+                    this.Doc.SetProperty(key, value);
+                }
+            } catch (Exception ex) {
+                Site.ErrorReport(ex);
+            }
+        }
         //
         //====================================================================================================
         #region  IDisposable Support 

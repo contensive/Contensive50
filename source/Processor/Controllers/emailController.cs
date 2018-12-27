@@ -259,20 +259,20 @@ namespace Contensive.Processor.Controllers {
             try {
                 if (person == null) {
                     userErrorMessage = "The email was not sent because the recipient could not be found by thier id [" + person.id.ToString() + "]";
-                } else if (!verifyEmailAddress(core, person.Email)) {
+                } else if (!verifyEmailAddress(core, person.email)) {
                     //
                     userErrorMessage = "Email not sent because the to-address is not valid.";
                 } else if (!verifyEmailAddress(core, fromAddress)) {
                     //
                     userErrorMessage = "Email not sent because the from-address is not valid.";
-                } else if (0 != GenericController.vbInstr(1, getBlockList(core), "\r\n" + person.Email + "\r\n", 1)) {
+                } else if (0 != GenericController.vbInstr(1, getBlockList(core), "\r\n" + person.email + "\r\n", 1)) {
                     //
                     userErrorMessage = "Email not sent because the to-address is blocked by this application. See the Blocked Email Report.";
                 } else {
                     subject = ActiveContentController.renderHtmlForEmail(core, subject, person.id, queryStringForLinkAppend);
                     body = ActiveContentController.renderHtmlForEmail(core, body, person.id, queryStringForLinkAppend);
                     body = GenericController.vbReplace(body, "#member_id#", person.id.ToString());
-                    body = GenericController.vbReplace(body, "#member_email#", person.Email);
+                    body = GenericController.vbReplace(body, "#member_email#", person.email);
                     string htmlBody;
                     string textBody;
                     if (!isHTML) {
@@ -314,7 +314,7 @@ namespace Contensive.Processor.Controllers {
                         replyToAddress = replyToAddress,
                         subject = subject,
                         textBody = textBody,
-                        toAddress = person.Email
+                        toAddress = person.email
                     };
                     if (verifyEmail(core, email, ref userErrorMessage)) {
                         queueEmail(core, Immediate, email);
@@ -483,13 +483,13 @@ namespace Contensive.Processor.Controllers {
                     if (person == null) {
                         confirmationMessage += "&nbsp;&nbsp;Error: Not sent additional user [#" + additionalMemberID + "] because the user record could not be found." + BR;
                     } else {
-                        if (string.IsNullOrWhiteSpace(person.Email)) {
+                        if (string.IsNullOrWhiteSpace(person.email)) {
                             confirmationMessage += "&nbsp;&nbsp;Error: Not sent additional user [#" + additionalMemberID + "] because their email address was blank." + BR;
                         } else {
                             string EmailStatus = "";
                             string queryStringForLinkAppend = "";
                             queuePersonEmail(core, person, email.fromAddress, EmailSubjectSource, EmailBodySource, "", "", false, true, EmailRecordID, EmailTemplateSource, EmailAllowLinkEID, ref EmailStatus, queryStringForLinkAppend);
-                            confirmationMessage += "&nbsp;&nbsp;Sent to " + person.name + " at " + person.Email + ", Status = " + EmailStatus + BR;
+                            confirmationMessage += "&nbsp;&nbsp;Sent to " + person.name + " at " + person.email + ", Status = " + EmailStatus + BR;
                         }
                     }
                 }
@@ -503,13 +503,13 @@ namespace Contensive.Processor.Controllers {
                     if (person == null) {
                         confirmationMessage += "&nbsp;&nbsp;Error: Not sent user [#" + additionalMemberID + "] because the user record could not be found." + BR;
                     } else {
-                        if (string.IsNullOrWhiteSpace(person.Email)) {
+                        if (string.IsNullOrWhiteSpace(person.email)) {
                             confirmationMessage += "&nbsp;&nbsp;Error: Not sent user [#" + additionalMemberID + "] because their email address was blank." + BR;
                         } else {
                             string EmailStatus = "";
                             string queryStringForLinkAppend = "";
                             queuePersonEmail(core, person, email.fromAddress, EmailSubjectSource, EmailBodySource, "", "", false, true, EmailRecordID, EmailTemplateSource, EmailAllowLinkEID, ref EmailStatus, queryStringForLinkAppend);
-                            confirmationMessage += "&nbsp;&nbsp;Sent to " + person.name + " at " + person.Email + ", Status = " + EmailStatus + BR;
+                            confirmationMessage += "&nbsp;&nbsp;Sent to " + person.name + " at " + person.email + ", Status = " + EmailStatus + BR;
                         }
                     }
                 }
@@ -639,7 +639,7 @@ namespace Contensive.Processor.Controllers {
                     } else {
                         foreach (var personId in personIdList) {
                             var person = PersonModel.create(core, personId);
-                            Emailtext = person.Email;
+                            Emailtext = person.email;
                             EMailName = person.name;
                             EmailMemberID = person.id;
                             if (string.IsNullOrEmpty(EMailName)) {

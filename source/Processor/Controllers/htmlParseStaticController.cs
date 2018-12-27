@@ -101,41 +101,31 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="ignore"></param>
         /// <param name="layout"></param>
-        /// <param name="Key"></param>
+        /// <param name="key"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static string getInner(CoreController core, string layout, string Key) {
+        public static string getInner(CoreController core, string layout, string key) {
             string returnValue = "";
             try {
-                int posStart = 0;
-                int posEnd = 0;
-                //
-                // short-cut for now, get the outerhtml, find the position, then remove the wrapping tags
-                //
-                if (string.IsNullOrEmpty(Key)) {
-                    //
-                    // inner of nothing is nothing
-                    //
-                } else {
-                    returnValue = layout;
-                    posStart = getTagStartPos(core, layout, 1, Key);
-                    if (posStart != 0) {
-                        posEnd = getTagEndPos(core, layout, posStart);
-                        if (posEnd > 0) {
-                            posStart = GenericController.vbInstr(posStart + 1, layout, ">");
-                            if (posStart != 0) {
-                                posStart = posStart + 1;
-                                posEnd = layout.LastIndexOf("<", posEnd - 2) + 1;
-                                if (posEnd != 0) {
-                                    //
-                                    // now move the end forward to skip trailing whitespace
-                                    //
-                                    do {
-                                        posEnd = posEnd + 1;
-                                    } while ((posEnd < layout.Length) && (("\t\r\n\t ").IndexOf(layout.Substring(posEnd - 1, 1))  != -1));
-                                    posEnd = posEnd - 1;
-                                    returnValue = layout.Substring(posStart - 1, (posEnd - posStart));
-                                }
+                if ((string.IsNullOrEmpty(key)) || (string.IsNullOrEmpty(layout))) { return string.Empty; }
+                returnValue = layout;
+                int posStart = getTagStartPos(core, layout, 1, key);
+                if (posStart != 0) {
+                    int posEnd = getTagEndPos(core, layout, posStart);
+                    if (posEnd > 0) {
+                        posStart = GenericController.vbInstr(posStart + 1, layout, ">");
+                        if (posStart != 0) {
+                            posStart = posStart + 1;
+                            posEnd = layout.LastIndexOf("<", posEnd - 2) + 1;
+                            if (posEnd != 0) {
+                                //
+                                // now move the end forward to skip trailing whitespace
+                                //
+                                do {
+                                    posEnd = posEnd + 1;
+                                } while ((posEnd < layout.Length) && (("\t\r\n\t ").IndexOf(layout.Substring(posEnd - 1, 1)) != -1));
+                                posEnd = posEnd - 1;
+                                returnValue = layout.Substring(posStart - 1, (posEnd - posStart));
                             }
                         }
                     }
@@ -153,40 +143,33 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="ignore"></param>
         /// <param name="layout"></param>
-        /// <param name="Key"></param>
+        /// <param name="key"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public static string getOuter(CoreController core, string layout, string Key) {
-            string returnValue = "";
+        public static string getOuter(CoreController core, string layout, string key) {
+            string result = "";
             try {
-                int posStart = 0;
-                int posEnd = 0;
-                string s;
-                //
-                s = layout;
-                if (!string.IsNullOrEmpty(s)) {
-                    posStart = getTagStartPos(core, s, 1, Key);
-                    if (posStart > 0) {
-                        //
-                        // now backtrack to include the leading whitespace
-                        //
-                        while ((posStart > 0) && (("\t\r\n\t ").IndexOf(s.Substring(posStart - 1, 1))  != -1)) {
-                            posStart = posStart - 1;
-                        }
-                        //posStart = posStart + 1
-                        s = s.Substring(posStart - 1);
-                        posEnd = getTagEndPos(core, s, 1);
-                        if (posEnd > 0) {
-                            s = s.Left( posEnd - 1);
-                            returnValue = s;
-                        }
+                if ((string.IsNullOrEmpty(key)) || (string.IsNullOrEmpty(layout))) { return string.Empty; }
+                string workingLayout = layout;
+                int posStart = getTagStartPos(core, workingLayout, 1, key);
+                if (posStart > 0) {
+                    //
+                    // now backtrack to include the leading whitespace
+                    while ((posStart > 0) && (("\t\r\n\t ").IndexOf(workingLayout.Substring(posStart - 1, 1)) != -1)) {
+                        posStart = posStart - 1;
+                    }
+                    workingLayout = workingLayout.Substring(posStart - 1);
+                    int posEnd = getTagEndPos(core, workingLayout, 1);
+                    if (posEnd > 0) {
+                        workingLayout = workingLayout.Left(posEnd - 1);
+                        result = workingLayout;
                     }
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
             }
-            return returnValue;
+            return result;
         }
         //
         //====================================================================================================

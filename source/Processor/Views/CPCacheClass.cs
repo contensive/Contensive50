@@ -14,51 +14,49 @@ namespace Contensive.Processor {
         public const string EventsId = "11B23802-CBD3-48E6-9C3E-1DC26ED8775A";
         #endregion
         //
-        private Contensive.Processor.Controllers.CoreController core { get; set; }
         private CPClass cp { get; set; }
         //
         //====================================================================================================
         /// <summary>
         /// constructor
         /// </summary>
-        /// <param name="cpParent"></param>
+        /// <param name="cp"></param>
         /// <remarks></remarks>
-        public CPCacheClass(CPClass cpParent) : base() {
-            cp = cpParent;
-            core = cp.core;
+        public CPCacheClass(CPClass cp) {
+            this.cp = cp;
         }
         //
         //====================================================================================================
         //
-        public override void Clear(List<string> keyList) => core.cache.invalidate(keyList);
+        public override void Clear(List<string> keyList) => cp.core.cache.invalidate(keyList);
         //
         //====================================================================================================
         //
-        public override object GetObject(string key) => core.cache.getObject<object>(key);
+        public override object GetObject(string key) => cp.core.cache.getObject<object>(key);
         //
         //====================================================================================================
         //
-        public override string GetText(string key) => core.cache.getText(key);
+        public override string GetText(string key) => cp.core.cache.getText(key);
         //
         //====================================================================================================
         //
-        public override int GetInteger(string key) => core.cache.getInteger(key);
+        public override int GetInteger(string key) => cp.core.cache.getInteger(key);
         //
         //====================================================================================================
         //
-        public override double GetNumber(string key) => core.cache.getNumber(key);
+        public override double GetNumber(string key) => cp.core.cache.getNumber(key);
         //
         //====================================================================================================
         //
-        public override DateTime GetDate(string key) => core.cache.getDate(key);
+        public override DateTime GetDate(string key) => cp.core.cache.getDate(key);
         //
         //====================================================================================================
         //
-        public override bool GetBoolean(string key) => core.cache.getBoolean(key);
+        public override bool GetBoolean(string key) => cp.core.cache.getBoolean(key);
         //
         //====================================================================================================
         //
-        public override void Invalidate(string key) => core.cache.invalidate(key);
+        public override void Invalidate(string key) => cp.core.cache.invalidate(key);
         //
         //====================================================================================================
         //
@@ -75,7 +73,6 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override string CreateKey(string objectName) => CacheController.createCacheKey_forObject(objectName);
-
         //
         public override string CreateKey(string objectName, string objectUniqueIdentifier = "") => CacheController.createCacheKey_forObject(objectName, objectUniqueIdentifier);
         //
@@ -93,38 +90,38 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override T GetObject<T>(string key) => core.cache.getObject<T>(key);
+        public override T GetObject<T>(string key) => cp.core.cache.getObject<T>(key);
         //
         //====================================================================================================
         //
-        public override void Store(string key, object value) => core.cache.storeObject(key, value);
+        public override void Store(string key, object value) => cp.core.cache.storeObject(key, value);
         //
         //====================================================================================================
         //
-        public override void Store(string key, object value, DateTime invalidationDate) => core.cache.storeObject(key, value, invalidationDate);
+        public override void Store(string key, object value, DateTime invalidationDate) => cp.core.cache.storeObject(key, value, invalidationDate);
         //
         //====================================================================================================
         //
-        public override void Store(string key, object value, List<string> dependentKeyList) => core.cache.storeObject(key, value, dependentKeyList);
+        public override void Store(string key, object value, List<string> dependentKeyList) => cp.core.cache.storeObject(key, value, dependentKeyList);
         //
         //====================================================================================================
         //
-        public override void Store(string key, object value, DateTime invalidationDate, List<string> dependentKeyList) => core.cache.storeObject(key, value, invalidationDate, dependentKeyList);
+        public override void Store(string key, object value, DateTime invalidationDate, List<string> dependentKeyList) => cp.core.cache.storeObject(key, value, invalidationDate, dependentKeyList);
         //
         //====================================================================================================
         //
-        public override void Store(string key, object value, string dependentKey) => core.cache.storeObject(key, value, new List<string>() { dependentKey });
+        public override void Store(string key, object value, string dependentKey) => cp.core.cache.storeObject(key, value, new List<string>() { dependentKey });
         //
         //====================================================================================================
         //
-        public override void Store(string key, object value, DateTime invalidationDate, string dependentKey) => core.cache.storeObject(key, value, invalidationDate, new List<string>() { dependentKey } );
+        public override void Store(string key, object value, DateTime invalidationDate, string dependentKey) => cp.core.cache.storeObject(key, value, invalidationDate, new List<string>() { dependentKey } );
         //
         //====================================================================================================
         /// <summary>
         /// Clear all cache values
         /// </summary>
         /// <remarks></remarks>
-        public override void ClearAll() => core.cache.invalidateAll();
+        public override void ClearAll() => cp.core.cache.invalidateAll();
         //
         //====================================================================================================
         /// <summary>
@@ -138,33 +135,75 @@ namespace Contensive.Processor {
             if (!string.IsNullOrEmpty(ContentNameList)) {
                 List<string> tableNameList = new List<string>();
                 foreach (var contentName in new List<string>(ContentNameList.ToLowerInvariant().Split(','))) {
-                    string tableName = CdefController.getContentTablename(core, contentName).ToLowerInvariant();
+                    string tableName = CdefController.getContentTablename(cp.core, contentName).ToLowerInvariant();
                     if (!tableNameList.Contains(tableName)) {
                         tableNameList.Add(tableName);
-                        core.cache.invalidateAllKeysInTable(tableName);
+                        cp.core.cache.invalidateAllKeysInTable(tableName);
                     }
                 }
             }
         }
         //
         //====================================================================================================
-        /// <summary>
-        /// read a cache value
-        /// </summary>
-        /// <param name="Name"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        [Obsolete("Use GetText()", true)]
-        public override string Read(string Name) => core.cache.getText(Name);
+        //
+        public override void InvalidateAll() {
+            cp.core.cache.invalidateAll();
+        }
+        //
         //====================================================================================================
-        /// <summary>
-        /// save a cache value. Legacy. Use object value.
-        /// </summary>
-        /// <param name="key"></param>
-        /// <param name="Value"></param>
-        /// <param name="invalidationTagCommaList"></param>
-        /// <param name="ClearOnDate"></param>
-        /// <remarks></remarks>
+        //
+        public override void InvalidateTagList(List<string> tagList) {
+            cp.core.cache.invalidate(tagList);
+        }
+        //
+        public override void InvalidateContentRecord(string contentName, int recordId) {
+            cp.core.cache.invalidateDbRecord(recordId, CdefController.getContentTablename( cp.core,  contentName));
+        }
+        //
+        //====================================================================================================
+        // deprecated
+        //
+        //
+        //====================================================================================================
+        //
+        [Obsolete("deprecated",true)]
+        public override void InvalidateTag(string tag) {
+            cp.core.cache.invalidate(tag);
+        }
+        //
+        [Obsolete("deprecated",true)]
+        public override void setKey(string key, object value) {
+            cp.core.cache.storeObject(key, value);
+        }
+        //
+        [Obsolete("deprecated",true)]
+        public override void setKey(string key, object value, DateTime invalidationDate) {
+            cp.core.cache.storeObject(key, value, invalidationDate, new List<string> { });
+        }
+        //
+        [Obsolete("deprecated",true)]
+        public override void setKey(string key, object value, List<string> tagList) {
+            cp.core.cache.storeObject(key, value, tagList);
+        }
+        //
+        [Obsolete("deprecated",true)]
+        public override void setKey(string key, object value, DateTime invalidationDate, List<string> tagList) {
+            cp.core.cache.storeObject(key, value, invalidationDate, tagList);
+        }
+        //
+        [Obsolete("deprecated",true)]
+        public override void setKey(string key, object value, string tag) {
+            cp.core.cache.storeObject(key, value, tag);
+        }
+        //
+        [Obsolete("deprecated",true)]
+        public override void setKey(string key, object Value, DateTime invalidationDate, string tag) {
+            List<string> depKeyList = (string.IsNullOrWhiteSpace(tag) ? new List<string> { } : tag.Split(',').ToList());
+            cp.core.cache.storeObject(key, Value, invalidationDate, depKeyList);
+        }
+        //
+        [Obsolete("Use GetText()", true)]
+        public override string Read(string Name) => cp.core.cache.getText(Name);
         /// 
         [Obsolete("Use StoreObject()", true)]
         public override void Save(string key, string Value) => Store(key, Value);
@@ -180,101 +219,16 @@ namespace Contensive.Processor {
                     invalidationTagList.AddRange(invalidationTagCommaList.Split(','));
                 }
                 if (invalidationDate.isOld()) {
-                    core.cache.storeObject(key, Value, invalidationTagList);
+                    cp.core.cache.storeObject(key, Value, invalidationTagList);
                 } else {
-                    core.cache.storeObject(key, Value, invalidationDate, invalidationTagList);
+                    cp.core.cache.storeObject(key, Value, invalidationDate, invalidationTagList);
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(cp.core, ex);
                 throw;
             }
         }
-        //
-        //====================================================================================================
-        //
-        public override void InvalidateAll() {
-            core.cache.invalidateAll();
-        }
-        //
-        //====================================================================================================
-        //
-        public override void InvalidateTagList(List<string> tagList) {
-            core.cache.invalidate(tagList);
-        }
-        //
-        //====================================================================================================
-        //
-        [Obsolete()]
-        public override void InvalidateTag(string tag) {
-            core.cache.invalidate(tag);
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Save a value to a cache key. It will invalidate after the default invalidation days
-        /// </summary>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
-        [Obsolete()]
-        public override void setKey(string key, object value) {
-            core.cache.storeObject(key, value);
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Save a value to a cache key and specify when it will be invalidated.
-        /// </summary>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
-        /// <param name="invalidationDate"></param>
-        [Obsolete()]
-        public override void setKey(string key, object value, DateTime invalidationDate) {
-            core.cache.storeObject(key, value, invalidationDate, new List<string> { });
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Save a value to a cachekey and associate it to one of more tags. This key will be invalidated if any of the tags are invalidated.
-        /// </summary>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
-        /// <param name="tagList"></param>
-        [Obsolete()]
-        public override void setKey(string key, object value, List<string> tagList) {
-            core.cache.storeObject(key, value, tagList);
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Save a value to a cachekey with an invalidate date, and associate it to one of more tags. This key will be invalidated if any of the tags are invalidated.
-        /// </summary>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
-        /// <param name="tagList"></param>
-        /// <param name="invalidationDate"></param>
-        [Obsolete()]
-        public override void setKey(string key, object value, DateTime invalidationDate, List<string> tagList) {
-            core.cache.storeObject(key, value, invalidationDate, tagList);
-        }
-        //
-        //====================================================================================================
-        //
-        [Obsolete()]
-        public override void setKey(string key, object value, string tag) {
-            core.cache.storeObject(key, value, tag);
-        }
-        //
-        //====================================================================================================
-        //
-        [Obsolete()]
-        public override void setKey(string key, object Value, DateTime invalidationDate, string tag) {
-            List<string> depKeyList = (string.IsNullOrWhiteSpace(tag) ? new List<string> { } : tag.Split(',').ToList());
-            core.cache.storeObject(key, Value, invalidationDate, depKeyList);
-        }
-        //
-        public override void InvalidateContentRecord(string contentName, int recordId) {
-            core.cache.invalidateDbRecord(recordId, CdefController.getContentTablename( core,  contentName));
-        }
+
         #region  IDisposable Support 
         //
         //====================================================================================================
@@ -287,8 +241,6 @@ namespace Contensive.Processor {
                     //
                     // call .dispose for managed objects
                     //
-                    cp = null;
-                    core = null;
                 }
                 //
                 // Add code here to release the unmanaged resource.

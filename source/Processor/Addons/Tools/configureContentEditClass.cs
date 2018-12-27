@@ -67,7 +67,7 @@ namespace Contensive.Addons.Tools {
                             //
                             // Save the form changes
                             //
-                            AllowContentAutoLoad = cp.Site.GetBoolean("AllowContentAutoLoad", "true");
+                            AllowContentAutoLoad = cp.Site.GetBoolean("AllowContentAutoLoad", true);
                             cp.Site.SetProperty("AllowContentAutoLoad", "false");
                             //
                             // ----- Save the input

@@ -4,6 +4,7 @@ using System.Data;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Exceptions;
 using System.Linq;
+using static Contensive.Processor.Controllers.GenericController;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -223,6 +224,154 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="groupName"></param>
         public static void removeUser(CoreController core, string groupName) => removeUser(core, groupName, core.session.user.id);
+        //
+        //========================================================================
+        /// <summary>
+        /// Returns true if the user is an admin, or authenticated and in the group named
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="GroupName"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        //
+        public static bool isMemberOfGroup(CoreController core, string GroupName, int userId) {
+            bool result = false;
+            try {
+                result = isInGroupList(core, "," + GroupController.getGroupId(core, GroupName), userId, true);
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+                throw;
+            }
+            return result;
+        }
+        //
+        public static bool isMemberOfGroup(CoreController core, string GroupName) => isMemberOfGroup(core, GroupName, core.session.user.id);
+        //
+        //========================================================================
+        // ----- Returns true if the visitor is an admin, or authenticated and in the group list
+        //========================================================================
+        //
+        public static bool isInGroupList(CoreController core, string GroupIDList, int checkMemberID = 0, bool adminReturnsTrue = false) {
+            bool result = false;
+            try {
+                if (checkMemberID == 0) {
+                    checkMemberID = core.session.user.id;
+                }
+                result = isInGroupList(core, checkMemberID, core.session.isAuthenticated, GroupIDList, adminReturnsTrue);
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+                throw;
+            }
+            return result;
+        }
+        //
+        //===============================================================================================================================
+        //   Is Group Member of a GroupIDList
+        //   admins are always returned true
+        //===============================================================================================================================
+        //
+        public static bool isInGroupList(CoreController core, int MemberID, bool isAuthenticated, string GroupIDList) {
+            return isInGroupList(core, MemberID, isAuthenticated, GroupIDList, true);
+        }
+        //
+        //===============================================================================================================================
+        //   Is Group Member of a GroupIDList
+        //===============================================================================================================================
+        //
+        public static bool isInGroupList(CoreController core, int MemberID, bool isAuthenticated, string GroupIDList, bool adminReturnsTrue) {
+            bool returnREsult = false;
+            try {
+                //
+                int CS = 0;
+                string SQL = null;
+                string Criteria = null;
+                string WorkingIDList = null;
+                //
+                returnREsult = false;
+                if (isAuthenticated) {
+                    WorkingIDList = GroupIDList;
+                    WorkingIDList = GenericController.vbReplace(WorkingIDList, " ", "");
+                    while (GenericController.vbInstr(1, WorkingIDList, ",,") != 0) {
+                        WorkingIDList = GenericController.vbReplace(WorkingIDList, ",,", ",");
+                    }
+                    if (!string.IsNullOrEmpty(WorkingIDList)) {
+                        if (vbMid(WorkingIDList, 1) == ",") {
+                            if (vbLen(WorkingIDList) <= 1) {
+                                WorkingIDList = "";
+                            } else {
+                                WorkingIDList = vbMid(WorkingIDList, 2);
+                            }
+                        }
+                    }
+                    if (!string.IsNullOrEmpty(WorkingIDList)) {
+                        if (WorkingIDList.Right(1) == ",") {
+                            if (vbLen(WorkingIDList) <= 1) {
+                                WorkingIDList = "";
+                            } else {
+                                WorkingIDList = GenericController.vbMid(WorkingIDList, 1, vbLen(WorkingIDList) - 1);
+                            }
+                        }
+                    }
+                    if (string.IsNullOrEmpty(WorkingIDList)) {
+                        if (adminReturnsTrue) {
+                            //
+                            // check if memberid is admin
+                            //
+                            SQL = "select top 1 m.id"
+                                + " from ccmembers m"
+                                + " where"
+                                + " (m.id=" + MemberID + ")"
+                                + " and(m.active<>0)"
+                                + " and("
+                                + " (m.admin<>0)"
+                                + " or(m.developer<>0)"
+                                + " )"
+                                + " ";
+                            CS = core.db.csOpenSql(SQL, "Default");
+                            returnREsult = core.db.csOk(CS);
+                            core.db.csClose(ref CS);
+                        }
+                    } else {
+                        //
+                        // check if they are admin or in the group list
+                        //
+                        if (GenericController.vbInstr(1, WorkingIDList, ",") != 0) {
+                            Criteria = "r.GroupID in (" + WorkingIDList + ")";
+                        } else {
+                            Criteria = "r.GroupID=" + WorkingIDList;
+                        }
+                        Criteria = ""
+                            + "(" + Criteria + ")"
+                            + " and(r.id is not null)"
+                            + " and((r.DateExpires is null)or(r.DateExpires>" + DbController.encodeSQLDate(DateTime.Now) + "))"
+                            + " ";
+                        if (adminReturnsTrue) {
+                            Criteria = "(" + Criteria + ")or(m.admin<>0)or(m.developer<>0)";
+                        }
+                        Criteria = ""
+                            + "(" + Criteria + ")"
+                            + " and(m.active<>0)"
+                            + " and(m.id=" + MemberID + ")";
+                        //
+                        SQL = "select top 1 m.id"
+                            + " from ccmembers m"
+                            + " left join ccMemberRules r on r.Memberid=m.id"
+                            + " where" + Criteria;
+                        CS = core.db.csOpenSql(SQL, "Default");
+                        returnREsult = core.db.csOk(CS);
+                        core.db.csClose(ref CS);
+                    }
+                }
+
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+                throw;
+            }
+            return returnREsult;
+        }
+
+
+
         //
         //====================================================================================================
         #region  IDisposable Support 

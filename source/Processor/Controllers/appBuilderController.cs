@@ -82,10 +82,10 @@ namespace Contensive.Processor.Controllers {
                         LogController.logInfo(core, logPrefix + ", root user not found, adding root/contensive");
                         root = PersonModel.addEmpty(core);
                         root.name = defaultRootUserName;
-                        root.FirstName = defaultRootUserName;
-                        root.Username = defaultRootUserUsername;
-                        root.Password = defaultRootUserPassword;
-                        root.Developer = true;
+                        root.firstName = defaultRootUserName;
+                        root.username = defaultRootUserUsername;
+                        root.password = defaultRootUserPassword;
+                        root.developer = true;
                         root.contentControlID = CdefController.getContentId(core, "people");
                         try 
                             {

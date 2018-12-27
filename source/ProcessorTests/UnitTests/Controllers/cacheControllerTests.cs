@@ -99,12 +99,12 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 string keyDependency = "dependencyKey1" + GenericController.GetRandomInteger(cp.core).ToString();
                 // act
                 cp.core.cache.storeObject(keyDependency, "1");
-                cp.Utils.Sleep(1);
+                System.Threading.Thread.Sleep(1);
                 cp.core.cache.storeObject(keyTest, originalObject, keyDependency);
-                cp.Utils.Sleep(1);
+                System.Threading.Thread.Sleep(1);
                 var valueBeforeDependencySave = cp.core.cache.getObject<cacheTestClass>(keyTest);
                 cp.core.cache.storeObject(keyDependency, "2");
-                cp.Utils.Sleep(1);
+                System.Threading.Thread.Sleep(1);
                 var valueAfterDependencySave = cp.core.cache.getObject<cacheTestClass>(keyTest);
                 // assert
                 Assert.AreEqual(originalObject, valueBeforeDependencySave);
@@ -124,12 +124,12 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 dependencyList.Add("fake");
                 // act
                 cp.core.cache.storeObject(keyDependency, "1");
-                cp.Utils.Sleep(1);
+                System.Threading.Thread.Sleep(1);
                 cp.core.cache.storeObject(keyTest, originalObject, dependencyList);
-                cp.Utils.Sleep(1);
+                System.Threading.Thread.Sleep(1);
                 var valueBeforeDependencySave = cp.core.cache.getObject<cacheTestClass>(keyTest);
                 cp.core.cache.storeObject(keyDependency, "2");
-                cp.Utils.Sleep(1);
+                System.Threading.Thread.Sleep(1);
                 var valueAfterDependencySave = cp.core.cache.getObject<cacheTestClass>(keyTest);
                 // assert
                 Assert.AreEqual(originalObject, valueBeforeDependencySave);
@@ -148,7 +148,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 // act
                 cp.core.cache.storeObject(keyTestNoDate, originalObject);
                 cp.core.cache.storeObject(keyTestWithDate, originalObject, invalidateDate);
-                cp.Utils.Sleep(1);
+                System.Threading.Thread.Sleep(1);
                 var valueWithDate = cp.core.cache.getObject<cacheTestClass>(keyTestWithDate);
                 var valueNoDate = cp.core.cache.getObject<cacheTestClass>(keyTestNoDate);
                 // assert
@@ -165,10 +165,10 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 string keyTest = "test" + GenericController.GetRandomInteger(cp.core).ToString();
                 // act
                 cp.core.cache.storeObject(keyTest, originalObject);
-                cp.Utils.Sleep(1);
+                System.Threading.Thread.Sleep(1);
                 var valueBeforeInvalidate = cp.core.cache.getObject<cacheTestClass>(keyTest);
                 cp.core.cache.invalidate(keyTest);
-                cp.Utils.Sleep(1);
+                System.Threading.Thread.Sleep(1);
                 var valueAfterDependencySave = cp.core.cache.getObject<cacheTestClass>(keyTest);
                 // assert
                 Assert.AreEqual(originalObject, valueBeforeInvalidate);

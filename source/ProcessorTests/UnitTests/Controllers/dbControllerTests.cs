@@ -70,10 +70,10 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 var person_test1 = Contensive.Processor.Models.Db.PersonModel.create(cp.core, testId_test1);
                 var person_test2 = Contensive.Processor.Models.Db.PersonModel.create(cp.core, testId_test2);
                 //
-                Assert.AreEqual("a", person_test1.Username);
-                Assert.AreEqual("b", person_test1.Password);
-                Assert.AreEqual("c", person_test2.Username);
-                Assert.AreEqual("", person_test2.Password); // original error this=b
+                Assert.AreEqual("a", person_test1.username);
+                Assert.AreEqual("b", person_test1.password);
+                Assert.AreEqual("c", person_test2.username);
+                Assert.AreEqual("", person_test2.password); // original error this=b
             }
         }
         //

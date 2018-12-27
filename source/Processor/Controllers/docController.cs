@@ -229,9 +229,6 @@ namespace Contensive.Processor.Controllers {
         public string emailBlockListStore { get; set; } = "";
         public bool emailBlockListStoreLoaded { get; set; }
         //
-        // -- list of log files, managed in logController
-        public Dictionary<string, TextWriterTraceListener> logList = new Dictionary<string, TextWriterTraceListener>();
-        //
         //====================================================================================================
         //
         internal string landingLink {

@@ -14,25 +14,159 @@ namespace Contensive.Processor {
         public const string EventsId = "C7FCA224-8542-46F2-9019-52A7B5BAE4DB";
         #endregion
         //
-        private Contensive.Processor.Controllers.CoreController core;
-        protected bool disposed = false;
+        //====================================================================================================
+        /// <summary>
+        /// dependencies
+        /// </summary>
+        private CPClass cp;
         //
-        // Constructor
-        //
-        public CPResponseClass(Contensive.Processor.Controllers.CoreController coreObj) : base() {
-            core = coreObj;
+        //====================================================================================================
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="cp"></param>
+        public CPResponseClass(CPClass cp) {
+            this.cp = cp;
         }
+        //
+        //====================================================================================================
+        //
+        public override string ContentType {
+            get {
+                return cp.core.webServer.bufferContentType;
+            }
+            set {
+                cp.core.webServer.setResponseContentType(value);
+            }
+        }
+        //
+        //====================================================================================================
+        //
+        public override string Cookies {
+            get {
+                return cp.core.webServer.bufferCookies;
+            }
+        }
+        //
+        //====================================================================================================
+        //
+        public override string Header {
+            get {
+                return cp.core.webServer.bufferResponseHeader;
+            }
+        }
+        //
+        //====================================================================================================
+        //
+        public override void Clear() {
+            cp.core.webServer.clearResponseBuffer();
+        }
+        //
+        //====================================================================================================
+        //
+        public override void Close()  {
+            cp.core.doc.continueProcessing = false;
+        }
+        //
+        //====================================================================================================
+        //
+        public override void AddHeader(string name, string value) {
+            cp.core.webServer.addResponseHeader(name, value);
+        }
+        //
+        //====================================================================================================
+        //
+        public override void Flush() {
+            cp.core.webServer.flushStream();
+        }
+        //
+        //====================================================================================================
+        //
+        public override void Redirect(string link) {
+            cp.core.webServer.redirect(link, "", false, false);
+        }
+        //
+        //====================================================================================================
+        //
+        public override void SetBuffer(bool bufferOn) {
+            cp.core.html.enableOutputBuffer(bufferOn);
+        }
+        //
+        //====================================================================================================
+        //
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="status"></param>
+        public override void SetStatus(string status) {
+            cp.core.webServer.setResponseStatus(status);
+        }
+        //
+        //====================================================================================================
+        //
+        public override void SetTimeout(string timeoutSeconds) {
+        }
+        //
+        //====================================================================================================
+        //
+        public override void SetType(string contentType) {
+            cp.core.webServer.setResponseContentType(contentType);
+        }
+        //
+        //====================================================================================================
+        //
+        public override void SetCookie(string name, string value) {
+            cp.core.webServer.addResponseCookie(name, value, DateTime.MinValue, "", "", false);
+        }
+        //
+        //====================================================================================================
+        //
+        public override void SetCookie(string name, string value, DateTime dateExpires) {
+            cp.core.webServer.addResponseCookie(name, value, dateExpires, "", "", false);
+        }
+        //
+        //====================================================================================================
+        //
+        public override void SetCookie(string CookieName, string CookieValue, DateTime DateExpires, string Domain) {
+            cp.core.webServer.addResponseCookie(CookieName, CookieValue, DateExpires, Domain, "", false);
+        }
+        //
+        //====================================================================================================
+        //
+        public override void SetCookie(string CookieName, string CookieValue, DateTime DateExpires, string Domain, string Path) {
+            cp.core.webServer.addResponseCookie(CookieName, CookieValue, DateExpires, Domain, Path, false);
+        }
+        //
+        //====================================================================================================
+        //
+        public override bool isOpen {
+            get {
+                return cp.core.doc.continueProcessing;
+            }
+        }
+        //
+        //====================================================================================================
+        //
+        public override void SetCookie(string CookieName, string CookieValue, DateTime DateExpires, string Domain, string Path, bool Secure) {
+            cp.core.webServer.addResponseCookie(CookieName, CookieValue, DateExpires, Domain, Path, Secure);
+        }
+        //
+        //====================================================================================================
+        // deprecated
+        //
+        [Obsolete("The write buffer is deprecated")]
+        public override void Write(string message) {}
+
+        #region  IDisposable Support 
         //
         // dispose
         //
         protected virtual void Dispose(bool disposing) {
             if (!this.disposed) {
-                appendDebugLog(".dispose, dereference main, csv");
                 if (disposing) {
                     //
                     // call .dispose for managed objects
                     //
-                    core = null;
                 }
                 //
                 // Add code here to release the unmanaged resource.
@@ -40,113 +174,7 @@ namespace Contensive.Processor {
             }
             this.disposed = true;
         }
-        //
-        //
-        //
-        public override string ContentType {
-            get {
-                return core.webServer.bufferContentType;
-            }
-            set {
-                core.webServer.setResponseContentType(value);
-            }
-        }
-
-        public override string Cookies {
-            get {
-                return core.webServer.bufferCookies;
-            }
-        }
-
-        public override string Header {
-            get {
-                return core.webServer.bufferResponseHeader;
-            }
-        }
-        //
-        //
-        //
-        public override void Clear() {
-            core.webServer.clearResponseBuffer();
-        }
-        //
-        //
-        //
-        public override void Close()  {
-            core.doc.continueProcessing = false;
-        }
-        //
-        public override void AddHeader(string HeaderName, string HeaderValue) {
-            core.webServer.addResponseHeader(HeaderName, HeaderValue);
-        }
-        //
-        public override void Flush() {
-            core.webServer.flushStream();
-        }
-        //
-        public override void Redirect(string Link) {
-            core.webServer.redirect(Link, "", false, false);
-        }
-
-        public override void SetBuffer(bool BufferOn) {
-            core.html.enableOutputBuffer(BufferOn);
-        }
-        /// <summary>
-        /// /
-        /// </summary>
-        /// <param name="status"></param>
-        public override void SetStatus(string status) {
-            core.webServer.setResponseStatus(status);
-        }
-        //
-        public override void SetTimeout(string TimeoutSeconds) {
-        }
-        //
-        public override void SetType(string ContentType) {
-            core.webServer.setResponseContentType(ContentType);
-        }
-        //
-        public override void SetCookie(string CookieName, string CookieValue) {
-            core.webServer.addResponseCookie(CookieName, CookieValue, DateTime.MinValue, "", "", false);
-        }
-        //
-        public override void SetCookie(string CookieName, string CookieValue, DateTime DateExpires) {
-            core.webServer.addResponseCookie(CookieName, CookieValue, DateExpires, "", "", false);
-        }
-        public override void SetCookie(string CookieName, string CookieValue, DateTime DateExpires, string Domain) {
-            core.webServer.addResponseCookie(CookieName, CookieValue, DateExpires, Domain, "", false);
-        }
-        //
-        public override void SetCookie(string CookieName, string CookieValue, DateTime DateExpires, string Domain, string Path) {
-            core.webServer.addResponseCookie(CookieName, CookieValue, DateExpires, Domain, Path, false);
-        }
-        //
-        public override void SetCookie(string CookieName, string CookieValue, DateTime DateExpires, string Domain, string Path, bool Secure) {
-            core.webServer.addResponseCookie(CookieName, CookieValue, DateExpires, Domain, Path, Secure);
-        }
-        //
-        [Obsolete("The write buffer is deprecated")]
-        //
-        //
-        //
-        public override void Write(string message) {}
-        //
-        //
-        //
-        public override bool isOpen {
-            get {
-                return core.doc.continueProcessing;
-            }
-        }
-        //
-        //
-        //
-        private void appendDebugLog(string copy) { }
-        //
-        // testpoint
-        //
-        private void tp(string msg) { }
-        #region  IDisposable Support 
+        protected bool disposed = false;
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
         public void Dispose() {

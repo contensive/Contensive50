@@ -442,12 +442,6 @@ namespace Contensive.Processor {
         internal const string SpanClassSeeAlso = "<span class=\"ccSeeAlso\">";
         internal const string SpanClassEnd = "</span>";
         //
-        //-----------------------------------------------------------------------
-        // ----- XHTML definitions
-        //-----------------------------------------------------------------------
-        //
-        internal const string DTDTransitional = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">";
-        //
         internal const string BR = "<br>";
         //
         /// <summary>

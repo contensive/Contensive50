@@ -35,7 +35,7 @@ namespace Contensive.Addons.Primitives {
                     if (string.IsNullOrEmpty(recipientEmailToBlock)) {
                         List<PersonModel> recipientList = PersonModel.createList(core, "(email=" + DbController.encodeSQLText(recipientEmailToBlock) + ")");
                         foreach (var recipient in recipientList) {
-                            recipient.AllowBulkEmail = false;
+                            recipient.allowBulkEmail = false;
                             recipient.save(core);
                             //
                             // -- Email spam footer was clicked, clear the AllowBulkEmail field

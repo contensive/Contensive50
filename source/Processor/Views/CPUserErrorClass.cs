@@ -11,13 +11,13 @@ namespace Contensive.Processor {
         public const string EventsId = "B784BFEF-127B-48D5-8C99-B075984227DB";
         #endregion
         //
-        private Contensive.Processor.Controllers.CoreController core;
+        private CPClass cp;
         protected bool disposed = false;
         //
         //====================================================================================================
         //
-        public CPUserErrorClass(Contensive.Processor.Controllers.CoreController coreObj) : base() {
-            core = coreObj;
+        public CPUserErrorClass(CPClass cp) {
+            this.cp = cp;
         }
         //
         //====================================================================================================
@@ -28,7 +28,6 @@ namespace Contensive.Processor {
                     //
                     // call .dispose for managed objects
                     //
-                    core = null;
                 }
                 //
                 // Add code here to release the unmanaged resource.
@@ -39,20 +38,20 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override void Add(string Message) {
-            ErrorController.addUserError(core, Message);
+        public override void Add(string message) {
+            ErrorController.addUserError(cp.core, message);
         }
         //
         //====================================================================================================
         //
         public override string GetList()  {
-            return ErrorController.getUserError(core);
+            return ErrorController.getUserError(cp.core);
         }
         //
         //====================================================================================================
         //
         public override bool OK() {
-            return !(core.doc.debug_iUserError != "");
+            return !(cp.core.doc.debug_iUserError != "");
         }
         #region  IDisposable Support 
         // Do not change or add Overridable to these methods.

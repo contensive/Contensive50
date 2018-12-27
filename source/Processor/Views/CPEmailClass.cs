@@ -22,7 +22,7 @@ namespace Contensive.Processor {
         /// constructor
         /// </summary>
         /// <param name="cp"></param>
-        public CPEmailClass(CPClass cp) : base() {
+        public CPEmailClass(CPClass cp) {
             this.cp = cp;
         }
         //

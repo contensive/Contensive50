@@ -343,8 +343,8 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 // field has some kind of restriction
                                 //
-                                if (!core.session.user.Developer) {
-                                    if (!core.session.user.Admin) {
+                                if (!core.session.user.developer) {
+                                    if (!core.session.user.admin) {
                                         //
                                         // you are not admin
                                         //

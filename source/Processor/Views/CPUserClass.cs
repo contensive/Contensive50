@@ -14,49 +14,41 @@ namespace Contensive.Processor {
         public const string EventsId = "DBE2B6CB-6339-4FFB-92D7-BE37AEA841CC";
         #endregion
         //
-        private Contensive.Processor.Controllers.CoreController core;
-        private CPClass CP;
-        protected bool disposed = false;
+        //====================================================================================================
+        /// <summary>
+        /// dependencies
+        /// </summary>
+        private CPClass cp;
         //
         //====================================================================================================
-        //
-        public CPUserClass(Contensive.Processor.Controllers.CoreController coreObj, CPClass CPParent) : base() {
-            core = coreObj;
-            CP = CPParent;
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="coreObj"></param>
+        /// <param name="cp"></param>
+        public CPUserClass(CPClass cp) {
+            this.cp = cp;
         }
         //
         //====================================================================================================
-        //
-        protected virtual void Dispose(bool disposing) {
-            if (!this.disposed) {
-                appendDebugLog(".dispose, dereference cp, main, csv");
-                if (disposing) {
-                    //
-                    // call .dispose for managed objects
-                    //
-                    CP = null;
-                    core = null;
-                }
-                //
-                // Add code here to release the unmanaged resource.
-                //
-            }
-            this.disposed = true;
-        }
-        //
-        //====================================================================================================
-        //
-        public override string Email
-        {
+        /// <summary>
+        /// return authetnicated user's email
+        /// </summary>
+        public override string Email {
             get {
-                return CP.core.session.user.Email;
+                return cp.core.session.user.email;
             }
         }
         //
         //====================================================================================================
-        //
-        public override int GetIdByLogin(string Username, string Password) {
-            return CP.core.session.getUserIdForCredentials(core, Username, Password);
+        /// <summary>
+        /// authetnicate to the provided credentials
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        public override int GetIdByLogin(string username, string password) {
+            return cp.core.session.getUserIdForCredentials(cp.core, username, password);
         }
         //
         //====================================================================================================
@@ -66,75 +58,79 @@ namespace Contensive.Processor {
         /// </summary>
         public override int Id {
             get {
-                if (CP.core.session.user.id==0) {
-                    var user = PersonModel.addDefault(core, CDefDomainModel.create( core, PersonModel.contentName));
-                    user.CreatedByVisit = true;
-                    user.save(core);
-                    SessionController.recognizeById(core, user.id, ref CP.core.session);
+                if (cp.core.session.user.id==0) {
+                    var user = PersonModel.addDefault(cp.core, CDefDomainModel.create( cp.core, PersonModel.contentName));
+                    user.createdByVisit = true;
+                    user.save(cp.core);
+                    SessionController.recognizeById(cp.core, user.id, ref cp.core.session);
                 }
-                return core.session.user.id;
-                //int localId = CP.core.session.user.id;
-                //if (localId == 0) {
-                //    localId = CP.core.db.insertContentRecordGetID("people", 0);
-                //    sessionController.recognizeById(core, localId, ref CP.core.session);
-                //}
-                //return localId;
+                return cp.core.session.user.id;
             }
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Is the current user authenticated and admin role
+        /// </summary>
         public override bool IsAdmin {
             get {
-                return CP.core.session.isAuthenticatedAdmin(core);
+                return cp.core.session.isAuthenticatedAdmin(cp.core);
             }
         }
         //
         //====================================================================================================
-        //
-        public override bool IsAdvancedEditing(string ContentName) {
-            return CP.core.session.isAdvancedEditing(core, ContentName);
+        /// <summary>
+        /// Is the current user authenticated and advanced editing
+        /// </summary>
+        /// <param name="contentName"></param>
+        /// <returns></returns>
+        public override bool IsAdvancedEditing(string contentName) {
+            return cp.core.session.isAdvancedEditing(cp.core, contentName);
         }
         //
         //====================================================================================================
         //
+        public override bool IsAdvancedEditing() => IsAdvancedEditing("");
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Is the current user authenticated
+        /// </summary>
         public override bool IsAuthenticated {
             get {
-                return (CP.core.session.isAuthenticated);
+                return (cp.core.session.isAuthenticated);
             }
         }
         //
         //====================================================================================================
-        //
-        public override bool IsAuthoring(string ContentName) {
-            return CP.core.session.isEditing(ContentName);
-        }
-        //
-        //====================================================================================================
-        //
-        public override bool IsContentManager(string ContentName = "Page Content") {
-            return CP.core.session.isAuthenticatedContentManager(core, ContentName);
+        /// <summary>
+        /// Is the current user authenticated and a content manager for the specified content.
+        /// </summary>
+        /// <param name="contentName"></param>
+        /// <returns></returns>
+        public override bool IsContentManager(string contentName) {
+            return cp.core.session.isAuthenticatedContentManager(cp.core, contentName);
         }
         //
         //====================================================================================================
         //
         public override bool IsDeveloper {
             get {
-                return CP.core.session.isAuthenticatedDeveloper(core);
+                return cp.core.session.isAuthenticatedDeveloper(cp.core);
             }
         }
         //
         //====================================================================================================
         //
-        public override bool IsEditing(string ContentName) {
-            return CP.core.session.isEditing(ContentName);
+        public override bool IsEditing(string contentName) {
+            return cp.core.session.isEditing(contentName);
         }
         //
         //====================================================================================================
         //
         public override bool IsEditingAnything {
             get {
-                return CP.core.session.isEditingAnything();
+                return cp.core.session.isEditingAnything();
             }
         }
         //
@@ -142,18 +138,17 @@ namespace Contensive.Processor {
         //
         public override bool IsGuest {
             get {
-                return CP.core.session.isGuest(core);
+                return cp.core.session.isGuest(cp.core);
             }
         }
         //
         //====================================================================================================
         //
-        public override bool IsInGroup(string groupName, int userId = 0) {
-            int groupId = 0;
+        public override bool IsInGroup(string groupName, int userId) {
             bool result = false;
             //
             try {
-                groupId = CP.Group.GetId(groupName);
+                int groupId = cp.Group.GetId(groupName);
                 if (userId == 0) {
                     userId = Id;
                 }
@@ -163,25 +158,26 @@ namespace Contensive.Processor {
                     result = IsInGroupList(groupId.ToString(), userId);
                 }
             } catch (Exception ex) {
-                LogController.handleError(CP.core,ex);
+                LogController.handleError(cp.core,ex);
                 result = false;
             }
             return result;
         }
         //
+        public override bool IsInGroup(string groupName) => IsInGroup(groupName, cp.User.Id);
+        //
         //====================================================================================================
         //
-        public override bool IsInGroupList(string GroupIDList, int userId = 0) //Inherits BaseClasses.CPUserBaseClass.IsInGroup
-        {
+        public override bool IsInGroupList(string groupIDList, int userId) {
             bool result = false;
             //
             try {
                 if (userId == 0) {
                     userId = Id;
                 }
-                result = CP.core.session.isMemberOfGroupIdList(core, userId, IsAuthenticated, GroupIDList, false);
+                result = GroupController.isInGroupList(cp.core, userId, IsAuthenticated, groupIDList, false);
             } catch (Exception ex) {
-                LogController.handleError(CP.core,ex);
+                LogController.handleError(cp.core,ex);
                 result = false;
             }
             return result;
@@ -190,23 +186,27 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
+        public override bool IsInGroupList(string groupIDList) => IsInGroupList(groupIDList, cp.User.Id);
+        //
+        //====================================================================================================
+        //
         public override bool IsMember {
             get {
-                return CP.core.session.isAuthenticatedMember(core);
+                return cp.core.session.isAuthenticatedMember(cp.core);
             }
         }
         //
         //====================================================================================================
         //
-        public override bool IsQuickEditing(string ContentName) {
-            return CP.core.session.isQuickEditing(core, ContentName);
+        public override bool IsQuickEditing(string contentName) {
+            return cp.core.session.isQuickEditing(cp.core, contentName);
         }
         //
         //====================================================================================================
         //
         public override bool IsRecognized {
             get {
-                return CP.core.session.isRecognized(core);
+                return cp.core.session.isRecognized(cp.core);
             }
         }
         //
@@ -214,7 +214,7 @@ namespace Contensive.Processor {
         //
         public override bool IsWorkflowRendering {
             get {
-                return CP.core.session.isWorkflowRendering();
+                return cp.core.session.isWorkflowRendering();
             }
         }
         //
@@ -222,8 +222,8 @@ namespace Contensive.Processor {
         //
         public override string Language {
             get {
-                if (CP.core.session.userLanguage != null) {
-                    return CP.core.session.userLanguage.name;
+                if (cp.core.session.userLanguage != null) {
+                    return cp.core.session.userLanguage.name;
                 }
                 return string.Empty;
             }
@@ -233,57 +233,51 @@ namespace Contensive.Processor {
         //
         public override int LanguageID {
             get {
-                return CP.core.session.user.LanguageID;
+                return cp.core.session.user.languageID;
             }
         }
         //
         //====================================================================================================
         //
-        public override bool Login(string UsernameOrEmail, string Password, bool SetAutoLogin = false) {
-            return CP.core.session.authenticate(core, UsernameOrEmail, Password, SetAutoLogin);
+        public override bool Login(string usernameOrEmail, string password, bool setAutoLogin) {
+            return cp.core.session.authenticate(cp.core, usernameOrEmail, password, setAutoLogin);
+        }
+        public override bool Login(string usernameOrEmail, string password) => Login(usernameOrEmail, password);
+        //
+        //====================================================================================================
+        //
+        public override bool LoginByID(int userId) {
+            return SessionController.authenticateById(cp.core, userId, cp.core.session);
         }
         //
         //====================================================================================================
         //
-        [Obsolete("Use LoginById(integer) instead", false)]
-        public override bool LoginByID(string RecordID, bool SetAutoLogin = false) {
-            return SessionController.authenticateById(core, encodeInteger(RecordID), CP.core.session);
-        }
-        //
-        //====================================================================================================
-        //
-        public override bool LoginByID(int RecordID) {
-            return SessionController.authenticateById(core, RecordID, CP.core.session);
-        }
-        //
-        //====================================================================================================
-        //
-        public override bool LoginByID(int RecordID, bool SetAutoLogin) {
-            bool result = SessionController.authenticateById(core, RecordID, CP.core.session);
+        public override bool LoginByID(int userId, bool setAutoLogin) {
+            bool result = SessionController.authenticateById(cp.core, userId, cp.core.session);
             if (result) {
-                CP.core.session.user.AutoLogin = SetAutoLogin;
-                CP.core.session.user.save(core);
+                cp.core.session.user.autoLogin = setAutoLogin;
+                cp.core.session.user.save(cp.core);
             }
             return result;
         }
         //
         //====================================================================================================
         //
-        public override bool LoginIsOK(string UsernameOrEmail, string Password) {
-            return CP.core.session.isLoginOK(core, UsernameOrEmail, Password);
+        public override bool LoginIsOK(string usernameOrEmail, string password) {
+            return cp.core.session.isLoginOK(cp.core, usernameOrEmail, password);
         }
         //
         //====================================================================================================
         //
         public override void Logout() {
-            CP.core.session.logout(core);
+            cp.core.session.logout(cp.core);
         }
         //
         //====================================================================================================
         //
         public override string Name {
             get {
-                return CP.core.session.user.name;
+                return cp.core.session.user.name;
             }
         }
         //
@@ -291,23 +285,23 @@ namespace Contensive.Processor {
         //
         public override bool IsNew {
             get {
-                return CP.core.session.visit.memberNew;
+                return cp.core.session.visit.memberNew;
             }
         }
         //
         //====================================================================================================
         //
-        public override bool IsNewLoginOK(string Username, string Password) {
+        public override bool IsNewLoginOK(string username, string password) {
             string errorMessage = "";
             int errorCode = 0;
-            return CP.core.session.isNewCredentialOK(core, Username, Password, ref errorMessage, ref errorCode);
+            return cp.core.session.isNewCredentialOK(cp.core, username, password, ref errorMessage, ref errorCode);
         }
         //
         //====================================================================================================
         //
         public override int OrganizationID {
             get {
-                return CP.core.session.user.OrganizationID;
+                return cp.core.session.user.organizationID;
             }
         }
         //
@@ -315,76 +309,60 @@ namespace Contensive.Processor {
         //
         public override string Password {
             get {
-                return CP.core.session.user.Password;
+                return cp.core.session.user.password;
             }
         }
         //
         //====================================================================================================
         //
-        public override bool Recognize(int UserID) {
-            return SessionController.recognizeById(core, UserID, ref CP.core.session);
+        public override bool Recognize(int userID) {
+            return SessionController.recognizeById(cp.core, userID, ref cp.core.session);
         }
         //
         //====================================================================================================
         //
         public override string Username {
             get {
-                return CP.core.session.user.Username;
+                return cp.core.session.user.username;
             }
         }
         //
         //=======================================================================================================
         //
-        public override string GetProperty(string PropertyName, string DefaultValue = "", int TargetMemberId = 0) {
-            if (TargetMemberId == 0) {
-                return CP.core.userProperty.getText(PropertyName, DefaultValue);
-            } else {
-                return CP.core.userProperty.getText(PropertyName, DefaultValue, TargetMemberId);
-            }
-        }
+        public override void SetProperty(string key, string value) => cp.core.userProperty.setProperty(key, value);
+        //
+        public override void SetProperty(string key, int value) => cp.core.userProperty.setProperty(key, value);
+        //
+        public override void SetProperty(string key, double value) => cp.core.userProperty.setProperty(key, value);
+        //
+        public override void SetProperty(string key, bool value) => cp.core.userProperty.setProperty(key, value);
+        //
+        public override void SetProperty(string key, DateTime value) => cp.core.userProperty.setProperty(key, value);
         //
         //=======================================================================================================
         //
-        public override void SetProperty(string PropertyName, string Value, int TargetMemberId = 0) {
-            if (TargetMemberId == 0) {
-                CP.core.userProperty.setProperty(PropertyName, Value);
-            } else {
-                CP.core.userProperty.setProperty(PropertyName, Value, TargetMemberId);
-            }
-        }
+        public override bool GetBoolean(string key) => cp.core.userProperty.getBoolean(key);
+        public override bool GetBoolean(string key, bool defaultValue) => cp.core.userProperty.getBoolean(key, defaultValue);
         //
         //=======================================================================================================
         //
-        public override bool GetBoolean(string PropertyName) => CP.core.userProperty.getBoolean(PropertyName);
-        public override bool GetBoolean(string PropertyName, bool DefaultValue) => CP.core.userProperty.getBoolean(PropertyName, DefaultValue);
-        [Obsolete()]
-        public override bool GetBoolean(string PropertyName, string DefaultValue) => CP.core.userProperty.getBoolean(PropertyName, encodeBoolean(DefaultValue));
+        public override DateTime GetDate(string key) => cp.core.userProperty.getDate(key);
+        public override DateTime GetDate(string key, DateTime defaultValue) => cp.core.userProperty.getDate(key, defaultValue);
         //
         //=======================================================================================================
         //
-        public override DateTime GetDate(string PropertyName) => CP.core.userProperty.getDate(PropertyName);
-        public override DateTime GetDate(string PropertyName, DateTime DefaultValue) => CP.core.userProperty.getDate(PropertyName, DefaultValue);
-        [Obsolete()]
-        public override DateTime GetDate(string PropertyName, string DefaultValue) => CP.core.userProperty.getDate(PropertyName, encodeDate(DefaultValue));
+        public override int GetInteger(string key) => cp.core.userProperty.getInteger(key);
+        public override int GetInteger(string key, int defaultValue) => cp.core.userProperty.getInteger(key, defaultValue);
         //
         //=======================================================================================================
         //
-        public override int GetInteger(string PropertyName) => CP.core.userProperty.getInteger(PropertyName);
-        public override int GetInteger(string PropertyName, int DefaultValue) => CP.core.userProperty.getInteger(PropertyName, DefaultValue);
-        [Obsolete()]
-        public override int GetInteger(string PropertyName, string DefaultValue) => CP.core.userProperty.getInteger(PropertyName, encodeInteger(DefaultValue));
+        public override double GetNumber(string key) => cp.core.userProperty.getNumber(key);
+        public override double GetNumber(string key, double defaultValue) => cp.core.userProperty.getNumber(key, defaultValue);
         //
         //=======================================================================================================
         //
-        public override double GetNumber(string PropertyName) => CP.core.userProperty.getNumber(PropertyName);
-        public override double GetNumber(string PropertyName, double DefaultValue) => CP.core.userProperty.getNumber(PropertyName, DefaultValue);
-        [Obsolete()]
-        public override double GetNumber(string PropertyName, string DefaultValue) => CP.core.userProperty.getNumber(PropertyName, encodeNumber(DefaultValue));
-        //
-        //=======================================================================================================
-        //
-        public override string GetText(string PropertyName) => CP.core.userProperty.getText(PropertyName);
-        public override string GetText(string PropertyName, string DefaultValue) => CP.core.userProperty.getText(PropertyName, DefaultValue);
+        public override string GetText(string key) => cp.core.userProperty.getText(key);
+        public override string GetText(string key, string defaultValue) => cp.core.userProperty.getText(key, defaultValue);
         //
         //====================================================================================================
         // todo  obsolete
@@ -394,18 +372,77 @@ namespace Contensive.Processor {
         }
         //
         //====================================================================================================
+        // deprecated methods
         //
-        private void appendDebugLog(string copy) {
-            //
+        [Obsolete("deprecated",true)]
+        public override double GetNumber(string key, string defaultValue) => cp.core.userProperty.getNumber(key, encodeNumber(defaultValue));
+        //
+        [Obsolete("deprecated",true)]
+        public override int GetInteger(string key, string defaultValue) => cp.core.userProperty.getInteger(key, encodeInteger(defaultValue));
+        //
+        [Obsolete("deprecated",true)]
+        public override DateTime GetDate(string key, string defaultValue) => cp.core.userProperty.getDate(key, encodeDate(defaultValue));
+        //
+        [Obsolete("deprecated",true)]
+        public override bool GetBoolean(string key, string defaultValue) => cp.core.userProperty.getBoolean(key, encodeBoolean(defaultValue));
+        //
+        [Obsolete("Use IsEditing",true)]
+        public override bool IsAuthoring(string contentName) => cp.core.session.isEditing(contentName);
+        //
+        [Obsolete("Use IsContentManager( Page Content )", true)]
+        public override bool IsContentManager() => IsContentManager("Page Content");
+        //
+        [Obsolete("Use LoginById(integer) instead", true)]
+        public override bool LoginByID(string RecordID, bool SetAutoLogin = false) {
+            return SessionController.authenticateById(cp.core, encodeInteger(RecordID), cp.core.session);
+        }
+        //
+        [Obsolete("Deprecated.", true)]
+        public override void SetProperty(string PropertyName, string Value, int TargetMemberId) {
+            cp.core.userProperty.setProperty(PropertyName, Value, TargetMemberId);
+        }
+        //
+        //=======================================================================================================
+        //
+        [Obsolete("Use Get with correct type", true)]
+        public override string GetProperty(string PropertyName, string DefaultValue = "", int TargetMemberId = 0) {
+            if (TargetMemberId == 0) {
+                return cp.core.userProperty.getText(PropertyName, DefaultValue);
+            } else {
+                return cp.core.userProperty.getText(PropertyName, DefaultValue, TargetMemberId);
+            }
+        }
+        //
+        [Obsolete("Use Get with correct type", true)]
+        public override string GetProperty(string PropertyName, string DefaultValue) {
+            return cp.core.userProperty.getText(PropertyName, DefaultValue);
+        }
+        //
+        [Obsolete("Use Get with correct type", true)]
+        public override string GetProperty(string PropertyName) {
+            return cp.core.userProperty.getText(PropertyName);
         }
         //
         //====================================================================================================
         //
-        private void tp(string msg) {}
+        #region  IDisposable Support 
         //
         //====================================================================================================
         //
-        #region  IDisposable Support 
+        protected virtual void Dispose(bool disposing) {
+            if (!this.disposed) {
+                if (disposing) {
+                    //
+                    // call .dispose for managed objects
+                    //
+                }
+                //
+                // Add code here to release the unmanaged resource.
+                //
+            }
+            this.disposed = true;
+        }
+        protected bool disposed = false;
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
         public void Dispose() {
@@ -414,8 +451,6 @@ namespace Contensive.Processor {
         }
         ~CPUserClass() {
             Dispose(false);
-            
-            
         }
         #endregion
     }

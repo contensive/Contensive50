@@ -1310,7 +1310,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 // add exception list header
-                if (core.session.user.Developer) {
+                if (core.session.user.developer) {
                     result = ErrorController.getDocExceptionHtmlList(core) + result;
                 }
             } catch (Exception ex) {
@@ -1421,7 +1421,7 @@ namespace Contensive.Processor.Controllers {
                                 // Group main_MemberShip
                                 //
                                 IsInGroup = core.docProperties.getBoolean("Group" + IDontKnowWhat.GroupName);
-                                WasInGroup = core.session.isMemberOfGroup(core, IDontKnowWhat.GroupName);
+                                WasInGroup = GroupController.isMemberOfGroup(core, IDontKnowWhat.GroupName);
                                 if (WasInGroup && !IsInGroup) {
                                     GroupController.removeUser(core, IDontKnowWhat.GroupName);
                                 } else if (IsInGroup && !WasInGroup) {
@@ -1623,7 +1623,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // Group main_MemberShip
                             //
-                            GroupValue = core.session.isMemberOfGroup(core, tempVar.GroupName);
+                            GroupValue = GroupController.isMemberOfGroup(core, tempVar.GroupName);
                             Body = f.RepeatCell;
                             Body = GenericController.vbReplace(Body, "{{CAPTION}}", HtmlController.checkbox("Group" + tempVar.GroupName, GroupValue), 1, 99, 1);
                             Body = GenericController.vbReplace(Body, "{{FIELD}}", tempVar.Caption);
@@ -2014,7 +2014,7 @@ namespace Contensive.Processor.Controllers {
                                 // If in Condition Group
                                 //
                                 if (ConditionGroupID != 0) {
-                                    if (core.session.isMemberOfGroup(core, GroupController.getGroupName(core, ConditionGroupID))) {
+                                    if (GroupController.isMemberOfGroup(core, GroupController.getGroupName(core, ConditionGroupID))) {
                                         if (SystemEMailID != 0) {
                                             EmailController.queueSystemEmail(core, core.db.getRecordName("System Email", SystemEMailID), "", core.session.user.id);
                                         }
@@ -2032,7 +2032,7 @@ namespace Contensive.Processor.Controllers {
                                 // If not in Condition Group
                                 //
                                 if (ConditionGroupID != 0) {
-                                    if (!core.session.isMemberOfGroup(core, GroupController.getGroupName(core, ConditionGroupID))) {
+                                    if (!GroupController.isMemberOfGroup(core, GroupController.getGroupName(core, ConditionGroupID))) {
                                         if (main_AddGroupID != 0) {
                                             GroupController.addUser(core, GroupController.getGroupName(core, main_AddGroupID));
                                         }
@@ -2543,7 +2543,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // ----- From Email address
                         //
-                        Copy = core.session.user.Email;
+                        Copy = core.session.user.email;
                         Panel = Panel + "<td align=\"right\" width=\"100\"><p>Your Email</p></td>";
                         Panel = Panel + "<td align=\"left\"><input type=\"text\" name=\"NoteFromEmail\" value=\"" + HtmlController.encodeHtml(Copy) + "\"></span></td>";
                         Panel = Panel + "</tr><tr>";

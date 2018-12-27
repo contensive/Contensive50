@@ -101,7 +101,7 @@ namespace Contensive.Processor.Controllers {
                     string QueryString = GenericController.modifyQueryString(core.webServer.requestQueryString, RequestNameHardCodedPage, "", false);
                     QueryString = GenericController.modifyQueryString(QueryString, "requestbinary", "", false);
                     loginForm += HtmlController.inputHidden("Type", FormTypeLogin);
-                    loginForm += HtmlController.inputHidden("email", core.session.user.Email);
+                    loginForm += HtmlController.inputHidden("email", core.session.user.email);
                     result = HtmlController.form(core, loginForm, QueryString);
                     //string Panel = errorController.getUserError(core) + "\r<p class=\"ccAdminNormal\">" + usernameMsg + loginForm + "";
                     //
@@ -234,9 +234,9 @@ namespace Contensive.Processor.Controllers {
                     } else {
                         returnREsult = SessionController.authenticateById(core, LocalMemberID, core.session);
                         if (returnREsult) {
-                            LogController.addSiteActivity(core, "successful username/password login", core.session.user.id, core.session.user.OrganizationID);
+                            LogController.addSiteActivity(core, "successful username/password login", core.session.user.id, core.session.user.organizationID);
                         } else {
-                            LogController.addSiteActivity(core, "bad username/password login", core.session.user.id, core.session.user.OrganizationID);
+                            LogController.addSiteActivity(core, "bad username/password login", core.session.user.id, core.session.user.organizationID);
                         }
                     }
                 }
@@ -310,7 +310,7 @@ namespace Contensive.Processor.Controllers {
                         //hint = "140"
                         EMailName = vbMid(workingEmail, 1, atPtr - 1);
                         //
-                        LogController.addSiteActivity(core, "password request for email " + workingEmail, core.session.user.id, core.session.user.OrganizationID);
+                        LogController.addSiteActivity(core, "password request for email " + workingEmail, core.session.user.id, core.session.user.organizationID);
                         //
                         allowEmailLogin = core.siteProperties.getBoolean("allowEmailLogin", false);
                         recordCnt = 0;

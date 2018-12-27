@@ -780,12 +780,12 @@ namespace Contensive.Processor.Controllers {
         ///   ex delimiter '&' -> name1=value1&name2=value2"
         ///   There can be no extra spaces between the delimiter, the name and the "="
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="nameValueString"></param>
+        /// <param name="key"></param>
+        /// <param name="keyValueString"></param>
         /// <param name="defaultValue"></param>
         /// <param name="delimiter"></param>
         /// <returns></returns>
-        public static string getValueFromNameValueString(string name, string nameValueString, string defaultValue, string delimiter) {
+        public static string getValueFromKeyValueString(string key, string keyValueString, string defaultValue, string delimiter) {
             string result = defaultValue;
             try {
                 //
@@ -793,7 +793,7 @@ namespace Contensive.Processor.Controllers {
                 if (string.IsNullOrEmpty(delimiter)) {
                     //
                     // If not explicit
-                    if (vbInstr(1, nameValueString, "\r\n") != 0) {
+                    if (vbInstr(1, keyValueString, "\r\n") != 0) {
                         //
                         // crlf can only be here if it is the delimiter
                         delimiter = "\r\n";
@@ -803,12 +803,12 @@ namespace Contensive.Processor.Controllers {
                         delimiter = "&";
                     }
                 }
-                string WorkingString = nameValueString;
+                string WorkingString = keyValueString;
                 if (!string.IsNullOrEmpty(WorkingString)) {
                     WorkingString = delimiter + WorkingString + delimiter;
-                    int ValueStart = vbInstr(1, WorkingString, delimiter + name + "=", 1);
+                    int ValueStart = vbInstr(1, WorkingString, delimiter + key + "=", 1);
                     if (ValueStart != 0) {
-                        int NameLength = name.Length;
+                        int NameLength = key.Length;
                         bool IsQuoted = false;
                         ValueStart = ValueStart + delimiter.Length + NameLength + 1;
                         if (WorkingString.Substring(ValueStart - 1, 1) == "\"") {
@@ -1226,7 +1226,7 @@ namespace Contensive.Processor.Controllers {
         //
         // ====================================================================================================
         /// <summary>
-        /// todo Please write what this does
+        /// convert a file link (like /ccLibraryFiles/imageFilename/000001/this.png) to a full URL
         /// </summary>
         /// <param name="url"></param>
         /// <param name="virtualPath"></param>

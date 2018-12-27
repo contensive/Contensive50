@@ -290,7 +290,7 @@ namespace Contensive.BaseClasses {
         [Obsolete("Use Clear(dependentKeyList)", true)]
         public abstract void Clear(string ContentNameList);
         //
-        [Obsolete("Use GetText(key) instead", false)]
+        [Obsolete("Use GetText(key) instead", true)]
         public abstract string Read(string key);
         //
         [Obsolete("Use Invalidate(key)", true)]

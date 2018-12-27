@@ -219,7 +219,7 @@ namespace Contensive.Processor.Controllers {
                                                                     // -- start block text
                                                                     Copy = "";
                                                                     string GroupIDList = HtmlController.getAddonOptionStringValue("AllowGroups", addonOptionString);
-                                                                    if (!core.session.isMemberOfGroupIdList(core, personalizationPeopleId, true, GroupIDList, true)) {
+                                                                    if (!GroupController.isInGroupList(core, personalizationPeopleId, true, GroupIDList, true)) {
                                                                         //
                                                                         // Block content if not allowed
                                                                         //

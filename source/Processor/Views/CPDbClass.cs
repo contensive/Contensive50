@@ -2,6 +2,7 @@
 using System;
 using System.Data;
 using Contensive.Processor.Controllers;
+using Contensive.BaseClasses;
 
 namespace Contensive.Processor {
     public class CPDbClass : BaseClasses.CPDbBaseClass, IDisposable {
@@ -51,40 +52,9 @@ namespace Contensive.Processor {
         }
         //
         //====================================================================================================
-        // deprecated
-        //
-        [Obsolete("Use GetConnectionString( dataSourceName )")]
-        public override string DbGetConnectionString(string DataSourcename) {
-            return GetConnectionString(DataSourcename);
-        }
-        //
-        //====================================================================================================
-        //
-        [Obsolete("Only Sql Server currently supported", true)]
-        public override int GetDataSourceType(string DataSourcename) {
-            return cp.core.db.getDataSourceType(DataSourcename);
-        }
-        //
-        //====================================================================================================
-        // deprecated
-        //
-        [Obsolete("Use GetDataSourceType( dataSourceName )")]
-        public override int DbGetDataSourceType(string DataSourcename) {
-            return GetDataSourceType(DataSourcename);
-        }
-        //
-        //====================================================================================================
         //
         public override int GetTableID(string TableName) {
             return cp.core.db.getTableID(TableName);
-        }
-        //
-        //====================================================================================================
-        // deprecated 
-        //
-        [Obsolete("Use GetTableId instead.", true)]
-        public override int DbGetTableID(string TableName) {
-            return GetTableID(TableName);
         }
         //
         //====================================================================================================
@@ -94,25 +64,9 @@ namespace Contensive.Processor {
         }
         //
         //====================================================================================================
-        // deprecated
-        //
-        [Obsolete("Use isTable instead", true)]
-        public override bool DbIsTable(string DataSourcename, string TableName) {
-            return IsTable(DataSourcename, TableName);
-        }
-        //
-        //====================================================================================================
         //
         public override bool IsTableField(string DataSourcename, string TableName, string FieldName) {
             return cp.core.db.isSQLTableField(DataSourcename, TableName, FieldName);
-        }
-        //
-        //====================================================================================================
-        // deprecated 
-        //
-        [Obsolete("Use isTableField instead", true)]
-        public override bool DbIsTableField(string DataSourcename, string TableName, string FieldName) {
-            return IsTableField(DataSourcename, TableName, FieldName);
         }
         //
         //====================================================================================================
@@ -147,50 +101,39 @@ namespace Contensive.Processor {
         /// <param name="DataSourceName"></param>
         /// <param name="pageSize"></param>
         /// <returns></returns>
-        public override string GetRemoteQueryKey(string sql, string DataSourceName = "Default", int pageSize = 100) {
+        public override string GetRemoteQueryKey(string sql, string DataSourceName, int pageSize) {
             string returnKey = "";
             try {
-                Contensive.BaseClasses.CPCSBaseClass cs = cp.CSNew();
-                int dataSourceID = 0;
-                //
-                if (pageSize == 0) {
-                    pageSize = 9999;
+                using (var cs = new CPCSClass(cp)) {
+                    //
+                    if (pageSize == 0) {
+                        pageSize = 9999;
+                    }
+                    if (cs.Insert("Remote Queries")) {
+                        returnKey = GenericController.getGUIDString();
+                        int dataSourceID = cp.Content.GetRecordID("Data Sources", DataSourceName);
+                        cs.SetField("remotekey", returnKey);
+                        cs.SetField("datasourceid", dataSourceID.ToString());
+                        cs.SetField("sqlquery", sql);
+                        cs.SetField("maxRows", pageSize.ToString());
+                        cs.SetField("dateexpires", DateTime.Now.AddDays(1).ToString());
+                        cs.SetField("QueryTypeID", remoteQueryType.sql.ToString());
+                        cs.SetField("VisitID", cp.Visit.Id.ToString());
+                    }
+                    cs.Close();
+                    //
                 }
-                if (cs.Insert("Remote Queries")) {
-                    returnKey = GenericController.getGUIDString();
-                    dataSourceID = cp.Content.GetRecordID("Data Sources", DataSourceName);
-                    cs.SetField("remotekey", returnKey);
-                    cs.SetField("datasourceid", dataSourceID.ToString());
-                    cs.SetField("sqlquery", sql);
-                    cs.SetField("maxRows", pageSize.ToString());
-                    cs.SetField("dateexpires", DateTime.Now.AddDays(1).ToString());
-                    cs.SetField("QueryTypeID", remoteQueryType.sql.ToString());
-                    cs.SetField("VisitID", cp.Visit.Id.ToString());
-                }
-                cs.Close();
-                //
             } catch (Exception ex) {
                 LogController.handleError(cp.core,ex);
             }
             return returnKey;
         }
         //
-        //====================================================================================================
-        /// <summary>
-        /// execute a sql query and return a recordset
-        /// </summary>
-        /// <param name="SQL"></param>
-        /// <param name="DataSourcename"></param>
-        /// <param name="ignoreRetries"></param>
-        /// <param name="ignorePageSize"></param>
-        /// <param name="ignorePageNumber"></param>
-        /// <returns></returns>
-        [Obsolete("deprecated. Convert to datatables and use executeQuery(), executeNonQuery(), or executeNonQueryAsync()", false)]
-        public override object ExecuteSQL(string SQL, string DataSourcename = "Default", string ignoreRetries = "0", string ignorePageSize = "10", string ignorePageNumber = "1") {
-            int recordsAffected = 0;
-            cp.core.db.executeNonQuery(SQL, DataSourcename,ref recordsAffected);
-            return null;
-        }
+        public override string GetRemoteQueryKey(string sql, string DataSourceName) 
+            => GetRemoteQueryKey(sql, DataSourceName, 100);
+        //
+        public override string GetRemoteQueryKey(string sql)
+            => GetRemoteQueryKey(sql, "default", 100);
         //
         //====================================================================================================
         //
@@ -246,6 +189,69 @@ namespace Contensive.Processor {
         }
         //
         //====================================================================================================
+        // deprecated
+        //
+        [Obsolete("deprecated. Convert to datatables and use executeQuery(), executeNonQuery(), or executeNonQueryAsync()", true)]
+        public override object ExecuteSQL(string sql, string dataSourcename, string ignoreRetries, string ignorePageSize, string ignorePageNumber) {
+            cp.core.db.executeNonQuery(sql, dataSourcename);
+            return null;
+        }
+        //
+        [Obsolete("Convert to datatables or use models", true)]
+        public override object ExecuteSQL(string sql, string dataSourcename, string Retries, string PageSize) {
+            cp.core.db.executeNonQuery(sql, dataSourcename);
+            return null;
+        }
+        //
+        [Obsolete("Convert to datatables or use models", true)]
+        public override object ExecuteSQL(string sql, string dataSourcename, string Retries) {
+            cp.core.db.executeNonQuery(sql, dataSourcename);
+            return null;
+        }
+        //
+        [Obsolete("Convert to datatables or use models", true)]
+        public override object ExecuteSQL(string sql, string dataSourcename) {
+            cp.core.db.executeNonQuery(sql, dataSourcename);
+            return null;
+        }
+        //
+        [Obsolete("Convert to datatables or use models", true)]
+        public override object ExecuteSQL(string sql) {
+            cp.core.db.executeNonQuery(sql);
+            return null;
+        }
+        //
+        [Obsolete("Use GetConnectionString( dataSourceName )")]
+        public override string DbGetConnectionString(string DataSourcename) {
+            return GetConnectionString(DataSourcename);
+        }
+        //
+        [Obsolete("Only Sql Server currently supported", true)]
+        public override int GetDataSourceType(string DataSourcename) {
+            return cp.core.db.getDataSourceType(DataSourcename);
+        }
+        //
+        [Obsolete("Use GetDataSourceType( dataSourceName )")]
+        public override int DbGetDataSourceType(string DataSourcename) {
+            return GetDataSourceType(DataSourcename);
+        }
+        //
+        [Obsolete("Use GetTableId instead.", true)]
+        public override int DbGetTableID(string TableName) {
+            return GetTableID(TableName);
+        }
+        //
+        [Obsolete("Use isTable instead", true)]
+        public override bool DbIsTable(string DataSourcename, string TableName) {
+            return IsTable(DataSourcename, TableName);
+        }
+        //
+        [Obsolete("Use isTableField instead", true)]
+        public override bool DbIsTableField(string DataSourcename, string TableName, string FieldName) {
+            return IsTableField(DataSourcename, TableName, FieldName);
+        }
+        //
+        //====================================================================================================
         //
         #region  IDisposable Support 
         //
@@ -274,11 +280,8 @@ namespace Contensive.Processor {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-
-        ~CPDbClass() {
+       ~CPDbClass() {
             Dispose(false);
-            
-            
         }
         #endregion
         //

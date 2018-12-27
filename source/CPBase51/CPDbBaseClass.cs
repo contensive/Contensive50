@@ -209,7 +209,11 @@ namespace Contensive.BaseClasses {
         /// <param name="DataSourceName"></param>
         /// <param name="pageSize"></param>
         /// <returns></returns>
-        public abstract string GetRemoteQueryKey(string sql, string DataSourceName = "Default", int pageSize = 100);
+        public abstract string GetRemoteQueryKey(string sql, string DataSourceName, int pageSize);
+        //
+        public abstract string GetRemoteQueryKey(string sql, string DataSourceName);
+        //
+        public abstract string GetRemoteQueryKey(string sql);
         //
         //====================================================================================================
         /// <summary>
@@ -222,8 +226,20 @@ namespace Contensive.BaseClasses {
         //====================================================================================================
         // deprecated
         //
-        [Obsolete("Convert to datatables and use executeQuery(), executeNonQuery(), or executeNonQueryAsync()", false)]
-        public abstract object ExecuteSQL(string SQL, string DataSourcename = "Default", string Retries = "0", string PageSize = "10", string PageNumber = "1");
+        [Obsolete("Convert to datatables and use executeQuery(), executeNonQuery(), or executeNonQueryAsync()", true)]
+        public abstract object ExecuteSQL(string SQL, string DataSourcename, string Retries, string PageSize, string PageNumber);
+        //
+        [Obsolete("Convert to datatables and use executeQuery(), executeNonQuery(), or executeNonQueryAsync()", true)]
+        public abstract object ExecuteSQL(string SQL, string DataSourcename, string Retries, string PageSize);
+        //
+        [Obsolete("Convert to datatables and use executeQuery(), executeNonQuery(), or executeNonQueryAsync()", true)]
+        public abstract object ExecuteSQL(string SQL, string DataSourcename, string Retries);
+        //
+        [Obsolete("Convert to datatables and use executeQuery(), executeNonQuery(), or executeNonQueryAsync()", true)]
+        public abstract object ExecuteSQL(string SQL, string DataSourcename);
+        //
+        [Obsolete("Convert to datatables and use executeQuery(), executeNonQuery(), or executeNonQueryAsync()", true)]
+        public abstract object ExecuteSQL(string SQL);
         //
         [Obsolete("Use GetConnectionString( dataSourceName )")]
         public abstract string DbGetConnectionString(string DataSourcename);

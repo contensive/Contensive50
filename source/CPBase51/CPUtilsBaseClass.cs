@@ -157,172 +157,179 @@ namespace Contensive.BaseClasses {
         }
         //
         //====================================================================================================
-        //
-        public abstract string ConvertHTML2Text(string Source);
-        //
-        //====================================================================================================
-        //
-        public abstract string ConvertText2HTML(string source);
-        //
-        //====================================================================================================
-        //
-        public abstract string CreateGuid();
-        //
-        //====================================================================================================
-        //
-        public abstract string DecodeUrl(string Url);
-        //
-        //====================================================================================================
-        //
-        public abstract string EncodeContentForWeb(string source, string contextContentName = "", int contextRecordID = 0, int wrapperID = 0);
-        //
-        //====================================================================================================
-        //
-        public abstract string EncodeHtmlForWysiwygEditor(string source);
-        //
-        //====================================================================================================
-        //
-        public abstract string DecodeHtmlFromWysiwygEditor(string source);
-        //
-        //====================================================================================================
-        //
-        public abstract string DecodeHTML(string source);
-        //
-        //====================================================================================================
-        //
-        public abstract string EncodeHTML(string source);
-        //
-        //====================================================================================================
-        //
-        public abstract string EncodeUrl(string source);
-        //
-        //====================================================================================================
-        //
-        public abstract string GetPleaseWaitEnd();
-        //
-        //====================================================================================================
-        //
-        public abstract string GetPleaseWaitStart();
-        //
-        //====================================================================================================
-        //
-        public abstract void IISReset();
-        //
-        //====================================================================================================
-        //
-        public abstract int EncodeInteger(object expression);
-        //
-        //====================================================================================================
-        //
-        public abstract double EncodeNumber(object expression);
-        //
-        //====================================================================================================
-        //
-        public abstract string EncodeText(object expression);
-        //
-        //====================================================================================================
-        //
-        public abstract bool EncodeBoolean(object expression);
-        //
-        //====================================================================================================
-        //
-        public abstract DateTime EncodeDate(object expression);
-        //
-        //====================================================================================================
-        //
+        /// <summary>
+        /// Create a log entry type "Log"
+        /// </summary>
+        /// <param name="logText"></param>
         public abstract void AppendLog(string logText);
         //
         //====================================================================================================
-        //
-        public abstract string DecodeResponseVariable(string Source);
-        //
-        //====================================================================================================
-        //
-        public abstract string EncodeJavascript(string Source);
-        //
-        //====================================================================================================
-        //
-        public abstract string EncodeQueryString(string Source);
+        /// <summary>
+        /// Return a text approximation of html content
+        /// </summary>
+        /// <param name="Source"></param>
+        /// <returns></returns>
+        public abstract string ConvertHTML2Text(string Source);
         //
         //====================================================================================================
+        /// <summary>
+        /// Return an html approximation of text content
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public abstract string ConvertText2HTML(string source);
         //
+        //====================================================================================================
+        /// <summary>
+        /// Return a new guid in system's format {...}
+        /// </summary>
+        /// <returns></returns>
+        public abstract string CreateGuid();
+        //
+        //====================================================================================================
+        /// <summary>
+        /// html content can be stored with embedded addons. Use this routine to prepare the content returnedfrom a wysiwyg editor. (addons converted to images)
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public abstract string DecodeHtmlFromWysiwygEditor(string source);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Decodes a querystring response argument (key or value) you would expect to see within a querystring (key1=value1&key2=value2)
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public abstract string DecodeResponseVariable(string source);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// convert a file link (like /ccLibraryFiles/imageFilename/000001/this.png) to a full URL
+        /// </summary>
+        /// <param name="link"></param>
+        /// <returns></returns>
+        public abstract string EncodeAppRootPath(string link);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Convert to boolean. If no valid rendition exists, returns false. (accepts true, yes, on, any +number)
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public abstract bool EncodeBoolean(object expression);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// html content can be stored with embedded addons. This routine renders the content for display on a website.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="contextContentName"></param>
+        /// <param name="contextRecordID"></param>
+        /// <param name="wrapperID"></param>
+        /// <returns></returns>
+        public abstract string EncodeContentForWeb(string source, string contextContentName = "", int contextRecordID = 0, int wrapperID = 0);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Convert to DateTime. If no valid rendition exists, returns default( DateTime ) = 1/1/0001 12:00:00AM.
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public abstract DateTime EncodeDate(object expression);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// html content can be stored with embedded addons. Use this routine to prepare the content for a wysiwyg editor.  (addons converted to images)
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public abstract string EncodeHtmlForWysiwygEditor(string source);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Convert to integer. If no valid rendition exists, returns 0.
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public abstract int EncodeInteger(object expression);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Convert to double. If no valid rendition exists, returns 0.
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public abstract double EncodeNumber(object expression);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Encodes a querystring response argument (key or value) you would expect to see within a querystring (key1=value1&key2=value2)
+        /// </summary>
+        /// <param name="Source"></param>
+        /// <returns></returns>
         public abstract string EncodeRequestVariable(string Source);
         //
         //====================================================================================================
-        //
-        public abstract string GetArgument(string Name, string ArgumentString, string DefaultValue = "", string Delimiter = "");
-        //
-        //====================================================================================================
-        //
-        public abstract string GetFilename(string PathFilename);
-        //
-        //====================================================================================================
-        //
-        public abstract DateTime GetFirstNonZeroDate(DateTime Date0, DateTime Date1);
+        /// <summary>
+        /// Convert to string. If no valid rendition exists, returns empty.
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public abstract string EncodeText(object expression);
         //
         //====================================================================================================
-        //
-        public abstract int GetFirstNonZeroInteger(int Integer0, int Integer1);
-        //
-        //====================================================================================================
-        //
-        public abstract string GetIntegerString(int Value, int DigitCount);
-        //
-        //====================================================================================================
-        //
-        public abstract string GetLine(string Body);
+        /// <summary>
+        /// Run an SQL query on the default datasource and save the data in a CSV file in the filename provided to a record in the downloads table.
+        /// </summary>
+        /// <param name="SQL">The query to run, selecting the data to be exported.</param>
+        /// <param name="exportName">The name of the export data, used in the downloads table</param>
+        /// <param name="filename">The filename for the export, saved in the downloads table</param>
+        public abstract void ExportCsv(string SQL, string exportName, string filename);
         //
         //====================================================================================================
-        //
-        public abstract int GetListIndex(string Item, string ListOfItems);
+        /// <summary>
+        /// get a value from a key=value delimited string. ex keyValueDelimitedString (a=b&c=4), keys ( a and c ), delimiter ( & ), values ( b and 4 )
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="keyValueDelimitedString"></param>
+        /// <param name="defaultValue"></param>
+        /// <param name="delimiter"></param>
+        /// <returns></returns>
+        public abstract string GetArgument(string key, string keyValueDelimitedString, string defaultValue, string delimiter);
+        public abstract string GetArgument(string key, string keyValueDelimitedString, string defaultValue);
+        public abstract string GetArgument(string key, string keyValueDelimitedString);
         //
         //====================================================================================================
-        //
-        public abstract int GetProcessID();
+        /// <summary>
+        /// Return the filename part of a path (after the left-most slash), either Unix or Dos
+        /// </summary>
+        /// <param name="pathFilename"></param>
+        /// <returns></returns>
+        public abstract string GetFilename(string pathFilename);
         //
         //====================================================================================================
+        /// <summary>
+        /// returns a 1-based index into the comma delimited ListOfItems where Item is found. 
+        /// </summary>
+        /// <param name="itemToFind"></param>
+        /// <param name="commaDelimitedListOfItems"></param>
+        /// <returns></returns>
+        public abstract int GetListIndex(string itemToFind, string commaDelimitedListOfItems);
         //
+        //====================================================================================================
+        /// <summary>
+        /// Return a random integer
+        /// </summary>
+        /// <returns></returns>
         public abstract int GetRandomInteger();
         //
         //====================================================================================================
-        //
-        public abstract bool IsInDelimitedString(string DelimitedString, string TestString, string Delimiter);
-        //
-        //====================================================================================================
-        //
-        public abstract string ModifyLinkQueryString(string Link, string QueryName, string QueryValue, bool AddIfMissing = true);
-        //
-        //====================================================================================================
-        //
-        public abstract string ModifyQueryString(string WorkingQuery, string QueryName, string QueryValue, bool AddIfMissing = true);
-        //
-        //====================================================================================================
-        //
-        public abstract void ParseURL(string SourceURL, ref string Protocol, ref string Host, ref string Port, ref string Path, ref string Page, ref string QueryString);
-        //
-        //====================================================================================================
-        //
-        public abstract void SeparateURL(string SourceURL, ref string Protocol, ref string Host, ref string Path, ref string Page, ref string QueryString);
-        //
-        //====================================================================================================
-        //
-        public abstract object SplitDelimited(string WordList, string Delimiter);
-        //
-        //====================================================================================================
-        //
-        public abstract void Sleep(int timeMSec);
-        //
-        //====================================================================================================
-        //
-        public abstract string hashMd5(string source);
-        //
-        //====================================================================================================
-        //
-        public abstract bool isGuid(string guid);
-        //
-        //====================================================================================================
-        //
-        public abstract void Upgrade(bool isNewApp);
+        /// <summary>
+        /// returns true if the string is a guid (start/end with brace, char count, check dashes
+        /// </summary>
+        /// <param name="guid"></param>
+        /// <returns></returns>
+        public abstract bool IsGuid(string guid);
         //
         //====================================================================================================
         /// <summary>
@@ -330,7 +337,7 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <param name="privateFile"></param>
         /// <returns></returns>
-        public abstract int installCollectionFromFile(string privateFile);
+        public abstract int InstallCollectionFromFile(string privateFile);
         //
         //====================================================================================================
         /// <summary>
@@ -339,7 +346,7 @@ namespace Contensive.BaseClasses {
         /// <param name="privateFolder"></param>
         /// <param name="deleteFolderWhenDone"></param>
         /// <returns></returns>
-        public abstract int installCollectionsFromFolder(string privateFolder, bool deleteFolderWhenDone);
+        public abstract int InstallCollectionsFromFolder(string privateFolder, bool deleteFolderWhenDone);
         //
         //====================================================================================================
         /// <summary>
@@ -347,7 +354,7 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <param name="privateFolder"></param>
         /// <returns></returns>
-        public abstract int installCollectionsFromFolder(string privateFolder);
+        public abstract int InstallCollectionsFromFolder(string privateFolder);
         //
         //====================================================================================================
         /// <summary>
@@ -355,7 +362,7 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <param name="collectionGuid"></param>
         /// <returns></returns>
-        public abstract int installCollectionFromLibrary(string collectionGuid);
+        public abstract int InstallCollectionFromLibrary(string collectionGuid);
         //
         //====================================================================================================
         /// <summary>
@@ -363,56 +370,179 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <param name="link"></param>
         /// <returns></returns>
-        public abstract int installCollectionFromLink(string link);
+        public abstract int InstallCollectionFromLink(string link);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// For websites, run an iisreset. Call from a remote method that detects the server restoration and recovers
+        /// </summary>
+        public abstract void IISReset();
+        //
+        //====================================================================================================
+        /// <summary>
+        /// return true if the itemToFind is in the delimitedString
+        /// </summary>
+        /// <param name="delimitedString"></param>
+        /// <param name="itemToFind"></param>
+        /// <param name="delimiter"></param>
+        /// <returns></returns>
+        public abstract bool IsInDelimitedString(string delimitedString, string itemToFind, string delimiter);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Update or add a key=value pair within a url like "/path/page?key=value&key=value"
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="addIfMissing"></param>
+        /// <returns></returns>
+        public abstract string ModifyLinkQueryString(string url, string key, string value, bool addIfMissing = true);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Update or add a key=value pair within key value pair string like "key=value&key=value"
+        /// </summary>
+        /// <param name="WorkingQuery"></param>
+        /// <param name="QueryName"></param>
+        /// <param name="QueryValue"></param>
+        /// <param name="AddIfMissing"></param>
+        /// <returns></returns>
+        public abstract string ModifyQueryString(string WorkingQuery, string QueryName, string QueryValue, bool AddIfMissing = true);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// return the components of a url
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="return_protocol"></param>
+        /// <param name="return_domain"></param>
+        /// <param name="return_port"></param>
+        /// <param name="return_path"></param>
+        /// <param name="return_page"></param>
+        /// <param name="return_queryString"></param>
+        public abstract void SeparateURL(string url, ref string return_protocol, ref string return_domain, ref string return_path, ref string return_page, ref string return_queryString);
+        public abstract void SeparateURL(string url, ref string return_protocol, ref string return_domain, ref string return_port, ref string return_path, ref string return_page, ref string return_queryString);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// returns the result of a Split, except it honors quoted text, if a quote is found, it is assumed to also be a delimiter ( 'this"that"theother' = 'this "that" theother' )
+        /// </summary>
+        /// <param name="wordList"></param>
+        /// <param name="delimiter"></param>
+        /// <returns></returns>
+        public abstract object SplitDelimited(string wordList, string delimiter);
         //
         //====================================================================================================
         // deprecated
         //
-        //
-        //====================================================================================================
-        //
-        [Obsolete("Deprecated. use cp.addon.execute()", false)]
-        public abstract string ExecuteAddon(string idGuidOrName);
-        //
-        //====================================================================================================
-        //
-        [Obsolete("Deprecated. use cp.addon.execute() and manage the wrapper manually.", false)]
-        public abstract string ExecuteAddon(string IdGuidOrName, int WrapperId);
-        //
-        //====================================================================================================
-        //
-        [Obsolete("Deprecated. use cp.addon.execute()", false)]
-        public abstract string ExecuteAddon(string IdGuidOrName, addonContext context);
-        //
-        //====================================================================================================
-        //
-        [Obsolete("Deprecated. use cp.addon.executeAsync()", false)]
-        public abstract string ExecuteAddonAsProcess(string IdGuidOrName);
-        //
-        //====================================================================================================
-        //
-        [Obsolete("Deprecated, use AppendLog", false)]
+        [Obsolete("Deprecated, use AppendLog", true)]
         public abstract void AppendLogFile(string Text);
         //
-        //====================================================================================================
-        //
-        [Obsolete("Deprecated, file logging is no longer supported. Use AppendLog(message) to log Info level messages", false)]
+        [Obsolete("Deprecated, file logging is no longer supported. Use AppendLog(message) to log Info level messages", true)]
         public abstract void AppendLog(string pathFilename, string logText);
         //
-        //====================================================================================================
+        [Obsolete("Deprecated. use cp.addon.execute()", true)]
+        public abstract string ExecuteAddon(string idGuidOrName);
         //
-        [Obsolete("Deprecated", false)]
+        [Obsolete("Deprecated. use cp.addon.execute() and manage the wrapper manually.", true)]
+        public abstract string ExecuteAddon(string IdGuidOrName, int WrapperId);
+        //
+        [Obsolete("Deprecated. use cp.addon.execute()", true)]
+        public abstract string ExecuteAddon(string IdGuidOrName, addonContext context);
+        //
+        [Obsolete("Deprecated. use cp.addon.executeAsync()", true)]
+        public abstract string ExecuteAddonAsProcess(string IdGuidOrName);
+        //
+        [Obsolete("Deprecated", true)]
         public abstract string ConvertLinkToShortLink(string URL, string ServerHost, string ServerVirtualPath);
         //
-        //====================================================================================================
-        //
-        [Obsolete("Deprecated", false)]
+        [Obsolete("Deprecated", true)]
         public abstract string ConvertShortLinkToLink(string URL, string PathPagePrefix);
         //
-        //====================================================================================================
-        //
-        [Obsolete("Deprecated. Use native methods to convert date formats.", false)]
+        [Obsolete("Deprecated. Use native methods to convert date formats.", true)]
         public abstract DateTime DecodeGMTDate(string GMTDate);
+        //
+        [Obsolete("Installation upgrade through the cp interface is deprecated. Please use the command line tool.", true)]
+        public abstract void Upgrade(bool isNewApp);
+        //
+        [Obsolete("Use System.Net.WebUtility.UrlDecode()", true)]
+        public abstract string DecodeUrl(string Url);
+        //
+        [Obsolete("Use System.Net.WebUtility.HtmlDecode()", true)]
+        public abstract string DecodeHTML(string source);
+        //
+        [Obsolete("Use System.Net.WebUtility.HtmlEnDecode()", true)]
+        public abstract string EncodeHTML(string source);
+        //
+        [Obsolete("Use System.Net.WebUtility.UrlEncode()", true)]
+        public abstract string EncodeUrl(string source);
+        //
+        [Obsolete("Deprecated", true)]
+        public abstract string GetPleaseWaitEnd();
+        //
+        [Obsolete("Deprecated", true)]
+        public abstract string GetPleaseWaitStart();
+        //
+        [Obsolete("Use System.Net.HttpUtility.JavaScriptStringEncode()", true)]
+        public abstract string EncodeJavascript(string source);
+        //
+        [Obsolete("Encode each key value first with EncodeResponseVariable(), then assemble them into the querystring.", true)]
+        public abstract string EncodeQueryString(string Source);
+        //
+        [Obsolete("Deprecated", true)]
+        public abstract DateTime GetFirstNonZeroDate(DateTime Date0, DateTime Date1);
+        //
+        [Obsolete("Deprecated", true)]
+        public abstract int GetFirstNonZeroInteger(int Integer0, int Integer1);
+        //
+        [Obsolete("Use string.PadRight() and string.PadLeft()", true)]
+        public abstract string GetIntegerString(int Value, int DigitCount);
+        //
+        [Obsolete("Use new StringReader(str).ReadLine()", true)]
+        public abstract string GetLine(string Body);
+        //
+        [Obsolete("Use Process.GetCurrentProcess().Id", true)]
+        public abstract int GetProcessID();
+        //
+        [Obsolete("Use SeparateUrl", true)]
+        public abstract void ParseURL(string SourceURL, ref string Protocol, ref string Host, ref string Port, ref string Path, ref string Page, ref string QueryString);
+        //
+        [Obsolete("Use System.Threading.Thread.Sleep()", true)]
+        public abstract void Sleep(int timeMSec);
+        //
+        [Obsolete("Deprecated, some server audits fail if Md5 use detected.")]
+        public abstract string hashMd5(string source);
+        //
+        [Obsolete("Deprecated, use correct case method.", true)]
+        public abstract bool isGuid(string guid);
+        //
+        [Obsolete("Deprecated, use correct case method.", true)]
+        public abstract int installCollectionFromFile(string privateFile);
+        //
+        [Obsolete("Deprecated, use correct case method.", true)]
+        public abstract int installCollectionsFromFolder(string privateFolder, bool deleteFolderWhenDone);
+        //
+        [Obsolete("Deprecated, use correct case method.", true)]
+        public abstract int installCollectionsFromFolder(string privateFolder);
+        //
+        [Obsolete("Deprecated, use correct case method.", true)]
+        public abstract int installCollectionFromLibrary(string collectionGuid);
+        //
+        [Obsolete("Deprecated, use correct case method.", true)]
+        public abstract int installCollectionFromLink(string link);
+
+
+
+
+
+
+
+
+
+
+
+
     }
 }
 

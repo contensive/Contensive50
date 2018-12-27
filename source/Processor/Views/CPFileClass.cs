@@ -27,7 +27,7 @@ namespace Contensive.Processor {
         /// Constructor
         /// </summary>
         /// <param name="core"></param>
-        public CPFileClass(CPClass cp) : base() {
+        public CPFileClass(CPClass cp) {
             this.core = cp.core;
         }
         //
@@ -37,7 +37,7 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="virtualFilename"></param>
         /// <returns></returns>
-        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", false)]
+        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", true)]
         public override string getVirtualFileLink(string virtualFilename) {
             return GenericController.getCdnFileLink(core, virtualFilename);
         }
@@ -48,7 +48,7 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="filename"></param>
         /// <param name="fileContent"></param>
-        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", false)]
+        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", true)]
         public override void AppendVirtual(string filename, string fileContent) {
             core.cdnFiles.appendFile(filename, fileContent);
         }
@@ -59,7 +59,7 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="sourceFilename"></param>
         /// <param name="destinationFilename"></param>
-        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", false)]
+        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", true)]
         public override void CopyVirtual(string sourceFilename, string destinationFilename) {
             core.cdnFiles.copyFile(sourceFilename, destinationFilename);
         }
@@ -69,7 +69,7 @@ namespace Contensive.Processor {
         /// Create a folder anywhere on the physical file space of the hosting server. Deprecated, use with cp.file.cdnFiles, cp.file.appRootFiles, or cp.file.privateFiles
         /// </summary>
         /// <param name="folderPath"></param>
-        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", false)]
+        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", true)]
         public override void CreateFolder(string folderPath) {
             if (core.appRootFiles.isinLocalAbsDosPath(folderPath)) {
                 core.appRootFiles.createPath(folderPath);
@@ -87,7 +87,7 @@ namespace Contensive.Processor {
         /// Delete a file anywhere on the physical file space of the hosting server.
         /// </summary>
         /// <param name="pathFilename"></param>
-        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", false)]
+        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", true)]
         public override void Delete(string pathFilename) {
             if (core.appRootFiles.isinLocalAbsDosPath(pathFilename)) {
                 core.appRootFiles.deleteFile(pathFilename);
@@ -105,7 +105,7 @@ namespace Contensive.Processor {
         /// Delete a file in the cdnFiles store.
         /// </summary>
         /// <param name="pathFilename"></param>
-        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", false)]
+        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", true)]
         public override void DeleteVirtual(string pathFilename) {
             core.cdnFiles.deleteFile(pathFilename);
         }
@@ -116,7 +116,7 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="pathFilename"></param>
         /// <returns></returns>
-        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", false)]
+        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", true)]
         public override string Read(string pathFilename) {
             if (core.appRootFiles.isinLocalAbsDosPath(pathFilename)) {
                 return core.appRootFiles.readFileText(pathFilename);
@@ -135,7 +135,7 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="pathFilename"></param>
         /// <returns></returns>
-        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", false)]
+        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", true)]
         public override string ReadVirtual(string pathFilename) {
             return core.cdnFiles.readFileText(pathFilename);
         }
@@ -146,7 +146,7 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="pathFilename"></param>
         /// <param name="fileContent"></param>
-        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", false)]
+        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", true)]
         public override void Save(string pathFilename, string fileContent) {
             if (core.appRootFiles.isinLocalAbsDosPath(pathFilename)) {
                 core.appRootFiles.saveFile(pathFilename, fileContent);
@@ -165,7 +165,7 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="filename"></param>
         /// <param name="fileContent"></param>
-        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", false)]
+        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", true)]
         public override void SaveVirtual(string filename, string fileContent) {
             core.cdnFiles.saveFile(filename, fileContent);
         }
@@ -176,7 +176,7 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="pathFileName"></param>
         /// <returns></returns>
-        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", false)]
+        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", true)]
         public override bool fileExists(string pathFileName) {
             bool result = false;
             if (core.appRootFiles.isinLocalAbsDosPath(pathFileName)) {
@@ -197,7 +197,7 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="pathFolderName"></param>
         /// <returns></returns>
-        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", false)]
+        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", true)]
         public override bool folderExists(string pathFolderName) {
             bool result = false;
             if (core.appRootFiles.isinLocalAbsDosPath(pathFolderName)) {
@@ -220,7 +220,7 @@ namespace Contensive.Processor {
         /// <param name="pageSize"></param>
         /// <param name="pageNumber"></param>
         /// <returns></returns>
-        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", false)]
+        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", true)]
         public override string fileList(string pathFolderName, int pageSize = 0, int pageNumber = 1) {
             string result = "";
             if (core.appRootFiles.isinLocalAbsDosPath(pathFolderName)) {
@@ -244,7 +244,7 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="pathFolderName"></param>
         /// <returns></returns>
-        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", false)]
+        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", true)]
         public override string folderList(string pathFolderName) {
             string result = "";
             if (core.appRootFiles.isinLocalAbsDosPath(pathFolderName)) {
@@ -267,7 +267,7 @@ namespace Contensive.Processor {
         /// Delete a folder anywhere on the physical file space of the hosting server.
         /// </summary>
         /// <param name="pathFolderName"></param>
-        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", false)]
+        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.Files.serverFiles instead.", true)]
         public override void DeleteFolder(string pathFolderName) {
             if (core.appRootFiles.isinLocalAbsDosPath(pathFolderName)) {
                 core.appRootFiles.deleteFolder(pathFolderName);

@@ -3085,7 +3085,6 @@ namespace Contensive.Processor.Controllers {
                     //
                     // call .dispose for managed objects
                     //
-                    //If Not (AddonObj Is Nothing) Then AddonObj.Dispose()
                 }
                 //
                 // cleanup non-managed objects

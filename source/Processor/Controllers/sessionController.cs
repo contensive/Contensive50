@@ -50,10 +50,10 @@ namespace Contensive.Processor.Controllers {
         public LanguageModel userLanguage {
             get {
                 if ((_language == null) && (user != null)) {
-                    if (user.LanguageID > 0) {
+                    if (user.languageID > 0) {
                         //
                         // -- get user language
-                        _language = LanguageModel.create(core, user.LanguageID);
+                        _language = LanguageModel.create(core, user.languageID);
                     }
                     if (_language == null) {
                         //
@@ -84,7 +84,7 @@ namespace Contensive.Processor.Controllers {
                         _language.name = "English";
                         _language.http_Accept_Language = "en";
                         _language.save(core);
-                        user.LanguageID = _language.id;
+                        user.languageID = _language.id;
                         user.save(core);
                     }
                 }
@@ -320,14 +320,14 @@ namespace Contensive.Processor.Controllers {
                                         //} else {
                                         //
                                         // -- if successful, now test for autologin (authentication)
-                                        if (core.siteProperties.AllowAutoLogin & resultSessionContext.user.AutoLogin & resultSessionContext.visit.cookieSupport) {
+                                        if (core.siteProperties.AllowAutoLogin & resultSessionContext.user.autoLogin & resultSessionContext.visit.cookieSupport) {
                                             //
                                             // -- they allow it, now Check if they were logged in on their last visit
                                             VisitModel lastVisit = VisitModel.getLastVisitByVisitor(core, resultSessionContext.visit.id, resultSessionContext.visitor.id);
                                             if (lastVisit != null) {
                                                 if (lastVisit.visitAuthenticated && (lastVisit.memberID == resultSessionContext.visit.id)) {
                                                     if (authenticateById(core, resultSessionContext.user.id, resultSessionContext)) {
-                                                        LogController.addSiteActivity(core, "autologin", resultSessionContext.user.id, resultSessionContext.user.OrganizationID);
+                                                        LogController.addSiteActivity(core, "autologin", resultSessionContext.user.id, resultSessionContext.user.organizationID);
                                                         visitor_changes = true;
                                                         user_changes = true;
                                                     }
@@ -336,7 +336,7 @@ namespace Contensive.Processor.Controllers {
                                         } else {
                                             //
                                             // -- Recognized, not auto login
-                                            LogController.addSiteActivity(core, "recognized", resultSessionContext.user.id, resultSessionContext.user.OrganizationID);
+                                            LogController.addSiteActivity(core, "recognized", resultSessionContext.user.id, resultSessionContext.user.organizationID);
                                         }
                                     }
                                 }
@@ -473,16 +473,16 @@ namespace Contensive.Processor.Controllers {
                                 // -- Link Login
                                 LogController.logTrace(core, "SessionController.create(), attempt link Login, linkToken.id [" + linkToken.id + "]");
                                 if (authenticateById(core, linkToken.id, resultSessionContext)) {
-                                    LogController.addSiteActivity(core, "link login with eid " + memberLinkinEID, resultSessionContext.user.id, resultSessionContext.user.OrganizationID);
+                                    LogController.addSiteActivity(core, "link login with eid " + memberLinkinEID, resultSessionContext.user.id, resultSessionContext.user.organizationID);
                                 }
                             } else if (memberLinkRecognizeID != 0) {
                                 //
                                 // -- Link Recognize
                                 LogController.logTrace(core, "SessionController.create(), attempt link Recognize, memberLinkRecognizeID [" + memberLinkRecognizeID + "]");
                                 if (recognizeById(core, memberLinkRecognizeID, ref resultSessionContext)) {
-                                    LogController.addSiteActivity(core, "Successful link recognize with eid " + memberLinkinEID, resultSessionContext.user.id, resultSessionContext.user.OrganizationID);
+                                    LogController.addSiteActivity(core, "Successful link recognize with eid " + memberLinkinEID, resultSessionContext.user.id, resultSessionContext.user.organizationID);
                                 } else {
-                                    LogController.addSiteActivity(core, "Unsuccessful link recognize with eid " + memberLinkinEID, resultSessionContext.user.id, resultSessionContext.user.OrganizationID);
+                                    LogController.addSiteActivity(core, "Unsuccessful link recognize with eid " + memberLinkinEID, resultSessionContext.user.id, resultSessionContext.user.organizationID);
                                 }
                             }
                             //
@@ -532,7 +532,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // -- count the page hit
                             LogController.logTrace(core, "SessionController.create(), attempt visit count update");
-                            resultSessionContext.visit.excludeFromAnalytics |= resultSessionContext.visit.bot || resultSessionContext.user.ExcludeFromAnalytics || resultSessionContext.user.Admin || resultSessionContext.user.Developer;
+                            resultSessionContext.visit.excludeFromAnalytics |= resultSessionContext.visit.bot || resultSessionContext.user.excludeFromAnalytics || resultSessionContext.user.admin || resultSessionContext.user.developer;
                             if (!core.webServer.pageExcludeFromAnalytics) {
                                 resultSessionContext.visit.pageVisits += 1;
                                 visit_changes = true;
@@ -593,7 +593,7 @@ namespace Contensive.Processor.Controllers {
         public bool isAuthenticatedAdmin(CoreController core) {
             bool result = false;
             try {
-                result = visit.visitAuthenticated & (user.Admin || user.Developer);
+                result = visit.visitAuthenticated & (user.admin || user.developer);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
@@ -610,7 +610,7 @@ namespace Contensive.Processor.Controllers {
         public bool isAuthenticatedDeveloper(CoreController core) {
             bool result = false;
             try {
-                result = visit.visitAuthenticated & (user.Admin || user.Developer);
+                result = visit.visitAuthenticated & (user.admin || user.developer);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
@@ -720,7 +720,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         public void logout(CoreController core) {
             try {
-                LogController.addSiteActivity(core, "logout", user.id, user.OrganizationID);
+                LogController.addSiteActivity(core, "logout", user.id, user.organizationID);
                 //
                 // new guest
                 user = PersonModel.addDefault(core, CDefDomainModel.create( core, PersonModel.contentName));
@@ -942,9 +942,9 @@ namespace Contensive.Processor.Controllers {
                 if (userId != 0) {
                     result = authenticateById(core, userId, this);
                     if (result) {
-                        LogController.addSiteActivity(core, "successful password login, username [" + username + "]", user.id, user.OrganizationID);
+                        LogController.addSiteActivity(core, "successful password login, username [" + username + "]", user.id, user.organizationID);
                     } else {
-                        LogController.addSiteActivity(core, "unsuccessful password login, username [" + username + "]", user.id, user.OrganizationID);
+                        LogController.addSiteActivity(core, "unsuccessful password login, username [" + username + "]", user.id, user.organizationID);
                     }
                 }
             } catch (Exception ex) {
@@ -1008,14 +1008,14 @@ namespace Contensive.Processor.Controllers {
                     sessionContext.visit.visitAuthenticated = false;
                     sessionContext.visit.visitorID = sessionContext.visitor.id;
                     sessionContext.visit.loginAttempts = 0;
-                    sessionContext.user.Visits = sessionContext.user.Visits + 1;
-                    if (sessionContext.user.Visits == 1) {
+                    sessionContext.user.visits = sessionContext.user.visits + 1;
+                    if (sessionContext.user.visits == 1) {
                         sessionContext.visit.memberNew = true;
                     } else {
                         sessionContext.visit.memberNew = false;
                     }
                     sessionContext.user.LastVisit = core.doc.profileStartTime;
-                    sessionContext.visit.excludeFromAnalytics = sessionContext.visit.excludeFromAnalytics || sessionContext.visit.bot || sessionContext.user.ExcludeFromAnalytics || sessionContext.user.Admin || sessionContext.user.Developer;
+                    sessionContext.visit.excludeFromAnalytics = sessionContext.visit.excludeFromAnalytics || sessionContext.visit.bot || sessionContext.user.excludeFromAnalytics || sessionContext.user.admin || sessionContext.user.developer;
                     sessionContext.visit.save(core);
                     sessionContext.visitor.save(core);
                     sessionContext.user.save(core);
@@ -1029,173 +1029,12 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //========================================================================
-        /// <summary>
-        /// Returns true if the visitor is an admin, or authenticated and in the group named
-        /// </summary>
-        /// <param name="core"></param>
-        /// <param name="GroupName"></param>
-        /// <param name="checkMemberID"></param>
-        /// <returns></returns>
-        //
-        public bool isMemberOfGroup(CoreController core, string GroupName, int checkMemberID = 0) {
-            bool result = false;
-            try {
-                int iMemberID = GenericController.encodeInteger(checkMemberID);
-                if (iMemberID == 0) {
-                    iMemberID = user.id;
-                }
-                result = isMemberOfGroupList(core, "," + GroupController.getGroupId(core, GenericController.encodeText(GroupName)), iMemberID, true);
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-                throw;
-            }
-            return result;
-        }
-        //
-        //========================================================================
-        // ----- Returns true if the visitor is an admin, or authenticated and in the group list
-        //========================================================================
-        //
-        public bool isMemberOfGroupList(CoreController core, string GroupIDList, int checkMemberID = 0, bool adminReturnsTrue = false) {
-            bool result = false;
-            try {
-                if (checkMemberID == 0) {
-                    checkMemberID = user.id;
-                }
-                result = isMemberOfGroupIdList(core, checkMemberID, isAuthenticated, GroupIDList, adminReturnsTrue);
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-                throw;
-            }
-            return result;
-        }
-        //
-        //========================================================================
         //   IsMember
         //   true if the user is authenticated and is a trusted people (member content)
         //========================================================================
         //
         public bool isAuthenticatedMember(CoreController core) {
-            bool result = false;
-            try {
-                result = visit.visitAuthenticated & (CdefController.isWithinContent(core, user.contentControlID, CdefController.getContentId(core, "members")));
-                //If (Not property_user_isMember_isLoaded) And (visit_initialized) Then
-                //    property_user_isMember = isAuthenticated() And core.IsWithinContent(user.ContentControlID, core.main_GetContentID("members"))
-                //    property_user_isMember_isLoaded = True
-                //End If
-                //result = property_user_isMember
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-                throw;
-            }
-            return result;
-        }
-        //Private property_user_isMember As Boolean = False
-        //Private property_user_isMember_isLoaded As Boolean = False
-        //
-        //===============================================================================================================================
-        //   Is Group Member of a GroupIDList
-        //   admins are always returned true
-        //===============================================================================================================================
-        //
-        public bool isMemberOfGroupIdList(CoreController core, int MemberID, bool isAuthenticated, string GroupIDList) {
-            return isMemberOfGroupIdList(core, MemberID, isAuthenticated, GroupIDList, true);
-        }
-        //
-        //===============================================================================================================================
-        //   Is Group Member of a GroupIDList
-        //===============================================================================================================================
-        //
-        public bool isMemberOfGroupIdList(CoreController core, int MemberID, bool isAuthenticated, string GroupIDList, bool adminReturnsTrue) {
-            bool returnREsult = false;
-            try {
-                //
-                int CS = 0;
-                string SQL = null;
-                string Criteria = null;
-                string WorkingIDList = null;
-                //
-                returnREsult = false;
-                if (isAuthenticated) {
-                    WorkingIDList = GroupIDList;
-                    WorkingIDList = GenericController.vbReplace(WorkingIDList, " ", "");
-                    while (GenericController.vbInstr(1, WorkingIDList, ",,") != 0) {
-                        WorkingIDList = GenericController.vbReplace(WorkingIDList, ",,", ",");
-                    }
-                    if (!string.IsNullOrEmpty(WorkingIDList)) {
-                        if (vbMid(WorkingIDList, 1) == ",") {
-                            if (vbLen(WorkingIDList) <= 1) {
-                                WorkingIDList = "";
-                            } else {
-                                WorkingIDList = vbMid(WorkingIDList, 2);
-                            }
-                        }
-                    }
-                    if (!string.IsNullOrEmpty(WorkingIDList)) {
-                        if (WorkingIDList.Right(1) == ",") {
-                            if (vbLen(WorkingIDList) <= 1) {
-                                WorkingIDList = "";
-                            } else {
-                                WorkingIDList = GenericController.vbMid(WorkingIDList, 1, vbLen(WorkingIDList) - 1);
-                            }
-                        }
-                    }
-                    if (string.IsNullOrEmpty(WorkingIDList)) {
-                        if (adminReturnsTrue) {
-                            //
-                            // check if memberid is admin
-                            //
-                            SQL = "select top 1 m.id"
-                                + " from ccmembers m"
-                                + " where"
-                                + " (m.id=" + MemberID + ")"
-                                + " and(m.active<>0)"
-                                + " and("
-                                + " (m.admin<>0)"
-                                + " or(m.developer<>0)"
-                                + " )"
-                                + " ";
-                            CS = core.db.csOpenSql(SQL,"Default");
-                            returnREsult = core.db.csOk(CS);
-                            core.db.csClose(ref CS);
-                        }
-                    } else {
-                        //
-                        // check if they are admin or in the group list
-                        //
-                        if (GenericController.vbInstr(1, WorkingIDList, ",") != 0) {
-                            Criteria = "r.GroupID in (" + WorkingIDList + ")";
-                        } else {
-                            Criteria = "r.GroupID=" + WorkingIDList;
-                        }
-                        Criteria = ""
-                            + "(" + Criteria + ")"
-                            + " and(r.id is not null)"
-                            + " and((r.DateExpires is null)or(r.DateExpires>" + DbController.encodeSQLDate(DateTime.Now) + "))"
-                            + " ";
-                        if (adminReturnsTrue) {
-                            Criteria = "(" + Criteria + ")or(m.admin<>0)or(m.developer<>0)";
-                        }
-                        Criteria = ""
-                            + "(" + Criteria + ")"
-                            + " and(m.active<>0)"
-                            + " and(m.id=" + MemberID + ")";
-                        //
-                        SQL = "select top 1 m.id"
-                            + " from ccmembers m"
-                            + " left join ccMemberRules r on r.Memberid=m.id"
-                            + " where" + Criteria;
-                        CS = core.db.csOpenSql(SQL,"Default");
-                        returnREsult = core.db.csOk(CS);
-                        core.db.csClose(ref CS);
-                    }
-                }
-
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-                throw;
-            }
-            return returnREsult;
+            return visit.visitAuthenticated & (CdefController.isWithinContent(core, user.contentControlID, CdefController.getContentId(core, "members")));
         }
         //
         //========================================================================

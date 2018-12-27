@@ -385,7 +385,7 @@ namespace Contensive.Addons.AdminSite {
                     cp.core.html.addScriptCode(adminData.JavaScriptString, "Admin Site");
                     result = Stream.Text;
                 }
-                if (cp.core.session.user.Developer) {
+                if (cp.core.session.user.developer) {
                     result = Processor.Controllers.ErrorController.getDocExceptionHtmlList(cp.core) + result;
                 }
             } catch (Exception ex) {
@@ -1563,7 +1563,7 @@ namespace Contensive.Addons.AdminSite {
                                             if (ActivityLogOrganizationID < 0) {
                                                 PersonModel person = PersonModel.create(cp.core, editRecord.id);
                                                 if (person != null) {
-                                                    ActivityLogOrganizationID = person.OrganizationID;
+                                                    ActivityLogOrganizationID = person.organizationID;
                                                 }
                                             }
                                             LogController.addSiteActivity(cp.core, "modifying field " + fieldName, editRecord.id, ActivityLogOrganizationID);

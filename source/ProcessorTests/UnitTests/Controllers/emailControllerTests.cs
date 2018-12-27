@@ -73,9 +73,9 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 string body = GenericController.GetRandomInteger(cp.core).ToString();
                 var toPerson = Processor.Models.Db.PersonModel.addDefault(cp.core, Processor.Models.Domain.CDefDomainModel.create(cp.core, Processor.Models.Db.PersonModel.contentName));
                 Assert.IsNotNull(toPerson);
-                toPerson.Email = GenericController.GetRandomInteger(cp.core).ToString() + "@kma.net";
-                toPerson.FirstName = GenericController.GetRandomInteger(cp.core).ToString();
-                toPerson.LastName = GenericController.GetRandomInteger(cp.core).ToString();
+                toPerson.email = GenericController.GetRandomInteger(cp.core).ToString() + "@kma.net";
+                toPerson.firstName = GenericController.GetRandomInteger(cp.core).ToString();
+                toPerson.lastName = GenericController.GetRandomInteger(cp.core).ToString();
                 toPerson.save(cp.core);
                 string sendStatus = "";
                 // act
@@ -86,7 +86,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 Assert.AreEqual(1, cp.core.mockSmtpList.Count);
                 CoreController.SmtpEmailClass sentEmail = cp.core.mockSmtpList.First();
                 Assert.AreEqual("", sentEmail.AttachmentFilename);
-                Assert.AreEqual( toPerson.Email, sentEmail.email.toAddress);
+                Assert.AreEqual( toPerson.email, sentEmail.email.toAddress);
                 Assert.AreEqual("from@kma.net", sentEmail.email.fromAddress);
                 Assert.AreEqual("bounce@kma.net", sentEmail.email.BounceAddress);
                 Assert.AreEqual("replyTo@kma.net", sentEmail.email.replyToAddress);

@@ -195,10 +195,10 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
             // arrange
             const string test1 = "a=1&b=2&c=3";
             // act
-            string result1 = GenericController.getValueFromNameValueString("a", test1, "0", "&");
-            string result2 = GenericController.getValueFromNameValueString("b", test1, "0", "&");
-            string result3 = GenericController.getValueFromNameValueString("c", test1, "0", "&");
-            string result4 = GenericController.getValueFromNameValueString("d", test1, "0", "&");
+            string result1 = GenericController.getValueFromKeyValueString("a", test1, "0", "&");
+            string result2 = GenericController.getValueFromKeyValueString("b", test1, "0", "&");
+            string result3 = GenericController.getValueFromKeyValueString("c", test1, "0", "&");
+            string result4 = GenericController.getValueFromKeyValueString("d", test1, "0", "&");
             // assert
             Assert.AreEqual("1", result1);
             Assert.AreEqual("2", result2);

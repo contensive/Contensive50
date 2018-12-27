@@ -11,26 +11,228 @@ namespace Contensive.Processor {
         public const string EventsId = "2AFEB1A8-5B27-45AC-A9DF-F99849BE1FAE";
         #endregion
         //
-        private Contensive.Processor.Controllers.CoreController core;
         private CPClass cp;
-        protected bool disposed = false;
         //
-        public CPVisitClass(Contensive.Processor.Controllers.CoreController coreObj, CPClass cpParent) : base() {
-            this.core = coreObj;
-            cp = cpParent;
+        //=======================================================================================================
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="cp"></param>
+        public CPVisitClass(CPClass cp) {
+            this.cp = cp;
         }
         //
+        //=======================================================================================================
+        /// <summary>
+        /// return true if cookies supported
+        /// </summary>
+        public override bool CookieSupport {
+            get {
+                return cp.core.session.visit.cookieSupport;
+            }
+        }
+        //
+        //=======================================================================================================
+        /// <summary>
+        /// return the visit id
+        /// </summary>
+        public override int Id {
+            get {
+                return cp.core.session.visit.id;
+            }
+        }
+        //
+        //=======================================================================================================
+        /// <summary>
+        /// return the time of the last visit
+        /// </summary>
+        public override DateTime LastTime {
+            get {
+                return cp.core.session.visit.lastVisitTime;
+            }
+        }
+        //
+        //=======================================================================================================
+        /// <summary>
+        /// return the login attempts
+        /// </summary>
+        public override int LoginAttempts {
+            get {
+                return cp.core.session.visit.loginAttempts;
+            }
+        }
+        //
+        //=======================================================================================================
+        /// <summary>
+        /// return the name of the visit
+        /// </summary>
+        public override string Name {
+            get {
+                return cp.core.session.visit.name;
+            }
+        }
+        //
+        //=======================================================================================================
+        /// <summary>
+        /// return the number of hits
+        /// </summary>
+        public override int Pages {
+            get {
+                return cp.core.session.visit.pageVisits;
+            }
+        }
+        //
+        //=======================================================================================================
+        /// <summary>
+        /// return the referer
+        /// </summary>
+        public override string Referer {
+            get {
+                return cp.core.session.visit.http_referer;
+            }
+        }
+        //
+        //=======================================================================================================
+        /// <summary>
+        /// Set a key value pair for this visit
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        public override void SetProperty(string key, string value) {
+            cp.core.visitProperty.setProperty(key, value);
+        }
+        //
+        //=======================================================================================================
+        //
+        public override bool GetBoolean(string key, bool defaultValue) {
+            return cp.core.visitProperty.getBoolean(key, defaultValue);
+        }
+        //
+        public override bool GetBoolean(string key) {
+            return cp.core.visitProperty.getBoolean(key);
+        }
+        //
+        //=======================================================================================================
+        //
+        public override DateTime GetDate(string key, DateTime defaultValue) {
+            return cp.core.visitProperty.getDate(key, defaultValue);
+        }
+        //
+        public override DateTime GetDate(string key) {
+            return cp.core.visitProperty.getDate(key);
+        }
+        //
+        //=======================================================================================================
+        //
+        public override int GetInteger(string key, int defaultValue) {
+            return cp.core.visitProperty.getInteger(key, defaultValue);
+        }
+        //
+        public override int GetInteger(string key) {
+            return cp.core.visitProperty.getInteger(key);
+        }
+        //
+        //=======================================================================================================
+        //
+        public override double GetNumber(string key, double defaultValue) {
+            return cp.core.visitProperty.getNumber(key, defaultValue);
+        }
+        //
+        public override double GetNumber(string key) {
+            return cp.core.visitProperty.getNumber(key);
+        }
+        //
+        //=======================================================================================================
+        //
+        public override string GetText(string key, string defaultValue) {
+            return cp.core.visitProperty.getText(key, defaultValue);
+        }
+        //
+        public override string GetText(string key) {
+            return cp.core.visitProperty.getText(key);
+        }
+        //
+        //=======================================================================================================
+        //
+        public override int StartDateValue {
+            get {
+                return cp.core.session.visit.startDateValue;
+            }
+        }
+        //
+        //=======================================================================================================
+        //
+        public override DateTime StartTime {
+            get {
+                return cp.core.session.visit.startTime;
+            }
+        }
+        //
+        //=======================================================================================================
+        // deprecated
+        //
+        //
+        //
+        //
+        [Obsolete("Deprecated", true )]
+        public override string GetProperty(string key, string defaultValue, int TargetVisitId) {
+            if (TargetVisitId == 0) {
+                return cp.core.visitProperty.getText(key, defaultValue);
+            } else {
+                return cp.core.visitProperty.getText(key, defaultValue, TargetVisitId);
+            }
+        }
+        //
+        [Obsolete("Deprecated", true)]
+        public override string GetProperty(string key, string defaultValue) {
+            return cp.core.visitProperty.getText(key, defaultValue);
+        }
+        //
+        [Obsolete("Deprecated", true)]
+        public override string GetProperty(string key) {
+            return cp.core.visitProperty.getText(key);
+        }
+        //
+        [Obsolete("Deprecated", true)]
+        public override void SetProperty(string key, string value, int TargetVisitId) {
+            if (TargetVisitId == 0) {
+                cp.core.visitProperty.setProperty(key, value);
+            } else {
+                cp.core.visitProperty.setProperty(key, value, TargetVisitId);
+            }
+        }
+        //
+        [Obsolete("Deprecated", true)]
+        public override bool GetBoolean(string key, string defaultValue) {
+            return GetBoolean(key, GenericController.encodeBoolean(defaultValue));
+        }
+        //
+        [Obsolete("Deprecated", true)]
+        public override DateTime GetDate(string key, string defaultValue) {
+            return GetDate(key, GenericController.encodeDate(defaultValue));
+        }
+        //
+        [Obsolete("Deprecated", true)]
+        public override int GetInteger(string key, string defaultValue) {
+            return GetInteger(key, GenericController.encodeInteger(defaultValue));
+        }
+        //
+        [Obsolete("Deprecated", true)]
+        public override double GetNumber(string key, string defaultValue) {
+            return GetNumber(key, GenericController.encodeNumber(defaultValue));
+        }
+        //
+        //=======================================================================================================
         // dispose
+        //
+        #region  IDisposable Support 
         //
         protected virtual void Dispose(bool disposing) {
             if (!this.disposed) {
-                appendDebugLog(".dispose, dereference main, csv");
                 if (disposing) {
                     //
                     // call .dispose for managed objects
                     //
-                    cp = null;
-                    core = null;
                 }
                 //
                 // Add code here to release the unmanaged resource.
@@ -38,150 +240,7 @@ namespace Contensive.Processor {
             }
             this.disposed = true;
         }
-
-        public override bool CookieSupport
-        {
-            get {
-                return core.session.visit.cookieSupport;
-            }
-        }
-        //
-        //
-        //
-        public override string GetProperty(string PropertyName, string DefaultValue = "", int TargetVisitId = 0) {
-            if (TargetVisitId == 0) {
-                return core.visitProperty.getText(PropertyName, DefaultValue);
-            } else {
-                return core.visitProperty.getText(PropertyName, DefaultValue, TargetVisitId);
-            }
-        }
-        //
-        //
-        //
-        public override int Id {
-            get {
-                return core.session.visit.id;
-            }
-        }
-        //
-        //=======================================================================================================
-        //
-        public override DateTime LastTime
-        {
-            get {
-                return core.session.visit.lastVisitTime;
-            }
-        }
-        //
-        //=======================================================================================================
-        //
-        public override int LoginAttempts
-        {
-            get {
-                return core.session.visit.loginAttempts;
-            }
-        }
-        //
-        //=======================================================================================================
-        //
-        public override string Name
-        {
-            get {
-                return core.session.visit.name;
-            }
-        }
-        //
-        //=======================================================================================================
-        //
-        public override int Pages
-        {
-            get {
-                return core.session.visit.pageVisits;
-            }
-        }
-        //
-        //=======================================================================================================
-        //
-        public override string Referer
-        {
-            get {
-                return core.session.visit.http_referer;
-            }
-        }
-        //
-        //=======================================================================================================
-        //
-        public override void SetProperty(string PropertyName, string Value, int TargetVisitId = 0) {
-            if (TargetVisitId == 0) {
-                core.visitProperty.setProperty(PropertyName, Value);
-            } else {
-                core.visitProperty.setProperty(PropertyName, Value, TargetVisitId);
-            }
-        }
-        //
-        //=======================================================================================================
-        //
-        public override bool GetBoolean(string PropertyName, string DefaultValue = "") {
-            return GenericController.encodeBoolean(GetProperty(PropertyName, DefaultValue));
-        }
-        //
-        //=======================================================================================================
-        //
-        //=======================================================================================================
-        //
-        public override DateTime GetDate(string PropertyName, string DefaultValue = "") {
-            return GenericController.encodeDate(GetProperty(PropertyName, DefaultValue));
-        }
-        //
-        //=======================================================================================================
-        //
-        //=======================================================================================================
-        //
-        public override int GetInteger(string PropertyName, string DefaultValue = "") {
-            return cp.Utils.EncodeInteger(GetProperty(PropertyName, DefaultValue));
-        }
-        //
-        //=======================================================================================================
-        //
-        //=======================================================================================================
-        //
-        public override double GetNumber(string PropertyName, string DefaultValue = "") {
-            return cp.Utils.EncodeNumber(GetProperty(PropertyName, DefaultValue));
-        }
-        //
-        //=======================================================================================================
-        //
-        //=======================================================================================================
-        //
-        public override string GetText(string FieldName, string DefaultValue = "") {
-            return GetProperty(FieldName, DefaultValue);
-        }
-
-        public override int StartDateValue
-        {
-            get {
-                return core.session.visit.startDateValue;
-            }
-        }
-
-        public override DateTime StartTime
-        {
-            get {
-                return core.session.visit.startTime;
-            }
-        }
-        //
-        //
-        //
-        private void appendDebugLog(string copy) {
-        }
-        //
-        // testpoint
-        //
-        private void tp(string msg) {
-            //Call appendDebugLog(msg)
-        }
-        #region  IDisposable Support 
+        protected bool disposed = false;
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
         public void Dispose() {
@@ -190,8 +249,6 @@ namespace Contensive.Processor {
         }
         ~CPVisitClass() {
             Dispose(false);
-            
-            
         }
         #endregion
     }

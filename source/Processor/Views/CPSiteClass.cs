@@ -15,146 +15,77 @@ namespace Contensive.Processor {
         public const string EventsId = "5E88DB23-E8D7-4CE8-9793-9C7A20F4CF3A";
         #endregion
         //
-        private CoreController core;
-        protected bool disposed = false;
+        private CPClass cp;
         //
         //====================================================================================================
         //
-        public CPSiteClass(Contensive.Processor.Controllers.CoreController coreObj, CPClass CPParent) : base() {
-            core = coreObj;
-        }
-        //
-        //====================================================================================================
-        //
-        protected virtual void Dispose(bool disposing) {
-            if (!this.disposed) {
-                if (disposing) {
-                    //
-                    // call .dispose for managed objects
-                    core = null;
-                }
-                //
-                // Add code here to release the unmanaged resource.
-            }
-            this.disposed = true;
+        public CPSiteClass(CPClass cp) {
+            this.cp = cp;
         }
         //
         //====================================================================================================
         //
         public override string Name {
             get {
-                return core.appConfig.name;
+                return cp.core.appConfig.name;
             }
         }
+        //
+        //====================================================================================================
+        //
+        public override void AddLinkAlias(string linkAlias, int pageId, string queryStringSuffix) => LinkAliasController.addLinkAlias(cp.core, linkAlias, pageId, queryStringSuffix);
+        //
+        public override void AddLinkAlias(string linkAlias, int pageId) => LinkAliasController.addLinkAlias(cp.core, linkAlias, pageId, "");
         //
         //====================================================================================================
         //
         public override void SetProperty(string FieldName, string FieldValue) {
-            core.siteProperties.setProperty(FieldName, FieldValue);
+            cp.core.siteProperties.setProperty(FieldName, FieldValue);
         }
         //
         //====================================================================================================
         //
-        public override string GetProperty(string propertyName, string DefaultValue = "") {
-            return core.siteProperties.getText(propertyName, DefaultValue);
+        public override bool GetBoolean(string key, bool defaultValue) {
+            return cp.core.siteProperties.getBoolean(key, defaultValue);
+        }
+        public override bool GetBoolean(string key) {
+            return cp.core.siteProperties.getBoolean(key, default(bool));
         }
         //
         //====================================================================================================
         //
-        public override bool GetBoolean(string propertyName, string DefaultValue = "") {
-            return core.siteProperties.getBoolean(propertyName, GenericController.encodeBoolean(DefaultValue));
+        public override DateTime GetDate(string key, DateTime DefaultValue) {
+            return cp.core.siteProperties.getDate(key, DefaultValue);
         }
-        public override bool GetBoolean(string propertyName, bool DefaultValue ) {
-            return core.siteProperties.getBoolean(propertyName, DefaultValue);
-        }
-
-        //
-        //====================================================================================================
-        //
-        public override DateTime GetDate(string propertyName, string DefaultValue = "") {
-            return core.siteProperties.getDate(propertyName, GenericController.encodeDate(DefaultValue));
-        }
-        public override DateTime GetDate(string propertyName, DateTime DefaultValue) {
-            return core.siteProperties.getDate(propertyName, DefaultValue);
+        public override DateTime GetDate(string key) {
+            return cp.core.siteProperties.getDate(key, default(DateTime));
         }
         //
         //====================================================================================================
         //
-        public override int GetInteger(string propertyName, string DefaultValue = "") {
-            return core.siteProperties.getInteger(propertyName, GenericController.encodeInteger(DefaultValue));
+        public override int GetInteger(string key, int DefaultValue) {
+            return cp.core.siteProperties.getInteger(key, DefaultValue);
         }
-        public override int GetInteger(string propertyName, int DefaultValue ) {
-            return core.siteProperties.getInteger(propertyName, DefaultValue);
-        }
-        //
-        //====================================================================================================
-        //
-        public override double GetNumber(string propertyName, string DefaultValue = "") {
-            return core.siteProperties.getNumber(propertyName, GenericController.encodeNumber(DefaultValue));
-        }
-        public override double GetNumber(string propertyName, double DefaultValue) {
-            return core.siteProperties.getNumber(propertyName, DefaultValue);
+        public override int GetInteger(string key) {
+            return cp.core.siteProperties.getInteger(key, default(int));
         }
         //
         //====================================================================================================
         //
-        public override string GetText(string FieldName, string DefaultValue = "") {
-            return GetProperty(FieldName, DefaultValue);
+        public override double GetNumber(string key, double DefaultValue) {
+            return cp.core.siteProperties.getNumber(key, DefaultValue);
+        }
+        public override double GetNumber(string key) {
+            return cp.core.siteProperties.getNumber(key, default(double));
         }
         //
         //====================================================================================================
         //
-        public override bool MultiDomainMode { get {return false; }}
-        //
-        //====================================================================================================
-        //
-        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", true)]
-        public override string PhysicalFilePath {
-            get {
-                return core.cdnFiles.localAbsRootPath;
-            }
+        public override string GetText(string key, string DefaultValue) {
+            return cp.core.siteProperties.getText(key, DefaultValue);
         }
-        //
-        //====================================================================================================
-        //
-        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", true)]
-        public override string PhysicalInstallPath {
-            get {
-                return core.privateFiles.localAbsRootPath;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", true)]
-        public override string PhysicalWWWPath {
-            get {
-                return core.appRootFiles.localAbsRootPath;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override bool TrapErrors {
-            get {
-                return GenericController.encodeBoolean(GetProperty("TrapErrors", "1"));
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override string AppPath {
-            get {
-                return AppRootPath;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override string AppRootPath {
-            get {
-                return appRootPath;
-            }
+        public override string GetText(string key) {
+            return cp.core.siteProperties.getText(key, default(string));
         }
         //
         //====================================================================================================
@@ -163,8 +94,8 @@ namespace Contensive.Processor {
             get {
                 string tempDomainPrimary = null;
                 tempDomainPrimary = "";
-                if (core.appConfig.domainList.Count > 0) {
-                    tempDomainPrimary = core.appConfig.domainList[0];
+                if (cp.core.appConfig.domainList.Count > 0) {
+                    tempDomainPrimary = cp.core.appConfig.domainList[0];
                 }
                 return tempDomainPrimary;
             }
@@ -174,7 +105,7 @@ namespace Contensive.Processor {
         //
         public override string Domain {
             get {
-                return core.webServer.requestDomain;
+                return cp.core.webServer.requestDomain;
             }
         }
         //
@@ -182,7 +113,7 @@ namespace Contensive.Processor {
         //
         public override string DomainList {
             get {
-                return string.Join(",", core.appConfig.domainList);
+                return string.Join(",", cp.core.appConfig.domainList);
             }
         }
         //
@@ -190,7 +121,7 @@ namespace Contensive.Processor {
         //
         public override string FilePath {
             get {
-                return core.appConfig.cdnFileUrl;
+                return cp.core.appConfig.cdnFileUrl;
             }
         }
         //
@@ -198,141 +129,191 @@ namespace Contensive.Processor {
         //
         public override string PageDefault {
             get {
-                return core.siteProperties.serverPageDefault;
+                return cp.core.siteProperties.serverPageDefault;
             }
         }
         //
         //====================================================================================================
         //
-        public override string VirtualPath {
-            get {
-                return "/" + core.appConfig.name;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override string EncodeAppRootPath(string Link) {
-            return GenericController.encodeVirtualPath(GenericController.encodeText(Link), core.appConfig.cdnFileUrl, appRootPath, core.webServer.requestDomain);
-        }
-        //
-        //====================================================================================================
-        //
-        public override bool IsTesting() { return false; }
-        //
-        //====================================================================================================
-        //
-        public override void LogActivity(string Message, int UserID, int OrganizationID) {
-            LogController.addSiteActivity(core, Message, 0, UserID, OrganizationID);
+        public override void LogActivity(string message, int userID, int organizationID) {
+            LogController.addSiteActivity(cp.core, message, 0, userID, organizationID);
         }
         //
         //====================================================================================================
         //
         public override void LogWarning(string name, string description, string typeOfWarningKey, string instanceKey) {
-            LogController.addSiteWarning(core, name, description, "", 0, description, typeOfWarningKey, instanceKey);
+            LogController.addSiteWarning(cp.core, name, description, "", 0, description, typeOfWarningKey, instanceKey);
         }
         //
         //====================================================================================================
         //
         public override void LogAlarm(string cause) {
-            LogController.logFatal(core, "logAlarm: " + cause);
+            LogController.logFatal(cp.core, "logAlarm: " + cause);
         }
         //
         //====================================================================================================
         //
-        public override void ErrorReport(string Message) {
-            LogController.handleException(core, new GenericException("Unexpected exception"), LogController.logLevel.Error, Message, 2);
+        public override void ErrorReport(string message) {
+            LogController.handleException(cp.core, new GenericException("Unexpected exception"), LogController.logLevel.Error, message, 2);
+        }
+        //
+        public override void ErrorReport(System.Exception ex, string message) {
+            LogController.handleException(cp.core, ex, LogController.logLevel.Error, message, 2);
+        }
+        //
+        public override void ErrorReport(System.Exception ex) {
+            LogController.handleException(cp.core, ex, LogController.logLevel.Error, "", 2);
         }
         //
         //====================================================================================================
         //
-        public override void ErrorReport(System.Exception Ex, string Message = "") {
-            LogController.handleException(core, Ex, LogController.logLevel.Error, Message, 2);
-        }
+        public override void TestPoint(string message) => LogController.logDebug(cp.core, message);
         //
         //====================================================================================================
         //
-        public override void RequestTask(string Command, string SQL, string ExportName, string Filename) {
-            try {
-                var ExportCSVAddon = Models.Db.AddonModel.create(core, addonGuidExportCSV);
-                if (ExportCSVAddon == null) {
-                    LogController.handleError( core,new GenericException("ExportCSV addon not found. Task could not be added to task queue."));
-                } else {
-                    var cmdDetail = new TaskModel.CmdDetailClass() {
-                        addonId = ExportCSVAddon.id,
-                        addonName = ExportCSVAddon.name,
-                        args = new Dictionary<string, string> {
-                            { "sql", SQL },
-                            { "ExportName", ExportName },
-                            { "filename", Filename }
-                        }
-                    };
-                    TaskSchedulerControllerx.addTaskToQueue(core, cmdDetail, false );
-                }
-            } catch (Exception) {
-                throw;
+        public override string ThrowEvent(string eventNameIdOrGuid) => cp.core.addon.throwEvent(eventNameIdOrGuid);
+        //
+        //====================================================================================================
+        // Deprecated
+        //
+        //
+        [Obsolete("Use AddLinkAlias()", true)]
+        public override void addLinkAlias(string linkAlias, int pageId, string queryStringSuffix = "") => LinkAliasController.addLinkAlias(cp.core, linkAlias, pageId, queryStringSuffix);
+        //
+        [Obsolete("Deprecated.", true)]
+        public override bool MultiDomainMode { get { return false; } }
+        //
+        [Obsolete("Use GetText()", true)]
+        public override string GetProperty(string propertyName, string DefaultValue) {
+            return cp.core.siteProperties.getText(propertyName, DefaultValue);
+        }
+        //
+        [Obsolete("Use GetText()", true)]
+        public override string GetProperty(string propertyName) {
+            throw new NotImplementedException();
+        }
+        //
+        [Obsolete("Use methods with matching types", true)]
+        public override bool GetBoolean(string propertyName, string DefaultValue) {
+            return cp.core.siteProperties.getBoolean(propertyName, GenericController.encodeBoolean(DefaultValue));
+        }
+        //
+        [Obsolete("Use methods with matching types", true)]
+        public override DateTime GetDate(string propertyName, string DefaultValue) {
+            return cp.core.siteProperties.getDate(propertyName, GenericController.encodeDate(DefaultValue));
+        }
+        //
+        [Obsolete("Use methods with matching types", true)]
+        public override int GetInteger(string propertyName, string DefaultValue) {
+            return cp.core.siteProperties.getInteger(propertyName, GenericController.encodeInteger(DefaultValue));
+        }
+        //
+        [Obsolete("Deprecated.", true)]
+        public override double GetNumber(string propertyName, string DefaultValue) {
+            return cp.core.siteProperties.getNumber(propertyName, GenericController.encodeNumber(DefaultValue));
+        }
+        //
+        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", true)]
+        public override string PhysicalFilePath {
+            get {
+                return cp.core.cdnFiles.localAbsRootPath;
             }
         }
         //
-        //====================================================================================================
-        //
-        public override void TestPoint(string message) => LogController.logDebug(core, message);
-        //
-        //====================================================================================================
-        //
-        public override int LandingPageId(string DomainName = "") {
-            if ( string.IsNullOrWhiteSpace(DomainName)) {
-                return GetInteger("LandingPageID", 0);
-            } else {
-                var domain = DomainModel.createByUniqueName(core, DomainName);
-                if ( domain == null) {
-                    return GetInteger("LandingPageID", 0);
-                } else {
-                    return domain.rootPageId;
-                }
+        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", true)]
+        public override string PhysicalInstallPath {
+            get {
+                return cp.core.privateFiles.localAbsRootPath;
             }
         }
         //
-        //====================================================================================================
-        //
-        public override void addLinkAlias(string linkAlias, int pageId, string queryStringSuffix = "") => LinkAliasController.addLinkAlias(core, linkAlias, pageId, queryStringSuffix);
-        //
-        //====================================================================================================
-        //
-        public override string ThrowEvent(string eventNameIdOrGuid) => core.addon.throwEvent(eventNameIdOrGuid);
-        //
-        //==========================================================================================
-        /// <summary>
-        /// Install an uploaded collection file from a private folder. Return true if successful, else the issue is in the returnUserError
-        /// </summary>
-        /// <param name="privatePathFilename"></param>
-        /// <param name="returnUserError"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public override bool installCollectionFile(string privatePathFilename, ref string returnUserError) {
-            bool returnOk = false;
-            try {
-                string ignoreReturnedCollectionGuid = "";
-                var tmpList = new List<string> { };
-                string logPrefix = "CPSiteClass.installCollectionFile";
-                var installedCollections = new List<string>();
-                returnOk = CollectionController.installCollectionsFromPrivateFile(core, privatePathFilename, ref returnUserError, ref ignoreReturnedCollectionGuid, false, true, ref tmpList, logPrefix, ref installedCollections);
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-                if (!core.siteProperties.trapErrors) {
-                    throw;
-                }
+        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", true)]
+        public override string PhysicalWWWPath {
+            get {
+                return cp.core.appRootFiles.localAbsRootPath;
             }
-            return returnOk;
         }
         //
-        //====================================================================================================
-        //
-        public override bool installCollectionFromLibrary(string collectionGuid, ref string returnUserError) {
-            return false;
+        [Obsolete("Deprecated.", true)]
+        public override bool TrapErrors {
+            get {
+                return GenericController.encodeBoolean(GetProperty("TrapErrors", "1"));
+            }
         }
-
+        //
+        [Obsolete("Deprecated.", true)]
+        public override string AppPath {
+            get {
+                return AppRootPath;
+            }
+        }
+        //
+        [Obsolete("Deprecated.", true)]
+        public override string AppRootPath {
+            get {
+                return appRootPath;
+            }
+        }
+        //
+        [Obsolete("Deprecated.", true)]
+        public override string VirtualPath {
+            get {
+                return "/" + cp.core.appConfig.name;
+            }
+        }
+        //
+        [Obsolete("Deprecated.", true)]
+        public override bool IsTesting() { return false; }
+        //
+        [Obsolete("Use GetInteger(LandingPageID)", true)]
+        public override int LandingPageId() {
+            return GetInteger("LandingPageID", 0);
+        }
+        //
+        [Obsolete("Use GetInteger(LandingPageID)", true)]
+        public override int LandingPageId(string domainName) {
+            if (string.IsNullOrWhiteSpace(domainName)) return GetInteger("LandingPageID", 0);
+            var domain = DomainModel.createByUniqueName(cp.core, domainName);
+            if (domain == null)  return GetInteger("LandingPageID", 0);
+            return domain.rootPageId;
+        }
+        //
+        [Obsolete("Use CP.Utils.ExportCsv()", true)]
+        public override void RequestTask(string command, string sql, string exportName, string filename) {
+            cp.Utils.ExportCsv(sql, exportName, filename);
+        }
+        //
+        [Obsolete("Use CP.Addon.InstallCollectionFile()", true)]
+        public override bool installCollectionFile(string privatePathFilename, ref string returnUserError) 
+            => cp.Addon.InstallCollectionFile(privatePathFilename, ref returnUserError);
+        //
+        [Obsolete("Use CP.Utils.InstallCollectionFromLibrary()", true)]
+        public override bool installCollectionFromLibrary(string collectionGuid, ref string returnUserError)
+            => cp.Addon.InstallCollectionFromLibrary(collectionGuid, ref returnUserError);
+        //
+        [Obsolete("Use CP.Utils.EncodeAppRootPath()", true)]
+        public override string EncodeAppRootPath(string link) {
+            throw new NotImplementedException();
+        }
+        //
+        //
         #region  IDisposable Support 
+        //
+        //====================================================================================================
+        //
+        protected virtual void Dispose(bool disposing) {
+            if (!this.disposed) {
+                if (disposing) {
+                    //
+                    // call .dispose for managed objects
+                    //
+                }
+                //
+                // Add code here to release the unmanaged resource.
+            }
+            this.disposed = true;
+        }
+        protected bool disposed = false;
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
         public void Dispose() {

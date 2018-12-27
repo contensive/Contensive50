@@ -433,7 +433,7 @@
 //            appendMonitorLog("unexepected error in " + methodName + ", " + exToString);
 //        }
 
-//        public StatusServerClass(CoreController cpCore) : base() {
+//        public StatusServerClass(CoreController cpCore) {
 //            this.cpCore = cpCore;
 //        }
 //    }

@@ -230,14 +230,11 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="core"></param>
         /// <returns></returns>
         public List<int> get_childIdList(CoreController core) {
-            _childIdList = new List<int>();
             if (( parentID>0)&(_childIdList == null)) {
-                string Sql = "select id from cccontent where parentid=" + id;
-                using (DataTable dt = core.db.executeQuery(Sql)) {
-                    if (dt.Rows.Count == 0) {
-                        foreach (DataRow row in dt.Rows) {
-                            _childIdList.Add(GenericController.encodeInteger(row[0]));
-                        }
+                _childIdList = new List<int>();
+                using (DataTable dt = core.db.executeQuery("select id from cccontent where parentid=" + id)) {
+                    foreach (DataRow row in dt.Rows) {
+                        _childIdList.Add(GenericController.encodeInteger(row[0]));
                     }
                 }
             }
