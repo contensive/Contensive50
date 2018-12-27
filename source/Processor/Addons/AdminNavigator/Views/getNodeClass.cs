@@ -1388,7 +1388,12 @@ namespace Contensive.Addons.AdminNavigator {
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// return a list of ids for each content the current user has memberRules to edit (like Page Content, etc.)
+        /// Ignores content parent/child
+        /// </summary>
+        /// <param name="cp"></param>
+        /// <returns></returns>
         private string GetContentManagerIdCommaList(CPBaseClass cp) {
             string result = "";
             try {
@@ -1403,15 +1408,16 @@ namespace Contensive.Addons.AdminNavigator {
                 CPCSBaseClass cs = cp.CSNew();
                 if (cs.OpenSQL(SQL)) {
                     do {
-                        int ContentID = cs.GetInteger("id");
-                        result = result + "," + ContentID.ToString();
-                        string ContentName = cp.Content.GetRecordName("content", ContentID);
-                        if (!string.IsNullOrEmpty(ContentName)) {
-                            string ChildIDList = cp.Content.GetProperty(ContentName, "ChildIDList");
-                            if (!string.IsNullOrEmpty(ChildIDList)) {
-                                result = result + "," + ChildIDList;
-                            }
-                        }
+                        result += "," + cs.GetInteger("id").ToString();
+                        //int ContentID = cs.GetInteger("id");
+                        //result = result + "," + ContentID.ToString();
+                        //string ContentName = cp.Content.GetRecordName("content", ContentID);
+                        //if (!string.IsNullOrEmpty(ContentName)) {
+                        //    string ChildIDList = cp.Content.GetProperty(ContentName, "ChildIDList");
+                        //    if (!string.IsNullOrEmpty(ChildIDList)) {
+                        //        result = result + "," + ChildIDList;
+                        //    }
+                        //}
                         cs.GoNext();
                     }
                     while (cs.OK());
