@@ -34,19 +34,21 @@ namespace Contensive.Processor.Controllers {
             if (maxRows == 0) {
                 maxRows = 1000;
             }
-            CS = csXfer.csInsert("Remote Queries");
-            if (csXfer.csOk(CS)) {
-                RemoteKey = GenericController.getGUIDString();
-                DataSourceID = core.db.getRecordID("Data Sources", dataSourceName);
-                csXfer.csSet(CS, "remotekey", RemoteKey);
-                csXfer.csSet(CS, "datasourceid", DataSourceID);
-                csXfer.csSet(CS, "sqlquery", SQL);
-                csXfer.csSet(CS, "maxRows", maxRows);
-                csXfer.csSet(CS, "dateexpires", DbController.encodeSQLDate(core.doc.profileStartTime.AddDays(1)));
-                csXfer.csSet(CS, "QueryTypeID", QueryTypeSQL);
-                csXfer.csSet(CS, "VisitId", core.session.visit.id);
+            using (var csXfer = new CsModel(core)) {
+                csXfer.csInsert("Remote Queries");
+                if (csXfer.csOk()) {
+                    RemoteKey = GenericController.getGUIDString();
+                    DataSourceID = MetaController.getRecordId(core, "Data Sources", dataSourceName);
+                    csXfer.csSet(CS, "remotekey", RemoteKey);
+                    csXfer.csSet(CS, "datasourceid", DataSourceID);
+                    csXfer.csSet(CS, "sqlquery", SQL);
+                    csXfer.csSet(CS, "maxRows", maxRows);
+                    csXfer.csSet(CS, "dateexpires", DbController.encodeSQLDate(core.doc.profileStartTime.AddDays(1)));
+                    csXfer.csSet(CS, "QueryTypeID", QueryTypeSQL);
+                    csXfer.csSet(CS, "VisitId", core.session.visit.id);
+                }
+                csXfer.csClose(ref CS);
             }
-            csXfer.csClose(ref CS);
             //
             return RemoteKey;
         }

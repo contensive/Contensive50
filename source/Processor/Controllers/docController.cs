@@ -246,13 +246,13 @@ namespace Contensive.Processor.Controllers {
         //
         public void sendPublishSubmitNotice(string ContentName, int RecordID, string RecordName) {
             try {
-                Models.Domain.ContentMetaDomainModel CDef = null;
+                Models.Domain.MetaModel CDef = null;
                 string Copy = null;
                 string Link = null;
                 string FromAddress = null;
                 //
                 FromAddress = core.siteProperties.getText("EmailPublishSubmitFrom", core.siteProperties.emailAdmin);
-                CDef = Models.Domain.ContentMetaDomainModel.createByUniqueName(core, ContentName);
+                CDef = Models.Domain.MetaModel.createByUniqueName(core, ContentName);
                 Link = "/" + core.appConfig.adminRoute + "?af=" + AdminFormPublishing;
                 Copy = Msg_AuthoringSubmittedNotification;
                 Copy = GenericController.vbReplace(Copy, "<DOMAINNAME>", "<a href=\"" + HtmlController.encodeHtml(Link) + "\">" + core.webServer.requestDomain + "</a>");
@@ -283,7 +283,7 @@ namespace Contensive.Processor.Controllers {
         public string getContentWatchLinkByName(string ContentName, int RecordID, string DefaultLink = "", bool IncrementClicks = true) {
             string result = "";
             try {
-                string ContentRecordKey = Models.Domain.ContentMetaDomainModel.getContentId(core, GenericController.encodeText(ContentName)) + "." + GenericController.encodeInteger(RecordID);
+                string ContentRecordKey = Models.Domain.MetaModel.getContentId(core, GenericController.encodeText(ContentName)) + "." + GenericController.encodeInteger(RecordID);
                 result = getContentWatchLinkByKey(ContentRecordKey, DefaultLink, IncrementClicks);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -306,15 +306,15 @@ namespace Contensive.Processor.Controllers {
                 // Lookup link in main_ContentWatch
                 //
                 CSPointer = csXfer.csOpen("Content Watch", "ContentRecordKey=" + DbController.encodeSQLText(ContentRecordKey), "", false, 0, false, false, "Link,Clicks");
-                if (csXfer.csOk(CSPointer)) {
+                if (csXfer.csOk()) {
                     tempgetContentWatchLinkByKey = csXfer.csGetText(CSPointer, "Link");
                     if (GenericController.encodeBoolean(IncrementClicks)) {
-                        csXfer.csSet(CSPointer, "Clicks", csXfer.csGetInteger(CSPointer, "clicks") + 1);
+                        csXfer.csSet(CSPointer, "Clicks", csXfer.csGetInteger( "clicks") + 1);
                     }
                 } else {
                     tempgetContentWatchLinkByKey = GenericController.encodeText(DefaultLink);
                 }
-                csXfer.csClose(ref CSPointer);
+                csXfer.csClose();
                 //
                 return GenericController.encodeVirtualPath(tempgetContentWatchLinkByKey, core.appConfig.cdnFileUrl, appRootPath, core.webServer.requestDomain);
                 //
@@ -370,12 +370,12 @@ namespace Contensive.Processor.Controllers {
                 int templateId = 0;
                 //
                 //
-                CS = csXfer.csOpenRecord("Page Content", PageID, false, false, "TemplateID,ParentID");
-                if (csXfer.csOk(CS)) {
+                csXfer.csOpenRecord("Page Content", PageID, false, false, "TemplateID,ParentID");
+                if (csXfer.csOk()) {
                     templateId = csXfer.csGetInteger(CS, "TemplateID");
                     ParentID = csXfer.csGetInteger(CS, "ParentID");
                 }
-                csXfer.csClose(ref CS);
+                csXfer.csClose();
                 //
                 // Chase page tree to main_Get templateid
                 //
@@ -507,15 +507,15 @@ namespace Contensive.Processor.Controllers {
                 string Copy = null;
                 //
                 core.db.deleteContentRecords("Form Pages", "name=" + DbController.encodeSQLText("Registration Form"));
-                CS = csXfer.csOpen("Form Pages", "name=" + DbController.encodeSQLText("Registration Form"));
-                if (!csXfer.csOk(CS)) {
+                csXfer.csOpen("Form Pages", "name=" + DbController.encodeSQLText("Registration Form"));
+                if (!csXfer.csOk()) {
                     //
                     // create Version 1 template - just to main_Get it started
                     //
-                    csXfer.csClose(ref CS);
+                    csXfer.csClose();
                     GroupNameList = "Registered";
-                    CS = csXfer.csInsert("Form Pages");
-                    if (csXfer.csOk(CS)) {
+                    csXfer.csInsert("Form Pages");
+                    if (csXfer.csOk()) {
                         csXfer.csSet(CS, "name", "Registration Form");
                         Copy = ""
                         + "\r\n<table border=\"0\" cellpadding=\"2\" cellspacing=\"0\" width=\"100%\">"
@@ -536,7 +536,7 @@ namespace Contensive.Processor.Controllers {
                         csXfer.csSet(CS, "Instructions", Copy);
                     }
                 }
-                csXfer.csClose(ref CS);
+                csXfer.csClose();
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
             }
@@ -549,8 +549,8 @@ namespace Contensive.Processor.Controllers {
         public int createPageGetID(string PageName, string ContentName, int CreatedBy, string pageGuid) {
             int Id = 0;
             //
-            int CS = csXfer.csInsert(ContentName, CreatedBy);
-            if (csXfer.csOk(CS)) {
+            int csXfer.csInsert(ContentName, CreatedBy);
+            if (csXfer.csOk()) {
                 Id = csXfer.csGetInteger(CS, "ID");
                 csXfer.csSet(CS, "name", PageName);
                 csXfer.csSet(CS, "active", "1");
@@ -560,7 +560,7 @@ namespace Contensive.Processor.Controllers {
                 csXfer.csSave(CS);
                 //   Call WorkflowController.publishEdit("Page Content", Id)
             }
-            csXfer.csClose(ref CS);
+            csXfer.csClose();
             //
             return Id;
         }
@@ -596,25 +596,25 @@ namespace Contensive.Processor.Controllers {
                 // -- open meta content record
                 string Criteria = "(ContentID=" + contentId + ")and(RecordID=" + recordId + ")";
                 string FieldList = "ID,Name,MetaDescription,OtherHeadTags,MetaKeywordList";
-                int CS = csXfer.csOpen("Meta Content", Criteria, "", false, 0, false, false, FieldList);
+                int csXfer.csOpen("Meta Content", Criteria, "", false, 0, false, false, FieldList);
                 string keywordList = "";
                 int MetaContentID = 0;
-                if (csXfer.csOk(CS)) {
+                if (csXfer.csOk()) {
                     MetaContentID = csXfer.csGetInteger(CS, "ID");
                     core.html.addTitle(HtmlController.encodeHtml(csXfer.csGetText(CS, "Name")), "page content");
                     core.html.addMetaDescription(HtmlController.encodeHtml(csXfer.csGetText(CS, "MetaDescription")), "page content");
                     core.html.addHeadTag(csXfer.csGetText(CS, "OtherHeadTags"), "page content");
                     keywordList = csXfer.csGetText(CS, "MetaKeywordList").Replace( "\r\n", ",");
                 }
-                csXfer.csClose(ref CS);
+                csXfer.csClose();
                 //
                 // open Keyword List
                 string SQL = "select ccMetaKeywords.Name"
                     + " From ccMetaKeywords"
                     + " LEFT JOIN ccMetaKeywordRules on ccMetaKeywordRules.MetaKeywordID=ccMetaKeywords.ID"
                     + " Where ccMetaKeywordRules.MetaContentID=" + MetaContentID;
-                CS = csXfer.csOpenSql(SQL);
-                while (csXfer.csOk(CS)) {
+                csXfer.csOpenSql(SQL);
+                while (csXfer.csOk()) {
                     keywordList = keywordList + "," + csXfer.csGetText(CS, "Name");
                     csXfer.csGoNext(CS);
                 }
@@ -625,7 +625,7 @@ namespace Contensive.Processor.Controllers {
                     keywordList = HtmlController.encodeHtml(keywordList);
                     core.html.addMetaKeywordList(keywordList, "page content");
                 }
-                csXfer.csClose(ref CS);
+                csXfer.csClose();
             }
         }
     }

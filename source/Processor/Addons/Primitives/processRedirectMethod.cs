@@ -34,7 +34,7 @@ namespace Contensive.Addons.Primitives {
                 core.doc.redirectContentID = core.docProperties.getInteger(rnRedirectContentId);
                 core.doc.redirectRecordID = core.docProperties.getInteger(rnRedirectRecordId);
                 if (core.doc.redirectContentID != 0 & core.doc.redirectRecordID != 0) {
-                    string ContentName = ContentMetaController.getContentNameByID(core, core.doc.redirectContentID);
+                    string ContentName = MetaController.getContentNameByID(core, core.doc.redirectContentID);
                     if (!string.IsNullOrEmpty(ContentName)) {
                         WebServerController.main_RedirectByRecord_ReturnStatus(core, ContentName, core.doc.redirectRecordID);
                         result = "";

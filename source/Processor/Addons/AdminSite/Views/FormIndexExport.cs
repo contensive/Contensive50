@@ -110,11 +110,11 @@ namespace Contensive.Addons.AdminSite {
                             // Get the total record count
                             //
                             SQL = "select count(" + adminData.adminContent.tableName + ".ID) as cnt from " + SQLFrom + " where " + SQLWhere;
-                            CS = csXfer.csOpenSql(SQL, datasource.name);
-                            if (csXfer.csOk(CS)) {
+                            csXfer.csOpenSql(SQL, datasource.name);
+                            if (csXfer.csOk()) {
                                 recordCnt = csXfer.csGetInteger(CS, "cnt");
                             }
-                            csXfer.csClose(ref CS);
+                            csXfer.csClose();
                             //
                             // Build the SQL
                             //

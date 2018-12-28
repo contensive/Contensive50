@@ -140,15 +140,15 @@ namespace Contensive.Processor.Models.Domain {
                     //
                     // insert a new property record, get the ID back and save it in cache
                     //
-                    int CS = csXfer.csInsert("Properties", SystemMemberID);
-                    if (csXfer.csOk(CS)) {
+                    int csXfer.csInsert("Properties", SystemMemberID);
+                    if (csXfer.csOk()) {
                         propertyCache[2, Ptr] = csXfer.csGetText(CS, "ID");
                         csXfer.csSet(CS, "name", propertyName);
                         csXfer.csSet(CS, "FieldValue", propertyValue);
                         csXfer.csSet(CS, "TypeID", (int)propertyType);
                         csXfer.csSet(CS, "KeyID", keyId.ToString());
                     }
-                    csXfer.csClose(ref CS);
+                    csXfer.csClose();
                 } else if (propertyCache[1, Ptr] != propertyValue) {
                     propertyCache[1, Ptr] = propertyValue;
                     int RecordID = GenericController.encodeInteger(propertyCache[2, Ptr]);

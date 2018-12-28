@@ -108,8 +108,8 @@ namespace Contensive.Addons.AdminSite {
                                 SQL += " where " + sqlWhere;
                             }
                             int recordCnt = 0;
-                            int CS = csXfer.csOpenSql(SQL, datasource.name);
-                            if (csXfer.csOk(CS)) {
+                            int csXfer.csOpenSql(SQL, datasource.name);
+                            if (csXfer.csOk()) {
                                 recordCnt = csXfer.csGetInteger(CS, "cnt");
                             }
                             csXfer.csClose(ref CS);
@@ -305,13 +305,13 @@ namespace Contensive.Addons.AdminSite {
                             string RowColor = "";
                             int RecordPointer = 0;
                             int RecordLast = 0;
-                            CS = csXfer.csOpenSql(SQL, datasource.name, IndexConfig.recordsPerPage, IndexConfig.pageNumber);
-                            if (csXfer.csOk(CS)) {
+                            csXfer.csOpenSql(SQL, datasource.name, IndexConfig.recordsPerPage, IndexConfig.pageNumber);
+                            if (csXfer.csOk()) {
                                 RecordPointer = IndexConfig.recordTop;
                                 RecordLast = IndexConfig.recordTop + IndexConfig.recordsPerPage;
                                 //
                                 // --- Print out the records
-                                while ((csXfer.csOk(CS)) && (RecordPointer < RecordLast)) {
+                                while ((csXfer.csOk()) && (RecordPointer < RecordLast)) {
                                     int RecordID = csXfer.csGetInteger(CS, "ID");
                                     //RecordName = csXfer.csGetText(CS, "name");
                                     //IsLandingPage = IsPageContent And (RecordID = LandingPageID)
@@ -363,7 +363,7 @@ namespace Contensive.Addons.AdminSite {
                                 // --- print out the stuff at the bottom
                                 //
                                 int RecordTop_NextPage = IndexConfig.recordTop;
-                                if (csXfer.csOk(CS)) {
+                                if (csXfer.csOk()) {
                                     RecordTop_NextPage = RecordPointer;
                                 }
                                 int RecordTop_PreviousPage = IndexConfig.recordTop - IndexConfig.recordsPerPage;
@@ -490,7 +490,7 @@ namespace Contensive.Addons.AdminSite {
         /// <param name="recordCnt"></param>
         /// <param name="ContentAccessLimitMessage"></param>
         /// <returns></returns>
-        public static string getForm_Index_Header(CoreController core, IndexConfigClass IndexConfig, ContentMetaDomainModel content, int recordCnt, string ContentAccessLimitMessage) {
+        public static string getForm_Index_Header(CoreController core, IndexConfigClass IndexConfig, MetaModel content, int recordCnt, string ContentAccessLimitMessage) {
             //
             // ----- TitleBar
             //
@@ -518,7 +518,7 @@ namespace Contensive.Addons.AdminSite {
             foreach (var kvp in IndexConfig.findWords) {
                 IndexConfigClass.IndexConfigFindWordClass findWord = kvp.Value;
                 if (!string.IsNullOrEmpty(findWord.Name)) {
-                    string FieldCaption = ContentMetaController.getContentFieldProperty(core, content.name, findWord.Name, "caption");
+                    string FieldCaption = MetaController.getContentFieldProperty(core, content.name, findWord.Name, "caption");
                     switch (findWord.MatchOption) {
                         case FindWordMatchEnum.MatchEmpty:
                             filterLine = filterLine + ", " + FieldCaption + " is empty";
@@ -549,7 +549,7 @@ namespace Contensive.Addons.AdminSite {
                 }
             }
             if (IndexConfig.subCDefID > 0) {
-                string ContentName = ContentMetaController.getContentNameByID(core, IndexConfig.subCDefID);
+                string ContentName = MetaController.getContentNameByID(core, IndexConfig.subCDefID);
                 if (!string.IsNullOrEmpty(ContentName)) {
                     filterLine = filterLine + ", in Sub-content '" + ContentName + "'";
                 }
@@ -1033,10 +1033,10 @@ namespace Contensive.Addons.AdminSite {
                         if (field.fieldTypeId == fieldTypeIdMemberSelect) {
                             LookupContentName = "people";
                         } else {
-                            LookupContentName = ContentMetaController.getContentNameByID(core, field.lookupContentID);
+                            LookupContentName = MetaController.getContentNameByID(core, field.lookupContentID);
                         }
                         if (!string.IsNullOrEmpty(LookupContentName)) {
-                            JoinTablename = ContentMetaController.getContentTablename(core, LookupContentName);
+                            JoinTablename = MetaController.getContentTablename(core, LookupContentName);
                         }
                         IncludedInLeftJoin = IncludedInColumns;
                         if (IndexConfig.findWords.Count > 0) {
@@ -1082,8 +1082,8 @@ namespace Contensive.Addons.AdminSite {
                 // Sub CDef filter
                 //
                 if (IndexConfig.subCDefID > 0) {
-                    ContentName = ContentMetaController.getContentNameByID(core, IndexConfig.subCDefID);
-                    return_SQLWhere += "AND(" + ContentMetaController.getContentControlCriteria(core, ContentName) + ")";
+                    ContentName = MetaController.getContentNameByID(core, IndexConfig.subCDefID);
+                    return_SQLWhere += "AND(" + MetaController.getContentControlCriteria(core, ContentName) + ")";
                 }
                 //
                 // Return_sqlFrom and Where Clause for Groups filter
@@ -1095,7 +1095,7 @@ namespace Contensive.Addons.AdminSite {
                         for (Ptr = 0; Ptr < IndexConfig.groupListCnt; Ptr++) {
                             GroupName = IndexConfig.groupList[Ptr];
                             if (!string.IsNullOrEmpty(GroupName)) {
-                                GroupID = core.db.getRecordID("Groups", GroupName);
+                                GroupID = MetaController.getRecordId( core,"Groups", GroupName);
                                 if (GroupID == 0 && GroupName.IsNumeric()) {
                                     GroupID = GenericController.encodeInteger(GroupName);
                                 }
@@ -1121,7 +1121,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // This person can see all the records
                     //
-                    return_SQLWhere += "AND(" + ContentMetaController.getContentControlCriteria(core, adminData.adminContent.name) + ")";
+                    return_SQLWhere += "AND(" + MetaController.getContentControlCriteria(core, adminData.adminContent.name) + ")";
                 } else {
                     //
                     // Limit the Query to what they can see
@@ -1144,7 +1144,7 @@ namespace Contensive.Addons.AdminSite {
                                     ContentID = GenericController.encodeInteger(ListSplit[Ptr].Left(Pos - 1));
                                     if (ContentID > 0 && (ContentID != adminData.adminContent.id) & AdminDataModel.userHasContentAccess(core, ContentID)) {
                                         SubQuery = SubQuery + "OR(" + adminData.adminContent.tableName + ".ContentControlID=" + ContentID + ")";
-                                        return_ContentAccessLimitMessage = return_ContentAccessLimitMessage + ", '<a href=\"?cid=" + ContentID + "\">" + ContentMetaController.getContentNameByID(core, ContentID) + "</a>'";
+                                        return_ContentAccessLimitMessage = return_ContentAccessLimitMessage + ", '<a href=\"?cid=" + ContentID + "\">" + MetaController.getContentNameByID(core, ContentID) + "</a>'";
                                         SubContactList += "," + ContentID;
                                         SubContentCnt = SubContentCnt + 1;
                                     }
@@ -1509,7 +1509,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 IndexConfig = IndexConfigClass.get(core, adminData);
                 //
-                ContentName = ContentMetaController.getContentNameByID(core, adminData.adminContent.id);
+                ContentName = MetaController.getContentNameByID(core, adminData.adminContent.id);
                 RQS = "cid=" + adminData.adminContent.id + "&af=1";
                 //
                 //-------------------------------------------------------------------------------------
@@ -1558,7 +1558,7 @@ namespace Contensive.Addons.AdminSite {
                     string SubContentName = null;
                     SubFilterList = "";
                     if (IndexConfig.subCDefID > 0) {
-                        SubContentName = ContentMetaController.getContentNameByID(core, IndexConfig.subCDefID);
+                        SubContentName = MetaController.getContentNameByID(core, IndexConfig.subCDefID);
                         QS = RQS;
                         QS = GenericController.modifyQueryString(QS, "IndexFilterRemoveCDef", encodeText(IndexConfig.subCDefID));
                         Link = "/" + core.appConfig.adminRoute + "?" + QS;
@@ -1607,7 +1607,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     foreach (var findWordKvp in IndexConfig.findWords) {
                         IndexConfigClass.IndexConfigFindWordClass findWord = findWordKvp.Value;
-                        FieldCaption = GenericController.encodeText(ContentMetaController.getContentFieldProperty(core, ContentName, findWord.Name, "caption"));
+                        FieldCaption = GenericController.encodeText(MetaController.getContentFieldProperty(core, ContentName, findWord.Name, "caption"));
                         QS = RQS;
                         QS = GenericController.modifyQueryString(QS, "IndexFilterRemoveFind", findWord.Name);
                         Link = "/" + core.appConfig.adminRoute + "?" + QS;
@@ -1696,12 +1696,12 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // people filters
                 //
-                TableName = ContentMetaController.getContentTablename(core, ContentName);
+                TableName = MetaController.getContentTablename(core, ContentName);
                 SubFilterList = "";
                 if (GenericController.vbLCase(TableName) == GenericController.vbLCase("ccMembers")) {
                     SQL = core.db.getSQLSelect("default", "ccGroups", "ID,Caption,Name", "(active<>0)", "Caption,Name");
-                    CS = csXfer.csOpenSql(SQL, "Default");
-                    while (csXfer.csOk(CS)) {
+                    csXfer.csOpenSql(SQL, "Default");
+                    while (csXfer.csOk()) {
                         string Name = csXfer.csGetText(CS, "Name");
                         Ptr = 0;
                         if (IndexConfig.groupListCnt > 0) {

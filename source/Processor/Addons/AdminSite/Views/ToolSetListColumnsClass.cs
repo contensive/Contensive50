@@ -20,7 +20,7 @@ namespace Contensive.Addons.AdminSite {
             string result = "";
             try {
                 // todo refactor out
-                ContentMetaDomainModel adminContent = adminData.adminContent;
+                MetaModel adminContent = adminData.adminContent;
                 string Button = core.docProperties.getText(RequestNameButton);
                 if (Button == ButtonOK) {
                     //
@@ -55,7 +55,7 @@ namespace Contensive.Addons.AdminSite {
                 //--------------------------------------------------------------------------------
                 //
                 if (adminContent.id != 0) {
-                    var CDef = ContentMetaDomainModel.create(core, adminContent.id);
+                    var CDef = MetaModel.create(core, adminContent.id);
                     int ColumnWidthTotal = 0;
                     if (ToolsAction != 0) {
                         //
@@ -137,12 +137,12 @@ namespace Contensive.Addons.AdminSite {
                                         }
                                         {
                                             column = new IndexConfigClass.IndexConfigColumnClass();
-                                            int CSPointer = csXfer.csOpenRecord("Content Fields", FieldIDToAdd, false, false);
-                                            if (csXfer.csOk(CSPointer)) {
-                                                column.Name = csXfer.csGet(CSPointer, "name");
+                                            csXfer.csOpenRecord("Content Fields", FieldIDToAdd, false, false);
+                                            if (csXfer.csOk()) {
+                                                column.Name = csXfer.csGet( "name");
                                                 column.Width = 20;
                                             }
-                                            csXfer.csClose(ref CSPointer);
+                                            csXfer.csClose();
                                             IndexConfig.columns.Add(column);
                                             normalizeSaveLoad = true;
                                         }
@@ -222,7 +222,7 @@ namespace Contensive.Addons.AdminSite {
                         if (reloadMetadata) {
                             core.clearMetaData();
                             core.cache.invalidateAll();
-                            CDef = ContentMetaDomainModel.createByUniqueName(core, adminContent.name);
+                            CDef = MetaModel.createByUniqueName(core, adminContent.name);
                         }
                         //
                         // save indexconfig

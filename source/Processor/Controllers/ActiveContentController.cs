@@ -291,8 +291,8 @@ namespace Contensive.Processor.Controllers {
                                                             } else {
                                                                 Criteria = "name=" + DbController.encodeSQLText(ACName.ToUpper());
                                                             }
-                                                            int CS = csXfer.csOpen(AddonContentName, Criteria, "Name,ID", false, 0, false, false, SelectList);
-                                                            if (csXfer.csOk(CS)) {
+                                                            int csXfer.csOpen(AddonContentName, Criteria, "Name,ID", false, 0, false, false, SelectList);
+                                                            if (csXfer.csOk()) {
                                                                 IconFilename = csXfer.csGet(CS, "IconFilename");
                                                                 SrcOptionList = csXfer.csGet(CS, "ArgumentList");
                                                                 IconWidth = csXfer.csGetInteger(CS, "IconWidth");
@@ -335,7 +335,7 @@ namespace Contensive.Processor.Controllers {
                                                                         break;
                                                                 }
                                                             }
-                                                            csXfer.csClose(ref CS);
+                                                            csXfer.csClose();
                                                             //
                                                             // Build AddonOptionStringHTMLEncoded from SrcOptionList (for names), itself (for current settings), and SrcOptionList (for select options)
                                                             //

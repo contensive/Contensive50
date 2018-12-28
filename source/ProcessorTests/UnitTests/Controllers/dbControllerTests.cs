@@ -167,30 +167,30 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 cp.csXfer.csSet(cs, "name", name);
                 cp.csXfer.csSave(cs);
                 int id0 = cp.csXfer.csGetInteger(cs, "id");
-                cp.csXfer.csClose(ref cs);
+                cp.csXfer.csClose();
                 //
                 cs = cp.csXfer.csInsert("people");
                 cp.csXfer.csSet(cs, "name", name);
                 cp.csXfer.csSave(cs);
                 int id1 = cp.csXfer.csGetInteger(cs, "id");
-                cp.csXfer.csClose(ref cs);
+                cp.csXfer.csClose();
                 //
                 cs = cp.csXfer.csInsert("people");
                 cp.csXfer.csSet(cs, "name", name);
                 cp.csXfer.csSave(cs);
                 int id2 = cp.csXfer.csGetInteger(cs, "id");
-                cp.csXfer.csClose(ref cs);
+                cp.csXfer.csClose();
                 //
                 // act
                 cs = cp.csXfer.csOpen("people", "name=" + DbController.encodeSQLText(name),"id");
-                Assert.IsTrue(cp.csXfer.csOk(cs), "csOpen");
+                Assert.IsTrue(cp.csXfer.csOk(), "csOpen");
                 Assert.AreEqual(id0, cp.csXfer.csGetInteger(cs, "id"),"correct id0 after open");
                 cp.csXfer.csGoNext(cs);
                 Assert.AreEqual(id1, cp.csXfer.csGetInteger(cs, "id"), "goNext id1, id correct");
                 cp.csXfer.csGoNext(cs);
                 Assert.AreEqual(id2, cp.csXfer.csGetInteger(cs, "id"), "goNext id2, id correct");
                 cp.csXfer.csGoNext(cs);
-                Assert.IsFalse(cp.csXfer.csOk(cs),"csOk false after all records");
+                Assert.IsFalse(cp.csXfer.csOk(),"csOk false after all records");
             }
         }
         //
@@ -207,29 +207,29 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 cp.csXfer.csSet(cs, "name", name);
                 cp.csXfer.csSave(cs);
                 int id0 = cp.csXfer.csGetInteger(cs, "id");
-                cp.csXfer.csClose(ref cs);
+                cp.csXfer.csClose();
                 //
                 cs = cp.csXfer.csInsert("people");
                 cp.csXfer.csSet(cs, "name", name);
                 cp.csXfer.csSave(cs);
                 int id1 = cp.csXfer.csGetInteger(cs, "id");
-                cp.csXfer.csClose(ref cs);
+                cp.csXfer.csClose();
                 //
                 cs = cp.csXfer.csInsert("people");
                 cp.csXfer.csSet(cs, "name", name);
                 cp.csXfer.csSave(cs);
                 int id2 = cp.csXfer.csGetInteger(cs, "id");
-                cp.csXfer.csClose(ref cs);
+                cp.csXfer.csClose();
                 //
                 // act
                 cs = cp.csXfer.csOpen("people", "name=" + DbController.encodeSQLText(name), "id");
-                Assert.IsTrue(cp.csXfer.csOk(cs), "csOpen");
+                Assert.IsTrue(cp.csXfer.csOk(), "csOpen");
                 cp.csXfer.csGoNext(cs);
                 cp.csXfer.csGoNext(cs);
                 cp.csXfer.csGoNext(cs);
-                Assert.IsFalse(cp.csXfer.csOk(cs), "csOK false after last record");
+                Assert.IsFalse(cp.csXfer.csOk(), "csOK false after last record");
                 cp.csXfer.csGoFirst(cs);
-                Assert.IsTrue(cp.csXfer.csOk(cs), "csOK true after goFirst (back at first record");
+                Assert.IsTrue(cp.csXfer.csOk(), "csOK true after goFirst (back at first record");
                 //
                 Assert.AreEqual(id0, cp.csXfer.csGetInteger(cs, "id"), "correct id0 after goFirst");
                 cp.csXfer.csGoNext(cs);
@@ -237,7 +237,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 cp.csXfer.csGoNext(cs);
                 Assert.AreEqual(id2, cp.csXfer.csGetInteger(cs, "id"), "goNext id2, id correct");
                 cp.csXfer.csGoNext(cs);
-                Assert.IsFalse(cp.csXfer.csOk(cs), "csOk false after all records");
+                Assert.IsFalse(cp.csXfer.csOk(), "csOk false after all records");
             }
         }
     }

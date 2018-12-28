@@ -26,15 +26,15 @@ namespace Contensive.Addons.AdminSite {
                 //
                 string AddonGuid = core.docProperties.getText("guid");
                 //$$$$$ cache this
-                int CS = csXfer.csOpen(Processor.Models.Db.AddonModel.contentName, "ccguid=" + DbController.encodeSQLText(AddonGuid));
+                int csXfer.csOpen(Processor.Models.Db.AddonModel.contentName, "ccguid=" + DbController.encodeSQLText(AddonGuid));
                 string addonArgumentList = "";
                 bool addonIsInline = false;
-                if (csXfer.csOk(CS)) {
+                if (csXfer.csOk()) {
                     addonArgumentList = csXfer.csGetText(CS, "argumentlist");
                     addonIsInline = csXfer.csGetBoolean(CS, "IsInline");
                     returnHtml = AddonController.getDefaultAddonOptions(core, addonArgumentList, AddonGuid, addonIsInline);
                 }
-                csXfer.csClose(ref CS);
+                csXfer.csClose();
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }

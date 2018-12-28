@@ -9,6 +9,7 @@ using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
 using static Contensive.Addons.AdminSite.Controllers.AdminUIController;
 using Contensive.Processor.Exceptions;
+using Contensive.Processor;
 //
 namespace Contensive.Addons.AdminSite {
     /// <summary>
@@ -18,7 +19,7 @@ namespace Contensive.Addons.AdminSite {
         /// <summary>
         /// the content metadata being edited
         /// </summary>
-        public ContentMetaDomainModel adminContent { get; set; }
+        public MetaModel adminContent { get; set; }
         /// <summary>
         /// the record being edited
         /// </summary>
@@ -136,9 +137,10 @@ namespace Contensive.Addons.AdminSite {
                 return _ContentWatchListID;
             }
             set {
-            _ContentWatchListID = value;
-            }   
-        } private int[] _ContentWatchListID;
+                _ContentWatchListID = value;
+            }
+        }
+        private int[] _ContentWatchListID;
         /// <summary>
         /// size of ContentWatchListID() array
         /// </summary>
@@ -214,7 +216,8 @@ namespace Contensive.Addons.AdminSite {
                 AllowAdminFieldCheck_Local = core.siteProperties.getBoolean("AllowAdminFieldCheck", true);
             }
             return (bool)AllowAdminFieldCheck_Local;
-        } private bool? AllowAdminFieldCheck_Local = null;
+        }
+        private bool? AllowAdminFieldCheck_Local = null;
         //
         //========================================================================
         /// <summary>
@@ -238,15 +241,18 @@ namespace Contensive.Addons.AdminSite {
                     // ----- Open the content watch record for this content record
                     //
                     ContentID = ((editRecord.contentControlId.Equals(0)) ? adminContent.id : editRecord.contentControlId);
-                    CSPointer = csXfer.csOpen("Content Watch", "(ContentID=" + DbController.encodeSQLNumber(ContentID) + ")AND(RecordID=" + DbController.encodeSQLNumber(editRecord.id) + ")");
-                    if (csXfer.csOk(CSPointer)) {
-                        ContentWatchLoaded = true;
-                        ContentWatchRecordID = (csXfer.csGetInteger(CSPointer, "ID"));
-                        ContentWatchLink = (csXfer.csGet(CSPointer, "Link"));
-                        ContentWatchClicks = (csXfer.csGetInteger(CSPointer, "Clicks"));
-                        ContentWatchLinkLabel = (csXfer.csGet(CSPointer, "LinkLabel"));
-                        ContentWatchExpires = (csXfer.csGetDate(CSPointer, "WhatsNewDateExpires"));
-                        csXfer.csClose(ref CSPointer);
+                    using (var csXfer = new CsModel(core)) {
+                        csXfer.csOpen("Content Watch", "(ContentID=" + DbController.encodeSQLNumber(ContentID) + ")AND(RecordID=" + DbController.encodeSQLNumber(editRecord.id) + ")");
+                        if (csXfer.csOk()) {
+                            ContentWatchLoaded = true;
+                            ContentWatchRecordID = (csXfer.csGetInteger("ID"));
+                            ContentWatchLink = (csXfer.csGet("Link"));
+                            ContentWatchClicks = (csXfer.csGetInteger("Clicks"));
+                            ContentWatchLinkLabel = (csXfer.csGet("LinkLabel"));
+                            ContentWatchExpires = (csXfer.csGetDate(CSPointer, "WhatsNewDateExpires"));
+                            csXfer.csClose();
+                        }
+
                     }
                 }
             } catch (Exception ex) {
@@ -275,20 +281,22 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // ----- Update ContentWatchListRules for all checked boxes
                     //
-                    CSContentWatchList = csXfer.csOpen("Content Watch Lists");
-                    while (csXfer.csOk(CSContentWatchList)) {
-                        RecordID = (csXfer.csGetInteger(CSContentWatchList, "ID"));
-                        if (core.docProperties.getBoolean("ContentWatchList." + RecordID)) {
-                            if (ContentWatchListIDCount >= ContentWatchListIDSize) {
-                                ContentWatchListIDSize = ContentWatchListIDSize + 50;
-                                Array.Resize(ref _ContentWatchListID, ContentWatchListIDSize);
+                    using (var csXfer = new CsModel(core)) {
+                        csXfer.csOpen("Content Watch Lists");
+                        while (csXfer.csOk(CSContentWatchList)) {
+                            RecordID = (csXfer.csGetInteger(CSContentWatchList, "ID"));
+                            if (core.docProperties.getBoolean("ContentWatchList." + RecordID)) {
+                                if (ContentWatchListIDCount >= ContentWatchListIDSize) {
+                                    ContentWatchListIDSize = ContentWatchListIDSize + 50;
+                                    Array.Resize(ref _ContentWatchListID, ContentWatchListIDSize);
+                                }
+                                ContentWatchListID[ContentWatchListIDCount] = RecordID;
+                                ContentWatchListIDCount = ContentWatchListIDCount + 1;
                             }
-                            ContentWatchListID[ContentWatchListIDCount] = RecordID;
-                            ContentWatchListIDCount = ContentWatchListIDCount + 1;
+                            csXfer.csGoNext(CSContentWatchList);
                         }
-                        csXfer.csGoNext(CSContentWatchList);
+                        csXfer.csClose();
                     }
-                    csXfer.csClose(ref CSContentWatchList);
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
@@ -378,13 +386,13 @@ namespace Contensive.Addons.AdminSite {
         /// <param name="core"></param>
         /// <param name="ContentID"></param>
         /// <returns></returns>
-        public static  bool userHasContentAccess(CoreController core, int ContentID) {
+        public static bool userHasContentAccess(CoreController core, int ContentID) {
             try {
                 if (core.session.isAuthenticatedAdmin(core)) return true;
                 //
-                ContentMetaDomainModel cdef = ContentMetaDomainModel.create(core, ContentID);
-                if ( cdef != null ) {
-                    return core.session.isAuthenticatedContentManager(core, cdef.name );
+                MetaModel cdef = MetaModel.create(core, ContentID);
+                if (cdef != null) {
+                    return core.session.isAuthenticatedContentManager(core, cdef.name);
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
@@ -434,16 +442,16 @@ namespace Contensive.Addons.AdminSite {
                 // adminContext.content init
                 requestedContentId = core.docProperties.getInteger("cid");
                 if (requestedContentId != 0) {
-                    adminContent = ContentMetaDomainModel.create(core, requestedContentId);
+                    adminContent = MetaModel.create(core, requestedContentId);
                     if (adminContent == null) {
-                        adminContent = new ContentMetaDomainModel();
+                        adminContent = new MetaModel();
                         adminContent.id = 0;
                         Processor.Controllers.ErrorController.addUserError(core, "There is no content with the requested id [" + requestedContentId + "]");
                         requestedContentId = 0;
                     }
                 }
                 if (adminContent == null) {
-                    adminContent = new ContentMetaDomainModel();
+                    adminContent = new MetaModel();
                 }
                 //
                 // determine user rights to this content
@@ -464,16 +472,18 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // set adminContext.content to the content definition of the requested record
                     //
-                    int CS = csXfer.csOpenRecord(adminContent.name, requestedRecordId, false, false, "ContentControlID");
-                    if (csXfer.csOk(CS)) {
-                        editRecord.id = requestedRecordId;
-                        int recordContentId = csXfer.csGetInteger(CS, "ContentControlID");
-                        //adminContent.id = csXfer.csGetInteger(CS, "ContentControlID");
-                        if ((recordContentId > 0) && (recordContentId != adminContent.id)) {
-                            adminContent = ContentMetaDomainModel.create(core, recordContentId);
+                    using (var csXfer = new CsModel(core)) {
+                        csXfer.csOpenRecord(adminContent.name, requestedRecordId, "ContentControlID");
+                        if (csXfer.csOk()) {
+                            editRecord.id = requestedRecordId;
+                            int recordContentId = csXfer.csGetInteger(CS, "ContentControlID");
+                            //adminContent.id = csXfer.csGetInteger(CS, "ContentControlID");
+                            if ((recordContentId > 0) && (recordContentId != adminContent.id)) {
+                                adminContent = MetaModel.create(core, recordContentId);
+                            }
                         }
+                        csXfer.csClose(ref CS);
                     }
-                    csXfer.csClose(ref CS);
                 }
                 //
                 // Other page control fields
@@ -718,7 +728,7 @@ namespace Contensive.Addons.AdminSite {
                     // ----- Set the local global copy of Edit Record Locks
                     var table = TableModel.createByContentName(core, adminContent.name);
                     WorkflowController.recordWorkflowStatusClass authoringStatus = WorkflowController.getWorkflowStatus(core, adminContent.name, editRecord.id);
-                    editRecord.EditLock = WorkflowController.getEditLock( core, table.id, editRecord.id );
+                    editRecord.EditLock = WorkflowController.getEditLock(core, table.id, editRecord.id);
                     editRecord.SubmitLock = authoringStatus.isWorkflowSubmitted;
                     editRecord.SubmittedName = authoringStatus.workflowSubmittedMemberName;
                     editRecord.SubmittedDate = authoringStatus.workflowSubmittedDate;
@@ -784,7 +794,7 @@ namespace Contensive.Addons.AdminSite {
                 editRecord.active = true;
                 editRecord.contentControlId = adminContent.id;
                 editRecord.contentControlId_Name = adminContent.name;
-                editRecord.EditLock = new WorkflowController.editLockClass() {editLockByMemberId=0, editLockByMemberName="", editLockExpiresDate=DateTime.MinValue, isEditLocked=false };
+                editRecord.EditLock = new WorkflowController.editLockClass() { editLockByMemberId = 0, editLockByMemberName = "", editLockExpiresDate = DateTime.MinValue, isEditLocked = false };
                 editRecord.Loaded = false;
                 editRecord.Saved = false;
                 foreach (var keyValuePair in adminContent.fields) {
@@ -824,9 +834,9 @@ namespace Contensive.Addons.AdminSite {
                                         editRecord.fieldsLc[field.nameLc].value = DefaultValueText;
                                     } else {
                                         if (field.lookupContentID != 0) {
-                                            LookupContentName = ContentMetaController.getContentNameByID(core, field.lookupContentID);
+                                            LookupContentName = MetaController.getContentNameByID(core, field.lookupContentID);
                                             if (!string.IsNullOrEmpty(LookupContentName)) {
-                                                editRecord.fieldsLc[field.nameLc].value = core.db.getRecordID(LookupContentName, DefaultValueText);
+                                                editRecord.fieldsLc[field.nameLc].value = MetaController.getRecordId(core, LookupContentName, DefaultValueText);
                                             }
                                         } else if (field.lookupList != "") {
                                             UCaseDefaultValueText = GenericController.vbUCase(DefaultValueText);
@@ -1050,7 +1060,7 @@ namespace Contensive.Addons.AdminSite {
                                 case _fieldTypeIdFileXML:
                                 case _fieldTypeIdFileJavascript:
                                 case _fieldTypeIdFileHTML:
-                                    DBValueVariant = csXfer.csGet(CSPointer, adminContentcontent.nameLc);
+                                    DBValueVariant = csXfer.csGet(adminContentcontent.nameLc);
                                     break;
                                 default:
                                     DBValueVariant = csXfer.csGetValue(CSPointer, adminContentcontent.nameLc);
@@ -1124,7 +1134,7 @@ namespace Contensive.Addons.AdminSite {
                                     if (editRecord.contentControlId.Equals(0)) {
                                         editRecord.contentControlId = adminContent.id;
                                     }
-                                    editRecord.contentControlId_Name = ContentMetaController.getContentNameByID(core, editRecord.contentControlId);
+                                    editRecord.contentControlId_Name = MetaController.getContentNameByID(core, editRecord.contentControlId);
                                     break;
                                 case "ID":
                                     editRecord.id = csXfer.csGetInteger(CSEditRecord, adminContentcontent.nameLc);
@@ -1537,8 +1547,8 @@ namespace Contensive.Addons.AdminSite {
                                     UsedIDs = editRecord.id.ToString();
                                     while ((LoopPtr < LoopPtrMax) && (ParentID != 0) && (("," + UsedIDs + ",").IndexOf("," + ParentID.ToString() + ",") == -1)) {
                                         UsedIDs = UsedIDs + "," + ParentID.ToString();
-                                        CS = csXfer.csOpen(adminContent.name, "ID=" + ParentID, "", true, 0, false, false, "ParentID");
-                                        if (!csXfer.csOk(CS)) {
+                                        csXfer.csOpen(adminContent.name, "ID=" + ParentID, "", true, 0, false, false, "ParentID");
+                                        if (!csXfer.csOk()) {
                                             ParentID = 0;
                                         } else {
                                             ParentID = csXfer.csGetInteger(CS, "ParentID");
@@ -1594,14 +1604,14 @@ namespace Contensive.Addons.AdminSite {
                                     //
                                     // ----- Do the unique check for this field
                                     //
-                                    string SQLUnique = "select id from " + adminContent.tableName + " where (" + field.nameLc + "=" + DbController.encodeSQL(ResponseFieldValueText, field.fieldTypeId) + ")and(" + ContentMetaController.getContentControlCriteria(core, adminContent.name) + ")";
+                                    string SQLUnique = "select id from " + adminContent.tableName + " where (" + field.nameLc + "=" + DbController.encodeSQL(ResponseFieldValueText, field.fieldTypeId) + ")and(" + MetaController.getContentControlCriteria(core, adminContent.name) + ")";
                                     if (editRecord.id > 0) {
                                         //
                                         // --editing record
                                         SQLUnique = SQLUnique + "and(id<>" + editRecord.id + ")";
                                     }
                                     CSPointer = csXfer.csOpenSql(SQLUnique, adminContent.dataSourceName);
-                                    if (csXfer.csOk(CSPointer)) {
+                                    if (csXfer.csOk()) {
                                         //
                                         // field is not unique, skip it and flag error
                                         //
@@ -1624,7 +1634,7 @@ namespace Contensive.Addons.AdminSite {
                                         }
                                         ResponseFieldValueIsOKToSave = false;
                                     }
-                                    csXfer.csClose(ref CSPointer);
+                                    csXfer.csClose();
                                 }
                             }
                             // end case

@@ -15,13 +15,13 @@ namespace Contensive.Processor.Models.Domain {
     /// content definitions - meta data
     /// </summary>
     [Serializable]
-    public class ContentMetaDomainModel : ICloneable {
+    public class MetaModel : ICloneable {
         //
         //====================================================================================================
         /// <summary>
         /// constructor to setup defaults for fields required
         /// </summary>
-        public ContentMetaDomainModel() {
+        public MetaModel() {
             // set defaults, create methods require name, table
             active = true;
         }
@@ -270,8 +270,8 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="loadInvalidFields"></param>
         /// <param name="forceDbLoad"></param>
         /// <returns></returns>
-        public static ContentMetaDomainModel create(CoreController core, ContentModel content, bool loadInvalidFields, bool forceDbLoad) {
-            ContentMetaDomainModel result = null;
+        public static MetaModel create(CoreController core, ContentModel content, bool loadInvalidFields, bool forceDbLoad) {
+            MetaModel result = null;
             try {
                 if ( content == null ) { return null; }
                 if ((!forceDbLoad) && (core.cdefDictionary.ContainsKey(content.id.ToString()))) { return core.cdefDictionary[content.id.ToString()]; }
@@ -327,7 +327,7 @@ namespace Contensive.Processor.Models.Domain {
                             // cdef not found
                             //
                         } else {
-                            result = new Models.Domain.ContentMetaDomainModel();
+                            result = new Models.Domain.MetaModel();
                             result.fields = new Dictionary<string, Models.Domain.CDefFieldModel>();
                             result.selectList = new List<string>();
                             result.adminColumns = new SortedList<string, CDefAdminColumnClass>();
@@ -367,7 +367,7 @@ namespace Contensive.Processor.Models.Domain {
                             if (result.parentID == 0) {
                                 result.parentID = -1;
                             } else {
-                                Models.Domain.ContentMetaDomainModel parentCdef = create(core, result.parentID, loadInvalidFields, forceDbLoad);
+                                Models.Domain.MetaModel parentCdef = create(core, result.parentID, loadInvalidFields, forceDbLoad);
                                 foreach (var keyvaluepair in parentCdef.fields) {
                                     Models.Domain.CDefFieldModel parentField = keyvaluepair.Value;
                                     Models.Domain.CDefFieldModel childField = new Models.Domain.CDefFieldModel();
@@ -587,9 +587,9 @@ namespace Contensive.Processor.Models.Domain {
             return result;
         }
         //
-        public static ContentMetaDomainModel create(CoreController core, ContentModel content, bool loadInvalidFields) => create(core, content, loadInvalidFields, false);
+        public static MetaModel create(CoreController core, ContentModel content, bool loadInvalidFields) => create(core, content, loadInvalidFields, false);
         //
-        public static ContentMetaDomainModel create(CoreController core, ContentModel content) => create(core, content, false, false);
+        public static MetaModel create(CoreController core, ContentModel content) => create(core, content, false, false);
         //
         //====================================================================================================
         /// <summary>
@@ -600,15 +600,15 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="loadInvalidFields"></param>
         /// <param name="forceDbLoad"></param>
         /// <returns></returns>
-        public static ContentMetaDomainModel create(CoreController core, string contentGuid, bool loadInvalidFields, bool forceDbLoad) {
+        public static MetaModel create(CoreController core, string contentGuid, bool loadInvalidFields, bool forceDbLoad) {
             var content = ContentModel.create(core, contentGuid);
             if (content == null) { return null; }
             return create(core, content, loadInvalidFields, forceDbLoad);
         }
         //
-        public static ContentMetaDomainModel create(CoreController core, string contentGuid, bool loadInvalidFields) => create(core, contentGuid, loadInvalidFields, false );
+        public static MetaModel create(CoreController core, string contentGuid, bool loadInvalidFields) => create(core, contentGuid, loadInvalidFields, false );
         //
-        public static ContentMetaDomainModel create(CoreController core, string contentGuid) => create(core, contentGuid, false, false );
+        public static MetaModel create(CoreController core, string contentGuid) => create(core, contentGuid, false, false );
         //
         //====================================================================================================
         /// <summary>
@@ -619,15 +619,15 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="loadInvalidFields"></param>
         /// <param name="forceDbLoad"></param>
         /// <returns></returns>
-        public static ContentMetaDomainModel create(CoreController core, int contentId, bool loadInvalidFields, bool forceDbLoad) {
+        public static MetaModel create(CoreController core, int contentId, bool loadInvalidFields, bool forceDbLoad) {
             var content = ContentModel.create(core, contentId);
             if (content == null) { return null; }
             return create(core, content, loadInvalidFields, forceDbLoad);
         }
         //
-        public static ContentMetaDomainModel create(CoreController core, int contentId, bool loadInvalidFields) => create(core, contentId, loadInvalidFields, false);
+        public static MetaModel create(CoreController core, int contentId, bool loadInvalidFields) => create(core, contentId, loadInvalidFields, false);
         //
-        public static ContentMetaDomainModel create(CoreController core, int contentId) => create(core, contentId, false, false);
+        public static MetaModel create(CoreController core, int contentId) => create(core, contentId, false, false);
         //   
         //====================================================================================================
         /// <summary>
@@ -635,15 +635,15 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         /// <param name="contentName"></param>
         /// <returns></returns>
-        public static ContentMetaDomainModel createByUniqueName(CoreController core, string contentName, bool loadInvalidFields, bool forceDbLoad) {
+        public static MetaModel createByUniqueName(CoreController core, string contentName, bool loadInvalidFields, bool forceDbLoad) {
             var content = ContentModel.createByUniqueName(core, contentName);
             if (content == null) { return null; }
             return create(core, content, loadInvalidFields, forceDbLoad);
         }
         //
-        public static ContentMetaDomainModel createByUniqueName(CoreController core, string contentName, bool loadInvalidFields) => create(core, contentName, loadInvalidFields, false);
+        public static MetaModel createByUniqueName(CoreController core, string contentName, bool loadInvalidFields) => create(core, contentName, loadInvalidFields, false);
         //
-        public static ContentMetaDomainModel createByUniqueName(CoreController core, string contentName) => create(core, contentName, false, false);
+        public static MetaModel createByUniqueName(CoreController core, string contentName) => create(core, contentName, false, false);
         //
         //========================================================================
         /// <summary>
@@ -689,7 +689,7 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         /// <param name="core"></param>
         /// <param name="cdef"></param>
-        private static void create_setAdminColumns(CoreController core, ContentMetaDomainModel cdef) {
+        private static void create_setAdminColumns(CoreController core, MetaModel cdef) {
             try {
                 if (cdef.id > 0) {
                     int cnt = 0;
@@ -772,7 +772,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="core"></param>
         /// <param name="contentId"></param>
         /// <param name="cdef"></param>
-        public static void setCache(CoreController core, int contentId, ContentMetaDomainModel cdef) {
+        public static void setCache(CoreController core, int contentId, MetaModel cdef) {
             List<string> dependantList = new List<string>();
             core.cache.storeObject(getCacheKey(contentId), cdef, dependantList);
         }
@@ -784,11 +784,11 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="core"></param>
         /// <param name="contentId"></param>
         /// <returns></returns>
-        public static ContentMetaDomainModel getCache(CoreController core, int contentId) {
-            ContentMetaDomainModel result = null;
+        public static MetaModel getCache(CoreController core, int contentId) {
+            MetaModel result = null;
             try {
                 try {
-                    result = core.cache.getObject<Models.Domain.ContentMetaDomainModel>(getCacheKey(contentId));
+                    result = core.cache.getObject<Models.Domain.MetaModel>(getCacheKey(contentId));
                 } catch (Exception ex) {
                     LogController.handleError(core, ex);
                 }

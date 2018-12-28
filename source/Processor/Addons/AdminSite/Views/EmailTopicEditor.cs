@@ -3,6 +3,7 @@ using System;
 using Contensive.Addons.AdminSite.Controllers;
 using Contensive.Processor;
 using Contensive.Processor.Controllers;
+using Contensive.Processor.Models.Domain;
 using static Contensive.Processor.Constants;
 
 namespace Contensive.Addons.AdminSite {
@@ -32,7 +33,7 @@ namespace Contensive.Addons.AdminSite {
                     + "<td class=\"ccAdminEditField\" colspan=2>" + SpanClassAdminNormal + s + "</span></td>"
                     + "</tr><tr>"
                     + "<td class=\"ccAdminEditCaption\">&nbsp;</td>"
-                    + "<td class=\"ccAdminEditField\" colspan=2>" + SpanClassAdminNormal + "[<a href=?cid=" + Models.Domain.ContentMetaDomainModel.getContentId(core, "Topics") + " target=_blank>Manage Topics</a>]</span></td>"
+                    + "<td class=\"ccAdminEditField\" colspan=2>" + SpanClassAdminNormal + "[<a href=?cid=" + MetaModel.getContentId(core, "Topics") + " target=_blank>Manage Topics</a>]</span></td>"
                     + "</tr>";
                 s = AdminUIController.editTable( s );
                 s = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), "Email Rules", "Send email to people in these groups", s);

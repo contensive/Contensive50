@@ -24,11 +24,11 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         //
-        public static _BlankModel addDefault(CoreController core, Domain.ContentMetaDomainModel cdef) => addDefault<_BlankModel>(core, cdef);
+        public static _BlankModel addDefault(CoreController core, Domain.MetaModel cdef) => addDefault<_BlankModel>(core, cdef);
         //
         //====================================================================================================
         //
-        public static _BlankModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.ContentMetaDomainModel cdef) => addDefault<_BlankModel>(core, cdef, ref callersCacheNameList);
+        public static _BlankModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.MetaModel cdef) => addDefault<_BlankModel>(core, cdef, ref callersCacheNameList);
         //
         //====================================================================================================
         //

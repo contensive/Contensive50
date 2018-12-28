@@ -24,7 +24,7 @@ namespace Contensive.Addons.AdminSite {
                 FindWordMatchEnum MatchOption = 0;
                 int FormFieldPtr = 0;
                 int FormFieldCnt = 0;
-                ContentMetaDomainModel CDef = null;
+                MetaModel CDef = null;
                 string FieldName = null;
                 StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 int FieldPtr = 0;
@@ -129,7 +129,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // ----- List out all fields
                 //
-                CDef = ContentMetaDomainModel.createByUniqueName(core, adminData.adminContent.name);
+                CDef = MetaModel.createByUniqueName(core, adminData.adminContent.name);
                 FieldSize = 100;
                 Array.Resize(ref FieldNames, FieldSize + 1);
                 Array.Resize(ref FieldCaption, FieldSize + 1);
@@ -160,7 +160,7 @@ namespace Contensive.Addons.AdminSite {
                     if (fieldTypeId[FieldPtr] == fieldTypeIdLookup) {
                         ContentID = field.lookupContentID;
                         if (ContentID > 0) {
-                            FieldLookupContentName[FieldPtr] = ContentMetaController.getContentNameByID(core, ContentID);
+                            FieldLookupContentName[FieldPtr] = MetaController.getContentNameByID(core, ContentID);
                         }
                         FieldLookupList[FieldPtr] = field.lookupList;
                     }

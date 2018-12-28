@@ -60,12 +60,12 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static DomainModel addDefault(CoreController core, Domain.ContentMetaDomainModel cdef) {
+        public static DomainModel addDefault(CoreController core, Domain.MetaModel cdef) {
             return addDefault<DomainModel>(core, cdef);
         }
         //
         //====================================================================================================
-        public static DomainModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.ContentMetaDomainModel cdef) {
+        public static DomainModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.MetaModel cdef) {
             return addDefault<DomainModel>(core, cdef, ref callersCacheNameList);
         }
         //

@@ -41,12 +41,12 @@ namespace Contensive.Processor.Controllers {
                 core.html.addStyleLink("/quickEditor/styles.css", "Quick Editor");
                 //
                 // -- First Active Record - Output Quick Editor form
-                Models.Domain.ContentMetaDomainModel cdef = Models.Domain.ContentMetaDomainModel.createByUniqueName(core, PageContentModel.contentName);
+                Models.Domain.MetaModel cdef = Models.Domain.MetaModel.createByUniqueName(core, PageContentModel.contentName);
                 var pageContentTable = Models.Db.TableModel.create(core, cdef.id);
                 var editLock = WorkflowController.getEditLock(core, pageContentTable.id, core.doc.pageController.page.id);
                 WorkflowController.recordWorkflowStatusClass authoringStatus = WorkflowController.getWorkflowStatus(core, PageContentModel.contentName, core.doc.pageController.page.id);
                 PermissionController.UserContentPermissions userContentPermissions = PermissionController.getUserContentPermissions(core, cdef);
-                bool AllowMarkReviewed = ContentMetaController.isContentFieldSupported(core, PageContentModel.contentName, "DateReviewed");
+                bool AllowMarkReviewed = MetaController.isContentFieldSupported(core, PageContentModel.contentName, "DateReviewed");
                 string OptionsPanelAuthoringStatus = core.session.getAuthoringStatusMessage(core, false, editLock.isEditLocked, editLock.editLockByMemberName, editLock.editLockExpiresDate, authoringStatus.isWorkflowApproved, authoringStatus.workflowApprovedMemberName, authoringStatus.isWorkflowSubmitted, authoringStatus.workflowSubmittedMemberName, authoringStatus.isWorkflowDeleted, authoringStatus.isWorkflowInserted, authoringStatus.isWorkflowModified, authoringStatus.workflowModifiedByMemberName);
                 //
                 // Set Editing Authoring Control

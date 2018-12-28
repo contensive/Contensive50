@@ -34,7 +34,7 @@ namespace Contensive.Addons.AdminSite {
                     } else {
                         //
                         // Content Definition was not specified
-                        LogController.handleError(core, new GenericException( "The content definition specified for this page [" + adminData.adminContent.id + "] was not found"));
+                        LogController.handleError(core, new GenericException("The content definition specified for this page [" + adminData.adminContent.id + "] was not found"));
                         return HtmlController.p("No content was specified.");
                     }
                 }
@@ -150,15 +150,15 @@ namespace Contensive.Addons.AdminSite {
                             HTMLFieldString = HTMLFieldString + HtmlController.inputHidden("ContentControlID", FieldValueInteger);
                         } else {
                             string RecordContentName = editRecord.contentControlId_Name;
-                            string TableName2 = ContentMetaController.getContentTablename(core, RecordContentName);
-                            int TableID = core.db.getRecordID("Tables", TableName2);
+                            string TableName2 = MetaController.getContentTablename(core, RecordContentName);
+                            int TableID = MetaController.getRecordId(core, "Tables", TableName2);
                             //
                             // Test for parentid
                             int ParentID = 0;
                             bool ContentSupportsParentID = false;
                             if (editRecord.id > 0) {
-                                int CS = csXfer.csOpenRecord(RecordContentName, editRecord.id);
-                                if (csXfer.csOk(CS)) {
+                                int csXfer.csOpenRecord(RecordContentName, editRecord.id);
+                                if (csXfer.csOk()) {
                                     ContentSupportsParentID = csXfer.csIsFieldSupported(CS, "ParentID");
                                     if (ContentSupportsParentID) {
                                         ParentID = csXfer.csGetInteger(CS, "ParentID");
@@ -174,11 +174,13 @@ namespace Contensive.Addons.AdminSite {
                                 if (ParentID != 0) {
                                     //
                                     // This record has a parent, set LimitContentSelectToThisID to the parent's CID
-                                    int CSPointer = csXfer.csOpenRecord(RecordContentName, ParentID, false, false, "ContentControlID");
-                                    if (csXfer.csOk(CSPointer)) {
-                                        LimitContentSelectToThisID = csXfer.csGetInteger(CSPointer, "ContentControlID");
+                                    using (var csXfer = new CsModel(core)) {
+                                        csXfer.csOpenRecord(RecordContentName, ParentID, "ContentControlID");
+                                        if (csXfer.csOk()) {
+                                            LimitContentSelectToThisID = csXfer.csGetInteger("ContentControlID");
+                                        }
+                                        csXfer.csClose();
                                     }
-                                    csXfer.csClose(ref CSPointer);
                                 }
 
                             }
@@ -187,31 +189,34 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 // administrator, and either ( no parentid or does not support it), let them select any content compatible with the table
                                 string sqlFilter = "(ContentTableID=" + TableID + ")";
-                                int contentCID = core.db.getRecordID(Processor.Models.Db.ContentModel.contentName, Processor.Models.Db.ContentModel.contentName);
+                                int contentCID = MetaController.getRecordId(core, Processor.Models.Db.ContentModel.contentName, Processor.Models.Db.ContentModel.contentName);
                                 HTMLFieldString += AdminUIController.getDefaultEditor_LookupContent(core, "contentcontrolid", FieldValueInteger, contentCID, ref IsEmptyList, false, "", "", true, sqlFilter);
                                 FieldHelp = FieldHelp + " (Only administrators have access to this control. Changing the Controlling Content allows you to change who can author the record, as well as how it is edited.)";
                             } else {
                                 //
                                 // Limit the list to only those cdefs that are within the record's parent contentid
                                 RecordContentName = editRecord.contentControlId_Name;
-                                TableName2 = ContentMetaController.getContentTablename(core, RecordContentName);
-                                TableID = core.db.getRecordID("Tables", TableName2);
-                                int CSPointer = csXfer.csOpen("Content", "ContentTableID=" + TableID, "", true, 0, false, false, "ContentControlID");
-                                string CIDList = "";
-                                while (csXfer.csOk(CSPointer)) {
-                                    int ChildCID = csXfer.csGetInteger(CSPointer, "ID");
-                                    if (ContentMetaController.isWithinContent(core, ChildCID, LimitContentSelectToThisID)) {
-                                        if ((core.session.isAuthenticatedAdmin(core)) || (core.session.isAuthenticatedContentManager(core, ContentMetaController.getContentNameByID(core, ChildCID)))) {
-                                            CIDList = CIDList + "," + ChildCID;
+                                TableName2 = MetaController.getContentTablename(core, RecordContentName);
+                                TableID = MetaController.getRecordId(core, "Tables", TableName2);
+                                using (var csXfer = new CsModel(core)) {
+                                    csXfer.csOpen("Content", "ContentTableID=" + TableID, "", true, 0, "ContentControlID");
+                                    string CIDList = "";
+                                    while (csXfer.csOk()) {
+                                        int ChildCID = csXfer.csGetInteger("ID");
+                                        if (MetaController.isWithinContent(core, ChildCID, LimitContentSelectToThisID)) {
+                                            if ((core.session.isAuthenticatedAdmin(core)) || (core.session.isAuthenticatedContentManager(core, MetaController.getContentNameByID(core, ChildCID)))) {
+                                                CIDList = CIDList + "," + ChildCID;
+                                            }
                                         }
+                                        csXfer.csGoNext();
                                     }
-                                    csXfer.csGoNext(CSPointer);
+                                    csXfer.csClose();
                                 }
-                                csXfer.csClose(ref CSPointer);
+
                                 if (!string.IsNullOrEmpty(CIDList)) {
                                     CIDList = CIDList.Substring(1);
                                     string sqlFilter = "(id in (" + CIDList + "))";
-                                    int contentCID = core.db.getRecordID(Processor.Models.Db.ContentModel.contentName, Processor.Models.Db.ContentModel.contentName);
+                                    int contentCID = MetaController.getRecordId(core, Processor.Models.Db.ContentModel.contentName, Processor.Models.Db.ContentModel.contentName);
                                     HTMLFieldString += AdminUIController.getDefaultEditor_LookupContent(core, "contentcontrolid", FieldValueInteger, contentCID, ref IsEmptyList, false, "", "", true, sqlFilter);
                                     FieldHelp = FieldHelp + " (Only administrators have access to this control. Changing the Controlling Content allows you to change who can author the record, as well as how it is edited. This record includes a Parent field, so your choices for controlling content are limited to those compatible with the parent of this record.)";
                                 }
@@ -235,16 +240,18 @@ namespace Contensive.Addons.AdminSite {
                         if (FieldValueInteger == 0) {
                             fieldValue = "(not set)";
                         } else {
-                            int CSPointer = csXfer.csOpen("people", "(id=" + FieldValueInteger + ")", "name,active", false);
-                            if (!csXfer.csOk(CSPointer)) {
-                                fieldValue = "#" + FieldValueInteger + ", (deleted)";
-                            } else {
-                                fieldValue = "#" + FieldValueInteger + ", " + csXfer.csGet(CSPointer, "name");
-                                if (!csXfer.csGetBoolean(CSPointer, "active")) {
-                                    fieldValue += " (inactive)";
+                            using (var csXfer = new CsModel(core)) {
+                                csXfer.csOpen("people", "(id=" + FieldValueInteger + ")", "name,active", false);
+                                if (!csXfer.csOk()) {
+                                    fieldValue = "#" + FieldValueInteger + ", (deleted)";
+                                } else {
+                                    fieldValue = "#" + FieldValueInteger + ", " + csXfer.csGet("name");
+                                    if (!csXfer.csGetBoolean("active")) {
+                                        fieldValue += " (inactive)";
+                                    }
                                 }
+                                csXfer.csClose();
                             }
-                            csXfer.csClose(ref CSPointer);
                         }
                     }
                     string fieldEditor = AdminUIController.getDefaultEditor_Text(core, "ignore_createdBy", fieldValue, true, "");
@@ -280,16 +287,18 @@ namespace Contensive.Addons.AdminSite {
                         if (FieldValueInteger == 0) {
                             fieldValue = "(not set)";
                         } else {
-                            int CSPointer = csXfer.csOpen("people", "(id=" + FieldValueInteger + ")", "name,active", false);
-                            if (!csXfer.csOk(CSPointer)) {
-                                fieldValue = "#" + FieldValueInteger + ", (deleted)";
-                            } else {
-                                fieldValue = "#" + FieldValueInteger + ", " + csXfer.csGet(CSPointer, "name");
-                                if (!csXfer.csGetBoolean(CSPointer, "active")) {
-                                    fieldValue += " (inactive)";
+                            using (var csXfer = new CsModel(core)) {
+                                csXfer.csOpen("people", "(id=" + FieldValueInteger + ")", "name,active", false);
+                                if (!csXfer.csOk()) {
+                                    fieldValue = "#" + FieldValueInteger + ", (deleted)";
+                                } else {
+                                    fieldValue = "#" + FieldValueInteger + ", " + csXfer.csGet("name");
+                                    if (!csXfer.csGetBoolean("active")) {
+                                        fieldValue += " (inactive)";
+                                    }
                                 }
+                                csXfer.csClose();
                             }
-                            csXfer.csClose(ref CSPointer);
                         }
                     }
                     string fieldEditor = AdminUIController.getDefaultEditor_Text(core, "ignore_modifiedBy", fieldValue, true, "");
@@ -312,7 +321,7 @@ namespace Contensive.Addons.AdminSite {
                     string fieldEditor = AdminUIController.getDefaultEditor_Text(core, "ignore_modifiedBy", fieldValue, true, "");
                     tabPanel.Add(AdminUIController.getEditRow(core, fieldEditor, "Modified Date", FieldHelp, false, false, ""));
                 }
-                string s = AdminUIController.editTable( tabPanel.Text );
+                string s = AdminUIController.editTable(tabPanel.Text);
                 result = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), "Control Information", "", s);
                 adminData.EditSectionPanelCount = adminData.EditSectionPanelCount + 1;
                 tabPanel = null;

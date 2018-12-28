@@ -57,11 +57,14 @@ namespace Contensive.Addons.Tools {
                 Stream.Add("<TD>" + SpanClassAdminNormal + "Content Name</SPAN></td>");
                 Stream.Add("<TD><Select name=\"ContentName\">");
                 int ItemCount = 0;
-                int CSPointer = csXfer.csOpen("Content", "", "name");
-                while (csXfer.csOk(CSPointer)) {
-                    Stream.Add("<option value=\"" + csXfer.csGetText(CSPointer, "name") + "\">" + csXfer.csGetText(CSPointer, "name") + "</option>");
-                    ItemCount = ItemCount + 1;
-                    csXfer.csGoNext(CSPointer);
+                using (var csXfer = new CsModel(core)) {
+                    csXfer.csOpen("Content", "", "name");
+                    while (csXfer.csOk()) {
+                        Stream.Add("<option value=\"" + csXfer.csGetText("name") + "\">" + csXfer.csGetText("name") + "</option>");
+                        ItemCount = ItemCount + 1;
+                        csXfer.csGoNext();
+                    }
+
                 }
                 if (ItemCount == 0) {
                     Stream.Add("<option value=\"-1\">System</option>");
@@ -89,7 +92,7 @@ namespace Contensive.Addons.Tools {
                     if (string.IsNullOrEmpty(ContentName)) {
                         Stream.Add("Select a content before submitting. Fields were not changed.");
                     } else {
-                        int ContentID = Models.Domain.ContentMetaDomainModel.getContentId(core, ContentName);
+                        int ContentID = Models.Domain.MetaModel.getContentId(core, ContentName);
                         if (ContentID == 0) {
                             Stream.Add("GetContentID failed. Fields were not changed.");
                         } else {

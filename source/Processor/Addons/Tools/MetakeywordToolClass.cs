@@ -82,11 +82,11 @@ namespace Contensive.Addons.Tools {
 
                                         dt = core.db.executeQuery("select top 1 ID from ccMetaKeywords where name=" + DbController.encodeSQLText(Keyword));
                                         if (dt.Rows.Count == 0) {
-                                            CS = csXfer.csInsert("Meta Keywords");
-                                            if (csXfer.csOk(CS)) {
+                                            csXfer.csInsert("Meta Keywords");
+                                            if (csXfer.csOk()) {
                                                 csXfer.csSet(CS, "name", Keyword);
                                             }
-                                            csXfer.csClose(ref CS);
+                                            csXfer.csClose();
                                         }
                                     }
                                 }

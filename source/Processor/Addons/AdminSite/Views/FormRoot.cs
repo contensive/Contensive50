@@ -23,12 +23,12 @@ namespace Contensive.Addons.AdminSite {
                 addonId = 0;
                 if (core.session.visit.id == core.docProperties.getInteger(RequestNameDashboardReset)) {
                     //$$$$$ cache this
-                    CS = csXfer.csOpen(Processor.Models.Db.AddonModel.contentName, "ccguid=" + DbController.encodeSQLText(addonGuidDashboard));
-                    if (csXfer.csOk(CS)) {
+                    csXfer.csOpen(Processor.Models.Db.AddonModel.contentName, "ccguid=" + DbController.encodeSQLText(addonGuidDashboard));
+                    if (csXfer.csOk()) {
                         addonId = csXfer.csGetInteger(CS, "id");
                         core.siteProperties.setProperty("AdminRootAddonID", GenericController.encodeText(addonId));
                     }
-                    csXfer.csClose(ref CS);
+                    csXfer.csClose();
                 }
                 if (addonId == 0) {
                     //

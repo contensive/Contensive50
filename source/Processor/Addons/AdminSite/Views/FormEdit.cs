@@ -261,8 +261,8 @@ namespace Contensive.Addons.AdminSite {
                     // -- email
                     bool EmailSubmitted = false;
                     bool EmailSent = false;
-                    int SystemEmailCID = ContentMetaDomainModel.getContentId(core, "System Email");
-                    int ConditionalEmailCID = ContentMetaDomainModel.getContentId(core, "Conditional Email");
+                    int SystemEmailCID = MetaModel.getContentId(core, "System Email");
+                    int ConditionalEmailCID = MetaModel.getContentId(core, "Conditional Email");
                     DateTime LastSendTestDate = DateTime.MinValue;
                     bool AllowEmailSendWithoutTest = (core.siteProperties.getBoolean("AllowEmailSendWithoutTest", false));
                     if (adminData.editRecord.fieldsLc.ContainsKey("lastsendtestdate")) {
@@ -272,7 +272,7 @@ namespace Contensive.Addons.AdminSite {
                         //
                         // Must be admin
                         Stream.Add(AdminErrorController.get(core, "This edit form requires Member Administration access.", "This edit form requires Member Administration access."));
-                    } else if (ContentMetaController.isWithinContent(core, adminData.editRecord.contentControlId, SystemEmailCID)) {
+                    } else if (MetaController.isWithinContent(core, adminData.editRecord.contentControlId, SystemEmailCID)) {
                         //
                         LogController.logTrace(core, "getFormEdit, System email");
                         //
@@ -306,7 +306,7 @@ namespace Contensive.Addons.AdminSite {
                         Stream.Add(addTab(core, adminMenu, "Control&nbsp;Info", ControlEditor.get(core, adminData), adminData.allowAdminTabs));
                         if (adminData.allowAdminTabs) Stream.Add(adminMenu.getTabs(core));
                         Stream.Add(EditSectionButtonBar);
-                    } else if (ContentMetaController.isWithinContent(core, adminData.editRecord.contentControlId, ConditionalEmailCID)) {
+                    } else if (MetaController.isWithinContent(core, adminData.editRecord.contentControlId, ConditionalEmailCID)) {
                         //
                         // Conditional Email
                         EmailSubmitted = false;
@@ -406,7 +406,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // Page Content
                     //
-                    int TableID = core.db.getRecordID("Tables", "ccPageContent");
+                    int TableID = MetaController.getRecordId( core,"Tables", "ccPageContent");
                     string EditSectionButtonBar = AdminUIController.getButtonBarForEdit(core, new EditButtonBarInfoClass() {
                         allowActivate = false,
                         allowAdd = (allowAdd && adminData.adminContent.allowAdd & adminData.editRecord.AllowUserAdd),
@@ -539,8 +539,8 @@ namespace Contensive.Addons.AdminSite {
                 } else {
                     //
                     // All other tables (User definined)
-                    bool IsPageContent = ContentMetaController.isWithinContent(core, adminData.adminContent.id, ContentMetaDomainModel.getContentId(core, "Page Content"));
-                    bool HasChildRecords = ContentMetaController.isContentFieldSupported(core, adminData.adminContent.name, "parentid");
+                    bool IsPageContent = MetaController.isWithinContent(core, adminData.adminContent.id, MetaModel.getContentId(core, "Page Content"));
+                    bool HasChildRecords = MetaController.isContentFieldSupported(core, adminData.adminContent.name, "parentid");
                     bool AllowMarkReviewed = core.db.isSQLTableField("default", adminData.adminContent.tableName, "DateReviewed");
                     string EditSectionButtonBar = AdminUIController.getButtonBarForEdit(core, new EditButtonBarInfoClass() {
                         allowActivate = false,
@@ -841,8 +841,8 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 // -- editor failed, determine if it is missing (or inactive). If missing, remove it from the members preferences
                                 string SQL = "select id from ccaggregatefunctions where id=" + editorAddonID;
-                                CS = csXfer.csOpenSql(SQL);
-                                if (!csXfer.csOk(CS)) {
+                                csXfer.csOpenSql(SQL);
+                                if (!csXfer.csOk()) {
                                     //
                                     // -- missing, not just inactive
                                     EditorString = "";
@@ -1781,12 +1781,12 @@ namespace Contensive.Addons.AdminSite {
                     SQL = "SELECT ccGroups.ID AS ID, ccGroupRules.AllowAdd as allowadd, ccGroupRules.AllowDelete as allowdelete"
                         + " FROM ccGroups LEFT JOIN ccGroupRules ON ccGroups.ID = ccGroupRules.GroupID"
                         + " WHERE (((ccGroupRules.ContentID)=" + editRecord.id + ") AND ((ccGroupRules.Active)<>0) AND ((ccGroups.Active)<>0))";
-                    CS = csXfer.csOpenSql(SQL, "Default");
-                    if (csXfer.csOk(CS)) {
+                    csXfer.csOpenSql(SQL, "Default");
+                    if (csXfer.csOk()) {
                         if (true) {
                             GroupRulesSize = 100;
                             GroupRules = new AdminDataModel.GroupRuleType[GroupRulesSize + 1];
-                            while (csXfer.csOk(CS)) {
+                            while (csXfer.csOk()) {
                                 if (GroupRulesCount >= GroupRulesSize) {
                                     GroupRulesSize = GroupRulesSize + 100;
                                     Array.Resize(ref GroupRules, GroupRulesSize + 1);
@@ -1809,15 +1809,15 @@ namespace Contensive.Addons.AdminSite {
                     + " Where (((ccGroups.Active) <> " + SQLFalse + ") And ((ccContent.Active) <> " + SQLFalse + "))"
                     + " GROUP BY ccGroups.ID, ccContent.Name, ccGroups.Name, ccGroups.Caption, ccGroups.SortOrder"
                     + " ORDER BY ccContent.Name, ccGroups.Caption, ccGroups.SortOrder";
-                CS = csXfer.csOpenSql(SQL, "Default");
-                if (!csXfer.csOk(CS)) {
+                csXfer.csOpenSql(SQL, "Default");
+                if (!csXfer.csOk()) {
                     FastString.Add("\r\n<tr><td colspan=\"3\">" + SpanClassAdminSmall + "There are no active groups</span></td></tr>");
                 } else {
                     if (true) {
                         //Call FastString.Add(vbCrLf & "<tr><td colspan=""3"" class=""ccAdminEditSubHeader"">Groups with authoring access</td></tr>")
                         SectionName = "";
                         GroupCount = 0;
-                        while (csXfer.csOk(CS)) {
+                        while (csXfer.csOk()) {
                             GroupName = csXfer.csGet(CS, "GroupCaption");
                             if (string.IsNullOrEmpty(GroupName)) {
                                 GroupName = csXfer.csGet(CS, "GroupName");

@@ -36,8 +36,8 @@
 //                    //
 //                    // Confirm the order
 //                    //
-//                    int CS = csXfer.csOpen("Orders", "(ID=" + ConfirmOrderID + ") and ((OrderCompleted=0)or(OrderCompleted is Null))");
-//                    if (csXfer.csOk(CS)) {
+//                    int csXfer.csOpen("Orders", "(ID=" + ConfirmOrderID + ") and ((OrderCompleted=0)or(OrderCompleted is Null))");
+//                    if (csXfer.csOk()) {
 //                        csXfer.csSet(CS, "OrderCompleted", true);
 //                        csXfer.csSet(CS, "DateCompleted", core.doc.profileStartTime);
 //                        csXfer.csSet(CS, "ccAuthCode", core.docProperties.getText("txn_id"));
@@ -50,19 +50,19 @@
 //                        csXfer.csSet(CS, "ShipState", core.docProperties.getText("address_state"));
 //                        csXfer.csSet(CS, "ShipZip", core.docProperties.getText("address_zip"));
 //                        csXfer.csSet(CS, "BilleMail", core.docProperties.getText("payer_email"));
-//                        csXfer.csSet(CS, "ContentControlID", Models.Domain.ContentMetaDomainModel.getContentId(core, "Orders Completed"));
+//                        csXfer.csSet(CS, "ContentControlID", Models.Domain.MetaModel.getContentId(core, "Orders Completed"));
 //                        csXfer.csSave2(CS);
 //                    }
-//                    csXfer.csClose(ref CS);
+//                    csXfer.csClose();
 //                    //
 //                    // Empty the cart
 //                    //
-//                    CS = csXfer.csOpen("Visitors", "OrderID=" + ConfirmOrderID);
-//                    if (csXfer.csOk(CS)) {
+//                    csXfer.csOpen("Visitors", "OrderID=" + ConfirmOrderID);
+//                    if (csXfer.csOk()) {
 //                        csXfer.csSet(CS, "OrderID", 0);
 //                        csXfer.csSave2(CS);
 //                    }
-//                    csXfer.csClose(ref CS);
+//                    csXfer.csClose();
 //                    //
 //                    // TEmp fix until HardCodedPage is complete
 //                    //

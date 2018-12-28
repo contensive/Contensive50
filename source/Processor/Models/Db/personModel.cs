@@ -90,12 +90,12 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static PersonModel addDefault(CoreController core, Domain.ContentMetaDomainModel cdef) {
+        public static PersonModel addDefault(CoreController core, Domain.MetaModel cdef) {
             return addDefault<PersonModel>(core, cdef);
         }
         //
         //====================================================================================================
-        public static PersonModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.ContentMetaDomainModel cdef) {
+        public static PersonModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.MetaModel cdef) {
             return addDefault<PersonModel>(core, cdef, ref callersCacheNameList);
         }
         //

@@ -291,7 +291,7 @@ namespace Contensive.Addons.AdminSite {
                         } else if (adminData.AdminForm == AdminFormDownloads) {
                             adminBody = (ToolDownloads.GetForm_Downloads(cp.core));
                         } else if (adminData.AdminForm == AdminformRSSControl) {
-                            adminBody = cp.core.webServer.redirect("?cid=" + ContentMetaDomainModel.getContentId(cp.core, "RSS Feeds"), "RSS Control page is not longer supported. RSS Feeds are controlled from the RSS feed records.");
+                            adminBody = cp.core.webServer.redirect("?cid=" + MetaModel.getContentId(cp.core, "RSS Feeds"), "RSS Control page is not longer supported. RSS Feeds are controlled from the RSS feed records.");
                         } else if (adminData.AdminForm == AdminFormImportWizard) {
                             adminBody = cp.core.addon.execute(addonGuidImportWizard, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                 addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
@@ -418,12 +418,12 @@ namespace Contensive.Addons.AdminSite {
                 //
                 if (GenericController.vbInstr(1, "," + UsedIDString + ",", "," + HelpAddonID.ToString() + ",") == 0) {
                     CS = cp.csXfer.csOpenRecord(Processor.Models.Db.AddonModel.contentName, HelpAddonID);
-                    if (cp.csXfer.csOk(CS)) {
+                    if (cp.csXfer.csOk()) {
                         FoundAddon = true;
                         AddonName = cp.csXfer.csGet(CS, "Name");
                         AddonHelpCopy = cp.csXfer.csGet(CS, "help");
                         AddonDateAdded = cp.csXfer.csGetDate(CS, "dateadded");
-                        if (ContentMetaController.isContentFieldSupported(cp.core, Processor.Models.Db.AddonModel.contentName, "lastupdated")) {
+                        if (MetaController.isContentFieldSupported(cp.core, Processor.Models.Db.AddonModel.contentName, "lastupdated")) {
                             AddonLastUpdated = cp.csXfer.csGetDate(CS, "lastupdated");
                         }
                         if (AddonLastUpdated == DateTime.MinValue) {
@@ -448,7 +448,7 @@ namespace Contensive.Addons.AdminSite {
                         }
                         //SQL = "select IncludedAddonID from ccAddonIncludeRules where AddonID=" + HelpAddonID;
                         //CS = cp.csXfer.csOpenSql(SQL, "Default");
-                        //while (cp.csXfer.csOk(CS)) {
+                        //while (cp.csXfer.csOk()) {
                         //    IncludeID = cp.csXfer.csGetInteger(CS, "IncludedAddonID");
                         //    IncludeHelp = IncludeHelp + GetAddonHelp(cp, IncludeID, HelpAddonID + "," + IncludeID.ToString());
                         //    cp.csXfer.csGoNext(CS);
@@ -499,14 +499,14 @@ namespace Contensive.Addons.AdminSite {
                 //
                 if (GenericController.vbInstr(1, "," + UsedIDString + ",", "," + HelpCollectionID.ToString() + ",") == 0) {
                     CS = cp.csXfer.csOpenRecord("Add-on Collections", HelpCollectionID);
-                    if (cp.csXfer.csOk(CS)) {
+                    if (cp.csXfer.csOk()) {
                         Collectionname = cp.csXfer.csGet(CS, "Name");
                         CollectionHelpCopy = cp.csXfer.csGet(CS, "help");
                         CollectionDateAdded = cp.csXfer.csGetDate(CS, "dateadded");
-                        if (ContentMetaController.isContentFieldSupported(cp.core, "Add-on Collections", "lastupdated")) {
+                        if (MetaController.isContentFieldSupported(cp.core, "Add-on Collections", "lastupdated")) {
                             CollectionLastUpdated = cp.csXfer.csGetDate(CS, "lastupdated");
                         }
-                        if (ContentMetaController.isContentFieldSupported(cp.core, "Add-on Collections", "helplink")) {
+                        if (MetaController.isContentFieldSupported(cp.core, "Add-on Collections", "helplink")) {
                             CollectionHelpLink = cp.csXfer.csGet(CS, "helplink");
                         }
                         if (CollectionLastUpdated == DateTime.MinValue) {
@@ -518,7 +518,7 @@ namespace Contensive.Addons.AdminSite {
                     // Add-ons
                     //
                     CS = cp.csXfer.csOpen(Processor.Models.Db.AddonModel.contentName, "CollectionID=" + HelpCollectionID, "name");
-                    while (cp.csXfer.csOk(CS)) {
+                    while (cp.csXfer.csOk()) {
                         IncludeHelp = IncludeHelp + "<div style=\"clear:both;\">" + GetAddonHelp(cp, cp.csXfer.csGetInteger(CS, "ID"), "") + "</div>";
                         cp.csXfer.csGoNext(CS);
                     }
@@ -571,7 +571,7 @@ namespace Contensive.Addons.AdminSite {
                 Found = false;
                 SQL = "select h.HelpDefault,h.HelpCustom from ccfieldhelp h left join ccfields f on f.id=h.fieldid where f.contentid=" + ContentID + " and f.name=" + DbController.encodeSQLText(FieldName);
                 CS = cp.csXfer.csOpenSql(SQL);
-                if (cp.csXfer.csOk(CS)) {
+                if (cp.csXfer.csOk()) {
                     Found = true;
                     return_Default = cp.csXfer.csGetText(CS, "helpDefault");
                     return_Custom = cp.csXfer.csGetText(CS, "helpCustom");
@@ -582,7 +582,7 @@ namespace Contensive.Addons.AdminSite {
                     ParentID = 0;
                     SQL = "select parentid from cccontent where id=" + ContentID;
                     CS = cp.csXfer.csOpenSql(SQL);
-                    if (cp.csXfer.csOk(CS)) {
+                    if (cp.csXfer.csOk()) {
                         ParentID = cp.csXfer.csGetInteger(CS, "parentid");
                     }
                     cp.csXfer.csClose(ref CS);
@@ -715,11 +715,11 @@ namespace Contensive.Addons.AdminSite {
                                     ProcessActionSave(cp,adminData, UseContentWatchLink);
                                     cp.core.processAfterSave(false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
                                     if (!(cp.core.doc.debug_iUserError != "")) {
-                                        if (!ContentMetaController.isWithinContent(cp.core, adminData.editRecord.contentControlId, ContentMetaDomainModel.getContentId(cp.core, "Group Email"))) {
+                                        if (!MetaController.isWithinContent(cp.core, adminData.editRecord.contentControlId, MetaModel.getContentId(cp.core, "Group Email"))) {
                                             Processor.Controllers.ErrorController.addUserError(cp.core, "The send action only supports Group Email.");
                                         } else {
                                             CS = cp.csXfer.csOpenRecord("Group Email", adminData.editRecord.id);
-                                            if (!cp.csXfer.csOk(CS)) {
+                                            if (!cp.csXfer.csOk()) {
                                                 //throw new GenericException("Unexpected exception"); // //throw new GenericException("Unexpected exception")' cp.core.handleLegacyError23("Email ID [" &  adminContext.editRecord.id & "] could not be found in Group Email.")
                                             } else if (cp.csXfer.csGet(CS, "FromAddress") == "") {
                                                 Processor.Controllers.ErrorController.addUserError(cp.core, "A 'From Address' is required before sending an email.");
@@ -749,11 +749,11 @@ namespace Contensive.Addons.AdminSite {
                                     // no save, page was read only - Call ProcessActionSave
                                     adminData.LoadEditRecord(cp.core);
                                     if (!(cp.core.doc.debug_iUserError != "")) {
-                                        if (!ContentMetaController.isWithinContent(cp.core, adminData.editRecord.contentControlId, ContentMetaDomainModel.getContentId(cp.core, "Conditional Email"))) {
+                                        if (!MetaController.isWithinContent(cp.core, adminData.editRecord.contentControlId, MetaModel.getContentId(cp.core, "Conditional Email"))) {
                                             Processor.Controllers.ErrorController.addUserError(cp.core, "The deactivate action only supports Conditional Email.");
                                         } else {
                                             CS = cp.csXfer.csOpenRecord("Conditional Email", adminData.editRecord.id);
-                                            if (!cp.csXfer.csOk(CS)) {
+                                            if (!cp.csXfer.csOk()) {
                                                 //throw new GenericException("Unexpected exception"); // //throw new GenericException("Unexpected exception")' cp.core.handleLegacyError23("Email ID [" & editRecord.id & "] could not be opened.")
                                             } else {
                                                 cp.csXfer.csSet(CS, "submitted", false);
@@ -776,11 +776,11 @@ namespace Contensive.Addons.AdminSite {
                                     ProcessActionSave(cp,adminData, UseContentWatchLink);
                                     cp.core.processAfterSave(false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
                                     if (!(cp.core.doc.debug_iUserError != "")) {
-                                        if (!ContentMetaController.isWithinContent(cp.core, adminData.editRecord.contentControlId, ContentMetaDomainModel.getContentId(cp.core, "Conditional Email"))) {
+                                        if (!MetaController.isWithinContent(cp.core, adminData.editRecord.contentControlId, MetaModel.getContentId(cp.core, "Conditional Email"))) {
                                             Processor.Controllers.ErrorController.addUserError(cp.core, "The activate action only supports Conditional Email.");
                                         } else {
                                             CS = cp.csXfer.csOpenRecord("Conditional Email", adminData.editRecord.id);
-                                            if (!cp.csXfer.csOk(CS)) {
+                                            if (!cp.csXfer.csOk()) {
                                                 //throw new GenericException("Unexpected exception"); // //throw new GenericException("Unexpected exception")' cp.core.handleLegacyError23("Email ID [" & editRecord.id & "] could not be opened.")
                                             } else if (cp.csXfer.csGetInteger(CS, "ConditionID") == 0) {
                                                 Processor.Controllers.ErrorController.addUserError(cp.core, "A condition must be set.");
@@ -841,7 +841,7 @@ namespace Contensive.Addons.AdminSite {
                                                     //
                                                     // non-Workflow Delete
                                                     //
-                                                    ContentName = ContentMetaController.getContentNameByID(cp.core, cp.csXfer.csGetInteger(CSEditRecord, "ContentControlID"));
+                                                    ContentName = MetaController.getContentNameByID(cp.core, cp.csXfer.csGetInteger(CSEditRecord, "ContentControlID"));
                                                     cp.core.cache.invalidateDbRecord(RecordID, adminData.adminContent.tableName);
                                                     cp.core.processAfterSave(true, ContentName, RecordID, "", 0, UseContentWatchLink);
                                                 }
@@ -1240,7 +1240,7 @@ namespace Contensive.Addons.AdminSite {
                             cp.core.db.executeQuery("update " + adminData.adminContent.tableName + " set linkalias=null where ( linkalias=" + DbController.encodeSQLText(linkAlias) + ") and (id<>" + editRecord.id + ")");
                         } else {
                             int CS = cp.csXfer.csOpen(adminData.adminContent.name, "( linkalias=" + DbController.encodeSQLText(linkAlias) + ")and(id<>" + editRecord.id + ")");
-                            if (cp.csXfer.csOk(CS)) {
+                            if (cp.csXfer.csOk()) {
                                 isDupError = true;
                                 Processor.Controllers.ErrorController.addUserError(cp.core, "The Link Alias you entered can not be used because another record uses this value [" + linkAlias + "]. Enter a different Link Alias, or check the Override Duplicates checkbox in the Link Alias tab.");
                             }
@@ -1249,7 +1249,7 @@ namespace Contensive.Addons.AdminSite {
                         if (!isDupError) {
                             DupCausesWarning = true;
                             int CS = cp.csXfer.csOpen2(adminData.adminContent.name, editRecord.id, true, true);
-                            if (cp.csXfer.csOk(CS)) {
+                            if (cp.csXfer.csOk()) {
                                 cp.csXfer.csSet(CS, "linkalias", linkAlias);
                             }
                             cp.csXfer.csClose(ref CS);
@@ -1525,7 +1525,7 @@ namespace Contensive.Addons.AdminSite {
                                             //MTMRuleContent = CdefController.getContentNameByID(cp.core,.manyToManyRuleContentID)
                                             //MTMRuleField0 = .ManyToManyRulePrimaryField
                                             //MTMRuleField1 = .ManyToManyRuleSecondaryField
-                                            cp.core.html.processCheckList("field" + field.id, ContentMetaController.getContentNameByID(cp.core, field.contentId), encodeText(editRecord.id), ContentMetaController.getContentNameByID(cp.core, field.manyToManyContentID), ContentMetaController.getContentNameByID(cp.core, field.manyToManyRuleContentID), field.ManyToManyRulePrimaryField, field.ManyToManyRuleSecondaryField);
+                                            cp.core.html.processCheckList("field" + field.id, MetaController.getContentNameByID(cp.core, field.contentId), encodeText(editRecord.id), MetaController.getContentNameByID(cp.core, field.manyToManyContentID), MetaController.getContentNameByID(cp.core, field.manyToManyRuleContentID), field.ManyToManyRulePrimaryField, field.ManyToManyRuleSecondaryField);
                                             break;
                                         }
                                     default: {
@@ -1583,9 +1583,9 @@ namespace Contensive.Addons.AdminSite {
                             // -- clear cache
                             string tableName = "";
                             if (editRecord.contentControlId == 0) {
-                                tableName = ContentMetaController.getContentTablename(cp.core, adminData.adminContent.name);
+                                tableName = MetaController.getContentTablename(cp.core, adminData.adminContent.name);
                             } else {
-                                tableName = ContentMetaController.getContentTablename(cp.core, editRecord.contentControlId_Name);
+                                tableName = MetaController.getContentTablename(cp.core, editRecord.contentControlId_Name);
                             }
                             //todo  NOTE: The following VB 'Select Case' included either a non-ordinal switch expression or non-ordinal, range-type, or non-constant 'Case' expressions and was converted to C# 'if-else' logic:
                             //							Select Case tableName.ToLowerInvariant()
@@ -1629,9 +1629,9 @@ namespace Contensive.Addons.AdminSite {
                         // ----- if admin content is changed, reload the adminContext.content data in case this is a save, and not an OK
                         //
                         if (recordChanged && SaveCCIDValue != 0) {
-                            ContentMetaController.setContentControlId(cp.core, (editRecord.contentControlId.Equals(0)) ? adminData.adminContent.id : editRecord.contentControlId, editRecord.id, SaveCCIDValue);
-                            editRecord.contentControlId_Name = ContentMetaController.getContentNameByID(cp.core, SaveCCIDValue);
-                            adminData.adminContent = ContentMetaDomainModel.createByUniqueName(cp.core, editRecord.contentControlId_Name);
+                            MetaController.setContentControlId(cp.core, (editRecord.contentControlId.Equals(0)) ? adminData.adminContent.id : editRecord.contentControlId, editRecord.id, SaveCCIDValue);
+                            editRecord.contentControlId_Name = MetaController.getContentNameByID(cp.core, SaveCCIDValue);
+                            adminData.adminContent = MetaModel.createByUniqueName(cp.core, editRecord.contentControlId_Name);
                             adminData.adminContent.id = adminData.adminContent.id;
                             adminData.adminContent.name = adminData.adminContent.name;
                         }
@@ -1704,7 +1704,7 @@ namespace Contensive.Addons.AdminSite {
                 Criteria = "(Active<>0)";
                 if (!string.IsNullOrEmpty(MenuContentName)) {
                     //ContentControlCriteria = cp.core.csv_GetContentControlCriteria(MenuContentName)
-                    Criteria = Criteria + "AND" + ContentMetaController.getContentControlCriteria(cp.core, MenuContentName);
+                    Criteria = Criteria + "AND" + MetaController.getContentControlCriteria(cp.core, MenuContentName);
                 }
                 iParentCriteria = GenericController.encodeEmpty(ParentCriteria, "");
                 if (cp.core.session.isAuthenticatedDeveloper(cp.core)) {
@@ -1728,7 +1728,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     string CMCriteria = null;
 
-                    editableCdefIdList = ContentMetaController.getEditableCdefIdList(cp.core);
+                    editableCdefIdList = MetaController.getEditableCdefIdList(cp.core);
                     if (editableCdefIdList.Count == 0) {
                         CMCriteria = "(1=0)";
                     } else if (editableCdefIdList.Count == 1) {
@@ -1855,12 +1855,12 @@ namespace Contensive.Addons.AdminSite {
                                 case ButtonCancel:
                                     adminData.Admin_Action = Constants.AdminActionNop;
                                     adminData.AdminForm = AdminFormRoot;
-                                    adminData.adminContent = new ContentMetaDomainModel();
+                                    adminData.adminContent = new MetaModel();
                                     break;
                                 case ButtonClose:
                                     adminData.Admin_Action = Constants.AdminActionNop;
                                     adminData.AdminForm = AdminFormRoot;
-                                    adminData.adminContent = new ContentMetaDomainModel();
+                                    adminData.adminContent = new MetaModel();
                                     break;
                                 case ButtonAdd:
                                     adminData.Admin_Action = Constants.AdminActionNop;
@@ -2475,7 +2475,7 @@ namespace Contensive.Addons.AdminSite {
                         //
                         ParentContentID = cp.core.docProperties.getInteger("ParentContentID");
                         if (ParentContentID == 0) {
-                            ParentContentID = ContentMetaDomainModel.getContentId(cp.core, "Page Content");
+                            ParentContentID = MetaModel.getContentId(cp.core, "Page Content");
                         }
                         AddAdminMenuEntry = true;
                         GroupID = 0;
@@ -2484,7 +2484,7 @@ namespace Contensive.Addons.AdminSite {
                         // Process input
                         //
                         ParentContentID = cp.core.docProperties.getInteger("ParentContentID");
-                        ParentContentName = ContentMetaController.getContentNameByID(cp.core, ParentContentID);
+                        ParentContentName = MetaController.getContentNameByID(cp.core, ParentContentID);
                         ChildContentName = cp.core.docProperties.getText("ChildContentName");
                         AddAdminMenuEntry = cp.core.docProperties.getBoolean("AddAdminMenuEntry");
                         GroupID = cp.core.docProperties.getInteger("GroupID");
@@ -2499,21 +2499,21 @@ namespace Contensive.Addons.AdminSite {
                             //
                             Description = Description + "<div>&nbsp;</div>"
                                 + "<div>Creating content [" + ChildContentName + "] from [" + ParentContentName + "]</div>";
-                            ContentMetaController.createContentChild(cp.core, ChildContentName, ParentContentName, cp.core.session.user.id);
-                            ChildContentID = ContentMetaDomainModel.getContentId(cp.core, ChildContentName);
+                            MetaController.createContentChild(cp.core, ChildContentName, ParentContentName, cp.core.session.user.id);
+                            ChildContentID = MetaModel.getContentId(cp.core, ChildContentName);
                             //
                             // Create Group and Rule
                             //
                             if (NewGroup && (!string.IsNullOrEmpty(NewGroupName))) {
                                 CS = cp.csXfer.csOpen("Groups", "name=" + DbController.encodeSQLText(NewGroupName));
-                                if (cp.csXfer.csOk(CS)) {
+                                if (cp.csXfer.csOk()) {
                                     Description = Description + "<div>Group [" + NewGroupName + "] already exists, using existing group.</div>";
                                     GroupID = cp.csXfer.csGetInteger(CS, "ID");
                                 } else {
                                     Description = Description + "<div>Creating new group [" + NewGroupName + "]</div>";
                                     cp.csXfer.csClose(ref CS);
                                     CS = cp.csXfer.csInsert("Groups");
-                                    if (cp.csXfer.csOk(CS)) {
+                                    if (cp.csXfer.csOk()) {
                                         GroupID = cp.csXfer.csGetInteger(CS, "ID");
                                         cp.csXfer.csSet(CS, "Name", NewGroupName);
                                         cp.csXfer.csSet(CS, "Caption", NewGroupName);
@@ -2523,8 +2523,8 @@ namespace Contensive.Addons.AdminSite {
                             }
                             if (GroupID != 0) {
                                 CS = cp.csXfer.csInsert("Group Rules");
-                                if (cp.csXfer.csOk(CS)) {
-                                    Description = Description + "<div>Assigning group [" + cp.core.db.getRecordName("Groups", GroupID) + "] to edit content [" + ChildContentName + "].</div>";
+                                if (cp.csXfer.csOk()) {
+                                    Description = Description + "<div>Assigning group [" + MetaController.getRecordName( core,"Groups", GroupID) + "] to edit content [" + ChildContentName + "].</div>";
                                     cp.csXfer.csSet(CS, "GroupID", GroupID);
                                     cp.csXfer.csSet(CS, "ContentID", ChildContentID);
                                 }
@@ -2663,7 +2663,7 @@ namespace Contensive.Addons.AdminSite {
                     SQL = "select Name, ID from ccContent where ParentID=" + ParentID + " and (AllowContentChildTool<>0) and not (allowcontentchildtool is null);";
                 }
                 CS = cp.csXfer.csOpenSql(SQL, "Default");
-                while (cp.csXfer.csOk(CS)) {
+                while (cp.csXfer.csOk()) {
                     RecordName = cp.csXfer.csGet(CS, "Name");
                     RecordID = cp.csXfer.csGetInteger(CS, "ID");
                     if (RecordID == DefaultValue) {
@@ -2842,7 +2842,7 @@ namespace Contensive.Addons.AdminSite {
                     Processor.Controllers.ErrorController.addUserError(cp.core, "Existing pages could not be checked for Link Alias names because there was another error on this page. Correct this error, and turn Link Alias on again to rerun the verification.");
                 } else {
                     CS = cp.csXfer.csOpen("Page Content");
-                    while (cp.csXfer.csOk(CS)) {
+                    while (cp.csXfer.csOk()) {
                         //
                         // Add the link alias
                         //

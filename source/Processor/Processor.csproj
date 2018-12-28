@@ -228,7 +228,7 @@
     <Compile Include="Controllers\ApplicationCDefMiniCollection.cs" />
     <Compile Include="Controllers\XmlController.cs" />
     <Compile Include="Controllers\QuickEditController.cs" />
-    <Compile Include="Controllers\ContentMetaController.cs" />
+    <Compile Include="Controllers\MetaController.cs" />
     <Compile Include="Controllers\_BlankController.cs" />
     <Compile Include="Extensions\extensionMethodsClass.cs" />
     <Compile Include="Extensions\webClientExtensionClass.cs" />
@@ -285,7 +285,7 @@
     <Compile Include="Views\CPVisitorClass.cs" />
     <Compile Include="Views\mainCsvCompatibilityClass.cs" />
     <Compile Include="Models\Domain\CDefFieldModel.cs" />
-    <Compile Include="Models\Domain\ContentMetaDomainModel.cs" />
+    <Compile Include="Models\Domain\MetaModel.cs" />
     <Compile Include="Models\Domain\RouteMapModel.cs" />
     <Compile Include="Models\Domain\TableSchemeModel.cs" />
     <Compile Include="Controllers\SessionController.cs" />

@@ -311,7 +311,7 @@ namespace Contensive.Processor.Controllers {
                             core.db.executeNonQuery(SQL, "", ref recordsAffected);
                             if (recordsAffected == 0) {
                                 SQL = "INSERT INTO ccSetup (ACTIVE,CONTENTCONTROLID,NAME,FIELDVALUE,ModifiedDate,DateAdded)VALUES("
-                            + SQLTrue + "," + DbController.encodeSQLNumber(ContentMetaDomainModel.getContentId(core, "site properties")) + "," + DbController.encodeSQLText(propertyName.ToUpper()) + "," + DbController.encodeSQLText(Value) + "," + SQLNow + "," + SQLNow + ");";
+                            + SQLTrue + "," + DbController.encodeSQLNumber(MetaModel.getContentId(core, "site properties")) + "," + DbController.encodeSQLText(propertyName.ToUpper()) + "," + DbController.encodeSQLText(Value) + "," + SQLNow + "," + SQLNow + ");";
                                 core.db.executeQuery(SQL);
                             }
                             //

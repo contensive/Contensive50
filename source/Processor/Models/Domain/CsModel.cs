@@ -55,7 +55,7 @@ namespace Contensive.Processor {
         /// <summary>
         /// If opened with a content name, this is that content's metadata
         /// </summary>
-        public Models.Domain.ContentMetaDomainModel CDef;
+        public Models.Domain.MetaModel CDef;
         /// <summary>
         /// data that needs to be written to the database on the next save
         /// </summary>
@@ -295,7 +295,7 @@ namespace Contensive.Processor {
                         //
                         core.db.deleteTableRecord(LiveRecordID, ContentTableName, ContentDataSourceName);
                         //
-                        ContentMetaController.deleteContentRules(core, ContentID, LiveRecordID);
+                        MetaController.deleteContentRules(core, ContentID, LiveRecordID);
                     }
                 }
             } catch (Exception ex) {
@@ -309,17 +309,17 @@ namespace Contensive.Processor {
         /// Inserts a record in a content definition and returns a csv_ContentSet with just that record
         /// If there was a problem, it returns -1
         /// </summary>
-        /// <param name="ContentName"></param>
+        /// <param name="contentName"></param>
         /// <param name="MemberID"></param>
         /// <returns></returns>
-        public bool csInsert(string ContentName) {
+        public bool csInsert(string contentName) {
             try {
                 if (IsOpen) { csClose(); }
-                if (string.IsNullOrEmpty(ContentName.Trim())) { throw new ArgumentException("ContentName cannot be blank"); }
+                if (string.IsNullOrEmpty(contentName.Trim())) { throw new ArgumentException("ContentName cannot be blank"); }
                 {
-                    var CDef = ContentMetaDomainModel.createByUniqueName(core, ContentName);
-                    if (CDef == null) { throw new GenericException("content [" + ContentName + "] could Not be found."); }
-                    if (CDef.id <= 0) { throw new GenericException("content [" + ContentName + "] could Not be found."); }
+                    var CDef = MetaModel.createByUniqueName(core, contentName);
+                    if (CDef == null) { throw new GenericException("content [" + contentName + "] could Not be found."); }
+                    if (CDef.id <= 0) { throw new GenericException("content [" + contentName + "] could Not be found."); }
                     //
                     // create default record in Live table
                     SqlFieldListClass sqlList = new SqlFieldListClass();
@@ -371,9 +371,9 @@ namespace Contensive.Processor {
                                                 DefaultValueText = "null";
                                             } else {
                                                 if (field.lookupContentID != 0) {
-                                                    string LookupContentName = ContentMetaController.getContentNameByID(core, field.lookupContentID);
+                                                    string LookupContentName = MetaController.getContentNameByID(core, field.lookupContentID);
                                                     if (!string.IsNullOrEmpty(LookupContentName)) {
-                                                        DefaultValueText = ContentMetaController.getRecordIdByUniqueName(core, LookupContentName, DefaultValueText).ToString();
+                                                        DefaultValueText = MetaController.getRecordIdByUniqueName(core, LookupContentName, DefaultValueText).ToString();
                                                     }
                                                 } else if (field.lookupList != "") {
                                                     string UCaseDefaultValueText = GenericController.vbUCase(DefaultValueText);
@@ -410,13 +410,15 @@ namespace Contensive.Processor {
                     core.db.insertTableRecord(CDef.dataSourceName, CDef.tableName, sqlList);
                     //
                     // ----- Get the record back so we can use the ID
-                    return csOpen(ContentName, "(ccguid=" + sqlGuid + ")And(DateAdded=" + sqlDateAdded + ")", "ID DESC", false, openingMemberID);
+                    return csOpen(contentName, "(ccguid=" + sqlGuid + ")And(DateAdded=" + sqlDateAdded + ")", "ID DESC", false, openingMemberID);
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
                 throw;
             }
         }
+        //
+        public bool csInsert(string contentName, int userId) => csInsert(contentName);
         //
         //====================================================================================================
         public bool getBoolean(string fieldName) {
@@ -534,7 +536,7 @@ namespace Contensive.Processor {
             int RecordID = 0;
             if (csIsFieldSupported(0, "id") & csIsFieldSupported(0, "contentcontrolId")) {
                 RecordID = csGetInteger(0, "id");
-                ContentName = ContentMetaController.getContentNameByID(core, csGetInteger(0, "contentcontrolId"));
+                ContentName = MetaController.getContentNameByID(core, csGetInteger(0, "contentcontrolId"));
             }
             string source = csGet(0, FieldName);
             return ActiveContentController.renderHtmlForWeb(core, source, ContentName, RecordID, core.session.user.id, "", 0, CPUtilsBaseClass.addonContext.ContextPage);
@@ -591,7 +593,7 @@ namespace Contensive.Processor {
         //
         //========================================================================
         //
-        public void csGoNext(int ignore, bool AsyncSave = false) {
+        public void csGoNext(bool AsyncSave) {
             try {
                 if (!csOk(0)) {
                     //
@@ -625,6 +627,12 @@ namespace Contensive.Processor {
                 throw;
             }
         }
+        //
+        public void csGoNext(int ignore, bool AsyncSave) => csGoNext(AsyncSave);
+        //
+        public void csGoNext(int ignore) => csGoNext(false);
+        //
+        public void csGoNext() => csGoNext(false);
         //
         //========================================================================
         //
@@ -852,7 +860,7 @@ namespace Contensive.Processor {
         /// <param name="OriginalFilename"></param>
         /// <param name="ContentName"></param>
         /// <returns></returns>
-        public string getFieldFilename(int ignore, string FieldName, string OriginalFilename, string ContentName = "", int fieldTypeId = 0) {
+        public string getFieldFilename(string FieldName, string OriginalFilename, string ContentName, int fieldTypeId) {
             string returnFilename = "";
             try {
                 string TableName = null;
@@ -917,7 +925,7 @@ namespace Contensive.Processor {
                             //
                             // CS is SQL-based, use the contentname
                             //
-                            TableName = ContentMetaController.getContentTablename(core, ContentName);
+                            TableName = MetaController.getContentTablename(core, ContentName);
                         } else {
                             //
                             // no Contentname given
@@ -961,6 +969,12 @@ namespace Contensive.Processor {
             }
             return returnFilename;
         }
+        //
+        public string getFieldFilename(int ignore, string FieldName, string OriginalFilename, string ContentName, int fieldTypeId) => getFieldFilename(FieldName, OriginalFilename, ContentName, fieldTypeId);
+        //
+        public string getFieldFilename(int ignore, string FieldName, string OriginalFilename, string ContentName) => getFieldFilename(FieldName, OriginalFilename, ContentName, 0);
+        //
+        public string getFieldFilename(int ignore, string FieldName, string OriginalFilename) => getFieldFilename(FieldName, OriginalFilename, "", 0);
         //
         //====================================================================================================
         //
@@ -1049,18 +1063,18 @@ namespace Contensive.Processor {
         //
         public void csSetTextFile(int ignore, string FieldName, string Copy, string ContentName) {
             try {
-                if (!csOk(ignore)) { throw new ArgumentException("dataset is not valid"); }
+                if (!csOk()) { throw new ArgumentException("dataset is not valid"); }
                 if (string.IsNullOrEmpty(FieldName)) { throw new ArgumentException("fieldName cannot be blank"); }
                 if (string.IsNullOrEmpty(ContentName)) { throw new ArgumentException("contentName cannot be blank"); }
                 if (!this.writeable) { throw new GenericException("Cannot save this dataset because it is read-only."); }
-                string OldFilename = csGetText(ignore, FieldName);
-                string Filename = getFieldFilename(ignore, FieldName, "", ContentName, Constants.fieldTypeIdFileText);
+                string OldFilename = csGetText( FieldName);
+                string Filename = getFieldFilename( FieldName, "", ContentName, Constants.fieldTypeIdFileText);
                 if (OldFilename != Filename) {
                     //
                     // Filename changed, mark record changed
                     //
                     core.cdnFiles.saveFile(Filename, Copy);
-                    csSet(ignore, FieldName, Filename);
+                    csSet(FieldName, Filename);
                 } else {
                     string OldCopy = core.cdnFiles.readFileText(Filename);
                     if (OldCopy != Copy) {
@@ -1068,7 +1082,7 @@ namespace Contensive.Processor {
                         // copy changed, mark record changed
                         //
                         core.cdnFiles.saveFile(Filename, Copy);
-                        csSet(ignore, FieldName, Filename);
+                        csSet(FieldName, Filename);
                     }
                 }
             } catch (Exception ex) {
@@ -1123,22 +1137,22 @@ namespace Contensive.Processor {
         /// <param name="FieldName"></param>
         /// <returns></returns>
         //
-        public string csGet(int ignore, string FieldName) {
+        public string csGet(string FieldName) {
             string fieldValue = "";
             try {
-                if (!csOk(ignore)) { throw new ArgumentException("the dataset is not valid"); }
+                if (!csOk()) { throw new ArgumentException("the dataset is not valid"); }
                 if (string.IsNullOrEmpty(FieldName.Trim())) { throw new ArgumentException("fieldname cannot be blank"); }
                 {
                     if (!this.writeable) {
                         //
                         // -- Not updateable, Just return what is there as a string
-                        return csGetValue(ignore, FieldName);
+                        return csGetValue( FieldName);
                     } else {
                         //
                         // -- Updateable, interpret the value
                         if (!this.CDef.fields.ContainsKey(FieldName.ToLowerInvariant())) {
                             try {
-                                fieldValue = GenericController.encodeText(csGetValue(ignore, FieldName));
+                                fieldValue = GenericController.encodeText(csGetValue( FieldName));
                             } catch (Exception ex) {
                                 throw new GenericException("Error [" + ex.Message + "] reading field [" + FieldName.ToLowerInvariant() + "] In content [" + this.CDef.name + "] With custom field list [" + this.SelectTableFieldList + "");
                             }
@@ -1154,9 +1168,9 @@ namespace Contensive.Processor {
                                 string ContentName = null;
                                 string SQL = null;
                                 if (this.CDef.fields.ContainsKey("id")) {
-                                    RecordID = GenericController.encodeInteger(csGetValue(ignore, "id"));
-                                    ContentName = ContentMetaController.getContentNameByID(core, field.manyToManyRuleContentID);
-                                    DbTable = ContentMetaController.getContentTablename(core, ContentName);
+                                    RecordID = GenericController.encodeInteger(csGetValue( "id"));
+                                    ContentName = MetaController.getContentNameByID(core, field.manyToManyRuleContentID);
+                                    DbTable = MetaController.getContentTablename(core, ContentName);
                                     using (DataTable dt = core.db.executeQuery("Select " + field.ManyToManyRuleSecondaryField + " from " + DbTable + " where " + field.ManyToManyRulePrimaryField + "=" + RecordID)) {
                                         if (DbController.isDataTableOk(dt)) {
                                             foreach (DataRow dr in dt.Rows) {
@@ -1172,7 +1186,7 @@ namespace Contensive.Processor {
                                 //
                                 //fieldTypeId = Constants.fieldTypeId;
                             } else {
-                                object FieldValueVariant = csGetValue(ignore, FieldName);
+                                object FieldValueVariant = csGetValue( FieldName);
                                 if (!GenericController.IsNull(FieldValueVariant)) {
                                     //
                                     // Field is good
@@ -1206,7 +1220,7 @@ namespace Contensive.Processor {
                                             //
                                             if (FieldValueVariant.IsNumeric()) {
                                                 int fieldLookupId = field.lookupContentID;
-                                                string LookupContentName = ContentMetaController.getContentNameByID(core, fieldLookupId);
+                                                string LookupContentName = MetaController.getContentNameByID(core, fieldLookupId);
                                                 string LookupList = field.lookupList;
                                                 if (!string.IsNullOrEmpty(LookupContentName)) {
                                                     //
@@ -1234,7 +1248,7 @@ namespace Contensive.Processor {
                                             //
                                             //
                                             if (FieldValueVariant.IsNumeric()) {
-                                                fieldValue = ContentMetaController.getRecordName(core, "people", GenericController.encodeInteger(FieldValueVariant));
+                                                fieldValue = MetaController.getRecordName(core, "people", GenericController.encodeInteger(FieldValueVariant));
                                             }
                                             break;
                                         case Constants._fieldTypeIdCurrency:
@@ -1307,6 +1321,8 @@ namespace Contensive.Processor {
             return fieldValue;
         }
         //
+        public string csGet(int ignore, string FieldName) => csGet(FieldName);
+        //
         //========================================================================
         /// <summary>
         /// Saves the value for the field. If the field uses a file, the content is saved to the file using the fields filename. To set a file-based field's filename, use setFieldFilename
@@ -1315,7 +1331,7 @@ namespace Contensive.Processor {
         /// <param name="FieldName"></param>
         /// <param name="FieldValue"></param>
         //
-        public void csSet(int ignore, string FieldName, string FieldValue) {
+        public void csSet(string FieldName, string FieldValue) {
             try {
                 string BlankTest = null;
                 string FieldNameLc = null;
@@ -1325,7 +1341,7 @@ namespace Contensive.Processor {
                 string fileName = null;
                 string pathFilenameOriginal = null;
                 //
-                if (!csOk(ignore)) {
+                if (!csOk()) {
                     throw new ArgumentException("dataset is not valid or End-Of-file.");
                 } else if (string.IsNullOrEmpty(FieldName.Trim())) {
                     throw new ArgumentException("fieldName cannnot be blank");
@@ -1391,7 +1407,7 @@ namespace Contensive.Processor {
                                         int FilenameRev = 0;
                                         string path = null;
                                         int Pos = 0;
-                                        pathFilenameOriginal = csGetText(ignore, FieldNameLc);
+                                        pathFilenameOriginal = csGetText(FieldNameLc);
                                         PathFilename = pathFilenameOriginal;
                                         BlankTest = FieldValue;
                                         BlankTest = GenericController.vbReplace(BlankTest, " ", "");
@@ -1405,7 +1421,7 @@ namespace Contensive.Processor {
                                             }
                                         } else {
                                             if (string.IsNullOrEmpty(PathFilename)) {
-                                                PathFilename = getFieldFilename(ignore, FieldNameLc, "", ContentName, field.fieldTypeId);
+                                                PathFilename = getFieldFilename(FieldNameLc, "", ContentName, field.fieldTypeId);
                                             }
                                             if (PathFilename.Left(1) == "/") {
                                                 //
@@ -1455,7 +1471,7 @@ namespace Contensive.Processor {
                                     case Constants._fieldTypeIdBoolean:
                                         //
                                         // Boolean - sepcial case, block on typed GetAlways set
-                                        if (GenericController.encodeBoolean(FieldValue) != csGetBoolean(ignore, FieldNameLc)) {
+                                        if (GenericController.encodeBoolean(FieldValue) != csGetBoolean(FieldNameLc)) {
                                             SetNeeded = true;
                                         }
                                         break;
@@ -1463,7 +1479,7 @@ namespace Contensive.Processor {
                                         //
                                         // Set if text of value changes
                                         //
-                                        if (GenericController.encodeText(FieldValue) != csGetText(ignore, FieldNameLc)) {
+                                        if (GenericController.encodeText(FieldValue) != csGetText( FieldNameLc)) {
                                             SetNeeded = true;
                                             if (FieldValue.Length > 255) {
                                                 LogController.handleError(core, new GenericException("Text length too long saving field [" + FieldName + "], length [" + FieldValue.Length + "], but max for Text field is 255. Save will be attempted"));
@@ -1475,7 +1491,7 @@ namespace Contensive.Processor {
                                         //
                                         // Set if text of value changes
                                         //
-                                        if (GenericController.encodeText(FieldValue) != csGetText(ignore, FieldNameLc)) {
+                                        if (GenericController.encodeText(FieldValue) != csGetText( FieldNameLc)) {
                                             SetNeeded = true;
                                             if (FieldValue.Length > 65535) {
                                                 LogController.handleError(core, new GenericException("Text length too long saving field [" + FieldName + "], length [" + FieldValue.Length + "], but max for LongText and Html is 65535. Save will be attempted"));
@@ -1486,7 +1502,7 @@ namespace Contensive.Processor {
                                         //
                                         // Set if text of value changes
                                         //
-                                        if (GenericController.encodeText(FieldValue) != csGetText(ignore, FieldNameLc)) {
+                                        if (GenericController.encodeText(FieldValue) != csGetText( FieldNameLc)) {
                                             SetNeeded = true;
                                         }
                                         break;
@@ -1514,29 +1530,23 @@ namespace Contensive.Processor {
             }
         }
         //
-        //========================================================================
+        public void csSet(string FieldName, int FieldValue) => csSet(FieldName, FieldValue.ToString());
         //
-        public void csSet(int CSPointer, string FieldName, DateTime FieldValue) {
-            csSet(CSPointer, FieldName, FieldValue.ToString());
-        }
+        public void csSet(string FieldName, double FieldValue) => csSet(FieldName, FieldValue.ToString());
         //
-        //========================================================================
+        public void csSet(string FieldName, DateTime FieldValue) => csSet(FieldName, FieldValue.ToString());
         //
-        public void csSet(int CSPointer, string FieldName, bool FieldValue) {
-            csSet(CSPointer, FieldName, FieldValue.ToString());
-        }
+        public void csSet(string FieldName, bool FieldValue) => csSet(FieldName, FieldValue.ToString());
         //
-        //========================================================================
+        public void csSet(int ignore, string FieldName, string FieldValue) => csSet(FieldName, FieldValue);
         //
-        public void csSet(int CSPointer, string FieldName, int FieldValue) {
-            csSet(CSPointer, FieldName, FieldValue.ToString());
-        }
+        public void csSet(int ignore, string FieldName, int FieldValue) => csSet(FieldName, FieldValue.ToString());
         //
-        //========================================================================
+        public void csSet(int ignore, string FieldName, DateTime FieldValue) => csSet(FieldName, FieldValue.ToString());
         //
-        public void csSet(int CSPointer, string FieldName, double FieldValue) {
-            csSet(CSPointer, FieldName, FieldValue.ToString());
-        }
+        public void csSet(int ignore, string FieldName, bool FieldValue) => csSet(FieldName, FieldValue.ToString());
+        //
+        public void csSet(int ignore, string FieldName, double FieldValue) => csSet(FieldName, FieldValue.ToString());
         //
         //========================================================================
         /// <summary>
@@ -1712,7 +1722,7 @@ namespace Contensive.Processor {
                                             case Constants._fieldTypeIdManyToMany:
                                                 break;
                                             default:
-                                                SQLCriteriaUnique += "(" + field.nameLc + "=" + ContentMetaController.encodeSQL(writeCacheValue, field.fieldTypeId) + ")";
+                                                SQLCriteriaUnique += "(" + field.nameLc + "=" + MetaController.encodeSQL(writeCacheValue, field.fieldTypeId) + ")";
                                                 break;
                                         }
                                     }
@@ -1972,7 +1982,7 @@ namespace Contensive.Processor {
         public string csGetRecordEditLink(int ignore, bool AllowCut = false) {
             try {
                 if (!csOk(0)) { throw (new GenericException("Cannot create edit link because data set is not valid.")); }
-                string ContentName = ContentMetaController.getContentNameByID(core, csGetInteger(0, "contentcontrolid"));
+                string ContentName = MetaController.getContentNameByID(core, csGetInteger(0, "contentcontrolid"));
                 if (!string.IsNullOrEmpty(ContentName)) { return Addons.AdminSite.Controllers.AdminUIController.getRecordEditLink(core, ContentName, csGetInteger(0, "ID"), GenericController.encodeBoolean(AllowCut), csGetText(0, "Name"), core.session.isEditing(ContentName)); }
                 return string.Empty;
             } catch (Exception ex) {
@@ -2167,7 +2177,7 @@ namespace Contensive.Processor {
             try {
                 if (string.IsNullOrEmpty(contentName)) { throw new ArgumentException("ContentName cannot be blank"); }
                 {
-                    var CDef = Models.Domain.ContentMetaDomainModel.createByUniqueName(core, contentName);
+                    var CDef = Models.Domain.MetaModel.createByUniqueName(core, contentName);
                     if (CDef == null) { throw (new GenericException("No content found For [" + contentName + "]")); }
                     if (CDef.id <= 0) { throw (new GenericException("No content found For [" + contentName + "]")); }
                     {
@@ -2331,7 +2341,7 @@ namespace Contensive.Processor {
         //        if (string.IsNullOrEmpty(ContentName)) {
         //            throw new ArgumentException("ContentName cannot be blank");
         //        } else {
-        //            var CDef = Models.Domain.ContentMetaDomainModel.createByUniqueName(core, ContentName);
+        //            var CDef = Models.Domain.MetaModel.createByUniqueName(core, ContentName);
         //            if (CDef == null) {
         //                throw (new GenericException("No content found For [" + ContentName + "]"));
         //            } else if (CDef.id <= 0) {
@@ -2424,10 +2434,14 @@ namespace Contensive.Processor {
         }
         //
         private void sample() {
-            using (var cs = new CsModel(core)) {
-                if (cs.openSQL("")) {
+            using (var csXfer = new CsModel(core)) {
+                if (csXfer.openSQL("")) {
 
                 }
+            }
+
+            using (var csXfer = new CsModel(core)) {
+
             }
         }
         //

@@ -44,17 +44,19 @@ namespace Contensive.Processor.Controllers {
                     //
                     // ----- convert editor active edit icons
                     //
-                    ContentCopy = ActiveContentController.processWysiwygResponseForSave(core,ContentCopy);
+                    ContentCopy = ActiveContentController.processWysiwygResponseForSave(core, ContentCopy);
                     //
                     // ----- save the content
                     //
-                    ContentName = ContentMetaController.getContentNameByID(core, ContentID);
+                    ContentName = MetaController.getContentNameByID(core, ContentID);
                     if (!string.IsNullOrEmpty(ContentName)) {
-                        CS = csXfer.csOpen(ContentName, "ID=" + DbController.encodeSQLNumber(RecordID), "", false);
-                        if (csXfer.csOk(CS)) {
-                            csXfer.csSet(CS, FieldName, ContentCopy);
+                        using (var csXfer = new CsModel(core)) {
+                            csXfer.csOpen(ContentName, "ID=" + DbController.encodeSQLNumber(RecordID), "", false);
+                            if (csXfer.csOk()) {
+                                csXfer.csSet(CS, FieldName, ContentCopy);
+                            }
+                            csXfer.csClose();
                         }
-                        csXfer.csClose(ref CS);
                     }
                     break;
             }
@@ -81,35 +83,37 @@ namespace Contensive.Processor.Controllers {
             strFieldName = GenericController.encodeText(FieldName);
             //
             EditorPanel = "";
-            ContentID = Models.Domain.ContentMetaDomainModel.getContentId(core, intContentName);
+            ContentID = Models.Domain.MetaModel.getContentId(core, intContentName);
             if ((ContentID < 1) || (intRecordId < 1) || (string.IsNullOrEmpty(strFieldName))) {
                 PanelCopy = SpanClassAdminNormal + "The information you have selected can not be accessed.</span>";
                 EditorPanel = EditorPanel + core.html.getPanel(PanelCopy);
             } else {
-                intContentName = ContentMetaController.getContentNameByID(core, ContentID);
+                intContentName = MetaController.getContentNameByID(core, ContentID);
                 if (!string.IsNullOrEmpty(intContentName)) {
-                    CSPointer = csXfer.csOpen(intContentName, "ID=" + intRecordId);
-                    if (!csXfer.csOk(CSPointer)) {
-                        PanelCopy = SpanClassAdminNormal + "The information you have selected can not be accessed.</span>";
-                        EditorPanel = EditorPanel + core.html.getPanel(PanelCopy);
-                    } else {
-                        Copy = csXfer.csGet(CSPointer, strFieldName);
-                        EditorPanel = EditorPanel + HtmlController.inputHidden("Type", FormTypeActiveEditor);
-                        EditorPanel = EditorPanel + HtmlController.inputHidden("cid", ContentID);
-                        EditorPanel = EditorPanel + HtmlController.inputHidden("ID", intRecordId);
-                        EditorPanel = EditorPanel + HtmlController.inputHidden("fn", strFieldName);
-                        EditorPanel = EditorPanel + GenericController.encodeText(FormElements);
-                        EditorPanel = EditorPanel + core.html.getFormInputHTML("ContentCopy", Copy, "3", "45", false, true);
-                        //EditorPanel = EditorPanel & main_GetFormInputActiveContent( "ContentCopy", Copy, 3, 45)
-                        ButtonPanel = core.html.getPanelButtons(ButtonCancel + "," + ButtonSave, "button");
-                        EditorPanel = EditorPanel + ButtonPanel;
+                    using (var csXfer = new CsModel(core)) {
+                        csXfer.csOpen(intContentName, "ID=" + intRecordId);
+                        if (!csXfer.csOk()) {
+                            PanelCopy = SpanClassAdminNormal + "The information you have selected can not be accessed.</span>";
+                            EditorPanel = EditorPanel + core.html.getPanel(PanelCopy);
+                        } else {
+                            Copy = csXfer.csGet(strFieldName);
+                            EditorPanel = EditorPanel + HtmlController.inputHidden("Type", FormTypeActiveEditor);
+                            EditorPanel = EditorPanel + HtmlController.inputHidden("cid", ContentID);
+                            EditorPanel = EditorPanel + HtmlController.inputHidden("ID", intRecordId);
+                            EditorPanel = EditorPanel + HtmlController.inputHidden("fn", strFieldName);
+                            EditorPanel = EditorPanel + GenericController.encodeText(FormElements);
+                            EditorPanel = EditorPanel + core.html.getFormInputHTML("ContentCopy", Copy, "3", "45", false, true);
+                            //EditorPanel = EditorPanel & main_GetFormInputActiveContent( "ContentCopy", Copy, 3, 45)
+                            ButtonPanel = core.html.getPanelButtons(ButtonCancel + "," + ButtonSave, "button");
+                            EditorPanel = EditorPanel + ButtonPanel;
+                        }
+                        csXfer.csClose();
                     }
-                    csXfer.csClose(ref CSPointer);
                 }
             }
             Stream = Stream + core.html.getPanelHeader("Contensive Active Content Editor");
             Stream = Stream + core.html.getPanel(EditorPanel);
-            Stream = HtmlController.form(core, Stream );
+            Stream = HtmlController.form(core, Stream);
             return Stream;
         }
         //
@@ -151,7 +155,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 result = string.Join(",", editorAddonIds);
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, ex);
             }
             return result;
         }
@@ -176,8 +180,8 @@ namespace Contensive.Processor.Controllers {
         ~EditorController() {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(false);
-            
-            
+
+
         }
         //
         //====================================================================================================

@@ -237,7 +237,7 @@ namespace Contensive.Processor.Controllers {
                 // ----- Do not allow blank message - if still nothing, create default
                 if (string.IsNullOrEmpty(result)) {
                     result = "<p>The content on this page has restricted access. If you have a username and password for this system, <a href=\"?method=login\" rel=\"nofollow\">Click Here</a>. For more information, please contact the administrator.</p>";
-                    copyRecord = CopyContentModel.addDefault(core, Models.Domain.ContentMetaDomainModel.createByUniqueName(core, CopyContentModel.contentName));
+                    copyRecord = CopyContentModel.addDefault(core, Models.Domain.MetaModel.createByUniqueName(core, CopyContentModel.contentName));
                     copyRecord.name = ContentBlockCopyName;
                     copyRecord.copy = result;
                     copyRecord.save(core);
@@ -254,8 +254,8 @@ namespace Contensive.Processor.Controllers {
             string result = "";
             try {
                 string Copy = "";
-                int CS = csXfer.csOpenContentRecord("People", PeopleID, 0, false, false, "Name,Phone,Email");
-                if (csXfer.csOk(CS)) {
+                int csXfer.csOpenContentRecord("People", PeopleID, 0, false, false, "Name,Phone,Email");
+                if (csXfer.csOk()) {
                     string ContactName = csXfer.csGetText(CS, "Name");
                     string ContactPhone = csXfer.csGetText(CS, "Phone");
                     string ContactEmail = csXfer.csGetText(CS, "Email");
@@ -362,7 +362,7 @@ namespace Contensive.Processor.Controllers {
                     if (core.doc.pageController.pageToRootList.Count == 0) {
                         //
                         // -- attempt failed, create default page
-                        core.doc.pageController.page = PageContentModel.addDefault(core, Models.Domain.ContentMetaDomainModel.createByUniqueName(core, PageContentModel.contentName));
+                        core.doc.pageController.page = PageContentModel.addDefault(core, Models.Domain.MetaModel.createByUniqueName(core, PageContentModel.contentName));
                         core.doc.pageController.page.name = DefaultNewLandingPageName + ", " + domain.name;
                         core.doc.pageController.page.copyfilename.content = landingPageDefaultHtml;
                         core.doc.pageController.page.save(core);
@@ -413,7 +413,7 @@ namespace Contensive.Processor.Controllers {
                             if (core.doc.pageController.template == null) {
                                 //
                                 // -- ceate new template named Default
-                                core.doc.pageController.template = PageTemplateModel.addDefault(core, Models.Domain.ContentMetaDomainModel.createByUniqueName(core, PageTemplateModel.contentName));
+                                core.doc.pageController.template = PageTemplateModel.addDefault(core, Models.Domain.MetaModel.createByUniqueName(core, PageTemplateModel.contentName));
                                 core.doc.pageController.template.name = defaultTemplateName;
                                 core.doc.pageController.template.bodyHTML = core.appRootFiles.readFileText(defaultTemplateHomeFilename);
                                 core.doc.pageController.template.save(core);
@@ -476,7 +476,7 @@ namespace Contensive.Processor.Controllers {
                         if (landingPage == null) {
                             //
                             // -- create detault landing page
-                            landingPage = PageContentModel.addDefault(core, Models.Domain.ContentMetaDomainModel.createByUniqueName(core, PageContentModel.contentName));
+                            landingPage = PageContentModel.addDefault(core, Models.Domain.MetaModel.createByUniqueName(core, PageContentModel.contentName));
                             landingPage.name = DefaultNewLandingPageName + ", " + domain.name;
                             landingPage.copyfilename.content = landingPageDefaultHtml;
                             landingPage.save(core);
@@ -656,7 +656,7 @@ namespace Contensive.Processor.Controllers {
                     // there is an allowed domain list and current domain is not on it, or use first
                     //
                     int setdomainId = allowTemplateRuleList.First().domainId;
-                    linkDomain = core.db.getRecordName("domains", setdomainId);
+                    linkDomain = MetaController.getRecordName( core,"domains", setdomainId);
                     if (string.IsNullOrEmpty(linkDomain)) {
                         linkDomain = core.webServer.requestDomain;
                     }
@@ -701,7 +701,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 result = (ChildRecordID == ParentRecordID);
                 if (!result) {
-                    Models.Domain.ContentMetaDomainModel CDef = Models.Domain.ContentMetaDomainModel.createByUniqueName(core, ContentName);
+                    Models.Domain.MetaModel CDef = Models.Domain.MetaModel.createByUniqueName(core, ContentName);
                     if (GenericController.isInDelimitedString(CDef.selectCommaList.ToUpper(), "PARENTID", ",")) {
                         result = main_IsChildRecord_Recurse(core, CDef.dataSourceName, CDef.tableName, ChildRecordID, ParentRecordID, "");
                     }
@@ -722,9 +722,9 @@ namespace Contensive.Processor.Controllers {
             bool result = false;
             try {
                 string SQL ="select ParentID from " + TableName + " where id=" + ChildRecordID;
-                int CS = csXfer.csOpenSql(SQL);
+                int csXfer.csOpenSql(SQL);
                 int ChildRecordParentID = 0;
-                if (csXfer.csOk(CS)) {
+                if (csXfer.csOk()) {
                     ChildRecordParentID = csXfer.csGetInteger(CS, "ParentID");
                 }
                 csXfer.csClose(ref CS);
@@ -836,8 +836,8 @@ namespace Contensive.Processor.Controllers {
                     //if (core.docProperties.getInteger("ContensiveUserForm") == 1) {
                     //    string FromAddress = core.siteProperties.getText("EmailFromAddress", "info@" + core.webServer.requestDomain);
                     //    EmailController.queueFormEmail(core, core.siteProperties.emailAdmin, FromAddress, "Form Submitted on " + core.webServer.requestReferer);
-                    //    int cs = csXfer.csInsert("User Form Response");
-                    //    if (csXfer.csOk(cs)) {
+                    //    int csXfer.csInsert("User Form Response");
+                    //    if (csXfer.csOk()) {
                     //        csXfer.csSet(cs, "name", "Form " + core.webServer.requestReferrer);
                     //        string Copy = "";
 
@@ -872,7 +872,7 @@ namespace Contensive.Processor.Controllers {
                     if (core.doc.redirectContentID != 0) {
                         core.doc.redirectRecordID = (core.docProperties.getInteger(rnRedirectRecordId));
                         if (core.doc.redirectRecordID != 0) {
-                            string contentName = ContentMetaController.getContentNameByID(core, core.doc.redirectContentID);
+                            string contentName = MetaController.getContentNameByID(core, core.doc.redirectContentID);
                             if (!string.IsNullOrEmpty(contentName)) {
                                 if (WebServerController.main_RedirectByRecord_ReturnStatus(core, contentName, core.doc.redirectRecordID)) {
                                     //
@@ -943,7 +943,7 @@ namespace Contensive.Processor.Controllers {
                         core.visitProperty.setProperty("Clipboard", "");
                         GenericController.modifyQueryString(core.doc.refreshQueryString, RequestNamePasteParentContentID, "");
                         GenericController.modifyQueryString(core.doc.refreshQueryString, RequestNamePasteParentRecordID, "");
-                        string ClipParentContentName = ContentMetaController.getContentNameByID(core, ClipParentContentID);
+                        string ClipParentContentName = MetaController.getContentNameByID(core, ClipParentContentID);
                         if (string.IsNullOrEmpty(ClipParentContentName)) {
                             // state not working...
                         } else if (string.IsNullOrEmpty(ClipBoard)) {
@@ -965,13 +965,13 @@ namespace Contensive.Processor.Controllers {
                                     } else {
                                         int ClipChildContentID = GenericController.encodeInteger(ClipBoardArray[0]);
                                         int ClipChildRecordID = GenericController.encodeInteger(ClipBoardArray[1]);
-                                        if (!ContentMetaController.isWithinContent(core, ClipChildContentID, ClipParentContentID)) {
+                                        if (!MetaController.isWithinContent(core, ClipChildContentID, ClipParentContentID)) {
                                             ErrorController.addUserError(core, "The paste operation failed because the destination location is not compatible with the clipboard data.");
                                         } else {
                                             //
                                             // the content definition relationship is OK between the child and parent record
                                             //
-                                            string ClipChildContentName = ContentMetaController.getContentNameByID(core, ClipChildContentID);
+                                            string ClipChildContentName = MetaController.getContentNameByID(core, ClipChildContentID);
                                             if (!(!string.IsNullOrEmpty(ClipChildContentName))) {
                                                 ErrorController.addUserError(core, "The paste operation failed because the clipboard data content is undefined.");
                                             } else {
@@ -1326,10 +1326,10 @@ namespace Contensive.Processor.Controllers {
                 //
                 // main_Get the instructions from the record
                 //
-                int CS = csXfer.csOpenRecord("Form Pages", FormPageID);
+                int csXfer.csOpenRecord("Form Pages", FormPageID);
                 string Formhtml = "";
                 string FormInstructions = "";
-                if (csXfer.csOk(CS)) {
+                if (csXfer.csOk()) {
                     Formhtml = csXfer.csGetText(CS, "Body");
                     FormInstructions = csXfer.csGetText(CS, "Instructions");
                 }
@@ -1362,10 +1362,10 @@ namespace Contensive.Processor.Controllers {
                                 // People Record
                                 //
                                 FormValue = core.docProperties.getText(IDontKnowWhat.PeopleField);
-                                if ((!string.IsNullOrEmpty(FormValue)) & GenericController.encodeBoolean(ContentMetaController.getContentFieldProperty(core, "people", IDontKnowWhat.PeopleField, "uniquename"))) {
+                                if ((!string.IsNullOrEmpty(FormValue)) & GenericController.encodeBoolean(MetaController.getContentFieldProperty(core, "people", IDontKnowWhat.PeopleField, "uniquename"))) {
                                     string SQL = "select count(*) from ccMembers where " + IDontKnowWhat.PeopleField + "=" + DbController.encodeSQLText(FormValue);
-                                    CS = csXfer.csOpenSql(SQL);
-                                    if (csXfer.csOk(CS)) {
+                                    csXfer.csOpenSql(SQL);
+                                    if (csXfer.csOk()) {
                                         Success = csXfer.csGetInteger(CS, "cnt") == 0;
                                     }
                                     csXfer.csClose(ref CS);
@@ -1373,7 +1373,7 @@ namespace Contensive.Processor.Controllers {
                                         ErrorController.addUserError(core, "The field [" + IDontKnowWhat.Caption + "] must be unique, and the value [" + HtmlController.encodeHtml(FormValue) + "] has already been used.");
                                     }
                                 }
-                                if ((IDontKnowWhat.REquired || GenericController.encodeBoolean(ContentMetaController.getContentFieldProperty(core, "people", IDontKnowWhat.PeopleField, "required"))) && string.IsNullOrEmpty(FormValue)) {
+                                if ((IDontKnowWhat.REquired || GenericController.encodeBoolean(MetaController.getContentFieldProperty(core, "people", IDontKnowWhat.PeopleField, "required"))) && string.IsNullOrEmpty(FormValue)) {
                                     Success = false;
                                     ErrorController.addUserError(core, "The field [" + HtmlController.encodeHtml(IDontKnowWhat.Caption) + "] is required.");
                                 } else {
@@ -1573,11 +1573,11 @@ namespace Contensive.Processor.Controllers {
             try {
                 Main_FormPagetype f;
                 bool IsRetry =  (core.docProperties.getInteger("ContensiveFormPageID") != 0);
-                int CS = csXfer.csOpen("Form Pages", "name=" + DbController.encodeSQLText(FormPageName));
+                int csXfer.csOpen("Form Pages", "name=" + DbController.encodeSQLText(FormPageName));
                 string Formhtml = "";
                 string FormInstructions = "";
                 int FormPageID = 0;
-                if (csXfer.csOk(CS)) {
+                if (csXfer.csOk()) {
                     FormPageID = csXfer.csGetInteger(CS, "ID");
                     Formhtml = csXfer.csGetText(CS, "Body");
                     FormInstructions = csXfer.csGetText(CS, "Instructions");
@@ -1608,7 +1608,7 @@ namespace Contensive.Processor.Controllers {
                                 CSPeople = csXfer.csOpenRecord("people", core.session.user.id);
                             }
                             Caption = tempVar.Caption;
-                            if (tempVar.REquired || GenericController.encodeBoolean(ContentMetaController.getContentFieldProperty(core, "People", tempVar.PeopleField, "Required"))) {
+                            if (tempVar.REquired || GenericController.encodeBoolean(MetaController.getContentFieldProperty(core, "People", tempVar.PeopleField, "Required"))) {
                                 Caption = "*" + Caption;
                             }
                             if (csXfer.csOk(CSPeople)) {
@@ -1719,9 +1719,9 @@ namespace Contensive.Processor.Controllers {
                             + " AND ((ccgroups.Active)<>0)"
                             + " AND ((ccMemberRules.Active)<>0)"
                             + " AND ((ccMemberRules.DateExpires) Is Null Or (ccMemberRules.DateExpires)>" + DbController.encodeSQLDate(core.doc.profileStartTime) + "));";
-                        CS = csXfer.csOpenSql(SQL);
+                        csXfer.csOpenSql(SQL);
                         BlockedRecordIDList = "," + BlockedRecordIDList;
-                        while (csXfer.csOk(CS)) {
+                        while (csXfer.csOk()) {
                             BlockedRecordIDList = GenericController.vbReplace(BlockedRecordIDList, "," + csXfer.csGetText(CS, "RecordID"), "");
                             csXfer.csGoNext(CS);
                         }
@@ -1743,8 +1743,8 @@ namespace Contensive.Processor.Controllers {
                                 + " AND ((ManagementMemberRules.Active)<>0)"
                                 + " AND ((ManagementMemberRules.DateExpires) Is Null Or (ManagementMemberRules.DateExpires)>" + DbController.encodeSQLDate(core.doc.profileStartTime) + ")"
                                 + " AND ((ManagementMemberRules.MemberID)=" + core.session.user.id + " ));";
-                            CS = csXfer.csOpenSql(SQL);
-                            while (csXfer.csOk(CS)) {
+                            csXfer.csOpenSql(SQL);
+                            while (csXfer.csOk()) {
                                 BlockedRecordIDList = GenericController.vbReplace(BlockedRecordIDList, "," + csXfer.csGetText(CS, "RecordID"), "");
                                 csXfer.csGoNext(CS);
                             }
@@ -1768,8 +1768,8 @@ namespace Contensive.Processor.Controllers {
                     int BlockedPageRecordID = GenericController.encodeInteger(BlockedPages[BlockedPages.GetUpperBound(0)]);
                     int RegistrationGroupID = 0;
                     if (BlockedPageRecordID != 0) {
-                        CS = csXfer.csOpenRecord("Page Content", BlockedPageRecordID, false, false, "CustomBlockMessage,BlockSourceID,RegistrationGroupID,ContentPadding");
-                        if (csXfer.csOk(CS)) {
+                        csXfer.csOpenRecord("Page Content", BlockedPageRecordID, false, false, "CustomBlockMessage,BlockSourceID,RegistrationGroupID,ContentPadding");
+                        if (csXfer.csOk()) {
                             BlockSourceID = csXfer.csGetInteger(CS, "BlockSourceID");
                             CustomBlockMessageFilename = csXfer.csGetText(CS, "CustomBlockMessage");
                             RegistrationGroupID = csXfer.csGetInteger(CS, "RegistrationGroupID");
@@ -2000,7 +2000,7 @@ namespace Contensive.Processor.Controllers {
                                 // Always
                                 //
                                 if (SystemEMailID != 0) {
-                                    EmailController.queueSystemEmail(core, core.db.getRecordName("System Email", SystemEMailID), "", core.session.user.id);
+                                    EmailController.queueSystemEmail(core, MetaController.getRecordName( core,"System Email", SystemEMailID), "", core.session.user.id);
                                 }
                                 if (main_AddGroupID != 0) {
                                     GroupController.addUser(core, GroupController.getGroupName(core, main_AddGroupID));
@@ -2016,7 +2016,7 @@ namespace Contensive.Processor.Controllers {
                                 if (ConditionGroupID != 0) {
                                     if (GroupController.isMemberOfGroup(core, GroupController.getGroupName(core, ConditionGroupID))) {
                                         if (SystemEMailID != 0) {
-                                            EmailController.queueSystemEmail(core, core.db.getRecordName("System Email", SystemEMailID), "", core.session.user.id);
+                                            EmailController.queueSystemEmail(core, MetaController.getRecordName( core,"System Email", SystemEMailID), "", core.session.user.id);
                                         }
                                         if (main_AddGroupID != 0) {
                                             GroupController.addUser(core, GroupController.getGroupName(core, main_AddGroupID));
@@ -2040,7 +2040,7 @@ namespace Contensive.Processor.Controllers {
                                             GroupController.removeUser(core, GroupController.getGroupName(core, RemoveGroupID));
                                         }
                                         if (SystemEMailID != 0) {
-                                            EmailController.queueSystemEmail(core, core.db.getRecordName("System Email", SystemEMailID), "", core.session.user.id);
+                                            EmailController.queueSystemEmail(core, MetaController.getRecordName( core,"System Email", SystemEMailID), "", core.session.user.id);
                                         }
                                     }
                                 }
@@ -2347,7 +2347,7 @@ namespace Contensive.Processor.Controllers {
                         if (core.doc.pageController.page.modifiedBy == 0) {
                             result += " (admin only: modified by unknown)";
                         } else {
-                            string personName = core.db.getRecordName("people", core.doc.pageController.page.modifiedBy);
+                            string personName = MetaController.getRecordName( core,"people", core.doc.pageController.page.modifiedBy);
                             if (string.IsNullOrEmpty(personName)) {
                                 result += " (admin only: modified by person with unnamed or deleted record #" + core.doc.pageController.page.modifiedBy + ")";
                             } else {
@@ -2365,7 +2365,7 @@ namespace Contensive.Processor.Controllers {
                         if (core.doc.pageController.page.reviewedBy == 0) {
                             result += " (by unknown)";
                         } else {
-                            string personName = core.db.getRecordName("people", core.doc.pageController.page.reviewedBy);
+                            string personName = MetaController.getRecordName( core,"people", core.doc.pageController.page.reviewedBy);
                             if (string.IsNullOrEmpty(personName)) {
                                 result += " (by person with unnamed or deleted record #" + core.doc.pageController.page.reviewedBy + ")";
                             } else {
@@ -2400,7 +2400,7 @@ namespace Contensive.Processor.Controllers {
             string result = "";
             try {
                 if (RecordID > 0) {
-                    int ContentID = Models.Domain.ContentMetaDomainModel.getContentId(core, ContentName);
+                    int ContentID = Models.Domain.MetaModel.getContentId(core, ContentName);
                     bool IsEditingLocal = false;
                     if (ContentID > 0) {
                         //
@@ -2409,13 +2409,13 @@ namespace Contensive.Processor.Controllers {
                     } else {
                         //
                         // ----- if iContentName was bad, maybe they put table in, no authoring
-                        ContentID = Models.Domain.ContentMetaDomainModel.getContentIdByTablename(core, ContentName);
+                        ContentID = Models.Domain.MetaModel.getContentIdByTablename(core, ContentName);
                     }
                     int SeeAlsoCount = 0;
                     if (ContentID > 0) {
                         //
-                        int CS = csXfer.csOpen("See Also", "((active<>0)AND(ContentID=" + ContentID + ")AND(RecordID=" + RecordID + "))");
-                        while (csXfer.csOk(CS)) {
+                        int csXfer.csOpen("See Also", "((active<>0)AND(ContentID=" + ContentID + ")AND(RecordID=" + RecordID + "))");
+                        while (csXfer.csOk()) {
                             string SeeAlsoLink = (csXfer.csGetText(CS, "Link"));
                             if (!string.IsNullOrEmpty(SeeAlsoLink)) {
                                 result += "\r<li class=\"ccListItem\">";
@@ -2504,9 +2504,9 @@ namespace Contensive.Processor.Controllers {
                         NoteCopy = NoteCopy + BR;
                         NoteCopy = NoteCopy + "<b>Content on which the comments are based</b>" + BR;
                         //
-                        CS = csXfer.csOpen(ContentName, "ID=" + RecordID);
+                        csXfer.csOpen(ContentName, "ID=" + RecordID);
                         Copy = "[the content of this page is not available]" + BR;
-                        if (csXfer.csOk(CS)) {
+                        if (csXfer.csOk()) {
                             Copy = (csXfer.csGet(CS, "copyFilename"));
                             //Copy = main_EncodeContent5(Copy, c.authcontext.user.userid, iContentName, iRecordID, 0, False, False, True, True, False, True, "", "", False, 0)
                         }
@@ -2778,14 +2778,14 @@ namespace Contensive.Processor.Controllers {
             try {
                 int CS = -1;
                 if (SortReverse && (!string.IsNullOrEmpty(SortField))) {
-                    CS = csXfer.csOpenContentWatchList(core, ListName, SortField + " Desc", true);
+                    csXfer.csOpenContentWatchList(core, ListName, SortField + " Desc", true);
                 } else {
-                    CS = csXfer.csOpenContentWatchList(core, ListName, SortField, true);
+                    csXfer.csOpenContentWatchList(core, ListName, SortField, true);
                 }
                 //
-                if (csXfer.csOk(CS)) {
-                    int ContentID = Models.Domain.ContentMetaDomainModel.getContentId(core, "Content Watch");
-                    while (csXfer.csOk(CS)) {
+                if (csXfer.csOk()) {
+                    int ContentID = Models.Domain.MetaModel.getContentId(core, "Content Watch");
+                    while (csXfer.csOk()) {
                         string Link = csXfer.csGetText(CS, "link");
                         string LinkLabel = csXfer.csGetText(CS, "LinkLabel");
                         int RecordID = csXfer.csGetInteger(CS, "ID");
@@ -2822,7 +2822,7 @@ namespace Contensive.Processor.Controllers {
             int recordId = (core.docProperties.getInteger("ID"));
             string button = core.docProperties.getText("Button");
             if ((!string.IsNullOrEmpty(button)) && (recordId != 0) && (core.session.isAuthenticatedContentManager(core, PageContentModel.contentName))) {
-                var pageCdef = Models.Domain.ContentMetaDomainModel.createByUniqueName(core, "page content");
+                var pageCdef = Models.Domain.MetaModel.createByUniqueName(core, "page content");
                 var pageTable = Models.Db.TableModel.createByContentName(core, pageCdef.name);
                 WorkflowController.editLockClass editLock = WorkflowController.getEditLock(core, pageTable.id, recordId);
                 WorkflowController.clearEditLock(core, pageTable.id, recordId);
@@ -2979,7 +2979,7 @@ namespace Contensive.Processor.Controllers {
                 CSPointer = csXfer.csOpenWhatsNew(core, SortFieldList);
                 //
                 if (csXfer.csOk(CSPointer)) {
-                    ContentID = Models.Domain.ContentMetaDomainModel.getContentId(core, "Content Watch");
+                    ContentID = Models.Domain.MetaModel.getContentId(core, "Content Watch");
                     while (csXfer.csOk(CSPointer)) {
                         Link = csXfer.csGetText(CSPointer, "link");
                         LinkLabel = csXfer.csGetText(CSPointer, "LinkLabel");

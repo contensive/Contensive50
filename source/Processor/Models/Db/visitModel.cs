@@ -58,12 +58,12 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static VisitModel addDefault(CoreController core, Domain.ContentMetaDomainModel cdef) {
+        public static VisitModel addDefault(CoreController core, Domain.MetaModel cdef) {
             return addDefault<VisitModel>(core, cdef);
         }
         //
         //====================================================================================================
-        public static VisitModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.ContentMetaDomainModel cdef) {
+        public static VisitModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.MetaModel cdef) {
             return addDefault<VisitModel>(core, cdef, ref callersCacheNameList);
         }
         //

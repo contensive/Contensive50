@@ -80,7 +80,7 @@ namespace Contensive.Processor.Controllers {
                     if (_language == null) {
                         //
                         // -- add english to the table
-                        _language = LanguageModel.addDefault(core, Models.Domain.ContentMetaDomainModel.createByUniqueName( core, LanguageModel.contentName));
+                        _language = LanguageModel.addDefault(core, Models.Domain.MetaModel.createByUniqueName( core, LanguageModel.contentName));
                         _language.name = "English";
                         _language.http_Accept_Language = "en";
                         _language.save(core);
@@ -493,7 +493,7 @@ namespace Contensive.Processor.Controllers {
                                 // lazy create a user if/when it is needed
                                 string DefaultMemberName = resultSessionContext.visit.name;
                                 if (DefaultMemberName.Left(5).ToLowerInvariant() == "visit") {
-                                    DefaultMemberName = ContentMetaController.getContentFieldProperty(core, "people", "name", "default");
+                                    DefaultMemberName = MetaController.getContentFieldProperty(core, "people", "name", "default");
                                 }
                                 resultSessionContext.user = new PersonModel {
                                     name = DefaultMemberName
@@ -625,7 +625,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="ContentName"></param>
         /// <returns></returns>
-        public bool isAuthenticatedContentManager(CoreController core, ContentMetaDomainModel cdef) {
+        public bool isAuthenticatedContentManager(CoreController core, MetaModel cdef) {
             bool returnIsContentManager = false;
             try {
                 if (core.session.isAuthenticatedAdmin(core)) return true;
@@ -660,7 +660,7 @@ namespace Contensive.Processor.Controllers {
                 } else {
                     //
                     // -- for specific Content
-                    ContentMetaDomainModel cdef = ContentMetaDomainModel.createByUniqueName(core, ContentName);
+                    MetaModel cdef = MetaModel.createByUniqueName(core, ContentName);
                     returnIsContentManager = PermissionController.getUserContentPermissions(core, cdef).allowEdit;
                 }
             } catch (Exception ex) {
@@ -694,9 +694,9 @@ namespace Contensive.Processor.Controllers {
                             + " AND(ccGroupRules.ContentID Is not Null)"
                             + " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + DbController.encodeSQLDate(core.doc.profileStartTime) + "))"
                             + ")";
-                    int CS = csXfer.csOpenSql(SQL);
-                    _isAuthenticatedContentManagerAnything = csXfer.csOk(CS);
-                    csXfer.csClose(ref CS);
+                    int csXfer.csOpenSql(SQL);
+                    _isAuthenticatedContentManagerAnything = csXfer.csOk();
+                    csXfer.csClose();
                     //
                     _isAuthenticatedContentManagerAnything_userId = user.id;
                     _isAuthenticatedContentManagerAnything_loaded = true;
@@ -723,7 +723,7 @@ namespace Contensive.Processor.Controllers {
                 LogController.addSiteActivity(core, "logout", user.id, user.organizationID);
                 //
                 // new guest
-                user = PersonModel.addDefault(core, ContentMetaDomainModel.createByUniqueName( core, PersonModel.contentName));
+                user = PersonModel.addDefault(core, MetaModel.createByUniqueName( core, PersonModel.contentName));
                 visit.memberID = user.id;
                 visit.visitAuthenticated = false;
                 visit.save(core);
@@ -799,8 +799,8 @@ namespace Contensive.Processor.Controllers {
                     if (true) {
                         Criteria = Criteria + "and((dateExpires is null)or(dateExpires>" + DbController.encodeSQLDate(DateTime.Now) + "))";
                     }
-                    CS = csXfer.csOpen("People", Criteria, "id", sqlSelectFieldList: "ID ,password,admin,developer", PageSize: 2);
-                    if (!csXfer.csOk(CS)) {
+                    csXfer.csOpen("People", Criteria, "id", sqlSelectFieldList: "ID ,password,admin,developer", PageSize: 2);
+                    if (!csXfer.csOk()) {
                         //
                         // ----- loginFieldValue not found, stop here
                         //
@@ -814,7 +814,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // ----- search all found records for the correct password
                         //
-                        while (csXfer.csOk(CS)) {
+                        while (csXfer.csOk()) {
                             returnUserId = 0;
                             //
                             // main_Get Id if password good
@@ -839,11 +839,11 @@ namespace Contensive.Processor.Controllers {
                                         + " AND(ccGroupRules.ContentID Is not Null)"
                                         + " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + DbController.encodeSQLDate(core.doc.profileStartTime) + "))"
                                         + ");";
-                                    CS = csXfer.csOpenSql(SQL);
-                                    if (csXfer.csOk(CS)) {
+                                    csXfer.csOpenSql(SQL);
+                                    if (csXfer.csOk()) {
                                         returnUserId = 0;
                                     }
-                                    csXfer.csClose(ref CS);
+                                    csXfer.csClose();
                                 }
                             } else {
                                 //
@@ -862,7 +862,7 @@ namespace Contensive.Processor.Controllers {
                             ErrorController.addUserError(core, badLoginUserError);
                         }
                     }
-                    csXfer.csClose(ref CS);
+                    csXfer.csClose();
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -908,7 +908,7 @@ namespace Contensive.Processor.Controllers {
                 } else {
 
                     CSPointer = csXfer.csOpen("People", "username=" + DbController.encodeSQLText(Username), "", false, sqlSelectFieldList: "ID", PageSize: 2);
-                    if (csXfer.csOk(CSPointer)) {
+                    if (csXfer.csOk()) {
                         //
                         // ----- username was found, stop here
                         //
@@ -917,7 +917,7 @@ namespace Contensive.Processor.Controllers {
                     } else {
                         returnOk = true;
                     }
-                    csXfer.csClose(ref CSPointer);
+                    csXfer.csClose();
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -1034,7 +1034,7 @@ namespace Contensive.Processor.Controllers {
         //========================================================================
         //
         public bool isAuthenticatedMember(CoreController core) {
-            return visit.visitAuthenticated & (ContentMetaController.isWithinContent(core, user.contentControlID, ContentMetaDomainModel.getContentId(core, "members")));
+            return visit.visitAuthenticated & (MetaController.isWithinContent(core, user.contentControlID, MetaModel.getContentId(core, "members")));
         }
         //
         //========================================================================
@@ -1091,7 +1091,7 @@ namespace Contensive.Processor.Controllers {
                         if (core.visitProperty.getBoolean("AllowEditing") || core.visitProperty.getBoolean("AllowAdvancedEditor")) {
                             if (!string.IsNullOrEmpty(contentNameOrId)) {
                                 if (contentNameOrId.IsNumeric()) {
-                                    contentNameOrId = ContentMetaController.getContentNameByID(core, encodeInteger(contentNameOrId));
+                                    contentNameOrId = MetaController.getContentNameByID(core, encodeInteger(contentNameOrId));
                                 }
                             }
                             result = isAuthenticatedContentManager(core, contentNameOrId);

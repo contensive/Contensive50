@@ -212,7 +212,7 @@ namespace Contensive.Processor.Controllers {
         //                            + "  or(ProcessNextRun<" + SQLNow + ")"
         //                            + " )";
         //                        int CS = coreApp.db.csOpen(Models.Db.AddonModel.contentName, sqlAddonsCriteria);
-        //                        while (coreApp.db.csOk(CS)) {
+        //                        while (coreApp.db.csOk()) {
         //                            int addonProcessInterval = coreApp.db.csGetInteger(CS, "ProcessInterval");
         //                            string addonName = coreApp.db.csGetText(CS, "name");
         //                            bool addonProcessRunOnce = coreApp.db.csGetBoolean(CS, "ProcessRunOnce");
@@ -247,7 +247,7 @@ namespace Contensive.Processor.Controllers {
         //                            }
         //                            coreApp.db.csGoNext(CS);
         //                        }
-        //                        coreApp.db.csClose(ref CS);
+        //                        coreApp.db.csClose();
         //                    } catch (Exception ex) {
         //                        //
         //                        LogController.logTrace(coreApp, "scheduleTasks, exception [" + ex.ToString() + "]");
@@ -277,7 +277,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 int downloadId = 0;
                 if (!string.IsNullOrEmpty(downloadName)) {
-                    var download = BaseModel.addDefault<DownloadModel>(core, ContentMetaDomainModel.createByUniqueName(core, DownloadModel.contentName));
+                    var download = BaseModel.addDefault<DownloadModel>(core, MetaModel.createByUniqueName(core, DownloadModel.contentName));
                     download.name = downloadName;
                     download.dateRequested = DateTime.Now;
                     download.requestedBy = core.session.user.id;
@@ -295,9 +295,9 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- Search for a duplicate
                     string sql = "select top 1 id from cctasks where ((cmdDetail=" + cmdDetailJson + ")and(datestarted is not null))";
-                    int cs = csXfer.csOpenSql(sql);
-                    resultTaskAdded = !csXfer.csOk(cs);
-                    csXfer.csClose(ref cs);
+                    int csXfer.csOpenSql(sql);
+                    resultTaskAdded = !csXfer.csOk();
+                    csXfer.csClose();
                 }
                 //
                 // -- add it to the queue and shell out to the command

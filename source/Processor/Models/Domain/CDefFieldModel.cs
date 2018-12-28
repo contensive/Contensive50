@@ -353,7 +353,7 @@ namespace Contensive.Processor.Models.Domain {
         public int lookupContentID { get; set; }
         public string get_lookupContentName(CoreController core) {
             if ((_lookupContentName == null)&(lookupContentID>0)) {
-                _lookupContentName = ContentMetaController.getContentNameByID(core, lookupContentID);
+                _lookupContentName = MetaController.getContentNameByID(core, lookupContentID);
                 //if (lookupContentID > 0) {
                 //    _lookupContentName = "";
                 //    var content = ContentModel.create(core, lookupContentID);
@@ -387,7 +387,7 @@ namespace Contensive.Processor.Models.Domain {
         public string memberSelectGroupName_get(CoreController core) {
             if (_memberSelectGroupName == null) {
                 if (_memberSelectGroupId != null) {
-                    _memberSelectGroupName = core.db.getRecordName("groups", GenericController.encodeInteger(_memberSelectGroupId));
+                    _memberSelectGroupName = MetaController.getRecordName( core,"groups", GenericController.encodeInteger(_memberSelectGroupId));
                 };
             }
             return (_memberSelectGroupName as string);
@@ -407,7 +407,7 @@ namespace Contensive.Processor.Models.Domain {
         public int memberSelectGroupId_get(CoreController core) {
             if (_memberSelectGroupId == null) {
                 if (_memberSelectGroupName != null) {
-                    _memberSelectGroupId = core.db.getRecordID("groups", GenericController.encodeText(_memberSelectGroupName));
+                    _memberSelectGroupId = MetaController.getRecordId( core,"groups", GenericController.encodeText(_memberSelectGroupName));
                 };
             }
             return (GenericController.encodeInteger(_memberSelectGroupId));

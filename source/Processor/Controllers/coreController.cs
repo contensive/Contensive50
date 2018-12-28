@@ -76,7 +76,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Dictionary of cdef, index by name
         /// </summary>
-        internal Dictionary<string, Models.Domain.ContentMetaDomainModel> cdefDictionary { get; set; }
+        internal Dictionary<string, Models.Domain.MetaModel> cdefDictionary { get; set; }
         //
         /// <summary>
         /// Dictionary of tableschema, index by name
@@ -436,7 +436,7 @@ namespace Contensive.Processor.Controllers {
             cp_forAddonExecutionOnly = cp;
             LogController.forceNLog( "CoreController constructor-0, enter", LogController.logLevel.Trace);
             //
-            cdefDictionary = new Dictionary<string, Models.Domain.ContentMetaDomainModel>();
+            cdefDictionary = new Dictionary<string, Models.Domain.MetaModel>();
             tableSchemaDictionary = null;
             //
             // -- create default auth objects for non-user methods, or until auth is available
@@ -459,7 +459,7 @@ namespace Contensive.Processor.Controllers {
             this.cp_forAddonExecutionOnly = cp;
             LogController.forceNLog( "CoreController constructor-1, enter", LogController.logLevel.Trace);
             //
-            cdefDictionary = new Dictionary<string, Models.Domain.ContentMetaDomainModel>();
+            cdefDictionary = new Dictionary<string, Models.Domain.MetaModel>();
             tableSchemaDictionary = null;
             //
             // -- create default auth objects for non-user methods, or until auth is available
@@ -509,7 +509,7 @@ namespace Contensive.Processor.Controllers {
             cp_forAddonExecutionOnly = cp;
             LogController.forceNLog( "CoreController constructor-2, enter", LogController.logLevel.Trace);
             //
-            cdefDictionary = new Dictionary<string, Models.Domain.ContentMetaDomainModel>();
+            cdefDictionary = new Dictionary<string, Models.Domain.MetaModel>();
             tableSchemaDictionary = null;
             //
             // -- create default auth objects for non-user methods, or until auth is available
@@ -553,7 +553,7 @@ namespace Contensive.Processor.Controllers {
             this.cp_forAddonExecutionOnly = cp;
             LogController.forceNLog( "CoreController constructor-4, enter", LogController.logLevel.Trace);
             //
-            cdefDictionary = new Dictionary<string, Models.Domain.ContentMetaDomainModel>();
+            cdefDictionary = new Dictionary<string, Models.Domain.MetaModel>();
             tableSchemaDictionary = null;
             //
             // -- create default auth objects for non-user methods, or until auth is available
@@ -997,7 +997,7 @@ namespace Contensive.Processor.Controllers {
                 //    bool AllowInactiveRecords2 = false;
                 //    string SelectFieldList = "";
                 //    int CS = db.csOpen("Remote Queries", "((VisitId=" + doc.authContext.visit.id + ")and(remotekey=" + DbController.encodeSQLText(RemoteKey) + "))");
-                //    if (db.csOk(CS)) {
+                //    if (db.csOk()) {
                 //        //
                 //        // Use user definied query
                 //        //
@@ -1048,7 +1048,7 @@ namespace Contensive.Processor.Controllers {
                 //                break;
                 //        }
                 //    }
-                //    db.csClose(ref CS);
+                //    db.csClose();
                 //    //
                 //    if (gv.status == GoogleVisualizationStatusEnum.OK) {
                 //        switch (QueryType) {
@@ -1073,7 +1073,7 @@ namespace Contensive.Processor.Controllers {
                 //                // Open the content and cycle through each setPair
                 //                //
                 //                CS = db.csOpen(ContentName, Criteria, SortFieldList, AllowInactiveRecords2, 0, false, false, SelectFieldList);
-                //                if (db.csOk(CS)) {
+                //                if (db.csOk()) {
                 //                    //
                 //                    // update by looping through the args and setting name=values
                 //                    //
@@ -1094,7 +1094,7 @@ namespace Contensive.Processor.Controllers {
                 //                        }
                 //                    }
                 //                }
-                //                db.csClose(ref CS);
+                //                db.csClose();
                 //                //Case QueryTypeInsertContent
                 //                //    '
                 //                //    ' !!!! only allow inbound hits with a referrer from this site - later use the aggregate access table
@@ -1208,8 +1208,8 @@ namespace Contensive.Processor.Controllers {
         /// <param name="UseContentWatchLink"></param>
         public void processAfterSave(bool IsDelete, string ContentName, int RecordID, string RecordName, int RecordParentID, bool UseContentWatchLink) {
             try {
-                int ContentID = ContentMetaDomainModel.getContentId(this, ContentName);
-                string TableName = ContentMetaController.getContentTablename(this, ContentName);
+                int ContentID = MetaModel.getContentId(this, ContentName);
+                string TableName = MetaController.getContentTablename(this, ContentName);
                 PageContentModel.markReviewed(this, RecordID);
                 //
                 // -- invalidate the specific cache for this record
@@ -1238,10 +1238,10 @@ namespace Contensive.Processor.Controllers {
                     case PersonModel.contentTableName:
                         //
                         CS = db.csOpen2("people", RecordID, false, false, "Name,OrganizationID");
-                        if (db.csOk(CS)) {
+                        if (db.csOk()) {
                             ActivityLogOrganizationID = db.csGetInteger(CS, "OrganizationID");
                         }
-                        db.csClose(ref CS);
+                        db.csClose();
                         if (IsDelete) {
                             LogController.addSiteActivity(this, "deleting user #" + RecordID + " (" + RecordName + ")", RecordID, ActivityLogOrganizationID);
                         } else {
@@ -1314,7 +1314,7 @@ namespace Contensive.Processor.Controllers {
                         if (siteProperties.getBoolean("ImageAllowSFResize", true)) {
                             if (!IsDelete) {
                                 CS = db.csOpenRecord("library files", RecordID);
-                                if (db.csOk(CS)) {
+                                if (db.csOk()) {
                                     string Filename = db.csGet(CS, "filename");
                                     int Pos = Filename.LastIndexOf("/") + 1;
                                     string FilePath = "";
@@ -1436,7 +1436,7 @@ namespace Contensive.Processor.Controllers {
                                         }
                                     }
                                 }
-                                db.csClose(ref CS);
+                                db.csClose();
                             }
                         }
                         break;
@@ -1471,7 +1471,7 @@ namespace Contensive.Processor.Controllers {
                         + "\r\ncontentid=" + ContentID
                         + "\r\nrecordid=" + RecordID + "";
                 }
-                while (db.csOk(CS)) {
+                while (db.csOk()) {
                     int addonId = db.csGetInteger(CS, "Addonid");
                     //hint = hint & ",210 addonid=[" & addonId & "]"
                     // convert for forground execution for now
@@ -1492,7 +1492,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     db.csGoNext(CS);
                 }
-                db.csClose(ref CS);
+                db.csClose();
             } catch (Exception ex) {
                 LogController.handleError(this, ex);
             }

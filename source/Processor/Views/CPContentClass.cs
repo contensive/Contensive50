@@ -42,7 +42,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override void SetCopy(string copyName, string content) {
-            cp.core.db.setContentCopy(copyName, content);
+            cp.core.html.setContentCopy(copyName, content);
         }
         //
         //====================================================================================================
@@ -58,25 +58,25 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override string GetContentControlCriteria(string contentName) {
-            return ContentMetaController.getContentControlCriteria(cp.core, contentName);
+            return MetaController.getContentControlCriteria(cp.core, contentName);
         }
         //
         //====================================================================================================
         //
         public override string GetFieldProperty(string contentName, string fieldName, string propertyName) {
-            return ContentMetaController.getContentFieldProperty(cp.core, contentName, fieldName, propertyName);
+            return MetaController.getContentFieldProperty(cp.core, contentName, fieldName, propertyName);
         }
         //
         //====================================================================================================
         //
         public override int GetID(string contentName) {
-            return Models.Domain.ContentMetaDomainModel.getContentId(cp.core, contentName);
+            return Models.Domain.MetaModel.getContentId(cp.core, contentName);
         }
         //
         //====================================================================================================
         //
         public override string GetDataSource(string contentName) {
-            return ContentMetaController.getContentDataSource(cp.core, contentName);
+            return MetaController.getContentDataSource(cp.core, contentName);
         }
         //
         //====================================================================================================
@@ -108,7 +108,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override int GetRecordID(string contentName, string recordName) {
-            return cp.core.db.getRecordID(contentName, recordName);
+            return cp.MetaController.getRecordId( core,contentName, recordName);
         }
         //
         //====================================================================================================
@@ -119,19 +119,19 @@ namespace Contensive.Processor {
         /// <param name="recordID"></param>
         /// <returns></returns>
         public override string GetRecordName(string contentName, int recordID) {
-            return cp.core.db.getRecordName(contentName, recordID);
+            return MetaController.getRecordName( core,contentName, recordID);
         }
         //
         //====================================================================================================
         //
         public override string GetTable(string contentName) {
-            return ContentMetaController.getContentTablename(cp.core, contentName);
+            return MetaController.getContentTablename(cp.core, contentName);
         }
         //
         //====================================================================================================
         //
         public override bool IsField(string contentName, string fieldName) {
-            return ContentMetaController.isContentFieldSupported(cp.core, contentName, fieldName);
+            return MetaController.isContentFieldSupported(cp.core, contentName, fieldName);
         }
         //
         //====================================================================================================
@@ -145,7 +145,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override bool IsChildContent(string childContentID, string parentContentID) {
-            return ContentMetaController.isWithinContent(cp.core, GenericController.encodeInteger(childContentID), GenericController.encodeInteger(parentContentID));
+            return MetaController.isWithinContent(cp.core, GenericController.encodeInteger(childContentID), GenericController.encodeInteger(parentContentID));
         }
         //
         //====================================================================================================
@@ -204,13 +204,13 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override void Delete(string contentName, string sqlCriteria) {
-            cp.core.db.deleteContentRecords(contentName, sqlCriteria);
+            MetaController.deleteContentRecords(cp.core,contentName, sqlCriteria);
         }
         //
         //====================================================================================================
         //
         public override void DeleteContent(string contentName) {
-            ContentModel.delete(cp.core, Models.Domain.ContentMetaDomainModel.getContentId(cp.core, contentName));
+            ContentModel.delete(cp.core, Models.Domain.MetaModel.getContentId(cp.core, contentName));
         }
         //
         //====================================================================================================
@@ -222,7 +222,7 @@ namespace Contensive.Processor {
             field.authorable = true;
             field.blockAccess = false;
             field.caption = fieldName;
-            field.contentId = Models.Domain.ContentMetaDomainModel.getContentId(cp.core, contentName);
+            field.contentId = Models.Domain.MetaModel.getContentId(cp.core, contentName);
             field.developerOnly = false;
             field.editSortPriority = 9999;
             field.editTabName = "";
@@ -255,7 +255,7 @@ namespace Contensive.Processor {
             field.Scramble = false;
             field.textBuffered = false;
             field.uniqueName = false;
-            return ContentMetaController.verifyContentField_returnId(cp.core, contentName, field);
+            return MetaController.verifyContentField_returnId(cp.core, contentName, field);
         }
         //
         //====================================================================================================
@@ -275,7 +275,7 @@ namespace Contensive.Processor {
         public override int AddContent(string contentName, string sqlTableName, string dataSourceName) {
             var tmpList = new List<string> { };
             DataSourceModel dataSource = DataSourceModel.createByUniqueName(cp.core, dataSourceName, ref tmpList);
-            return ContentMetaController.verifyContent_returnId(cp.core, new Models.Domain.ContentMetaDomainModel() {
+            return MetaController.verifyContent_returnId(cp.core, new Models.Domain.MetaModel() {
                 dataSourceName = dataSource.name,
                 tableName = sqlTableName,
                 name = contentName
@@ -285,7 +285,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override string GetListLink(string contentName) {
-            return AdminUIController.getIconEditAdminLink(cp.core, Models.Domain.ContentMetaDomainModel.createByUniqueName(cp.core, contentName));
+            return AdminUIController.getIconEditAdminLink(cp.core, Models.Domain.MetaModel.createByUniqueName(cp.core, contentName));
         }
         //
         //====================================================================================================
@@ -330,7 +330,7 @@ namespace Contensive.Processor {
         //
         [Obsolete("Deprecated, access model properties instead", true)]
         public override string GetProperty(string ContentName, string PropertyName) {
-            return ContentMetaController.getContentProperty(cp.core, ContentName, PropertyName);
+            return MetaController.getContentProperty(cp.core, ContentName, PropertyName);
         }
         //
         //

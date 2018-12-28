@@ -57,69 +57,60 @@ namespace Contensive.Addons.AdminSite {
                     SQL2 += ""
                         + " GROUP BY ccGroups.ID, ccContent.Name, ccGroups.Caption, ccGroups.name, ccGroups.SortOrder"
                         + " ORDER BY ccGroups.Caption";
-                    int CS2 = csXfer.csOpenSql(SQL2, "Default");
-                    //
-                    // Output all the groups, with the active and dateexpires from those joined
-                    //body.Add(adminUIController.EditTableOpen);
-                    bool CanSeeHiddenGroups = core.session.isAuthenticatedDeveloper(core);
-                    while (csXfer.csOk(CS2)) {
-                        string GroupName = csXfer.csGet(CS2, "GroupName");
-                        if ((GroupName.Left(1) != "_") || CanSeeHiddenGroups) {
-                            string GroupCaption = csXfer.csGet(CS2, "GroupCaption");
-                            int GroupID = csXfer.csGetInteger(CS2, "ID");
-                            if (string.IsNullOrEmpty(GroupCaption)) {
-                                GroupCaption = GroupName;
+
+                    using (var csXfer = new CsModel(core)) {
+                        //
+                        // Output all the groups, with the active and dateexpires from those joined
+                        //body.Add(adminUIController.EditTableOpen);
+                        bool CanSeeHiddenGroups = core.session.isAuthenticatedDeveloper(core);
+                        csXfer.csOpenSql(SQL2, "Default");
+                        while (csXfer.csOk()) {
+                            string GroupName = csXfer.csGet("GroupName");
+                            if ((GroupName.Left(1) != "_") || CanSeeHiddenGroups) {
+                                string GroupCaption = csXfer.csGet("GroupCaption");
+                                int GroupID = csXfer.csGetInteger("ID");
                                 if (string.IsNullOrEmpty(GroupCaption)) {
-                                    GroupCaption = "Group&nbsp;" + GroupID;
-                                }
-                            }
-                            bool GroupActive = false;
-                            string DateExpireValue = "";
-                            if (membershipCount != 0) {
-                                for (int MembershipPointer = 0; MembershipPointer < membershipCount; MembershipPointer++) {
-                                    if (membershipListGroupId[MembershipPointer] == GroupID) {
-                                        GroupActive = membershipListActive[MembershipPointer];
-                                        if (membershipListDateExpires[MembershipPointer] > DateTime.MinValue) {
-                                            DateExpireValue = GenericController.encodeText(membershipListDateExpires[MembershipPointer]);
-                                        }
-                                        break;
+                                    GroupCaption = GroupName;
+                                    if (string.IsNullOrEmpty(GroupCaption)) {
+                                        GroupCaption = "Group&nbsp;" + GroupID;
                                     }
                                 }
+                                bool GroupActive = false;
+                                string DateExpireValue = "";
+                                if (membershipCount != 0) {
+                                    for (int MembershipPointer = 0; MembershipPointer < membershipCount; MembershipPointer++) {
+                                        if (membershipListGroupId[MembershipPointer] == GroupID) {
+                                            GroupActive = membershipListActive[MembershipPointer];
+                                            if (membershipListDateExpires[MembershipPointer] > DateTime.MinValue) {
+                                                DateExpireValue = GenericController.encodeText(membershipListDateExpires[MembershipPointer]);
+                                            }
+                                            break;
+                                        }
+                                    }
+                                }
+                                string relatedButtonList = "";
+                                relatedButtonList += AdminUIController.getButtonPrimaryAnchor("Edit", "?af=4&cid=" + Models.Domain.MetaModel.getContentId(core, "Groups") + "&id=" + GroupID);
+                                relatedButtonList += AdminUIController.getButtonPrimaryAnchor("Members", "?af=1&cid=" + Models.Domain.MetaModel.getContentId(core, "people") + "&IndexFilterAddGroup=" + GenericController.encodeURL(GroupName));
+                                //
+                                var row = new GroupRuleEditorRowModel() {
+                                    idHidden = HtmlController.inputHidden("Memberrules." + GroupCount + ".ID", GroupID),
+                                    checkboxInput = HtmlController.checkbox("MemberRules." + GroupCount, GroupActive),
+                                    groupCaption = GroupCaption,
+                                    expiresInput = HtmlController.inputText(core, "MemberRules." + GroupCount + ".DateExpires", DateExpireValue, 1, 20, "", false, false, "text form-control", -1, false, "expires"),
+                                    relatedButtonList = relatedButtonList,
+                                };
+                                groupRuleEditor.rowList.Add(row);
+                                GroupCount += 1;
                             }
-                            string relatedButtonList = "";
-                            relatedButtonList += AdminUIController.getButtonPrimaryAnchor("Edit", "?af=4&cid=" + Models.Domain.ContentMetaDomainModel.getContentId(core, "Groups") + "&id=" + GroupID);
-                            relatedButtonList += AdminUIController.getButtonPrimaryAnchor("Members", "?af=1&cid=" + Models.Domain.ContentMetaDomainModel.getContentId(core, "people") + "&IndexFilterAddGroup=" + GenericController.encodeURL(GroupName));
-                            //relatedButtonList += "[<a href=\"?af=4&cid=" + Models.Domain.ContentMetaDomainModel.getContentId(core, "Groups") + "&id=" + GroupID + "\">Edit&nbsp;Group</a>]";
-                            //relatedButtonList += "&nbsp;[<a href=\"?af=12&rid=35&recordid=" + GroupID + "\">Group&nbsp;Report</a>]";
-                            //relatedButtonList += "&nbsp;[<a href=\"\">People</a>]";
-                            //
-                            var row = new GroupRuleEditorRowModel() {
-                                idHidden = HtmlController.inputHidden("Memberrules." + GroupCount + ".ID", GroupID),
-                                checkboxInput = HtmlController.checkbox("MemberRules." + GroupCount, GroupActive),
-                                groupCaption = GroupCaption,
-                                expiresInput = HtmlController.inputText(core, "MemberRules." + GroupCount + ".DateExpires", DateExpireValue, 1, 20,"",false,false, "text form-control", -1,false,"expires"),
-                                relatedButtonList = relatedButtonList,
-                            };
-                            groupRuleEditor.rowList.Add(row);
-                            //body.Add("<tr><td class=\"ccAdminEditCaption\">" + Caption + "</td>");
-                            //body.Add("<td class=\"ccAdminEditField\">");
-                            //body.Add("<table border=0 cellpadding=0 cellspacing=0 width=\"100%\" ><tr>");
-                            //body.Add("<td width=\"40%\">" + HtmlController.inputHidden("Memberrules." + GroupCount + ".ID", GroupID) + HtmlController.checkbox("MemberRules." + GroupCount, GroupActive) + GroupCaption + "</td>");
-                            //body.Add("<td width=\"30%\"> Expires " + HtmlController.inputText(core, "MemberRules." + GroupCount + ".DateExpires", DateExpireValue, 1, 20) + "</td>");
-                            //body.Add("<td width=\"30%\">" + relatedButtonList + "</td>");
-                            //body.Add("</tr></table>");
-                            //body.Add("</td></tr>");
-                            GroupCount += 1;
+                            csXfer.csGoNext(CS2);
                         }
-                        csXfer.csGoNext(CS2);
                     }
-                    csXfer.csClose(ref CS2);
                 }
                 //
                 // -- add a row for group count and Add Group button
                 groupRuleEditor.rowList.Add(new GroupRuleEditorRowModel() {
                     idHidden = HtmlController.inputHidden("MemberRules.RowCount", GroupCount),
-                    checkboxInput = AdminUIController.getButtonPrimaryAnchor("Add Group", "?af=4&cid=" + Models.Domain.ContentMetaDomainModel.getContentId(core, "Groups")),
+                    checkboxInput = AdminUIController.getButtonPrimaryAnchor("Add Group", "?af=4&cid=" + Models.Domain.MetaModel.getContentId(core, "Groups")),
                     groupCaption = "",
                     expiresInput = "",
                     relatedButtonList = "",
@@ -132,7 +123,7 @@ namespace Contensive.Addons.AdminSite {
                 //}
                 //body.Add("<tr>");
                 //body.Add("<td class=\"ccAdminEditCaption\">&nbsp;</td>");
-                //body.Add("<td class=\"ccAdminEditField\">" + SpanClassAdminNormal + "[<a href=?cid=" + Models.Domain.ContentMetaDomainModel.getContentId(core, "Groups") + " target=_blank>Manage Groups</a>]</span></td>");
+                //body.Add("<td class=\"ccAdminEditField\">" + SpanClassAdminNormal + "[<a href=?cid=" + Models.Domain.MetaModel.getContentId(core, "Groups") + " target=_blank>Manage Groups</a>]</span></td>");
                 //body.Add("</tr>");
 
                 result = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), "Group Membership", "", body.Text );

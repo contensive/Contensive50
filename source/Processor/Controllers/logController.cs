@@ -286,8 +286,8 @@ namespace Contensive.Processor.Controllers {
                 //
                 if (Message.Length > 255) Message = Message.Substring(0, 255);
                 if (Link.Length > 255) Message = Link.Substring(0, 255);
-                int CS = csXfer.csInsert("Activity Log", ByMemberID);
-                if (csXfer.csOk(CS)) {
+                int csXfer.csInsert("Activity Log", ByMemberID);
+                if (csXfer.csOk()) {
                     csXfer.csSet(CS, "MemberID", SubjectMemberID);
                     csXfer.csSet(CS, "OrganizationID", SubjectOrganizationID);
                     csXfer.csSet(CS, "Message", Message);
@@ -295,7 +295,7 @@ namespace Contensive.Processor.Controllers {
                     csXfer.csSet(CS, "VisitorID", VisitorID);
                     csXfer.csSet(CS, "VisitID", VisitID);
                 }
-                csXfer.csClose(ref CS);
+                csXfer.csClose();
                 //
                 return;
                 //
@@ -377,8 +377,8 @@ namespace Contensive.Processor.Controllers {
                 //
                 // insert new record
                 //
-                CS = csXfer.csInsert("Site Warnings", 0);
-                if (csXfer.csOk(CS)) {
+                csXfer.csInsert("Site Warnings", 0);
+                if (csXfer.csOk()) {
                     csXfer.csSet(CS, "name", Name);
                     csXfer.csSet(CS, "description", Description);
                     csXfer.csSet(CS, "generalKey", generalKey);
@@ -391,7 +391,7 @@ namespace Contensive.Processor.Controllers {
                         csXfer.csSet(CS, "pageId", PageID);
                     }
                 }
-                csXfer.csClose(ref CS);
+                csXfer.csClose();
             }
             //
         }

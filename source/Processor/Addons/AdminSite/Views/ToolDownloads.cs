@@ -133,11 +133,11 @@ namespace Contensive.Addons.AdminSite {
                                 } else if ((string.IsNullOrEmpty(Format)) && (ContentID != 0)) {
                                     Description = Description + "<p>Please select a Format before requesting a download</p>";
                                 } else if (Format == "CSV") {
-                                    CS = csXfer.csInsert("Tasks");
-                                    if (csXfer.csOk(CS)) {
-                                        ContentName = ContentMetaController.getContentNameByID(core, ContentID);
-                                        TableName = ContentMetaController.getContentTablename(core, ContentName);
-                                        Criteria = ContentMetaController.getContentControlCriteria(core, ContentName);
+                                    csXfer.csInsert("Tasks");
+                                    if (csXfer.csOk()) {
+                                        ContentName = MetaController.getContentNameByID(core, ContentID);
+                                        TableName = MetaController.getContentTablename(core, ContentName);
+                                        Criteria = MetaController.getContentControlCriteria(core, ContentName);
                                         Name = "CSV Download, " + ContentName;
                                         Filename = GenericController.vbReplace(ContentName, " ", "") + "_" + encodeText(GenericController.dateToSeconds(core.doc.profileStartTime)) + encodeText(GenericController.GetRandomInteger(core)) + ".csv";
                                         csXfer.csSet(CS, "Name", Name);
@@ -146,15 +146,15 @@ namespace Contensive.Addons.AdminSite {
                                         csXfer.csSet(CS, SQLFieldName, "SELECT * from " + TableName + " where " + Criteria);
                                         Description = Description + "<p>Your CSV Download has been requested.</p>";
                                     }
-                                    csXfer.csClose(ref CS);
+                                    csXfer.csClose();
                                     Format = "";
                                     ContentID = 0;
                                 } else if (Format == "XML") {
-                                    CS = csXfer.csInsert("Tasks");
-                                    if (csXfer.csOk(CS)) {
-                                        ContentName = ContentMetaController.getContentNameByID(core, ContentID);
-                                        TableName = ContentMetaController.getContentTablename(core, ContentName);
-                                        Criteria = ContentMetaController.getContentControlCriteria(core, ContentName);
+                                    csXfer.csInsert("Tasks");
+                                    if (csXfer.csOk()) {
+                                        ContentName = MetaController.getContentNameByID(core, ContentID);
+                                        TableName = MetaController.getContentTablename(core, ContentName);
+                                        Criteria = MetaController.getContentControlCriteria(core, ContentName);
                                         Name = "XML Download, " + ContentName;
                                         Filename = GenericController.vbReplace(ContentName, " ", "") + "_" + encodeText(GenericController.dateToSeconds(core.doc.profileStartTime)) + encodeText(GenericController.GetRandomInteger(core)) + ".xml";
                                         csXfer.csSet(CS, "Name", Name);
@@ -163,7 +163,7 @@ namespace Contensive.Addons.AdminSite {
                                         csXfer.csSet(CS, SQLFieldName, "SELECT * from " + TableName + " where " + Criteria);
                                         Description = Description + "<p>Your XML Download has been requested.</p>";
                                     }
-                                    csXfer.csClose(ref CS);
+                                    csXfer.csClose();
                                     Format = "";
                                     ContentID = 0;
                                 }
@@ -223,16 +223,16 @@ namespace Contensive.Addons.AdminSite {
                     //
                     SQL = "select M.Name as CreatedByName, T.* from ccTasks T left join ccMembers M on M.ID=T.CreatedBy where (T.Command='BuildCSV')or(T.Command='BuildXML') order by T.DateAdded Desc";
                     //Call core.main_TestPoint("Selection SQL=" & SQL)
-                    CS = csXfer.csOpenSql(SQL, "Default", PageSize, PageNumber);
+                    csXfer.csOpenSql(SQL, "Default", PageSize, PageNumber);
                     RowPointer = 0;
-                    if (!csXfer.csOk(CS)) {
+                    if (!csXfer.csOk()) {
                         Cells[0, 1] = "There are no download requests";
                         RowPointer = 1;
                     } else {
                         DataRowCount = csXfer.csGetRowCount(CS);
                         LinkPrefix = "<a href=\"" + core.appConfig.cdnFileUrl;
                         LinkSuffix = "\" target=_blank>Available</a>";
-                        while (csXfer.csOk(CS) && (RowPointer < PageSize)) {
+                        while (csXfer.csOk() && (RowPointer < PageSize)) {
                             RecordID = csXfer.csGetInteger(CS, "ID");
                             DateCompleted = csXfer.csGetDate(CS, "DateCompleted");
                             ResultMessage = csXfer.csGetText(CS, "ResultMessage");
@@ -279,7 +279,7 @@ namespace Contensive.Addons.AdminSite {
                             csXfer.csGoNext(CS);
                         }
                     }
-                    csXfer.csClose(ref CS);
+                    csXfer.csClose();
                     Tab0.Add(HtmlController.inputHidden("RowCnt", RowPointer));
                     Cell = AdminUIController.getReport(core, RowPointer, ColCaption, ColAlign, ColWidth, Cells, PageSize, PageNumber, PreTableCopy, PostTableCopy, DataRowCount, "ccPanel");
                     Tab0.Add(Cell);

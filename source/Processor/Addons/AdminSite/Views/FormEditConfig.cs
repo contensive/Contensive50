@@ -76,13 +76,13 @@ namespace Contensive.Addons.AdminSite {
                             string EditorStyleRulesFilename = GenericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", "0", 1, 99, 1);
                             core.privateFiles.deleteFile(EditorStyleRulesFilename);
                             //
-                            int CS = csXfer.csOpenSql("select id from cctemplates");
-                            while (csXfer.csOk(CS)) {
+                            int csXfer.csOpenSql("select id from cctemplates");
+                            while (csXfer.csOk()) {
                                 EditorStyleRulesFilename = GenericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", csXfer.csGet(CS, "ID"), 1, 99, 1);
                                 core.privateFiles.deleteFile(EditorStyleRulesFilename);
                                 csXfer.csGoNext(CS);
                             }
-                            csXfer.csClose(ref CS);
+                            csXfer.csClose();
 
                         }
                         if (Button == ButtonOK) {

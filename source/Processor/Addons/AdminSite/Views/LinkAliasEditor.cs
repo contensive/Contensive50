@@ -68,13 +68,13 @@ namespace Contensive.Addons.AdminSite {
                     // Table of old Link Aliases
                     //
                     Link = core.doc.main_GetPageDynamicLink(editRecord.id, false);
-                    CS = csXfer.csOpen("Link Aliases", "pageid=" + editRecord.id, "ID Desc", true, 0, false, false, "name");
-                    while (csXfer.csOk(CS)) {
+                    csXfer.csOpen("Link Aliases", "pageid=" + editRecord.id, "ID Desc", true, 0, false, false, "name");
+                    while (csXfer.csOk()) {
                         LinkList = LinkList + "<div style=\"margin-left:4px;margin-bottom:4px;\">" + HtmlController.encodeHtml(csXfer.csGetText(CS, "name")) + "</div>";
                         LinkCnt = LinkCnt + 1;
                         csXfer.csGoNext(CS);
                     }
-                    csXfer.csClose(ref CS);
+                    csXfer.csClose();
                     if (LinkCnt > 0) {
                         f.Add("<tr><td class=\"ccAdminEditCaption\">" + SpanClassAdminSmall + "Previous Link Alias List</td>");
                         f.Add("<td class=\"ccAdminEditField\" align=\"left\" colspan=\"2\">" + SpanClassAdminNormal);

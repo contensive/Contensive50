@@ -11,6 +11,7 @@ using System.Data.SqlClient;
 using Contensive.Processor;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
+using Contensive.Processor.Models.Domain;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Addons.AdminSite.Controllers;
@@ -52,7 +53,7 @@ namespace Contensive.Addons.Tools {
                 //
                 // display form
                 bool isEmptyList = false;
-                Stream.Add(AdminUIController.getToolFormInputRow(core, "Caption", AdminUIController.getDefaultEditor_LookupContent(core, "countryId", countryId, Models.Domain.ContentMetaDomainModel.getContentId(core, "countries"), ref isEmptyList)));
+                Stream.Add(AdminUIController.getToolFormInputRow(core, "Caption", AdminUIController.getDefaultEditor_LookupContent(core, "countryId", countryId, MetaModel.getContentId(core, "countries"), ref isEmptyList)));
                 Stream.Add(AdminUIController.getToolFormInputRow(core, "Caption", AdminUIController.getDefaultEditor_Text(core, "PageSize", PageSize.ToString())));
                 //
                 // -- assemble form

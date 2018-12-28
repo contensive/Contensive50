@@ -40,7 +40,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 core.webServer.setResponseContentType("text/plain");
                 core.html.enableOutputBuffer(false);
-                TableName = DbController.getDbObjectTableName(ContentMetaController.getContentTablename(core, iContentName));
+                TableName = DbController.getDbObjectTableName(MetaController.getContentTablename(core, iContentName));
                 switch (GenericController.vbUCase(TableName)) {
                     case "CCMEMBERS":
                         //
@@ -53,7 +53,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // ----- print out the field names
                             //
-                            if (csXfer.csOk(CSPointer)) {
+                            if (csXfer.csOk()) {
                                 sb.Append("\"EID\"");
                                 Delimiter = ",";
                                 FieldNameVariant = csXfer.csGetFirstFieldName(CSPointer);
@@ -71,9 +71,9 @@ namespace Contensive.Processor.Controllers {
                             //
                             // ----- print out the values
                             //
-                            while (csXfer.csOk(CSPointer)) {
-                                if (!(csXfer.csGetBoolean(CSPointer, "Developer"))) {
-                                    Copy = SecurityController.encodeToken(core, csXfer.csGetInteger(CSPointer, "ID"), core.doc.profileStartTime);
+                            while (csXfer.csOk()) {
+                                if (!(csXfer.csGetBoolean( "Developer"))) {
+                                    Copy = SecurityController.encodeToken(core, csXfer.csGetInteger( "ID"), core.doc.profileStartTime);
                                     sb.Append("\"" + Copy + "\"");
                                     Delimiter = ",";
                                     FieldNameVariant = csXfer.csGetFirstFieldName(CSPointer);
@@ -81,7 +81,7 @@ namespace Contensive.Processor.Controllers {
                                         FieldName = GenericController.encodeText(FieldNameVariant);
                                         UcaseFieldName = GenericController.vbUCase(FieldName);
                                         if ((UcaseFieldName != "USERNAME") && (UcaseFieldName != "PASSWORD")) {
-                                            Copy = csXfer.csGet(CSPointer, FieldName);
+                                            Copy = csXfer.csGet( FieldName);
                                             if (!string.IsNullOrEmpty(Copy)) {
                                                 Copy = GenericController.vbReplace(Copy, "\"", "'");
                                                 Copy = GenericController.vbReplace(Copy, "\r\n", " ");
@@ -95,7 +95,7 @@ namespace Contensive.Processor.Controllers {
                                     }
                                     sb.Append("\r\n");
                                 }
-                                csXfer.csGoNext(CSPointer);
+                                csXfer.csGoNext();
                                 ///DoEvents
                             }
                         }
@@ -112,7 +112,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // ----- print out the field names
                             //
-                            if (csXfer.csOk(CSPointer)) {
+                            if (csXfer.csOk()) {
                                 Delimiter = "";
                                 FieldNameVariant = csXfer.csGetFirstFieldName(CSPointer);
                                 while (!string.IsNullOrEmpty(FieldNameVariant)) {
@@ -126,7 +126,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // ----- print out the values
                             //
-                            while (csXfer.csOk(CSPointer)) {
+                            while (csXfer.csOk()) {
                                 Delimiter = "";
                                 FieldNameVariant = csXfer.csGetFirstFieldName(CSPointer);
                                 while (!string.IsNullOrEmpty(FieldNameVariant)) {
@@ -160,7 +160,7 @@ namespace Contensive.Processor.Controllers {
                                     ///DoEvents
                                 }
                                 core.appRootFiles.appendFile(TestFilename, "\r\n");
-                                csXfer.csGoNext(CSPointer);
+                                csXfer.csGoNext();
                                 ///DoEvents
                             }
                         }

@@ -32,14 +32,14 @@ namespace Contensive.Addons.Primitives {
                 //
                 bool InsertTestOK = false;
                 int TrapID = 0;
-                int CS = csXfer.csInsert("Trap Log");
-                if (!csXfer.csOk(CS)) {
+                int csXfer.csInsert("Trap Log");
+                if (!csXfer.csOk()) {
                     //throw new GenericException("Unexpected exception"); // todo - remove this - handleLegacyError10(ignoreInteger, "dll", "Error during Status. Called InsertCSRecord to insert 'Trap Log' test, record set was not OK.", "Init", False, True)
                 } else {
                     InsertTestOK = true;
                     TrapID = csXfer.csGetInteger(CS, "ID");
                 }
-                csXfer.csClose(ref CS);
+                csXfer.csClose();
                 if (InsertTestOK) {
                     if (TrapID == 0) {
                         //throw new GenericException("Unexpected exception"); // todo - remove this - handleLegacyError10(ignoreInteger, "dll", "Error during Status. Called InsertCSRecord to insert 'Trap Log' test, record set was OK, but ID=0.", "Init", False, True)

@@ -318,8 +318,8 @@ namespace Contensive.Processor.Controllers {
                         if (true) {
                             sqlCriteria = sqlCriteria + "and((dateExpires is null)or(dateExpires>" + DbController.encodeSQLDate(DateTime.Now) + "))";
                         }
-                        CS = csXfer.csOpen("People", sqlCriteria, "ID", sqlSelectFieldList: "username,password", PageSize: 1);
-                        if (!csXfer.csOk(CS)) {
+                        csXfer.csOpen("People", sqlCriteria, "ID", sqlSelectFieldList: "username,password", PageSize: 1);
+                        if (!csXfer.csOk()) {
                             //
                             // valid login account for this email not found
                             //
@@ -327,9 +327,9 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // look for expired account to renew
                                 //
-                                csXfer.csClose(ref CS);
-                                CS = csXfer.csOpen("People", "((email=" + DbController.encodeSQLText(workingEmail) + "))", "ID", PageSize: 1);
-                                if (csXfer.csOk(CS)) {
+                                csXfer.csClose();
+                                csXfer.csOpen("People", "((email=" + DbController.encodeSQLText(workingEmail) + "))", "ID", PageSize: 1);
+                                if (csXfer.csOk()) {
                                     //
                                     // renew this old record
                                     //
@@ -342,8 +342,8 @@ namespace Contensive.Processor.Controllers {
                                     // inject support record
                                     //
                                     //hint = "150"
-                                    csXfer.csClose(ref CS);
-                                    CS = csXfer.csInsert("people");
+                                    csXfer.csClose();
+                                    csXfer.csInsert("people");
                                     csXfer.csSet(CS, "name", "Contensive Support");
                                     csXfer.csSet(CS, "email", workingEmail);
                                     csXfer.csSet(CS, "developer", "1");
@@ -356,12 +356,12 @@ namespace Contensive.Processor.Controllers {
                                 ErrorController.addUserError(core, "No current user was found matching this email address. Please try again. ");
                             }
                         }
-                        if (csXfer.csOk(CS)) {
+                        if (csXfer.csOk()) {
                             //hint = "160"
                             FromAddress = core.siteProperties.getText("EmailFromAddress", "info@" + core.webServer.requestDomain);
                             subject = "Password Request at " + core.webServer.requestDomain;
                             Message = "";
-                            while (csXfer.csOk(CS)) {
+                            while (csXfer.csOk()) {
                                 //hint = "170"
                                 updateUser = false;
                                 if (string.IsNullOrEmpty(Message)) {
@@ -481,8 +481,8 @@ namespace Contensive.Processor.Controllers {
                         ErrorController.addUserError(core, ErrorMessage);
                     } else {
                         if (!(core.doc.debug_iUserError != "")) {
-                            CS = csXfer.csOpen("people", "ID=" + DbController.encodeSQLNumber(core.session.user.id));
-                            if (!csXfer.csOk(CS)) {
+                            csXfer.csOpen("people", "ID=" + DbController.encodeSQLNumber(core.session.user.id));
+                            if (!csXfer.csOk()) {
                                 LogController.handleError( core,new Exception("Could not open the current members account to set the username and password."));
                             } else {
                                 if ((csXfer.csGetText(CS, "username") != "") || (csXfer.csGetText(CS, "password") != "") || (csXfer.csGetBoolean(CS, "admin")) || (csXfer.csGetBoolean(CS, "developer"))) {
@@ -502,7 +502,7 @@ namespace Contensive.Processor.Controllers {
                                 csXfer.csSet(CS, "password", loginForm_Password);
                                 SessionController.authenticateById(core, core.session.user.id, core.session);
                             }
-                            csXfer.csClose(ref CS);
+                            csXfer.csClose();
                         }
                     }
                 }

@@ -488,7 +488,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // forward to a replacement domain
                         //
-                        string forwardDomain = core.db.getRecordName("domains", core.domain.forwardDomainId);
+                        string forwardDomain = MetaController.getRecordName( core,"domains", core.domain.forwardDomainId);
                         if (!string.IsNullOrEmpty(forwardDomain)) {
                             int pos = requestUrlSource.ToLowerInvariant().IndexOf( requestDomain.ToLowerInvariant() );
                             if (pos > 0) {
@@ -1080,7 +1080,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             LinkPrefix = core.webServer.requestContentWatchPrefix;
                             ContentID = (csXfer.csGetInteger(CSPointer, "ContentID"));
-                            HostContentName = ContentMetaController.getContentNameByID(core, ContentID);
+                            HostContentName = MetaController.getContentNameByID(core, ContentID);
                             if (string.IsNullOrEmpty(HostContentName)) {
                                 //
                                 // ----- Content Watch with a bad ContentID, mark inactive
@@ -1111,7 +1111,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // ----- if a content watch record is blocked, delete the content tracking
                                 //
-                                core.db.deleteContentRules(ContentMetaDomainModel.getContentId(core, HostContentName), HostRecordID);
+                                core.db.deleteContentRules(MetaModel.getContentId(core, HostContentName), HostRecordID);
                             }
                             break;
                     }

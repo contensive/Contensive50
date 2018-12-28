@@ -384,7 +384,7 @@ namespace Contensive.Processor.Controllers {
         public static bool queueSystemEmail(CoreController core, string emailName, string appendedCopy, int additionalMemberID, ref string userErrorMessage) {
             SystemEmailModel email = SystemEmailModel.createByUniqueName(core, emailName);
             if (email == null) {
-                email = SystemEmailModel.addDefault(core, Models.Domain.ContentMetaDomainModel.createByUniqueName(core, SystemEmailModel.contentName));
+                email = SystemEmailModel.addDefault(core, Models.Domain.MetaModel.createByUniqueName(core, SystemEmailModel.contentName));
                 email.name = emailName;
                 email.subject = emailName;
                 email.fromAddress = core.siteProperties.getText("EmailAdmin", "webmaster@" + core.appConfig.domainList[0]);
@@ -596,8 +596,8 @@ namespace Contensive.Processor.Controllers {
                 int CSTemplate = 0;
                 string EmailStatus = null;
                 //
-                CS = csXfer.csOpenRecord("email", EmailID);
-                if (!csXfer.csOk(CS)) {
+                csXfer.csOpenRecord("email", EmailID);
+                if (!csXfer.csOk()) {
                     ErrorController.addUserError(core, "There was a problem sending the email confirmation. The email record could not be found.");
                 } else {
                     EmailSubject = csXfer.csGet(CS, "Subject");
@@ -724,7 +724,7 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                 }
-                csXfer.csClose(ref CS);
+                csXfer.csClose();
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;

@@ -40,7 +40,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// Name dictionary of content definitions in the collection
         /// </summary>
-        public Dictionary<string, Models.Domain.ContentMetaDomainModel> cdef = new Dictionary<string, Models.Domain.ContentMetaDomainModel>();
+        public Dictionary<string, Models.Domain.MetaModel> cdef = new Dictionary<string, Models.Domain.MetaModel>();
         //
         //====================================================================================================
         /// <summary>
@@ -222,7 +222,7 @@ namespace Contensive.Processor.Models.Domain {
         private static CDefMiniCollectionModel installCDefMiniCollection_LoadXml(CoreController core, string srcCollecionXml, bool IsccBaseFile, bool setAllDataChanged, bool IsNewBuild, CDefMiniCollectionModel defaultCollection, string logPrefix, ref List<string> installedCollections) {
             CDefMiniCollectionModel result = null;
             try {
-                Models.Domain.ContentMetaDomainModel DefaultCDef = null;
+                Models.Domain.MetaModel DefaultCDef = null;
                 Models.Domain.CDefFieldModel DefaultCDefField = null;
                 string contentNameLc = null;
                 string Collectionname = null;
@@ -315,7 +315,7 @@ namespace Contensive.Processor.Models.Domain {
                                         if (defaultCollection.cdef.ContainsKey(contentNameLc)) {
                                             DefaultCDef = defaultCollection.cdef[contentNameLc];
                                         } else {
-                                            DefaultCDef = new Models.Domain.ContentMetaDomainModel() {
+                                            DefaultCDef = new Models.Domain.MetaModel() {
                                                 active = true,
                                                 activeOnly = true,
                                                 aliasID = "id",
@@ -344,12 +344,12 @@ namespace Contensive.Processor.Models.Domain {
                                             // ----- Add CDef if not already there
                                             //
                                             if (!result.cdef.ContainsKey(ContentName.ToLowerInvariant())) {
-                                                result.cdef.Add(ContentName.ToLowerInvariant(), new Models.Domain.ContentMetaDomainModel());
+                                                result.cdef.Add(ContentName.ToLowerInvariant(), new Models.Domain.MetaModel());
                                             }
                                             //
                                             // Get CDef attributes
                                             //
-                                            Models.Domain.ContentMetaDomainModel targetCdef = result.cdef[ContentName.ToLowerInvariant()];
+                                            Models.Domain.MetaModel targetCdef = result.cdef[ContentName.ToLowerInvariant()];
                                             string activeDefaultText = "1";
                                             if (!(DefaultCDef.active)) {
                                                 activeDefaultText = "0";
@@ -736,7 +736,7 @@ namespace Contensive.Processor.Models.Domain {
                 if (true) {
                     string UsedTables = "";
                     foreach (var keypairvalue in Collection.cdef) {
-                        Models.Domain.ContentMetaDomainModel workingCdef = keypairvalue.Value;
+                        Models.Domain.MetaModel workingCdef = keypairvalue.Value;
                         ContentName = workingCdef.name;
                         if (workingCdef.dataChanged) {
                             LogController.logInfo(core, "creating sql table [" + workingCdef.tableName + "], datasource [" + workingCdef.dataSourceName + "]");
@@ -811,7 +811,7 @@ namespace Contensive.Processor.Models.Domain {
                 //----------------------------------------------------------------------------------------------------------------------
                 //
                 foreach (var keypairvalue in Collection.cdef) {
-                    ContentMetaDomainModel cdef = keypairvalue.Value;
+                    MetaModel cdef = keypairvalue.Value;
                     bool fieldChanged = false;
                     if (!cdef.dataChanged) {
                         foreach (var field in cdef.fields) {
@@ -830,9 +830,9 @@ namespace Contensive.Processor.Models.Domain {
                 LogController.logInfo(core, "CDef Load, stage 7: Verify all field help");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
-                int FieldHelpCID = core.db.getRecordID("content", "Content Field Help");
+                int FieldHelpCID = MetaController.getRecordId( core,"content", "Content Field Help");
                 foreach (var keypairvalue in Collection.cdef) {
-                    Models.Domain.ContentMetaDomainModel workingCdef = keypairvalue.Value;
+                    Models.Domain.MetaModel workingCdef = keypairvalue.Value;
                     //ContentName = workingCdef.name;
                     foreach (var fieldKeyValuePair in workingCdef.fields) {
                         Models.Domain.CDefFieldModel workingField = fieldKeyValuePair.Value;
@@ -1019,14 +1019,14 @@ namespace Contensive.Processor.Models.Domain {
             try {
                 string SrcFieldName = null;
                 bool updateDst = false;
-                Models.Domain.ContentMetaDomainModel srcCdef = null;
+                Models.Domain.MetaModel srcCdef = null;
                 //
                 // If the Src is the BaseCollection, the Dst must be the Application Collectio
                 //   in this case, reset any BaseContent or BaseField attributes in the application that are not in the base
                 //
                 if (srcCollection.isBaseCollection) {
                     foreach (var dstKeyValuePair in dstCollection.cdef) {
-                        Models.Domain.ContentMetaDomainModel dstWorkingCdef = dstKeyValuePair.Value;
+                        Models.Domain.MetaModel dstWorkingCdef = dstKeyValuePair.Value;
                         string contentName = dstWorkingCdef.name;
                         if (dstCollection.cdef[contentName.ToLowerInvariant()].isBaseContent) {
                             //
@@ -1070,12 +1070,12 @@ namespace Contensive.Processor.Models.Domain {
                     // Search for this cdef in the Dst
                     //
                     updateDst = false;
-                    Models.Domain.ContentMetaDomainModel dstCdef = null;
+                    Models.Domain.MetaModel dstCdef = null;
                     if (!dstCollection.cdef.ContainsKey(srcName.ToLowerInvariant())) {
                         //
                         // add src to dst
                         //
-                        dstCdef = new Models.Domain.ContentMetaDomainModel();
+                        dstCdef = new Models.Domain.MetaModel();
                         dstCollection.cdef.Add(srcName.ToLowerInvariant(), dstCdef);
                         updateDst = true;
                     } else {
@@ -1565,7 +1565,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// Update a table from a collection cdef node
         /// </summary>
-        internal static void installCDefMiniCollection_buildDb_saveCDefToDb(CoreController core, Models.Domain.ContentMetaDomainModel cdef, string BuildVersion) {
+        internal static void installCDefMiniCollection_buildDb_saveCDefToDb(CoreController core, Models.Domain.MetaModel cdef, string BuildVersion) {
             try {
                 //
                 LogController.logInfo(core, "Update db cdef [" + cdef.name + "]");
@@ -1576,16 +1576,16 @@ namespace Contensive.Processor.Models.Domain {
                         //
                         // -- update definition (use SingleRecord as an update flag)
                         var datasource = DataSourceModel.createByUniqueName(core, cdef.dataSourceName);
-                        ContentMetaController.verifyContent_returnId(core, cdef);
+                        MetaController.verifyContent_returnId(core, cdef);
                     }
                     //
                     // -- update Content Field Records and Content Field Help records
-                    ContentMetaDomainModel cdefFieldHelp = ContentMetaDomainModel.createByUniqueName(core, ContentFieldHelpModel.contentName);
+                    MetaModel cdefFieldHelp = MetaModel.createByUniqueName(core, ContentFieldHelpModel.contentName);
                     foreach (var nameValuePair in cdef.fields) {
                         CDefFieldModel field = nameValuePair.Value;
                         int fieldId = 0;
                         if (field.dataChanged) {
-                            fieldId = ContentMetaController.verifyContentField_returnId(core, cdef.name, field);
+                            fieldId = MetaController.verifyContentField_returnId(core, cdef.name, field);
                         }
                         //
                         // -- update content field help records

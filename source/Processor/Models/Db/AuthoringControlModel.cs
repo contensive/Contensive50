@@ -36,11 +36,11 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         //
-        public static AuthoringControlModel addDefault(CoreController core, Domain.ContentMetaDomainModel cdef) => addDefault<AuthoringControlModel>(core, cdef);
+        public static AuthoringControlModel addDefault(CoreController core, Domain.MetaModel cdef) => addDefault<AuthoringControlModel>(core, cdef);
         //
         //====================================================================================================
         //
-        public static AuthoringControlModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.ContentMetaDomainModel cdef) => addDefault<AuthoringControlModel>(core, cdef, ref callersCacheNameList);
+        public static AuthoringControlModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.MetaModel cdef) => addDefault<AuthoringControlModel>(core, cdef, ref callersCacheNameList);
         //
         //====================================================================================================
         //

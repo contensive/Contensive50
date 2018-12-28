@@ -370,7 +370,7 @@ namespace Contensive.Processor.Controllers {
                                     RecordID = GenericController.encodeInteger(CFields[f_MemberSelectGroupId, CFieldPtr]);
                                     RecordName = "";
                                     if (RecordID>0) {
-                                        RecordName = core.db.getRecordName("groups", RecordID);
+                                        RecordName = MetaController.getRecordName( core,"groups", RecordID);
                                     }
                                     sb.Append(" MemberSelectGroup=\"" + xmlValueText(CFields[f_MemberSelectGroupId, CFieldPtr]) + "\"");
 
@@ -431,8 +431,8 @@ namespace Contensive.Processor.Controllers {
                     + " select D.name as DataSourceName,T.name as TableName"
                     + " from cctables T left join ccDataSources d on D.ID=T.DataSourceID"
                     + " where t.active<>0";
-                int CS = csXfer.csOpenSql(SQL);
-                while (csXfer.csOk(CS)) {
+                int csXfer.csOpenSql(SQL);
+                while (csXfer.csOk()) {
                     string DataSourceName = csXfer.csGetText(CS, "DataSourceName");
                     string TableName = csXfer.csGetText(CS, "TableName");
                     string IndexList = core.db.getSQLIndexList(DataSourceName, TableName);
@@ -542,7 +542,7 @@ namespace Contensive.Processor.Controllers {
                 // ****************************** if cdef not loaded, this fails
                 //
                 appName = core.appConfig.name;
-                MenuContentID = core.db.getRecordID("Content", Processor.Models.Db.NavigatorEntryModel.contentName);
+                MenuContentID = MetaController.getRecordId( core,"Content", Processor.Models.Db.NavigatorEntryModel.contentName);
                 dt = core.db.executeQuery("select * from ccMenuEntries where (contentcontrolid=" + MenuContentID + ")and(name<>'')");
                 if (dt.Rows.Count > 0) {
                     NavIconType = 0;
@@ -591,7 +591,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 System.Text.StringBuilder sb = new System.Text.StringBuilder();
                 string appName = core.appConfig.name;
-                int MenuContentID = core.db.getRecordID("Content", Processor.Models.Db.NavigatorEntryModel.contentName);
+                int MenuContentID = MetaController.getRecordId( core,"Content", Processor.Models.Db.NavigatorEntryModel.contentName);
                 DataTable rs = core.db.executeQuery("select * from ccMenuEntries where (contentcontrolid=" + MenuContentID + ")and(name<>'')");
                 if (DbController.isDataTableOk(rs)) {
                     if (true) {

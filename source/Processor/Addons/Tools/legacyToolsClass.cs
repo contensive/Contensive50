@@ -418,25 +418,25 @@ namespace Contensive.Addons.Tools {
                     Stream.Add("<P>Creating content [" + ContentName + "] on table [" + TableName + "] on Datasource [" + datasource.name + "].</P>");
                     if ((!string.IsNullOrEmpty(ContentName)) && (!string.IsNullOrEmpty(TableName)) && (!string.IsNullOrEmpty(datasource.name))) {
                         core.db.createSQLTable(datasource.name, TableName);
-                        core.db.createContentFromSQLTable(datasource, TableName, ContentName);
+                        MetaController.createContentFromSQLTable(core,datasource, TableName, ContentName);
                         core.cache.invalidateAll();
                         core.clearMetaData();
-                        ContentID = Models.Domain.ContentMetaDomainModel.getContentId(core, ContentName);
-                        ParentNavID = core.db.getRecordID(Processor.Models.Db.NavigatorEntryModel.contentName, "Manage Site Content");
+                        ContentID = Processor.Models.Domain.MetaModel.getContentId(core, ContentName);
+                        ParentNavID = MetaController.getRecordId( core,Processor.Models.Db.NavigatorEntryModel.contentName, "Manage Site Content");
                         if (ParentNavID != 0) {
-                            CS = csXfer.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, "(name=" + DbController.encodeSQLText("Advanced") + ")and(parentid=" + ParentNavID + ")");
+                            csXfer.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, "(name=" + DbController.encodeSQLText("Advanced") + ")and(parentid=" + ParentNavID + ")");
                             ParentNavID = 0;
-                            if (csXfer.csOk(CS)) {
+                            if (csXfer.csOk()) {
                                 ParentNavID = csXfer.csGetInteger(CS, "ID");
                             }
                             csXfer.csClose(ref CS);
                             if (ParentNavID != 0) {
-                                CS = csXfer.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, "(name=" + DbController.encodeSQLText(ContentName) + ")and(parentid=" + NavID + ")");
-                                if (!csXfer.csOk(CS)) {
+                                csXfer.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, "(name=" + DbController.encodeSQLText(ContentName) + ")and(parentid=" + NavID + ")");
+                                if (!csXfer.csOk()) {
                                     csXfer.csClose(ref CS);
-                                    CS = csXfer.csInsert(Processor.Models.Db.NavigatorEntryModel.contentName);
+                                    csXfer.csInsert(Processor.Models.Db.NavigatorEntryModel.contentName);
                                 }
-                                if (csXfer.csOk(CS)) {
+                                if (csXfer.csOk()) {
                                     csXfer.csSet(CS, "name", ContentName);
                                     csXfer.csSet(CS, "parentid", ParentNavID);
                                     csXfer.csSet(CS, "contentid", ContentID);
@@ -444,7 +444,7 @@ namespace Contensive.Addons.Tools {
                                 csXfer.csClose(ref CS);
                             }
                         }
-                        ContentID = Models.Domain.ContentMetaDomainModel.getContentId(core, ContentName);
+                        ContentID = Models.Domain.MetaModel.getContentId(core, ContentName);
                         Stream.Add("<P>Content Definition was created. An admin menu entry for this definition has been added under 'Site Content', and will be visible on the next page view. Use the [<a href=\"?af=105&ContentID=" + ContentID + "\">Edit Content Definition Fields</a>] tool to review and edit this definition's fields.</P>");
                     } else {
                         Stream.Add("<P>Error, a required field is missing. Content not created.</P>");
@@ -481,7 +481,7 @@ namespace Contensive.Addons.Tools {
                 string AStart = null;
                 int CSPointer = 0;
                 int ContentID = 0;
-                Processor.Models.Domain.ContentMetaDomainModel CDef = null;
+                Processor.Models.Domain.MetaModel CDef = null;
                 string ContentName = null;
                 int CS1 = 0;
                 int TargetFieldID = 0;
@@ -528,7 +528,7 @@ namespace Contensive.Addons.Tools {
                 if (ContentID != 0) {
                     ButtonList = ButtonCancel + "," + ButtonSaveandInvalidateCache;
                     ContentName = Local_GetContentNameByID(ContentID);
-                    CDef = Processor.Models.Domain.ContentMetaDomainModel.create(core, ContentID, false, true );
+                    CDef = Processor.Models.Domain.MetaModel.create(core, ContentID, false, true );
                     if (ToolsAction != 0) {
                         //
                         // Block contentautoload, then force a load at the end
@@ -567,7 +567,7 @@ namespace Contensive.Addons.Tools {
                         //
                         ColumnNumberMax = 0;
                         foreach (var keyValuePair in CDef.adminColumns) {
-                            Processor.Models.Domain.ContentMetaDomainModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
+                            Processor.Models.Domain.MetaModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
                             Processor.Models.Domain.CDefFieldModel field = CDef.fields[adminColumn.Name];
                             if (field.inherited) {
                                 SourceContentID = field.contentId;
@@ -603,7 +603,7 @@ namespace Contensive.Addons.Tools {
                                         columnPtr = 0;
                                         if (CDef.adminColumns.Count > 1) {
                                             foreach (var keyValuePair in CDef.adminColumns) {
-                                                Processor.Models.Domain.ContentMetaDomainModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
+                                                Processor.Models.Domain.MetaModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
                                                 Processor.Models.Domain.CDefFieldModel field = CDef.fields[adminColumn.Name];
                                                 CSPointer = csXfer.csOpenRecord("Content Fields", field.id);
                                                 csXfer.csSet(CSPointer, "IndexColumn", (columnPtr) * 10);
@@ -632,7 +632,7 @@ namespace Contensive.Addons.Tools {
                                     if (CDef.adminColumns.Count > 1) {
                                         columnPtr = 0;
                                         foreach (var keyValuePair in CDef.adminColumns) {
-                                            Processor.Models.Domain.ContentMetaDomainModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
+                                            Processor.Models.Domain.MetaModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
                                             Processor.Models.Domain.CDefFieldModel field = CDef.fields[adminColumn.Name];
                                             CSPointer = csXfer.csOpenRecord("Content Fields", field.id);
                                             if (fieldId == TargetFieldID) {
@@ -659,7 +659,7 @@ namespace Contensive.Addons.Tools {
                                         MoveNextColumn = false;
                                         columnPtr = 0;
                                         foreach (var keyValuePair in CDef.adminColumns) {
-                                            Processor.Models.Domain.ContentMetaDomainModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
+                                            Processor.Models.Domain.MetaModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
                                             Processor.Models.Domain.CDefFieldModel field = CDef.fields[adminColumn.Name];
                                             FieldName = adminColumn.Name;
                                             CS1 = csXfer.csOpenRecord("Content Fields", field.id);
@@ -697,7 +697,7 @@ namespace Contensive.Addons.Tools {
                                         MoveNextColumn = false;
                                         columnPtr = 0;
                                         foreach (var keyValuePair in CDef.adminColumns.Reverse()) {
-                                            Processor.Models.Domain.ContentMetaDomainModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
+                                            Processor.Models.Domain.MetaModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
                                             Processor.Models.Domain.CDefFieldModel field = CDef.fields[adminColumn.Name];
                                             FieldName = adminColumn.Name;
                                             CS1 = csXfer.csOpenRecord("Content Fields", field.id);
@@ -873,7 +873,7 @@ namespace Contensive.Addons.Tools {
                         //
                         // Get a new copy of the content definition
                         //
-                        CDef = Processor.Models.Domain.ContentMetaDomainModel.create(core, ContentID, false, true);
+                        CDef = Processor.Models.Domain.MetaModel.create(core, ContentID, false, true);
                     }
                     if (Button == ButtonSaveandInvalidateCache) {
                         core.cache.invalidateAll();
@@ -924,7 +924,7 @@ namespace Contensive.Addons.Tools {
                         //
                         // Calc total width
                         //
-                        foreach (KeyValuePair<string, Processor.Models.Domain.ContentMetaDomainModel.CDefAdminColumnClass> kvp in CDef.adminColumns) {
+                        foreach (KeyValuePair<string, Processor.Models.Domain.MetaModel.CDefAdminColumnClass> kvp in CDef.adminColumns) {
                             ColumnWidthTotal += kvp.Value.Width;
                         }
                         //For ColumnCount = 0 To CDef.adminColumns.Count - 1
@@ -933,7 +933,7 @@ namespace Contensive.Addons.Tools {
                         if (ColumnWidthTotal > 0) {
                             Stream.Add("<table border=\"0\" cellpadding=\"5\" cellspacing=\"0\" width=\"90%\">");
                             int ColumnCount = 0;
-                            foreach (KeyValuePair<string, Processor.Models.Domain.ContentMetaDomainModel.CDefAdminColumnClass> kvp in CDef.adminColumns) {
+                            foreach (KeyValuePair<string, Processor.Models.Domain.MetaModel.CDefAdminColumnClass> kvp in CDef.adminColumns) {
                                 //
                                 // print column headers - anchored so they sort columns
                                 //
@@ -985,7 +985,7 @@ namespace Contensive.Addons.Tools {
                             skipField = false;
                             //ColumnPointer = CDef.adminColumns.Count
                             if (CDef.adminColumns.Count > 0) {
-                                foreach (KeyValuePair<string, Processor.Models.Domain.ContentMetaDomainModel.CDefAdminColumnClass> kvp in CDef.adminColumns) {
+                                foreach (KeyValuePair<string, Processor.Models.Domain.MetaModel.CDefAdminColumnClass> kvp in CDef.adminColumns) {
                                     if (field.nameLc == kvp.Value.Name) {
                                         skipField = true;
                                         break;
@@ -1133,8 +1133,8 @@ namespace Contensive.Addons.Tools {
                                 // ----- Set Field Type
                                 //
                                 ContentID = Local_GetContentID(DiagArgument(DiagAction, 1));
-                                CS = csXfer.csOpen("Content Fields", "(ContentID=" + ContentID + ")and(Name=" + DbController.encodeSQLText(DiagArgument(DiagAction, 2)) + ")");
-                                if (csXfer.csOk(CS)) {
+                                csXfer.csOpen("Content Fields", "(ContentID=" + ContentID + ")and(Name=" + DbController.encodeSQLText(DiagArgument(DiagAction, 2)) + ")");
+                                if (csXfer.csOk()) {
                                     csXfer.csSet(CS, "Type", DiagArgument(DiagAction, 3));
                                 }
                                 csXfer.csClose(ref CS);
@@ -1145,8 +1145,8 @@ namespace Contensive.Addons.Tools {
                                 // ----- Set Field Inactive
                                 //
                                 ContentID = Local_GetContentID(DiagArgument(DiagAction, 1));
-                                CS = csXfer.csOpen("Content Fields", "(ContentID=" + ContentID + ")and(Name=" + DbController.encodeSQLText(DiagArgument(DiagAction, 2)) + ")");
-                                if (csXfer.csOk(CS)) {
+                                csXfer.csOpen("Content Fields", "(ContentID=" + ContentID + ")and(Name=" + DbController.encodeSQLText(DiagArgument(DiagAction, 2)) + ")");
+                                if (csXfer.csOk()) {
                                     csXfer.csSet(CS, "active", 0);
                                 }
                                 csXfer.csClose(ref CS);
@@ -1163,10 +1163,10 @@ namespace Contensive.Addons.Tools {
                                 break;
                             case DiagActionContentDeDupe:
                                 ContentName = DiagArgument(DiagAction, 1);
-                                CS = csXfer.csOpen("Content", "name=" + DbController.encodeSQLText(ContentName), "ID");
-                                if (csXfer.csOk(CS)) {
+                                csXfer.csOpen("Content", "name=" + DbController.encodeSQLText(ContentName), "ID");
+                                if (csXfer.csOk()) {
                                     csXfer.csGoNext(CS);
-                                    while (csXfer.csOk(CS)) {
+                                    while (csXfer.csOk()) {
                                         csXfer.csSet(CS, "active", 0);
                                         csXfer.csGoNext(CS);
                                     }
@@ -1180,8 +1180,8 @@ namespace Contensive.Addons.Tools {
                                 //
                                 ContentName = DiagArgument(DiagAction, 1);
                                 RecordID = GenericController.encodeInteger(DiagArgument(DiagAction, 2));
-                                CS = csXfer.csOpen(ContentName, "(ID=" + RecordID + ")");
-                                if (csXfer.csOk(CS)) {
+                                csXfer.csOpen(ContentName, "(ID=" + RecordID + ")");
+                                if (csXfer.csOk()) {
                                     csXfer.csSet(CS, "active", 0);
                                 }
                                 csXfer.csClose(ref CS);
@@ -1193,8 +1193,8 @@ namespace Contensive.Addons.Tools {
                                 //
                                 ContentName = DiagArgument(DiagAction, 1);
                                 RecordID = GenericController.encodeInteger(DiagArgument(DiagAction, 2));
-                                CS = csXfer.csOpen(ContentName, "(ID=" + RecordID + ")");
-                                if (csXfer.csOk(CS)) {
+                                csXfer.csOpen(ContentName, "(ID=" + RecordID + ")");
+                                if (csXfer.csOk()) {
                                     csXfer.csSet(CS, "required", 0);
                                 }
                                 csXfer.csClose(ref CS);
@@ -1249,15 +1249,15 @@ namespace Contensive.Addons.Tools {
                             SQL = "SELECT ccFields.required AS FieldRequired, ccFields.Authorable AS FieldAuthorable, ccFields.Type AS FieldType, ccFields.Name AS FieldName, ccContent.ID AS ContentID, ccContent.Name AS ContentName, ccTables.Name AS TableName, ccDataSources.Name AS DataSourceName"
                                     + " FROM (ccFields LEFT JOIN ccContent ON ccFields.ContentID = ccContent.ID) LEFT JOIN (ccTables LEFT JOIN ccDataSources ON ccTables.DataSourceID = ccDataSources.ID) ON ccContent.ContentTableID = ccTables.ID"
                                     + " WHERE (((ccFields.Active)<>0) AND ((ccContent.Active)<>0) AND ((ccTables.Active)<>0)) OR (((ccFields.Active)<>0) AND ((ccContent.Active)<>0) AND ((ccTables.Active)<>0));";
-                            CS = csXfer.csOpenSql(SQL,"Default");
-                            if (!csXfer.csOk(CS)) {
+                            csXfer.csOpenSql(SQL,"Default");
+                            if (!csXfer.csOk()) {
                                 DiagProblem = "PROBLEM: No Content entries were found in the content table.";
                                 DiagActions = new DiagActionType[2];
                                 DiagActions[0].Name = "Ignore, or handle this issue manually";
                                 DiagActions[0].Command = "";
                                 Stream.Add(GetDiagError(DiagProblem, DiagActions));
                             } else {
-                                while (csXfer.csOk(CS) && (DiagActionCount < DiagActionCountMax)) {
+                                while (csXfer.csOk() && (DiagActionCount < DiagActionCountMax)) {
                                     FieldName = csXfer.csGetText(CS, "FieldName");
                                     fieldType = csXfer.csGetInteger(CS, "FieldType");
                                     FieldRequired = csXfer.csGetBoolean(CS, "FieldRequired");
@@ -1651,7 +1651,7 @@ namespace Contensive.Addons.Tools {
                         // Create Definition
                         //
                         Stream.Add("<P>Creating content [" + ChildContentName + "] from [" + ParentContentName + "]");
-                        ContentMetaController.createContentChild(core, ChildContentName, ParentContentName, core.session.user.id);
+                        MetaController.createContentChild(core, ChildContentName, ParentContentName, core.session.user.id);
                         //
                         Stream.Add("<br>Reloading Content Definitions...");
                         core.cache.invalidateAll();
@@ -1661,7 +1661,7 @@ namespace Contensive.Addons.Tools {
                         //
                         //If AddAdminMenuEntry Then
                         //    Stream.Add("<br>Adding menu entry (will not display until the next page)...")
-                        //    CS = csXfer.cs_open(Processor.Models.Db.NavigatorEntryModel.contentName, "ContentID=" & ParentContentID)
+                        //    csXfer.cs_open(Processor.Models.Db.NavigatorEntryModel.contentName, "ContentID=" & ParentContentID)
                         //    If csXfer.cs_ok(CS) Then
                         //        MenuName = csXfer.cs_getText(CS, "name")
                         //        AdminOnly = csXfer.cs_getBoolean(CS, "AdminOnly")
@@ -1744,7 +1744,7 @@ namespace Contensive.Addons.Tools {
             string returnValue = "";
             try {
                 int CSContent = 0;
-                Processor.Models.Domain.ContentMetaDomainModel CD = null;
+                Processor.Models.Domain.MetaModel CD = null;
                 StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 string[,] ContentNameArray = null;
                 int ContentNameCount = 0;
@@ -1763,7 +1763,7 @@ namespace Contensive.Addons.Tools {
                     CSContent = csXfer.csOpen("Content", "", "", false, 0, false, false, "id");
                     if (csXfer.csOk(CSContent)) {
                         do {
-                            CD = Processor.Models.Domain.ContentMetaDomainModel.create(core, csXfer.csGetInteger(CSContent, "id"));
+                            CD = Processor.Models.Domain.MetaModel.create(core, csXfer.csGetInteger(CSContent, "id"));
                             TableName = CD.tableName;
                             Stream.Add("Synchronizing Content " + CD.name + " to table " + TableName + "<br>");
                             core.db.createSQLTable(CD.dataSourceName, TableName);
@@ -1965,11 +1965,11 @@ namespace Contensive.Addons.Tools {
                     for (TestPointer = 1; TestPointer <= TestCount; TestPointer++) {
                         //
                         TestTicks = core.doc.appStopWatch.ElapsedMilliseconds;
-                        CS = csXfer.csOpen("Site Properties", "","",true,0,true,false,"", PageSize, PageNumber);
+                        csXfer.csOpen("Site Properties", "","",true,0,true,false,"", PageSize, PageNumber);
                         OpenTicks = OpenTicks + core.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                         //
                         RecordCount = 0;
-                        while (csXfer.csOk(CS)) {
+                        while (csXfer.csOk()) {
                             //
                             TestTicks = core.doc.appStopWatch.ElapsedMilliseconds;
                             TestCopy = GenericController.encodeText(csXfer.csGetValue(CS, "Name"));
@@ -2001,11 +2001,11 @@ namespace Contensive.Addons.Tools {
                     for (TestPointer = 1; TestPointer <= TestCount; TestPointer++) {
                         //
                         TestTicks = core.doc.appStopWatch.ElapsedMilliseconds;
-                        CS = csXfer.csOpen("Site Properties", "", "", true, 0, false, false, "name", PageSize, PageNumber);
+                        csXfer.csOpen("Site Properties", "", "", true, 0, false, false, "name", PageSize, PageNumber);
                         OpenTicks = OpenTicks + core.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                         //
                         RecordCount = 0;
-                        while (csXfer.csOk(CS)) {
+                        while (csXfer.csOk()) {
                             //
                             TestTicks = core.doc.appStopWatch.ElapsedMilliseconds;
                             TestCopy = GenericController.encodeText(csXfer.csGetValue(CS, "Name"));
@@ -2392,8 +2392,8 @@ namespace Contensive.Addons.Tools {
                 //
                 // Get Tablename and DataSource
                 //
-                CS = csXfer.csOpenRecord("Tables", TableID,false,false, "Name,DataSourceID");
-                if (csXfer.csOk(CS)) {
+                csXfer.csOpenRecord("Tables", TableID,false,false, "Name,DataSourceID");
+                if (csXfer.csOk()) {
                     TableName = csXfer.csGetText(CS, "name");
                     DataSource = csXfer.csGetLookup(CS, "DataSourceID");
                 }
@@ -2546,9 +2546,9 @@ namespace Contensive.Addons.Tools {
                 SQL = "SELECT DISTINCT ccTables.Name as TableName, ccFields.Name as FieldName, ccFieldTypes.Name as FieldType"
                         + " FROM ((ccContent LEFT JOIN ccTables ON ccContent.ContentTableID = ccTables.ID) LEFT JOIN ccFields ON ccContent.ID = ccFields.ContentID) LEFT JOIN ccFieldTypes ON ccFields.Type = ccFieldTypes.ID"
                         + " ORDER BY ccTables.Name, ccFields.Name;";
-                CS = csXfer.csOpenSql(SQL,"Default");
+                csXfer.csOpenSql(SQL,"Default");
                 TableName = "";
-                while (csXfer.csOk(CS)) {
+                while (csXfer.csOk()) {
                     if (TableName != csXfer.csGetText(CS, "TableName")) {
                         TableName = csXfer.csGetText(CS, "TableName");
                         result += HtmlController.tableRow("<B>" + TableName + "</b>", TableColSpan, TableEvenRow);
@@ -2836,8 +2836,8 @@ namespace Contensive.Addons.Tools {
         //
         //
         //
-        private Processor.Models.Domain.ContentMetaDomainModel GetCDef(string ContentName) {
-            return Processor.Models.Domain.ContentMetaDomainModel.createByUniqueName(core, ContentName);
+        private Processor.Models.Domain.MetaModel GetCDef(string ContentName) {
+            return Processor.Models.Domain.MetaModel.createByUniqueName(core, ContentName);
         }
         //
         //=============================================================================
@@ -2940,10 +2940,10 @@ namespace Contensive.Addons.Tools {
 
         //                End If
         //                '
-        //                CS = csXfer.cs_open("Page Templates", "Link=" & DbController.encodeSQLText(Link))
+        //                csXfer.cs_open("Page Templates", "Link=" & DbController.encodeSQLText(Link))
         //                If Not csXfer.cs_ok(CS) Then
         //                    Call csXfer.cs_Close(CS)
-        //                    CS = csXfer.cs_insertRecord("Page Templates")
+        //                    csXfer.cs_insertRecord("Page Templates")
         //                    Call csXfer.cs_set(CS, "Link", Link)
         //                End If
         //                If csXfer.cs_ok(CS) Then
@@ -2965,10 +2965,10 @@ namespace Contensive.Addons.Tools {
         //                '
         //                result = result & "<br>Create Soft Template from source [" & Link & "]"
         //                '
-        //                CS = csXfer.cs_open("Page Templates", "Source=" & DbController.encodeSQLText(Link))
+        //                csXfer.cs_open("Page Templates", "Source=" & DbController.encodeSQLText(Link))
         //                If Not csXfer.cs_ok(CS) Then
         //                    Call csXfer.cs_Close(CS)
-        //                    CS = csXfer.cs_insertRecord("Page Templates")
+        //                    csXfer.cs_insertRecord("Page Templates")
         //                    Call csXfer.cs_set(CS, "Source", Link)
         //                    Call csXfer.cs_set(CS, "name", TemplateName)
         //                End If
@@ -3054,7 +3054,7 @@ namespace Contensive.Addons.Tools {
         //                ' Add this definition on it
         //                '
         //                With LoadCDef
-        //                    CS = csXfer.cs_open("Content Fields", "contentid=" & ContentID)
+        //                    csXfer.cs_open("Content Fields", "contentid=" & ContentID)
         //                    Do While csXfer.cs_ok(CS)
         //                        Select Case genericController.vbUCase(csXfer.cs_getText(CS, "name"))
         //                            Case "NAME"
@@ -3301,8 +3301,8 @@ namespace Contensive.Addons.Tools {
                 Stream.Add("&nbsp;<INPUT TYPE=\"Text\" TabIndex=-1 NAME=\"ReplaceTextRows\" SIZE=\"3\" VALUE=\"" + ReplaceRows + "\" ID=\"\"  onchange=\"ReplaceText.rows=ReplaceTextRows.value; return true\"> Rows");
                 Stream.Add("<br><br>");
                 //
-                CS = csXfer.csOpen("Content");
-                while (csXfer.csOk(CS)) {
+                csXfer.csOpen("Content");
+                while (csXfer.csOk()) {
                     RecordName = csXfer.csGetText(CS, "Name");
                     lcName = GenericController.vbLCase(RecordName);
                     if (IsDeveloper || (lcName == "page content") || (lcName == "copy content") || (lcName == "page templates")) {

@@ -24,12 +24,12 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static SitePropertyModel addDefault(CoreController core, Domain.ContentMetaDomainModel cdef) {
+        public static SitePropertyModel addDefault(CoreController core, Domain.MetaModel cdef) {
             return addDefault<SitePropertyModel>(core, cdef);
         }
         //
         //====================================================================================================
-        public static SitePropertyModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.ContentMetaDomainModel cdef) {
+        public static SitePropertyModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.MetaModel cdef) {
             return addDefault<SitePropertyModel>(core, cdef, ref callersCacheNameList);
         }
         //

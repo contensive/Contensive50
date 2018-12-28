@@ -86,7 +86,7 @@ namespace Contensive.Processor.Controllers {
                         root.username = defaultRootUserUsername;
                         root.password = defaultRootUserPassword;
                         root.developer = true;
-                        root.contentControlID = ContentMetaDomainModel.getContentId(core, "people");
+                        root.contentControlID = MetaModel.getContentId(core, "people");
                         try 
                             {
                             root.save(core);
@@ -493,7 +493,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="inActive"></param>
         private static void verifyRecord(CoreController core, string contentName, string name, string sqlName = "", string sqlValue = "") {
             try {
-                var cdef = ContentMetaDomainModel.createByUniqueName(core, contentName);
+                var cdef = MetaModel.createByUniqueName(core, contentName);
                 DataTable dt = core.db.executeQuery("SELECT ID FROM " + cdef.tableName + " WHERE NAME=" + DbController.encodeSQLText(name) + ";");
                 if (dt.Rows.Count == 0) {
                     string sql1 = "insert into " + cdef.tableName + " (active,name";
@@ -623,7 +623,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // Load basic records -- default images are handled in the REsource Library through the /ContensiveBase/config/DefaultValues.txt GetDefaultValue(key) mechanism
                 //
-                if (core.db.getRecordID("Library File Types", "Image") == 0) {
+                if (MetaController.getRecordId( core,"Library File Types", "Image") == 0) {
                     verifyRecord(core, "Library File Types", "Image", "ExtensionList", "'GIF,JPG,JPE,JPEG,BMP,PNG'");
                     verifyRecord(core, "Library File Types", "Image", "IsImage", "1");
                     verifyRecord(core, "Library File Types", "Image", "IsVideo", "0");
@@ -631,7 +631,7 @@ namespace Contensive.Processor.Controllers {
                     verifyRecord(core, "Library File Types", "Image", "IsFlash", "0");
                 }
                 //
-                if (core.db.getRecordID("Library File Types", "Video") == 0) {
+                if (MetaController.getRecordId( core,"Library File Types", "Video") == 0) {
                     verifyRecord(core, "Library File Types", "Video", "ExtensionList", "'ASX,AVI,WMV,MOV,MPG,MPEG,MP4,QT,RM'");
                     verifyRecord(core, "Library File Types", "Video", "IsImage", "0");
                     verifyRecord(core, "Library File Types", "Video", "IsVideo", "1");
@@ -639,7 +639,7 @@ namespace Contensive.Processor.Controllers {
                     verifyRecord(core, "Library File Types", "Video", "IsFlash", "0");
                 }
                 //
-                if (core.db.getRecordID("Library File Types", "Audio") == 0) {
+                if (MetaController.getRecordId( core,"Library File Types", "Audio") == 0) {
                     verifyRecord(core, "Library File Types", "Audio", "ExtensionList", "'AIF,AIFF,ASF,CDA,M4A,M4P,MP2,MP3,MPA,WAV,WMA'");
                     verifyRecord(core, "Library File Types", "Audio", "IsImage", "0");
                     verifyRecord(core, "Library File Types", "Audio", "IsVideo", "0");
@@ -647,7 +647,7 @@ namespace Contensive.Processor.Controllers {
                     verifyRecord(core, "Library File Types", "Audio", "IsFlash", "0");
                 }
                 //
-                if (core.db.getRecordID("Library File Types", "Word") == 0) {
+                if (MetaController.getRecordId( core,"Library File Types", "Word") == 0) {
                     verifyRecord(core, "Library File Types", "Word", "ExtensionList", "'DOC'");
                     verifyRecord(core, "Library File Types", "Word", "IsImage", "0");
                     verifyRecord(core, "Library File Types", "Word", "IsVideo", "0");
@@ -655,7 +655,7 @@ namespace Contensive.Processor.Controllers {
                     verifyRecord(core, "Library File Types", "Word", "IsFlash", "0");
                 }
                 //
-                if (core.db.getRecordID("Library File Types", "Flash") == 0) {
+                if (MetaController.getRecordId( core,"Library File Types", "Flash") == 0) {
                     verifyRecord(core, "Library File Types", "Flash", "ExtensionList", "'SWF'");
                     verifyRecord(core, "Library File Types", "Flash", "IsImage", "0");
                     verifyRecord(core, "Library File Types", "Flash", "IsVideo", "0");
@@ -663,7 +663,7 @@ namespace Contensive.Processor.Controllers {
                     verifyRecord(core, "Library File Types", "Flash", "IsFlash", "1");
                 }
                 //
-                if (core.db.getRecordID("Library File Types", "PDF") == 0) {
+                if (MetaController.getRecordId( core,"Library File Types", "PDF") == 0) {
                     verifyRecord(core, "Library File Types", "PDF", "ExtensionList", "'PDF'");
                     verifyRecord(core, "Library File Types", "PDF", "IsImage", "0");
                     verifyRecord(core, "Library File Types", "PDF", "IsVideo", "0");
@@ -671,7 +671,7 @@ namespace Contensive.Processor.Controllers {
                     verifyRecord(core, "Library File Types", "PDF", "IsFlash", "0");
                 }
                 //
-                if (core.db.getRecordID("Library File Types", "XLS") == 0) {
+                if (MetaController.getRecordId( core,"Library File Types", "XLS") == 0) {
                     verifyRecord(core, "Library File Types", "Excel", "ExtensionList", "'XLS'");
                     verifyRecord(core, "Library File Types", "Excel", "IsImage", "0");
                     verifyRecord(core, "Library File Types", "Excel", "IsVideo", "0");
@@ -679,7 +679,7 @@ namespace Contensive.Processor.Controllers {
                     verifyRecord(core, "Library File Types", "Excel", "IsFlash", "0");
                 }
                 //
-                if (core.db.getRecordID("Library File Types", "PPT") == 0) {
+                if (MetaController.getRecordId( core,"Library File Types", "PPT") == 0) {
                     verifyRecord(core, "Library File Types", "Power Point", "ExtensionList", "'PPT,PPS'");
                     verifyRecord(core, "Library File Types", "Power Point", "IsImage", "0");
                     verifyRecord(core, "Library File Types", "Power Point", "IsVideo", "0");
@@ -687,7 +687,7 @@ namespace Contensive.Processor.Controllers {
                     verifyRecord(core, "Library File Types", "Power Point", "IsFlash", "0");
                 }
                 //
-                if (core.db.getRecordID("Library File Types", "Default") == 0) {
+                if (MetaController.getRecordId( core,"Library File Types", "Default") == 0) {
                     verifyRecord(core, "Library File Types", "Default", "ExtensionList", "''");
                     verifyRecord(core, "Library File Types", "Default", "IsImage", "0");
                     verifyRecord(core, "Library File Types", "Default", "IsVideo", "0");
@@ -734,7 +734,7 @@ namespace Contensive.Processor.Controllers {
                 appendUpgradeLogAddStep(core, core.appConfig.name, "VerifyStates", "Verify States");
                 //
                 verifyCountry(core, "United States", "US");
-                int CountryID = core.db.getRecordID("Countries", "United States");
+                int CountryID = MetaController.getRecordId( core,"Countries", "United States");
                 //
                 verifyState(core, "Alaska", "AK", 0.0D, CountryID);
                 verifyState(core, "Alabama", "AL", 0.0D, CountryID);
@@ -806,24 +806,24 @@ namespace Contensive.Processor.Controllers {
         /// <param name="abbreviation"></param>
         private static void verifyCountry(CoreController core, string name, string abbreviation) {
             try {
-                int CS;
-                //
-                CS = csXfer.csOpen("Countries", "name=" + DbController.encodeSQLText(name));
-                if (!csXfer.csOk(CS)) {
+                using (var csXfer = new CsModel(core)) {
+                    csXfer.csOpen("Countries", "name=" + DbController.encodeSQLText(name));
+                    if (!csXfer.csOk()) {
+                        csXfer.csClose(ref CS);
+                        csXfer.csInsert("Countries", SystemMemberID);
+                        if (csXfer.csOk()) {
+                            csXfer.csSet(CS, "ACTIVE", true);
+                        }
+                    }
+                    if (csXfer.csOk()) {
+                        csXfer.csSet(CS, "NAME", name);
+                        csXfer.csSet(CS, "Abbreviation", abbreviation);
+                        if (GenericController.vbLCase(name) == "united states") {
+                            csXfer.csSet(CS, "DomesticShipping", "1");
+                        }
+                    }
                     csXfer.csClose(ref CS);
-                    CS = csXfer.csInsert("Countries", SystemMemberID);
-                    if (csXfer.csOk(CS)) {
-                        csXfer.csSet(CS, "ACTIVE", true);
-                    }
                 }
-                if (csXfer.csOk(CS)) {
-                    csXfer.csSet(CS, "NAME", name);
-                    csXfer.csSet(CS, "Abbreviation", abbreviation);
-                    if (GenericController.vbLCase(name) == "united states") {
-                        csXfer.csSet(CS, "DomesticShipping", "1");
-                    }
-                }
-                csXfer.csClose(ref CS);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
@@ -1021,9 +1021,9 @@ namespace Contensive.Processor.Controllers {
             int returnEntry = 0;
             try {
                 if (!string.IsNullOrEmpty(EntryName.Trim())) {
-                    int addonId = core.db.getRecordID(Models.Db.AddonModel.contentName, AddonName);
+                    int addonId = MetaController.getRecordId( core,Models.Db.AddonModel.contentName, AddonName);
                     int parentId = verifyNavigatorEntry_getParentIdFromNameSpace(core, menuNameSpace);
-                    int contentId = ContentMetaDomainModel.getContentId(core, ContentName);
+                    int contentId = MetaModel.getContentId(core, ContentName);
                     string listCriteria = "(name=" + DbController.encodeSQLText(EntryName) + ")and(Parentid=" + parentId + ")";
                     List<Models.Db.NavigatorEntryModel> entryList = NavigatorEntryModel.createList(core, listCriteria, "id");
                     NavigatorEntryModel entry = null;
@@ -1082,14 +1082,14 @@ namespace Contensive.Processor.Controllers {
                                 Criteria += "and(Parentid=" + parentRecordId + ")";
                             }
                             int RecordID = 0;
-                            int CS = csXfer.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, Criteria, "ID", true, 0, false, false, "ID", 1);
-                            if (csXfer.csOk(CS)) {
+                            int csXfer.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, Criteria, "ID", true, 0, false, false, "ID", 1);
+                            if (csXfer.csOk()) {
                                 RecordID = (csXfer.csGetInteger(CS, "ID"));
                             }
                             csXfer.csClose(ref CS);
                             if (RecordID == 0) {
-                                CS = csXfer.csInsert(Processor.Models.Db.NavigatorEntryModel.contentName, SystemMemberID);
-                                if (csXfer.csOk(CS)) {
+                                csXfer.csInsert(Processor.Models.Db.NavigatorEntryModel.contentName, SystemMemberID);
+                                if (csXfer.csOk()) {
                                     RecordID = csXfer.csGetInteger(CS, "ID");
                                     csXfer.csSet(CS, "name", recordName);
                                     csXfer.csSet(CS, "parentID", parentRecordId);
@@ -1121,7 +1121,7 @@ namespace Contensive.Processor.Controllers {
                 sqlList.add("CreatedBy", "0");
                 sqlList.add("OrderByClause", DbController.encodeSQLText(OrderByCriteria));
                 sqlList.add("active", SQLTrue);
-                sqlList.add("ContentControlID", ContentMetaDomainModel.getContentId(core, "Sort Methods").ToString());
+                sqlList.add("ContentControlID", MetaModel.getContentId(core, "Sort Methods").ToString());
                 //
                 dt = core.db.openTable("Default", "ccSortMethods", "Name=" + DbController.encodeSQLText(Name), "ID", "ID", 1);
                 if (dt.Rows.Count > 0) {
@@ -1214,7 +1214,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 RowsNeeded = fieldTypeIdMax - RowsFound;
                 if (RowsNeeded > 0) {
-                    CID = ContentMetaDomainModel.getContentId(core, "Content Field Types");
+                    CID = MetaModel.getContentId(core, "Content Field Types");
                     if (CID <= 0) {
                         //
                         // Problem
