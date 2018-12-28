@@ -251,7 +251,7 @@ namespace Contensive.Processor.Models.Db {
         /// <typeparam name="T"></typeparam>
         /// <param name="core"></param>
         /// <returns></returns>
-        public static T addDefault<T>(CoreController core, Domain.CDefDomainModel cdef) where T : BaseModel {
+        public static T addDefault<T>(CoreController core, Domain.ContentMetaDomainModel cdef) where T : BaseModel {
             var callersCacheNameList = new List<string>();
             return addDefault<T>(core, cdef, ref callersCacheNameList);
         }
@@ -263,7 +263,7 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="core"></param>
         /// <param name="callersCacheNameList"></param>
         /// <returns></returns>
-        public static T addDefault<T>(CoreController core, Domain.CDefDomainModel cdef, ref List<string> callersCacheNameList) where T : BaseModel {
+        public static T addDefault<T>(CoreController core, Domain.ContentMetaDomainModel cdef, ref List<string> callersCacheNameList) where T : BaseModel {
             T result = default(T);
             try {
                 result = addEmpty<T>(core);

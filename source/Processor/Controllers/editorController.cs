@@ -48,13 +48,13 @@ namespace Contensive.Processor.Controllers {
                     //
                     // ----- save the content
                     //
-                    ContentName = CdefController.getContentNameByID(core, ContentID);
+                    ContentName = ContentMetaController.getContentNameByID(core, ContentID);
                     if (!string.IsNullOrEmpty(ContentName)) {
-                        CS = core.db.csOpen(ContentName, "ID=" + DbController.encodeSQLNumber(RecordID), "", false);
-                        if (core.db.csOk(CS)) {
-                            core.db.csSet(CS, FieldName, ContentCopy);
+                        CS = csXfer.csOpen(ContentName, "ID=" + DbController.encodeSQLNumber(RecordID), "", false);
+                        if (csXfer.csOk(CS)) {
+                            csXfer.csSet(CS, FieldName, ContentCopy);
                         }
-                        core.db.csClose(ref CS);
+                        csXfer.csClose(ref CS);
                     }
                     break;
             }
@@ -81,19 +81,19 @@ namespace Contensive.Processor.Controllers {
             strFieldName = GenericController.encodeText(FieldName);
             //
             EditorPanel = "";
-            ContentID = CDefDomainModel.getContentId(core, intContentName);
+            ContentID = Models.Domain.ContentMetaDomainModel.getContentId(core, intContentName);
             if ((ContentID < 1) || (intRecordId < 1) || (string.IsNullOrEmpty(strFieldName))) {
                 PanelCopy = SpanClassAdminNormal + "The information you have selected can not be accessed.</span>";
                 EditorPanel = EditorPanel + core.html.getPanel(PanelCopy);
             } else {
-                intContentName = CdefController.getContentNameByID(core, ContentID);
+                intContentName = ContentMetaController.getContentNameByID(core, ContentID);
                 if (!string.IsNullOrEmpty(intContentName)) {
-                    CSPointer = core.db.csOpen(intContentName, "ID=" + intRecordId);
-                    if (!core.db.csOk(CSPointer)) {
+                    CSPointer = csXfer.csOpen(intContentName, "ID=" + intRecordId);
+                    if (!csXfer.csOk(CSPointer)) {
                         PanelCopy = SpanClassAdminNormal + "The information you have selected can not be accessed.</span>";
                         EditorPanel = EditorPanel + core.html.getPanel(PanelCopy);
                     } else {
-                        Copy = core.db.csGet(CSPointer, strFieldName);
+                        Copy = csXfer.csGet(CSPointer, strFieldName);
                         EditorPanel = EditorPanel + HtmlController.inputHidden("Type", FormTypeActiveEditor);
                         EditorPanel = EditorPanel + HtmlController.inputHidden("cid", ContentID);
                         EditorPanel = EditorPanel + HtmlController.inputHidden("ID", intRecordId);
@@ -104,7 +104,7 @@ namespace Contensive.Processor.Controllers {
                         ButtonPanel = core.html.getPanelButtons(ButtonCancel + "," + ButtonSave, "button");
                         EditorPanel = EditorPanel + ButtonPanel;
                     }
-                    core.db.csClose(ref CSPointer);
+                    csXfer.csClose(ref CSPointer);
                 }
             }
             Stream = Stream + core.html.getPanelHeader("Contensive Active Content Editor");

@@ -90,12 +90,12 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static PersonModel addDefault(CoreController core, Domain.CDefDomainModel cdef) {
+        public static PersonModel addDefault(CoreController core, Domain.ContentMetaDomainModel cdef) {
             return addDefault<PersonModel>(core, cdef);
         }
         //
         //====================================================================================================
-        public static PersonModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefDomainModel cdef) {
+        public static PersonModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.ContentMetaDomainModel cdef) {
             return addDefault<PersonModel>(core, cdef, ref callersCacheNameList);
         }
         //
@@ -290,7 +290,7 @@ namespace Contensive.Processor.Models.Db {
                     cs.goNext();
                 } while (cs.ok());
             }
-            cs.close();
+            cs.csClose();
             return result;
         }
         //

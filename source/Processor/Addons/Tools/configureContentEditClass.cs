@@ -44,14 +44,14 @@ namespace Contensive.Addons.Tools {
                 int ContentID = cp.Doc.GetInteger("" + RequestNameToolContentID + "");
                 string dataSourceName = "default";
                 string ContentName = "";
-                Processor.Models.Domain.CDefDomainModel CDef = null;
+                Processor.Models.Domain.ContentMetaDomainModel CDef = null;
                 string TableName = "";
                 if (ContentID > 0) {
                     ContentName = cp.Content.GetRecordName("content", ContentID);
                     if (!string.IsNullOrEmpty(ContentName)) {
                         TableName = cp.Content.GetTable(ContentName);
                         dataSourceName = cp.Content.GetDataSource(ContentName);
-                        CDef = Processor.Models.Domain.CDefDomainModel.create(core, ContentID, true, true);
+                        CDef = Processor.Models.Domain.ContentMetaDomainModel.create(core, ContentID, true, true);
                     }
                 }
                 int RecordCount = 0;
@@ -94,17 +94,17 @@ namespace Contensive.Addons.Tools {
                                                 //
                                                 // Was inherited, but make a copy of the field
                                                 //
-                                                int CSTarget = core.db.csInsertRecord("Content Fields");
-                                                if (core.db.csOk(CSTarget)) {
-                                                    int CSSource = core.db.csOpenContentRecord("Content Fields", formFieldId);
-                                                    if (core.db.csOk(CSSource)) {
-                                                        core.db.csCopyRecord(CSSource, CSTarget);
+                                                int CSTarget = csXfer.csInsert("Content Fields");
+                                                if (csXfer.csOk(CSTarget)) {
+                                                    int CSSource = csXfer.csOpenContentRecord("Content Fields", formFieldId);
+                                                    if (csXfer.csOk(CSSource)) {
+                                                        csXfer.csCopyRecord(CSSource, CSTarget);
                                                     }
-                                                    core.db.csClose(ref CSSource);
-                                                    formFieldId = core.db.csGetInteger(CSTarget, "ID");
-                                                    core.db.csSet(CSTarget, "ContentID", ContentID);
+                                                    csXfer.csClose(ref CSSource);
+                                                    formFieldId = csXfer.csGetInteger(CSTarget, "ID");
+                                                    csXfer.csSet(CSTarget, "ContentID", ContentID);
                                                 }
-                                                core.db.csClose(ref CSTarget);
+                                                csXfer.csClose(ref CSTarget);
                                                 ReloadCDef = true;
                                             } else if ((!cdefFieldKvp.Value.inherited) && (formFieldInherited)) {
                                                 //
@@ -186,14 +186,14 @@ namespace Contensive.Addons.Tools {
                             //
                             // ----- Insert a blank Field
                             //
-                            CSPointer = core.db.csInsertRecord("Content Fields");
-                            if (core.db.csOk(CSPointer)) {
-                                core.db.csSet(CSPointer, "name", "unnamedField" + core.db.csGetInteger(CSPointer, "id").ToString());
-                                core.db.csSet(CSPointer, "ContentID", ContentID);
-                                core.db.csSet(CSPointer, "EditSortPriority", 0);
+                            CSPointer = csXfer.csInsert("Content Fields");
+                            if (csXfer.csOk(CSPointer)) {
+                                csXfer.csSet(CSPointer, "name", "unnamedField" + csXfer.csGetInteger(CSPointer, "id").ToString());
+                                csXfer.csSet(CSPointer, "ContentID", ContentID);
+                                csXfer.csSet(CSPointer, "EditSortPriority", 0);
                                 ReloadCDef = true;
                             }
-                            core.db.csClose(ref CSPointer);
+                            csXfer.csClose(ref CSPointer);
                         }
                         //
                         // ----- Button Reload CDef
@@ -234,19 +234,19 @@ namespace Contensive.Addons.Tools {
                     Stream.Add( HtmlController.div( "There was a problem saving these changes" + "<UL>" + ErrorMessage + "</UL>","ccError"));
                 }
                 if (ReloadCDef) {
-                    CDef = Processor.Models.Domain.CDefDomainModel.create(core, ContentID, true, true);
+                    CDef = Processor.Models.Domain.ContentMetaDomainModel.create(core, ContentID, true, true);
                 }
                 if (ContentID == 0) {
                     //
                     // content tables that have edit forms to Configure
                     bool isEmptyList = false;
-                    Stream.Add(AdminUIController.getToolFormInputRow(core, "Select a Content Definition to Configure", AdminUIController.getDefaultEditor_LookupContent(core,RequestNameToolContentID, ContentID, CDefDomainModel.getContentId( core,"Content" ), ref isEmptyList)));
+                    Stream.Add(AdminUIController.getToolFormInputRow(core, "Select a Content Definition to Configure", AdminUIController.getDefaultEditor_LookupContent(core,RequestNameToolContentID, ContentID, Models.Domain.ContentMetaDomainModel.getContentId( core,"Content" ), ref isEmptyList)));
                 } else {
                     //
                     // Configure edit form
                     Stream.Add(HtmlController.inputHidden(RequestNameToolContentID, ContentID));
 Stream.Add(core.html.getPanelTop());
-                    ContentName = CdefController.getContentNameByID(core, ContentID);
+                    ContentName = ContentMetaController.getContentNameByID(core, ContentID);
                     ButtonList = ButtonCancel + "," + ButtonSave + "," + ButtonOK + "," + ButtonAdd;
                     //
                     // Get a new copy of the content definition
@@ -256,13 +256,13 @@ Stream.Add(core.html.getPanelTop());
                     //
                     int ParentContentID = CDef.parentID;
                     bool AllowCDefInherit = false;
-                    Processor.Models.Domain.CDefDomainModel ParentCDef = null;
+                    Processor.Models.Domain.ContentMetaDomainModel ParentCDef = null;
                     if (ParentContentID == -1) {
                         AllowCDefInherit = false;
                     } else {
                         AllowCDefInherit = true;
-                        string ParentContentName = CdefController.getContentNameByID(core, ParentContentID);
-                        ParentCDef = Processor.Models.Domain.CDefDomainModel.create(core, ParentContentID, true, true);
+                        string ParentContentName = ContentMetaController.getContentNameByID(core, ParentContentID);
+                        ParentCDef = Processor.Models.Domain.ContentMetaDomainModel.create(core, ParentContentID, true, true);
                     }
                     bool NeedFootNote1 = false;
                     bool NeedFootNote2 = false;
@@ -327,7 +327,7 @@ Stream.Add(core.html.getPanelTop());
                         }
                         fieldList.Sort((p1, p2) => p1.sort.CompareTo(p2.sort));
                         StringBuilderLegacyController StreamValidRows = new StringBuilderLegacyController();
-                        var contentFieldsCdef = Processor.Models.Domain.CDefDomainModel.createByUniqueName(core, "content fields");
+                        var contentFieldsCdef = Processor.Models.Domain.ContentMetaDomainModel.createByUniqueName(core, "content fields");
                         foreach (fieldSortClass fieldsort in fieldList) {
                             StringBuilderLegacyController streamRow = new StringBuilderLegacyController();
                             bool rowValid = true;
@@ -428,13 +428,13 @@ Stream.Add(core.html.getPanelTop());
                             rowValid = rowValid && (fieldsort.field.fieldTypeId > 0);
                             streamRow.Add("<td class=\"ccPanelInput\" align=\"left\"><nobr>");
                             if (fieldsort.field.inherited) {
-                                CSPointer = core.db.csOpenRecord("Content Field Types", fieldsort.field.fieldTypeId);
-                                if (!core.db.csOk(CSPointer)) {
+                                CSPointer = csXfer.csOpenRecord("Content Field Types", fieldsort.field.fieldTypeId);
+                                if (!csXfer.csOk(CSPointer)) {
                                     streamRow.Add(SpanClassAdminSmall + "Unknown[" + fieldsort.field.fieldTypeId + "]</SPAN>");
                                 } else {
-                                    streamRow.Add(SpanClassAdminSmall + core.db.csGetText(CSPointer, "Name") + "</SPAN>");
+                                    streamRow.Add(SpanClassAdminSmall + csXfer.csGetText(CSPointer, "Name") + "</SPAN>");
                                 }
-                                core.db.csClose(ref CSPointer);
+                                csXfer.csClose(ref CSPointer);
                             } else if (FieldLocked) {
                                 streamRow.Add(core.db.getRecordName("content field types", fieldsort.field.fieldTypeId) + HtmlController.inputHidden("dtfaType." + RecordCount, fieldsort.field.fieldTypeId));
                             } else {

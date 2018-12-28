@@ -286,16 +286,16 @@ namespace Contensive.Processor.Controllers {
                 //
                 if (Message.Length > 255) Message = Message.Substring(0, 255);
                 if (Link.Length > 255) Message = Link.Substring(0, 255);
-                int CS = core.db.csInsertRecord("Activity Log", ByMemberID);
-                if (core.db.csOk(CS)) {
-                    core.db.csSet(CS, "MemberID", SubjectMemberID);
-                    core.db.csSet(CS, "OrganizationID", SubjectOrganizationID);
-                    core.db.csSet(CS, "Message", Message);
-                    core.db.csSet(CS, "Link", Link);
-                    core.db.csSet(CS, "VisitorID", VisitorID);
-                    core.db.csSet(CS, "VisitID", VisitID);
+                int CS = csXfer.csInsert("Activity Log", ByMemberID);
+                if (csXfer.csOk(CS)) {
+                    csXfer.csSet(CS, "MemberID", SubjectMemberID);
+                    csXfer.csSet(CS, "OrganizationID", SubjectOrganizationID);
+                    csXfer.csSet(CS, "Message", Message);
+                    csXfer.csSet(CS, "Link", Link);
+                    csXfer.csSet(CS, "VisitorID", VisitorID);
+                    csXfer.csSet(CS, "VisitID", VisitID);
                 }
-                core.db.csClose(ref CS);
+                csXfer.csClose(ref CS);
                 //
                 return;
                 //
@@ -377,21 +377,21 @@ namespace Contensive.Processor.Controllers {
                 //
                 // insert new record
                 //
-                CS = core.db.csInsertRecord("Site Warnings", 0);
-                if (core.db.csOk(CS)) {
-                    core.db.csSet(CS, "name", Name);
-                    core.db.csSet(CS, "description", Description);
-                    core.db.csSet(CS, "generalKey", generalKey);
-                    core.db.csSet(CS, "specificKey", specificKey);
-                    core.db.csSet(CS, "count", 1);
-                    core.db.csSet(CS, "DateLastReported", DateTime.Now);
+                CS = csXfer.csInsert("Site Warnings", 0);
+                if (csXfer.csOk(CS)) {
+                    csXfer.csSet(CS, "name", Name);
+                    csXfer.csSet(CS, "description", Description);
+                    csXfer.csSet(CS, "generalKey", generalKey);
+                    csXfer.csSet(CS, "specificKey", specificKey);
+                    csXfer.csSet(CS, "count", 1);
+                    csXfer.csSet(CS, "DateLastReported", DateTime.Now);
                     if (true) {
-                        core.db.csSet(CS, "shortDescription", shortDescription);
-                        core.db.csSet(CS, "location", location);
-                        core.db.csSet(CS, "pageId", PageID);
+                        csXfer.csSet(CS, "shortDescription", shortDescription);
+                        csXfer.csSet(CS, "location", location);
+                        csXfer.csSet(CS, "pageId", PageID);
                     }
                 }
-                core.db.csClose(ref CS);
+                csXfer.csClose(ref CS);
             }
             //
         }

@@ -384,7 +384,7 @@ namespace Contensive.Processor.Controllers {
         public static bool queueSystemEmail(CoreController core, string emailName, string appendedCopy, int additionalMemberID, ref string userErrorMessage) {
             SystemEmailModel email = SystemEmailModel.createByUniqueName(core, emailName);
             if (email == null) {
-                email = SystemEmailModel.addDefault(core, Models.Domain.CDefDomainModel.createByUniqueName(core, SystemEmailModel.contentName));
+                email = SystemEmailModel.addDefault(core, Models.Domain.ContentMetaDomainModel.createByUniqueName(core, SystemEmailModel.contentName));
                 email.name = emailName;
                 email.subject = emailName;
                 email.fromAddress = core.siteProperties.getText("EmailAdmin", "webmaster@" + core.appConfig.domainList[0]);
@@ -596,23 +596,23 @@ namespace Contensive.Processor.Controllers {
                 int CSTemplate = 0;
                 string EmailStatus = null;
                 //
-                CS = core.db.csOpenRecord("email", EmailID);
-                if (!core.db.csOk(CS)) {
+                CS = csXfer.csOpenRecord("email", EmailID);
+                if (!csXfer.csOk(CS)) {
                     ErrorController.addUserError(core, "There was a problem sending the email confirmation. The email record could not be found.");
                 } else {
-                    EmailSubject = core.db.csGet(CS, "Subject");
-                    EmailBody = core.db.csGet(CS, "copyFilename");
+                    EmailSubject = csXfer.csGet(CS, "Subject");
+                    EmailBody = csXfer.csGet(CS, "copyFilename");
                     //
                     // merge in template
                     //
                     EmailTemplate = "";
-                    EMailTemplateID = core.db.csGetInteger(CS, "EmailTemplateID");
+                    EMailTemplateID = csXfer.csGetInteger(CS, "EmailTemplateID");
                     if (EMailTemplateID != 0) {
-                        CSTemplate = core.db.csOpenRecord("Email Templates", EMailTemplateID, false, false, "BodyHTML");
-                        if (core.db.csOk(CSTemplate)) {
-                            EmailTemplate = core.db.csGet(CSTemplate, "BodyHTML");
+                        CSTemplate = csXfer.csOpenRecord("Email Templates", EMailTemplateID, false, false, "BodyHTML");
+                        if (csXfer.csOk(CSTemplate)) {
+                            EmailTemplate = csXfer.csGet(CSTemplate, "BodyHTML");
                         }
-                        core.db.csClose(ref CSTemplate);
+                        csXfer.csClose(ref CSTemplate);
                     }
                     //
                     // styles
@@ -622,7 +622,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // spam footer
                     //
-                    if (core.db.csGetBoolean(CS, "AllowSpamFooter")) {
+                    if (csXfer.csGetBoolean(CS, "AllowSpamFooter")) {
                         //
                         // This field is default true, and non-authorable
                         // It will be true in all cases, except a possible unforseen exception
@@ -718,13 +718,13 @@ namespace Contensive.Processor.Controllers {
                             EmailBody = EmailBody + "<div style=\"clear:both;padding:10px;margin:10px;border:1px dashed #888;\">Administrator<br><br>" + ConfirmFooter + "</div>";
                             string queryStringForLinkAppend = "";
                             string sendStatus = "";
-                            if (!queuePersonEmail(core, person, core.db.csGetText(CS, "FromAddress"), EmailSubject, EmailBody, "", "", true, true, EmailID, EmailTemplate, false, ref sendStatus, queryStringForLinkAppend)) {
+                            if (!queuePersonEmail(core, person, csXfer.csGetText(CS, "FromAddress"), EmailSubject, EmailBody, "", "", true, true, EmailID, EmailTemplate, false, ref sendStatus, queryStringForLinkAppend)) {
                                 ErrorController.addUserError(core, EmailStatus);
                             }
                         }
                     }
                 }
-                core.db.csClose(ref CS);
+                csXfer.csClose(ref CS);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;

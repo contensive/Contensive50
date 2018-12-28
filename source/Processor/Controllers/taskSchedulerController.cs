@@ -277,7 +277,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 int downloadId = 0;
                 if (!string.IsNullOrEmpty(downloadName)) {
-                    var download = BaseModel.addDefault<DownloadModel>(core, CDefDomainModel.createByUniqueName(core, DownloadModel.contentName));
+                    var download = BaseModel.addDefault<DownloadModel>(core, ContentMetaDomainModel.createByUniqueName(core, DownloadModel.contentName));
                     download.name = downloadName;
                     download.dateRequested = DateTime.Now;
                     download.requestedBy = core.session.user.id;
@@ -295,9 +295,9 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- Search for a duplicate
                     string sql = "select top 1 id from cctasks where ((cmdDetail=" + cmdDetailJson + ")and(datestarted is not null))";
-                    int cs = core.db.csOpenSql(sql);
-                    resultTaskAdded = !core.db.csOk(cs);
-                    core.db.csClose(ref cs);
+                    int cs = csXfer.csOpenSql(sql);
+                    resultTaskAdded = !csXfer.csOk(cs);
+                    csXfer.csClose(ref cs);
                 }
                 //
                 // -- add it to the queue and shell out to the command

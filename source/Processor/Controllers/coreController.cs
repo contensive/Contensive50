@@ -76,7 +76,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Dictionary of cdef, index by name
         /// </summary>
-        internal Dictionary<string, Models.Domain.CDefDomainModel> cdefDictionary { get; set; }
+        internal Dictionary<string, Models.Domain.ContentMetaDomainModel> cdefDictionary { get; set; }
         //
         /// <summary>
         /// Dictionary of tableschema, index by name
@@ -436,7 +436,7 @@ namespace Contensive.Processor.Controllers {
             cp_forAddonExecutionOnly = cp;
             LogController.forceNLog( "CoreController constructor-0, enter", LogController.logLevel.Trace);
             //
-            cdefDictionary = new Dictionary<string, Models.Domain.CDefDomainModel>();
+            cdefDictionary = new Dictionary<string, Models.Domain.ContentMetaDomainModel>();
             tableSchemaDictionary = null;
             //
             // -- create default auth objects for non-user methods, or until auth is available
@@ -459,7 +459,7 @@ namespace Contensive.Processor.Controllers {
             this.cp_forAddonExecutionOnly = cp;
             LogController.forceNLog( "CoreController constructor-1, enter", LogController.logLevel.Trace);
             //
-            cdefDictionary = new Dictionary<string, Models.Domain.CDefDomainModel>();
+            cdefDictionary = new Dictionary<string, Models.Domain.ContentMetaDomainModel>();
             tableSchemaDictionary = null;
             //
             // -- create default auth objects for non-user methods, or until auth is available
@@ -509,7 +509,7 @@ namespace Contensive.Processor.Controllers {
             cp_forAddonExecutionOnly = cp;
             LogController.forceNLog( "CoreController constructor-2, enter", LogController.logLevel.Trace);
             //
-            cdefDictionary = new Dictionary<string, Models.Domain.CDefDomainModel>();
+            cdefDictionary = new Dictionary<string, Models.Domain.ContentMetaDomainModel>();
             tableSchemaDictionary = null;
             //
             // -- create default auth objects for non-user methods, or until auth is available
@@ -553,7 +553,7 @@ namespace Contensive.Processor.Controllers {
             this.cp_forAddonExecutionOnly = cp;
             LogController.forceNLog( "CoreController constructor-4, enter", LogController.logLevel.Trace);
             //
-            cdefDictionary = new Dictionary<string, Models.Domain.CDefDomainModel>();
+            cdefDictionary = new Dictionary<string, Models.Domain.ContentMetaDomainModel>();
             tableSchemaDictionary = null;
             //
             // -- create default auth objects for non-user methods, or until auth is available
@@ -1208,8 +1208,8 @@ namespace Contensive.Processor.Controllers {
         /// <param name="UseContentWatchLink"></param>
         public void processAfterSave(bool IsDelete, string ContentName, int RecordID, string RecordName, int RecordParentID, bool UseContentWatchLink) {
             try {
-                int ContentID = CDefDomainModel.getContentId(this, ContentName);
-                string TableName = CdefController.getContentTablename(this, ContentName);
+                int ContentID = ContentMetaDomainModel.getContentId(this, ContentName);
+                string TableName = ContentMetaController.getContentTablename(this, ContentName);
                 PageContentModel.markReviewed(this, RecordID);
                 //
                 // -- invalidate the specific cache for this record

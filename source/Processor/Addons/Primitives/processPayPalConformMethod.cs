@@ -36,33 +36,33 @@
 //                    //
 //                    // Confirm the order
 //                    //
-//                    int CS = core.db.csOpen("Orders", "(ID=" + ConfirmOrderID + ") and ((OrderCompleted=0)or(OrderCompleted is Null))");
-//                    if (core.db.csOk(CS)) {
-//                        core.db.csSet(CS, "OrderCompleted", true);
-//                        core.db.csSet(CS, "DateCompleted", core.doc.profileStartTime);
-//                        core.db.csSet(CS, "ccAuthCode", core.docProperties.getText("txn_id"));
-//                        core.db.csSet(CS, "ccActionCode", core.docProperties.getText("payment_status"));
-//                        core.db.csSet(CS, "ccRefCode", core.docProperties.getText("pending_reason"));
-//                        core.db.csSet(CS, "PayMethod", "PayPal " + core.docProperties.getText("payment_type"));
-//                        core.db.csSet(CS, "ShipName", core.docProperties.getText("first_name") + " " + core.docProperties.getText("last_name"));
-//                        core.db.csSet(CS, "ShipAddress", core.docProperties.getText("address_street"));
-//                        core.db.csSet(CS, "ShipCity", core.docProperties.getText("address_city"));
-//                        core.db.csSet(CS, "ShipState", core.docProperties.getText("address_state"));
-//                        core.db.csSet(CS, "ShipZip", core.docProperties.getText("address_zip"));
-//                        core.db.csSet(CS, "BilleMail", core.docProperties.getText("payer_email"));
-//                        core.db.csSet(CS, "ContentControlID", CDefDomainModel.getContentId(core, "Orders Completed"));
-//                        core.db.csSave2(CS);
+//                    int CS = csXfer.csOpen("Orders", "(ID=" + ConfirmOrderID + ") and ((OrderCompleted=0)or(OrderCompleted is Null))");
+//                    if (csXfer.csOk(CS)) {
+//                        csXfer.csSet(CS, "OrderCompleted", true);
+//                        csXfer.csSet(CS, "DateCompleted", core.doc.profileStartTime);
+//                        csXfer.csSet(CS, "ccAuthCode", core.docProperties.getText("txn_id"));
+//                        csXfer.csSet(CS, "ccActionCode", core.docProperties.getText("payment_status"));
+//                        csXfer.csSet(CS, "ccRefCode", core.docProperties.getText("pending_reason"));
+//                        csXfer.csSet(CS, "PayMethod", "PayPal " + core.docProperties.getText("payment_type"));
+//                        csXfer.csSet(CS, "ShipName", core.docProperties.getText("first_name") + " " + core.docProperties.getText("last_name"));
+//                        csXfer.csSet(CS, "ShipAddress", core.docProperties.getText("address_street"));
+//                        csXfer.csSet(CS, "ShipCity", core.docProperties.getText("address_city"));
+//                        csXfer.csSet(CS, "ShipState", core.docProperties.getText("address_state"));
+//                        csXfer.csSet(CS, "ShipZip", core.docProperties.getText("address_zip"));
+//                        csXfer.csSet(CS, "BilleMail", core.docProperties.getText("payer_email"));
+//                        csXfer.csSet(CS, "ContentControlID", Models.Domain.ContentMetaDomainModel.getContentId(core, "Orders Completed"));
+//                        csXfer.csSave2(CS);
 //                    }
-//                    core.db.csClose(ref CS);
+//                    csXfer.csClose(ref CS);
 //                    //
 //                    // Empty the cart
 //                    //
-//                    CS = core.db.csOpen("Visitors", "OrderID=" + ConfirmOrderID);
-//                    if (core.db.csOk(CS)) {
-//                        core.db.csSet(CS, "OrderID", 0);
-//                        core.db.csSave2(CS);
+//                    CS = csXfer.csOpen("Visitors", "OrderID=" + ConfirmOrderID);
+//                    if (csXfer.csOk(CS)) {
+//                        csXfer.csSet(CS, "OrderID", 0);
+//                        csXfer.csSave2(CS);
 //                    }
-//                    core.db.csClose(ref CS);
+//                    csXfer.csClose(ref CS);
 //                    //
 //                    // TEmp fix until HardCodedPage is complete
 //                    //

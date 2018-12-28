@@ -119,7 +119,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 const string MenuNameFPO = "<MenuName>";
                 const string NoneCaptionFPO = "<NoneCaption>";
-                Models.Domain.CDefDomainModel CDef = null;
+                Models.Domain.ContentMetaDomainModel CDef = null;
                 string ContentControlCriteria = null;
                 string LcaseCriteria = null;
                 int CSPointer = 0;
@@ -178,7 +178,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // This was commented out -- I really do not know why -- seems like the best way
                     //
-                    CDef = Models.Domain.CDefDomainModel.createByUniqueName(core, ContentName);
+                    CDef = Models.Domain.ContentMetaDomainModel.createByUniqueName(core, ContentName);
                     TableName = CDef.tableName;
                     DataSource = CDef.dataSourceName;
                     ContentControlCriteria = CDef.legacyContentControlCriteria;
@@ -216,11 +216,11 @@ namespace Contensive.Processor.Controllers {
                         if (CurrentValue == 0) {
                             result = inputText(core, MenuName, "0");
                         } else {
-                            CSPointer = core.db.csOpenRecord(ContentName, CurrentValue);
-                            if (core.db.csOk(CSPointer)) {
-                                result = core.db.csGetText(CSPointer, "name") + "&nbsp;";
+                            using ( var csXfer = new CsModel( core )) {
+                                if (csXfer.csOpenRecord(ContentName, CurrentValue)) {
+                                    result = csXfer.csGetText(CSPointer, "name") + "&nbsp;";
+                                }
                             }
-                            core.db.csClose(ref CSPointer);
                         }
                         result += "(Selection is too large to display option list)";
                     } else {
@@ -307,10 +307,10 @@ namespace Contensive.Processor.Controllers {
                             //
                             // ----- select values
                             //
-                            CSPointer = core.db.csOpen(ContentName, Criteria, SortFieldList, false, 0, false, false, SelectFields);
-                            if (core.db.csOk(CSPointer)) {
-                                RowsArray = core.db.csGetRows(CSPointer);
-                                RowFieldArray = core.db.csGetSelectFieldList(CSPointer).Split(',');
+                            CSPointer = csXfer.csOpen(ContentName, Criteria, SortFieldList, false, 0, false, false, SelectFields);
+                            if (csXfer.csOk(CSPointer)) {
+                                RowsArray = csXfer.csGetRows(CSPointer);
+                                RowFieldArray = csXfer.csGetSelectFieldList(CSPointer).Split(',');
                                 ColumnMax = RowsArray.GetUpperBound(0);
                                 RowMax = RowsArray.GetUpperBound(1);
                                 //
@@ -360,15 +360,15 @@ namespace Contensive.Processor.Controllers {
                                     FastString.Add(">" + HtmlController.encodeHtml(Copy) + "</option>");
                                 }
                                 if (!SelectedFound && (CurrentValue != 0)) {
-                                    core.db.csClose(ref CSPointer);
+                                    csXfer.csClose(ref CSPointer);
                                     if (!string.IsNullOrEmpty(Criteria)) {
                                         Criteria = Criteria + "and";
                                     }
                                     Criteria = Criteria + "(id=" + GenericController.encodeInteger(CurrentValue) + ")";
-                                    CSPointer = core.db.csOpen(ContentName, Criteria, SortFieldList, false, 0, false, false, SelectFields);
-                                    if (core.db.csOk(CSPointer)) {
-                                        RowsArray = core.db.csGetRows(CSPointer);
-                                        RowFieldArray = core.db.csGetSelectFieldList(CSPointer).Split(',');
+                                    CSPointer = csXfer.csOpen(ContentName, Criteria, SortFieldList, false, 0, false, false, SelectFields);
+                                    if (csXfer.csOk(CSPointer)) {
+                                        RowsArray = csXfer.csGetRows(CSPointer);
+                                        RowFieldArray = csXfer.csGetSelectFieldList(CSPointer).Split(',');
                                         RowMax = RowsArray.GetUpperBound(1);
                                         ColumnMax = RowsArray.GetUpperBound(0);
                                         RecordID = GenericController.encodeInteger(RowsArray[IDFieldPointer, 0]);
@@ -391,7 +391,7 @@ namespace Contensive.Processor.Controllers {
                                 }
                             }
                             FastString.Add("</select>");
-                            core.db.csClose(ref CSPointer);
+                            csXfer.csClose(ref CSPointer);
                             SelectRaw = FastString.Text;
                         }
                     }
@@ -456,11 +456,11 @@ namespace Contensive.Processor.Controllers {
                         + " inner join ccMembers P on R.MemberID=P.ID"
                         + " where (P.active<>0)"
                         + " and (R.GroupID=" + GroupID + ")";
-                    int CSPointer = core.db.csOpenSql(SQL);
-                    if (core.db.csOk(CSPointer)) {
-                        RowMax = RowMax + core.db.csGetInteger(CSPointer, "cnt");
+                    int CSPointer = csXfer.csOpenSql(SQL);
+                    if (csXfer.csOk(CSPointer)) {
+                        RowMax = RowMax + csXfer.csGetInteger(CSPointer, "cnt");
                     }
-                    core.db.csClose(ref CSPointer);
+                    csXfer.csClose(ref CSPointer);
                     if (RowMax > core.siteProperties.selectFieldLimit) {
                         //
                         // Selection is too big
@@ -468,11 +468,11 @@ namespace Contensive.Processor.Controllers {
                         LogController.handleError( core,new Exception("While building a group members list for group [" + GroupController.getGroupName(core, GroupID) + "], too many rows were selected. [" + RowMax + "] records exceeds [" + core.siteProperties.selectFieldLimit + "], the current Site Property app.SiteProperty_SelectFieldLimit."));
                         result += inputHidden(MenuNameFPO, currentValue);
                         if (currentValue != 0) {
-                            CSPointer = core.db.csOpenRecord("people", currentValue);
-                            if (core.db.csOk(CSPointer)) {
-                                result = core.db.csGetText(CSPointer, "name") + "&nbsp;";
+                            CSPointer = csXfer.csOpenRecord("people", currentValue);
+                            if (csXfer.csOk(CSPointer)) {
+                                result = csXfer.csGetText(CSPointer, "name") + "&nbsp;";
                             }
-                            core.db.csClose(ref CSPointer);
+                            csXfer.csClose(ref CSPointer);
                         }
                         result += "(Selection is too large to display)";
                     } else {
@@ -480,7 +480,7 @@ namespace Contensive.Processor.Controllers {
                         // ----- Generate Drop Down Field Names
                         //
                         string DropDownFieldList = "name";
-                        var peopleCdef = Models.Domain.CDefDomainModel.createByUniqueName(core, "people");
+                        var peopleCdef = Models.Domain.ContentMetaDomainModel.createByUniqueName(core, "people");
                         if ( peopleCdef != null ) DropDownFieldList = peopleCdef.dropDownFieldList;
                         int DropDownFieldCount = 0;
                         string CharAllowed = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -576,10 +576,10 @@ namespace Contensive.Processor.Controllers {
                                 + " and((R.DateExpires is null)or(R.DateExpires>" + DbController.encodeSQLDate(DateTime.Now) + "))"
                                 + " and(P.active<>0)"
                                 + " order by P." + SortFieldList;
-                            CSPointer = core.db.csOpenSql(SQL);
-                            if (core.db.csOk(CSPointer)) {
-                                string[,] RowsArray = core.db.csGetRows(CSPointer);
-                                string[] RowFieldArray = core.db.csGetSelectFieldList(CSPointer).Split(',');
+                            CSPointer = csXfer.csOpenSql(SQL);
+                            if (csXfer.csOk(CSPointer)) {
+                                string[,] RowsArray = csXfer.csGetRows(CSPointer);
+                                string[] RowFieldArray = csXfer.csGetSelectFieldList(CSPointer).Split(',');
                                 RowMax = RowsArray.GetUpperBound(1);
                                 int ColumnMax = RowsArray.GetUpperBound(0);
                                 //
@@ -634,7 +634,7 @@ namespace Contensive.Processor.Controllers {
                                 }
                             }
                             FastString.Add("</select>");
-                            core.db.csClose(ref CSPointer);
+                            csXfer.csClose(ref CSPointer);
                             SelectRaw = FastString.Text;
                         }
                     }
@@ -1120,7 +1120,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public string inputCs(int CSPointer, string ContentName, string FieldName, int Height = 1, int Width = 40, string htmlId = "") {
+        public string inputCs(CsModel cs, string ContentName, string fieldName, int Height = 1, int Width = 40, string htmlId = "") {
             string returnResult = "";
             try {
                 bool IsEmptyList = false;
@@ -1135,17 +1135,17 @@ namespace Contensive.Processor.Controllers {
                 int FieldLookupContentID = 0;
                 int FieldMemberSelectGroupID = 0;
                 string FieldLookupContentName = null;
-                Models.Domain.CDefDomainModel Contentdefinition = null;
+                Models.Domain.ContentMetaDomainModel Contentdefinition = null;
                 bool FieldHTMLContent = false;
                 int CSLookup = 0;
                 string FieldLookupList = "";
                 //
                 if (true) {
                     fieldFound = false;
-                    Contentdefinition = Models.Domain.CDefDomainModel.createByUniqueName(core, ContentName);
+                    Contentdefinition = Models.Domain.ContentMetaDomainModel.createByUniqueName(core, ContentName);
                     foreach (KeyValuePair<string, Models.Domain.CDefFieldModel> keyValuePair in Contentdefinition.fields) {
                         Models.Domain.CDefFieldModel field = keyValuePair.Value;
-                        if (GenericController.vbUCase(field.nameLc) == GenericController.vbUCase(FieldName)) {
+                        if (GenericController.vbUCase(field.nameLc) == GenericController.vbUCase(fieldName)) {
                             FieldValueVariant = field.defaultValue;
                             fieldTypeId = field.fieldTypeId;
                             FieldReadOnly = field.readOnly;
@@ -1159,13 +1159,13 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                     if (!fieldFound) {
-                        LogController.handleError( core,new Exception("Field [" + FieldName + "] was not found in Content Definition [" + ContentName + "]"));
+                        LogController.handleError( core,new Exception("Field [" + fieldName + "] was not found in Content Definition [" + ContentName + "]"));
                     } else {
                         //
                         // main_Get the current value if the record was found
                         //
-                        if (core.db.csOk(CSPointer)) {
-                            FieldValueVariant = core.db.csGetValue(CSPointer, FieldName);
+                        if (cs.ok()) {
+                            FieldValueVariant = cs.csGetValue(fieldName);
                         }
                         //
                         if (FieldPassword) {
@@ -1173,7 +1173,7 @@ namespace Contensive.Processor.Controllers {
                             // Handle Password Fields
                             //
                             FieldValueText = GenericController.encodeText(FieldValueVariant);
-                            returnResult = inputText(core, FieldName, FieldValueText, Height, Width, "", true);
+                            returnResult = inputText(core, fieldName, FieldValueText, Height, Width, "", true);
                         } else {
                             //
                             // Non Password field by fieldtype
@@ -1187,7 +1187,7 @@ namespace Contensive.Processor.Controllers {
                                     if (FieldReadOnly) {
                                         returnResult = FieldValueText;
                                     } else {
-                                        returnResult = getFormInputHTML(FieldName, FieldValueText, "", Width.ToString());
+                                        returnResult = getFormInputHTML(fieldName, FieldValueText, "", Width.ToString());
                                     }
                                     //
                                     // html files, read from cdnFiles and use html editor
@@ -1202,7 +1202,7 @@ namespace Contensive.Processor.Controllers {
                                         returnResult = FieldValueText;
                                     } else {
                                         //Height = encodeEmptyInteger(Height, 4)
-                                        returnResult = getFormInputHTML(FieldName, FieldValueText, "", Width.ToString());
+                                        returnResult = getFormInputHTML(fieldName, FieldValueText, "", Width.ToString());
                                     }
                                     //
                                     // text cdnFiles files, read from cdnFiles and use text editor
@@ -1217,7 +1217,7 @@ namespace Contensive.Processor.Controllers {
                                         returnResult = FieldValueText;
                                     } else {
                                         //Height = encodeEmptyInteger(Height, 4)
-                                        returnResult = inputText(core,FieldName, FieldValueText, Height, Width);
+                                        returnResult = inputText(core,fieldName, FieldValueText, Height, Width);
                                     }
                                     //
                                     // text public files, read from core.cdnFiles and use text editor
@@ -1234,7 +1234,7 @@ namespace Contensive.Processor.Controllers {
                                         returnResult = FieldValueText;
                                     } else {
                                         //Height = encodeEmptyInteger(Height, 4)
-                                        returnResult = inputText(core, FieldName, FieldValueText, Height, Width);
+                                        returnResult = inputText(core, fieldName, FieldValueText, Height, Width);
                                     }
                                     //
                                     //
@@ -1244,7 +1244,7 @@ namespace Contensive.Processor.Controllers {
                                     if (FieldReadOnly) {
                                         returnResult = GenericController.encodeText(GenericController.encodeBoolean(FieldValueVariant));
                                     } else {
-                                        returnResult = checkbox(FieldName, GenericController.encodeBoolean(FieldValueVariant));
+                                        returnResult = checkbox(fieldName, GenericController.encodeBoolean(FieldValueVariant));
                                     }
                                     //
                                     //
@@ -1263,7 +1263,7 @@ namespace Contensive.Processor.Controllers {
                                     if (FieldReadOnly) {
                                         returnResult = GenericController.encodeText(FieldValueVariant);
                                     } else {
-                                        returnResult = inputText(core, FieldName, GenericController.encodeText(FieldValueVariant), Height, Width);
+                                        returnResult = inputText(core, fieldName, GenericController.encodeText(FieldValueVariant), Height, Width);
                                     }
                                     //
                                     //
@@ -1274,7 +1274,7 @@ namespace Contensive.Processor.Controllers {
                                     if (FieldReadOnly) {
                                         returnResult = FieldValueText;
                                     } else {
-                                        returnResult = FieldValueText + "<br>change: " + inputFile(FieldName, GenericController.encodeText(FieldValueVariant));
+                                        returnResult = FieldValueText + "<br>change: " + inputFile(fieldName, GenericController.encodeText(FieldValueVariant));
                                     }
                                     //
                                     //
@@ -1285,7 +1285,7 @@ namespace Contensive.Processor.Controllers {
                                     if (FieldReadOnly) {
                                         returnResult = FieldValueText;
                                     } else {
-                                        returnResult = "<img src=\"" + GenericController.getCdnFileLink(core, FieldValueText) + "\"><br>change: " + inputFile(FieldName, GenericController.encodeText(FieldValueVariant));
+                                        returnResult = "<img src=\"" + GenericController.getCdnFileLink(core, FieldValueText) + "\"><br>change: " + inputFile(fieldName, GenericController.encodeText(FieldValueVariant));
                                     }
                                     //
                                     //
@@ -1293,30 +1293,30 @@ namespace Contensive.Processor.Controllers {
                                     break;
                                 case _fieldTypeIdLookup:
                                     FieldValueInteger = GenericController.encodeInteger(FieldValueVariant);
-                                    FieldLookupContentName = CdefController.getContentNameByID(core, FieldLookupContentID);
+                                    FieldLookupContentName = ContentMetaController.getContentNameByID(core, FieldLookupContentID);
                                     if (!string.IsNullOrEmpty(FieldLookupContentName)) {
                                         //
                                         // Lookup into Content
                                         //
                                         if (FieldReadOnly) {
-                                            CSPointer = core.db.csOpen2(FieldLookupContentName, FieldValueInteger);
-                                            if (core.db.csOk(CSLookup)) {
-                                                returnResult = CsModel.getTextEncoded(core, CSLookup, "name");
+                                            using (CsModel csLookup = new CsModel(core)) {
+                                                if (cs.csOpenRecord(FieldLookupContentName, FieldValueInteger)) {
+                                                    returnResult = csLookup.getTextEncoded("name");
+                                                }
                                             }
-                                            core.db.csClose(ref CSLookup);
                                         } else {
-                                            returnResult = selectFromContent(FieldName, FieldValueInteger, FieldLookupContentName, "", "", "", ref IsEmptyList);
+                                            returnResult = selectFromContent(fieldName, FieldValueInteger, FieldLookupContentName, "", "", "", ref IsEmptyList);
                                         }
                                     } else if (!string.IsNullOrEmpty(FieldLookupList)) {
                                         //
                                         // Lookup into LookupList
                                         //
-                                        returnResult = selectFromList(core, FieldName, FieldValueInteger, FieldLookupList.Split(','), "", "");
+                                        returnResult = selectFromList(core, fieldName, FieldValueInteger, FieldLookupList.Split(','), "", "");
                                     } else {
                                         //
                                         // Just call it text
                                         //
-                                        returnResult = inputText(core, FieldName, FieldValueInteger.ToString(), Height, Width);
+                                        returnResult = inputText(core, fieldName, FieldValueInteger.ToString(), Height, Width);
                                     }
                                     //
                                     //
@@ -1324,7 +1324,7 @@ namespace Contensive.Processor.Controllers {
                                     break;
                                 case _fieldTypeIdMemberSelect:
                                     FieldValueInteger = GenericController.encodeInteger(FieldValueVariant);
-                                    returnResult = selectUserFromGroup(FieldName, FieldValueInteger, FieldMemberSelectGroupID);
+                                    returnResult = selectUserFromGroup(fieldName, FieldValueInteger, FieldMemberSelectGroupID);
                                     //
                                     //
                                     //
@@ -1335,10 +1335,9 @@ namespace Contensive.Processor.Controllers {
                                         returnResult = FieldValueText;
                                     } else {
                                         if (FieldHTMLContent) {
-                                            returnResult = getFormInputHTML(FieldName, FieldValueText, Height.ToString(), Width.ToString(), FieldReadOnly, false);
-                                            //main_GetFormInputCS = main_GetFormInputActiveContent(fieldname, FieldValueText, height, width)
+                                            returnResult = getFormInputHTML(fieldName, FieldValueText, Height.ToString(), Width.ToString(), FieldReadOnly, false);
                                         } else {
-                                            returnResult = inputText(core, FieldName, FieldValueText, Height, Width);
+                                            returnResult = inputText(core, fieldName, FieldValueText, Height, Width);
                                         }
                                     }
                                     break;
@@ -1448,7 +1447,7 @@ namespace Contensive.Processor.Controllers {
                         // Personalization Tag
                         //
                         string selectOptions = "";
-                        var peopleCdef = Models.Domain.CDefDomainModel.createByUniqueName(core, "people");
+                        var peopleCdef = Models.Domain.ContentMetaDomainModel.createByUniqueName(core, "people");
                         if (peopleCdef != null) selectOptions = string.Join("|", peopleCdef.selectList);
                         IconIDControlString = "AC,PERSONALIZATION,0,Personalization,field=[" + selectOptions + "]";
                         IconImg = AddonController.getAddonIconImg("/" + core.appConfig.adminRoute, 0, 0, 0, true, IconIDControlString, "", core.appConfig.cdnFileUrl, "Any Personalization Field", "Renders as any Personalization Field", "", 0);
@@ -1487,10 +1486,10 @@ namespace Contensive.Processor.Controllers {
                         //
                         // Watch Lists
                         //
-                        int CSLists = core.db.csOpen("Content Watch Lists", "", "Name,ID", false, 0, false, false, "Name,ID", 20, 1);
-                        if (core.db.csOk(CSLists)) {
-                            while (core.db.csOk(CSLists)) {
-                                string FieldName = encodeText(core.db.csGetText(CSLists, "name")).Trim(' ');
+                        int CSLists = csXfer.csOpen("Content Watch Lists", "", "Name,ID", false, 0, false, false, "Name,ID", 20, 1);
+                        if (csXfer.csOk(CSLists)) {
+                            while (csXfer.csOk(CSLists)) {
+                                string FieldName = encodeText(csXfer.csGetText(CSLists, "name")).Trim(' ');
                                 if (!string.IsNullOrEmpty(FieldName)) {
                                     string FieldCaption = "Watch List [" + FieldName + "]";
                                     IconIDControlString = "AC,WATCHLIST,0," + FieldName + ",ListName=" + FieldName + "&SortField=[DateAdded|Link|LinkLabel|Clicks|WhatsNewDateExpires]&SortDirection=Z-A[A-Z|Z-A]";
@@ -1506,10 +1505,10 @@ namespace Contensive.Processor.Controllers {
                                         Array.Resize(ref Items, ItemsSize + 1);
                                     }
                                 }
-                                core.db.csGoNext(CSLists);
+                                csXfer.csGoNext(CSLists);
                             }
                         }
-                        core.db.csClose(ref CSLists);
+                        csXfer.csClose(ref CSLists);
                     }
                     //
                     // -- addons
@@ -1532,44 +1531,44 @@ namespace Contensive.Processor.Controllers {
                     }
                     string AddonContentName = Models.Db.AddonModel.contentName;
                     string SelectList = "Name,Link,ID,ArgumentList,ObjectProgramID,IconFilename,IconWidth,IconHeight,IconSprites,IsInline,ccguid";
-                    int CSAddons = core.db.csOpen(AddonContentName, Criteria, "Name,ID", false, 0, false, false, SelectList);
-                    if (core.db.csOk(CSAddons)) {
+                    int CSAddons = csXfer.csOpen(AddonContentName, Criteria, "Name,ID", false, 0, false, false, SelectList);
+                    if (csXfer.csOk(CSAddons)) {
                         string LastAddonName = "";
-                        while (core.db.csOk(CSAddons)) {
-                            string addonGuid = core.db.csGetText(CSAddons, "ccguid");
-                            string ObjectProgramID2 = core.db.csGetText(CSAddons, "ObjectProgramID");
+                        while (csXfer.csOk(CSAddons)) {
+                            string addonGuid = csXfer.csGetText(CSAddons, "ccguid");
+                            string ObjectProgramID2 = csXfer.csGetText(CSAddons, "ObjectProgramID");
                             if ((contentType == CPHtmlBaseClass.EditorContentType.contentTypeEmail) && (!string.IsNullOrEmpty(ObjectProgramID2))) {
                                 //
                                 // Block activex addons from email
                                 //
                                 //ObjectProgramID2 = ObjectProgramID2;
                             } else {
-                                string addonName = encodeText(core.db.csGet(CSAddons, "name")).Trim(' ');
+                                string addonName = encodeText(csXfer.csGet(CSAddons, "name")).Trim(' ');
                                 if (!string.IsNullOrEmpty(addonName) && (addonName != LastAddonName)) {
                                     //
                                     // Icon (fieldtyperesourcelink)
                                     //
-                                    bool IsInline = core.db.csGetBoolean(CSAddons, "IsInline");
-                                    string IconFilename = core.db.csGet(CSAddons, "Iconfilename");
+                                    bool IsInline = csXfer.csGetBoolean(CSAddons, "IsInline");
+                                    string IconFilename = csXfer.csGet(CSAddons, "Iconfilename");
                                     int IconWidth = 0;
                                     int IconHeight = 0;
                                     int IconSprites = 0;
                                     if (!string.IsNullOrEmpty(IconFilename)) {
-                                        IconWidth = core.db.csGetInteger(CSAddons, "IconWidth");
-                                        IconHeight = core.db.csGetInteger(CSAddons, "IconHeight");
-                                        IconSprites = core.db.csGetInteger(CSAddons, "IconSprites");
+                                        IconWidth = csXfer.csGetInteger(CSAddons, "IconWidth");
+                                        IconHeight = csXfer.csGetInteger(CSAddons, "IconHeight");
+                                        IconSprites = csXfer.csGetInteger(CSAddons, "IconSprites");
                                     }
                                     //
                                     // Calculate DefaultAddonOption_String
                                     //
-                                    string ArgumentList = core.db.csGet(CSAddons, "ArgumentList").Trim(' ');
+                                    string ArgumentList = csXfer.csGet(CSAddons, "ArgumentList").Trim(' ');
                                     string defaultAddonOptions = AddonController.getDefaultAddonOptions(core, ArgumentList, addonGuid, IsInline);
                                     defaultAddonOptions = encodeHtml(defaultAddonOptions);
                                     //UseAjaxDefaultAddonOptions = false;
                                     //if (UseAjaxDefaultAddonOptions) {
                                     //    DefaultAddonOption_String = "";
                                     //} else {
-                                    //    ArgumentList = encodeText(core.db.csGet(CSAddons, "ArgumentList")).Trim(' ');
+                                    //    ArgumentList = encodeText(csXfer.csGet(CSAddons, "ArgumentList")).Trim(' ');
                                     //    DefaultAddonOption_String = addonController.getDefaultAddonOption(core, ArgumentList, AddonGuid, IsInline);
                                     //    DefaultAddonOption_String = encodeHTML(DefaultAddonOption_String);
                                     //}
@@ -1590,10 +1589,10 @@ namespace Contensive.Processor.Controllers {
                                     }
                                 }
                             }
-                            core.db.csGoNext(CSAddons);
+                            csXfer.csGoNext(CSAddons);
                         }
                     }
-                    core.db.csClose(ref CSAddons);
+                    csXfer.csClose(ref CSAddons);
                     //
                     // Build output sting in alphabetical order by name
                     //
@@ -1783,17 +1782,17 @@ namespace Contensive.Processor.Controllers {
                             if (IsContentList) {
                                 //
                                 // ContentList - Open the Content and build the options from the names
-                                CS = core.db.csOpen(ContentName, ContentCriteria, "name", true, 0, false, false, "ID,Name");
+                                CS = csXfer.csOpen(ContentName, ContentCriteria, "name", true, 0, false, false, "ID,Name");
                             } else if (IsListField) {
                                 //
                                 //
                                 // ListField
-                                int CID = CDefDomainModel.getContentId(core, ContentName);
-                                CS = core.db.csOpen("Content Fields", "Contentid=" + CID, "name", true, 0, false, false, "ID,Name");
+                                int CID = Models.Domain.ContentMetaDomainModel.getContentId(core, ContentName);
+                                CS = csXfer.csOpen("Content Fields", "Contentid=" + CID, "name", true, 0, false, false, "ID,Name");
                             }
 
-                            if (core.db.csOk(CS)) {
-                                object[,] Cell = core.db.csGetRows(CS);
+                            if (csXfer.csOk(CS)) {
+                                object[,] Cell = csXfer.csGetRows(CS);
                                 int RowCnt = Cell.GetUpperBound(1) + 1;
                                 int RowPtr = 0;
                                 for (RowPtr = 0; RowPtr < RowCnt; RowPtr++) {
@@ -1813,7 +1812,7 @@ namespace Contensive.Processor.Controllers {
                                     }
                                 }
                             }
-                            core.db.csClose(ref CS);
+                            csXfer.csClose(ref CS);
                         } else {
                             //
                             // choice is not a function, just add the choice back to the list
@@ -2139,23 +2138,23 @@ namespace Contensive.Processor.Controllers {
                 //
                 // ----- Normal Content Edit - find instance in the content
                 //
-                CS = core.db.csOpenRecord(ContentName, RecordID);
-                if (!core.db.csOk(CS)) {
+                CS = csXfer.csOpenRecord(ContentName, RecordID);
+                if (!csXfer.csOk(CS)) {
                     LogController.handleError( core,new Exception("No record found with content [" + ContentName + "] and RecordID [" + RecordID + "]"));
                 } else {
                     if (!string.IsNullOrEmpty(FieldName)) {
                         //
                         // Field is given, find the position
                         //
-                        Copy = core.db.csGet(CS, FieldName);
+                        Copy = csXfer.csGet(CS, FieldName);
                         PosACInstanceID = GenericController.vbInstr(1, Copy, "=\"" + ACInstanceID + "\" ", 1);
                     } else {
                         //
                         // Find the field, then find the position
                         //
-                        FieldName = core.db.csGetFirstFieldName(CS);
+                        FieldName = csXfer.csGetFirstFieldName(CS);
                         while (!string.IsNullOrEmpty(FieldName)) {
-                            fieldType = core.db.csGetFieldTypeId(CS, FieldName);
+                            fieldType = csXfer.csGetFieldTypeId(CS, FieldName);
                             switch (fieldType) {
                                 case _fieldTypeIdLongText:
                                 case _fieldTypeIdText:
@@ -2165,7 +2164,7 @@ namespace Contensive.Processor.Controllers {
                                 case _fieldTypeIdFileJavascript:
                                 case _fieldTypeIdHTML:
                                 case _fieldTypeIdFileHTML:
-                                    Copy = core.db.csGet(CS, FieldName);
+                                    Copy = csXfer.csGet(CS, FieldName);
                                     PosACInstanceID = GenericController.vbInstr(1, Copy, "ACInstanceID=\"" + ACInstanceID + "\"", 1);
                                     if (PosACInstanceID != 0) {
                                         //
@@ -2178,7 +2177,7 @@ namespace Contensive.Processor.Controllers {
                                     }
                                     break;
                             }
-                            FieldName = core.db.csGetNextFieldName(CS);
+                            FieldName = csXfer.csGetNextFieldName(CS);
                         }
                         ExitLabel1:;
                     }
@@ -2278,7 +2277,7 @@ namespace Contensive.Processor.Controllers {
                                     if (PosIDEnd != 0) {
                                         ParseOK = true;
                                         Copy = Copy.Left(PosIDStart - 1) + HtmlController.encodeHtml(addonOption_String) + Copy.Substring(PosIDEnd - 1);
-                                        core.db.csSet(CS, FieldName, Copy);
+                                        csXfer.csSet(CS, FieldName, Copy);
                                         needToClearCache = true;
                                     }
                                 }
@@ -2289,14 +2288,14 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                 }
-                core.db.csClose(ref CS);
+                csXfer.csClose(ref CS);
             }
             if (needToClearCache) {
                 //
                 // Clear Caches
                 //
                 if (!string.IsNullOrEmpty(ContentName)) {
-                    string contentTablename = CdefController.getContentTablename(core, ContentName);                    
+                    string contentTablename = ContentMetaController.getContentTablename(core, ContentName);                    
                     core.cache.invalidateAllKeysInTable(contentTablename);
                 }
             }
@@ -2372,7 +2371,7 @@ namespace Contensive.Processor.Controllers {
             string returnHtml = "";
             try {
                 bool CanSeeHiddenFields = false;
-                Models.Domain.CDefDomainModel SecondaryCDef = null;
+                Models.Domain.ContentMetaDomainModel SecondaryCDef = null;
                 List<int> ContentIDList = new List<int>();
                 bool Found = false;
                 int RecordID = 0;
@@ -2401,8 +2400,8 @@ namespace Contensive.Processor.Controllers {
                     //
                     // ----- Gather all the SecondaryContent that associates to the PrimaryContent
                     //
-                    int PrimaryContentID = CDefDomainModel.getContentId(core, PrimaryContentName);
-                    SecondaryCDef = Models.Domain.CDefDomainModel.createByUniqueName(core, SecondaryContentName);
+                    int PrimaryContentID = Models.Domain.ContentMetaDomainModel.getContentId(core, PrimaryContentName);
+                    SecondaryCDef = Models.Domain.ContentMetaDomainModel.createByUniqueName(core, SecondaryContentName);
                     string SecondaryTablename = SecondaryCDef.tableName;
                     int SecondaryContentID = SecondaryCDef.id;
                     ContentIDList.Add(SecondaryContentID);
@@ -2410,7 +2409,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     //
                     //
-                    string rulesTablename = CdefController.getContentTablename(core, RulesContentName);
+                    string rulesTablename = ContentMetaController.getContentTablename(core, RulesContentName);
                     SingularPrefixHtmlEncoded = HtmlController.encodeHtml(GenericController.getSingular_Sortof(SecondaryContentName)) + "&nbsp;";
                     //
                     int main_MemberShipCount = 0;
@@ -2467,26 +2466,26 @@ namespace Contensive.Processor.Controllers {
                             if (!string.IsNullOrEmpty(SecondaryContentSelectCriteria)) {
                                 SQL += "AND(" + SecondaryContentSelectCriteria + ")";
                             }
-                            CS = core.db.csOpenSql(SQL);
-                            if (core.db.csOk(CS)) {
+                            CS = csXfer.csOpenSql(SQL);
+                            if (csXfer.csOk(CS)) {
                                 if (true) {
                                     main_MemberShipSize = 10;
                                     main_MemberShip = new int[main_MemberShipSize + 1];
                                     main_MemberShipRuleCopy = new string[main_MemberShipSize + 1];
-                                    while (core.db.csOk(CS)) {
+                                    while (csXfer.csOk(CS)) {
                                         if (main_MemberShipCount >= main_MemberShipSize) {
                                             main_MemberShipSize = main_MemberShipSize + 10;
                                             Array.Resize(ref main_MemberShip, main_MemberShipSize + 1);
                                             Array.Resize(ref main_MemberShipRuleCopy, main_MemberShipSize + 1);
                                         }
-                                        main_MemberShip[main_MemberShipCount] = core.db.csGetInteger(CS, "ID");
-                                        main_MemberShipRuleCopy[main_MemberShipCount] = core.db.csGetText(CS, "RuleCopy");
+                                        main_MemberShip[main_MemberShipCount] = csXfer.csGetInteger(CS, "ID");
+                                        main_MemberShipRuleCopy[main_MemberShipCount] = csXfer.csGetText(CS, "RuleCopy");
                                         main_MemberShipCount = main_MemberShipCount + 1;
-                                        core.db.csGoNext(CS);
+                                        csXfer.csGoNext(CS);
                                     }
                                 }
                             }
-                            core.db.csClose(ref CS);
+                            csXfer.csClose(ref CS);
                         }
                         //
                         // ----- Gather all the Secondary Records, sorted by ContentName
@@ -2508,8 +2507,8 @@ namespace Contensive.Processor.Controllers {
                         //}
                         SQL += " ORDER BY ";
                         SQL += SecondaryTablename + "." + CaptionFieldName;
-                        CS = core.db.csOpenSql(SQL);
-                        if (!core.db.csOk(CS)) {
+                        CS = csXfer.csOpenSql(SQL);
+                        if (!csXfer.csOk(CS)) {
                             returnHtml = "(No choices are available.)";
                         } else {
                             if (true) {
@@ -2518,16 +2517,16 @@ namespace Contensive.Processor.Controllers {
                                 int DivCheckBoxCnt = 0;
                                 CanSeeHiddenFields = core.session.isAuthenticatedDeveloper(core);
                                 string DivName = htmlNamePrefix + ".All";
-                                while (core.db.csOk(CS)) {
-                                    string OptionName = core.db.csGetText(CS, "OptionName");
+                                while (csXfer.csOk(CS)) {
+                                    string OptionName = csXfer.csGetText(CS, "OptionName");
                                     if ((OptionName.Left(1) != "_") || CanSeeHiddenFields) {
                                         //
                                         // Current checkbox is visible
                                         //
-                                        RecordID = core.db.csGetInteger(CS, "ID");
-                                        AllowRuleCopy = core.db.csGetBoolean(CS, "AllowRuleCopy");
-                                        string RuleCopyCaption = core.db.csGetText(CS, "RuleCopyCaption");
-                                        string OptionCaption = core.db.csGetText(CS, "OptionCaption");
+                                        RecordID = csXfer.csGetInteger(CS, "ID");
+                                        AllowRuleCopy = csXfer.csGetBoolean(CS, "AllowRuleCopy");
+                                        string RuleCopyCaption = csXfer.csGetText(CS, "RuleCopyCaption");
+                                        string OptionCaption = csXfer.csGetText(CS, "OptionCaption");
                                         if (string.IsNullOrEmpty(OptionCaption)) {
                                             OptionCaption = OptionName;
                                         }
@@ -2581,13 +2580,13 @@ namespace Contensive.Processor.Controllers {
                                         CheckBoxCnt = CheckBoxCnt + 1;
                                         DivCheckBoxCnt = DivCheckBoxCnt + 1;
                                     }
-                                    core.db.csGoNext(CS);
+                                    csXfer.csGoNext(CS);
                                 }
                                 returnHtml += EndDiv;
                                 returnHtml += inputHidden( htmlNamePrefix + ".RowCount", CheckBoxCnt );
                             }
                         }
-                        core.db.csClose(ref CS);
+                        csXfer.csClose(ref CS);
                         addScriptCode(javaScriptRequired, "CheckList Categories");
                     }
                     //End If
@@ -2877,16 +2876,16 @@ namespace Contensive.Processor.Controllers {
                             //        ' Path blocking allowed
                             //        '
                             //        'OptionsPanel = OptionsPanel & SpanClassAdminSmall & "<LABEL for=""" & TagID & """>"
-                            //        CS = core.db.cs_open("Paths", "name=" & DbController.encodeSQLText(core.webServer.requestPath), , , , , , "ID")
-                            //        If core.db.cs_ok(CS) Then
-                            //            PathID = (core.db.cs_getInteger(CS, "ID"))
+                            //        CS = csXfer.cs_open("Paths", "name=" & DbController.encodeSQLText(core.webServer.requestPath), , , , , , "ID")
+                            //        If csXfer.cs_ok(CS) Then
+                            //            PathID = (csXfer.cs_getInteger(CS, "ID"))
                             //        End If
-                            //        Call core.db.cs_Close(CS)
+                            //        Call csXfer.cs_Close(CS)
                             //        If PathID <> 0 Then
                             //            '
                             //            ' Path is blocked
                             //            '
-                            //            Tag = core.html.html_GetFormInputCheckBox2(TagID, True, TagID) & "&nbsp;Path is blocked [" & core.webServer.requestPath & "] [<a href=""" & htmlController.encodeHTML("/" & core.appConfig.adminRoute & "?af=" & AdminFormEdit & "&id=" & PathID & "&cid=" & Models.Complex.CDefDomainModel.getContentId(core,"paths") & "&ad=1") & """ target=""_blank"">edit</a>]</LABEL>"
+                            //            Tag = core.html.html_GetFormInputCheckBox2(TagID, True, TagID) & "&nbsp;Path is blocked [" & core.webServer.requestPath & "] [<a href=""" & htmlController.encodeHTML("/" & core.appConfig.adminRoute & "?af=" & AdminFormEdit & "&id=" & PathID & "&cid=" & Models.Complex.Models.Domain.ContentMetaDomainModel.getContentId(core,"paths") & "&ad=1") & """ target=""_blank"">edit</a>]</LABEL>"
                             //        Else
                             //            '
                             //            ' Path is not blocked
@@ -3391,35 +3390,35 @@ namespace Contensive.Processor.Controllers {
                 //
                 // honestly, not sure what to do with 'return_ErrorMessage'
                 //
-                CS = core.db.csOpen("copy content", "Name=" + DbController.encodeSQLText(CopyName), "ID", true, 0, false, false, "Name,ID,Copy,modifiedBy");
-                if (!core.db.csOk(CS)) {
-                    core.db.csClose(ref CS);
-                    CS = core.db.csInsertRecord("copy content", 0);
-                    if (core.db.csOk(CS)) {
-                        RecordID = core.db.csGetInteger(CS, "ID");
-                        core.db.csSet(CS, "name", CopyName);
-                        core.db.csSet(CS, "copy", GenericController.encodeText(DefaultContent));
-                        core.db.csSave(CS);
+                CS = csXfer.csOpen("copy content", "Name=" + DbController.encodeSQLText(CopyName), "ID", true, 0, false, false, "Name,ID,Copy,modifiedBy");
+                if (!csXfer.csOk(CS)) {
+                    csXfer.csClose(ref CS);
+                    CS = csXfer.csInsert("copy content", 0);
+                    if (csXfer.csOk(CS)) {
+                        RecordID = csXfer.csGetInteger(CS, "ID");
+                        csXfer.csSet(CS, "name", CopyName);
+                        csXfer.csSet(CS, "copy", GenericController.encodeText(DefaultContent));
+                        csXfer.csSave(CS);
                         //   Call WorkflowController.publishEdit("copy content", RecordID)
                     }
                 }
-                if (core.db.csOk(CS)) {
-                    RecordID = core.db.csGetInteger(CS, "ID");
-                    contactPeopleId = core.db.csGetInteger(CS, "modifiedBy");
-                    returnCopy = core.db.csGet(CS, "Copy");
+                if (csXfer.csOk(CS)) {
+                    RecordID = csXfer.csGetInteger(CS, "ID");
+                    contactPeopleId = csXfer.csGetInteger(CS, "modifiedBy");
+                    returnCopy = csXfer.csGet(CS, "Copy");
                     //returnCopy = contentCmdController.executeContentCommands(core, returnCopy, CPUtilsBaseClass.addonContext.ContextPage, personalizationPeopleId, personalizationIsAuthenticated, ref Return_ErrorMessage);
                     returnCopy = ActiveContentController.renderHtmlForWeb(core, returnCopy, "copy content", RecordID, personalizationPeopleId, "", 0, CPUtilsBaseClass.addonContext.ContextPage);
                     //
                     if (true) {
                         if (core.session.isEditingAnything()) {
-                            returnCopy = core.db.csGetRecordEditLink(CS, false) + returnCopy;
+                            returnCopy = csXfer.csGetRecordEditLink(CS, false) + returnCopy;
                             if (AllowEditWrapper) {
                                 returnCopy = AdminUIController.getEditWrapper(core,"copy content", returnCopy);
                             }
                         }
                     }
                 }
-                core.db.csClose(ref CS);
+                csXfer.csClose(ref CS);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
@@ -3446,7 +3445,7 @@ namespace Contensive.Processor.Controllers {
                 CS = csOpen(ContentName, "name=" + encodeSQLText(iCopyName));
                 if (!csOk(CS)) {
                     csClose(ref CS);
-                    CS = csInsertRecord(ContentName);
+                    CS = csInsert(ContentName);
                 }
                 if (csOk(CS)) {
                     csSet(CS, "name", iCopyName);
@@ -3493,17 +3492,17 @@ namespace Contensive.Processor.Controllers {
             if (GroupCnt > 0) {
                 //
                 // Test if RuleCopy is supported
-                bool SupportRuleCopy = CdefController.isContentFieldSupported(core, rulesContentName, "RuleCopy");
+                bool SupportRuleCopy = ContentMetaController.isContentFieldSupported(core, rulesContentName, "RuleCopy");
                 if (SupportRuleCopy) {
-                    SupportRuleCopy = SupportRuleCopy && CdefController.isContentFieldSupported(core, secondaryContentName, "AllowRuleCopy");
+                    SupportRuleCopy = SupportRuleCopy && ContentMetaController.isContentFieldSupported(core, secondaryContentName, "AllowRuleCopy");
                     if (SupportRuleCopy) {
-                        SupportRuleCopy = SupportRuleCopy && CdefController.isContentFieldSupported(core, secondaryContentName, "RuleCopyCaption");
+                        SupportRuleCopy = SupportRuleCopy && ContentMetaController.isContentFieldSupported(core, secondaryContentName, "RuleCopyCaption");
                     }
                 }
                 //
                 // Go through each checkbox and check for a rule
                 string dupRuleIdList = "";
-                string rulesTablename = CdefController.getContentTablename(core, rulesContentName);
+                string rulesTablename = ContentMetaController.getContentTablename(core, rulesContentName);
                 string SQL = "select " + rulesSecondaryFieldName + ",id from " + rulesTablename + " where (" + rulesPrimaryFieldname + "=" + primaryRecordID + ")and(active<>0) order by " + rulesSecondaryFieldName;
                 DataTable currentRules = core.db.executeQuery(SQL);
                 int currentRulesCnt = currentRules.Rows.Count; 
@@ -3545,16 +3544,16 @@ namespace Contensive.Processor.Controllers {
                     } else if (RuleNeeded && (!RuleFound)) {
                         //
                         // No record exists, and one is needed                        //
-                        int CSRule = core.db.csInsertRecord(rulesContentName);
-                        if (core.db.csOk(CSRule)) {
-                            core.db.csSet(CSRule, "Active", RuleNeeded);
-                            core.db.csSet(CSRule, rulesPrimaryFieldname, primaryRecordID);
-                            core.db.csSet(CSRule, rulesSecondaryFieldName, SecondaryRecordID);
+                        int CSRule = csXfer.csInsert(rulesContentName);
+                        if (csXfer.csOk(CSRule)) {
+                            csXfer.csSet(CSRule, "Active", RuleNeeded);
+                            csXfer.csSet(CSRule, rulesPrimaryFieldname, primaryRecordID);
+                            csXfer.csSet(CSRule, rulesSecondaryFieldName, SecondaryRecordID);
                             if (SupportRuleCopy) {
-                                core.db.csSet(CSRule, "RuleCopy", RuleCopy);
+                                csXfer.csSet(CSRule, "RuleCopy", RuleCopy);
                             }
                         }
-                        core.db.csClose(ref CSRule);
+                        csXfer.csClose(ref CSRule);
                         RuleContentChanged = true;
                     } else if ((!RuleNeeded) && RuleFound) {
                         //
@@ -3573,7 +3572,7 @@ namespace Contensive.Processor.Controllers {
                 }
             }
             if (RuleContentChanged) {
-                string tablename = CdefController.getContentTablename(core, rulesContentName);
+                string tablename = ContentMetaController.getContentTablename(core, rulesContentName);
                 core.cache.invalidateAllKeysInTable(tablename);
             }
         }

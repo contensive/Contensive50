@@ -615,7 +615,7 @@ namespace Contensive.Processor.Controllers {
                                         if (core.visitProperty.getBoolean("AllowAdvancedEditor")) {
                                             string addonArgumentListPassToBubbleEditor = ""; // comes from method in this class the generates it from addon and instance properites - lost it in the shuffle
                                             string AddonEditIcon = getIconSprite("", 0, "/ContensiveBase/images/tooledit.png", 22, 22, "Edit the " + addon.name + " Add-on", "Edit the " + addon.name + " Add-on", "", true, "");
-                                            AddonEditIcon = "<a href=\"/" + core.appConfig.adminRoute + "?cid=" + CDefDomainModel.getContentId(core, Models.Db.AddonModel.contentName) + "&id=" + addon.id + "&af=4&aa=2&ad=1\" tabindex=\"-1\">" + AddonEditIcon + "</a>";
+                                            AddonEditIcon = "<a href=\"/" + core.appConfig.adminRoute + "?cid=" + Models.Domain.ContentMetaDomainModel.getContentId(core, Models.Db.AddonModel.contentName) + "&id=" + addon.id + "&af=4&aa=2&ad=1\" tabindex=\"-1\">" + AddonEditIcon + "</a>";
                                             string InstanceSettingsEditIcon = getInstanceBubble(addon.name, addonArgumentListPassToBubbleEditor, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, executeContext.hostRecord.fieldName, executeContext.instanceGuid, executeContext.addonType, ref DialogList);
                                             string HTMLViewerEditIcon = getHTMLViewerBubble(addon.id, "editWrapper" + core.doc.editWrapperCnt, ref DialogList);
                                             string SiteStylesEditIcon = ""; // ?????
@@ -881,27 +881,27 @@ namespace Contensive.Processor.Controllers {
                                                                     FieldValue = core.docProperties.getText(FieldName);
                                                                 }
 
-                                                                CS = core.db.csOpen("Copy Content", "name=" + DbController.encodeSQLText(FieldName), "ID");
-                                                                if (!core.db.csOk(CS)) {
-                                                                    core.db.csClose(ref CS);
-                                                                    CS = core.db.csInsertRecord("Copy Content", core.session.user.id);
+                                                                CS = csXfer.csOpen("Copy Content", "name=" + DbController.encodeSQLText(FieldName), "ID");
+                                                                if (!csXfer.csOk(CS)) {
+                                                                    csXfer.csClose(ref CS);
+                                                                    CS = csXfer.csInsert("Copy Content", core.session.user.id);
                                                                 }
-                                                                if (core.db.csOk(CS)) {
-                                                                    core.db.csSet(CS, "name", FieldName);
+                                                                if (csXfer.csOk(CS)) {
+                                                                    csXfer.csSet(CS, "name", FieldName);
                                                                     //
                                                                     // Set copy
                                                                     //
-                                                                    core.db.csSet(CS, "copy", FieldValue);
+                                                                    csXfer.csSet(CS, "copy", FieldValue);
                                                                     //
                                                                     // delete duplicates
                                                                     //
-                                                                    core.db.csGoNext(CS);
-                                                                    while (core.db.csOk(CS)) {
-                                                                        core.db.csDeleteRecord(CS);
-                                                                        core.db.csGoNext(CS);
+                                                                    csXfer.csGoNext(CS);
+                                                                    while (csXfer.csOk(CS)) {
+                                                                        csXfer.csDeleteRecord(CS);
+                                                                        csXfer.csGoNext(CS);
                                                                     }
                                                                 }
-                                                                core.db.csClose(ref CS);
+                                                                csXfer.csClose(ref CS);
                                                             }
 
                                                             break;
@@ -1166,20 +1166,20 @@ namespace Contensive.Processor.Controllers {
                                                             FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "");
                                                             FieldHTML = GenericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", ""));
                                                             //
-                                                            CS = core.db.csOpen("Copy Content", "Name=" + DbController.encodeSQLText(FieldName), "ID", false, 0, false, false, "id,name,Copy");
-                                                            if (!core.db.csOk(CS)) {
-                                                                core.db.csClose(ref CS);
-                                                                CS = core.db.csInsertRecord("Copy Content", core.session.user.id);
-                                                                if (core.db.csOk(CS)) {
-                                                                    int RecordID = core.db.csGetInteger(CS, "ID");
-                                                                    core.db.csSet(CS, "name", FieldName);
-                                                                    core.db.csSet(CS, "copy", GenericController.encodeText(TabNode.InnerText));
-                                                                    core.db.csSave(CS);
+                                                            CS = csXfer.csOpen("Copy Content", "Name=" + DbController.encodeSQLText(FieldName), "ID", false, 0, false, false, "id,name,Copy");
+                                                            if (!csXfer.csOk(CS)) {
+                                                                csXfer.csClose(ref CS);
+                                                                CS = csXfer.csInsert("Copy Content", core.session.user.id);
+                                                                if (csXfer.csOk(CS)) {
+                                                                    int RecordID = csXfer.csGetInteger(CS, "ID");
+                                                                    csXfer.csSet(CS, "name", FieldName);
+                                                                    csXfer.csSet(CS, "copy", GenericController.encodeText(TabNode.InnerText));
+                                                                    csXfer.csSave(CS);
                                                                     // Call WorkflowController.publishEdit("Copy Content", RecordID)
                                                                 }
                                                             }
-                                                            if (core.db.csOk(CS)) {
-                                                                FieldValue = core.db.csGetText(CS, "copy");
+                                                            if (csXfer.csOk(CS)) {
+                                                                FieldValue = csXfer.csGetText(CS, "copy");
                                                             }
                                                             if (FieldHTML) {
                                                                 Copy = AdminUIController.getDefaultEditor_Html(core, FieldName, FieldValue, "", "", "", FieldReadOnly);
@@ -2529,26 +2529,26 @@ namespace Contensive.Processor.Controllers {
                 //
                 s = Content;
                 SelectFieldList = "name,copytext,javascriptonload,javascriptbodyend,stylesfilename,otherheadtags,JSFilename,targetString";
-                CS = core.db.csOpenRecord("Wrappers", WrapperID, false, false, SelectFieldList);
-                if (core.db.csOk(CS)) {
-                    Wrapper = core.db.csGetText(CS, "copytext");
-                    wrapperName = core.db.csGetText(CS, "name");
-                    TargetString = core.db.csGetText(CS, "targetString");
+                CS = csXfer.csOpenRecord("Wrappers", WrapperID, false, false, SelectFieldList);
+                if (csXfer.csOk(CS)) {
+                    Wrapper = csXfer.csGetText(CS, "copytext");
+                    wrapperName = csXfer.csGetText(CS, "name");
+                    TargetString = csXfer.csGetText(CS, "targetString");
                     //
                     SourceComment = "wrapper " + wrapperName;
                     if (!string.IsNullOrEmpty(WrapperSourceForComment)) {
                         SourceComment = SourceComment + " for " + WrapperSourceForComment;
                     }
-                    core.html.addScriptCode_onLoad(core.db.csGetText(CS, "javascriptonload"), SourceComment);
-                    core.html.addScriptCode(core.db.csGetText(CS, "javascriptbodyend"), SourceComment);
-                    core.html.addHeadTag(core.db.csGetText(CS, "OtherHeadTags"), SourceComment);
+                    core.html.addScriptCode_onLoad(csXfer.csGetText(CS, "javascriptonload"), SourceComment);
+                    core.html.addScriptCode(csXfer.csGetText(CS, "javascriptbodyend"), SourceComment);
+                    core.html.addHeadTag(csXfer.csGetText(CS, "OtherHeadTags"), SourceComment);
                     //
-                    JSFilename = core.db.csGetText(CS, "jsfilename");
+                    JSFilename = csXfer.csGetText(CS, "jsfilename");
                     if (!string.IsNullOrEmpty(JSFilename)) {
                         JSFilename = GenericController.getCdnFileLink(core, JSFilename);
                         core.html.addScriptLinkSrc(JSFilename, SourceComment);
                     }
-                    Copy = core.db.csGetText(CS, "stylesfilename");
+                    Copy = csXfer.csGetText(CS, "stylesfilename");
                     if (!string.IsNullOrEmpty(Copy)) {
                         if (GenericController.vbInstr(1, Copy, "://") != 0) {
                         } else if (Copy.Left(1) == "/") {
@@ -2569,7 +2569,7 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                 }
-                core.db.csClose(ref CS);
+                csXfer.csClose(ref CS);
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
             }
@@ -2855,16 +2855,16 @@ namespace Contensive.Processor.Controllers {
                         //
                         // create event with Guid and id for name
                         //
-                        cs.close();
-                        cs.insert("add-on Events");
+                        cs.csClose();
+                        cs.csInsert("add-on Events");
                         cs.setField("ccguid", eventNameIdOrGuid);
                         cs.setField("name", "Event " + cs.getInteger("id").ToString());
                     } else if (!string.IsNullOrEmpty(eventNameIdOrGuid)) {
                         //
                         // create event with name
                         //
-                        cs.close();
-                        cs.insert("add-on Events");
+                        cs.csClose();
+                        cs.csInsert("add-on Events");
                         cs.setField("name", eventNameIdOrGuid);
                     }
                 } else {
@@ -2880,7 +2880,7 @@ namespace Contensive.Processor.Controllers {
                         cs.goNext();
                     }
                 }
-                cs.close();
+                cs.csClose();
                 //
             } catch (Exception ex) {
                 LogController.handleError(core, ex);

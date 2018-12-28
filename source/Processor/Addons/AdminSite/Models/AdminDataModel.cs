@@ -18,7 +18,7 @@ namespace Contensive.Addons.AdminSite {
         /// <summary>
         /// the content metadata being edited
         /// </summary>
-        public CDefDomainModel adminContent { get; set; }
+        public ContentMetaDomainModel adminContent { get; set; }
         /// <summary>
         /// the record being edited
         /// </summary>
@@ -238,15 +238,15 @@ namespace Contensive.Addons.AdminSite {
                     // ----- Open the content watch record for this content record
                     //
                     ContentID = ((editRecord.contentControlId.Equals(0)) ? adminContent.id : editRecord.contentControlId);
-                    CSPointer = core.db.csOpen("Content Watch", "(ContentID=" + DbController.encodeSQLNumber(ContentID) + ")AND(RecordID=" + DbController.encodeSQLNumber(editRecord.id) + ")");
-                    if (core.db.csOk(CSPointer)) {
+                    CSPointer = csXfer.csOpen("Content Watch", "(ContentID=" + DbController.encodeSQLNumber(ContentID) + ")AND(RecordID=" + DbController.encodeSQLNumber(editRecord.id) + ")");
+                    if (csXfer.csOk(CSPointer)) {
                         ContentWatchLoaded = true;
-                        ContentWatchRecordID = (core.db.csGetInteger(CSPointer, "ID"));
-                        ContentWatchLink = (core.db.csGet(CSPointer, "Link"));
-                        ContentWatchClicks = (core.db.csGetInteger(CSPointer, "Clicks"));
-                        ContentWatchLinkLabel = (core.db.csGet(CSPointer, "LinkLabel"));
-                        ContentWatchExpires = (core.db.csGetDate(CSPointer, "WhatsNewDateExpires"));
-                        core.db.csClose(ref CSPointer);
+                        ContentWatchRecordID = (csXfer.csGetInteger(CSPointer, "ID"));
+                        ContentWatchLink = (csXfer.csGet(CSPointer, "Link"));
+                        ContentWatchClicks = (csXfer.csGetInteger(CSPointer, "Clicks"));
+                        ContentWatchLinkLabel = (csXfer.csGet(CSPointer, "LinkLabel"));
+                        ContentWatchExpires = (csXfer.csGetDate(CSPointer, "WhatsNewDateExpires"));
+                        csXfer.csClose(ref CSPointer);
                     }
                 }
             } catch (Exception ex) {
@@ -275,9 +275,9 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // ----- Update ContentWatchListRules for all checked boxes
                     //
-                    CSContentWatchList = core.db.csOpen("Content Watch Lists");
-                    while (core.db.csOk(CSContentWatchList)) {
-                        RecordID = (core.db.csGetInteger(CSContentWatchList, "ID"));
+                    CSContentWatchList = csXfer.csOpen("Content Watch Lists");
+                    while (csXfer.csOk(CSContentWatchList)) {
+                        RecordID = (csXfer.csGetInteger(CSContentWatchList, "ID"));
                         if (core.docProperties.getBoolean("ContentWatchList." + RecordID)) {
                             if (ContentWatchListIDCount >= ContentWatchListIDSize) {
                                 ContentWatchListIDSize = ContentWatchListIDSize + 50;
@@ -286,9 +286,9 @@ namespace Contensive.Addons.AdminSite {
                             ContentWatchListID[ContentWatchListIDCount] = RecordID;
                             ContentWatchListIDCount = ContentWatchListIDCount + 1;
                         }
-                        core.db.csGoNext(CSContentWatchList);
+                        csXfer.csGoNext(CSContentWatchList);
                     }
-                    core.db.csClose(ref CSContentWatchList);
+                    csXfer.csClose(ref CSContentWatchList);
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
@@ -382,7 +382,7 @@ namespace Contensive.Addons.AdminSite {
             try {
                 if (core.session.isAuthenticatedAdmin(core)) return true;
                 //
-                CDefDomainModel cdef = CDefDomainModel.create(core, ContentID);
+                ContentMetaDomainModel cdef = ContentMetaDomainModel.create(core, ContentID);
                 if ( cdef != null ) {
                     return core.session.isAuthenticatedContentManager(core, cdef.name );
                 }
@@ -434,16 +434,16 @@ namespace Contensive.Addons.AdminSite {
                 // adminContext.content init
                 requestedContentId = core.docProperties.getInteger("cid");
                 if (requestedContentId != 0) {
-                    adminContent = CDefDomainModel.create(core, requestedContentId);
+                    adminContent = ContentMetaDomainModel.create(core, requestedContentId);
                     if (adminContent == null) {
-                        adminContent = new CDefDomainModel();
+                        adminContent = new ContentMetaDomainModel();
                         adminContent.id = 0;
                         Processor.Controllers.ErrorController.addUserError(core, "There is no content with the requested id [" + requestedContentId + "]");
                         requestedContentId = 0;
                     }
                 }
                 if (adminContent == null) {
-                    adminContent = new CDefDomainModel();
+                    adminContent = new ContentMetaDomainModel();
                 }
                 //
                 // determine user rights to this content
@@ -464,16 +464,16 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // set adminContext.content to the content definition of the requested record
                     //
-                    int CS = core.db.csOpenRecord(adminContent.name, requestedRecordId, false, false, "ContentControlID");
-                    if (core.db.csOk(CS)) {
+                    int CS = csXfer.csOpenRecord(adminContent.name, requestedRecordId, false, false, "ContentControlID");
+                    if (csXfer.csOk(CS)) {
                         editRecord.id = requestedRecordId;
-                        int recordContentId = core.db.csGetInteger(CS, "ContentControlID");
-                        //adminContent.id = core.db.csGetInteger(CS, "ContentControlID");
+                        int recordContentId = csXfer.csGetInteger(CS, "ContentControlID");
+                        //adminContent.id = csXfer.csGetInteger(CS, "ContentControlID");
                         if ((recordContentId > 0) && (recordContentId != adminContent.id)) {
-                            adminContent = CDefDomainModel.create(core, recordContentId);
+                            adminContent = ContentMetaDomainModel.create(core, recordContentId);
                         }
                     }
-                    core.db.csClose(ref CS);
+                    csXfer.csClose(ref CS);
                 }
                 //
                 // Other page control fields
@@ -824,7 +824,7 @@ namespace Contensive.Addons.AdminSite {
                                         editRecord.fieldsLc[field.nameLc].value = DefaultValueText;
                                     } else {
                                         if (field.lookupContentID != 0) {
-                                            LookupContentName = CdefController.getContentNameByID(core, field.lookupContentID);
+                                            LookupContentName = ContentMetaController.getContentNameByID(core, field.lookupContentID);
                                             if (!string.IsNullOrEmpty(LookupContentName)) {
                                                 editRecord.fieldsLc[field.nameLc].value = core.db.getRecordID(LookupContentName, DefaultValueText);
                                             }
@@ -992,12 +992,12 @@ namespace Contensive.Addons.AdminSite {
                     //
                     //   Open Content Sets with the data
                     //
-                    CSEditRecord = core.db.csOpen2(adminContent.name, editRecord.id, true, true);
+                    CSEditRecord = csXfer.csOpen2(adminContent.name, editRecord.id, true, true);
                     //
                     //
                     // store fieldvalues in RecordValuesVariant
                     //
-                    if (!(core.db.csOk(CSEditRecord))) {
+                    if (!(csXfer.csOk(CSEditRecord))) {
                         //
                         //   Live or Edit records were not found
                         //
@@ -1050,10 +1050,10 @@ namespace Contensive.Addons.AdminSite {
                                 case _fieldTypeIdFileXML:
                                 case _fieldTypeIdFileJavascript:
                                 case _fieldTypeIdFileHTML:
-                                    DBValueVariant = core.db.csGet(CSPointer, adminContentcontent.nameLc);
+                                    DBValueVariant = csXfer.csGet(CSPointer, adminContentcontent.nameLc);
                                     break;
                                 default:
-                                    DBValueVariant = core.db.csGetValue(CSPointer, adminContentcontent.nameLc);
+                                    DBValueVariant = csXfer.csGetValue(CSPointer, adminContentcontent.nameLc);
                                     break;
                             }
                             //
@@ -1089,13 +1089,13 @@ namespace Contensive.Addons.AdminSite {
                             //
                             switch (GenericController.vbUCase(adminContentcontent.nameLc)) {
                                 case "DATEADDED":
-                                    editRecord.dateAdded = core.db.csGetDate(CSEditRecord, adminContentcontent.nameLc);
+                                    editRecord.dateAdded = csXfer.csGetDate(CSEditRecord, adminContentcontent.nameLc);
                                     break;
                                 case "MODIFIEDDATE":
-                                    editRecord.modifiedDate = core.db.csGetDate(CSEditRecord, adminContentcontent.nameLc);
+                                    editRecord.modifiedDate = csXfer.csGetDate(CSEditRecord, adminContentcontent.nameLc);
                                     break;
                                 case "CREATEDBY":
-                                    int createdByPersonId = core.db.csGetInteger(CSEditRecord, adminContentcontent.nameLc);
+                                    int createdByPersonId = csXfer.csGetInteger(CSEditRecord, adminContentcontent.nameLc);
                                     if (createdByPersonId == 0) {
                                         editRecord.createdBy = new PersonModel() { name = "system" };
                                     } else {
@@ -1106,7 +1106,7 @@ namespace Contensive.Addons.AdminSite {
                                     }
                                     break;
                                 case "MODIFIEDBY":
-                                    int modifiedByPersonId = core.db.csGetInteger(CSEditRecord, adminContentcontent.nameLc);
+                                    int modifiedByPersonId = csXfer.csGetInteger(CSEditRecord, adminContentcontent.nameLc);
                                     if (modifiedByPersonId == 0) {
                                         editRecord.modifiedBy = new PersonModel() { name = "system" };
                                     } else {
@@ -1117,26 +1117,26 @@ namespace Contensive.Addons.AdminSite {
                                     }
                                     break;
                                 case "ACTIVE":
-                                    editRecord.active = core.db.csGetBoolean(CSEditRecord, adminContentcontent.nameLc);
+                                    editRecord.active = csXfer.csGetBoolean(CSEditRecord, adminContentcontent.nameLc);
                                     break;
                                 case "CONTENTCONTROLID":
-                                    editRecord.contentControlId = core.db.csGetInteger(CSEditRecord, adminContentcontent.nameLc);
+                                    editRecord.contentControlId = csXfer.csGetInteger(CSEditRecord, adminContentcontent.nameLc);
                                     if (editRecord.contentControlId.Equals(0)) {
                                         editRecord.contentControlId = adminContent.id;
                                     }
-                                    editRecord.contentControlId_Name = CdefController.getContentNameByID(core, editRecord.contentControlId);
+                                    editRecord.contentControlId_Name = ContentMetaController.getContentNameByID(core, editRecord.contentControlId);
                                     break;
                                 case "ID":
-                                    editRecord.id = core.db.csGetInteger(CSEditRecord, adminContentcontent.nameLc);
+                                    editRecord.id = csXfer.csGetInteger(CSEditRecord, adminContentcontent.nameLc);
                                     break;
                                 case "MENUHEADLINE":
-                                    editRecord.menuHeadline = core.db.csGetText(CSEditRecord, adminContentcontent.nameLc);
+                                    editRecord.menuHeadline = csXfer.csGetText(CSEditRecord, adminContentcontent.nameLc);
                                     break;
                                 case "NAME":
-                                    editRecord.nameLc = core.db.csGetText(CSEditRecord, adminContentcontent.nameLc);
+                                    editRecord.nameLc = csXfer.csGetText(CSEditRecord, adminContentcontent.nameLc);
                                     break;
                                 case "PARENTID":
-                                    editRecord.parentID = core.db.csGetInteger(CSEditRecord, adminContentcontent.nameLc);
+                                    editRecord.parentID = csXfer.csGetInteger(CSEditRecord, adminContentcontent.nameLc);
                                     //Case Else
                                     //    EditRecordValuesVariant(FieldPointer) = DBValueVariant
                                     break;
@@ -1146,7 +1146,7 @@ namespace Contensive.Addons.AdminSite {
                             editRecordField.value = DBValueVariant;
                         }
                     }
-                    core.db.csClose(ref CSEditRecord);
+                    csXfer.csClose(ref CSEditRecord);
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
@@ -1537,13 +1537,13 @@ namespace Contensive.Addons.AdminSite {
                                     UsedIDs = editRecord.id.ToString();
                                     while ((LoopPtr < LoopPtrMax) && (ParentID != 0) && (("," + UsedIDs + ",").IndexOf("," + ParentID.ToString() + ",") == -1)) {
                                         UsedIDs = UsedIDs + "," + ParentID.ToString();
-                                        CS = core.db.csOpen(adminContent.name, "ID=" + ParentID, "", true, 0, false, false, "ParentID");
-                                        if (!core.db.csOk(CS)) {
+                                        CS = csXfer.csOpen(adminContent.name, "ID=" + ParentID, "", true, 0, false, false, "ParentID");
+                                        if (!csXfer.csOk(CS)) {
                                             ParentID = 0;
                                         } else {
-                                            ParentID = core.db.csGetInteger(CS, "ParentID");
+                                            ParentID = csXfer.csGetInteger(CS, "ParentID");
                                         }
-                                        core.db.csClose(ref CS);
+                                        csXfer.csClose(ref CS);
                                         LoopPtr = LoopPtr + 1;
                                     }
                                     if (LoopPtr == LoopPtrMax) {
@@ -1594,14 +1594,14 @@ namespace Contensive.Addons.AdminSite {
                                     //
                                     // ----- Do the unique check for this field
                                     //
-                                    string SQLUnique = "select id from " + adminContent.tableName + " where (" + field.nameLc + "=" + DbController.encodeSQL(ResponseFieldValueText, field.fieldTypeId) + ")and(" + CdefController.getContentControlCriteria(core, adminContent.name) + ")";
+                                    string SQLUnique = "select id from " + adminContent.tableName + " where (" + field.nameLc + "=" + DbController.encodeSQL(ResponseFieldValueText, field.fieldTypeId) + ")and(" + ContentMetaController.getContentControlCriteria(core, adminContent.name) + ")";
                                     if (editRecord.id > 0) {
                                         //
                                         // --editing record
                                         SQLUnique = SQLUnique + "and(id<>" + editRecord.id + ")";
                                     }
-                                    CSPointer = core.db.csOpenSql(SQLUnique, adminContent.dataSourceName);
-                                    if (core.db.csOk(CSPointer)) {
+                                    CSPointer = csXfer.csOpenSql(SQLUnique, adminContent.dataSourceName);
+                                    if (csXfer.csOk(CSPointer)) {
                                         //
                                         // field is not unique, skip it and flag error
                                         //
@@ -1624,7 +1624,7 @@ namespace Contensive.Addons.AdminSite {
                                         }
                                         ResponseFieldValueIsOKToSave = false;
                                     }
-                                    core.db.csClose(ref CSPointer);
+                                    csXfer.csClose(ref CSPointer);
                                 }
                             }
                             // end case

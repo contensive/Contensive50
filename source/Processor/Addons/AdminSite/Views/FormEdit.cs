@@ -261,8 +261,8 @@ namespace Contensive.Addons.AdminSite {
                     // -- email
                     bool EmailSubmitted = false;
                     bool EmailSent = false;
-                    int SystemEmailCID = CDefDomainModel.getContentId(core, "System Email");
-                    int ConditionalEmailCID = CDefDomainModel.getContentId(core, "Conditional Email");
+                    int SystemEmailCID = ContentMetaDomainModel.getContentId(core, "System Email");
+                    int ConditionalEmailCID = ContentMetaDomainModel.getContentId(core, "Conditional Email");
                     DateTime LastSendTestDate = DateTime.MinValue;
                     bool AllowEmailSendWithoutTest = (core.siteProperties.getBoolean("AllowEmailSendWithoutTest", false));
                     if (adminData.editRecord.fieldsLc.ContainsKey("lastsendtestdate")) {
@@ -272,7 +272,7 @@ namespace Contensive.Addons.AdminSite {
                         //
                         // Must be admin
                         Stream.Add(AdminErrorController.get(core, "This edit form requires Member Administration access.", "This edit form requires Member Administration access."));
-                    } else if (CdefController.isWithinContent(core, adminData.editRecord.contentControlId, SystemEmailCID)) {
+                    } else if (ContentMetaController.isWithinContent(core, adminData.editRecord.contentControlId, SystemEmailCID)) {
                         //
                         LogController.logTrace(core, "getFormEdit, System email");
                         //
@@ -306,7 +306,7 @@ namespace Contensive.Addons.AdminSite {
                         Stream.Add(addTab(core, adminMenu, "Control&nbsp;Info", ControlEditor.get(core, adminData), adminData.allowAdminTabs));
                         if (adminData.allowAdminTabs) Stream.Add(adminMenu.getTabs(core));
                         Stream.Add(EditSectionButtonBar);
-                    } else if (CdefController.isWithinContent(core, adminData.editRecord.contentControlId, ConditionalEmailCID)) {
+                    } else if (ContentMetaController.isWithinContent(core, adminData.editRecord.contentControlId, ConditionalEmailCID)) {
                         //
                         // Conditional Email
                         EmailSubmitted = false;
@@ -539,8 +539,8 @@ namespace Contensive.Addons.AdminSite {
                 } else {
                     //
                     // All other tables (User definined)
-                    bool IsPageContent = CdefController.isWithinContent(core, adminData.adminContent.id, CDefDomainModel.getContentId(core, "Page Content"));
-                    bool HasChildRecords = CdefController.isContentFieldSupported(core, adminData.adminContent.name, "parentid");
+                    bool IsPageContent = ContentMetaController.isWithinContent(core, adminData.adminContent.id, ContentMetaDomainModel.getContentId(core, "Page Content"));
+                    bool HasChildRecords = ContentMetaController.isContentFieldSupported(core, adminData.adminContent.name, "parentid");
                     bool AllowMarkReviewed = core.db.isSQLTableField("default", adminData.adminContent.tableName, "DateReviewed");
                     string EditSectionButtonBar = AdminUIController.getButtonBarForEdit(core, new EditButtonBarInfoClass() {
                         allowActivate = false,
@@ -841,8 +841,8 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 // -- editor failed, determine if it is missing (or inactive). If missing, remove it from the members preferences
                                 string SQL = "select id from ccaggregatefunctions where id=" + editorAddonID;
-                                CS = core.db.csOpenSql(SQL);
-                                if (!core.db.csOk(CS)) {
+                                CS = csXfer.csOpenSql(SQL);
+                                if (!csXfer.csOk(CS)) {
                                     //
                                     // -- missing, not just inactive
                                     EditorString = "";
@@ -864,7 +864,7 @@ namespace Contensive.Addons.AdminSite {
                                         core.userProperty.setProperty("editorPreferencesForContent:" + adminData.adminContent.id, tmpList);
                                     }
                                 }
-                                core.db.csClose(ref CS);
+                                csXfer.csClose(ref CS);
                             }
                         }
                         if (!useEditorAddon) {
@@ -1781,26 +1781,26 @@ namespace Contensive.Addons.AdminSite {
                     SQL = "SELECT ccGroups.ID AS ID, ccGroupRules.AllowAdd as allowadd, ccGroupRules.AllowDelete as allowdelete"
                         + " FROM ccGroups LEFT JOIN ccGroupRules ON ccGroups.ID = ccGroupRules.GroupID"
                         + " WHERE (((ccGroupRules.ContentID)=" + editRecord.id + ") AND ((ccGroupRules.Active)<>0) AND ((ccGroups.Active)<>0))";
-                    CS = core.db.csOpenSql(SQL, "Default");
-                    if (core.db.csOk(CS)) {
+                    CS = csXfer.csOpenSql(SQL, "Default");
+                    if (csXfer.csOk(CS)) {
                         if (true) {
                             GroupRulesSize = 100;
                             GroupRules = new AdminDataModel.GroupRuleType[GroupRulesSize + 1];
-                            while (core.db.csOk(CS)) {
+                            while (csXfer.csOk(CS)) {
                                 if (GroupRulesCount >= GroupRulesSize) {
                                     GroupRulesSize = GroupRulesSize + 100;
                                     Array.Resize(ref GroupRules, GroupRulesSize + 1);
                                 }
-                                GroupRules[GroupRulesCount].GroupID = core.db.csGetInteger(CS, "ID");
-                                GroupRules[GroupRulesCount].AllowAdd = core.db.csGetBoolean(CS, "AllowAdd");
-                                GroupRules[GroupRulesCount].AllowDelete = core.db.csGetBoolean(CS, "AllowDelete");
+                                GroupRules[GroupRulesCount].GroupID = csXfer.csGetInteger(CS, "ID");
+                                GroupRules[GroupRulesCount].AllowAdd = csXfer.csGetBoolean(CS, "AllowAdd");
+                                GroupRules[GroupRulesCount].AllowDelete = csXfer.csGetBoolean(CS, "AllowDelete");
                                 GroupRulesCount = GroupRulesCount + 1;
-                                core.db.csGoNext(CS);
+                                csXfer.csGoNext(CS);
                             }
                         }
                     }
                 }
-                core.db.csClose(ref CS);
+                csXfer.csClose(ref CS);
                 //
                 // ----- Gather all the groups, sorted by ContentName
                 //
@@ -1809,25 +1809,25 @@ namespace Contensive.Addons.AdminSite {
                     + " Where (((ccGroups.Active) <> " + SQLFalse + ") And ((ccContent.Active) <> " + SQLFalse + "))"
                     + " GROUP BY ccGroups.ID, ccContent.Name, ccGroups.Name, ccGroups.Caption, ccGroups.SortOrder"
                     + " ORDER BY ccContent.Name, ccGroups.Caption, ccGroups.SortOrder";
-                CS = core.db.csOpenSql(SQL, "Default");
-                if (!core.db.csOk(CS)) {
+                CS = csXfer.csOpenSql(SQL, "Default");
+                if (!csXfer.csOk(CS)) {
                     FastString.Add("\r\n<tr><td colspan=\"3\">" + SpanClassAdminSmall + "There are no active groups</span></td></tr>");
                 } else {
                     if (true) {
                         //Call FastString.Add(vbCrLf & "<tr><td colspan=""3"" class=""ccAdminEditSubHeader"">Groups with authoring access</td></tr>")
                         SectionName = "";
                         GroupCount = 0;
-                        while (core.db.csOk(CS)) {
-                            GroupName = core.db.csGet(CS, "GroupCaption");
+                        while (csXfer.csOk(CS)) {
+                            GroupName = csXfer.csGet(CS, "GroupCaption");
                             if (string.IsNullOrEmpty(GroupName)) {
-                                GroupName = core.db.csGet(CS, "GroupName");
+                                GroupName = csXfer.csGet(CS, "GroupName");
                             }
                             FastString.Add("<tr>");
-                            if (SectionName != core.db.csGet(CS, "SectionName")) {
+                            if (SectionName != csXfer.csGet(CS, "SectionName")) {
                                 //
                                 // ----- create the next section
                                 //
-                                SectionName = core.db.csGet(CS, "SectionName");
+                                SectionName = csXfer.csGet(CS, "SectionName");
                                 FastString.Add("<td valign=\"top\" align=\"right\">" + SpanClassAdminSmall + SectionName + "</td>");
                             } else {
                                 FastString.Add("<td valign=\"top\" align=\"right\">&nbsp;</td>");
@@ -1836,13 +1836,13 @@ namespace Contensive.Addons.AdminSite {
                             GroupFound = false;
                             if (GroupRulesCount != 0) {
                                 for (GroupRulesPointer = 0; GroupRulesPointer < GroupRulesCount; GroupRulesPointer++) {
-                                    if (GroupRules[GroupRulesPointer].GroupID == core.db.csGetInteger(CS, "ID")) {
+                                    if (GroupRules[GroupRulesPointer].GroupID == csXfer.csGetInteger(CS, "ID")) {
                                         GroupFound = true;
                                         break;
                                     }
                                 }
                             }
-                            FastString.Add("<input type=\"hidden\" name=\"GroupID" + GroupCount + "\" value=\"" + core.db.csGet(CS, "ID") + "\">");
+                            FastString.Add("<input type=\"hidden\" name=\"GroupID" + GroupCount + "\" value=\"" + csXfer.csGet(CS, "ID") + "\">");
                             FastString.Add("<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"400\"><tr>");
                             if (GroupFound) {
                                 FastString.Add("<td width=\"200\">" + SpanClassAdminSmall + HtmlController.checkbox("Group" + GroupCount, true) + GroupName + "</span></td>");
@@ -1857,12 +1857,12 @@ namespace Contensive.Addons.AdminSite {
                             FastString.Add("</span></td>");
                             FastString.Add("</tr>");
                             GroupCount = GroupCount + 1;
-                            core.db.csGoNext(CS);
+                            csXfer.csGoNext(CS);
                         }
                         FastString.Add("\r\n<input type=\"hidden\" name=\"GroupCount\" value=\"" + GroupCount + "\">");
                     }
                 }
-                core.db.csClose(ref CS);
+                csXfer.csClose(ref CS);
                 //
                 // ----- close the panel
                 //

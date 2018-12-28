@@ -41,8 +41,8 @@ namespace Contensive.Addons.AdminSite {
                         adminData.LoadContentTrackingResponse(core);
                         //        Call LoadAndSaveCalendarEvents
                     }
-                    CSLists = core.db.csOpen("Content Watch Lists", "name<>" + DbController.encodeSQLText(""), "ID");
-                    if (core.db.csOk(CSLists)) {
+                    CSLists = csXfer.csOpen("Content Watch Lists", "name<>" + DbController.encodeSQLText(""), "ID");
+                    if (csXfer.csOk(CSLists)) {
                         //
                         // ----- Open the panel
                         //
@@ -58,27 +58,27 @@ namespace Contensive.Addons.AdminSite {
                         // ----- Content Watch Lists, checking the ones that have active rules
                         //
                         RecordCount = 0;
-                        while (core.db.csOk(CSLists)) {
-                            ContentWatchListID = core.db.csGetInteger(CSLists, "id");
+                        while (csXfer.csOk(CSLists)) {
+                            ContentWatchListID = csXfer.csGetInteger(CSLists, "id");
                             //
                             if (adminData.ContentWatchRecordID != 0) {
-                                CSRules = core.db.csOpen("Content Watch List Rules", "(ContentWatchID=" + adminData.ContentWatchRecordID + ")AND(ContentWatchListID=" + ContentWatchListID + ")");
+                                CSRules = csXfer.csOpen("Content Watch List Rules", "(ContentWatchID=" + adminData.ContentWatchRecordID + ")AND(ContentWatchListID=" + ContentWatchListID + ")");
                                 if (editRecord.userReadOnly) {
-                                    HTMLFieldString = GenericController.encodeText(core.db.csOk(CSRules));
+                                    HTMLFieldString = GenericController.encodeText(csXfer.csOk(CSRules));
                                 } else {
-                                    HTMLFieldString = HtmlController.checkbox("ContentWatchList." + core.db.csGet(CSLists, "ID"), core.db.csOk(CSRules));
+                                    HTMLFieldString = HtmlController.checkbox("ContentWatchList." + csXfer.csGet(CSLists, "ID"), csXfer.csOk(CSRules));
                                 }
-                                core.db.csClose(ref CSRules);
+                                csXfer.csClose(ref CSRules);
                             } else {
                                 if (editRecord.userReadOnly) {
                                     HTMLFieldString = GenericController.encodeText(false);
                                 } else {
-                                    HTMLFieldString = HtmlController.checkbox("ContentWatchList." + core.db.csGet(CSLists, "ID"), false);
+                                    HTMLFieldString = HtmlController.checkbox("ContentWatchList." + csXfer.csGet(CSLists, "ID"), false);
                                 }
                             }
                             //
-                            FastString.Add(AdminUIController.getEditRowLegacy(core, HTMLFieldString, "Include in " + core.db.csGet(CSLists, "name"), "When true, this Content Record can be included in the '" + core.db.csGet(CSLists, "name") + "' list", false, false, ""));
-                            core.db.csGoNext(CSLists);
+                            FastString.Add(AdminUIController.getEditRowLegacy(core, HTMLFieldString, "Include in " + csXfer.csGet(CSLists, "name"), "When true, this Content Record can be included in the '" + csXfer.csGet(CSLists, "name") + "' list", false, false, ""));
+                            csXfer.csGoNext(CSLists);
                             RecordCount = RecordCount + 1;
                         }
                         //
@@ -129,7 +129,7 @@ namespace Contensive.Addons.AdminSite {
                         adminData.EditSectionPanelCount = adminData.EditSectionPanelCount + 1;
                         //
                     }
-                    core.db.csClose(ref CSLists);
+                    csXfer.csClose(ref CSLists);
                     FastString = null;
                 }
             } catch (Exception ex) {

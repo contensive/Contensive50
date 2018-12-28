@@ -33,12 +33,12 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static EmailLogModel addDefault(CoreController core, Domain.CDefDomainModel cdef) {
+        public static EmailLogModel addDefault(CoreController core, Domain.ContentMetaDomainModel cdef) {
             return addDefault<EmailLogModel>(core, cdef);
         }
         //
         //====================================================================================================
-        public static EmailLogModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefDomainModel cdef) {
+        public static EmailLogModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.ContentMetaDomainModel cdef) {
             return addDefault<EmailLogModel>(core, cdef, ref callersCacheNameList);
         }
         //

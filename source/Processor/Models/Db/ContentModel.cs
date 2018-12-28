@@ -42,12 +42,12 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static ContentModel addDefault(CoreController core, Domain.CDefDomainModel cdef) {
+        public static ContentModel addDefault(CoreController core, Domain.ContentMetaDomainModel cdef) {
             return addDefault<ContentModel>(core, cdef);
         }
         //
         //====================================================================================================
-        public static ContentModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefDomainModel cdef) {
+        public static ContentModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.ContentMetaDomainModel cdef) {
             return addDefault<ContentModel>(core, cdef, ref callersCacheNameList);
         }
         //

@@ -318,8 +318,8 @@ namespace Contensive.Processor.Controllers {
                         if (true) {
                             sqlCriteria = sqlCriteria + "and((dateExpires is null)or(dateExpires>" + DbController.encodeSQLDate(DateTime.Now) + "))";
                         }
-                        CS = core.db.csOpen("People", sqlCriteria, "ID", sqlSelectFieldList: "username,password", PageSize: 1);
-                        if (!core.db.csOk(CS)) {
+                        CS = csXfer.csOpen("People", sqlCriteria, "ID", sqlSelectFieldList: "username,password", PageSize: 1);
+                        if (!csXfer.csOk(CS)) {
                             //
                             // valid login account for this email not found
                             //
@@ -327,41 +327,41 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // look for expired account to renew
                                 //
-                                core.db.csClose(ref CS);
-                                CS = core.db.csOpen("People", "((email=" + DbController.encodeSQLText(workingEmail) + "))", "ID", PageSize: 1);
-                                if (core.db.csOk(CS)) {
+                                csXfer.csClose(ref CS);
+                                CS = csXfer.csOpen("People", "((email=" + DbController.encodeSQLText(workingEmail) + "))", "ID", PageSize: 1);
+                                if (csXfer.csOk(CS)) {
                                     //
                                     // renew this old record
                                     //
                                     //hint = "150"
-                                    core.db.csSet(CS, "developer", "1");
-                                    core.db.csSet(CS, "admin", "1");
-                                    core.db.csSet(CS, "dateExpires", DateTime.Now.AddDays(7).Date.ToString());
+                                    csXfer.csSet(CS, "developer", "1");
+                                    csXfer.csSet(CS, "admin", "1");
+                                    csXfer.csSet(CS, "dateExpires", DateTime.Now.AddDays(7).Date.ToString());
                                 } else {
                                     //
                                     // inject support record
                                     //
                                     //hint = "150"
-                                    core.db.csClose(ref CS);
-                                    CS = core.db.csInsertRecord("people");
-                                    core.db.csSet(CS, "name", "Contensive Support");
-                                    core.db.csSet(CS, "email", workingEmail);
-                                    core.db.csSet(CS, "developer", "1");
-                                    core.db.csSet(CS, "admin", "1");
-                                    core.db.csSet(CS, "dateExpires", DateTime.Now.AddDays(7).Date.ToString());
+                                    csXfer.csClose(ref CS);
+                                    CS = csXfer.csInsert("people");
+                                    csXfer.csSet(CS, "name", "Contensive Support");
+                                    csXfer.csSet(CS, "email", workingEmail);
+                                    csXfer.csSet(CS, "developer", "1");
+                                    csXfer.csSet(CS, "admin", "1");
+                                    csXfer.csSet(CS, "dateExpires", DateTime.Now.AddDays(7).Date.ToString());
                                 }
-                                core.db.csSave(CS);
+                                csXfer.csSave(CS);
                             } else {
                                 //hint = "155"
                                 ErrorController.addUserError(core, "No current user was found matching this email address. Please try again. ");
                             }
                         }
-                        if (core.db.csOk(CS)) {
+                        if (csXfer.csOk(CS)) {
                             //hint = "160"
                             FromAddress = core.siteProperties.getText("EmailFromAddress", "info@" + core.webServer.requestDomain);
                             subject = "Password Request at " + core.webServer.requestDomain;
                             Message = "";
-                            while (core.db.csOk(CS)) {
+                            while (csXfer.csOk(CS)) {
                                 //hint = "170"
                                 updateUser = false;
                                 if (string.IsNullOrEmpty(Message)) {
@@ -378,7 +378,7 @@ namespace Contensive.Processor.Controllers {
                                 // username
                                 //
                                 //hint = "200"
-                                Username = core.db.csGetText(CS, "Username");
+                                Username = csXfer.csGetText(CS, "Username");
                                 usernameOK = true;
                                 if (!allowEmailLogin) {
                                     //hint = "210"
@@ -412,7 +412,7 @@ namespace Contensive.Processor.Controllers {
                                     // password
                                     //
                                     //hint = "280"
-                                    Password = core.db.csGetText(CS, "Password");
+                                    Password = csXfer.csGetText(CS, "Password");
                                     if (Password.Trim() != Password) {
                                         //hint = "290"
                                         Password = Password.Trim();
@@ -434,12 +434,12 @@ namespace Contensive.Processor.Controllers {
                                     result = true;
                                     if (updateUser) {
                                         //hint = "350"
-                                        core.db.csSet(CS, "username", Username);
-                                        core.db.csSet(CS, "password", Password);
+                                        csXfer.csSet(CS, "username", Username);
+                                        csXfer.csSet(CS, "password", Password);
                                     }
                                     recordCnt = recordCnt + 1;
                                 }
-                                core.db.csGoNext(CS);
+                                csXfer.csGoNext(CS);
                             }
                         }
                     }
@@ -481,11 +481,11 @@ namespace Contensive.Processor.Controllers {
                         ErrorController.addUserError(core, ErrorMessage);
                     } else {
                         if (!(core.doc.debug_iUserError != "")) {
-                            CS = core.db.csOpen("people", "ID=" + DbController.encodeSQLNumber(core.session.user.id));
-                            if (!core.db.csOk(CS)) {
+                            CS = csXfer.csOpen("people", "ID=" + DbController.encodeSQLNumber(core.session.user.id));
+                            if (!csXfer.csOk(CS)) {
                                 LogController.handleError( core,new Exception("Could not open the current members account to set the username and password."));
                             } else {
-                                if ((core.db.csGetText(CS, "username") != "") || (core.db.csGetText(CS, "password") != "") || (core.db.csGetBoolean(CS, "admin")) || (core.db.csGetBoolean(CS, "developer"))) {
+                                if ((csXfer.csGetText(CS, "username") != "") || (csXfer.csGetText(CS, "password") != "") || (csXfer.csGetBoolean(CS, "admin")) || (csXfer.csGetBoolean(CS, "developer"))) {
                                     //
                                     // if the current account can be logged into, you can not join 'into' it
                                     //
@@ -495,14 +495,14 @@ namespace Contensive.Processor.Controllers {
                                 LastName = core.docProperties.getText("firstname");
                                 FullName = FirstName + " " + LastName;
                                 Email = core.docProperties.getText("email");
-                                core.db.csSet(CS, "FirstName", FirstName);
-                                core.db.csSet(CS, "LastName", LastName);
-                                core.db.csSet(CS, "Name", FullName);
-                                core.db.csSet(CS, "username", loginForm_Username);
-                                core.db.csSet(CS, "password", loginForm_Password);
+                                csXfer.csSet(CS, "FirstName", FirstName);
+                                csXfer.csSet(CS, "LastName", LastName);
+                                csXfer.csSet(CS, "Name", FullName);
+                                csXfer.csSet(CS, "username", loginForm_Username);
+                                csXfer.csSet(CS, "password", loginForm_Password);
                                 SessionController.authenticateById(core, core.session.user.id, core.session);
                             }
-                            core.db.csClose(ref CS);
+                            csXfer.csClose(ref CS);
                         }
                     }
                 }

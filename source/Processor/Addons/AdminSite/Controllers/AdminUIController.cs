@@ -904,10 +904,10 @@ namespace Contensive.Addons.AdminSite.Controllers {
                     //
                     string CreatedBy = "the system";
                     if ( editRecord.createdBy.id != 0) {
-                        int CS = core.db.csOpenSql( "select Name,Active from ccMembers where id=" + editRecord.createdBy.id);
-                        if (core.db.csOk(CS)) {
-                            string Name = core.db.csGetText(CS, "name");
-                            bool Active = core.db.csGetBoolean(CS, "active");
+                        int CS = csXfer.csOpenSql( "select Name,Active from ccMembers where id=" + editRecord.createdBy.id);
+                        if (csXfer.csOk(CS)) {
+                            string Name = csXfer.csGetText(CS, "name");
+                            bool Active = csXfer.csGetBoolean(CS, "active");
                             if (!Active && (!string.IsNullOrEmpty(Name))) {
                                 CreatedBy = "Inactive user " + Name;
                             } else if (!Active) {
@@ -920,7 +920,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                         } else {
                             CreatedBy = "deleted user #" + editRecord.createdBy.id;
                         }
-                        core.db.csClose(ref CS);
+                        csXfer.csClose(ref CS);
                     }
                     if (!string.IsNullOrEmpty(CreatedBy)) {
                         CreatedCopy = CreatedCopy + " by " + CreatedBy;
@@ -935,10 +935,10 @@ namespace Contensive.Addons.AdminSite.Controllers {
                         ModifiedCopy = ModifiedCopy + " " + editRecord.modifiedDate;
                         CreatedBy = "the system";
                         if ( editRecord.modifiedBy.id != 0) {
-                            int CS = core.db.csOpenSql( "select Name,Active from ccMembers where id=" + editRecord.modifiedBy.id);
-                            if (core.db.csOk(CS)) {
-                                string Name = core.db.csGetText(CS, "name");
-                                bool Active = core.db.csGetBoolean(CS, "active");
+                            int CS = csXfer.csOpenSql( "select Name,Active from ccMembers where id=" + editRecord.modifiedBy.id);
+                            if (csXfer.csOk(CS)) {
+                                string Name = csXfer.csGetText(CS, "name");
+                                bool Active = csXfer.csGetBoolean(CS, "active");
                                 if (!Active && (!string.IsNullOrEmpty(Name))) {
                                     CreatedBy = "Inactive user " + Name;
                                 } else if (!Active) {
@@ -951,7 +951,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                             } else {
                                 CreatedBy = "deleted user #" + editRecord.modifiedBy.id;
                             }
-                            core.db.csClose(ref CS);
+                            csXfer.csClose(ref CS);
                         }
                         if (!string.IsNullOrEmpty(CreatedBy)) {
                             ModifiedCopy = ModifiedCopy + " by " + CreatedBy;
@@ -1073,24 +1073,24 @@ namespace Contensive.Addons.AdminSite.Controllers {
         public static string getDefaultEditor_LookupContent( CoreController core, string fieldName, int fieldValue, int lookupContentID, ref bool IsEmptyList, bool readOnly = false, string htmlId = "", string WhyReadOnlyMsg = "", bool fieldRequired = false, string sqlFilter = "") {
             string result = "";
             string LookupContentName = "";
-            if (lookupContentID != 0) LookupContentName = GenericController.encodeText(CdefController.getContentNameByID(core, lookupContentID));
+            if (lookupContentID != 0) LookupContentName = GenericController.encodeText(ContentMetaController.getContentNameByID(core, lookupContentID));
             if (readOnly) {
                 //
                 // ----- Lookup ReadOnly
                 result += (HtmlController.inputHidden(fieldName, GenericController.encodeText(fieldValue)));
                 if (!string.IsNullOrEmpty(LookupContentName)) {
-                    int CSLookup = core.db.csOpen2(LookupContentName, fieldValue, false, false, "Name,ContentControlID");
-                    if (core.db.csOk(CSLookup)) {
-                        if (core.db.csGet(CSLookup, "Name") == "") {
+                    int CSLookup = csXfer.csOpen2(LookupContentName, fieldValue, false, false, "Name,ContentControlID");
+                    if (csXfer.csOk(CSLookup)) {
+                        if (csXfer.csGet(CSLookup, "Name") == "") {
                             result += ("No Name");
                         } else {
-                            result += (HtmlController.encodeHtml(core.db.csGet(CSLookup, "Name")));
+                            result += (HtmlController.encodeHtml(csXfer.csGet(CSLookup, "Name")));
                         }
                         result += ("&nbsp;[<a TabIndex=-1 href=\"?" + rnAdminForm + "=4&cid=" + lookupContentID + "&id=" + fieldValue.ToString() + "\" target=\"_blank\">View details in new window</a>]");
                     } else {
                         result += ("None");
                     }
-                    core.db.csClose(ref CSLookup);
+                    csXfer.csClose(ref CSLookup);
                     result += ("&nbsp;[<a TabIndex=-1 href=\"?cid=" + lookupContentID + "\" target=\"_blank\">See all " + LookupContentName + "</a>]");
                 }
                 result += WhyReadOnlyMsg;
@@ -1100,11 +1100,11 @@ namespace Contensive.Addons.AdminSite.Controllers {
                 string nonLabel = (fieldRequired) ? "" : "None";
                 result += core.html.selectFromContent(fieldName, fieldValue, LookupContentName, sqlFilter, nonLabel, "", ref IsEmptyList, "select form-control");
                 if (fieldValue != 0) {
-                    int CSPointer = core.db.csOpen2(LookupContentName, fieldValue, false, false, "ID");
-                    if (core.db.csOk(CSPointer)) {
+                    int CSPointer = csXfer.csOpen2(LookupContentName, fieldValue, false, false, "ID");
+                    if (csXfer.csOk(CSPointer)) {
                         result += ("&nbsp;[<a TabIndex=-1 href=\"?" + rnAdminForm + "=4&cid=" + lookupContentID + "&id=" + fieldValue.ToString() + "\" target=\"_blank\">Details</a>]");
                     }
-                    core.db.csClose(ref CSPointer);
+                    csXfer.csClose(ref CSPointer);
                 }
                 result += ("&nbsp;[<a TabIndex=-1 href=\"?cid=" + lookupContentID + "\" target=\"_blank\">See all " + LookupContentName + "</a>]");
 
@@ -1247,7 +1247,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                         EditorString += "&nbsp;[Edit <a TabIndex=-1 href=\"?af=4&cid=" + selectedUser.contentControlID.ToString() + "&id=" + selectedRecordId.ToString() + "\">" + HtmlController.encodeHtml( recordName ) + "</a>]";
                     }
                 }
-                EditorString += ("&nbsp;[Select from members of <a TabIndex=-1 href=\"?cid=" + CDefDomainModel.getContentId(core, "groups") + "\">" + groupName + "</a>]");
+                EditorString += ("&nbsp;[Select from members of <a TabIndex=-1 href=\"?cid=" + ContentMetaDomainModel.getContentId(core, "groups") + "\">" + groupName + "</a>]");
             }
             return EditorString;
         }
@@ -1257,9 +1257,9 @@ namespace Contensive.Addons.AdminSite.Controllers {
         public static string getDefaultEditor_manyToMany(CoreController core, CDefFieldModel field, string htmlName, string currentValueCommaList, int editRecordId, bool readOnly = false, string WhyReadOnlyMsg = "" ) {
             string result = "";
             //
-            string MTMContent0 =   CdefController.getContentNameByID(core, field.contentId);
-            string MTMContent1 = CdefController.getContentNameByID(core, field.manyToManyContentID);
-            string MTMRuleContent = CdefController.getContentNameByID(core, field.manyToManyRuleContentID);
+            string MTMContent0 =   ContentMetaController.getContentNameByID(core, field.contentId);
+            string MTMContent1 = ContentMetaController.getContentNameByID(core, field.manyToManyContentID);
+            string MTMRuleContent = ContentMetaController.getContentNameByID(core, field.manyToManyRuleContentID);
             string MTMRuleField0 = field.ManyToManyRulePrimaryField;
             string MTMRuleField1 = field.ManyToManyRuleSecondaryField;
             result += core.html.getCheckList(htmlName, MTMContent0, editRecordId, MTMContent1, MTMRuleContent, MTMRuleField0, MTMRuleField1, "", "", false, false, currentValueCommaList);
@@ -1476,8 +1476,8 @@ namespace Contensive.Addons.AdminSite.Controllers {
         /// <param name="core"></param>
         /// <param name="cdef"></param>
         /// <returns></returns>
-        public static string getIconEditAdminLink(CoreController core, CDefDomainModel cdef) { return getIconEditLink("/" + core.appConfig.adminRoute + "?cid=" + cdef.id, "ccRecordEditLink");}
-        public static string getIconEditAdminLink(CoreController core, CDefDomainModel cdef, int recordId) {return getIconEditLink("/" + core.appConfig.adminRoute + "?af=4&aa=2&ad=1&cid=" + cdef.id + "&id=" + recordId, "ccRecordEditLink");}
+        public static string getIconEditAdminLink(CoreController core, ContentMetaDomainModel cdef) { return getIconEditLink("/" + core.appConfig.adminRoute + "?cid=" + cdef.id, "ccRecordEditLink");}
+        public static string getIconEditAdminLink(CoreController core, ContentMetaDomainModel cdef, int recordId) {return getIconEditLink("/" + core.appConfig.adminRoute + "?af=4&aa=2&ad=1&cid=" + cdef.id + "&id=" + recordId, "ccRecordEditLink");}
         //
         //====================================================================================================
         //
@@ -1564,7 +1564,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                         throw (new GenericException("RecordID [" + recordID + "] is invalid"));
                     } else {
                         if (IsEditing) {
-                            var cdef = CDefDomainModel.createByUniqueName(core, contentName);
+                            var cdef = ContentMetaDomainModel.createByUniqueName(core, contentName);
                             if ( cdef==null) {
                                 throw new GenericException("getRecordEditLink called with contentName [" + contentName + "], but no content found with this name.");
                             } else {
@@ -1616,7 +1616,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                                     if (ClipBoardArray.GetUpperBound(0) > 0) {
                                         int ClipboardContentID = GenericController.encodeInteger(ClipBoardArray[0]);
                                         int ClipChildRecordID = GenericController.encodeInteger(ClipBoardArray[1]);
-                                        if (CdefController.isWithinContent(core, ClipboardContentID, content.id)) {
+                                        if (ContentMetaController.isWithinContent(core, ClipboardContentID, content.id)) {
                                             int ParentID = 0;
                                             if (GenericController.vbInstr(1, presetNameValueList, "PARENTID=", 1) != 0) {
                                                 //
@@ -1710,15 +1710,15 @@ namespace Contensive.Addons.AdminSite.Controllers {
                             + " AND(ccMembers.active<>0)"
                             + " AND(ccMembers.ID=" + core.session.user.id + ")"
                             + " );";
-                        int CS = core.db.csOpenSql(SQL);
-                        if (core.db.csOk(CS)) {
+                        int CS = csXfer.csOpenSql(SQL);
+                        if (csXfer.csOk(CS)) {
                             //
                             // ----- Entry was found, member has some kind of access
                             //
                             userHasAccess = true;
                             contentAllowAdd = content.allowAdd;
-                            groupRulesAllowAdd = core.db.csGetBoolean(CS, "GroupRulesAllowAdd");
-                            memberRulesDateExpires = core.db.csGetDate(CS, "MemberRulesDateExpires");
+                            groupRulesAllowAdd = csXfer.csGetBoolean(CS, "GroupRulesAllowAdd");
+                            memberRulesDateExpires = csXfer.csGetDate(CS, "MemberRulesDateExpires");
                             memberRulesAllow = false;
                             if (memberRulesDateExpires == DateTime.MinValue) {
                                 memberRulesAllow = true;
@@ -1734,7 +1734,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                             groupRulesAllowAdd = false;
                             memberRulesAllow = false;
                         }
-                        core.db.csClose(ref CS);
+                        csXfer.csClose(ref CS);
                     }
                     if (userHasAccess) {
                         //
@@ -1769,7 +1769,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                         }
                     }
                 }
-                core.db.csClose(ref csChildContent);
+                csXfer.csClose(ref csChildContent);
             }
             return result;
         }

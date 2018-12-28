@@ -59,12 +59,12 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static ContentFieldModel addDefault(CoreController core, Domain.CDefDomainModel cdef) {
+        public static ContentFieldModel addDefault(CoreController core, Domain.ContentMetaDomainModel cdef) {
             return addDefault<ContentFieldModel>(core, cdef);
         }
         //
         //====================================================================================================
-        public static ContentFieldModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefDomainModel cdef) {
+        public static ContentFieldModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.ContentMetaDomainModel cdef) {
             return addDefault<ContentFieldModel>(core, cdef, ref callersCacheNameList);
         }
         //

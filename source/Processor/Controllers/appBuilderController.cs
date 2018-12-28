@@ -86,7 +86,7 @@ namespace Contensive.Processor.Controllers {
                         root.username = defaultRootUserUsername;
                         root.password = defaultRootUserPassword;
                         root.developer = true;
-                        root.contentControlID = CDefDomainModel.getContentId(core, "people");
+                        root.contentControlID = ContentMetaDomainModel.getContentId(core, "people");
                         try 
                             {
                             root.save(core);
@@ -493,7 +493,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="inActive"></param>
         private static void verifyRecord(CoreController core, string contentName, string name, string sqlName = "", string sqlValue = "") {
             try {
-                var cdef = CDefDomainModel.createByUniqueName(core, contentName);
+                var cdef = ContentMetaDomainModel.createByUniqueName(core, contentName);
                 DataTable dt = core.db.executeQuery("SELECT ID FROM " + cdef.tableName + " WHERE NAME=" + DbController.encodeSQLText(name) + ";");
                 if (dt.Rows.Count == 0) {
                     string sql1 = "insert into " + cdef.tableName + " (active,name";
@@ -808,22 +808,22 @@ namespace Contensive.Processor.Controllers {
             try {
                 int CS;
                 //
-                CS = core.db.csOpen("Countries", "name=" + DbController.encodeSQLText(name));
-                if (!core.db.csOk(CS)) {
-                    core.db.csClose(ref CS);
-                    CS = core.db.csInsertRecord("Countries", SystemMemberID);
-                    if (core.db.csOk(CS)) {
-                        core.db.csSet(CS, "ACTIVE", true);
+                CS = csXfer.csOpen("Countries", "name=" + DbController.encodeSQLText(name));
+                if (!csXfer.csOk(CS)) {
+                    csXfer.csClose(ref CS);
+                    CS = csXfer.csInsert("Countries", SystemMemberID);
+                    if (csXfer.csOk(CS)) {
+                        csXfer.csSet(CS, "ACTIVE", true);
                     }
                 }
-                if (core.db.csOk(CS)) {
-                    core.db.csSet(CS, "NAME", name);
-                    core.db.csSet(CS, "Abbreviation", abbreviation);
+                if (csXfer.csOk(CS)) {
+                    csXfer.csSet(CS, "NAME", name);
+                    csXfer.csSet(CS, "Abbreviation", abbreviation);
                     if (GenericController.vbLCase(name) == "united states") {
-                        core.db.csSet(CS, "DomesticShipping", "1");
+                        csXfer.csSet(CS, "DomesticShipping", "1");
                     }
                 }
-                core.db.csClose(ref CS);
+                csXfer.csClose(ref CS);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
@@ -1023,7 +1023,7 @@ namespace Contensive.Processor.Controllers {
                 if (!string.IsNullOrEmpty(EntryName.Trim())) {
                     int addonId = core.db.getRecordID(Models.Db.AddonModel.contentName, AddonName);
                     int parentId = verifyNavigatorEntry_getParentIdFromNameSpace(core, menuNameSpace);
-                    int contentId = CDefDomainModel.getContentId(core, ContentName);
+                    int contentId = ContentMetaDomainModel.getContentId(core, ContentName);
                     string listCriteria = "(name=" + DbController.encodeSQLText(EntryName) + ")and(Parentid=" + parentId + ")";
                     List<Models.Db.NavigatorEntryModel> entryList = NavigatorEntryModel.createList(core, listCriteria, "id");
                     NavigatorEntryModel entry = null;
@@ -1082,19 +1082,19 @@ namespace Contensive.Processor.Controllers {
                                 Criteria += "and(Parentid=" + parentRecordId + ")";
                             }
                             int RecordID = 0;
-                            int CS = core.db.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, Criteria, "ID", true, 0, false, false, "ID", 1);
-                            if (core.db.csOk(CS)) {
-                                RecordID = (core.db.csGetInteger(CS, "ID"));
+                            int CS = csXfer.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, Criteria, "ID", true, 0, false, false, "ID", 1);
+                            if (csXfer.csOk(CS)) {
+                                RecordID = (csXfer.csGetInteger(CS, "ID"));
                             }
-                            core.db.csClose(ref CS);
+                            csXfer.csClose(ref CS);
                             if (RecordID == 0) {
-                                CS = core.db.csInsertRecord(Processor.Models.Db.NavigatorEntryModel.contentName, SystemMemberID);
-                                if (core.db.csOk(CS)) {
-                                    RecordID = core.db.csGetInteger(CS, "ID");
-                                    core.db.csSet(CS, "name", recordName);
-                                    core.db.csSet(CS, "parentID", parentRecordId);
+                                CS = csXfer.csInsert(Processor.Models.Db.NavigatorEntryModel.contentName, SystemMemberID);
+                                if (csXfer.csOk(CS)) {
+                                    RecordID = csXfer.csGetInteger(CS, "ID");
+                                    csXfer.csSet(CS, "name", recordName);
+                                    csXfer.csSet(CS, "parentID", parentRecordId);
                                 }
-                                core.db.csClose(ref CS);
+                                csXfer.csClose(ref CS);
                             }
                             parentRecordId = RecordID;
                         }
@@ -1121,7 +1121,7 @@ namespace Contensive.Processor.Controllers {
                 sqlList.add("CreatedBy", "0");
                 sqlList.add("OrderByClause", DbController.encodeSQLText(OrderByCriteria));
                 sqlList.add("active", SQLTrue);
-                sqlList.add("ContentControlID", CDefDomainModel.getContentId(core, "Sort Methods").ToString());
+                sqlList.add("ContentControlID", ContentMetaDomainModel.getContentId(core, "Sort Methods").ToString());
                 //
                 dt = core.db.openTable("Default", "ccSortMethods", "Name=" + DbController.encodeSQLText(Name), "ID", "ID", 1);
                 if (dt.Rows.Count > 0) {
@@ -1214,7 +1214,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 RowsNeeded = fieldTypeIdMax - RowsFound;
                 if (RowsNeeded > 0) {
-                    CID = CDefDomainModel.getContentId(core, "Content Field Types");
+                    CID = ContentMetaDomainModel.getContentId(core, "Content Field Types");
                     if (CID <= 0) {
                         //
                         // Problem

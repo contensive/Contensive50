@@ -43,12 +43,12 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static PageTemplateModel addDefault(CoreController core, Domain.CDefDomainModel cdef) {
+        public static PageTemplateModel addDefault(CoreController core, Domain.ContentMetaDomainModel cdef) {
             return addDefault<PageTemplateModel>(core, cdef);
         }
         //
         //====================================================================================================
-        public static PageTemplateModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefDomainModel cdef) {
+        public static PageTemplateModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.ContentMetaDomainModel cdef) {
             return addDefault<PageTemplateModel>(core, cdef, ref callersCacheNameList);
         }
         //

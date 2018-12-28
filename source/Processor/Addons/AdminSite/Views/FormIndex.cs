@@ -108,11 +108,11 @@ namespace Contensive.Addons.AdminSite {
                                 SQL += " where " + sqlWhere;
                             }
                             int recordCnt = 0;
-                            int CS = core.db.csOpenSql(SQL, datasource.name);
-                            if (core.db.csOk(CS)) {
-                                recordCnt = core.db.csGetInteger(CS, "cnt");
+                            int CS = csXfer.csOpenSql(SQL, datasource.name);
+                            if (csXfer.csOk(CS)) {
+                                recordCnt = csXfer.csGetInteger(CS, "cnt");
                             }
-                            core.db.csClose(ref CS);
+                            csXfer.csClose(ref CS);
                             //
                             // Assumble the SQL
                             //
@@ -305,15 +305,15 @@ namespace Contensive.Addons.AdminSite {
                             string RowColor = "";
                             int RecordPointer = 0;
                             int RecordLast = 0;
-                            CS = core.db.csOpenSql(SQL, datasource.name, IndexConfig.recordsPerPage, IndexConfig.pageNumber);
-                            if (core.db.csOk(CS)) {
+                            CS = csXfer.csOpenSql(SQL, datasource.name, IndexConfig.recordsPerPage, IndexConfig.pageNumber);
+                            if (csXfer.csOk(CS)) {
                                 RecordPointer = IndexConfig.recordTop;
                                 RecordLast = IndexConfig.recordTop + IndexConfig.recordsPerPage;
                                 //
                                 // --- Print out the records
-                                while ((core.db.csOk(CS)) && (RecordPointer < RecordLast)) {
-                                    int RecordID = core.db.csGetInteger(CS, "ID");
-                                    //RecordName = core.db.csGetText(CS, "name");
+                                while ((csXfer.csOk(CS)) && (RecordPointer < RecordLast)) {
+                                    int RecordID = csXfer.csGetInteger(CS, "ID");
+                                    //RecordName = csXfer.csGetText(CS, "name");
                                     //IsLandingPage = IsPageContent And (RecordID = LandingPageID)
                                     if (RowColor == "class=\"ccAdminListRowOdd\"") {
                                         RowColor = "class=\"ccAdminListRowEven\"";
@@ -355,7 +355,7 @@ namespace Contensive.Addons.AdminSite {
                                         }
                                     }
                                     DataTable_DataRows += ("\n    </tr>");
-                                    core.db.csGoNext(CS);
+                                    csXfer.csGoNext(CS);
                                     RecordPointer = RecordPointer + 1;
                                 }
                                 DataTable_DataRows += "<input type=hidden name=rowcnt value=" + RecordPointer + ">";
@@ -363,7 +363,7 @@ namespace Contensive.Addons.AdminSite {
                                 // --- print out the stuff at the bottom
                                 //
                                 int RecordTop_NextPage = IndexConfig.recordTop;
-                                if (core.db.csOk(CS)) {
+                                if (csXfer.csOk(CS)) {
                                     RecordTop_NextPage = RecordPointer;
                                 }
                                 int RecordTop_PreviousPage = IndexConfig.recordTop - IndexConfig.recordsPerPage;
@@ -371,7 +371,7 @@ namespace Contensive.Addons.AdminSite {
                                     RecordTop_PreviousPage = 0;
                                 }
                             }
-                            core.db.csClose(ref CS);
+                            csXfer.csClose(ref CS);
                             //
                             // Header at bottom
                             //
@@ -490,7 +490,7 @@ namespace Contensive.Addons.AdminSite {
         /// <param name="recordCnt"></param>
         /// <param name="ContentAccessLimitMessage"></param>
         /// <returns></returns>
-        public static string getForm_Index_Header(CoreController core, IndexConfigClass IndexConfig, CDefDomainModel content, int recordCnt, string ContentAccessLimitMessage) {
+        public static string getForm_Index_Header(CoreController core, IndexConfigClass IndexConfig, ContentMetaDomainModel content, int recordCnt, string ContentAccessLimitMessage) {
             //
             // ----- TitleBar
             //
@@ -518,7 +518,7 @@ namespace Contensive.Addons.AdminSite {
             foreach (var kvp in IndexConfig.findWords) {
                 IndexConfigClass.IndexConfigFindWordClass findWord = kvp.Value;
                 if (!string.IsNullOrEmpty(findWord.Name)) {
-                    string FieldCaption = CdefController.getContentFieldProperty(core, content.name, findWord.Name, "caption");
+                    string FieldCaption = ContentMetaController.getContentFieldProperty(core, content.name, findWord.Name, "caption");
                     switch (findWord.MatchOption) {
                         case FindWordMatchEnum.MatchEmpty:
                             filterLine = filterLine + ", " + FieldCaption + " is empty";
@@ -549,7 +549,7 @@ namespace Contensive.Addons.AdminSite {
                 }
             }
             if (IndexConfig.subCDefID > 0) {
-                string ContentName = CdefController.getContentNameByID(core, IndexConfig.subCDefID);
+                string ContentName = ContentMetaController.getContentNameByID(core, IndexConfig.subCDefID);
                 if (!string.IsNullOrEmpty(ContentName)) {
                     filterLine = filterLine + ", in Sub-content '" + ContentName + "'";
                 }
@@ -1033,10 +1033,10 @@ namespace Contensive.Addons.AdminSite {
                         if (field.fieldTypeId == fieldTypeIdMemberSelect) {
                             LookupContentName = "people";
                         } else {
-                            LookupContentName = CdefController.getContentNameByID(core, field.lookupContentID);
+                            LookupContentName = ContentMetaController.getContentNameByID(core, field.lookupContentID);
                         }
                         if (!string.IsNullOrEmpty(LookupContentName)) {
-                            JoinTablename = CdefController.getContentTablename(core, LookupContentName);
+                            JoinTablename = ContentMetaController.getContentTablename(core, LookupContentName);
                         }
                         IncludedInLeftJoin = IncludedInColumns;
                         if (IndexConfig.findWords.Count > 0) {
@@ -1082,8 +1082,8 @@ namespace Contensive.Addons.AdminSite {
                 // Sub CDef filter
                 //
                 if (IndexConfig.subCDefID > 0) {
-                    ContentName = CdefController.getContentNameByID(core, IndexConfig.subCDefID);
-                    return_SQLWhere += "AND(" + CdefController.getContentControlCriteria(core, ContentName) + ")";
+                    ContentName = ContentMetaController.getContentNameByID(core, IndexConfig.subCDefID);
+                    return_SQLWhere += "AND(" + ContentMetaController.getContentControlCriteria(core, ContentName) + ")";
                 }
                 //
                 // Return_sqlFrom and Where Clause for Groups filter
@@ -1121,7 +1121,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // This person can see all the records
                     //
-                    return_SQLWhere += "AND(" + CdefController.getContentControlCriteria(core, adminData.adminContent.name) + ")";
+                    return_SQLWhere += "AND(" + ContentMetaController.getContentControlCriteria(core, adminData.adminContent.name) + ")";
                 } else {
                     //
                     // Limit the Query to what they can see
@@ -1144,7 +1144,7 @@ namespace Contensive.Addons.AdminSite {
                                     ContentID = GenericController.encodeInteger(ListSplit[Ptr].Left(Pos - 1));
                                     if (ContentID > 0 && (ContentID != adminData.adminContent.id) & AdminDataModel.userHasContentAccess(core, ContentID)) {
                                         SubQuery = SubQuery + "OR(" + adminData.adminContent.tableName + ".ContentControlID=" + ContentID + ")";
-                                        return_ContentAccessLimitMessage = return_ContentAccessLimitMessage + ", '<a href=\"?cid=" + ContentID + "\">" + CdefController.getContentNameByID(core, ContentID) + "</a>'";
+                                        return_ContentAccessLimitMessage = return_ContentAccessLimitMessage + ", '<a href=\"?cid=" + ContentID + "\">" + ContentMetaController.getContentNameByID(core, ContentID) + "</a>'";
                                         SubContactList += "," + ContentID;
                                         SubContentCnt = SubContentCnt + 1;
                                     }
@@ -1509,7 +1509,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 IndexConfig = IndexConfigClass.get(core, adminData);
                 //
-                ContentName = CdefController.getContentNameByID(core, adminData.adminContent.id);
+                ContentName = ContentMetaController.getContentNameByID(core, adminData.adminContent.id);
                 RQS = "cid=" + adminData.adminContent.id + "&af=1";
                 //
                 //-------------------------------------------------------------------------------------
@@ -1558,7 +1558,7 @@ namespace Contensive.Addons.AdminSite {
                     string SubContentName = null;
                     SubFilterList = "";
                     if (IndexConfig.subCDefID > 0) {
-                        SubContentName = CdefController.getContentNameByID(core, IndexConfig.subCDefID);
+                        SubContentName = ContentMetaController.getContentNameByID(core, IndexConfig.subCDefID);
                         QS = RQS;
                         QS = GenericController.modifyQueryString(QS, "IndexFilterRemoveCDef", encodeText(IndexConfig.subCDefID));
                         Link = "/" + core.appConfig.adminRoute + "?" + QS;
@@ -1607,7 +1607,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     foreach (var findWordKvp in IndexConfig.findWords) {
                         IndexConfigClass.IndexConfigFindWordClass findWord = findWordKvp.Value;
-                        FieldCaption = GenericController.encodeText(CdefController.getContentFieldProperty(core, ContentName, findWord.Name, "caption"));
+                        FieldCaption = GenericController.encodeText(ContentMetaController.getContentFieldProperty(core, ContentName, findWord.Name, "caption"));
                         QS = RQS;
                         QS = GenericController.modifyQueryString(QS, "IndexFilterRemoveFind", findWord.Name);
                         Link = "/" + core.appConfig.adminRoute + "?" + QS;
@@ -1696,13 +1696,13 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // people filters
                 //
-                TableName = CdefController.getContentTablename(core, ContentName);
+                TableName = ContentMetaController.getContentTablename(core, ContentName);
                 SubFilterList = "";
                 if (GenericController.vbLCase(TableName) == GenericController.vbLCase("ccMembers")) {
                     SQL = core.db.getSQLSelect("default", "ccGroups", "ID,Caption,Name", "(active<>0)", "Caption,Name");
-                    CS = core.db.csOpenSql(SQL, "Default");
-                    while (core.db.csOk(CS)) {
-                        string Name = core.db.csGetText(CS, "Name");
+                    CS = csXfer.csOpenSql(SQL, "Default");
+                    while (csXfer.csOk(CS)) {
+                        string Name = csXfer.csGetText(CS, "Name");
                         Ptr = 0;
                         if (IndexConfig.groupListCnt > 0) {
                             for (Ptr = 0; Ptr < IndexConfig.groupListCnt; Ptr++) {
@@ -1712,8 +1712,8 @@ namespace Contensive.Addons.AdminSite {
                             }
                         }
                         if (Ptr == IndexConfig.groupListCnt) {
-                            int RecordID = core.db.csGetInteger(CS, "ID");
-                            Caption = core.db.csGetText(CS, "Caption");
+                            int RecordID = csXfer.csGetInteger(CS, "ID");
+                            Caption = csXfer.csGetText(CS, "Caption");
                             if (string.IsNullOrEmpty(Caption)) {
                                 Caption = Name;
                                 if (string.IsNullOrEmpty(Caption)) {
@@ -1733,7 +1733,7 @@ namespace Contensive.Addons.AdminSite {
                             Link = "/" + core.appConfig.adminRoute + "?" + QS;
                             SubFilterList = SubFilterList + "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\">" + Caption + "</a></div>";
                         }
-                        core.db.csGoNext(CS);
+                        csXfer.csGoNext(CS);
                     }
                 }
                 if (!string.IsNullOrEmpty(SubFilterList)) {
@@ -1829,7 +1829,7 @@ namespace Contensive.Addons.AdminSite {
                     //    Stream.Add( Mid(core.app.cs_get(CS, .Name), 7 + Len(.Name) + Len(adminContext.content.ContentTableName)))
                     case _fieldTypeIdFile:
                     case _fieldTypeIdFileImage:
-                        Filename = core.db.csGet(CS, tempVar.nameLc);
+                        Filename = csXfer.csGet(CS, tempVar.nameLc);
                         Filename = GenericController.vbReplace(Filename, "\\", "/");
                         Pos = Filename.LastIndexOf("/") + 1;
                         if (Pos != 0) {
@@ -1839,11 +1839,11 @@ namespace Contensive.Addons.AdminSite {
                         break;
                     case _fieldTypeIdLookup:
                         if (IsLookupFieldValid) {
-                            Stream.Add(core.db.csGet(CS, "LookupTable" + lookupTableCnt + "Name"));
+                            Stream.Add(csXfer.csGet(CS, "LookupTable" + lookupTableCnt + "Name"));
                             lookupTableCnt += 1;
                         } else if (tempVar.lookupList != "") {
                             lookups = tempVar.lookupList.Split(',');
-                            LookupPtr = core.db.csGetInteger(CS, tempVar.nameLc) - 1;
+                            LookupPtr = csXfer.csGetInteger(CS, tempVar.nameLc) - 1;
                             if (LookupPtr <= lookups.GetUpperBound(0)) {
                                 if (LookupPtr < 0) {
                                     //Stream.Add( "-1")
@@ -1861,25 +1861,25 @@ namespace Contensive.Addons.AdminSite {
                         break;
                     case _fieldTypeIdMemberSelect:
                         if (IsLookupFieldValid) {
-                            Stream.Add(core.db.csGet(CS, "LookupTable" + lookupTableCnt + "Name"));
+                            Stream.Add(csXfer.csGet(CS, "LookupTable" + lookupTableCnt + "Name"));
                             lookupTableCnt += 1;
                         } else {
-                            Stream.Add(core.db.csGet(CS, tempVar.nameLc));
+                            Stream.Add(csXfer.csGet(CS, tempVar.nameLc));
                         }
                         break;
                     case _fieldTypeIdBoolean:
-                        if (core.db.csGetBoolean(CS, tempVar.nameLc)) {
+                        if (csXfer.csGetBoolean(CS, tempVar.nameLc)) {
                             Stream.Add("yes");
                         } else {
                             Stream.Add("no");
                         }
                         break;
                     case _fieldTypeIdCurrency:
-                        Stream.Add(string.Format("{0:C}", core.db.csGetNumber(CS, tempVar.nameLc)));
+                        Stream.Add(string.Format("{0:C}", csXfer.csGetNumber(CS, tempVar.nameLc)));
                         break;
                     case _fieldTypeIdLongText:
                     case _fieldTypeIdHTML:
-                        FieldText = core.db.csGet(CS, tempVar.nameLc);
+                        FieldText = csXfer.csGet(CS, tempVar.nameLc);
                         if (FieldText.Length > 50) {
                             FieldText = FieldText.Left(50) + "[more]";
                         }
@@ -1891,7 +1891,7 @@ namespace Contensive.Addons.AdminSite {
                     case _fieldTypeIdFileJavascript:
                     case _fieldTypeIdFileHTML:
                         // rw( "n/a" )
-                        Filename = core.db.csGet(CS, tempVar.nameLc);
+                        Filename = csXfer.csGet(CS, tempVar.nameLc);
                         if (!string.IsNullOrEmpty(Filename)) {
                             Copy = core.cdnFiles.readFileText(Filename);
                             // 20171103 - dont see why this is being converted, not html
@@ -1907,7 +1907,7 @@ namespace Contensive.Addons.AdminSite {
                         if (tempVar.password) {
                             Stream.Add("****");
                         } else {
-                            Stream.Add(core.db.csGet(CS, tempVar.nameLc));
+                            Stream.Add(csXfer.csGet(CS, tempVar.nameLc));
                         }
                         break;
                 }

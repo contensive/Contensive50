@@ -421,30 +421,30 @@ namespace Contensive.Addons.Tools {
                         core.db.createContentFromSQLTable(datasource, TableName, ContentName);
                         core.cache.invalidateAll();
                         core.clearMetaData();
-                        ContentID = CDefDomainModel.getContentId(core, ContentName);
+                        ContentID = Models.Domain.ContentMetaDomainModel.getContentId(core, ContentName);
                         ParentNavID = core.db.getRecordID(Processor.Models.Db.NavigatorEntryModel.contentName, "Manage Site Content");
                         if (ParentNavID != 0) {
-                            CS = core.db.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, "(name=" + DbController.encodeSQLText("Advanced") + ")and(parentid=" + ParentNavID + ")");
+                            CS = csXfer.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, "(name=" + DbController.encodeSQLText("Advanced") + ")and(parentid=" + ParentNavID + ")");
                             ParentNavID = 0;
-                            if (core.db.csOk(CS)) {
-                                ParentNavID = core.db.csGetInteger(CS, "ID");
+                            if (csXfer.csOk(CS)) {
+                                ParentNavID = csXfer.csGetInteger(CS, "ID");
                             }
-                            core.db.csClose(ref CS);
+                            csXfer.csClose(ref CS);
                             if (ParentNavID != 0) {
-                                CS = core.db.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, "(name=" + DbController.encodeSQLText(ContentName) + ")and(parentid=" + NavID + ")");
-                                if (!core.db.csOk(CS)) {
-                                    core.db.csClose(ref CS);
-                                    CS = core.db.csInsertRecord(Processor.Models.Db.NavigatorEntryModel.contentName);
+                                CS = csXfer.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, "(name=" + DbController.encodeSQLText(ContentName) + ")and(parentid=" + NavID + ")");
+                                if (!csXfer.csOk(CS)) {
+                                    csXfer.csClose(ref CS);
+                                    CS = csXfer.csInsert(Processor.Models.Db.NavigatorEntryModel.contentName);
                                 }
-                                if (core.db.csOk(CS)) {
-                                    core.db.csSet(CS, "name", ContentName);
-                                    core.db.csSet(CS, "parentid", ParentNavID);
-                                    core.db.csSet(CS, "contentid", ContentID);
+                                if (csXfer.csOk(CS)) {
+                                    csXfer.csSet(CS, "name", ContentName);
+                                    csXfer.csSet(CS, "parentid", ParentNavID);
+                                    csXfer.csSet(CS, "contentid", ContentID);
                                 }
-                                core.db.csClose(ref CS);
+                                csXfer.csClose(ref CS);
                             }
                         }
-                        ContentID = CDefDomainModel.getContentId(core, ContentName);
+                        ContentID = Models.Domain.ContentMetaDomainModel.getContentId(core, ContentName);
                         Stream.Add("<P>Content Definition was created. An admin menu entry for this definition has been added under 'Site Content', and will be visible on the next page view. Use the [<a href=\"?af=105&ContentID=" + ContentID + "\">Edit Content Definition Fields</a>] tool to review and edit this definition's fields.</P>");
                     } else {
                         Stream.Add("<P>Error, a required field is missing. Content not created.</P>");
@@ -481,7 +481,7 @@ namespace Contensive.Addons.Tools {
                 string AStart = null;
                 int CSPointer = 0;
                 int ContentID = 0;
-                Processor.Models.Domain.CDefDomainModel CDef = null;
+                Processor.Models.Domain.ContentMetaDomainModel CDef = null;
                 string ContentName = null;
                 int CS1 = 0;
                 int TargetFieldID = 0;
@@ -528,7 +528,7 @@ namespace Contensive.Addons.Tools {
                 if (ContentID != 0) {
                     ButtonList = ButtonCancel + "," + ButtonSaveandInvalidateCache;
                     ContentName = Local_GetContentNameByID(ContentID);
-                    CDef = Processor.Models.Domain.CDefDomainModel.create(core, ContentID, false, true );
+                    CDef = Processor.Models.Domain.ContentMetaDomainModel.create(core, ContentID, false, true );
                     if (ToolsAction != 0) {
                         //
                         // Block contentautoload, then force a load at the end
@@ -546,17 +546,17 @@ namespace Contensive.Addons.Tools {
                                     if (field.inherited) {
                                         SourceContentID = field.contentId;
                                         SourceName = field.nameLc;
-                                        CSSource = core.db.csOpen("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + DbController.encodeSQLText(SourceName) + ")");
-                                        if (core.db.csOk(CSSource)) {
-                                            CSTarget = core.db.csInsertRecord("Content Fields");
-                                            if (core.db.csOk(CSTarget)) {
-                                                core.db.csCopyRecord(CSSource, CSTarget);
-                                                core.db.csSet(CSTarget, "ContentID", ContentID);
+                                        CSSource = csXfer.csOpen("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + DbController.encodeSQLText(SourceName) + ")");
+                                        if (csXfer.csOk(CSSource)) {
+                                            CSTarget = csXfer.csInsert("Content Fields");
+                                            if (csXfer.csOk(CSTarget)) {
+                                                csXfer.csCopyRecord(CSSource, CSTarget);
+                                                csXfer.csSet(CSTarget, "ContentID", ContentID);
                                                 ReloadCDef = true;
                                             }
-                                            core.db.csClose(ref CSTarget);
+                                            csXfer.csClose(ref CSTarget);
                                         }
-                                        core.db.csClose(ref CSSource);
+                                        csXfer.csClose(ref CSSource);
                                     }
                                     break;
                                 }
@@ -567,22 +567,22 @@ namespace Contensive.Addons.Tools {
                         //
                         ColumnNumberMax = 0;
                         foreach (var keyValuePair in CDef.adminColumns) {
-                            Processor.Models.Domain.CDefDomainModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
+                            Processor.Models.Domain.ContentMetaDomainModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
                             Processor.Models.Domain.CDefFieldModel field = CDef.fields[adminColumn.Name];
                             if (field.inherited) {
                                 SourceContentID = field.contentId;
                                 SourceName = field.nameLc;
-                                CSSource = core.db.csOpen("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + DbController.encodeSQLText(SourceName) + ")");
-                                if (core.db.csOk(CSSource)) {
-                                    CSTarget = core.db.csInsertRecord("Content Fields");
-                                    if (core.db.csOk(CSTarget)) {
-                                        core.db.csCopyRecord(CSSource, CSTarget);
-                                        core.db.csSet(CSTarget, "ContentID", ContentID);
+                                CSSource = csXfer.csOpen("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + DbController.encodeSQLText(SourceName) + ")");
+                                if (csXfer.csOk(CSSource)) {
+                                    CSTarget = csXfer.csInsert("Content Fields");
+                                    if (csXfer.csOk(CSTarget)) {
+                                        csXfer.csCopyRecord(CSSource, CSTarget);
+                                        csXfer.csSet(CSTarget, "ContentID", ContentID);
                                         ReloadCDef = true;
                                     }
-                                    core.db.csClose(ref CSTarget);
+                                    csXfer.csClose(ref CSTarget);
                                 }
-                                core.db.csClose(ref CSSource);
+                                csXfer.csClose(ref CSSource);
                             }
                             if (ColumnNumberMax < field.indexColumn) {
                                 ColumnNumberMax = field.indexColumn;
@@ -603,23 +603,23 @@ namespace Contensive.Addons.Tools {
                                         columnPtr = 0;
                                         if (CDef.adminColumns.Count > 1) {
                                             foreach (var keyValuePair in CDef.adminColumns) {
-                                                Processor.Models.Domain.CDefDomainModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
+                                                Processor.Models.Domain.ContentMetaDomainModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
                                                 Processor.Models.Domain.CDefFieldModel field = CDef.fields[adminColumn.Name];
-                                                CSPointer = core.db.csOpenRecord("Content Fields", field.id);
-                                                core.db.csSet(CSPointer, "IndexColumn", (columnPtr) * 10);
-                                                core.db.csSet(CSPointer, "IndexWidth", Math.Floor((adminColumn.Width * 80) / (double)ColumnWidthTotal));
-                                                core.db.csClose(ref CSPointer);
+                                                CSPointer = csXfer.csOpenRecord("Content Fields", field.id);
+                                                csXfer.csSet(CSPointer, "IndexColumn", (columnPtr) * 10);
+                                                csXfer.csSet(CSPointer, "IndexWidth", Math.Floor((adminColumn.Width * 80) / (double)ColumnWidthTotal));
+                                                csXfer.csClose(ref CSPointer);
                                                 columnPtr += 1;
                                             }
                                         }
-                                        CSPointer = core.db.csOpenRecord("Content Fields", FieldIDToAdd, false, false);
-                                        if (core.db.csOk(CSPointer)) {
-                                            core.db.csSet(CSPointer, "IndexColumn", columnPtr * 10);
-                                            core.db.csSet(CSPointer, "IndexWidth", 20);
-                                            core.db.csSet(CSPointer, "IndexSortPriority", 99);
-                                            core.db.csSet(CSPointer, "IndexSortDirection", 1);
+                                        CSPointer = csXfer.csOpenRecord("Content Fields", FieldIDToAdd, false, false);
+                                        if (csXfer.csOk(CSPointer)) {
+                                            csXfer.csSet(CSPointer, "IndexColumn", columnPtr * 10);
+                                            csXfer.csSet(CSPointer, "IndexWidth", 20);
+                                            csXfer.csSet(CSPointer, "IndexSortPriority", 99);
+                                            csXfer.csSet(CSPointer, "IndexSortDirection", 1);
                                         }
-                                        core.db.csClose(ref CSPointer);
+                                        csXfer.csClose(ref CSPointer);
                                         ReloadCDef = true;
                                     }
                                     //
@@ -632,19 +632,19 @@ namespace Contensive.Addons.Tools {
                                     if (CDef.adminColumns.Count > 1) {
                                         columnPtr = 0;
                                         foreach (var keyValuePair in CDef.adminColumns) {
-                                            Processor.Models.Domain.CDefDomainModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
+                                            Processor.Models.Domain.ContentMetaDomainModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
                                             Processor.Models.Domain.CDefFieldModel field = CDef.fields[adminColumn.Name];
-                                            CSPointer = core.db.csOpenRecord("Content Fields", field.id);
+                                            CSPointer = csXfer.csOpenRecord("Content Fields", field.id);
                                             if (fieldId == TargetFieldID) {
-                                                core.db.csSet(CSPointer, "IndexColumn", 0);
-                                                core.db.csSet(CSPointer, "IndexWidth", 0);
-                                                core.db.csSet(CSPointer, "IndexSortPriority", 0);
-                                                core.db.csSet(CSPointer, "IndexSortDirection", 0);
+                                                csXfer.csSet(CSPointer, "IndexColumn", 0);
+                                                csXfer.csSet(CSPointer, "IndexWidth", 0);
+                                                csXfer.csSet(CSPointer, "IndexSortPriority", 0);
+                                                csXfer.csSet(CSPointer, "IndexSortDirection", 0);
                                             } else {
-                                                core.db.csSet(CSPointer, "IndexColumn", (columnPtr) * 10);
-                                                core.db.csSet(CSPointer, "IndexWidth", Math.Floor((adminColumn.Width * 100) / (double)ColumnWidthTotal));
+                                                csXfer.csSet(CSPointer, "IndexColumn", (columnPtr) * 10);
+                                                csXfer.csSet(CSPointer, "IndexWidth", Math.Floor((adminColumn.Width * 100) / (double)ColumnWidthTotal));
                                             }
-                                            core.db.csClose(ref CSPointer);
+                                            csXfer.csClose(ref CSPointer);
                                             columnPtr += 1;
                                         }
                                         ReloadCDef = true;
@@ -659,29 +659,29 @@ namespace Contensive.Addons.Tools {
                                         MoveNextColumn = false;
                                         columnPtr = 0;
                                         foreach (var keyValuePair in CDef.adminColumns) {
-                                            Processor.Models.Domain.CDefDomainModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
+                                            Processor.Models.Domain.ContentMetaDomainModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
                                             Processor.Models.Domain.CDefFieldModel field = CDef.fields[adminColumn.Name];
                                             FieldName = adminColumn.Name;
-                                            CS1 = core.db.csOpenRecord("Content Fields", field.id);
+                                            CS1 = csXfer.csOpenRecord("Content Fields", field.id);
                                             if ((CDef.fields[FieldName.ToLowerInvariant()].id == TargetFieldID) && (columnPtr < CDef.adminColumns.Count)) {
-                                                core.db.csSet(CS1, "IndexColumn", (columnPtr + 1) * 10);
+                                                csXfer.csSet(CS1, "IndexColumn", (columnPtr + 1) * 10);
                                                 //
                                                 MoveNextColumn = true;
                                             } else if (MoveNextColumn) {
                                                 //
                                                 // This is one past target
                                                 //
-                                                core.db.csSet(CS1, "IndexColumn", (columnPtr - 1) * 10);
+                                                csXfer.csSet(CS1, "IndexColumn", (columnPtr - 1) * 10);
                                                 MoveNextColumn = false;
                                             } else {
                                                 //
                                                 // not target or one past target
                                                 //
-                                                core.db.csSet(CS1, "IndexColumn", (columnPtr) * 10);
+                                                csXfer.csSet(CS1, "IndexColumn", (columnPtr) * 10);
                                                 MoveNextColumn = false;
                                             }
-                                            core.db.csSet(CS1, "IndexWidth", Math.Floor((adminColumn.Width * 100) / (double)ColumnWidthTotal));
-                                            core.db.csClose(ref CS1);
+                                            csXfer.csSet(CS1, "IndexWidth", Math.Floor((adminColumn.Width * 100) / (double)ColumnWidthTotal));
+                                            csXfer.csClose(ref CS1);
                                             columnPtr += 1;
                                         }
                                         ReloadCDef = true;
@@ -697,29 +697,29 @@ namespace Contensive.Addons.Tools {
                                         MoveNextColumn = false;
                                         columnPtr = 0;
                                         foreach (var keyValuePair in CDef.adminColumns.Reverse()) {
-                                            Processor.Models.Domain.CDefDomainModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
+                                            Processor.Models.Domain.ContentMetaDomainModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
                                             Processor.Models.Domain.CDefFieldModel field = CDef.fields[adminColumn.Name];
                                             FieldName = adminColumn.Name;
-                                            CS1 = core.db.csOpenRecord("Content Fields", field.id);
+                                            CS1 = csXfer.csOpenRecord("Content Fields", field.id);
                                             if ((field.id == TargetFieldID) && (columnPtr < CDef.adminColumns.Count)) {
-                                                core.db.csSet(CS1, "IndexColumn", (columnPtr - 1) * 10);
+                                                csXfer.csSet(CS1, "IndexColumn", (columnPtr - 1) * 10);
                                                 //
                                                 MoveNextColumn = true;
                                             } else if (MoveNextColumn) {
                                                 //
                                                 // This is one past target
                                                 //
-                                                core.db.csSet(CS1, "IndexColumn", (columnPtr + 1) * 10);
+                                                csXfer.csSet(CS1, "IndexColumn", (columnPtr + 1) * 10);
                                                 MoveNextColumn = false;
                                             } else {
                                                 //
                                                 // not target or one past target
                                                 //
-                                                core.db.csSet(CS1, "IndexColumn", (columnPtr) * 10);
+                                                csXfer.csSet(CS1, "IndexColumn", (columnPtr) * 10);
                                                 MoveNextColumn = false;
                                             }
-                                            core.db.csSet(CS1, "IndexWidth", Math.Floor((adminColumn.Width * 100) / (double)ColumnWidthTotal));
-                                            core.db.csClose(ref CS1);
+                                            csXfer.csSet(CS1, "IndexWidth", Math.Floor((adminColumn.Width * 100) / (double)ColumnWidthTotal));
+                                            csXfer.csClose(ref CS1);
                                             columnPtr += 1;
                                         }
                                         ReloadCDef = true;
@@ -873,7 +873,7 @@ namespace Contensive.Addons.Tools {
                         //
                         // Get a new copy of the content definition
                         //
-                        CDef = Processor.Models.Domain.CDefDomainModel.create(core, ContentID, false, true);
+                        CDef = Processor.Models.Domain.ContentMetaDomainModel.create(core, ContentID, false, true);
                     }
                     if (Button == ButtonSaveandInvalidateCache) {
                         core.cache.invalidateAll();
@@ -924,7 +924,7 @@ namespace Contensive.Addons.Tools {
                         //
                         // Calc total width
                         //
-                        foreach (KeyValuePair<string, Processor.Models.Domain.CDefDomainModel.CDefAdminColumnClass> kvp in CDef.adminColumns) {
+                        foreach (KeyValuePair<string, Processor.Models.Domain.ContentMetaDomainModel.CDefAdminColumnClass> kvp in CDef.adminColumns) {
                             ColumnWidthTotal += kvp.Value.Width;
                         }
                         //For ColumnCount = 0 To CDef.adminColumns.Count - 1
@@ -933,7 +933,7 @@ namespace Contensive.Addons.Tools {
                         if (ColumnWidthTotal > 0) {
                             Stream.Add("<table border=\"0\" cellpadding=\"5\" cellspacing=\"0\" width=\"90%\">");
                             int ColumnCount = 0;
-                            foreach (KeyValuePair<string, Processor.Models.Domain.CDefDomainModel.CDefAdminColumnClass> kvp in CDef.adminColumns) {
+                            foreach (KeyValuePair<string, Processor.Models.Domain.ContentMetaDomainModel.CDefAdminColumnClass> kvp in CDef.adminColumns) {
                                 //
                                 // print column headers - anchored so they sort columns
                                 //
@@ -985,7 +985,7 @@ namespace Contensive.Addons.Tools {
                             skipField = false;
                             //ColumnPointer = CDef.adminColumns.Count
                             if (CDef.adminColumns.Count > 0) {
-                                foreach (KeyValuePair<string, Processor.Models.Domain.CDefDomainModel.CDefAdminColumnClass> kvp in CDef.adminColumns) {
+                                foreach (KeyValuePair<string, Processor.Models.Domain.ContentMetaDomainModel.CDefAdminColumnClass> kvp in CDef.adminColumns) {
                                     if (field.nameLc == kvp.Value.Name) {
                                         skipField = true;
                                         break;
@@ -1133,11 +1133,11 @@ namespace Contensive.Addons.Tools {
                                 // ----- Set Field Type
                                 //
                                 ContentID = Local_GetContentID(DiagArgument(DiagAction, 1));
-                                CS = core.db.csOpen("Content Fields", "(ContentID=" + ContentID + ")and(Name=" + DbController.encodeSQLText(DiagArgument(DiagAction, 2)) + ")");
-                                if (core.db.csOk(CS)) {
-                                    core.db.csSet(CS, "Type", DiagArgument(DiagAction, 3));
+                                CS = csXfer.csOpen("Content Fields", "(ContentID=" + ContentID + ")and(Name=" + DbController.encodeSQLText(DiagArgument(DiagAction, 2)) + ")");
+                                if (csXfer.csOk(CS)) {
+                                    csXfer.csSet(CS, "Type", DiagArgument(DiagAction, 3));
                                 }
-                                core.db.csClose(ref CS);
+                                csXfer.csClose(ref CS);
                                 //end case
                                 break;
                             case DiagActionSetFieldInactive:
@@ -1145,11 +1145,11 @@ namespace Contensive.Addons.Tools {
                                 // ----- Set Field Inactive
                                 //
                                 ContentID = Local_GetContentID(DiagArgument(DiagAction, 1));
-                                CS = core.db.csOpen("Content Fields", "(ContentID=" + ContentID + ")and(Name=" + DbController.encodeSQLText(DiagArgument(DiagAction, 2)) + ")");
-                                if (core.db.csOk(CS)) {
-                                    core.db.csSet(CS, "active", 0);
+                                CS = csXfer.csOpen("Content Fields", "(ContentID=" + ContentID + ")and(Name=" + DbController.encodeSQLText(DiagArgument(DiagAction, 2)) + ")");
+                                if (csXfer.csOk(CS)) {
+                                    csXfer.csSet(CS, "active", 0);
                                 }
-                                core.db.csClose(ref CS);
+                                csXfer.csClose(ref CS);
                                 //end case
                                 break;
                             case DiagActionDeleteRecord:
@@ -1163,15 +1163,15 @@ namespace Contensive.Addons.Tools {
                                 break;
                             case DiagActionContentDeDupe:
                                 ContentName = DiagArgument(DiagAction, 1);
-                                CS = core.db.csOpen("Content", "name=" + DbController.encodeSQLText(ContentName), "ID");
-                                if (core.db.csOk(CS)) {
-                                    core.db.csGoNext(CS);
-                                    while (core.db.csOk(CS)) {
-                                        core.db.csSet(CS, "active", 0);
-                                        core.db.csGoNext(CS);
+                                CS = csXfer.csOpen("Content", "name=" + DbController.encodeSQLText(ContentName), "ID");
+                                if (csXfer.csOk(CS)) {
+                                    csXfer.csGoNext(CS);
+                                    while (csXfer.csOk(CS)) {
+                                        csXfer.csSet(CS, "active", 0);
+                                        csXfer.csGoNext(CS);
                                     }
                                 }
-                                core.db.csClose(ref CS);
+                                csXfer.csClose(ref CS);
                                 //end case
                                 break;
                             case DiagActionSetRecordInactive:
@@ -1180,11 +1180,11 @@ namespace Contensive.Addons.Tools {
                                 //
                                 ContentName = DiagArgument(DiagAction, 1);
                                 RecordID = GenericController.encodeInteger(DiagArgument(DiagAction, 2));
-                                CS = core.db.csOpen(ContentName, "(ID=" + RecordID + ")");
-                                if (core.db.csOk(CS)) {
-                                    core.db.csSet(CS, "active", 0);
+                                CS = csXfer.csOpen(ContentName, "(ID=" + RecordID + ")");
+                                if (csXfer.csOk(CS)) {
+                                    csXfer.csSet(CS, "active", 0);
                                 }
-                                core.db.csClose(ref CS);
+                                csXfer.csClose(ref CS);
                                 //end case
                                 break;
                             case DiagActionSetFieldNotRequired:
@@ -1193,11 +1193,11 @@ namespace Contensive.Addons.Tools {
                                 //
                                 ContentName = DiagArgument(DiagAction, 1);
                                 RecordID = GenericController.encodeInteger(DiagArgument(DiagAction, 2));
-                                CS = core.db.csOpen(ContentName, "(ID=" + RecordID + ")");
-                                if (core.db.csOk(CS)) {
-                                    core.db.csSet(CS, "required", 0);
+                                CS = csXfer.csOpen(ContentName, "(ID=" + RecordID + ")");
+                                if (csXfer.csOk(CS)) {
+                                    csXfer.csSet(CS, "required", 0);
                                 }
-                                core.db.csClose(ref CS);
+                                csXfer.csClose(ref CS);
                                 //end case
                                 break;
                         }
@@ -1225,20 +1225,20 @@ namespace Contensive.Addons.Tools {
                                     + " GROUP BY ccContent.Name, ccContent.Active"
                                     + " Having (((Count(ccContent.ID)) > 1) And ((ccContent.active) <> 0))"
                                     + " ORDER BY Count(ccContent.ID) DESC;";
-                            CSPointer = core.db.csOpenSql(SQL,"Default");
-                            if (core.db.csOk(CSPointer)) {
-                                while (core.db.csOk(CSPointer)) {
-                                    DiagProblem = "PROBLEM: There are " + core.db.csGetText(CSPointer, "RecordCount") + " records in the Content table with the name [" + core.db.csGetText(CSPointer, "Name") + "]";
+                            CSPointer = csXfer.csOpenSql(SQL,"Default");
+                            if (csXfer.csOk(CSPointer)) {
+                                while (csXfer.csOk(CSPointer)) {
+                                    DiagProblem = "PROBLEM: There are " + csXfer.csGetText(CSPointer, "RecordCount") + " records in the Content table with the name [" + csXfer.csGetText(CSPointer, "Name") + "]";
                                     DiagActions = new  DiagActionType[3];
                                     DiagActions[0].Name = "Ignore, or handle this issue manually";
                                     DiagActions[0].Command = "";
                                     DiagActions[1].Name = "Mark all duplicate definitions inactive";
-                                    DiagActions[1].Command = DiagActionContentDeDupe.ToString() + "," + core.db.csGetValue(CSPointer, "name");
+                                    DiagActions[1].Command = DiagActionContentDeDupe.ToString() + "," + csXfer.csGetValue(CSPointer, "name");
                                     Stream.Add(GetDiagError(DiagProblem, DiagActions));
-                                    core.db.csGoNext(CSPointer);
+                                    csXfer.csGoNext(CSPointer);
                                 }
                             }
-                            core.db.csClose(ref CSPointer);
+                            csXfer.csClose(ref CSPointer);
                         }
                         //
                         // ----- Content Fields
@@ -1249,22 +1249,22 @@ namespace Contensive.Addons.Tools {
                             SQL = "SELECT ccFields.required AS FieldRequired, ccFields.Authorable AS FieldAuthorable, ccFields.Type AS FieldType, ccFields.Name AS FieldName, ccContent.ID AS ContentID, ccContent.Name AS ContentName, ccTables.Name AS TableName, ccDataSources.Name AS DataSourceName"
                                     + " FROM (ccFields LEFT JOIN ccContent ON ccFields.ContentID = ccContent.ID) LEFT JOIN (ccTables LEFT JOIN ccDataSources ON ccTables.DataSourceID = ccDataSources.ID) ON ccContent.ContentTableID = ccTables.ID"
                                     + " WHERE (((ccFields.Active)<>0) AND ((ccContent.Active)<>0) AND ((ccTables.Active)<>0)) OR (((ccFields.Active)<>0) AND ((ccContent.Active)<>0) AND ((ccTables.Active)<>0));";
-                            CS = core.db.csOpenSql(SQL,"Default");
-                            if (!core.db.csOk(CS)) {
+                            CS = csXfer.csOpenSql(SQL,"Default");
+                            if (!csXfer.csOk(CS)) {
                                 DiagProblem = "PROBLEM: No Content entries were found in the content table.";
                                 DiagActions = new DiagActionType[2];
                                 DiagActions[0].Name = "Ignore, or handle this issue manually";
                                 DiagActions[0].Command = "";
                                 Stream.Add(GetDiagError(DiagProblem, DiagActions));
                             } else {
-                                while (core.db.csOk(CS) && (DiagActionCount < DiagActionCountMax)) {
-                                    FieldName = core.db.csGetText(CS, "FieldName");
-                                    fieldType = core.db.csGetInteger(CS, "FieldType");
-                                    FieldRequired = core.db.csGetBoolean(CS, "FieldRequired");
-                                    FieldAuthorable = core.db.csGetBoolean(CS, "FieldAuthorable");
-                                    ContentName = core.db.csGetText(CS, "ContentName");
-                                    TableName = core.db.csGetText(CS, "TableName");
-                                    DataSourceName = core.db.csGetText(CS, "DataSourceName");
+                                while (csXfer.csOk(CS) && (DiagActionCount < DiagActionCountMax)) {
+                                    FieldName = csXfer.csGetText(CS, "FieldName");
+                                    fieldType = csXfer.csGetInteger(CS, "FieldType");
+                                    FieldRequired = csXfer.csGetBoolean(CS, "FieldRequired");
+                                    FieldAuthorable = csXfer.csGetBoolean(CS, "FieldAuthorable");
+                                    ContentName = csXfer.csGetText(CS, "ContentName");
+                                    TableName = csXfer.csGetText(CS, "TableName");
+                                    DataSourceName = csXfer.csGetText(CS, "DataSourceName");
                                     if (string.IsNullOrEmpty(DataSourceName)) {
                                         DataSourceName = "Default";
                                     }
@@ -1281,7 +1281,7 @@ namespace Contensive.Addons.Tools {
                                     }
                                     if ((!string.IsNullOrEmpty(FieldName)) && (fieldType != fieldTypeIdRedirect) && (fieldType != fieldTypeIdManyToMany)) {
                                         SQL = "SELECT " + FieldName + " FROM " + TableName + " WHERE ID=0;";
-                                        CSTest = core.db.csOpenSql( SQL, DataSourceName);
+                                        CSTest = csXfer.csOpenSql( SQL, DataSourceName);
                                         if (CSTest == -1) {
                                             DiagProblem = "PROBLEM: Field [" + FieldName + "] in Content Definition [" + ContentName + "] could not be read from database table [" + TableName + "] on datasource [" + DataSourceName + "].";
                                             DiagActions = new DiagActionType[2];
@@ -1292,11 +1292,11 @@ namespace Contensive.Addons.Tools {
                                             Stream.Add(GetDiagError(DiagProblem, DiagActions));
                                         }
                                     }
-                                    core.db.csClose(ref CSTest);
-                                    core.db.csGoNext(CS);
+                                    csXfer.csClose(ref CSTest);
+                                    csXfer.csGoNext(CS);
                                 }
                             }
-                            core.db.csClose(ref CS);
+                            csXfer.csClose(ref CS);
                         }
                         //
                         // ----- Insert Content Testing
@@ -1304,26 +1304,26 @@ namespace Contensive.Addons.Tools {
                         if (DiagActionCount < DiagActionCountMax) {
                             Stream.Add(GetDiagHeader("Checking Content Insertion...<br>"));
                             //
-                            CSContent = core.db.csOpen("Content");
-                            if (!core.db.csOk(CSContent)) {
+                            CSContent = csXfer.csOpen("Content");
+                            if (!csXfer.csOk(CSContent)) {
                                 DiagProblem = "PROBLEM: No Content entries were found in the content table.";
                                 DiagActions = new DiagActionType[2];
                                 DiagActions[0].Name = "Ignore, or handle this issue manually";
                                 DiagActions[0].Command = "";
                                 Stream.Add(GetDiagError(DiagProblem, DiagActions));
                             } else {
-                                while (core.db.csOk(CSContent) && (DiagActionCount < DiagActionCountMax)) {
-                                    ContentID = core.db.csGetInteger(CSContent, "ID");
-                                    ContentName = core.db.csGetText(CSContent, "name");
-                                    CSTestRecord = core.db.csInsertRecord(ContentName);
-                                    if (!core.db.csOk(CSTestRecord)) {
+                                while (csXfer.csOk(CSContent) && (DiagActionCount < DiagActionCountMax)) {
+                                    ContentID = csXfer.csGetInteger(CSContent, "ID");
+                                    ContentName = csXfer.csGetText(CSContent, "name");
+                                    CSTestRecord = csXfer.csInsert(ContentName);
+                                    if (!csXfer.csOk(CSTestRecord)) {
                                         DiagProblem = "PROBLEM: Could not insert a record using Content Definition [" + ContentName + "]";
                                         DiagActions = new DiagActionType[2];
                                         DiagActions[0].Name = "Ignore, or handle this issue manually";
                                         DiagActions[0].Command = "";
                                         Stream.Add(GetDiagError(DiagProblem, DiagActions));
                                     } else {
-                                        TestRecordID = core.db.csGetInteger(CSTestRecord, "id");
+                                        TestRecordID = csXfer.csGetInteger(CSTestRecord, "id");
                                         if (TestRecordID == 0) {
                                             DiagProblem = "PROBLEM: Content Definition [" + ContentName + "] does not support the required field [ID]\"";
                                             DiagActions = new DiagActionType[2];
@@ -1333,13 +1333,13 @@ namespace Contensive.Addons.Tools {
                                             DiagActions[1].Command = DiagActionSetRecordInactive.ToString() + ",Content," + ContentID;
                                             Stream.Add(GetDiagError(DiagProblem, DiagActions));
                                         } else {
-                                            CSFields = core.db.csOpen("Content Fields", "ContentID=" + ContentID);
-                                            while (core.db.csOk(CSFields)) {
+                                            CSFields = csXfer.csOpen("Content Fields", "ContentID=" + ContentID);
+                                            while (csXfer.csOk(CSFields)) {
                                                 //
                                                 // ----- read the value of the field to test its presents
                                                 //
-                                                FieldName = core.db.csGetText(CSFields, "name");
-                                                fieldType = core.db.csGetInteger(CSFields, "Type");
+                                                FieldName = csXfer.csGetText(CSFields, "name");
+                                                fieldType = csXfer.csGetInteger(CSFields, "Type");
                                                 switch (fieldType) {
                                                     case _fieldTypeIdManyToMany:
                                                         //
@@ -1350,7 +1350,7 @@ namespace Contensive.Addons.Tools {
                                                         //
                                                         // ----- redirect type, check redirect contentid
                                                         //
-                                                        RedirectContentID = core.db.csGetInteger(CSFields, "RedirectContentID");
+                                                        RedirectContentID = csXfer.csGetInteger(CSFields, "RedirectContentID");
                                                         ErrorCount = core.doc.errorCount;
                                                         bitBucket = Local_GetContentNameByID(RedirectContentID);
                                                         if (IsNull(bitBucket) || (ErrorCount != core.doc.errorCount)) {
@@ -1376,7 +1376,7 @@ namespace Contensive.Addons.Tools {
                                                         // ----- lookup type, read value and check lookup contentid
                                                         //
                                                         ErrorCount = core.doc.errorCount;
-                                                        bitBucket = core.db.csGetValue(CSTestRecord, FieldName);
+                                                        bitBucket = csXfer.csGetValue(CSTestRecord, FieldName);
                                                         if (ErrorCount != core.doc.errorCount) {
                                                             DiagProblem = "PROBLEM: An error occurred reading the value of Content Field [" + ContentName + "].[" + FieldName + "]";
                                                             DiagActions = new DiagActionType[2];
@@ -1385,8 +1385,8 @@ namespace Contensive.Addons.Tools {
                                                             Stream.Add(GetDiagError(DiagProblem, DiagActions));
                                                         } else {
                                                             bitBucket = "";
-                                                            LookupList = core.db.csGetText(CSFields, "Lookuplist");
-                                                            LookupContentID = core.db.csGetInteger(CSFields, "LookupContentID");
+                                                            LookupList = csXfer.csGetText(CSFields, "Lookuplist");
+                                                            LookupContentID = csXfer.csGetInteger(CSFields, "LookupContentID");
                                                             if (LookupContentID != 0) {
                                                                 ErrorCount = core.doc.errorCount;
                                                                 bitBucket = Local_GetContentNameByID(LookupContentID);
@@ -1407,7 +1407,7 @@ namespace Contensive.Addons.Tools {
                                                         // ----- check for value in database
                                                         //
                                                         ErrorCount = core.doc.errorCount;
-                                                        bitBucket = core.db.csGetValue(CSTestRecord, FieldName);
+                                                        bitBucket = csXfer.csGetValue(CSTestRecord, FieldName);
                                                         if (ErrorCount != core.doc.errorCount) {
                                                             DiagProblem = "PROBLEM: An error occurred reading the value of Content Field [" + ContentName + "].[" + FieldName + "]";
                                                             DiagActions = new DiagActionType[4];
@@ -1419,50 +1419,50 @@ namespace Contensive.Addons.Tools {
                                                         }
                                                         break;
                                                 }
-                                                core.db.csGoNext(CSFields);
+                                                csXfer.csGoNext(CSFields);
                                             }
                                         }
-                                        core.db.csClose(ref CSFields);
-                                        core.db.csClose(ref CSTestRecord);
+                                        csXfer.csClose(ref CSFields);
+                                        csXfer.csClose(ref CSTestRecord);
                                         core.db.deleteContentRecord(ContentName, TestRecordID);
                                     }
-                                    core.db.csGoNext(CSContent);
+                                    csXfer.csGoNext(CSContent);
                                 }
                             }
-                            core.db.csClose(ref CSContent);
+                            csXfer.csClose(ref CSContent);
                         }
                         //
                         // ----- Check Navigator Entries
                         //
                         if (DiagActionCount < DiagActionCountMax) {
                             Stream.Add(GetDiagHeader("Checking Navigator Entries...<br>"));
-                            CSPointer = core.db.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName);
-                            if (!core.db.csOk(CSPointer)) {
+                            CSPointer = csXfer.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName);
+                            if (!csXfer.csOk(CSPointer)) {
                                 DiagProblem = "PROBLEM: Could not open the [Navigator Entries] content.";
                                 DiagActions = new DiagActionType[4];
                                 DiagActions[0].Name = "Ignore, or handle this issue manually";
                                 DiagActions[0].Command = "";
                                 Stream.Add(GetDiagError(DiagProblem, DiagActions));
                             } else {
-                                while (core.db.csOk(CSPointer) && (DiagActionCount < DiagActionCountMax)) {
-                                    ContentID = core.db.csGetInteger(CSPointer, "ContentID");
+                                while (csXfer.csOk(CSPointer) && (DiagActionCount < DiagActionCountMax)) {
+                                    ContentID = csXfer.csGetInteger(CSPointer, "ContentID");
                                     if (ContentID != 0) {
-                                        CSContent = core.db.csOpen("Content", "ID=" + ContentID);
-                                        if (!core.db.csOk(CSContent)) {
-                                            DiagProblem = "PROBLEM: Menu Entry [" + core.db.csGetText(CSPointer, "name") + "] points to an invalid Content Definition.";
+                                        CSContent = csXfer.csOpen("Content", "ID=" + ContentID);
+                                        if (!csXfer.csOk(CSContent)) {
+                                            DiagProblem = "PROBLEM: Menu Entry [" + csXfer.csGetText(CSPointer, "name") + "] points to an invalid Content Definition.";
                                             DiagActions = new DiagActionType[4];
                                             DiagActions[0].Name = "Ignore, or handle this issue manually";
                                             DiagActions[0].Command = "";
                                             DiagActions[1].Name = "Remove this menu entry";
-                                            DiagActions[1].Command = DiagActionDeleteRecord.ToString() + ",Navigator Entries," + core.db.csGetInteger(CSPointer, "ID");
+                                            DiagActions[1].Command = DiagActionDeleteRecord.ToString() + ",Navigator Entries," + csXfer.csGetInteger(CSPointer, "ID");
                                             Stream.Add(GetDiagError(DiagProblem, DiagActions));
                                         }
-                                        core.db.csClose(ref CSContent);
+                                        csXfer.csClose(ref CSContent);
                                     }
-                                    core.db.csGoNext(CSPointer);
+                                    csXfer.csGoNext(CSPointer);
                                 }
                             }
-                            core.db.csClose(ref CSPointer);
+                            csXfer.csClose(ref CSPointer);
                         }
                         if (DiagActionCount >= DiagActionCountMax) {
                             DiagProblem = "Diagnostic Problem Limit (" + DiagActionCountMax + ") has been reached. Resolve the above issues to see more.";
@@ -1510,71 +1510,71 @@ namespace Contensive.Addons.Tools {
                 //
                 //Call LoadContentDefinitions
                 //
-                CSPointer = core.db.csOpen("Content Fields", "(ContentID=" + ContentID + ")", "IndexColumn");
-                if (!core.db.csOk(CSPointer)) {
+                CSPointer = csXfer.csOpen("Content Fields", "(ContentID=" + ContentID + ")", "IndexColumn");
+                if (!csXfer.csOk(CSPointer)) {
                     throw (new GenericException("Unexpected exception")); // Call handleLegacyClassErrors2("NormalizeIndexColumns", "Could not read Content Field Definitions")
                 } else {
                     //
                     // Adjust IndexSortOrder to be 0 based, count by 1
                     //
                     ColumnCounter = 0;
-                    while (core.db.csOk(CSPointer)) {
-                        IndexColumn = core.db.csGetInteger(CSPointer, "IndexColumn");
-                        ColumnWidth = core.db.csGetInteger(CSPointer, "IndexWidth");
+                    while (csXfer.csOk(CSPointer)) {
+                        IndexColumn = csXfer.csGetInteger(CSPointer, "IndexColumn");
+                        ColumnWidth = csXfer.csGetInteger(CSPointer, "IndexWidth");
                         if ((IndexColumn == 0) || (ColumnWidth == 0)) {
-                            core.db.csSet(CSPointer, "IndexColumn", 0);
-                            core.db.csSet(CSPointer, "IndexWidth", 0);
-                            core.db.csSet(CSPointer, "IndexSortPriority", 0);
+                            csXfer.csSet(CSPointer, "IndexColumn", 0);
+                            csXfer.csSet(CSPointer, "IndexWidth", 0);
+                            csXfer.csSet(CSPointer, "IndexSortPriority", 0);
                         } else {
                             //
                             // Column appears in Index, clean it up
                             //
-                            core.db.csSet(CSPointer, "IndexColumn", ColumnCounter);
+                            csXfer.csSet(CSPointer, "IndexColumn", ColumnCounter);
                             ColumnCounter = ColumnCounter + 1;
                             ColumnWidthTotal = ColumnWidthTotal + ColumnWidth;
                         }
-                        core.db.csGoNext(CSPointer);
+                        csXfer.csGoNext(CSPointer);
                     }
                     if (ColumnCounter == 0) {
                         //
                         // No columns found, set name as Column 0, active as column 1
                         //
-                        core.db.csGoFirst(CSPointer);
-                        while (core.db.csOk(CSPointer)) {
-                            switch (GenericController.vbUCase(core.db.csGetText(CSPointer, "name"))) {
+                        csXfer.csGoFirst(CSPointer);
+                        while (csXfer.csOk(CSPointer)) {
+                            switch (GenericController.vbUCase(csXfer.csGetText(CSPointer, "name"))) {
                                 case "ACTIVE":
-                                    core.db.csSet(CSPointer, "IndexColumn", 0);
-                                    core.db.csSet(CSPointer, "IndexWidth", 20);
+                                    csXfer.csSet(CSPointer, "IndexColumn", 0);
+                                    csXfer.csSet(CSPointer, "IndexWidth", 20);
                                     ColumnWidthTotal = ColumnWidthTotal + 20;
                                     break;
                                 case "NAME":
-                                    core.db.csSet(CSPointer, "IndexColumn", 1);
-                                    core.db.csSet(CSPointer, "IndexWidth", 80);
+                                    csXfer.csSet(CSPointer, "IndexColumn", 1);
+                                    csXfer.csSet(CSPointer, "IndexWidth", 80);
                                     ColumnWidthTotal = ColumnWidthTotal + 80;
                                     break;
                             }
-                            core.db.csGoNext(CSPointer);
+                            csXfer.csGoNext(CSPointer);
                         }
                     }
                     //
                     // ----- Now go back and set a normalized Width value
                     //
                     if (ColumnWidthTotal > 0) {
-                        core.db.csGoFirst(CSPointer);
-                        while (core.db.csOk(CSPointer)) {
-                            ColumnWidth = core.db.csGetInteger(CSPointer, "IndexWidth");
+                        csXfer.csGoFirst(CSPointer);
+                        while (csXfer.csOk(CSPointer)) {
+                            ColumnWidth = csXfer.csGetInteger(CSPointer, "IndexWidth");
                             ColumnWidth = encodeInteger((ColumnWidth * 100) / (double)ColumnWidthTotal);
-                            core.db.csSet(CSPointer, "IndexWidth", ColumnWidth);
-                            core.db.csGoNext(CSPointer);
+                            csXfer.csSet(CSPointer, "IndexWidth", ColumnWidth);
+                            csXfer.csGoNext(CSPointer);
                         }
                     }
                 }
-                core.db.csClose(ref CSPointer);
+                csXfer.csClose(ref CSPointer);
                 //
                 // ----- now fixup Sort Priority so only visible fields are sorted.
                 //
-                CSPointer = core.db.csOpen("Content Fields", "(ContentID=" + ContentID + ")", "IndexSortPriority, IndexColumn");
-                if (!core.db.csOk(CSPointer)) {
+                CSPointer = csXfer.csOpen("Content Fields", "(ContentID=" + ContentID + ")", "IndexSortPriority, IndexColumn");
+                if (!csXfer.csOk(CSPointer)) {
                     throw (new GenericException("Unexpected exception")); // Call handleLegacyClassErrors2("NormalizeIndexColumns", "Error reading Content Field Definitions")
                 } else {
                     //
@@ -1583,13 +1583,13 @@ namespace Contensive.Addons.Tools {
                     int SortValue = 0;
                     int SortDirection = 0;
                     SortValue = 0;
-                    while (core.db.csOk(CSPointer)) {
+                    while (csXfer.csOk(CSPointer)) {
                         SortDirection = 0;
-                        if (core.db.csGetInteger(CSPointer, "IndexColumn") == 0) {
-                            core.db.csSet(CSPointer, "IndexSortPriority", 0);
+                        if (csXfer.csGetInteger(CSPointer, "IndexColumn") == 0) {
+                            csXfer.csSet(CSPointer, "IndexSortPriority", 0);
                         } else {
-                            core.db.csSet(CSPointer, "IndexSortPriority", SortValue);
-                            SortDirection = core.db.csGetInteger(CSPointer, "IndexSortDirection");
+                            csXfer.csSet(CSPointer, "IndexSortPriority", SortValue);
+                            SortDirection = csXfer.csGetInteger(CSPointer, "IndexSortDirection");
                             if (SortDirection == 0) {
                                 SortDirection = 1;
                             } else {
@@ -1601,8 +1601,8 @@ namespace Contensive.Addons.Tools {
                             }
                             SortValue = SortValue + 1;
                         }
-                        core.db.csSet(CSPointer, "IndexSortDirection", SortDirection);
-                        core.db.csGoNext(CSPointer);
+                        csXfer.csSet(CSPointer, "IndexSortDirection", SortDirection);
+                        csXfer.csGoNext(CSPointer);
                     }
                 }
                 //
@@ -1651,7 +1651,7 @@ namespace Contensive.Addons.Tools {
                         // Create Definition
                         //
                         Stream.Add("<P>Creating content [" + ChildContentName + "] from [" + ParentContentName + "]");
-                        CdefController.createContentChild(core, ChildContentName, ParentContentName, core.session.user.id);
+                        ContentMetaController.createContentChild(core, ChildContentName, ParentContentName, core.session.user.id);
                         //
                         Stream.Add("<br>Reloading Content Definitions...");
                         core.cache.invalidateAll();
@@ -1661,13 +1661,13 @@ namespace Contensive.Addons.Tools {
                         //
                         //If AddAdminMenuEntry Then
                         //    Stream.Add("<br>Adding menu entry (will not display until the next page)...")
-                        //    CS = core.db.cs_open(Processor.Models.Db.NavigatorEntryModel.contentName, "ContentID=" & ParentContentID)
-                        //    If core.db.cs_ok(CS) Then
-                        //        MenuName = core.db.cs_getText(CS, "name")
-                        //        AdminOnly = core.db.cs_getBoolean(CS, "AdminOnly")
-                        //        DeveloperOnly = core.db.cs_getBoolean(CS, "DeveloperOnly")
+                        //    CS = csXfer.cs_open(Processor.Models.Db.NavigatorEntryModel.contentName, "ContentID=" & ParentContentID)
+                        //    If csXfer.cs_ok(CS) Then
+                        //        MenuName = csXfer.cs_getText(CS, "name")
+                        //        AdminOnly = csXfer.cs_getBoolean(CS, "AdminOnly")
+                        //        DeveloperOnly = csXfer.cs_getBoolean(CS, "DeveloperOnly")
                         //    End If
-                        //    Call core.db.cs_Close(CS)
+                        //    Call csXfer.cs_Close(CS)
                         //    If MenuName <> "" Then
                         //        Call Controllers.appBuilderController.admin_VerifyAdminMenu(core, MenuName, ChildContentName, ChildContentName, "", ChildContentName, AdminOnly, DeveloperOnly, False)
                         //    Else
@@ -1744,7 +1744,7 @@ namespace Contensive.Addons.Tools {
             string returnValue = "";
             try {
                 int CSContent = 0;
-                Processor.Models.Domain.CDefDomainModel CD = null;
+                Processor.Models.Domain.ContentMetaDomainModel CD = null;
                 StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 string[,] ContentNameArray = null;
                 int ContentNameCount = 0;
@@ -1760,10 +1760,10 @@ namespace Contensive.Addons.Tools {
                     //   Run Tools
                     //
                     Stream.Add("Synchronizing Tables to Content Definitions<br>");
-                    CSContent = core.db.csOpen("Content", "", "", false, 0, false, false, "id");
-                    if (core.db.csOk(CSContent)) {
+                    CSContent = csXfer.csOpen("Content", "", "", false, 0, false, false, "id");
+                    if (csXfer.csOk(CSContent)) {
                         do {
-                            CD = Processor.Models.Domain.CDefDomainModel.create(core, core.db.csGetInteger(CSContent, "id"));
+                            CD = Processor.Models.Domain.ContentMetaDomainModel.create(core, csXfer.csGetInteger(CSContent, "id"));
                             TableName = CD.tableName;
                             Stream.Add("Synchronizing Content " + CD.name + " to table " + TableName + "<br>");
                             core.db.createSQLTable(CD.dataSourceName, TableName);
@@ -1774,12 +1774,12 @@ namespace Contensive.Addons.Tools {
                                     core.db.createSQLTableField(CD.dataSourceName, TableName, field.nameLc, field.fieldTypeId);
                                 }
                             }
-                            core.db.csGoNext(CSContent);
-                        } while (core.db.csOk(CSContent));
-                        ContentNameArray = core.db.csGetRows(CSContent);
+                            csXfer.csGoNext(CSContent);
+                        } while (csXfer.csOk(CSContent));
+                        ContentNameArray = csXfer.csGetRows(CSContent);
                         ContentNameCount = ContentNameArray.GetUpperBound(1) + 1;
                     }
-                    core.db.csClose(ref CSContent);
+                    csXfer.csClose(ref CSContent);
                 }
                 //
                 returnValue = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
@@ -1965,23 +1965,23 @@ namespace Contensive.Addons.Tools {
                     for (TestPointer = 1; TestPointer <= TestCount; TestPointer++) {
                         //
                         TestTicks = core.doc.appStopWatch.ElapsedMilliseconds;
-                        CS = core.db.csOpen("Site Properties", "","",true,0,true,false,"", PageSize, PageNumber);
+                        CS = csXfer.csOpen("Site Properties", "","",true,0,true,false,"", PageSize, PageNumber);
                         OpenTicks = OpenTicks + core.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                         //
                         RecordCount = 0;
-                        while (core.db.csOk(CS)) {
+                        while (csXfer.csOk(CS)) {
                             //
                             TestTicks = core.doc.appStopWatch.ElapsedMilliseconds;
-                            TestCopy = GenericController.encodeText(core.db.csGetValue(CS, "Name"));
+                            TestCopy = GenericController.encodeText(csXfer.csGetValue(CS, "Name"));
                             ReadTicks = ReadTicks + core.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                             //
                             TestTicks = core.doc.appStopWatch.ElapsedMilliseconds;
-                            core.db.csGoNext(CS);
+                            csXfer.csGoNext(CS);
                             NextTicks = NextTicks + core.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                             //
                             RecordCount = RecordCount + 1;
                         }
-                        core.db.csClose(ref CS);
+                        csXfer.csClose(ref CS);
                         ReadTicks = ReadTicks + core.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                     }
                     Stream.Add(DateTime.Now + " Finished<br>");
@@ -2001,23 +2001,23 @@ namespace Contensive.Addons.Tools {
                     for (TestPointer = 1; TestPointer <= TestCount; TestPointer++) {
                         //
                         TestTicks = core.doc.appStopWatch.ElapsedMilliseconds;
-                        CS = core.db.csOpen("Site Properties", "", "", true, 0, false, false, "name", PageSize, PageNumber);
+                        CS = csXfer.csOpen("Site Properties", "", "", true, 0, false, false, "name", PageSize, PageNumber);
                         OpenTicks = OpenTicks + core.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                         //
                         RecordCount = 0;
-                        while (core.db.csOk(CS)) {
+                        while (csXfer.csOk(CS)) {
                             //
                             TestTicks = core.doc.appStopWatch.ElapsedMilliseconds;
-                            TestCopy = GenericController.encodeText(core.db.csGetValue(CS, "Name"));
+                            TestCopy = GenericController.encodeText(csXfer.csGetValue(CS, "Name"));
                             ReadTicks = ReadTicks + core.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                             //
                             TestTicks = core.doc.appStopWatch.ElapsedMilliseconds;
-                            core.db.csGoNext(CS);
+                            csXfer.csGoNext(CS);
                             NextTicks = NextTicks + core.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                             //
                             RecordCount = RecordCount + 1;
                         }
-                        core.db.csClose(ref CS);
+                        csXfer.csClose(ref CS);
                         ReadTicks = ReadTicks + core.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                     }
                     Stream.Add(DateTime.Now + " Finished<br>");
@@ -2096,33 +2096,6 @@ namespace Contensive.Addons.Tools {
                 LogController.handleError( core,ex);
             }
             return tempLocal_GetContentTableName;
-        }
-        //
-        //=============================================================================
-        //   Get a ContentID from the ContentName using just the tables
-        //=============================================================================
-        //
-        private string Local_GetContentDataSource(string ContentName) {
-            string tempLocal_GetContentDataSource = null;
-            try {
-                tempLocal_GetContentDataSource = "";
-                string SQL = ""
-                    +"Select ccDataSources.Name"
-                    + " from ( ccContent Left Join ccTables on ccContent.ContentTableID=ccTables.ID )"
-                    + " Left Join ccDataSources on ccTables.DataSourceID=ccDataSources.ID"
-                    + " where ccContent.name=" + DbController.encodeSQLText(ContentName);
-                DataTable RS = core.db.executeQuery(SQL);
-                if (DbController.isDataTableOk(RS)) {
-                    tempLocal_GetContentDataSource = GenericController.encodeText(RS.Rows[0]["Name"]);
-                }
-                if (string.IsNullOrEmpty(tempLocal_GetContentDataSource)) {
-                    tempLocal_GetContentDataSource = "Default";
-                }
-                DbController.closeDataTable(RS);
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-            }
-            return tempLocal_GetContentDataSource;
         }
         //
         //=============================================================================
@@ -2419,12 +2392,12 @@ namespace Contensive.Addons.Tools {
                 //
                 // Get Tablename and DataSource
                 //
-                CS = core.db.csOpenRecord("Tables", TableID,false,false, "Name,DataSourceID");
-                if (core.db.csOk(CS)) {
-                    TableName = core.db.csGetText(CS, "name");
-                    DataSource = core.db.csGetLookup(CS, "DataSourceID");
+                CS = csXfer.csOpenRecord("Tables", TableID,false,false, "Name,DataSourceID");
+                if (csXfer.csOk(CS)) {
+                    TableName = csXfer.csGetText(CS, "name");
+                    DataSource = csXfer.csGetLookup(CS, "DataSourceID");
                 }
-                core.db.csClose(ref CS);
+                csXfer.csClose(ref CS);
                 //
                 if ((TableID != 0) && (TableID == core.docProperties.getInteger("previoustableid")) && (!string.IsNullOrEmpty(Button))) {
                     //
@@ -2573,20 +2546,20 @@ namespace Contensive.Addons.Tools {
                 SQL = "SELECT DISTINCT ccTables.Name as TableName, ccFields.Name as FieldName, ccFieldTypes.Name as FieldType"
                         + " FROM ((ccContent LEFT JOIN ccTables ON ccContent.ContentTableID = ccTables.ID) LEFT JOIN ccFields ON ccContent.ID = ccFields.ContentID) LEFT JOIN ccFieldTypes ON ccFields.Type = ccFieldTypes.ID"
                         + " ORDER BY ccTables.Name, ccFields.Name;";
-                CS = core.db.csOpenSql(SQL,"Default");
+                CS = csXfer.csOpenSql(SQL,"Default");
                 TableName = "";
-                while (core.db.csOk(CS)) {
-                    if (TableName != core.db.csGetText(CS, "TableName")) {
-                        TableName = core.db.csGetText(CS, "TableName");
+                while (csXfer.csOk(CS)) {
+                    if (TableName != csXfer.csGetText(CS, "TableName")) {
+                        TableName = csXfer.csGetText(CS, "TableName");
                         result += HtmlController.tableRow("<B>" + TableName + "</b>", TableColSpan, TableEvenRow);
                     }
                     result += HtmlController.tableRowStart();
                     result += HtmlController.td("&nbsp;","",0, TableEvenRow);
-                    result += HtmlController.td(core.db.csGetText(CS, "FieldName"), "", 0, TableEvenRow);
-                    result += HtmlController.td(core.db.csGetText(CS, "FieldType"), "", 0, TableEvenRow);
+                    result += HtmlController.td(csXfer.csGetText(CS, "FieldName"), "", 0, TableEvenRow);
+                    result += HtmlController.td(csXfer.csGetText(CS, "FieldType"), "", 0, TableEvenRow);
                     result += kmaEndTableRow;
                     TableEvenRow = !TableEvenRow;
-                    core.db.csGoNext(CS);
+                    csXfer.csGoNext(CS);
                 }
                 //
                 // Field Type Definitions
@@ -2863,8 +2836,8 @@ namespace Contensive.Addons.Tools {
         //
         //
         //
-        private Processor.Models.Domain.CDefDomainModel GetCDef(string ContentName) {
-            return Processor.Models.Domain.CDefDomainModel.createByUniqueName(core, ContentName);
+        private Processor.Models.Domain.ContentMetaDomainModel GetCDef(string ContentName) {
+            return Processor.Models.Domain.ContentMetaDomainModel.createByUniqueName(core, ContentName);
         }
         //
         //=============================================================================
@@ -2967,16 +2940,16 @@ namespace Contensive.Addons.Tools {
 
         //                End If
         //                '
-        //                CS = core.db.cs_open("Page Templates", "Link=" & DbController.encodeSQLText(Link))
-        //                If Not core.db.cs_ok(CS) Then
-        //                    Call core.db.cs_Close(CS)
-        //                    CS = core.db.cs_insertRecord("Page Templates")
-        //                    Call core.db.cs_set(CS, "Link", Link)
+        //                CS = csXfer.cs_open("Page Templates", "Link=" & DbController.encodeSQLText(Link))
+        //                If Not csXfer.cs_ok(CS) Then
+        //                    Call csXfer.cs_Close(CS)
+        //                    CS = csXfer.cs_insertRecord("Page Templates")
+        //                    Call csXfer.cs_set(CS, "Link", Link)
         //                End If
-        //                If core.db.cs_ok(CS) Then
-        //                    Call core.db.cs_set(CS, "name", TemplateName)
+        //                If csXfer.cs_ok(CS) Then
+        //                    Call csXfer.cs_set(CS, "name", TemplateName)
         //                End If
-        //                Call core.db.cs_Close(CS)
+        //                Call csXfer.cs_Close(CS)
         //            ElseIf AllowBodyHTML And (InStr(1, Filename, ".htm", vbTextCompare) <> 0) And (Mid(Filename, 1, 1) <> "_") Then
         //                '
         //                ' HTML, import body
@@ -2992,18 +2965,18 @@ namespace Contensive.Addons.Tools {
         //                '
         //                result = result & "<br>Create Soft Template from source [" & Link & "]"
         //                '
-        //                CS = core.db.cs_open("Page Templates", "Source=" & DbController.encodeSQLText(Link))
-        //                If Not core.db.cs_ok(CS) Then
-        //                    Call core.db.cs_Close(CS)
-        //                    CS = core.db.cs_insertRecord("Page Templates")
-        //                    Call core.db.cs_set(CS, "Source", Link)
-        //                    Call core.db.cs_set(CS, "name", TemplateName)
+        //                CS = csXfer.cs_open("Page Templates", "Source=" & DbController.encodeSQLText(Link))
+        //                If Not csXfer.cs_ok(CS) Then
+        //                    Call csXfer.cs_Close(CS)
+        //                    CS = csXfer.cs_insertRecord("Page Templates")
+        //                    Call csXfer.cs_set(CS, "Source", Link)
+        //                    Call csXfer.cs_set(CS, "name", TemplateName)
         //                End If
-        //                If core.db.cs_ok(CS) Then
-        //                    Call core.db.cs_set(CS, "Link", "")
-        //                    Call core.db.cs_set(CS, "bodyhtml", PageSource)
+        //                If csXfer.cs_ok(CS) Then
+        //                    Call csXfer.cs_set(CS, "Link", "")
+        //                    Call csXfer.cs_set(CS, "bodyhtml", PageSource)
         //                End If
-        //                Call core.db.cs_Close(CS)
+        //                Call csXfer.cs_Close(CS)
         //                '
         //            ElseIf AllowImageImport And (InStr(1, Filename, ".gif", vbTextCompare) <> 0) And (Mid(Filename, 1, 1) <> "_") Then
         //                '
@@ -3065,12 +3038,12 @@ namespace Contensive.Addons.Tools {
         //            Dim ParentContentName As String
         //            Dim ParentID As Integer
         //            '
-        //            CSContent = core.db.cs_open("Content", "name=" & DbController.encodeSQLText(ContentName))
-        //            If core.db.cs_ok(CSContent) Then
+        //            CSContent = csXfer.cs_open("Content", "name=" & DbController.encodeSQLText(ContentName))
+        //            If csXfer.cs_ok(CSContent) Then
         //                '
         //                ' Start with parent CDef
         //                '
-        //                ParentID = core.db.cs_getInteger(CSContent, "parentID")
+        //                ParentID = csXfer.cs_getInteger(CSContent, "parentID")
         //                If ParentID <> 0 Then
         //                    ParentContentName = Models.Complex.CdefController.getContentNameByID(core,ParentID)
         //                    If ParentContentName <> "" Then
@@ -3081,18 +3054,18 @@ namespace Contensive.Addons.Tools {
         //                ' Add this definition on it
         //                '
         //                With LoadCDef
-        //                    CS = core.db.cs_open("Content Fields", "contentid=" & ContentID)
-        //                    Do While core.db.cs_ok(CS)
-        //                        Select Case genericController.vbUCase(core.db.cs_getText(CS, "name"))
+        //                    CS = csXfer.cs_open("Content Fields", "contentid=" & ContentID)
+        //                    Do While csXfer.cs_ok(CS)
+        //                        Select Case genericController.vbUCase(csXfer.cs_getText(CS, "name"))
         //                            Case "NAME"
         //                                .Name = ""
         //                        End Select
-        //                        Call core.db.cs_goNext(CS)
+        //                        Call csXfer.cs_goNext(CS)
         //                    Loop
-        //                    Call core.db.cs_Close(CS)
+        //                    Call csXfer.cs_Close(CS)
         //                End With
         //            End If
-        //            Call core.db.cs_Close(CSContent)
+        //            Call csXfer.cs_Close(CSContent)
         //            throw (new GenericException("Unexpected exception"))'  Call handleLegacyClassErrors1("ImportTemplates", "ErrorTrap")
         //        End Function
         //        '
@@ -3328,22 +3301,22 @@ namespace Contensive.Addons.Tools {
                 Stream.Add("&nbsp;<INPUT TYPE=\"Text\" TabIndex=-1 NAME=\"ReplaceTextRows\" SIZE=\"3\" VALUE=\"" + ReplaceRows + "\" ID=\"\"  onchange=\"ReplaceText.rows=ReplaceTextRows.value; return true\"> Rows");
                 Stream.Add("<br><br>");
                 //
-                CS = core.db.csOpen("Content");
-                while (core.db.csOk(CS)) {
-                    RecordName = core.db.csGetText(CS, "Name");
+                CS = csXfer.csOpen("Content");
+                while (csXfer.csOk(CS)) {
+                    RecordName = csXfer.csGetText(CS, "Name");
                     lcName = GenericController.vbLCase(RecordName);
                     if (IsDeveloper || (lcName == "page content") || (lcName == "copy content") || (lcName == "page templates")) {
-                        RecordID = core.db.csGetInteger(CS, "ID");
+                        RecordID = csXfer.csGetInteger(CS, "ID");
                         if (GenericController.vbInstr(1, "," + CDefList + ",", "," + RecordName + ",") != 0) {
-                            TopHalf = TopHalf + "<div>" + HtmlController.checkbox("Cdef" + RowPtr, true) + HtmlController.inputHidden("CDefName" + RowPtr, RecordName) + "&nbsp;" + core.db.csGetText(CS, "Name") + "</div>";
+                            TopHalf = TopHalf + "<div>" + HtmlController.checkbox("Cdef" + RowPtr, true) + HtmlController.inputHidden("CDefName" + RowPtr, RecordName) + "&nbsp;" + csXfer.csGetText(CS, "Name") + "</div>";
                         } else {
-                            BottomHalf = BottomHalf + "<div>" + HtmlController.checkbox("Cdef" + RowPtr, false) + HtmlController.inputHidden("CDefName" + RowPtr, RecordName) + "&nbsp;" + core.db.csGetText(CS, "Name") + "</div>";
+                            BottomHalf = BottomHalf + "<div>" + HtmlController.checkbox("Cdef" + RowPtr, false) + HtmlController.inputHidden("CDefName" + RowPtr, RecordName) + "&nbsp;" + csXfer.csGetText(CS, "Name") + "</div>";
                         }
                     }
-                    core.db.csGoNext(CS);
+                    csXfer.csGoNext(CS);
                     RowPtr = RowPtr + 1;
                 }
-                core.db.csClose(ref CS);
+                csXfer.csClose(ref CS);
                 Stream.Add(TopHalf + BottomHalf + HtmlController.inputHidden("CDefRowCnt", RowPtr));
                 //
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonCancel + "," + ButtonFindAndReplace);

@@ -24,12 +24,12 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static SitePropertyModel addDefault(CoreController core, Domain.CDefDomainModel cdef) {
+        public static SitePropertyModel addDefault(CoreController core, Domain.ContentMetaDomainModel cdef) {
             return addDefault<SitePropertyModel>(core, cdef);
         }
         //
         //====================================================================================================
-        public static SitePropertyModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefDomainModel cdef) {
+        public static SitePropertyModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.ContentMetaDomainModel cdef) {
             return addDefault<SitePropertyModel>(core, cdef, ref callersCacheNameList);
         }
         //
@@ -176,7 +176,7 @@ namespace Contensive.Processor.Models.Db {
                     cs.goNext();
                 } while (cs.ok());
             }
-            cs.close();
+            cs.csClose();
             return result;
         }
     }

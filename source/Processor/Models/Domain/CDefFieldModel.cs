@@ -353,7 +353,7 @@ namespace Contensive.Processor.Models.Domain {
         public int lookupContentID { get; set; }
         public string get_lookupContentName(CoreController core) {
             if ((_lookupContentName == null)&(lookupContentID>0)) {
-                _lookupContentName = CdefController.getContentNameByID(core, lookupContentID);
+                _lookupContentName = ContentMetaController.getContentNameByID(core, lookupContentID);
                 //if (lookupContentID > 0) {
                 //    _lookupContentName = "";
                 //    var content = ContentModel.create(core, lookupContentID);

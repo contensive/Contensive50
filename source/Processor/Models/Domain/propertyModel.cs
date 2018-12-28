@@ -140,15 +140,15 @@ namespace Contensive.Processor.Models.Domain {
                     //
                     // insert a new property record, get the ID back and save it in cache
                     //
-                    int CS = core.db.csInsertRecord("Properties", SystemMemberID);
-                    if (core.db.csOk(CS)) {
-                        propertyCache[2, Ptr] = core.db.csGetText(CS, "ID");
-                        core.db.csSet(CS, "name", propertyName);
-                        core.db.csSet(CS, "FieldValue", propertyValue);
-                        core.db.csSet(CS, "TypeID", (int)propertyType);
-                        core.db.csSet(CS, "KeyID", keyId.ToString());
+                    int CS = csXfer.csInsert("Properties", SystemMemberID);
+                    if (csXfer.csOk(CS)) {
+                        propertyCache[2, Ptr] = csXfer.csGetText(CS, "ID");
+                        csXfer.csSet(CS, "name", propertyName);
+                        csXfer.csSet(CS, "FieldValue", propertyValue);
+                        csXfer.csSet(CS, "TypeID", (int)propertyType);
+                        csXfer.csSet(CS, "KeyID", keyId.ToString());
                     }
-                    core.db.csClose(ref CS);
+                    csXfer.csClose(ref CS);
                 } else if (propertyCache[1, Ptr] != propertyValue) {
                     propertyCache[1, Ptr] = propertyValue;
                     int RecordID = GenericController.encodeInteger(propertyCache[2, Ptr]);

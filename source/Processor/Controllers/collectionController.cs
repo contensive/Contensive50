@@ -1244,14 +1244,14 @@ namespace Contensive.Processor.Controllers {
                                                                             //
                                                                             // setup cdef rule
                                                                             //
-                                                                            int ContentID = CDefDomainModel.getContentId(core, ContentName);
+                                                                            int ContentID = ContentMetaDomainModel.getContentId(core, ContentName);
                                                                             if (ContentID > 0) {
-                                                                                int CS = core.db.csInsertRecord("Add-on Collection CDef Rules", 0);
-                                                                                if (core.db.csOk(CS)) {
-                                                                                    core.db.csSet(CS, "Contentid", ContentID);
-                                                                                    core.db.csSet(CS, "CollectionID", collection.id);
+                                                                                int CS = csXfer.csInsert("Add-on Collection CDef Rules", 0);
+                                                                                if (csXfer.csOk(CS)) {
+                                                                                    csXfer.csSet(CS, "Contentid", ContentID);
+                                                                                    csXfer.csSet(CS, "CollectionID", collection.id);
                                                                                 }
-                                                                                core.db.csClose(ref CS);
+                                                                                csXfer.csClose(ref CS);
                                                                             }
                                                                             break;
                                                                     }
@@ -1293,23 +1293,23 @@ namespace Contensive.Processor.Controllers {
                                                                                         //
                                                                                         // create or update the record
                                                                                         //
-                                                                                        Models.Domain.CDefDomainModel CDef = Models.Domain.CDefDomainModel.createByUniqueName(core, ContentName);
+                                                                                        Models.Domain.ContentMetaDomainModel CDef = Models.Domain.ContentMetaDomainModel.createByUniqueName(core, ContentName);
                                                                                         int cs = -1;
                                                                                         if (!string.IsNullOrEmpty(ContentRecordGuid)) {
-                                                                                            cs = core.db.csOpen(ContentName, "ccguid=" + DbController.encodeSQLText(ContentRecordGuid));
+                                                                                            cs = csXfer.csOpen(ContentName, "ccguid=" + DbController.encodeSQLText(ContentRecordGuid));
                                                                                         } else {
-                                                                                            cs = core.db.csOpen(ContentName, "name=" + DbController.encodeSQLText(ContentRecordName));
+                                                                                            cs = csXfer.csOpen(ContentName, "name=" + DbController.encodeSQLText(ContentRecordName));
                                                                                         }
                                                                                         bool recordfound = true;
-                                                                                        if (!core.db.csOk(cs)) {
+                                                                                        if (!csXfer.csOk(cs)) {
                                                                                             //
                                                                                             // Insert the new record
                                                                                             //
                                                                                             recordfound = false;
-                                                                                            core.db.csClose(ref cs);
-                                                                                            cs = core.db.csInsertRecord(ContentName, 0);
+                                                                                            csXfer.csClose(ref cs);
+                                                                                            cs = csXfer.csInsert(ContentName, 0);
                                                                                         }
-                                                                                        if (core.db.csOk(cs)) {
+                                                                                        if (csXfer.csOk(cs)) {
                                                                                             //
                                                                                             // Update the record
                                                                                             //
@@ -1317,7 +1317,7 @@ namespace Contensive.Processor.Controllers {
                                                                                                 //
                                                                                                 // found by guid, use guid in list and save name
                                                                                                 //
-                                                                                                core.db.csSet(cs, "name", ContentRecordName);
+                                                                                                csXfer.csSet(cs, "name", ContentRecordName);
                                                                                                 DataRecordList = DataRecordList + "\r\n" + ContentName + "," + ContentRecordGuid;
                                                                                             } else if (recordfound) {
                                                                                                 //
@@ -1328,12 +1328,12 @@ namespace Contensive.Processor.Controllers {
                                                                                                 //
                                                                                                 // record was created
                                                                                                 //
-                                                                                                core.db.csSet(cs, "ccguid", ContentRecordGuid);
-                                                                                                core.db.csSet(cs, "name", ContentRecordName);
+                                                                                                csXfer.csSet(cs, "ccguid", ContentRecordGuid);
+                                                                                                csXfer.csSet(cs, "name", ContentRecordName);
                                                                                                 DataRecordList = DataRecordList + "\r\n" + ContentName + "," + ContentRecordGuid;
                                                                                             }
                                                                                         }
-                                                                                        core.db.csClose(ref cs);
+                                                                                        csXfer.csClose(ref cs);
                                                                                     }
                                                                                 }
                                                                             }
@@ -1371,18 +1371,18 @@ namespace Contensive.Processor.Controllers {
                                                                 if (!string.IsNullOrEmpty(ChildCollectionGUID)) {
                                                                     int ChildCollectionID = 0;
                                                                     int cs = -1;
-                                                                    cs = core.db.csOpen("Add-on Collections", "ccguid=" + DbController.encodeSQLText(ChildCollectionGUID));
-                                                                    if (core.db.csOk(cs)) {
-                                                                        ChildCollectionID = core.db.csGetInteger(cs, "id");
+                                                                    cs = csXfer.csOpen("Add-on Collections", "ccguid=" + DbController.encodeSQLText(ChildCollectionGUID));
+                                                                    if (csXfer.csOk(cs)) {
+                                                                        ChildCollectionID = csXfer.csGetInteger(cs, "id");
                                                                     }
-                                                                    core.db.csClose(ref cs);
+                                                                    csXfer.csClose(ref cs);
                                                                     if (ChildCollectionID != 0) {
-                                                                        cs = core.db.csInsertRecord("Add-on Collection Parent Rules", 0);
-                                                                        if (core.db.csOk(cs)) {
-                                                                            core.db.csSet(cs, "ParentID", collection.id);
-                                                                            core.db.csSet(cs, "ChildID", ChildCollectionID);
+                                                                        cs = csXfer.csInsert("Add-on Collection Parent Rules", 0);
+                                                                        if (csXfer.csOk(cs)) {
+                                                                            csXfer.csSet(cs, "ParentID", collection.id);
+                                                                            csXfer.csSet(cs, "ChildID", ChildCollectionID);
                                                                         }
-                                                                        core.db.csClose(ref cs);
+                                                                        csXfer.csClose(ref cs);
                                                                     }
                                                                 }
                                                                 break;
@@ -1404,8 +1404,8 @@ namespace Contensive.Processor.Controllers {
                                                                 //    End If
                                                                 //    Criteria = "(ccguid=" & DbController.encodeSQLText(ScriptingGuid) & ")"
                                                                 //    ScriptingModuleID = 0
-                                                                //    CS = core.db.cs_open("Scripting Modules", Criteria)
-                                                                //    If core.db.cs_ok(CS) Then
+                                                                //    CS = csXfer.cs_open("Scripting Modules", Criteria)
+                                                                //    If csXfer.cs_ok(CS) Then
                                                                 //        '
                                                                 //        ' Update the Addon
                                                                 //        '
@@ -1414,45 +1414,45 @@ namespace Contensive.Processor.Controllers {
                                                                 //        '
                                                                 //        ' not found by GUID - search name against name to update legacy Add-ons
                                                                 //        '
-                                                                //        Call core.db.cs_Close(CS)
+                                                                //        Call csXfer.cs_Close(CS)
                                                                 //        Criteria = "(name=" & DbController.encodeSQLText(ScriptingName) & ")and(ccguid is null)"
-                                                                //        CS = core.db.cs_open("Scripting Modules", Criteria)
-                                                                //        If core.db.cs_ok(CS) Then
+                                                                //        CS = csXfer.cs_open("Scripting Modules", Criteria)
+                                                                //        If csXfer.cs_ok(CS) Then
                                                                 //            Call logcontroller.appendInstallLog(core, "UpgradeAppFromLocalCollection, Scripting Module matched an existing Module that has no GUID, Updating to [" & ScriptingName & "], Guid [" & ScriptingGuid & "]")
                                                                 //        End If
                                                                 //    End If
-                                                                //    If Not core.db.cs_ok(CS) Then
+                                                                //    If Not csXfer.cs_ok(CS) Then
                                                                 //        '
                                                                 //        ' not found by GUID or by name, Insert a new
                                                                 //        '
-                                                                //        Call core.db.cs_Close(CS)
-                                                                //        CS = core.db.cs_insertRecord("Scripting Modules", 0)
-                                                                //        If core.db.cs_ok(CS) Then
+                                                                //        Call csXfer.cs_Close(CS)
+                                                                //        CS = csXfer.cs_insertRecord("Scripting Modules", 0)
+                                                                //        If csXfer.cs_ok(CS) Then
                                                                 //            Call logcontroller.appendInstallLog(core, "UpgradeAppFromLocalCollection, Creating new Scripting Module [" & ScriptingName & "], Guid [" & ScriptingGuid & "]")
                                                                 //        End If
                                                                 //    End If
-                                                                //    If Not core.db.cs_ok(CS) Then
+                                                                //    If Not csXfer.cs_ok(CS) Then
                                                                 //        '
                                                                 //        ' Could not create new
                                                                 //        '
                                                                 //        Call logcontroller.appendInstallLog(core, "UpgradeAppFromLocalCollection, Scripting Module could not be created, skipping Scripting Module [" & ScriptingName & "], Guid [" & ScriptingGuid & "]")
                                                                 //    Else
-                                                                //        ScriptingModuleID = core.db.cs_getInteger(CS, "ID")
-                                                                //        Call core.db.cs_set(CS, "code", CDefSection.InnerText)
-                                                                //        Call core.db.cs_set(CS, "name", ScriptingName)
-                                                                //        Call core.db.cs_set(CS, "ccguid", ScriptingGuid)
+                                                                //        ScriptingModuleID = csXfer.cs_getInteger(CS, "ID")
+                                                                //        Call csXfer.cs_set(CS, "code", CDefSection.InnerText)
+                                                                //        Call csXfer.cs_set(CS, "name", ScriptingName)
+                                                                //        Call csXfer.cs_set(CS, "ccguid", ScriptingGuid)
                                                                 //    End If
-                                                                //    Call core.db.cs_Close(CS)
+                                                                //    Call csXfer.cs_Close(CS)
                                                                 //    If ScriptingModuleID <> 0 Then
                                                                 //        '
                                                                 //        ' Add Add-on Collection Module Rule
                                                                 //        '
-                                                                //        CS = core.db.cs_insertRecord("Add-on Collection Module Rules", 0)
-                                                                //        If core.db.cs_ok(CS) Then
-                                                                //            Call core.db.cs_set(CS, "Collectionid", CollectionID)
-                                                                //            Call core.db.cs_set(CS, "ScriptingModuleID", ScriptingModuleID)
+                                                                //        CS = csXfer.cs_insertRecord("Add-on Collection Module Rules", 0)
+                                                                //        If csXfer.cs_ok(CS) Then
+                                                                //            Call csXfer.cs_set(CS, "Collectionid", CollectionID)
+                                                                //            Call csXfer.cs_set(CS, "ScriptingModuleID", ScriptingModuleID)
                                                                 //        End If
-                                                                //        Call core.db.cs_Close(CS)
+                                                                //        Call csXfer.cs_Close(CS)
                                                                 //    End If
                                                                 break;
                                                             case "sharedstyle":
@@ -1474,8 +1474,8 @@ namespace Contensive.Processor.Controllers {
                                                                 //    End If
                                                                 //    Criteria = "(ccguid=" & DbController.encodeSQLText(nodeGuid) & ")"
                                                                 //    ScriptingModuleID = 0
-                                                                //    CS = core.db.cs_open("Shared Styles", Criteria)
-                                                                //    If core.db.cs_ok(CS) Then
+                                                                //    CS = csXfer.cs_open("Shared Styles", Criteria)
+                                                                //    If csXfer.cs_ok(CS) Then
                                                                 //        '
                                                                 //        ' Update the Addon
                                                                 //        '
@@ -1484,40 +1484,40 @@ namespace Contensive.Processor.Controllers {
                                                                 //        '
                                                                 //        ' not found by GUID - search name against name to update legacy Add-ons
                                                                 //        '
-                                                                //        Call core.db.cs_Close(CS)
+                                                                //        Call csXfer.cs_Close(CS)
                                                                 //        Criteria = "(name=" & DbController.encodeSQLText(NodeName) & ")and(ccguid is null)"
-                                                                //        CS = core.db.cs_open("shared styles", Criteria)
-                                                                //        If core.db.cs_ok(CS) Then
+                                                                //        CS = csXfer.cs_open("shared styles", Criteria)
+                                                                //        If csXfer.cs_ok(CS) Then
                                                                 //            Call logcontroller.appendInstallLog(core, "UpgradeAppFromLocalCollection, shared style matched an existing Module that has no GUID, Updating to [" & NodeName & "], Guid [" & nodeGuid & "]")
                                                                 //        End If
                                                                 //    End If
-                                                                //    If Not core.db.cs_ok(CS) Then
+                                                                //    If Not csXfer.cs_ok(CS) Then
                                                                 //        '
                                                                 //        ' not found by GUID or by name, Insert a new
                                                                 //        '
-                                                                //        Call core.db.cs_Close(CS)
-                                                                //        CS = core.db.cs_insertRecord("shared styles", 0)
-                                                                //        If core.db.cs_ok(CS) Then
+                                                                //        Call csXfer.cs_Close(CS)
+                                                                //        CS = csXfer.cs_insertRecord("shared styles", 0)
+                                                                //        If csXfer.cs_ok(CS) Then
                                                                 //            Call logcontroller.appendInstallLog(core, "UpgradeAppFromLocalCollection, Creating new shared style [" & NodeName & "], Guid [" & nodeGuid & "]")
                                                                 //        End If
                                                                 //    End If
-                                                                //    If Not core.db.cs_ok(CS) Then
+                                                                //    If Not csXfer.cs_ok(CS) Then
                                                                 //        '
                                                                 //        ' Could not create new
                                                                 //        '
                                                                 //        Call logcontroller.appendInstallLog(core, "UpgradeAppFromLocalCollection, shared style could not be created, skipping shared style [" & NodeName & "], Guid [" & nodeGuid & "]")
                                                                 //    Else
-                                                                //        sharedStyleId = core.db.cs_getInteger(CS, "ID")
-                                                                //        Call core.db.cs_set(CS, "StyleFilename", CDefSection.InnerText)
-                                                                //        Call core.db.cs_set(CS, "name", NodeName)
-                                                                //        Call core.db.cs_set(CS, "ccguid", nodeGuid)
-                                                                //        Call core.db.cs_set(CS, "alwaysInclude",xmlController.GetXMLAttribute(core,IsFound, CDefSection, "alwaysinclude", "0"))
-                                                                //        Call core.db.cs_set(CS, "prefix",xmlController.GetXMLAttribute(core,IsFound, CDefSection, "prefix", ""))
-                                                                //        Call core.db.cs_set(CS, "suffix",xmlController.GetXMLAttribute(core,IsFound, CDefSection, "suffix", ""))
-                                                                //        Call core.db.cs_set(CS, "suffix",xmlController.GetXMLAttribute(core,IsFound, CDefSection, "suffix", ""))
-                                                                //        Call core.db.cs_set(CS, "sortOrder",xmlController.GetXMLAttribute(core,IsFound, CDefSection, "sortOrder", ""))
+                                                                //        sharedStyleId = csXfer.cs_getInteger(CS, "ID")
+                                                                //        Call csXfer.cs_set(CS, "StyleFilename", CDefSection.InnerText)
+                                                                //        Call csXfer.cs_set(CS, "name", NodeName)
+                                                                //        Call csXfer.cs_set(CS, "ccguid", nodeGuid)
+                                                                //        Call csXfer.cs_set(CS, "alwaysInclude",xmlController.GetXMLAttribute(core,IsFound, CDefSection, "alwaysinclude", "0"))
+                                                                //        Call csXfer.cs_set(CS, "prefix",xmlController.GetXMLAttribute(core,IsFound, CDefSection, "prefix", ""))
+                                                                //        Call csXfer.cs_set(CS, "suffix",xmlController.GetXMLAttribute(core,IsFound, CDefSection, "suffix", ""))
+                                                                //        Call csXfer.cs_set(CS, "suffix",xmlController.GetXMLAttribute(core,IsFound, CDefSection, "suffix", ""))
+                                                                //        Call csXfer.cs_set(CS, "sortOrder",xmlController.GetXMLAttribute(core,IsFound, CDefSection, "sortOrder", ""))
                                                                 //    End If
-                                                                //    Call core.db.cs_Close(CS)
+                                                                //    Call csXfer.cs_Close(CS)
                                                                 break;
                                                             case "addon":
                                                             case "add-on":
@@ -1605,14 +1605,14 @@ namespace Contensive.Processor.Controllers {
                                                                             string ContentRecordGuid =XmlController.GetXMLAttribute(core, IsFound, ContentNode, "guid", "");
                                                                             string ContentRecordName =XmlController.GetXMLAttribute(core, IsFound, ContentNode, "name", "");
                                                                             if ((!string.IsNullOrEmpty(ContentRecordGuid)) || (!string.IsNullOrEmpty(ContentRecordName))) {
-                                                                                Models.Domain.CDefDomainModel CDef = Models.Domain.CDefDomainModel.createByUniqueName(core, ContentName);
+                                                                                Models.Domain.ContentMetaDomainModel CDef = Models.Domain.ContentMetaDomainModel.createByUniqueName(core, ContentName);
                                                                                 int cs = -1;
                                                                                 if (!string.IsNullOrEmpty(ContentRecordGuid)) {
-                                                                                    cs = core.db.csOpen(ContentName, "ccguid=" + DbController.encodeSQLText(ContentRecordGuid));
+                                                                                    cs = csXfer.csOpen(ContentName, "ccguid=" + DbController.encodeSQLText(ContentRecordGuid));
                                                                                 } else {
-                                                                                    cs = core.db.csOpen(ContentName, "name=" + DbController.encodeSQLText(ContentRecordName));
+                                                                                    cs = csXfer.csOpen(ContentName, "name=" + DbController.encodeSQLText(ContentRecordName));
                                                                                 }
-                                                                                if (core.db.csOk(cs)) {
+                                                                                if (csXfer.csOk(cs)) {
                                                                                     //
                                                                                     // Update the record
                                                                                     foreach (XmlNode FieldNode in ContentNode.ChildNodes) {
@@ -1643,16 +1643,16 @@ namespace Contensive.Processor.Controllers {
                                                                                                             //
                                                                                                             // read in text value, if a guid, use it, otherwise assume name
                                                                                                             if (FieldLookupContentID != 0) {
-                                                                                                                string FieldLookupContentName = CdefController.getContentNameByID(core, FieldLookupContentID);
+                                                                                                                string FieldLookupContentName = ContentMetaController.getContentNameByID(core, FieldLookupContentID);
                                                                                                                 if (!string.IsNullOrEmpty(FieldLookupContentName)) {
-                                                                                                                    if ((FieldValue.Left(1) == "{") && (FieldValue.Substring(FieldValue.Length - 1) == "}") && CdefController.isContentFieldSupported(core, FieldLookupContentName, "ccguid")) {
+                                                                                                                    if ((FieldValue.Left(1) == "{") && (FieldValue.Substring(FieldValue.Length - 1) == "}") && ContentMetaController.isContentFieldSupported(core, FieldLookupContentName, "ccguid")) {
                                                                                                                         //
                                                                                                                         // Lookup by guid
                                                                                                                         int fieldLookupId = GenericController.encodeInteger(core.db.getRecordIDByGuid(FieldLookupContentName, FieldValue));
                                                                                                                         if (fieldLookupId <= 0) {
                                                                                                                             return_ErrorMessage = return_ErrorMessage + "<P>Warning: There was a problem translating field [" + FieldName + "] in record [" + ContentName + "] because the record it refers to was not found in this site.</P>";
                                                                                                                         } else {
-                                                                                                                            core.db.csSet(cs, FieldName, fieldLookupId);
+                                                                                                                            csXfer.csSet(cs, FieldName, fieldLookupId);
                                                                                                                         }
                                                                                                                     } else {
                                                                                                                         //
@@ -1662,7 +1662,7 @@ namespace Contensive.Processor.Controllers {
                                                                                                                             if (fieldLookupId <= 0) {
                                                                                                                                 return_ErrorMessage = return_ErrorMessage + "<P>Warning: There was a problem translating field [" + FieldName + "] in record [" + ContentName + "] because the record it refers to was not found in this site.</P>";
                                                                                                                             } else {
-                                                                                                                                core.db.csSet(cs, FieldName, fieldLookupId);
+                                                                                                                                csXfer.csSet(cs, FieldName, fieldLookupId);
                                                                                                                             }
                                                                                                                         }
                                                                                                                     }
@@ -1670,12 +1670,12 @@ namespace Contensive.Processor.Controllers {
                                                                                                             } else if (FieldValue.IsNumeric()) {
                                                                                                                 //
                                                                                                                 // must be lookup list
-                                                                                                                core.db.csSet(cs, FieldName, FieldValue);
+                                                                                                                csXfer.csSet(cs, FieldName, FieldValue);
                                                                                                             }
                                                                                                             break;
                                                                                                         }
                                                                                                     default: {
-                                                                                                            core.db.csSet(cs, FieldName, FieldValue);
+                                                                                                            csXfer.csSet(cs, FieldName, FieldValue);
                                                                                                             break;
                                                                                                         }
                                                                                                 }
@@ -1683,7 +1683,7 @@ namespace Contensive.Processor.Controllers {
                                                                                         }
                                                                                     }
                                                                                 }
-                                                                                core.db.csClose(ref cs);
+                                                                                csXfer.csClose(ref cs);
                                                                             }
                                                                         }
                                                                     }
@@ -1995,11 +1995,11 @@ namespace Contensive.Processor.Controllers {
             try {
                 int CS;
                 //
-                CS = core.db.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, "ccguid=" + DbController.encodeSQLText(ccGuid), "ID",true,0,false,false, "ID");
-                if (core.db.csOk(CS)) {
-                    navId = core.db.csGetInteger(CS, "id");
+                CS = csXfer.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, "ccguid=" + DbController.encodeSQLText(ccGuid), "ID",true,0,false,false, "ID");
+                if (csXfer.csOk(CS)) {
+                    navId = csXfer.csGetInteger(CS, "id");
                 }
-                core.db.csClose(ref CS);
+                csXfer.csClose(ref CS);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
@@ -2131,8 +2131,8 @@ namespace Contensive.Processor.Controllers {
                         navTypeId = NavTypeIDAddon;
                     }
                     string Criteria = "(" + AddonGuidFieldName + "=" + DbController.encodeSQLText(addonGuid) + ")";
-                    int CS = core.db.csOpen(Models.Db.AddonModel.contentName, Criteria, "", false);
-                    if (core.db.csOk(CS)) {
+                    int CS = csXfer.csOpen(Models.Db.AddonModel.contentName, Criteria, "", false);
+                    if (csXfer.csOk(CS)) {
                         //
                         // Update the Addon
                         //
@@ -2141,30 +2141,30 @@ namespace Contensive.Processor.Controllers {
                         //
                         // not found by GUID - search name against name to update legacy Add-ons
                         //
-                        core.db.csClose(ref CS);
+                        csXfer.csClose(ref CS);
                         Criteria = "(name=" + DbController.encodeSQLText(addonName) + ")and(" + AddonGuidFieldName + " is null)";
-                        CS = core.db.csOpen(Models.Db.AddonModel.contentName, Criteria,"", false);
-                        if (core.db.csOk(CS)) {
+                        CS = csXfer.csOpen(Models.Db.AddonModel.contentName, Criteria,"", false);
+                        if (csXfer.csOk(CS)) {
                             LogController.logInfo(core, "UpgradeAppFromLocalCollection, Add-on name matched an existing Add-on that has no GUID, Updating legacy Aggregate Function to Add-on [" + addonName + "], Guid [" + addonGuid + "]");
                         }
                     }
-                    if (!core.db.csOk(CS)) {
+                    if (!csXfer.csOk(CS)) {
                         //
                         // not found by GUID or by name, Insert a new addon
                         //
-                        core.db.csClose(ref CS);
-                        CS = core.db.csInsertRecord(Models.Db.AddonModel.contentName, 0);
-                        if (core.db.csOk(CS)) {
+                        csXfer.csClose(ref CS);
+                        CS = csXfer.csInsert(Models.Db.AddonModel.contentName, 0);
+                        if (csXfer.csOk(CS)) {
                             LogController.logInfo(core, "UpgradeAppFromLocalCollection, Creating new Add-on [" + addonName + "], Guid [" + addonGuid + "]");
                         }
                     }
-                    if (!core.db.csOk(CS)) {
+                    if (!csXfer.csOk(CS)) {
                         //
                         // Could not create new Add-on
                         //
                         LogController.logInfo(core, "UpgradeAppFromLocalCollection, Add-on could not be created, skipping Add-on [" + addonName + "], Guid [" + addonGuid + "]");
                     } else {
-                        int addonId = core.db.csGetInteger(CS, "ID");
+                        int addonId = csXfer.csGetInteger(CS, "ID");
                         //
                         // Initialize the add-on
                         // Delete any existing related records - so if this is an update with removed relationships, those are removed
@@ -2174,10 +2174,10 @@ namespace Contensive.Processor.Controllers {
                         core.db.deleteContentRecords("Add-on Include Rules", "addonid=" + addonId);
                         core.db.deleteContentRecords("Add-on Content Trigger Rules", "addonid=" + addonId);
                         //
-                        core.db.csSet(CS, "collectionid", CollectionID);
-                        core.db.csSet(CS, AddonGuidFieldName, addonGuid);
-                        core.db.csSet(CS, "name", addonName);
-                        core.db.csSet(CS, "navTypeId", navTypeId);
+                        csXfer.csSet(CS, "collectionid", CollectionID);
+                        csXfer.csSet(CS, AddonGuidFieldName, addonGuid);
+                        csXfer.csSet(CS, "name", addonName);
+                        csXfer.csSet(CS, "navTypeId", navTypeId);
                         string ArgumentList = "";
                         string StyleSheet = "";
                         if (AddonNode.ChildNodes.Count > 0) {
@@ -2216,16 +2216,16 @@ namespace Contensive.Processor.Controllers {
                                                         fieldTypeID = core.db.getRecordID("Content Field Types", fieldType);
                                                         if (fieldTypeID > 0) {
                                                             Criteria = "(addonid=" + addonId + ")and(contentfieldTypeID=" + fieldTypeID + ")";
-                                                            CS2 = core.db.csOpen("Add-on Content Field Type Rules", Criteria);
-                                                            if (!core.db.csOk(CS2)) {
-                                                                core.db.csClose(ref CS2);
-                                                                CS2 = core.db.csInsertRecord("Add-on Content Field Type Rules", 0);
+                                                            CS2 = csXfer.csOpen("Add-on Content Field Type Rules", Criteria);
+                                                            if (!csXfer.csOk(CS2)) {
+                                                                csXfer.csClose(ref CS2);
+                                                                CS2 = csXfer.csInsert("Add-on Content Field Type Rules", 0);
                                                             }
-                                                            if (core.db.csOk(CS2)) {
-                                                                core.db.csSet(CS2, "addonid", addonId);
-                                                                core.db.csSet(CS2, "contentfieldTypeID", fieldTypeID);
+                                                            if (csXfer.csOk(CS2)) {
+                                                                csXfer.csSet(CS2, "addonid", addonId);
+                                                                csXfer.csSet(CS2, "contentfieldTypeID", fieldTypeID);
                                                             }
-                                                            core.db.csClose(ref CS2);
+                                                            csXfer.csClose(ref CS2);
                                                         }
                                                         break;
                                                 }
@@ -2249,31 +2249,31 @@ namespace Contensive.Processor.Controllers {
                                                             }
                                                         }
                                                         Criteria = "(ccguid=" + DbController.encodeSQLText(ContentNameorGuid) + ")";
-                                                        CS2 = core.db.csOpen("Content", Criteria);
-                                                        if (!core.db.csOk(CS2)) {
-                                                            core.db.csClose(ref CS2);
+                                                        CS2 = csXfer.csOpen("Content", Criteria);
+                                                        if (!csXfer.csOk(CS2)) {
+                                                            csXfer.csClose(ref CS2);
                                                             Criteria = "(ccguid is null)and(name=" + DbController.encodeSQLText(ContentNameorGuid) + ")";
-                                                            CS2 = core.db.csOpen("content", Criteria);
+                                                            CS2 = csXfer.csOpen("content", Criteria);
                                                         }
-                                                        if (core.db.csOk(CS2)) {
-                                                            TriggerContentID = core.db.csGetInteger(CS2, "ID");
+                                                        if (csXfer.csOk(CS2)) {
+                                                            TriggerContentID = csXfer.csGetInteger(CS2, "ID");
                                                         }
-                                                        core.db.csClose(ref CS2);
+                                                        csXfer.csClose(ref CS2);
                                                         if (TriggerContentID == 0) {
                                                             //
                                                             // could not find the content
                                                         } else {
                                                             Criteria = "(addonid=" + addonId + ")and(contentid=" + TriggerContentID + ")";
-                                                            CS2 = core.db.csOpen("Add-on Content Trigger Rules", Criteria);
-                                                            if (!core.db.csOk(CS2)) {
-                                                                core.db.csClose(ref CS2);
-                                                                CS2 = core.db.csInsertRecord("Add-on Content Trigger Rules", 0);
-                                                                if (core.db.csOk(CS2)) {
-                                                                    core.db.csSet(CS2, "addonid", addonId);
-                                                                    core.db.csSet(CS2, "contentid", TriggerContentID);
+                                                            CS2 = csXfer.csOpen("Add-on Content Trigger Rules", Criteria);
+                                                            if (!csXfer.csOk(CS2)) {
+                                                                csXfer.csClose(ref CS2);
+                                                                CS2 = csXfer.csInsert("Add-on Content Trigger Rules", 0);
+                                                                if (csXfer.csOk(CS2)) {
+                                                                    csXfer.csSet(CS2, "addonid", addonId);
+                                                                    csXfer.csSet(CS2, "contentid", TriggerContentID);
                                                                 }
                                                             }
-                                                            core.db.csClose(ref CS2);
+                                                            csXfer.csClose(ref CS2);
                                                         }
                                                         break;
                                                 }
@@ -2290,11 +2290,11 @@ namespace Contensive.Processor.Controllers {
                                             } else {
                                                 scriptinglanguageid = (int)AddonController.ScriptLanguages.VBScript;
                                             }
-                                            core.db.csSet(CS, "scriptinglanguageid", scriptinglanguageid);
+                                            csXfer.csSet(CS, "scriptinglanguageid", scriptinglanguageid);
                                             ScriptingEntryPoint = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "entrypoint", "");
-                                            core.db.csSet(CS, "ScriptingEntryPoint", ScriptingEntryPoint);
+                                            csXfer.csSet(CS, "ScriptingEntryPoint", ScriptingEntryPoint);
                                             ScriptingTimeout = GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "timeout", "5000"));
-                                            core.db.csSet(CS, "ScriptingTimeout", ScriptingTimeout);
+                                            csXfer.csSet(CS, "ScriptingTimeout", ScriptingTimeout);
                                             ScriptingCode = "";
                                             foreach (XmlNode ScriptingNode in PageInterfaceWithinLoop.ChildNodes) {
                                                 switch (GenericController.vbLCase(ScriptingNode.Name)) {
@@ -2303,20 +2303,20 @@ namespace Contensive.Processor.Controllers {
                                                         break;
                                                 }
                                             }
-                                            core.db.csSet(CS, "ScriptingCode", ScriptingCode);
+                                            csXfer.csSet(CS, "ScriptingCode", ScriptingCode);
                                             break;
                                         case "activexprogramid":
                                             //
                                             // save program id
                                             //
                                             FieldValue = PageInterfaceWithinLoop.InnerText;
-                                            core.db.csSet(CS, "ObjectProgramID", FieldValue);
+                                            csXfer.csSet(CS, "ObjectProgramID", FieldValue);
                                             break;
                                         case "navigator":
                                             //
                                             // create a navigator entry with a parent set to this
                                             //
-                                            core.db.csSave(CS);
+                                            csXfer.csSave(CS);
                                             menuNameSpace = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "NameSpace", "");
                                             if (!string.IsNullOrEmpty(menuNameSpace)) {
                                                 string NavIconTypeString = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "type", "");
@@ -2377,12 +2377,12 @@ namespace Contensive.Processor.Controllers {
                                             //
                                             FieldName = PageInterfaceWithinLoop.Name;
                                             FieldValue = PageInterfaceWithinLoop.InnerText;
-                                            if (!core.db.csIsFieldSupported(CS, FieldName)) {
+                                            if (!csXfer.csIsFieldSupported(CS, FieldName)) {
                                                 //
                                                 // Bad field name - need to report it somehow
                                                 //
                                             } else {
-                                                core.db.csSet(CS, FieldName, FieldValue);
+                                                csXfer.csSet(CS, FieldName, FieldValue);
                                                 if (GenericController.encodeBoolean(PageInterfaceWithinLoop.InnerText)) {
                                                     //
                                                     // if template, admin or content - let non-developers have navigator entry
@@ -2418,11 +2418,11 @@ namespace Contensive.Processor.Controllers {
                                                         FieldValue = FieldValue.Substring(17);
                                                     }
                                                 }
-                                                core.db.csSet(CS, "IconFilename", FieldValue);
+                                                csXfer.csSet(CS, "IconFilename", FieldValue);
                                                 if (true) {
-                                                    core.db.csSet(CS, "IconWidth", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "width", "0")));
-                                                    core.db.csSet(CS, "IconHeight", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "height", "0")));
-                                                    core.db.csSet(CS, "IconSprites", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "sprites", "0")));
+                                                    csXfer.csSet(CS, "IconWidth", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "width", "0")));
+                                                    csXfer.csSet(CS, "IconHeight", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "height", "0")));
+                                                    csXfer.csSet(CS, "IconSprites", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "sprites", "0")));
                                                 }
                                             }
                                             break;
@@ -2442,7 +2442,7 @@ namespace Contensive.Processor.Controllers {
                                             //   this removes the ccsettingpages and settingcollectionrules, etc.
                                             //
                                             if (true) {
-                                                core.db.csSet(CS, "formxml", PageInterfaceWithinLoop.InnerXml);
+                                                csXfer.csSet(CS, "formxml", PageInterfaceWithinLoop.InnerXml);
                                             }
                                             break;
                                         case "javascript":
@@ -2451,7 +2451,7 @@ namespace Contensive.Processor.Controllers {
                                             // these all translate to JSFilename
                                             //
                                             FieldName = "jsfilename";
-                                            core.db.csSet(CS, FieldName, PageInterfaceWithinLoop.InnerText);
+                                            csXfer.csSet(CS, FieldName, PageInterfaceWithinLoop.InnerText);
 
                                             break;
                                         case "iniframe":
@@ -2459,7 +2459,7 @@ namespace Contensive.Processor.Controllers {
                                             // typo - field is inframe
                                             //
                                             FieldName = "inframe";
-                                            core.db.csSet(CS, FieldName, PageInterfaceWithinLoop.InnerText);
+                                            csXfer.csSet(CS, FieldName, PageInterfaceWithinLoop.InnerText);
                                             break;
                                         default:
                                             //
@@ -2467,21 +2467,21 @@ namespace Contensive.Processor.Controllers {
                                             //
                                             FieldName = PageInterfaceWithinLoop.Name;
                                             FieldValue = PageInterfaceWithinLoop.InnerText;
-                                            if (!core.db.csIsFieldSupported(CS, FieldName)) {
+                                            if (!csXfer.csIsFieldSupported(CS, FieldName)) {
                                                 //
                                                 // Bad field name - need to report it somehow
                                                 //
                                                 LogController.handleError(core, new ApplicationException("bad field found [" + FieldName + "], in addon node [" + addonName + "], of collection [" + core.db.getRecordName("add-on collections", CollectionID) + "]"));
                                             } else {
-                                                core.db.csSet(CS, FieldName, FieldValue);
+                                                csXfer.csSet(CS, FieldName, FieldValue);
                                             }
                                             break;
                                     }
                                 }
                             }
                         }
-                        core.db.csSet(CS, "ArgumentList", ArgumentList);
-                        core.db.csSet(CS, "StylesFilename", StyleSheet);
+                        csXfer.csSet(CS, "ArgumentList", ArgumentList);
+                        csXfer.csSet(CS, "StylesFilename", StyleSheet);
                         // these are dynamic now
                         //            '
                         //            ' Setup special setting/tool/report Navigator Entry
@@ -2496,7 +2496,7 @@ namespace Contensive.Processor.Controllers {
                         //                AddonNavID = GetNonRootNavigatorID(asv, AOName, GetNavIDByGuid(asv, "{5FDDC758-4A15-4F98-8333-9CE8B8BFABC4}"), addonid, 0, NavIconTypeSetting, AOName & " Add-on", NavDeveloperOnly, 0, "", 0, 0, CollectionID, navAdminOnly)
                         //            End If
                     }
-                    core.db.csClose(ref CS);
+                    csXfer.csClose(ref CS);
                     //
                     // -- if this is needed, the installation xml files are available in the addon install folder. - I do not believe this is important
                     //       as if a collection is missing a dependancy, there is an error and you would expect to have to reinstall.
@@ -2508,9 +2508,9 @@ namespace Contensive.Processor.Controllers {
                     //   - if this addon is the target of another add-on's  "includeaddon" node
                     //
                     //Doc = New XmlDocument
-                    //CS = core.db.cs_open("Add-on Collections")
-                    //Do While core.db.cs_ok(CS)
-                    //    CollectionFile = core.db.cs_get(CS, "InstallFile")
+                    //CS = csXfer.cs_open("Add-on Collections")
+                    //Do While csXfer.cs_ok(CS)
+                    //    CollectionFile = csXfer.cs_get(CS, "InstallFile")
                     //    If CollectionFile <> "" Then
                     //        Try
                     //            Call Doc.LoadXml(CollectionFile)
@@ -2551,27 +2551,27 @@ namespace Contensive.Processor.Controllers {
                     //                                                End If
                     //                                                If Criteria <> "" Then
                     //                                                    '$$$$$ cache this
-                    //                                                    CS2 = core.db.cs_open(Models.Db.AddonModel.contentName, Criteria, "ID")
-                    //                                                    If core.db.cs_ok(CS2) Then
-                    //                                                        SrcAddonID = core.db.cs_getInteger(CS2, "ID")
+                    //                                                    CS2 = csXfer.cs_open(Models.Db.AddonModel.contentName, Criteria, "ID")
+                    //                                                    If csXfer.cs_ok(CS2) Then
+                    //                                                        SrcAddonID = csXfer.cs_getInteger(CS2, "ID")
                     //                                                    End If
-                    //                                                    Call core.db.cs_Close(CS2)
+                    //                                                    Call csXfer.cs_Close(CS2)
                     //                                                    AddRule = False
                     //                                                    If SrcAddonID = 0 Then
                     //                                                        UserError = "The add-on being installed is referenced by another add-on in collection [], but this add-on could not be found by the respoective criteria [" & Criteria & "]"
                     //                                                        Call logcontroller.appendInstallLog(core,  "UpgradeAddFromLocalCollection_InstallAddonNode, UserError [" & UserError & "]")
                     //                                                    Else
-                    //                                                        CS2 = core.db.cs_openCsSql_rev("default", "select ID from ccAddonIncludeRules where Addonid=" & SrcAddonID & " and IncludedAddonID=" & addonId)
-                    //                                                        AddRule = Not core.db.cs_ok(CS2)
-                    //                                                        Call core.db.cs_Close(CS2)
+                    //                                                        CS2 = csXfer.cs_openCsSql_rev("default", "select ID from ccAddonIncludeRules where Addonid=" & SrcAddonID & " and IncludedAddonID=" & addonId)
+                    //                                                        AddRule = Not csXfer.cs_ok(CS2)
+                    //                                                        Call csXfer.cs_Close(CS2)
                     //                                                    End If
                     //                                                    If AddRule Then
-                    //                                                        CS2 = core.db.cs_insertRecord("Add-on Include Rules", 0)
-                    //                                                        If core.db.cs_ok(CS2) Then
-                    //                                                            Call core.db.cs_set(CS2, "Addonid", SrcAddonID)
-                    //                                                            Call core.db.cs_set(CS2, "IncludedAddonID", addonId)
+                    //                                                        CS2 = csXfer.cs_insertRecord("Add-on Include Rules", 0)
+                    //                                                        If csXfer.cs_ok(CS2) Then
+                    //                                                            Call csXfer.cs_set(CS2, "Addonid", SrcAddonID)
+                    //                                                            Call csXfer.cs_set(CS2, "IncludedAddonID", addonId)
                     //                                                        End If
-                    //                                                        Call core.db.cs_Close(CS2)
+                    //                                                        Call csXfer.cs_Close(CS2)
                     //                                                    End If
                     //                                                End If
                     //                                            End If
@@ -2589,9 +2589,9 @@ namespace Contensive.Processor.Controllers {
                     //            core.handleExceptionAndContinue(ex) : Throw
                     //        End Try
                     //    End If
-                    //    Call core.db.cs_goNext(CS)
+                    //    Call csXfer.cs_goNext(CS)
                     //Loop
-                    //Call core.db.cs_Close(CS)
+                    //Call csXfer.cs_Close(CS)
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -2635,8 +2635,8 @@ namespace Contensive.Processor.Controllers {
                     }
                     AddOnType =XmlController.GetXMLAttribute(core, IsFound, AddonNode, "type", "");
                     Criteria = "(" + AddonGuidFieldName + "=" + DbController.encodeSQLText(AOGuid) + ")";
-                    CS = core.db.csOpen(Models.Db.AddonModel.contentName, Criteria,"", false);
-                    if (core.db.csOk(CS)) {
+                    CS = csXfer.csOpen(Models.Db.AddonModel.contentName, Criteria,"", false);
+                    if (csXfer.csOk(CS)) {
                         //
                         // Update the Addon
                         //
@@ -2645,17 +2645,17 @@ namespace Contensive.Processor.Controllers {
                         //
                         // not found by GUID - search name against name to update legacy Add-ons
                         //
-                        core.db.csClose(ref CS);
+                        csXfer.csClose(ref CS);
                         Criteria = "(name=" + DbController.encodeSQLText(AOName) + ")and(" + AddonGuidFieldName + " is null)";
-                        CS = core.db.csOpen(Models.Db.AddonModel.contentName, Criteria,"", false);
+                        CS = csXfer.csOpen(Models.Db.AddonModel.contentName, Criteria,"", false);
                     }
-                    if (!core.db.csOk(CS)) {
+                    if (!csXfer.csOk(CS)) {
                         //
                         // Could not find add-on
                         //
                         LogController.logInfo(core, "UpgradeAppFromLocalCollection, Add-on could not be created, skipping Add-on [" + AOName + "], Guid [" + AOGuid + "]");
                     } else {
-                        addonId = core.db.csGetInteger(CS, "ID");
+                        addonId = csXfer.csGetInteger(CS, "ID");
                         if (AddonNode.ChildNodes.Count > 0) {
                             foreach (XmlNode PageInterface in AddonNode.ChildNodes) {
                                 switch (GenericController.vbLCase(PageInterface.Name)) {
@@ -2681,11 +2681,11 @@ namespace Contensive.Processor.Controllers {
                                                 Criteria = "(name=" + DbController.encodeSQLText(IncludeAddonName) + ")";
                                             }
                                             if (!string.IsNullOrEmpty(Criteria)) {
-                                                CS2 = core.db.csOpen(Models.Db.AddonModel.contentName, Criteria);
-                                                if (core.db.csOk(CS2)) {
-                                                    IncludeAddonID = core.db.csGetInteger(CS2, "ID");
+                                                CS2 = csXfer.csOpen(Models.Db.AddonModel.contentName, Criteria);
+                                                if (csXfer.csOk(CS2)) {
+                                                    IncludeAddonID = csXfer.csGetInteger(CS2, "ID");
                                                 }
-                                                core.db.csClose(ref CS2);
+                                                csXfer.csClose(ref CS2);
                                                 AddRule = false;
                                                 if (IncludeAddonID == 0) {
                                                     UserError = "The include add-on [" + IncludeAddonName + "] could not be added because it was not found. If it is in the collection being installed, it must appear before any add-ons that include it.";
@@ -2693,17 +2693,17 @@ namespace Contensive.Processor.Controllers {
                                                     ReturnUpgradeOK = false;
                                                     ReturnErrorMessage = ReturnErrorMessage + "<P>The collection was not installed because the add-on [" + AOName + "] requires an included add-on [" + IncludeAddonName + "] which could not be found. If it is in the collection being installed, it must appear before any add-ons that include it.</P>";
                                                 } else {
-                                                    CS2 = core.db.csOpenSql( "select ID from ccAddonIncludeRules where Addonid=" + addonId + " and IncludedAddonID=" + IncludeAddonID);
-                                                    AddRule = !core.db.csOk(CS2);
-                                                    core.db.csClose(ref CS2);
+                                                    CS2 = csXfer.csOpenSql( "select ID from ccAddonIncludeRules where Addonid=" + addonId + " and IncludedAddonID=" + IncludeAddonID);
+                                                    AddRule = !csXfer.csOk(CS2);
+                                                    csXfer.csClose(ref CS2);
                                                 }
                                                 if (AddRule) {
-                                                    CS2 = core.db.csInsertRecord("Add-on Include Rules", 0);
-                                                    if (core.db.csOk(CS2)) {
-                                                        core.db.csSet(CS2, "Addonid", addonId);
-                                                        core.db.csSet(CS2, "IncludedAddonID", IncludeAddonID);
+                                                    CS2 = csXfer.csInsert("Add-on Include Rules", 0);
+                                                    if (csXfer.csOk(CS2)) {
+                                                        csXfer.csSet(CS2, "Addonid", addonId);
+                                                        csXfer.csSet(CS2, "IncludedAddonID", IncludeAddonID);
                                                     }
-                                                    core.db.csClose(ref CS2);
+                                                    csXfer.csClose(ref CS2);
                                                 }
                                             }
                                         }
@@ -2712,7 +2712,7 @@ namespace Contensive.Processor.Controllers {
                             }
                         }
                     }
-                    core.db.csClose(ref CS);
+                    csXfer.csClose(ref CS);
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);

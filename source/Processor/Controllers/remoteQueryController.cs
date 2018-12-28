@@ -34,19 +34,19 @@ namespace Contensive.Processor.Controllers {
             if (maxRows == 0) {
                 maxRows = 1000;
             }
-            CS = core.db.csInsertRecord("Remote Queries");
-            if (core.db.csOk(CS)) {
+            CS = csXfer.csInsert("Remote Queries");
+            if (csXfer.csOk(CS)) {
                 RemoteKey = GenericController.getGUIDString();
                 DataSourceID = core.db.getRecordID("Data Sources", dataSourceName);
-                core.db.csSet(CS, "remotekey", RemoteKey);
-                core.db.csSet(CS, "datasourceid", DataSourceID);
-                core.db.csSet(CS, "sqlquery", SQL);
-                core.db.csSet(CS, "maxRows", maxRows);
-                core.db.csSet(CS, "dateexpires", DbController.encodeSQLDate(core.doc.profileStartTime.AddDays(1)));
-                core.db.csSet(CS, "QueryTypeID", QueryTypeSQL);
-                core.db.csSet(CS, "VisitId", core.session.visit.id);
+                csXfer.csSet(CS, "remotekey", RemoteKey);
+                csXfer.csSet(CS, "datasourceid", DataSourceID);
+                csXfer.csSet(CS, "sqlquery", SQL);
+                csXfer.csSet(CS, "maxRows", maxRows);
+                csXfer.csSet(CS, "dateexpires", DbController.encodeSQLDate(core.doc.profileStartTime.AddDays(1)));
+                csXfer.csSet(CS, "QueryTypeID", QueryTypeSQL);
+                csXfer.csSet(CS, "VisitId", core.session.visit.id);
             }
-            core.db.csClose(ref CS);
+            csXfer.csClose(ref CS);
             //
             return RemoteKey;
         }

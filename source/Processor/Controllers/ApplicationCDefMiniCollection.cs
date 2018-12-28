@@ -431,10 +431,10 @@ namespace Contensive.Processor.Controllers {
                     + " select D.name as DataSourceName,T.name as TableName"
                     + " from cctables T left join ccDataSources d on D.ID=T.DataSourceID"
                     + " where t.active<>0";
-                int CS = core.db.csOpenSql(SQL);
-                while (core.db.csOk(CS)) {
-                    string DataSourceName = core.db.csGetText(CS, "DataSourceName");
-                    string TableName = core.db.csGetText(CS, "TableName");
+                int CS = csXfer.csOpenSql(SQL);
+                while (csXfer.csOk(CS)) {
+                    string DataSourceName = csXfer.csGetText(CS, "DataSourceName");
+                    string TableName = csXfer.csGetText(CS, "TableName");
                     string IndexList = core.db.getSQLIndexList(DataSourceName, TableName);
                     //
                     if (!string.IsNullOrEmpty(IndexList)) {
@@ -489,9 +489,9 @@ namespace Contensive.Processor.Controllers {
                             }
                         }
                     }
-                    core.db.csGoNext(CS);
+                    csXfer.csGoNext(CS);
                 }
-                core.db.csClose(ref CS);
+                csXfer.csClose(ref CS);
                 result = sb.ToString();
             } catch( Exception ex ) {
                 LogController.handleError( core,ex);

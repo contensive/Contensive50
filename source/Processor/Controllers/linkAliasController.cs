@@ -142,19 +142,19 @@ namespace Contensive.Processor.Controllers {
                             //
                             // Make sure there is one here for this
                             //
-                            int CS = core.db.csOpen("Link Aliases", "name=" + DbController.encodeSQLText(WorkingLinkAlias), "", false, 0, false, false, "Name,PageID,QueryStringSuffix");
-                            if (!core.db.csOk(CS)) {
+                            int CS = csXfer.csOpen("Link Aliases", "name=" + DbController.encodeSQLText(WorkingLinkAlias), "", false, 0, false, false, "Name,PageID,QueryStringSuffix");
+                            if (!csXfer.csOk(CS)) {
                                 //
                                 // Alias not found, create a Link Aliases
                                 //
-                                core.db.csClose(ref CS);
-                                CS = core.db.csInsertRecord("Link Aliases", 0);
-                                if (core.db.csOk(CS)) {
-                                    core.db.csSet(CS, "Name", WorkingLinkAlias);
+                                csXfer.csClose(ref CS);
+                                CS = csXfer.csInsert("Link Aliases", 0);
+                                if (csXfer.csOk(CS)) {
+                                    csXfer.csSet(CS, "Name", WorkingLinkAlias);
                                     //Call app.csv_SetCS(CS, "Link", Link)
-                                    core.db.csSet(CS, "Pageid", PageID);
+                                    csXfer.csSet(CS, "Pageid", PageID);
                                     if (true) {
-                                        core.db.csSet(CS, "QueryStringSuffix", QueryStringSuffix);
+                                        csXfer.csSet(CS, "QueryStringSuffix", QueryStringSuffix);
                                     }
                                 }
                             } else {
@@ -164,27 +164,27 @@ namespace Contensive.Processor.Controllers {
                                 int CurrentLinkAliasID = 0;
                                 bool resaveLinkAlias = false;
                                 int CS2 = 0;
-                                int LinkAliasPageID = core.db.csGetInteger(CS, "pageID");
-                                if ((core.db.csGetText(CS, "QueryStringSuffix").ToLowerInvariant() == QueryStringSuffix.ToLowerInvariant()) && (PageID == LinkAliasPageID)) {
+                                int LinkAliasPageID = csXfer.csGetInteger(CS, "pageID");
+                                if ((csXfer.csGetText(CS, "QueryStringSuffix").ToLowerInvariant() == QueryStringSuffix.ToLowerInvariant()) && (PageID == LinkAliasPageID)) {
                                     //
                                     // it maches a current entry for this link alias, if the current entry is not the highest number id,
                                     //   remove it and add this one
                                     //
-                                    CurrentLinkAliasID = core.db.csGetInteger(CS, "id");
-                                    CS2 = core.db.csOpenSql("select top 1 id from ccLinkAliases where pageid=" + LinkAliasPageID + " order by id desc");
-                                    if (core.db.csOk(CS2)) {
-                                        resaveLinkAlias = (CurrentLinkAliasID != core.db.csGetInteger(CS2, "id"));
+                                    CurrentLinkAliasID = csXfer.csGetInteger(CS, "id");
+                                    CS2 = csXfer.csOpenSql("select top 1 id from ccLinkAliases where pageid=" + LinkAliasPageID + " order by id desc");
+                                    if (csXfer.csOk(CS2)) {
+                                        resaveLinkAlias = (CurrentLinkAliasID != csXfer.csGetInteger(CS2, "id"));
                                     }
-                                    core.db.csClose(ref CS2);
+                                    csXfer.csClose(ref CS2);
                                     if (resaveLinkAlias) {
                                         core.db.executeQuery("delete from ccLinkAliases where id=" + CurrentLinkAliasID);
-                                        core.db.csClose(ref CS);
-                                        CS = core.db.csInsertRecord("Link Aliases", 0);
-                                        if (core.db.csOk(CS)) {
-                                            core.db.csSet(CS, "Name", WorkingLinkAlias);
-                                            core.db.csSet(CS, "Pageid", PageID);
+                                        csXfer.csClose(ref CS);
+                                        CS = csXfer.csInsert("Link Aliases", 0);
+                                        if (csXfer.csOk(CS)) {
+                                            csXfer.csSet(CS, "Name", WorkingLinkAlias);
+                                            csXfer.csSet(CS, "Pageid", PageID);
                                             if (true) {
-                                                core.db.csSet(CS, "QueryStringSuffix", QueryStringSuffix);
+                                                csXfer.csSet(CS, "QueryStringSuffix", QueryStringSuffix);
                                             }
                                         }
                                     }
@@ -197,9 +197,9 @@ namespace Contensive.Processor.Controllers {
                                         // change the Link Alias to the new link
                                         //
                                         //Call app.csv_SetCS(CS, "Link", Link)
-                                        core.db.csSet(CS, "Pageid", PageID);
+                                        csXfer.csSet(CS, "Pageid", PageID);
                                         if (true) {
-                                            core.db.csSet(CS, "QueryStringSuffix", QueryStringSuffix);
+                                            csXfer.csSet(CS, "QueryStringSuffix", QueryStringSuffix);
                                         }
                                     } else if (AllowLinkAlias) {
                                         //
@@ -207,12 +207,12 @@ namespace Contensive.Processor.Controllers {
                                         //
                                         if (DupCausesWarning) {
                                             if (LinkAliasPageID == 0) {
-                                                int PageContentCID = CDefDomainModel.getContentId(core, "Page Content");
+                                                int PageContentCID = Models.Domain.ContentMetaDomainModel.getContentId(core, "Page Content");
                                                 return_WarningMessage = ""
                                                     + "This page has been saved, but the Link Alias could not be created (" + WorkingLinkAlias + ") because it is already in use for another page."
                                                     + " To use Link Aliasing (friendly page names) for this page, the Link Alias value must be unique on this site. To set or change the Link Alias, clicke the Link Alias tab and select a name not used by another page or a folder in your website.";
                                             } else {
-                                                int PageContentCID = CDefDomainModel.getContentId(core, "Page Content");
+                                                int PageContentCID = Models.Domain.ContentMetaDomainModel.getContentId(core, "Page Content");
                                                 return_WarningMessage = ""
                                                     + "This page has been saved, but the Link Alias could not be created (" + WorkingLinkAlias + ") because it is already in use for another page (<a href=\"?af=4&cid=" + PageContentCID + "&id=" + LinkAliasPageID + "\">edit</a>)."
                                                     + " To use Link Aliasing (friendly page names) for this page, the Link Alias value must be unique. To set or change the Link Alias, click the Link Alias tab and select a name not used by another page or a folder in your website.";
@@ -221,8 +221,8 @@ namespace Contensive.Processor.Controllers {
                                     }
                                 }
                             }
-                            int linkAliasId = core.db.csGetInteger(CS, "id");
-                            core.db.csClose(ref CS);
+                            int linkAliasId = csXfer.csGetInteger(CS, "id");
+                            csXfer.csClose(ref CS);
                             core.cache.invalidateDbRecord(linkAliasId, LinkAliasModel.contentTableName);
                             //
                             // -- force route reload if this is a webserver page

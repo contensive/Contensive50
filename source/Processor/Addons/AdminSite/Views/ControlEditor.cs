@@ -150,21 +150,21 @@ namespace Contensive.Addons.AdminSite {
                             HTMLFieldString = HTMLFieldString + HtmlController.inputHidden("ContentControlID", FieldValueInteger);
                         } else {
                             string RecordContentName = editRecord.contentControlId_Name;
-                            string TableName2 = CdefController.getContentTablename(core, RecordContentName);
+                            string TableName2 = ContentMetaController.getContentTablename(core, RecordContentName);
                             int TableID = core.db.getRecordID("Tables", TableName2);
                             //
                             // Test for parentid
                             int ParentID = 0;
                             bool ContentSupportsParentID = false;
                             if (editRecord.id > 0) {
-                                int CS = core.db.csOpenRecord(RecordContentName, editRecord.id);
-                                if (core.db.csOk(CS)) {
-                                    ContentSupportsParentID = core.db.csIsFieldSupported(CS, "ParentID");
+                                int CS = csXfer.csOpenRecord(RecordContentName, editRecord.id);
+                                if (csXfer.csOk(CS)) {
+                                    ContentSupportsParentID = csXfer.csIsFieldSupported(CS, "ParentID");
                                     if (ContentSupportsParentID) {
-                                        ParentID = core.db.csGetInteger(CS, "ParentID");
+                                        ParentID = csXfer.csGetInteger(CS, "ParentID");
                                     }
                                 }
-                                core.db.csClose(ref CS);
+                                csXfer.csClose(ref CS);
                             }
                             //
                             int LimitContentSelectToThisID = 0;
@@ -174,11 +174,11 @@ namespace Contensive.Addons.AdminSite {
                                 if (ParentID != 0) {
                                     //
                                     // This record has a parent, set LimitContentSelectToThisID to the parent's CID
-                                    int CSPointer = core.db.csOpenRecord(RecordContentName, ParentID, false, false, "ContentControlID");
-                                    if (core.db.csOk(CSPointer)) {
-                                        LimitContentSelectToThisID = core.db.csGetInteger(CSPointer, "ContentControlID");
+                                    int CSPointer = csXfer.csOpenRecord(RecordContentName, ParentID, false, false, "ContentControlID");
+                                    if (csXfer.csOk(CSPointer)) {
+                                        LimitContentSelectToThisID = csXfer.csGetInteger(CSPointer, "ContentControlID");
                                     }
-                                    core.db.csClose(ref CSPointer);
+                                    csXfer.csClose(ref CSPointer);
                                 }
 
                             }
@@ -194,20 +194,20 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 // Limit the list to only those cdefs that are within the record's parent contentid
                                 RecordContentName = editRecord.contentControlId_Name;
-                                TableName2 = CdefController.getContentTablename(core, RecordContentName);
+                                TableName2 = ContentMetaController.getContentTablename(core, RecordContentName);
                                 TableID = core.db.getRecordID("Tables", TableName2);
-                                int CSPointer = core.db.csOpen("Content", "ContentTableID=" + TableID, "", true, 0, false, false, "ContentControlID");
+                                int CSPointer = csXfer.csOpen("Content", "ContentTableID=" + TableID, "", true, 0, false, false, "ContentControlID");
                                 string CIDList = "";
-                                while (core.db.csOk(CSPointer)) {
-                                    int ChildCID = core.db.csGetInteger(CSPointer, "ID");
-                                    if (CdefController.isWithinContent(core, ChildCID, LimitContentSelectToThisID)) {
-                                        if ((core.session.isAuthenticatedAdmin(core)) || (core.session.isAuthenticatedContentManager(core, CdefController.getContentNameByID(core, ChildCID)))) {
+                                while (csXfer.csOk(CSPointer)) {
+                                    int ChildCID = csXfer.csGetInteger(CSPointer, "ID");
+                                    if (ContentMetaController.isWithinContent(core, ChildCID, LimitContentSelectToThisID)) {
+                                        if ((core.session.isAuthenticatedAdmin(core)) || (core.session.isAuthenticatedContentManager(core, ContentMetaController.getContentNameByID(core, ChildCID)))) {
                                             CIDList = CIDList + "," + ChildCID;
                                         }
                                     }
-                                    core.db.csGoNext(CSPointer);
+                                    csXfer.csGoNext(CSPointer);
                                 }
-                                core.db.csClose(ref CSPointer);
+                                csXfer.csClose(ref CSPointer);
                                 if (!string.IsNullOrEmpty(CIDList)) {
                                     CIDList = CIDList.Substring(1);
                                     string sqlFilter = "(id in (" + CIDList + "))";
@@ -235,16 +235,16 @@ namespace Contensive.Addons.AdminSite {
                         if (FieldValueInteger == 0) {
                             fieldValue = "(not set)";
                         } else {
-                            int CSPointer = core.db.csOpen("people", "(id=" + FieldValueInteger + ")", "name,active", false);
-                            if (!core.db.csOk(CSPointer)) {
+                            int CSPointer = csXfer.csOpen("people", "(id=" + FieldValueInteger + ")", "name,active", false);
+                            if (!csXfer.csOk(CSPointer)) {
                                 fieldValue = "#" + FieldValueInteger + ", (deleted)";
                             } else {
-                                fieldValue = "#" + FieldValueInteger + ", " + core.db.csGet(CSPointer, "name");
-                                if (!core.db.csGetBoolean(CSPointer, "active")) {
+                                fieldValue = "#" + FieldValueInteger + ", " + csXfer.csGet(CSPointer, "name");
+                                if (!csXfer.csGetBoolean(CSPointer, "active")) {
                                     fieldValue += " (inactive)";
                                 }
                             }
-                            core.db.csClose(ref CSPointer);
+                            csXfer.csClose(ref CSPointer);
                         }
                     }
                     string fieldEditor = AdminUIController.getDefaultEditor_Text(core, "ignore_createdBy", fieldValue, true, "");
@@ -280,16 +280,16 @@ namespace Contensive.Addons.AdminSite {
                         if (FieldValueInteger == 0) {
                             fieldValue = "(not set)";
                         } else {
-                            int CSPointer = core.db.csOpen("people", "(id=" + FieldValueInteger + ")", "name,active", false);
-                            if (!core.db.csOk(CSPointer)) {
+                            int CSPointer = csXfer.csOpen("people", "(id=" + FieldValueInteger + ")", "name,active", false);
+                            if (!csXfer.csOk(CSPointer)) {
                                 fieldValue = "#" + FieldValueInteger + ", (deleted)";
                             } else {
-                                fieldValue = "#" + FieldValueInteger + ", " + core.db.csGet(CSPointer, "name");
-                                if (!core.db.csGetBoolean(CSPointer, "active")) {
+                                fieldValue = "#" + FieldValueInteger + ", " + csXfer.csGet(CSPointer, "name");
+                                if (!csXfer.csGetBoolean(CSPointer, "active")) {
                                     fieldValue += " (inactive)";
                                 }
                             }
-                            core.db.csClose(ref CSPointer);
+                            csXfer.csClose(ref CSPointer);
                         }
                     }
                     string fieldEditor = AdminUIController.getDefaultEditor_Text(core, "ignore_modifiedBy", fieldValue, true, "");

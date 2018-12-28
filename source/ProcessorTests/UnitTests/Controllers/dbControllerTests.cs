@@ -43,28 +43,28 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 // arrange
                 cp.core.db.executeNonQuery("delete from ccMembers where (username='a')or(username='c')");
                 //
-                int cs1 = cp.core.db.csInsertRecord("people");
-                int testId_test1 = cp.core.db.csGetInteger(cs1, "id");
-                cp.core.db.csClose(ref cs1);
+                int cs1 = cp.csXfer.csInsert("people");
+                int testId_test1 = cp.csXfer.csGetInteger(cs1, "id");
+                cp.csXfer.csClose(ref cs1);
                 //
-                int cs2 = cp.core.db.csInsertRecord("people");
-                int testId_test2 = cp.core.db.csGetInteger(cs2, "id");
-                cp.core.db.csClose(ref cs2);
+                int cs2 = cp.csXfer.csInsert("people");
+                int testId_test2 = cp.csXfer.csGetInteger(cs2, "id");
+                cp.csXfer.csClose(ref cs2);
                 // act
-                int cs3 = cp.core.db.csOpen("people", "(id=" + testId_test1 + ")or(id=" + testId_test2 + ")");
-                if (!cp.core.db.csOk(cs3)) {
+                int cs3 = cp.csXfer.csOpen("people", "(id=" + testId_test1 + ")or(id=" + testId_test2 + ")");
+                if (!cp.csXfer.csOk(cs3)) {
                     Assert.Fail("new people records not valid");
                 } else {
-                    cp.core.db.csSet(cs3, "username", "a");
-                    cp.core.db.csSet(cs3, "password", "b");
-                    cp.core.db.csGoNext(cs3);
+                    cp.csXfer.csSet(cs3, "username", "a");
+                    cp.csXfer.csSet(cs3, "password", "b");
+                    cp.csXfer.csGoNext(cs3);
                 }
-                if (!cp.core.db.csOk(cs3)) {
+                if (!cp.csXfer.csOk(cs3)) {
                     Assert.Fail("new people records not valid");
                 } else {
-                    cp.core.db.csSet(cs3, "username", "c");
-                    cp.core.db.csGoNext(cs3);
-                    cp.core.db.csClose(ref cs3);
+                    cp.csXfer.csSet(cs3, "username", "c");
+                    cp.csXfer.csGoNext(cs3);
+                    cp.csXfer.csClose(ref cs3);
                 }
                 // assert
                 var person_test1 = Contensive.Processor.Models.Db.PersonModel.create(cp.core, testId_test1);
@@ -87,15 +87,15 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 // arrange
                 cp.core.db.executeNonQuery("delete from ccMembers where (username='a')or(username='c')");
                 //
-                int cs1 = cp.core.db.csInsertRecord("people");
-                if (!cp.core.db.csOk(cs1)) {
+                int cs1 = cp.csXfer.csInsert("people");
+                if (!cp.csXfer.csOk(cs1)) {
                     Assert.Fail("new people records not valid");
                 } else {
-                    Assert.AreNotEqual("a", cp.core.db.csGet(cs1, "username"));
-                    cp.core.db.csSet(cs1, "username", "a");
-                    Assert.AreEqual("a", cp.core.db.csGet(cs1, "username"));
+                    Assert.AreNotEqual("a", cp.csXfer.csGet(cs1, "username"));
+                    cp.csXfer.csSet(cs1, "username", "a");
+                    Assert.AreEqual("a", cp.csXfer.csGet(cs1, "username"));
                 }
-                cp.core.db.csClose(ref cs1);
+                cp.csXfer.csClose(ref cs1);
             }
         }
         //
@@ -109,17 +109,17 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 // arrange
                 cp.core.db.executeNonQuery("delete from ccMembers where (username='a')or(username='c')");
                 //
-                int cs1 = cp.core.db.csInsertRecord("people");
-                if (!cp.core.db.csOk(cs1)) {
+                int cs1 = cp.csXfer.csInsert("people");
+                if (!cp.csXfer.csOk(cs1)) {
                     Assert.Fail("new people records not valid");
                 } else {
-                    Assert.AreNotEqual("a", cp.core.db.csGet(cs1, "username"));
-                    cp.core.db.csSet(cs1, "username", "a");
-                    cp.core.db.csSave(cs1);
-                    string result1 = cp.core.db.csGet(cs1, "username");
+                    Assert.AreNotEqual("a", cp.csXfer.csGet(cs1, "username"));
+                    cp.csXfer.csSet(cs1, "username", "a");
+                    cp.csXfer.csSave(cs1);
+                    string result1 = cp.csXfer.csGet(cs1, "username");
                     Assert.AreEqual("a", result1);
                 }
-                cp.core.db.csClose(ref cs1);
+                cp.csXfer.csClose(ref cs1);
             }
         }
         //
@@ -163,34 +163,34 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 string name = GenericController.getGUID();
                 //
                 // -- add three records
-                int cs = cp.core.db.csInsertRecord("people");
-                cp.core.db.csSet(cs, "name", name);
-                cp.core.db.csSave(cs);
-                int id0 = cp.core.db.csGetInteger(cs, "id");
-                cp.core.db.csClose(ref cs);
+                int cs = cp.csXfer.csInsert("people");
+                cp.csXfer.csSet(cs, "name", name);
+                cp.csXfer.csSave(cs);
+                int id0 = cp.csXfer.csGetInteger(cs, "id");
+                cp.csXfer.csClose(ref cs);
                 //
-                cs = cp.core.db.csInsertRecord("people");
-                cp.core.db.csSet(cs, "name", name);
-                cp.core.db.csSave(cs);
-                int id1 = cp.core.db.csGetInteger(cs, "id");
-                cp.core.db.csClose(ref cs);
+                cs = cp.csXfer.csInsert("people");
+                cp.csXfer.csSet(cs, "name", name);
+                cp.csXfer.csSave(cs);
+                int id1 = cp.csXfer.csGetInteger(cs, "id");
+                cp.csXfer.csClose(ref cs);
                 //
-                cs = cp.core.db.csInsertRecord("people");
-                cp.core.db.csSet(cs, "name", name);
-                cp.core.db.csSave(cs);
-                int id2 = cp.core.db.csGetInteger(cs, "id");
-                cp.core.db.csClose(ref cs);
+                cs = cp.csXfer.csInsert("people");
+                cp.csXfer.csSet(cs, "name", name);
+                cp.csXfer.csSave(cs);
+                int id2 = cp.csXfer.csGetInteger(cs, "id");
+                cp.csXfer.csClose(ref cs);
                 //
                 // act
-                cs = cp.core.db.csOpen("people", "name=" + DbController.encodeSQLText(name),"id");
-                Assert.IsTrue(cp.core.db.csOk(cs), "csOpen");
-                Assert.AreEqual(id0, cp.core.db.csGetInteger(cs, "id"),"correct id0 after open");
-                cp.core.db.csGoNext(cs);
-                Assert.AreEqual(id1, cp.core.db.csGetInteger(cs, "id"), "goNext id1, id correct");
-                cp.core.db.csGoNext(cs);
-                Assert.AreEqual(id2, cp.core.db.csGetInteger(cs, "id"), "goNext id2, id correct");
-                cp.core.db.csGoNext(cs);
-                Assert.IsFalse(cp.core.db.csOk(cs),"csOk false after all records");
+                cs = cp.csXfer.csOpen("people", "name=" + DbController.encodeSQLText(name),"id");
+                Assert.IsTrue(cp.csXfer.csOk(cs), "csOpen");
+                Assert.AreEqual(id0, cp.csXfer.csGetInteger(cs, "id"),"correct id0 after open");
+                cp.csXfer.csGoNext(cs);
+                Assert.AreEqual(id1, cp.csXfer.csGetInteger(cs, "id"), "goNext id1, id correct");
+                cp.csXfer.csGoNext(cs);
+                Assert.AreEqual(id2, cp.csXfer.csGetInteger(cs, "id"), "goNext id2, id correct");
+                cp.csXfer.csGoNext(cs);
+                Assert.IsFalse(cp.csXfer.csOk(cs),"csOk false after all records");
             }
         }
         //
@@ -203,41 +203,41 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 string name = GenericController.getGUID();
                 //
                 // -- add three records
-                int cs = cp.core.db.csInsertRecord("people");
-                cp.core.db.csSet(cs, "name", name);
-                cp.core.db.csSave(cs);
-                int id0 = cp.core.db.csGetInteger(cs, "id");
-                cp.core.db.csClose(ref cs);
+                int cs = cp.csXfer.csInsert("people");
+                cp.csXfer.csSet(cs, "name", name);
+                cp.csXfer.csSave(cs);
+                int id0 = cp.csXfer.csGetInteger(cs, "id");
+                cp.csXfer.csClose(ref cs);
                 //
-                cs = cp.core.db.csInsertRecord("people");
-                cp.core.db.csSet(cs, "name", name);
-                cp.core.db.csSave(cs);
-                int id1 = cp.core.db.csGetInteger(cs, "id");
-                cp.core.db.csClose(ref cs);
+                cs = cp.csXfer.csInsert("people");
+                cp.csXfer.csSet(cs, "name", name);
+                cp.csXfer.csSave(cs);
+                int id1 = cp.csXfer.csGetInteger(cs, "id");
+                cp.csXfer.csClose(ref cs);
                 //
-                cs = cp.core.db.csInsertRecord("people");
-                cp.core.db.csSet(cs, "name", name);
-                cp.core.db.csSave(cs);
-                int id2 = cp.core.db.csGetInteger(cs, "id");
-                cp.core.db.csClose(ref cs);
+                cs = cp.csXfer.csInsert("people");
+                cp.csXfer.csSet(cs, "name", name);
+                cp.csXfer.csSave(cs);
+                int id2 = cp.csXfer.csGetInteger(cs, "id");
+                cp.csXfer.csClose(ref cs);
                 //
                 // act
-                cs = cp.core.db.csOpen("people", "name=" + DbController.encodeSQLText(name), "id");
-                Assert.IsTrue(cp.core.db.csOk(cs), "csOpen");
-                cp.core.db.csGoNext(cs);
-                cp.core.db.csGoNext(cs);
-                cp.core.db.csGoNext(cs);
-                Assert.IsFalse(cp.core.db.csOk(cs), "csOK false after last record");
-                cp.core.db.csGoFirst(cs);
-                Assert.IsTrue(cp.core.db.csOk(cs), "csOK true after goFirst (back at first record");
+                cs = cp.csXfer.csOpen("people", "name=" + DbController.encodeSQLText(name), "id");
+                Assert.IsTrue(cp.csXfer.csOk(cs), "csOpen");
+                cp.csXfer.csGoNext(cs);
+                cp.csXfer.csGoNext(cs);
+                cp.csXfer.csGoNext(cs);
+                Assert.IsFalse(cp.csXfer.csOk(cs), "csOK false after last record");
+                cp.csXfer.csGoFirst(cs);
+                Assert.IsTrue(cp.csXfer.csOk(cs), "csOK true after goFirst (back at first record");
                 //
-                Assert.AreEqual(id0, cp.core.db.csGetInteger(cs, "id"), "correct id0 after goFirst");
-                cp.core.db.csGoNext(cs);
-                Assert.AreEqual(id1, cp.core.db.csGetInteger(cs, "id"), "goNext id1, id correct");
-                cp.core.db.csGoNext(cs);
-                Assert.AreEqual(id2, cp.core.db.csGetInteger(cs, "id"), "goNext id2, id correct");
-                cp.core.db.csGoNext(cs);
-                Assert.IsFalse(cp.core.db.csOk(cs), "csOk false after all records");
+                Assert.AreEqual(id0, cp.csXfer.csGetInteger(cs, "id"), "correct id0 after goFirst");
+                cp.csXfer.csGoNext(cs);
+                Assert.AreEqual(id1, cp.csXfer.csGetInteger(cs, "id"), "goNext id1, id correct");
+                cp.csXfer.csGoNext(cs);
+                Assert.AreEqual(id2, cp.csXfer.csGetInteger(cs, "id"), "goNext id2, id correct");
+                cp.csXfer.csGoNext(cs);
+                Assert.IsFalse(cp.csXfer.csOk(cs), "csOk false after all records");
             }
         }
     }

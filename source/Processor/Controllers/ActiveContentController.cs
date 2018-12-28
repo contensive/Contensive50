@@ -291,15 +291,15 @@ namespace Contensive.Processor.Controllers {
                                                             } else {
                                                                 Criteria = "name=" + DbController.encodeSQLText(ACName.ToUpper());
                                                             }
-                                                            int CS = core.db.csOpen(AddonContentName, Criteria, "Name,ID", false, 0, false, false, SelectList);
-                                                            if (core.db.csOk(CS)) {
-                                                                IconFilename = core.db.csGet(CS, "IconFilename");
-                                                                SrcOptionList = core.db.csGet(CS, "ArgumentList");
-                                                                IconWidth = core.db.csGetInteger(CS, "IconWidth");
-                                                                IconHeight = core.db.csGetInteger(CS, "IconHeight");
-                                                                IconSprites = core.db.csGetInteger(CS, "IconSprites");
-                                                                AddonIsInline = core.db.csGetBoolean(CS, "IsInline");
-                                                                ACGuid = core.db.csGetText(CS, "ccGuid");
+                                                            int CS = csXfer.csOpen(AddonContentName, Criteria, "Name,ID", false, 0, false, false, SelectList);
+                                                            if (csXfer.csOk(CS)) {
+                                                                IconFilename = csXfer.csGet(CS, "IconFilename");
+                                                                SrcOptionList = csXfer.csGet(CS, "ArgumentList");
+                                                                IconWidth = csXfer.csGetInteger(CS, "IconWidth");
+                                                                IconHeight = csXfer.csGetInteger(CS, "IconHeight");
+                                                                IconSprites = csXfer.csGetInteger(CS, "IconSprites");
+                                                                AddonIsInline = csXfer.csGetBoolean(CS, "IsInline");
+                                                                ACGuid = csXfer.csGetText(CS, "ccGuid");
                                                                 IconAlt = ACName;
                                                                 IconTitle = "Rendered as the Add-on [" + ACName + "]";
                                                             } else {
@@ -335,7 +335,7 @@ namespace Contensive.Processor.Controllers {
                                                                         break;
                                                                 }
                                                             }
-                                                            core.db.csClose(ref CS);
+                                                            csXfer.csClose(ref CS);
                                                             //
                                                             // Build AddonOptionStringHTMLEncoded from SrcOptionList (for names), itself (for current settings), and SrcOptionList (for select options)
                                                             //
@@ -447,16 +447,16 @@ namespace Contensive.Processor.Controllers {
                                             //            string IconIDControlString = "AC," + ACType + "," + fieldName;
                                             //            Copy = AddonController.getAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "User's Organization " + fieldName, "Renders as [User's Organization " + fieldName + "]", ACInstanceID, 0);
                                             //        } else if (EncodeNonCachableTags) {
-                                            //            if ( !core.db.csOk(csOrganization)) {
-                                            //                if (!core.db.csOk(csPeople)) {
-                                            //                    csPeople = core.db.csOpen(personModel.contentName, "(id=" + personalizationPeopleId + ")");
+                                            //            if ( !csXfer.csOk(csOrganization)) {
+                                            //                if (!csXfer.csOk(csPeople)) {
+                                            //                    csPeople = csXfer.csOpen(personModel.contentName, "(id=" + personalizationPeopleId + ")");
                                             //                }
-                                            //                if ( core.db.csOk( csPeople)) {
-                                            //                    csOrganization = core.db.csOpen(organizationModel.contentName, "(id=" + core.db.csGetInteger(csPeople, "organizationId") + ")");
+                                            //                if ( csXfer.csOk( csPeople)) {
+                                            //                    csOrganization = csXfer.csOpen(organizationModel.contentName, "(id=" + csXfer.csGetInteger(csPeople, "organizationId") + ")");
                                             //                }
                                             //            }
-                                            //            if (core.db.csOk(csOrganization)) {
-                                            //                Copy = core.db.csGetLookup(csOrganization, fieldName);
+                                            //            if (csXfer.csOk(csOrganization)) {
+                                            //                Copy = csXfer.csGetLookup(csOrganization, fieldName);
                                             //            }
                                             //        }
                                             //        break;
@@ -504,11 +504,11 @@ namespace Contensive.Processor.Controllers {
                                             //                if (genericController.vbUCase(fieldNameInitialCaps) == "EID") {
                                             //                    Copy = SecurityController.encodeToken(core, personalizationPeopleId, DateTime.Now);
                                             //                } else {
-                                            //                    if (!core.db.csOk(csPeople)) {
-                                            //                        csPeople = core.db.csOpen(personModel.contentName, "(id=" + personalizationPeopleId + ")");
+                                            //                    if (!csXfer.csOk(csPeople)) {
+                                            //                        csPeople = csXfer.csOpen(personModel.contentName, "(id=" + personalizationPeopleId + ")");
                                             //                    }
-                                            //                    if (core.db.csOk(csPeople)) {
-                                            //                        Copy = core.db.csGetLookup(csPeople, fieldName);
+                                            //                    if (csXfer.csOk(csPeople)) {
+                                            //                        Copy = csXfer.csGetLookup(csPeople, fieldName);
                                             //                    }
                                             //                }
                                             //            }

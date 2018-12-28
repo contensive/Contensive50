@@ -24,7 +24,7 @@ namespace Contensive.Addons.AdminSite {
                 FindWordMatchEnum MatchOption = 0;
                 int FormFieldPtr = 0;
                 int FormFieldCnt = 0;
-                CDefDomainModel CDef = null;
+                ContentMetaDomainModel CDef = null;
                 string FieldName = null;
                 StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 int FieldPtr = 0;
@@ -129,7 +129,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // ----- List out all fields
                 //
-                CDef = CDefDomainModel.createByUniqueName(core, adminData.adminContent.name);
+                CDef = ContentMetaDomainModel.createByUniqueName(core, adminData.adminContent.name);
                 FieldSize = 100;
                 Array.Resize(ref FieldNames, FieldSize + 1);
                 Array.Resize(ref FieldCaption, FieldSize + 1);
@@ -160,7 +160,7 @@ namespace Contensive.Addons.AdminSite {
                     if (fieldTypeId[FieldPtr] == fieldTypeIdLookup) {
                         ContentID = field.lookupContentID;
                         if (ContentID > 0) {
-                            FieldLookupContentName[FieldPtr] = CdefController.getContentNameByID(core, ContentID);
+                            FieldLookupContentName[FieldPtr] = ContentMetaController.getContentNameByID(core, ContentID);
                         }
                         FieldLookupList[FieldPtr] = field.lookupList;
                     }
@@ -188,9 +188,9 @@ namespace Contensive.Addons.AdminSite {
                 //                ReDim Preserve FieldLookupContentName(FieldSize)
                 //                ReDim Preserve FieldLookupList(FieldSize)
                 //            End If
-                //            FieldName = genericController.vbLCase(core.db.cs_getText(CS, "name"))
+                //            FieldName = genericController.vbLCase(csXfer.cs_getText(CS, "name"))
                 //            FieldNames(FieldPtr) = FieldName
-                //            FieldCaption(FieldPtr) = core.db.cs_getText(CS, "Caption")
+                //            FieldCaption(FieldPtr) = csXfer.cs_getText(CS, "Caption")
                 //            FieldID(FieldPtr) = core.app.cs_getInteger(CS, "ID")
                 //            FieldType(FieldPtr) = core.app.cs_getInteger(CS, "Type")
                 //            If FieldType(FieldPtr) = 7 Then
@@ -198,7 +198,7 @@ namespace Contensive.Addons.AdminSite {
                 //                If ContentID > 0 Then
                 //                    FieldLookupContentName(FieldPtr) = CdefController.getContentNameByID(core,ContentID)
                 //                End If
-                //                FieldLookupList(FieldPtr) = core.db.cs_getText(CS, "LookupList")
+                //                FieldLookupList(FieldPtr) = csXfer.cs_getText(CS, "LookupList")
                 //            End If
                 //            '
                 //            ' set prepoplate value from indexconfig

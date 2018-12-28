@@ -1057,13 +1057,13 @@ namespace Contensive.Processor.Controllers {
             //
             tempmain_RedirectByRecord_ReturnStatus = false;
             BlockRedirect = false;
-            CSPointer = core.db.csOpen(iContentName, "ID=" + iRecordID);
-            if (core.db.csOk(CSPointer)) {
+            CSPointer = csXfer.csOpen(iContentName, "ID=" + iRecordID);
+            if (csXfer.csOk(CSPointer)) {
                 // 2/18/2008 - EncodeLink change
                 //
                 // Assume all Link fields are already encoded -- as this is how they would appear if the admin cut and pasted
                 //
-                EncodedLink = encodeText(core.db.csGetText(CSPointer, iFieldName)).Trim(' ');
+                EncodedLink = encodeText(csXfer.csGetText(CSPointer, iFieldName)).Trim(' ');
                 if (string.IsNullOrEmpty(EncodedLink)) {
                     BlockRedirect = true;
                 } else {
@@ -1079,39 +1079,39 @@ namespace Contensive.Processor.Controllers {
                             //       inactive or expired before redirecting
                             //
                             LinkPrefix = core.webServer.requestContentWatchPrefix;
-                            ContentID = (core.db.csGetInteger(CSPointer, "ContentID"));
-                            HostContentName = CdefController.getContentNameByID(core, ContentID);
+                            ContentID = (csXfer.csGetInteger(CSPointer, "ContentID"));
+                            HostContentName = ContentMetaController.getContentNameByID(core, ContentID);
                             if (string.IsNullOrEmpty(HostContentName)) {
                                 //
                                 // ----- Content Watch with a bad ContentID, mark inactive
                                 //
                                 BlockRedirect = true;
-                                core.db.csSet(CSPointer, "active", 0);
+                                csXfer.csSet(CSPointer, "active", 0);
                             } else {
-                                HostRecordID = (core.db.csGetInteger(CSPointer, "RecordID"));
+                                HostRecordID = (csXfer.csGetInteger(CSPointer, "RecordID"));
                                 if (HostRecordID == 0) {
                                     //
                                     // ----- Content Watch with a bad iRecordID, mark inactive
                                     //
                                     BlockRedirect = true;
-                                    core.db.csSet(CSPointer, "active", 0);
+                                    csXfer.csSet(CSPointer, "active", 0);
                                 } else {
-                                    CSHost = core.db.csOpen(HostContentName, "ID=" + HostRecordID);
-                                    if (!core.db.csOk(CSHost)) {
+                                    CSHost = csXfer.csOpen(HostContentName, "ID=" + HostRecordID);
+                                    if (!csXfer.csOk(CSHost)) {
                                         //
                                         // ----- Content Watch host record not found, mark inactive
                                         //
                                         BlockRedirect = true;
-                                        core.db.csSet(CSPointer, "active", 0);
+                                        csXfer.csSet(CSPointer, "active", 0);
                                     }
                                 }
-                                core.db.csClose(ref CSHost);
+                                csXfer.csClose(ref CSHost);
                             }
                             if (BlockRedirect) {
                                 //
                                 // ----- if a content watch record is blocked, delete the content tracking
                                 //
-                                core.db.deleteContentRules(CDefDomainModel.getContentId(core, HostContentName), HostRecordID);
+                                core.db.deleteContentRules(ContentMetaDomainModel.getContentId(core, HostContentName), HostRecordID);
                             }
                             break;
                     }
@@ -1121,14 +1121,14 @@ namespace Contensive.Processor.Controllers {
                     // If link incorrectly includes the LinkPrefix, take it off first, then add it back
                     //
                     NonEncodedLink = GenericController.removeUrlPrefix(NonEncodedLink, LinkPrefix);
-                    if (core.db.csIsFieldSupported(CSPointer, "Clicks")) {
-                        core.db.csSet(CSPointer, "Clicks", (core.db.csGetNumber(CSPointer, "Clicks")) + 1);
+                    if (csXfer.csIsFieldSupported(CSPointer, "Clicks")) {
+                        csXfer.csSet(CSPointer, "Clicks", (csXfer.csGetNumber(CSPointer, "Clicks")) + 1);
                     }
                     core.webServer.redirect(LinkPrefix + NonEncodedLink, "Call to " + MethodName + ", no reason given.", false, false);
                     tempmain_RedirectByRecord_ReturnStatus = true;
                 }
             }
-            core.db.csClose(ref CSPointer);
+            csXfer.csClose(ref CSPointer);
             return tempmain_RedirectByRecord_ReturnStatus;
         }
         //

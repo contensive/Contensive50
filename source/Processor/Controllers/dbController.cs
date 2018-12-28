@@ -27,7 +27,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// default page size. Page size is how many records are read in a single fetch.
         /// </summary>
-        private const int pageSizeDefault = 9999;
+        public const int pageSizeDefault = 9999;
         //
         /// <summary>
         /// set true when configured and tested - else db calls are skipped
@@ -59,22 +59,22 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// number of elements being used
         /// </summary>
-        private int contentSetStoreCount { get; set; }
+        //private int contentSetStoreCount { get; set; }
         //
         /// <summary>
         /// number of elements available for use.
         /// </summary>
-        private int contentSetStoreSize { get; set; }
+        //private int contentSetStoreSize { get; set; }
         //
         /// <summary>
         /// How many are added at a time
         /// </summary>
-        private const int contentSetStoreChunk = 50;
+        //private const int contentSetStoreChunk = 50;
         //
         /// <summary>
         /// when true, all csOpen, etc, will be setup, but not return any data (csv_IsCSOK false), this is used to generate the csv_ContentSet.Source so we can run a csv_GetContentRows without first opening a recordset
         /// </summary>
-        private bool contentSetOpenWithoutRecords = false;
+        //public bool contentSetOpenWithoutRecords = false;
         //
         //==========================================================================================
         /// <summary>
@@ -1583,6 +1583,8 @@ namespace Contensive.Processor.Controllers {
         //=================================================================================
         //
         public static bool isDataTableOk(DataTable dt) {
+            if ( dt == null ) { return false; }
+            if ( dt.Rows == null) { return false; }
             return (dt.Rows.Count > 0);
         }
         //
@@ -1617,16 +1619,39 @@ namespace Contensive.Processor.Controllers {
         /// <param name="DbObject"></param>
         /// <returns></returns>
         public static string getDbObjectTableName(string DbObject) {
-            string tempGetDbObjectTableName = null;
-            int Position = 0;
-            //
-            tempGetDbObjectTableName = DbObject;
-            Position = tempGetDbObjectTableName.LastIndexOf(".") + 1;
+            int Position = DbObject.LastIndexOf(".") + 1;
             if (Position > 0) {
-                tempGetDbObjectTableName = tempGetDbObjectTableName.Substring(Position);
+                return DbObject.Substring(Position);
             }
-            return tempGetDbObjectTableName;
+            return "";
         }
+        //
+        //=============================================================================
+        /// <summary>
+        /// Get a ContentID from the ContentName using just the tables
+        /// </summary>
+        /// <param name="contentName"></param>
+        /// <returns></returns>
+        public static int getContentId(CoreController core, string contentName) {
+            using (DataTable dt = core.db.executeQuery("select top 1 id from cccontent where name=" + encodeSQLText(contentName) + " order by id" )) {
+                if (dt.Rows.Count == 0) { return 0; }
+                return getDataRowFieldInteger(dt.Rows[0], "id");
+            }
+        }
+        //
+        // ====================================================================================================
+        /// <summary>
+        /// get the id of the table in the cctable table
+        /// </summary>
+        /// <param name="TableName"></param>
+        /// <returns></returns>
+        public static int getTableID(CoreController core, string TableName) {
+            using (DataTable dt = core.db.executeQuery("select top 1 id from cctables where name=" + encodeSQLText(TableName) + " order by id")) {
+                if (dt.Rows.Count == 0) { return 0; }
+                return getDataRowFieldInteger(dt.Rows[0], "id");
+            }
+        }
+
 
         #region  IDisposable Support 
         protected bool disposed = false;
@@ -1643,19 +1668,6 @@ namespace Contensive.Processor.Controllers {
                     //
                     // ----- call .dispose for managed objects
                     //
-                    //
-                    // ----- Close all open csv_ContentSets, and make sure the RS is killed
-                    //
-                    if (contentSetStoreCount > 0) {
-                        for (int CSPointer = 1; CSPointer <= contentSetStoreCount; CSPointer++) {
-                            int tmpPtr = CSPointer;
-                            if (contentSetStore[tmpPtr] != null) {
-                                if (contentSetStore[tmpPtr].IsOpen) {
-                                    csClose(ref tmpPtr);
-                                }
-                            }
-                        }
-                    }
                 }
                 //
                 // Add code here to release the unmanaged resource.
@@ -1671,8 +1683,6 @@ namespace Contensive.Processor.Controllers {
         }
         ~DbController() {
             Dispose(false);
-            
-            
         }
         #endregion
     }

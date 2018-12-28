@@ -103,12 +103,12 @@ namespace Contensive.Addons.AdminSite {
                                     if ((string.IsNullOrEmpty(Name)) || (string.IsNullOrEmpty(SQL))) {
                                         Processor.Controllers.ErrorController.addUserError(core, "A name and SQL Query are required to save a new custom report.");
                                     } else {
-                                        CS = core.db.csInsertRecord("Custom Reports");
-                                        if (core.db.csOk(CS)) {
-                                            core.db.csSet(CS, "Name", Name);
-                                            core.db.csSet(CS, SQLFieldName, SQL);
+                                        CS = csXfer.csInsert("Custom Reports");
+                                        if (csXfer.csOk(CS)) {
+                                            csXfer.csSet(CS, "Name", Name);
+                                            csXfer.csSet(CS, SQLFieldName, SQL);
                                         }
-                                        core.db.csClose(ref CS);
+                                        csXfer.csClose(ref CS);
                                     }
                                 }
                                 //
@@ -117,28 +117,28 @@ namespace Contensive.Addons.AdminSite {
                                     for (RowPtr = 0; RowPtr < RowCnt; RowPtr++) {
                                         if (core.docProperties.getBoolean("Row" + RowPtr)) {
                                             RecordID = core.docProperties.getInteger("RowID" + RowPtr);
-                                            CS = core.db.csOpenRecord("Custom Reports", RecordID);
-                                            if (core.db.csOk(CS)) {
-                                                SQL = core.db.csGetText(CS, SQLFieldName);
-                                                Name = core.db.csGetText(CS, "Name");
+                                            CS = csXfer.csOpenRecord("Custom Reports", RecordID);
+                                            if (csXfer.csOk(CS)) {
+                                                SQL = csXfer.csGetText(CS, SQLFieldName);
+                                                Name = csXfer.csGetText(CS, "Name");
                                             }
-                                            core.db.csClose(ref CS);
+                                            csXfer.csClose(ref CS);
                                             //
-                                            CS = core.db.csInsertRecord("Tasks");
-                                            if (core.db.csOk(CS)) {
+                                            CS = csXfer.csInsert("Tasks");
+                                            if (csXfer.csOk(CS)) {
                                                 RecordName = "CSV Download, Custom Report [" + Name + "]";
                                                 Filename = "CustomReport_" + encodeText(GenericController.dateToSeconds(core.doc.profileStartTime)) + encodeText(GenericController.GetRandomInteger(core)) + ".csv";
-                                                core.db.csSet(CS, "Name", RecordName);
-                                                core.db.csSet(CS, "Filename", Filename);
+                                                csXfer.csSet(CS, "Name", RecordName);
+                                                csXfer.csSet(CS, "Filename", Filename);
                                                 if (Format == "XML") {
-                                                    core.db.csSet(CS, "Command", "BUILDXML");
+                                                    csXfer.csSet(CS, "Command", "BUILDXML");
                                                 } else {
-                                                    core.db.csSet(CS, "Command", "BUILDCSV");
+                                                    csXfer.csSet(CS, "Command", "BUILDCSV");
                                                 }
-                                                core.db.csSet(CS, SQLFieldName, SQL);
+                                                csXfer.csSet(CS, SQLFieldName, SQL);
                                                 Description = Description + "<p>Your Download [" + Name + "] has been requested, and will be available in the <a href=\"?" + rnAdminForm + "=30\">Download Manager</a> when it is complete. This may take a few minutes depending on the size of the report.</p>";
                                             }
-                                            core.db.csClose(ref CS);
+                                            csXfer.csClose(ref CS);
                                         }
                                     }
                                 }
@@ -196,26 +196,26 @@ namespace Contensive.Addons.AdminSite {
                     //
                     //   Get Data
                     //
-                    CS = core.db.csOpen("Custom Reports");
+                    CS = csXfer.csOpen("Custom Reports");
                     RowPointer = 0;
-                    if (!core.db.csOk(CS)) {
+                    if (!csXfer.csOk(CS)) {
                         Cells[0, 1] = "There are no custom reports defined";
                         RowPointer = 1;
                     } else {
-                        DataRowCount = core.db.csGetRowCount(CS);
-                        while (core.db.csOk(CS) && (RowPointer < PageSize)) {
-                            RecordID = core.db.csGetInteger(CS, "ID");
-                            //DateCompleted = core.db.cs_getDate(CS, "DateCompleted")
+                        DataRowCount = csXfer.csGetRowCount(CS);
+                        while (csXfer.csOk(CS) && (RowPointer < PageSize)) {
+                            RecordID = csXfer.csGetInteger(CS, "ID");
+                            //DateCompleted = csXfer.cs_getDate(CS, "DateCompleted")
                             Cells[RowPointer, 0] = HtmlController.checkbox("Row" + RowPointer) + HtmlController.inputHidden("RowID" + RowPointer, RecordID);
-                            Cells[RowPointer, 1] = core.db.csGetText(CS, "name");
-                            Cells[RowPointer, 2] = core.db.csGet(CS, "CreatedBy");
-                            Cells[RowPointer, 3] = core.db.csGetDate(CS, "DateAdded").ToShortDateString();
+                            Cells[RowPointer, 1] = csXfer.csGetText(CS, "name");
+                            Cells[RowPointer, 2] = csXfer.csGet(CS, "CreatedBy");
+                            Cells[RowPointer, 3] = csXfer.csGetDate(CS, "DateAdded").ToShortDateString();
                             //Cells(RowPointer, 4) = "&nbsp;"
                             RowPointer = RowPointer + 1;
-                            core.db.csGoNext(CS);
+                            csXfer.csGoNext(CS);
                         }
                     }
-                    core.db.csClose(ref CS);
+                    csXfer.csClose(ref CS);
                     string Cell = null;
                     Tab0.Add(HtmlController.inputHidden("RowCnt", RowPointer));
                     //adminUIController Adminui = new adminUIController(core);

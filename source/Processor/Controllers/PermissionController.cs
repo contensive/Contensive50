@@ -15,7 +15,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Permissions this user has for this content.
         /// </summary>
-        public static UserContentPermissions getUserContentPermissions(CoreController core, CDefDomainModel cdef) {
+        public static UserContentPermissions getUserContentPermissions(CoreController core, ContentMetaDomainModel cdef) {
             var result = new UserContentPermissions() {
                 allowDelete = false,
                 allowAdd = false,
@@ -119,7 +119,7 @@ namespace Contensive.Processor.Controllers {
         //            //
         //            // Authenticated and not admin or developer
         //            //
-        //            int ContentID = CDefDomainModel.getContentId(core, contentName);
+        //            int ContentID = Models.Domain.ContentMetaDomainModel.getContentId(core, contentName);
         //            getContentAccessRights_NonAdminByContentId(core, ContentID, ref returnAllowEdit, ref returnAllowAdd, ref returnAllowDelete, "");
         //        }
         //    } catch (Exception ex) {
@@ -140,7 +140,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="usedContentIdList"></param>
         //========================================================================
         //
-        private static UserContentPermissions getUserAuthoringPermissions_ContentManager(CoreController core, CDefDomainModel cdef, List<int> usedContentIdList) {
+        private static UserContentPermissions getUserAuthoringPermissions_ContentManager(CoreController core, ContentMetaDomainModel cdef, List<int> usedContentIdList) {
             var result = new UserContentPermissions() {
                 allowAdd = false,
                 allowDelete = false,
@@ -182,20 +182,20 @@ namespace Contensive.Processor.Controllers {
                         + " AND(ccGroupRules.ContentID=" + cdef.id + ")"
                         + " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + DbController.encodeSQLDate(core.doc.profileStartTime) + "))"
                         + ");";
-                    int CSPointer = core.db.csOpenSql(SQL);
-                    if (core.db.csOk(CSPointer)) {
+                    int CSPointer = csXfer.csOpenSql(SQL);
+                    if (csXfer.csOk(CSPointer)) {
                         result.allowEdit = true;
                         result.allowSave = true;
-                        result.allowAdd = core.db.csGetBoolean(CSPointer, "allowAdd");
-                        result.allowDelete = core.db.csGetBoolean(CSPointer, "allowDelete");
+                        result.allowAdd = csXfer.csGetBoolean(CSPointer, "allowAdd");
+                        result.allowDelete = csXfer.csGetBoolean(CSPointer, "allowDelete");
                     }
-                    core.db.csClose(ref CSPointer);
+                    csXfer.csClose(ref CSPointer);
                     //
                     if (!result.allowEdit) {
                         //
                         // ----- Not a content manager for this one, check the parent
                         if (cdef.parentID > 0) {
-                            var parentCdef = CDefDomainModel.create(core, cdef.parentID);
+                            var parentCdef = ContentMetaDomainModel.create(core, cdef.parentID);
                             usedContentIdList.Add(cdef.id);
                             getUserAuthoringPermissions_ContentManager(core, cdef, usedContentIdList);
                         }

@@ -58,25 +58,25 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override string GetContentControlCriteria(string contentName) {
-            return CdefController.getContentControlCriteria(cp.core, contentName);
+            return ContentMetaController.getContentControlCriteria(cp.core, contentName);
         }
         //
         //====================================================================================================
         //
         public override string GetFieldProperty(string contentName, string fieldName, string propertyName) {
-            return CdefController.getContentFieldProperty(cp.core, contentName, fieldName, propertyName);
+            return ContentMetaController.getContentFieldProperty(cp.core, contentName, fieldName, propertyName);
         }
         //
         //====================================================================================================
         //
         public override int GetID(string contentName) {
-            return CDefDomainModel.getContentId(cp.core, contentName);
+            return Models.Domain.ContentMetaDomainModel.getContentId(cp.core, contentName);
         }
         //
         //====================================================================================================
         //
         public override string GetDataSource(string contentName) {
-            return CdefController.getContentDataSource(cp.core, contentName);
+            return ContentMetaController.getContentDataSource(cp.core, contentName);
         }
         //
         //====================================================================================================
@@ -125,13 +125,13 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override string GetTable(string contentName) {
-            return CdefController.getContentTablename(cp.core, contentName);
+            return ContentMetaController.getContentTablename(cp.core, contentName);
         }
         //
         //====================================================================================================
         //
         public override bool IsField(string contentName, string fieldName) {
-            return CdefController.isContentFieldSupported(cp.core, contentName, fieldName);
+            return ContentMetaController.isContentFieldSupported(cp.core, contentName, fieldName);
         }
         //
         //====================================================================================================
@@ -145,7 +145,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override bool IsChildContent(string childContentID, string parentContentID) {
-            return CdefController.isWithinContent(cp.core, GenericController.encodeInteger(childContentID), GenericController.encodeInteger(parentContentID));
+            return ContentMetaController.isWithinContent(cp.core, GenericController.encodeInteger(childContentID), GenericController.encodeInteger(parentContentID));
         }
         //
         //====================================================================================================
@@ -154,11 +154,11 @@ namespace Contensive.Processor {
             string result = "";
             try {
                 CsModel cs = new CsModel(cp.core);
-                cs.open("layouts", "name=" + DbController.encodeSQLText(layoutName), "id", false, "layout");
+                cs.csOpen("layouts", "name=" + DbController.encodeSQLText(layoutName), "id", false, "layout");
                 if (cs.ok()) {
                     result = cs.getText("layout");
                 }
-                cs.close();
+                cs.csClose();
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -172,11 +172,11 @@ namespace Contensive.Processor {
             int recordId = 0;
             try {
                 CsModel cs = new CsModel(cp.core);
-                if (cs.insert(contentName)) {
+                if (cs.csInsert(contentName)) {
                     cs.setField("name", recordName);
                     recordId = cs.getInteger("id");
                 }
-                cs.close();
+                cs.csClose();
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -190,10 +190,10 @@ namespace Contensive.Processor {
             int result = 0;
             try {
                 CsModel cs = new CsModel(cp.core);
-                if (cs.insert(contentName)) {
+                if (cs.csInsert(contentName)) {
                     result = cs.getInteger("id");
                 }
-                cs.close();
+                cs.csClose();
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -210,7 +210,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override void DeleteContent(string contentName) {
-            ContentModel.delete(cp.core, CDefDomainModel.getContentId(cp.core, contentName));
+            ContentModel.delete(cp.core, Models.Domain.ContentMetaDomainModel.getContentId(cp.core, contentName));
         }
         //
         //====================================================================================================
@@ -222,7 +222,7 @@ namespace Contensive.Processor {
             field.authorable = true;
             field.blockAccess = false;
             field.caption = fieldName;
-            field.contentId = CDefDomainModel.getContentId(cp.core, contentName);
+            field.contentId = Models.Domain.ContentMetaDomainModel.getContentId(cp.core, contentName);
             field.developerOnly = false;
             field.editSortPriority = 9999;
             field.editTabName = "";
@@ -255,7 +255,7 @@ namespace Contensive.Processor {
             field.Scramble = false;
             field.textBuffered = false;
             field.uniqueName = false;
-            return CdefController.verifyContentField_returnID(cp.core, contentName, field);
+            return ContentMetaController.verifyContentField_returnId(cp.core, contentName, field);
         }
         //
         //====================================================================================================
@@ -275,7 +275,7 @@ namespace Contensive.Processor {
         public override int AddContent(string contentName, string sqlTableName, string dataSourceName) {
             var tmpList = new List<string> { };
             DataSourceModel dataSource = DataSourceModel.createByUniqueName(cp.core, dataSourceName, ref tmpList);
-            return CdefController.verifyContent_returnId(cp.core, new Models.Domain.CDefDomainModel() {
+            return ContentMetaController.verifyContent_returnId(cp.core, new Models.Domain.ContentMetaDomainModel() {
                 dataSourceName = dataSource.name,
                 tableName = sqlTableName,
                 name = contentName
@@ -285,7 +285,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override string GetListLink(string contentName) {
-            return AdminUIController.getIconEditAdminLink(cp.core, Models.Domain.CDefDomainModel.createByUniqueName(cp.core, contentName));
+            return AdminUIController.getIconEditAdminLink(cp.core, Models.Domain.ContentMetaDomainModel.createByUniqueName(cp.core, contentName));
         }
         //
         //====================================================================================================
@@ -330,7 +330,7 @@ namespace Contensive.Processor {
         //
         [Obsolete("Deprecated, access model properties instead", true)]
         public override string GetProperty(string ContentName, string PropertyName) {
-            return CdefController.getContentProperty(cp.core, ContentName, PropertyName);
+            return ContentMetaController.getContentProperty(cp.core, ContentName, PropertyName);
         }
         //
         //
