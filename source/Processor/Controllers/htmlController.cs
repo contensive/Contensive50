@@ -178,7 +178,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // This was commented out -- I really do not know why -- seems like the best way
                     //
-                    CDef = Models.Domain.CDefDomainModel.create(core, ContentName);
+                    CDef = Models.Domain.CDefDomainModel.createByUniqueName(core, ContentName);
                     TableName = CDef.tableName;
                     DataSource = CDef.dataSourceName;
                     ContentControlCriteria = CDef.legacyContentControlCriteria;
@@ -480,7 +480,7 @@ namespace Contensive.Processor.Controllers {
                         // ----- Generate Drop Down Field Names
                         //
                         string DropDownFieldList = "name";
-                        var peopleCdef = Models.Domain.CDefDomainModel.create(core, "people");
+                        var peopleCdef = Models.Domain.CDefDomainModel.createByUniqueName(core, "people");
                         if ( peopleCdef != null ) DropDownFieldList = peopleCdef.dropDownFieldList;
                         int DropDownFieldCount = 0;
                         string CharAllowed = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -1142,7 +1142,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 if (true) {
                     fieldFound = false;
-                    Contentdefinition = Models.Domain.CDefDomainModel.create(core, ContentName);
+                    Contentdefinition = Models.Domain.CDefDomainModel.createByUniqueName(core, ContentName);
                     foreach (KeyValuePair<string, Models.Domain.CDefFieldModel> keyValuePair in Contentdefinition.fields) {
                         Models.Domain.CDefFieldModel field = keyValuePair.Value;
                         if (GenericController.vbUCase(field.nameLc) == GenericController.vbUCase(FieldName)) {
@@ -1301,7 +1301,7 @@ namespace Contensive.Processor.Controllers {
                                         if (FieldReadOnly) {
                                             CSPointer = core.db.csOpen2(FieldLookupContentName, FieldValueInteger);
                                             if (core.db.csOk(CSLookup)) {
-                                                returnResult = CsController.getTextEncoded(core, CSLookup, "name");
+                                                returnResult = CsModel.getTextEncoded(core, CSLookup, "name");
                                             }
                                             core.db.csClose(ref CSLookup);
                                         } else {
@@ -1448,7 +1448,7 @@ namespace Contensive.Processor.Controllers {
                         // Personalization Tag
                         //
                         string selectOptions = "";
-                        var peopleCdef = Models.Domain.CDefDomainModel.create(core, "people");
+                        var peopleCdef = Models.Domain.CDefDomainModel.createByUniqueName(core, "people");
                         if (peopleCdef != null) selectOptions = string.Join("|", peopleCdef.selectList);
                         IconIDControlString = "AC,PERSONALIZATION,0,Personalization,field=[" + selectOptions + "]";
                         IconImg = AddonController.getAddonIconImg("/" + core.appConfig.adminRoute, 0, 0, 0, true, IconIDControlString, "", core.appConfig.cdnFileUrl, "Any Personalization Field", "Renders as any Personalization Field", "", 0);
@@ -1788,7 +1788,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 //
                                 // ListField
-                                int CID = CdefController.getContentId(core, ContentName);
+                                int CID = CDefDomainModel.getContentId(core, ContentName);
                                 CS = core.db.csOpen("Content Fields", "Contentid=" + CID, "name", true, 0, false, false, "ID,Name");
                             }
 
@@ -2401,12 +2401,12 @@ namespace Contensive.Processor.Controllers {
                     //
                     // ----- Gather all the SecondaryContent that associates to the PrimaryContent
                     //
-                    int PrimaryContentID = CdefController.getContentId(core, PrimaryContentName);
-                    SecondaryCDef = Models.Domain.CDefDomainModel.create(core, SecondaryContentName);
+                    int PrimaryContentID = CDefDomainModel.getContentId(core, PrimaryContentName);
+                    SecondaryCDef = Models.Domain.CDefDomainModel.createByUniqueName(core, SecondaryContentName);
                     string SecondaryTablename = SecondaryCDef.tableName;
                     int SecondaryContentID = SecondaryCDef.id;
                     ContentIDList.Add(SecondaryContentID);
-                    ContentIDList.AddRange(SecondaryCDef.get_childIdList(core));
+                    ContentIDList.AddRange(SecondaryCDef.childIdList(core));
                     //
                     //
                     //
@@ -2886,7 +2886,7 @@ namespace Contensive.Processor.Controllers {
                             //            '
                             //            ' Path is blocked
                             //            '
-                            //            Tag = core.html.html_GetFormInputCheckBox2(TagID, True, TagID) & "&nbsp;Path is blocked [" & core.webServer.requestPath & "] [<a href=""" & htmlController.encodeHTML("/" & core.appConfig.adminRoute & "?af=" & AdminFormEdit & "&id=" & PathID & "&cid=" & Models.Complex.CdefController.getContentId(core,"paths") & "&ad=1") & """ target=""_blank"">edit</a>]</LABEL>"
+                            //            Tag = core.html.html_GetFormInputCheckBox2(TagID, True, TagID) & "&nbsp;Path is blocked [" & core.webServer.requestPath & "] [<a href=""" & htmlController.encodeHTML("/" & core.appConfig.adminRoute & "?af=" & AdminFormEdit & "&id=" & PathID & "&cid=" & Models.Complex.CDefDomainModel.getContentId(core,"paths") & "&ad=1") & """ target=""_blank"">edit</a>]</LABEL>"
                             //        Else
                             //            '
                             //            ' Path is not blocked
@@ -3426,6 +3426,37 @@ namespace Contensive.Processor.Controllers {
             }
             return returnCopy;
         }
+        //
+        // ====================================================================================================
+        //
+        public void setContentCopy(string CopyName, string Content) {
+            //
+            int CS = 0;
+            string iCopyName = null;
+            string iContent = null;
+            const string ContentName = "Copy Content";
+            //
+            //  BuildVersion = app.dataBuildVersion
+            if (false) //.3.210" Then
+            {
+                throw (new Exception("Contensive database was created with version " + core.siteProperties.dataBuildVersion + ". main_SetContentCopy requires an builder."));
+            } else {
+                iCopyName = GenericController.encodeText(CopyName);
+                iContent = GenericController.encodeText(Content);
+                CS = csOpen(ContentName, "name=" + encodeSQLText(iCopyName));
+                if (!csOk(CS)) {
+                    csClose(ref CS);
+                    CS = csInsertRecord(ContentName);
+                }
+                if (csOk(CS)) {
+                    csSet(CS, "name", iCopyName);
+                    csSet(CS, "Copy", iContent);
+                }
+                csClose(ref CS);
+            }
+        }
+
+
         //
         //====================================================================================================
         //

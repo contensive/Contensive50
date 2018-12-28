@@ -1244,7 +1244,7 @@ namespace Contensive.Processor.Controllers {
                                                                             //
                                                                             // setup cdef rule
                                                                             //
-                                                                            int ContentID = CdefController.getContentId(core, ContentName);
+                                                                            int ContentID = CDefDomainModel.getContentId(core, ContentName);
                                                                             if (ContentID > 0) {
                                                                                 int CS = core.db.csInsertRecord("Add-on Collection CDef Rules", 0);
                                                                                 if (core.db.csOk(CS)) {
@@ -1293,7 +1293,7 @@ namespace Contensive.Processor.Controllers {
                                                                                         //
                                                                                         // create or update the record
                                                                                         //
-                                                                                        Models.Domain.CDefDomainModel CDef = Models.Domain.CDefDomainModel.create(core, ContentName);
+                                                                                        Models.Domain.CDefDomainModel CDef = Models.Domain.CDefDomainModel.createByUniqueName(core, ContentName);
                                                                                         int cs = -1;
                                                                                         if (!string.IsNullOrEmpty(ContentRecordGuid)) {
                                                                                             cs = core.db.csOpen(ContentName, "ccguid=" + DbController.encodeSQLText(ContentRecordGuid));
@@ -1605,7 +1605,7 @@ namespace Contensive.Processor.Controllers {
                                                                             string ContentRecordGuid =XmlController.GetXMLAttribute(core, IsFound, ContentNode, "guid", "");
                                                                             string ContentRecordName =XmlController.GetXMLAttribute(core, IsFound, ContentNode, "name", "");
                                                                             if ((!string.IsNullOrEmpty(ContentRecordGuid)) || (!string.IsNullOrEmpty(ContentRecordName))) {
-                                                                                Models.Domain.CDefDomainModel CDef = Models.Domain.CDefDomainModel.create(core, ContentName);
+                                                                                Models.Domain.CDefDomainModel CDef = Models.Domain.CDefDomainModel.createByUniqueName(core, ContentName);
                                                                                 int cs = -1;
                                                                                 if (!string.IsNullOrEmpty(ContentRecordGuid)) {
                                                                                     cs = core.db.csOpen(ContentName, "ccguid=" + DbController.encodeSQLText(ContentRecordGuid));

@@ -136,7 +136,7 @@ namespace Contensive.Processor.Controllers {
                                         case _fieldTypeIdFileXML:
                                         case _fieldTypeIdFileJavascript:
                                         case _fieldTypeIdFileHTML:
-                                            Copy = CsController.getTextEncoded(core, CSPointer, GenericController.encodeText(FieldNameVariant));
+                                            Copy = CsModel.getTextEncoded(core, CSPointer, GenericController.encodeText(FieldNameVariant));
                                             break;
                                         case _fieldTypeIdLookup:
                                             Copy = core.db.csGetLookup(CSPointer, GenericController.encodeText(FieldNameVariant));

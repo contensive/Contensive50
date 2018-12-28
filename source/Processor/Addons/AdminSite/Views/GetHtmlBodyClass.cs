@@ -291,7 +291,7 @@ namespace Contensive.Addons.AdminSite {
                         } else if (adminData.AdminForm == AdminFormDownloads) {
                             adminBody = (ToolDownloads.GetForm_Downloads(cp.core));
                         } else if (adminData.AdminForm == AdminformRSSControl) {
-                            adminBody = cp.core.webServer.redirect("?cid=" + CdefController.getContentId(cp.core, "RSS Feeds"), "RSS Control page is not longer supported. RSS Feeds are controlled from the RSS feed records.");
+                            adminBody = cp.core.webServer.redirect("?cid=" + CDefDomainModel.getContentId(cp.core, "RSS Feeds"), "RSS Control page is not longer supported. RSS Feeds are controlled from the RSS feed records.");
                         } else if (adminData.AdminForm == AdminFormImportWizard) {
                             adminBody = cp.core.addon.execute(addonGuidImportWizard, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
                                 addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
@@ -715,7 +715,7 @@ namespace Contensive.Addons.AdminSite {
                                     ProcessActionSave(cp,adminData, UseContentWatchLink);
                                     cp.core.processAfterSave(false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
                                     if (!(cp.core.doc.debug_iUserError != "")) {
-                                        if (!CdefController.isWithinContent(cp.core, adminData.editRecord.contentControlId, CdefController.getContentId(cp.core, "Group Email"))) {
+                                        if (!CdefController.isWithinContent(cp.core, adminData.editRecord.contentControlId, CDefDomainModel.getContentId(cp.core, "Group Email"))) {
                                             Processor.Controllers.ErrorController.addUserError(cp.core, "The send action only supports Group Email.");
                                         } else {
                                             CS = cp.core.db.csOpenRecord("Group Email", adminData.editRecord.id);
@@ -749,7 +749,7 @@ namespace Contensive.Addons.AdminSite {
                                     // no save, page was read only - Call ProcessActionSave
                                     adminData.LoadEditRecord(cp.core);
                                     if (!(cp.core.doc.debug_iUserError != "")) {
-                                        if (!CdefController.isWithinContent(cp.core, adminData.editRecord.contentControlId, CdefController.getContentId(cp.core, "Conditional Email"))) {
+                                        if (!CdefController.isWithinContent(cp.core, adminData.editRecord.contentControlId, CDefDomainModel.getContentId(cp.core, "Conditional Email"))) {
                                             Processor.Controllers.ErrorController.addUserError(cp.core, "The deactivate action only supports Conditional Email.");
                                         } else {
                                             CS = cp.core.db.csOpenRecord("Conditional Email", adminData.editRecord.id);
@@ -776,7 +776,7 @@ namespace Contensive.Addons.AdminSite {
                                     ProcessActionSave(cp,adminData, UseContentWatchLink);
                                     cp.core.processAfterSave(false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentID, UseContentWatchLink);
                                     if (!(cp.core.doc.debug_iUserError != "")) {
-                                        if (!CdefController.isWithinContent(cp.core, adminData.editRecord.contentControlId, CdefController.getContentId(cp.core, "Conditional Email"))) {
+                                        if (!CdefController.isWithinContent(cp.core, adminData.editRecord.contentControlId, CDefDomainModel.getContentId(cp.core, "Conditional Email"))) {
                                             Processor.Controllers.ErrorController.addUserError(cp.core, "The activate action only supports Conditional Email.");
                                         } else {
                                             CS = cp.core.db.csOpenRecord("Conditional Email", adminData.editRecord.id);
@@ -1631,7 +1631,7 @@ namespace Contensive.Addons.AdminSite {
                         if (recordChanged && SaveCCIDValue != 0) {
                             CdefController.setContentControlId(cp.core, (editRecord.contentControlId.Equals(0)) ? adminData.adminContent.id : editRecord.contentControlId, editRecord.id, SaveCCIDValue);
                             editRecord.contentControlId_Name = CdefController.getContentNameByID(cp.core, SaveCCIDValue);
-                            adminData.adminContent = CDefDomainModel.create(cp.core, editRecord.contentControlId_Name);
+                            adminData.adminContent = CDefDomainModel.createByUniqueName(cp.core, editRecord.contentControlId_Name);
                             adminData.adminContent.id = adminData.adminContent.id;
                             adminData.adminContent.name = adminData.adminContent.name;
                         }
@@ -2475,7 +2475,7 @@ namespace Contensive.Addons.AdminSite {
                         //
                         ParentContentID = cp.core.docProperties.getInteger("ParentContentID");
                         if (ParentContentID == 0) {
-                            ParentContentID = CdefController.getContentId(cp.core, "Page Content");
+                            ParentContentID = CDefDomainModel.getContentId(cp.core, "Page Content");
                         }
                         AddAdminMenuEntry = true;
                         GroupID = 0;
@@ -2500,7 +2500,7 @@ namespace Contensive.Addons.AdminSite {
                             Description = Description + "<div>&nbsp;</div>"
                                 + "<div>Creating content [" + ChildContentName + "] from [" + ParentContentName + "]</div>";
                             CdefController.createContentChild(cp.core, ChildContentName, ParentContentName, cp.core.session.user.id);
-                            ChildContentID = CdefController.getContentId(cp.core, ChildContentName);
+                            ChildContentID = CDefDomainModel.getContentId(cp.core, ChildContentName);
                             //
                             // Create Group and Rule
                             //

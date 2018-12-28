@@ -261,8 +261,8 @@ namespace Contensive.Addons.AdminSite {
                     // -- email
                     bool EmailSubmitted = false;
                     bool EmailSent = false;
-                    int SystemEmailCID = CdefController.getContentId(core, "System Email");
-                    int ConditionalEmailCID = CdefController.getContentId(core, "Conditional Email");
+                    int SystemEmailCID = CDefDomainModel.getContentId(core, "System Email");
+                    int ConditionalEmailCID = CDefDomainModel.getContentId(core, "Conditional Email");
                     DateTime LastSendTestDate = DateTime.MinValue;
                     bool AllowEmailSendWithoutTest = (core.siteProperties.getBoolean("AllowEmailSendWithoutTest", false));
                     if (adminData.editRecord.fieldsLc.ContainsKey("lastsendtestdate")) {
@@ -539,7 +539,7 @@ namespace Contensive.Addons.AdminSite {
                 } else {
                     //
                     // All other tables (User definined)
-                    bool IsPageContent = CdefController.isWithinContent(core, adminData.adminContent.id, CdefController.getContentId(core, "Page Content"));
+                    bool IsPageContent = CdefController.isWithinContent(core, adminData.adminContent.id, CDefDomainModel.getContentId(core, "Page Content"));
                     bool HasChildRecords = CdefController.isContentFieldSupported(core, adminData.adminContent.name, "parentid");
                     bool AllowMarkReviewed = core.db.isSQLTableField("default", adminData.adminContent.tableName, "DateReviewed");
                     string EditSectionButtonBar = AdminUIController.getButtonBarForEdit(core, new EditButtonBarInfoClass() {

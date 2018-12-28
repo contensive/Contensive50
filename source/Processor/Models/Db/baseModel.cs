@@ -406,7 +406,7 @@ namespace Contensive.Processor.Models.Db {
                     if (recordId > 0) {
                         result = readRecordCache<T>(core, recordId);
                         if (result == null) {
-                            using (var cs = new CsController(core)) {
+                            using (var cs = new CsModel(core)) {
                                 using (var dt = core.db.executeQuery(getSelectSql<T>(core, null, "(id=" + recordId + ")", ""))) {
                                     if (dt != null) {
                                         if (dt.Rows.Count > 0) {
@@ -488,7 +488,7 @@ namespace Contensive.Processor.Models.Db {
                         Type instanceType = typeof(T);
                         result = readRecordCacheByGuidPtr<T>(core, recordGuid);
                         if (result == null) {
-                            using (var cs = new CsController(core)) {
+                            using (var cs = new CsModel(core)) {
                                 using (var dt = core.db.executeQuery(getSelectSql<T>(core, null, "(ccGuid=" + DbController.encodeSQLText(recordGuid) + ")", ""))) {
                                     if (dt != null) {
                                         if (dt.Rows.Count > 0) {

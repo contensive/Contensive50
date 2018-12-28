@@ -119,7 +119,7 @@ namespace Contensive.Processor.Controllers {
         //            //
         //            // Authenticated and not admin or developer
         //            //
-        //            int ContentID = CdefController.getContentId(core, contentName);
+        //            int ContentID = CDefDomainModel.getContentId(core, contentName);
         //            getContentAccessRights_NonAdminByContentId(core, ContentID, ref returnAllowEdit, ref returnAllowAdd, ref returnAllowDelete, "");
         //        }
         //    } catch (Exception ex) {

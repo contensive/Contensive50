@@ -615,7 +615,7 @@ namespace Contensive.Processor.Controllers {
                                         if (core.visitProperty.getBoolean("AllowAdvancedEditor")) {
                                             string addonArgumentListPassToBubbleEditor = ""; // comes from method in this class the generates it from addon and instance properites - lost it in the shuffle
                                             string AddonEditIcon = getIconSprite("", 0, "/ContensiveBase/images/tooledit.png", 22, 22, "Edit the " + addon.name + " Add-on", "Edit the " + addon.name + " Add-on", "", true, "");
-                                            AddonEditIcon = "<a href=\"/" + core.appConfig.adminRoute + "?cid=" + CdefController.getContentId(core, Models.Db.AddonModel.contentName) + "&id=" + addon.id + "&af=4&aa=2&ad=1\" tabindex=\"-1\">" + AddonEditIcon + "</a>";
+                                            AddonEditIcon = "<a href=\"/" + core.appConfig.adminRoute + "?cid=" + CDefDomainModel.getContentId(core, Models.Db.AddonModel.contentName) + "&id=" + addon.id + "&af=4&aa=2&ad=1\" tabindex=\"-1\">" + AddonEditIcon + "</a>";
                                             string InstanceSettingsEditIcon = getInstanceBubble(addon.name, addonArgumentListPassToBubbleEditor, executeContext.hostRecord.contentName, executeContext.hostRecord.recordId, executeContext.hostRecord.fieldName, executeContext.instanceGuid, executeContext.addonType, ref DialogList);
                                             string HTMLViewerEditIcon = getHTMLViewerBubble(addon.id, "editWrapper" + core.doc.editWrapperCnt, ref DialogList);
                                             string SiteStylesEditIcon = ""; // ?????
@@ -2829,7 +2829,7 @@ namespace Contensive.Processor.Controllers {
             string returnString = "";
             try {
                 string sql = null;
-                var cs = new CsController(core);
+                var cs = new CsModel(core);
                 int addonid = 0;
                 //
                 sql = "select e.id,c.addonId"

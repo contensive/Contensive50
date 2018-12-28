@@ -81,7 +81,7 @@ namespace Contensive.Processor.Controllers {
             strFieldName = GenericController.encodeText(FieldName);
             //
             EditorPanel = "";
-            ContentID = CdefController.getContentId(core, intContentName);
+            ContentID = CDefDomainModel.getContentId(core, intContentName);
             if ((ContentID < 1) || (intRecordId < 1) || (string.IsNullOrEmpty(strFieldName))) {
                 PanelCopy = SpanClassAdminNormal + "The information you have selected can not be accessed.</span>";
                 EditorPanel = EditorPanel + core.html.getPanel(PanelCopy);

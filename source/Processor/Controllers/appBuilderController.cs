@@ -86,7 +86,7 @@ namespace Contensive.Processor.Controllers {
                         root.username = defaultRootUserUsername;
                         root.password = defaultRootUserPassword;
                         root.developer = true;
-                        root.contentControlID = CdefController.getContentId(core, "people");
+                        root.contentControlID = CDefDomainModel.getContentId(core, "people");
                         try 
                             {
                             root.save(core);
@@ -493,7 +493,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="inActive"></param>
         private static void verifyRecord(CoreController core, string contentName, string name, string sqlName = "", string sqlValue = "") {
             try {
-                var cdef = CDefDomainModel.create(core, contentName);
+                var cdef = CDefDomainModel.createByUniqueName(core, contentName);
                 DataTable dt = core.db.executeQuery("SELECT ID FROM " + cdef.tableName + " WHERE NAME=" + DbController.encodeSQLText(name) + ";");
                 if (dt.Rows.Count == 0) {
                     string sql1 = "insert into " + cdef.tableName + " (active,name";
@@ -1023,7 +1023,7 @@ namespace Contensive.Processor.Controllers {
                 if (!string.IsNullOrEmpty(EntryName.Trim())) {
                     int addonId = core.db.getRecordID(Models.Db.AddonModel.contentName, AddonName);
                     int parentId = verifyNavigatorEntry_getParentIdFromNameSpace(core, menuNameSpace);
-                    int contentId = CdefController.getContentId(core, ContentName);
+                    int contentId = CDefDomainModel.getContentId(core, ContentName);
                     string listCriteria = "(name=" + DbController.encodeSQLText(EntryName) + ")and(Parentid=" + parentId + ")";
                     List<Models.Db.NavigatorEntryModel> entryList = NavigatorEntryModel.createList(core, listCriteria, "id");
                     NavigatorEntryModel entry = null;
@@ -1121,7 +1121,7 @@ namespace Contensive.Processor.Controllers {
                 sqlList.add("CreatedBy", "0");
                 sqlList.add("OrderByClause", DbController.encodeSQLText(OrderByCriteria));
                 sqlList.add("active", SQLTrue);
-                sqlList.add("ContentControlID", CdefController.getContentId(core, "Sort Methods").ToString());
+                sqlList.add("ContentControlID", CDefDomainModel.getContentId(core, "Sort Methods").ToString());
                 //
                 dt = core.db.openTable("Default", "ccSortMethods", "Name=" + DbController.encodeSQLText(Name), "ID", "ID", 1);
                 if (dt.Rows.Count > 0) {
@@ -1214,7 +1214,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 RowsNeeded = fieldTypeIdMax - RowsFound;
                 if (RowsNeeded > 0) {
-                    CID = CdefController.getContentId(core, "Content Field Types");
+                    CID = CDefDomainModel.getContentId(core, "Content Field Types");
                     if (CID <= 0) {
                         //
                         // Problem

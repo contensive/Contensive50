@@ -44,7 +44,7 @@ namespace Contensive.Processor.Controllers {
                 var ruleList = Models.Db.MemberRuleModel.createList(core, "(MemberID=" + user.id.ToString() + ")and(GroupID=" + group.id.ToString() + ")");
                 if ( ruleList.Count==0) {
                     // -- add new rule
-                    var groupsCdef = Models.Domain.CDefDomainModel.create(core, "groups");
+                    var groupsCdef = Models.Domain.CDefDomainModel.createByUniqueName(core, "groups");
                     var rule = Models.Db.MemberRuleModel.addDefault(core, groupsCdef ) ;
                     rule.groupId = group.id;
                     rule.MemberID = user.id;
@@ -116,7 +116,7 @@ namespace Contensive.Processor.Controllers {
             } else if ( GenericController.isGuid( groupNameIdOrGuid )) {
                 group = Models.Db.GroupModel.create(core, groupNameIdOrGuid);
                 if (group == null) {
-                    var groupCdef = Models.Domain.CDefDomainModel.create(core, "groups");
+                    var groupCdef = Models.Domain.CDefDomainModel.createByUniqueName(core, "groups");
                     group = Models.Db.GroupModel.addDefault(core, groupCdef);
                     group.ccguid = groupNameIdOrGuid;
                     group.name = groupNameIdOrGuid;
@@ -126,7 +126,7 @@ namespace Contensive.Processor.Controllers {
             } else {
                 group = Models.Db.GroupModel.createByUniqueName(core, groupNameIdOrGuid);
                 if (group == null) {
-                    var groupCdef = Models.Domain.CDefDomainModel.create(core, "groups");
+                    var groupCdef = Models.Domain.CDefDomainModel.createByUniqueName(core, "groups");
                     group = Models.Db.GroupModel.addDefault(core, groupCdef);
                     group.ccguid = groupNameIdOrGuid;
                     group.name = groupNameIdOrGuid;

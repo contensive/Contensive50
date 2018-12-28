@@ -52,7 +52,7 @@ namespace Contensive.Addons.Tools {
                 //
                 // display form
                 bool isEmptyList = false;
-                Stream.Add(AdminUIController.getToolFormInputRow(core, "Caption", AdminUIController.getDefaultEditor_LookupContent(core, "countryId", countryId, CdefController.getContentId(core, "countries"), ref isEmptyList)));
+                Stream.Add(AdminUIController.getToolFormInputRow(core, "Caption", AdminUIController.getDefaultEditor_LookupContent(core, "countryId", countryId, CDefDomainModel.getContentId(core, "countries"), ref isEmptyList)));
                 Stream.Add(AdminUIController.getToolFormInputRow(core, "Caption", AdminUIController.getDefaultEditor_Text(core, "PageSize", PageSize.ToString())));
                 //
                 // -- assemble form

@@ -99,7 +99,7 @@ namespace Contensive.Addons.Housekeeping {
                     int DataSourceType = core.db.getDataSourceType("default");
                     //
                     string DefaultMemberName = "";
-                    int PeopleCID = CdefController.getContentId(core, "people");
+                    int PeopleCID = CDefDomainModel.getContentId(core, "people");
                     string SQL = "select defaultvalue from ccfields where name='name' and contentid=(" + PeopleCID + ")";
                     int CS = core.db.csOpenSql(SQL,"Default");
                     if (core.db.csOk(CS)) {

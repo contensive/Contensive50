@@ -89,7 +89,7 @@ namespace Contensive.Addons.Tools {
                     if (string.IsNullOrEmpty(ContentName)) {
                         Stream.Add("Select a content before submitting. Fields were not changed.");
                     } else {
-                        int ContentID = CdefController.getContentId(core, ContentName);
+                        int ContentID = CDefDomainModel.getContentId(core, ContentName);
                         if (ContentID == 0) {
                             Stream.Add("GetContentID failed. Fields were not changed.");
                         } else {

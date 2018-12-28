@@ -70,7 +70,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override int GetID(string contentName) {
-            return CdefController.getContentId(cp.core, contentName);
+            return CDefDomainModel.getContentId(cp.core, contentName);
         }
         //
         //====================================================================================================
@@ -153,7 +153,7 @@ namespace Contensive.Processor {
         public override string getLayout(string layoutName) {
             string result = "";
             try {
-                CsController cs = new CsController(cp.core);
+                CsModel cs = new CsModel(cp.core);
                 cs.open("layouts", "name=" + DbController.encodeSQLText(layoutName), "id", false, "layout");
                 if (cs.ok()) {
                     result = cs.getText("layout");
@@ -171,7 +171,7 @@ namespace Contensive.Processor {
         public override int AddRecord(string contentName, string recordName) {
             int recordId = 0;
             try {
-                CsController cs = new CsController(cp.core);
+                CsModel cs = new CsModel(cp.core);
                 if (cs.insert(contentName)) {
                     cs.setField("name", recordName);
                     recordId = cs.getInteger("id");
@@ -189,7 +189,7 @@ namespace Contensive.Processor {
         public override int AddRecord(string contentName) {
             int result = 0;
             try {
-                CsController cs = new CsController(cp.core);
+                CsModel cs = new CsModel(cp.core);
                 if (cs.insert(contentName)) {
                     result = cs.getInteger("id");
                 }
@@ -210,7 +210,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override void DeleteContent(string contentName) {
-            ContentModel.delete(cp.core, CdefController.getContentId(cp.core, contentName));
+            ContentModel.delete(cp.core, CDefDomainModel.getContentId(cp.core, contentName));
         }
         //
         //====================================================================================================
@@ -222,7 +222,7 @@ namespace Contensive.Processor {
             field.authorable = true;
             field.blockAccess = false;
             field.caption = fieldName;
-            field.contentId = CdefController.getContentId(cp.core, contentName);
+            field.contentId = CDefDomainModel.getContentId(cp.core, contentName);
             field.developerOnly = false;
             field.editSortPriority = 9999;
             field.editTabName = "";
@@ -285,7 +285,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override string GetListLink(string contentName) {
-            return AdminUIController.getIconEditAdminLink(cp.core, Models.Domain.CDefDomainModel.create(cp.core, contentName));
+            return AdminUIController.getIconEditAdminLink(cp.core, Models.Domain.CDefDomainModel.createByUniqueName(cp.core, contentName));
         }
         //
         //====================================================================================================

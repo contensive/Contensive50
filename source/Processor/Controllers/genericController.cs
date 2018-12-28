@@ -1961,11 +1961,8 @@ namespace Contensive.Processor.Controllers {
         /// <param name="source"></param>
         /// <returns></returns>
         public static string vbUCase(string source) {
-            if (string.IsNullOrEmpty(source)) {
-                return "";
-            } else {
-                return source.ToUpper();
-            }
+            if (!string.IsNullOrEmpty(source)) { return source.ToUpper(); }
+            return string.Empty;
         }
         //
         //====================================================================================================
@@ -1975,11 +1972,8 @@ namespace Contensive.Processor.Controllers {
         /// <param name="source"></param>
         /// <returns></returns>
         public static string vbLCase(string source) {
-            if (string.IsNullOrEmpty(source)) {
-                return "";
-            } else {
-                return source.ToLowerInvariant();
-            }
+            if (!string.IsNullOrEmpty(source)) { return source.ToLowerInvariant(); }
+            return string.Empty;
         }
         //
         // ====================================================================================================

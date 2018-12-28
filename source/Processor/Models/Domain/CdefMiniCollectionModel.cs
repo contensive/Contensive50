@@ -843,7 +843,7 @@ namespace Contensive.Processor.Models.Domain {
                             SQL = "select f.id from ccfields f left join cccontent c on c.id=f.contentid where (f.name=" + DbController.encodeSQLText(workingField.nameLc) + ")and(c.name=" + DbController.encodeSQLText(workingCdef.name) + ") order by f.id";
                             rs = core.db.executeQuery(SQL);
                             if (DbController.isDataTableOk(rs)) {
-                                fieldId = GenericController.encodeInteger(core.db.getDataRowColumnName(rs.Rows[0], "id"));
+                                fieldId = GenericController.encodeInteger(DbController.getDataRowFieldText(rs.Rows[0], "id"));
                             }
                             rs.Dispose();
                             if (fieldId == 0) {
@@ -1580,7 +1580,7 @@ namespace Contensive.Processor.Models.Domain {
                     }
                     //
                     // -- update Content Field Records and Content Field Help records
-                    CDefDomainModel cdefFieldHelp = CDefDomainModel.create(core, ContentFieldHelpModel.contentName);
+                    CDefDomainModel cdefFieldHelp = CDefDomainModel.createByUniqueName(core, ContentFieldHelpModel.contentName);
                     foreach (var nameValuePair in cdef.fields) {
                         CDefFieldModel field = nameValuePair.Value;
                         int fieldId = 0;

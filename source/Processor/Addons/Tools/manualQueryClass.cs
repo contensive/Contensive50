@@ -192,7 +192,7 @@ namespace Contensive.Addons.Tools {
                 //
                 // -- data source
                 bool isEmptyList = false;
-                Stream.Add(AdminUIController.getToolFormInputRow(core, "Data Source", AdminUIController.getDefaultEditor_LookupContent(core, "DataSourceID", datasource.id, CdefController.getContentId(core, "data sources"), ref isEmptyList)));
+                Stream.Add(AdminUIController.getToolFormInputRow(core, "Data Source", AdminUIController.getDefaultEditor_LookupContent(core, "DataSourceID", datasource.id, CDefDomainModel.getContentId(core, "data sources"), ref isEmptyList)));
                 {
                     //
                     // -- sql list

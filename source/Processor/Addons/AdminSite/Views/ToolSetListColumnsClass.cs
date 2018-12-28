@@ -222,7 +222,7 @@ namespace Contensive.Addons.AdminSite {
                         if (reloadMetadata) {
                             core.clearMetaData();
                             core.cache.invalidateAll();
-                            CDef = CDefDomainModel.create(core, adminContent.name);
+                            CDef = CDefDomainModel.createByUniqueName(core, adminContent.name);
                         }
                         //
                         // save indexconfig

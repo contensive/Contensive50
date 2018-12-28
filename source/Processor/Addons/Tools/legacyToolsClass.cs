@@ -421,7 +421,7 @@ namespace Contensive.Addons.Tools {
                         core.db.createContentFromSQLTable(datasource, TableName, ContentName);
                         core.cache.invalidateAll();
                         core.clearMetaData();
-                        ContentID = CdefController.getContentId(core, ContentName);
+                        ContentID = CDefDomainModel.getContentId(core, ContentName);
                         ParentNavID = core.db.getRecordID(Processor.Models.Db.NavigatorEntryModel.contentName, "Manage Site Content");
                         if (ParentNavID != 0) {
                             CS = core.db.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, "(name=" + DbController.encodeSQLText("Advanced") + ")and(parentid=" + ParentNavID + ")");
@@ -444,7 +444,7 @@ namespace Contensive.Addons.Tools {
                                 core.db.csClose(ref CS);
                             }
                         }
-                        ContentID = CdefController.getContentId(core, ContentName);
+                        ContentID = CDefDomainModel.getContentId(core, ContentName);
                         Stream.Add("<P>Content Definition was created. An admin menu entry for this definition has been added under 'Site Content', and will be visible on the next page view. Use the [<a href=\"?af=105&ContentID=" + ContentID + "\">Edit Content Definition Fields</a>] tool to review and edit this definition's fields.</P>");
                     } else {
                         Stream.Add("<P>Error, a required field is missing. Content not created.</P>");
@@ -2864,7 +2864,7 @@ namespace Contensive.Addons.Tools {
         //
         //
         private Processor.Models.Domain.CDefDomainModel GetCDef(string ContentName) {
-            return Processor.Models.Domain.CDefDomainModel.create(core, ContentName);
+            return Processor.Models.Domain.CDefDomainModel.createByUniqueName(core, ContentName);
         }
         //
         //=============================================================================

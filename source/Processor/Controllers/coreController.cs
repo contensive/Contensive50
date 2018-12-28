@@ -1208,7 +1208,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="UseContentWatchLink"></param>
         public void processAfterSave(bool IsDelete, string ContentName, int RecordID, string RecordName, int RecordParentID, bool UseContentWatchLink) {
             try {
-                int ContentID = CdefController.getContentId(this, ContentName);
+                int ContentID = CDefDomainModel.getContentId(this, ContentName);
                 string TableName = CdefController.getContentTablename(this, ContentName);
                 PageContentModel.markReviewed(this, RecordID);
                 //

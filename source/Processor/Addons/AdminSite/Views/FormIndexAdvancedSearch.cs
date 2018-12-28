@@ -129,7 +129,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // ----- List out all fields
                 //
-                CDef = CDefDomainModel.create(core, adminData.adminContent.name);
+                CDef = CDefDomainModel.createByUniqueName(core, adminData.adminContent.name);
                 FieldSize = 100;
                 Array.Resize(ref FieldNames, FieldSize + 1);
                 Array.Resize(ref FieldCaption, FieldSize + 1);

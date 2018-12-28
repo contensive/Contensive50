@@ -5,6 +5,9 @@ using Contensive.Processor.Controllers;
 using Contensive.BaseClasses;
 
 namespace Contensive.Processor {
+    /// <summary>
+    /// The implementation of the CPCSBaseClass interface. Base interface is exposed to addons, and this implementation is passed during run-time
+    /// </summary>
     public class CPCSClass : CPCSBaseClass, IDisposable {
         //
         #region COM GUIDs
@@ -19,11 +22,13 @@ namespace Contensive.Processor {
         /// <summary>
         /// index into metadata array
         /// </summary>
-        private int cs;
+        private int legacy_cs;
         /// <summary>
         /// user who opened the dataset
         /// </summary>
-        private int openingMemberID;
+        private int legacy_openingMemberID;
+        //
+        private CsModel cs;
         //
         //====================================================================================================
         /// <summary>
@@ -32,8 +37,9 @@ namespace Contensive.Processor {
         /// <param name="cp"></param>
         public CPCSClass(CPBaseClass cp) {
             this.cp = (CPClass)cp;
-            cs = -1;
-            openingMemberID = this.cp.core.session.user.id;
+            cs = new CsModel(this.cp.core);
+            //csKeyLegacy = -1;
+            //legacy_openingMemberID = this.cp.core.session.user.id;
         }
         //
         //====================================================================================================
@@ -44,9 +50,9 @@ namespace Contensive.Processor {
         /// <returns></returns>
         public override bool Insert(string contentName) {
             try {
-                if (cs != -1) { cp.core.db.csClose(ref cs); }
-                cs = cp.core.db.csInsertRecord(contentName, openingMemberID);
-                return cp.core.db.csOk(cs);
+                if (legacy_cs != -1) { cp.core.db.csClose(ref legacy_cs); }
+                legacy_cs = cp.core.db.csInsertRecord(contentName, legacy_openingMemberID);
+                return cp.core.db.csOk(legacy_cs);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -64,9 +70,9 @@ namespace Contensive.Processor {
         /// <returns></returns>
         public override bool OpenRecord(string contentName, int recordId, string selectFieldList, bool activeOnly) {
             try {
-                if (cs != -1) { cp.core.db.csClose(ref cs); }
-                cs = cp.core.db.csOpen(contentName, "id=" + recordId, "", activeOnly, 0, false, false, selectFieldList, 1, 1);
-                return cp.core.db.csOk(cs);
+                if (legacy_cs != -1) { cp.core.db.csClose(ref legacy_cs); }
+                legacy_cs = cp.core.db.csOpen(contentName, "id=" + recordId, "", activeOnly, 0, false, false, selectFieldList, 1, 1);
+                return cp.core.db.csOk(legacy_cs);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex );
                 throw;
@@ -87,7 +93,7 @@ namespace Contensive.Processor {
         //
         public override bool Open(string contentName, string sqlCriteria, string sortFieldList, bool activeOnly, string selectFieldList, int pageSize, int pageNumber) {
             try {
-                if (cs != -1) { cp.core.db.csClose(ref cs); }
+                if (legacy_cs != -1) { cp.core.db.csClose(ref legacy_cs); }
                 if ((pageSize == 0) || (pageSize == 10)) {
                     // -- (hack) fix for interface issue that has default value 0. later add new method and deprecate
                     // -- pagesize=10, pageNumber=1 -- old code returns all records, new code only returns the first 10 records -- this in effect makes it not compatiblie
@@ -95,8 +101,8 @@ namespace Contensive.Processor {
                     // -- when I changed new cpbase to pagesize default 0, and compiled code against it, it would not run on c41 because pagesize=0 is passed
                     pageSize = 9999;
                 }
-                cs = cp.core.db.csOpen(contentName, sqlCriteria, sortFieldList, activeOnly, 0, false, false, selectFieldList, pageSize, pageNumber);
-                return cp.core.db.csOk(cs);
+                legacy_cs = cp.core.db.csOpen(contentName, sqlCriteria, sortFieldList, activeOnly, 0, false, false, selectFieldList, pageSize, pageNumber);
+                return cp.core.db.csOk(legacy_cs);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -138,9 +144,9 @@ namespace Contensive.Processor {
         //
         public override bool OpenGroupUsers(List<string> groupList, string sqlCriteria, string sortFieldList, bool activeOnly, int pageSize, int pageNumber) {
             try {
-                if (cs != -1) { cp.core.db.csClose(ref cs); }
-                cs = cp.core.db.csOpenGroupUsers(groupList, sqlCriteria, sortFieldList, activeOnly, pageSize, pageNumber);
-                return cp.core.db.csOk(cs);
+                if (legacy_cs != -1) { cp.core.db.csClose(ref legacy_cs); }
+                legacy_cs = cp.core.db.csOpenGroupUsers(groupList, sqlCriteria, sortFieldList, activeOnly, pageSize, pageNumber);
+                return cp.core.db.csOk(legacy_cs);
             } catch (Exception ex) {
                 LogController.handleError( cp.core, ex );
                 throw;
@@ -206,16 +212,16 @@ namespace Contensive.Processor {
         //
         public override bool OpenSQL(string sql, string dataSourcename, int pageSize, int pageNumber) {
             try {
-                if (cs != -1) { cp.core.db.csClose(ref cs); }
+                if (legacy_cs != -1) { cp.core.db.csClose(ref legacy_cs); }
                 if (((string.IsNullOrEmpty(sql)) || (sql.ToLowerInvariant() == "default")) && (!string.IsNullOrEmpty(dataSourcename)) && (dataSourcename.ToLowerInvariant() != "default")) {
                     //
                     // -- arguments reversed from legacy api mistake, datasource has the query, sql has the datasource
                     LogController.logWarn(cp.core, "Call to cs with arguments reversed, datasource [" + dataSourcename + "], sql [" + sql + "]");
-                    cs = cp.core.db.csOpenSql(dataSourcename, sql, pageSize, pageNumber);
+                    legacy_cs = cp.core.db.csOpenSql(dataSourcename, sql, pageSize, pageNumber);
                 } else {
-                    cs = cp.core.db.csOpenSql(sql, dataSourcename, pageSize, pageNumber);
+                    legacy_cs = cp.core.db.csOpenSql(sql, dataSourcename, pageSize, pageNumber);
                 }
-                return cp.core.db.csOk(cs);
+                return cp.core.db.csOk(legacy_cs);
             } catch (Exception ex) {
                 LogController.handleError(cp.core, ex);
                 throw;
@@ -241,9 +247,9 @@ namespace Contensive.Processor {
         //
         public override void Close() {
             try {
-                if (cs != -1) {
-                    cp.core.db.csClose(ref cs);
-                    cs = -1;
+                if (legacy_cs != -1) {
+                    cp.core.db.csClose(ref legacy_cs);
+                    legacy_cs = -1;
                 }
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
@@ -254,23 +260,23 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override object GetFormInput(string contentName, string fieldName, int height, int width, string htmlId) {
-            return cp.core.html.inputCs(cs, contentName, fieldName, height, width, htmlId);
+            return cp.core.html.inputCs(legacy_cs, contentName, fieldName, height, width, htmlId);
         }
         public override object GetFormInput(string contentName, string fieldName, int height, int width) {
-            return cp.core.html.inputCs(cs, contentName, fieldName, height, width);
+            return cp.core.html.inputCs(legacy_cs, contentName, fieldName, height, width);
         }
         public override object GetFormInput(string contentName, string fieldName, int height) {
-            return cp.core.html.inputCs(cs, contentName, fieldName, height);
+            return cp.core.html.inputCs(legacy_cs, contentName, fieldName, height);
         }
         public override object GetFormInput(string contentName, string fieldName) {
-            return cp.core.html.inputCs(cs, contentName, fieldName);
+            return cp.core.html.inputCs(legacy_cs, contentName, fieldName);
         }
         //
         //====================================================================================================
         //
         public override void Delete() {
             try {
-                cp.core.db.csDeleteRecord(cs);
+                cp.core.db.csDeleteRecord(legacy_cs);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -281,7 +287,7 @@ namespace Contensive.Processor {
         //
         public override bool FieldOK(string fieldName) {
             try {
-                return cp.core.db.csIsFieldSupported(cs, fieldName);
+                return cp.core.db.csIsFieldSupported(legacy_cs, fieldName);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -292,7 +298,7 @@ namespace Contensive.Processor {
         //
         public override void GoFirst() {
             try {
-                cp.core.db.csGoFirst(cs, false);
+                cp.core.db.csGoFirst(legacy_cs, false);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -303,7 +309,7 @@ namespace Contensive.Processor {
         //
         public override string GetAddLink(string presetNameValueList, bool allowPaste) {
             try {
-                return DbController.csGetRecordAddLink(cp.core, cs, presetNameValueList, allowPaste);
+                return DbController.csGetRecordAddLink(cp.core, legacy_cs, presetNameValueList, allowPaste);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -320,7 +326,7 @@ namespace Contensive.Processor {
         //
         public override bool GetBoolean(string FieldName) {
             try {
-                return cp.core.db.csGetBoolean(cs, FieldName);
+                return cp.core.db.csGetBoolean(legacy_cs, FieldName);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -331,7 +337,7 @@ namespace Contensive.Processor {
         //
         public override DateTime GetDate(string FieldName) {
             try {
-                return cp.core.db.csGetDate(cs, FieldName);
+                return cp.core.db.csGetDate(legacy_cs, FieldName);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -342,7 +348,7 @@ namespace Contensive.Processor {
         //
         public override string GetEditLink(bool allowCut) {
             try {
-                return cp.core.db.csGetRecordEditLink(cs, allowCut);
+                return cp.core.db.csGetRecordEditLink(legacy_cs, allowCut);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -355,7 +361,7 @@ namespace Contensive.Processor {
         //
         public override string GetFilename(string fieldName, string OriginalFilename, string ContentName) {
             try {
-                return cp.core.db.csGetFieldFilename(cs, fieldName, OriginalFilename, ContentName);
+                return cp.core.db.csGetFieldFilename(legacy_cs, fieldName, OriginalFilename, ContentName);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -372,7 +378,7 @@ namespace Contensive.Processor {
         //
         public override int GetInteger(string FieldName) {
             try {
-                return cp.core.db.csGetInteger(cs, FieldName);
+                return cp.core.db.csGetInteger(legacy_cs, FieldName);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -383,7 +389,7 @@ namespace Contensive.Processor {
         //
         public override double GetNumber(string FieldName) {
             try {
-                return cp.core.db.csGetNumber(cs, FieldName);
+                return cp.core.db.csGetNumber(legacy_cs, FieldName);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -394,7 +400,7 @@ namespace Contensive.Processor {
         //
         public override int GetRowCount() {
             try {
-                return cp.core.db.csGetRowCount(cs);
+                return cp.core.db.csGetRowCount(legacy_cs);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -405,7 +411,7 @@ namespace Contensive.Processor {
         //
         public override string GetSQL() {
             try {
-                return cp.core.db.csGetSql(cs);
+                return cp.core.db.csGetSql(legacy_cs);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -416,7 +422,7 @@ namespace Contensive.Processor {
         //
         public override string GetText(string fieldName) {
             try {
-                return cp.core.db.csGet(cs, fieldName);
+                return cp.core.db.csGet(legacy_cs, fieldName);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -427,7 +433,7 @@ namespace Contensive.Processor {
         //
         public override string GetHtml(string fieldName) {
             try {
-                return cp.core.db.csGet(cs, fieldName);
+                return cp.core.db.csGet(legacy_cs, fieldName);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -438,7 +444,7 @@ namespace Contensive.Processor {
         //
         public override void GoNext() {
             try {
-                cp.core.db.csGoNext(cs);
+                cp.core.db.csGoNext(legacy_cs);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -449,8 +455,8 @@ namespace Contensive.Processor {
         //
         public override bool NextOK() {
             try {
-                cp.core.db.csGoNext(cs);
-                return cp.core.db.csOk(cs);
+                cp.core.db.csGoNext(legacy_cs);
+                return cp.core.db.csOk(legacy_cs);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -461,7 +467,7 @@ namespace Contensive.Processor {
         //
         public override bool OK() {
             try {
-                return cp.core.db.csOk(cs);
+                return cp.core.db.csOk(legacy_cs);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -472,7 +478,7 @@ namespace Contensive.Processor {
         //
         public override void Save() {
             try {
-                cp.core.db.csSave(cs);
+                cp.core.db.csSave(legacy_cs);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -484,25 +490,25 @@ namespace Contensive.Processor {
         public override void SetField(string fieldName, object fieldValue) {
             try {
                 if (fieldValue is string fieldString) {
-                    cp.core.db.csSet(cs, fieldName, fieldString);
+                    cp.core.db.csSet(legacy_cs, fieldName, fieldString);
                     return;
                 }
                 int? fieldInt = fieldValue as int?;
                 if (fieldInt != null) {
-                    cp.core.db.csSet(cs, fieldName, fieldInt.GetValueOrDefault());
+                    cp.core.db.csSet(legacy_cs, fieldName, fieldInt.GetValueOrDefault());
                     return;
                 }
                 bool? fieldBool = fieldValue as bool?;
                 if (fieldBool != null) {
-                    cp.core.db.csSet(cs, fieldName, fieldBool.GetValueOrDefault());
+                    cp.core.db.csSet(legacy_cs, fieldName, fieldBool.GetValueOrDefault());
                     return;
                 }
                 DateTime? fieldDate = fieldValue as DateTime?;
                 if (fieldDate != null) {
-                    cp.core.db.csSet(cs, fieldName, fieldDate.GetValueOrDefault());
+                    cp.core.db.csSet(legacy_cs, fieldName, fieldDate.GetValueOrDefault());
                     return;
                 }
-                cp.core.db.csSet(cs, fieldName, fieldValue.ToString());
+                cp.core.db.csSet(legacy_cs, fieldName, fieldValue.ToString());
             } catch (Exception ex) {
                 LogController.handleError(cp.core, ex);
                 throw;
@@ -510,26 +516,26 @@ namespace Contensive.Processor {
         }
         //
         public override void SetField(string FieldName, int FieldValue) {
-            cp.core.db.csSet(cs, FieldName, FieldValue);
+            cp.core.db.csSet(legacy_cs, FieldName, FieldValue);
         }
         //
         public override void SetField(string FieldName, bool FieldValue) {
-            cp.core.db.csSet(cs, FieldName, FieldValue);
+            cp.core.db.csSet(legacy_cs, FieldName, FieldValue);
         }
         //
         public override void SetField(string FieldName, DateTime FieldValue) {
-            cp.core.db.csSet(cs, FieldName, FieldValue);
+            cp.core.db.csSet(legacy_cs, FieldName, FieldValue);
         }
         //
         public override void SetField(string FieldName, String FieldValue) {
-            cp.core.db.csSet(cs, FieldName, FieldValue);
+            cp.core.db.csSet(legacy_cs, FieldName, FieldValue);
         }
         //
         //====================================================================================================
         //
         public override void SetFormInput(string fieldName, string requestName) {
             try {
-                DbController.csSetFormInput(cp.core, cs, fieldName, requestName);
+                DbController.csSetFormInput(cp.core, legacy_cs, fieldName, requestName);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -545,7 +551,7 @@ namespace Contensive.Processor {
         /// <param name="fieldName"></param>
         /// <returns></returns>
         public override string GetValue(string fieldName) {
-            return cp.core.db.csGetValue(cs, fieldName);
+            return cp.core.db.csGetValue(legacy_cs, fieldName);
         }
         //
         //====================================================================================================
@@ -573,7 +579,7 @@ namespace Contensive.Processor {
         [Obsolete("Use SetField for all field types that store data in files (textfile, cssfile, etc)")]
         public override void SetFile(string FieldName, string Copy, string ContentName) {
             try {
-                cp.core.db.csSetTextFile(cs, FieldName, Copy, ContentName);
+                cp.core.db.csSetTextFile(legacy_cs, FieldName, Copy, ContentName);
             } catch (Exception ex) {
                 LogController.handleError(cp.core, ex);
                 throw;
@@ -584,15 +590,15 @@ namespace Contensive.Processor {
         public override bool OpenSQL2(string sql, string DataSourcename = "default", int PageSize = 10, int PageNumber = 1) {
             bool success = false;
             try {
-                if (cs != -1) {
-                    cp.core.db.csClose(ref cs);
+                if (legacy_cs != -1) {
+                    cp.core.db.csClose(ref legacy_cs);
                 }
                 if (((string.IsNullOrEmpty(sql)) || (sql.ToLowerInvariant() == "default")) && (!string.IsNullOrEmpty(DataSourcename)) && (DataSourcename.ToLowerInvariant() != "default")) {
-                    cs = cp.core.db.csOpenSql(sql, DataSourcename, PageSize, PageNumber);
+                    legacy_cs = cp.core.db.csOpenSql(sql, DataSourcename, PageSize, PageNumber);
                 } else {
-                    cs = cp.core.db.csOpenSql(sql, DataSourcename, PageSize, PageNumber);
+                    legacy_cs = cp.core.db.csOpenSql(sql, DataSourcename, PageSize, PageNumber);
                 }
-                success = cp.core.db.csOk(cs);
+                success = cp.core.db.csOk(legacy_cs);
             } catch (Exception ex) {
                 LogController.handleError(cp.core, ex);
                 throw;
@@ -603,7 +609,7 @@ namespace Contensive.Processor {
         [Obsolete("Use getText for copy. getFilename for filename", true)]
         public override string GetTextFile(string FieldName) {
             try {
-                return cp.core.db.csGetText(cs, FieldName);
+                return cp.core.db.csGetText(legacy_cs, FieldName);
             } catch (Exception ex) {
                 LogController.handleError(cp.core, ex);
                 throw;
@@ -627,7 +633,7 @@ namespace Contensive.Processor {
             if (!this.disposed) {
                 if (disposing) {
                     try {
-                        if (cs > -1) { cp.core.db.csClose(ref cs); }
+                        if (legacy_cs > -1) { cp.core.db.csClose(ref legacy_cs); }
                     } catch( Exception ) {
                         //
                     }

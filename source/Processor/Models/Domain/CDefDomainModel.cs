@@ -234,12 +234,12 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         /// <param name="core"></param>
         /// <returns></returns>
-        public List<int> get_childIdList(CoreController core) {
-            if (( parentID>0)&(_childIdList == null)) {
+        public List<int> childIdList(CoreController core) {
+            if (( parentID>0 ) && ( _childIdList == null )) {
                 _childIdList = new List<int>();
                 using (DataTable dt = core.db.executeQuery("select id from cccontent where parentid=" + id)) {
                     foreach (DataRow row in dt.Rows) {
-                        _childIdList.Add(GenericController.encodeInteger(row[0]));
+                        _childIdList.Add(encodeInteger(row[0]));
                     }
                 }
             }
@@ -595,6 +595,26 @@ namespace Contensive.Processor.Models.Domain {
             return result;
         }
         //   
+        //====================================================================================================
+        /// <summary>
+        /// get Cdef from content name. If the cdef is not found, return nothing.
+        /// </summary>
+        /// <param name="contentName"></param>
+        /// <returns></returns>
+        public static CDefDomainModel createByUniqueName(CoreController core, string contentName) {
+            CDefDomainModel returnCdef = null;
+            try {
+                int ContentId = getContentId(core, contentName);
+                if (ContentId > 0) {
+                    returnCdef = create(core, ContentId);
+                }
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+                throw;
+            }
+            return returnCdef;
+        }
+        //
         //========================================================================
         /// <summary>
         /// Calculates the query criteria for a content with parentId set non-zero. DO NOT CALL if parentId is not 0.
@@ -634,7 +654,11 @@ namespace Contensive.Processor.Models.Domain {
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// setup the admin column model for the create methods
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="cdef"></param>
         private static void create_setAdminColumns(CoreController core, CDefDomainModel cdef) {
             try {
                 if (cdef.id > 0) {
@@ -693,26 +717,6 @@ namespace Contensive.Processor.Models.Domain {
         //
         //====================================================================================================
         /// <summary>
-        /// get Cdef from content name. If the cdef is not found, return nothing.
-        /// </summary>
-        /// <param name="contentName"></param>
-        /// <returns></returns>
-        public static CDefDomainModel create(CoreController core, string contentName) {
-            CDefDomainModel returnCdef = null;
-            try {
-                int ContentId = CdefController.getContentId(core, contentName);
-                if (ContentId > 0) {
-                    returnCdef = create(core, ContentId);
-                }
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-                throw;
-            }
-            return returnCdef;
-        }
-        //
-        //====================================================================================================
-        /// <summary>
         /// Get cache key for a cdef object in cache
         /// </summary>
         /// <param name="contentId"></param>
@@ -760,6 +764,28 @@ namespace Contensive.Processor.Models.Domain {
                 }
             } catch (Exception) { }
             return result;
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// get content id from content name. In model not controller because controller calls model, not the other wau (see constants)
+        /// </summary>
+        /// <param name="contentName"></param>
+        /// <returns></returns>
+        public static int getContentId(CoreController core, string contentName) {
+            try {
+                var nameLower = contentName.Trim().ToLowerInvariant();
+                if (core.contentNameIdDictionary.ContainsKey(nameLower)) { return core.contentNameIdDictionary[nameLower]; }
+                ContentModel content = ContentModel.createByUniqueName(core, contentName);
+                if (content != null) {
+                    core.contentNameIdDictionary.Add(nameLower, content.id);
+                    return content.id;
+                }
+                return 0;
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+                throw;
+            }
         }
     }
 }

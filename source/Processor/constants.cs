@@ -9,18 +9,28 @@ namespace Contensive.Processor {
         //      - only allow calls from top to bottom
         //      - NEVER CALL UP
         //
-        //      ContentSets: a convenient way to open data that follows the content definition rules (active, contentcontrolId, guid, etc)
-        //          = csController
+        //      CPCSBaseClass:
+        //          abstract interface that addons are built agains
         //
-        //      CdefModel: the model for content definitions, and methods to create them
+        //      CPCSClass:
+        //          implementation of CPCSBaseClass passed into addons for dependencies
         //
-        //      ? CDef domain model, should it's 'control' methods just be methods in the model?
-        //      CdefController: static methods for all things ContentDefinition (cdef)
+        //      csModel: 
+        //          open data using CDef metadata (active, contentcontrolId, guid, etc)
+        //
+        //      CdefController: 
+        //          Static Methods that use CDef metadata to support data activity
         //          - getContentId, getCdef, etc.
         //
-        //      DbModels: convenient, cached access to database records
+        //      CdefModel:
+        //          An instance of a contentDefinition. 
+        //          Properties and Methods that relate to that instance
+        //
+        //      DbModels: 
+        //          cached access to database records
         //  
-        //      DbController: fast access to database records without consideration for content-definition structure, like contentcontrolid
+        //      DbController: 
+        //          direct access to database records without consideration for content-definition structure, like contentcontrolid
         //          manages active, guid and create/modified user/date
         //
         //      CacheController: 

@@ -32,7 +32,7 @@ namespace Contensive.Addons.AdminSite {
                     + "<td class=\"ccAdminEditField\" colspan=2>" + SpanClassAdminNormal + s + "</span></td>"
                     + "</tr><tr>"
                     + "<td class=\"ccAdminEditCaption\">&nbsp;</td>"
-                    + "<td class=\"ccAdminEditField\" colspan=2>" + SpanClassAdminNormal + "[<a href=?cid=" + CdefController.getContentId(core, "Topics") + " target=_blank>Manage Topics</a>]</span></td>"
+                    + "<td class=\"ccAdminEditField\" colspan=2>" + SpanClassAdminNormal + "[<a href=?cid=" + CDefDomainModel.getContentId(core, "Topics") + " target=_blank>Manage Topics</a>]</span></td>"
                     + "</tr>";
                 s = AdminUIController.editTable( s );
                 s = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), "Email Rules", "Send email to people in these groups", s);

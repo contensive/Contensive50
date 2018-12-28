@@ -164,7 +164,7 @@ namespace Contensive.Processor.Models.Db {
         //
         public static Dictionary<string, string> getNameValueDict( CoreController core ) {
             var result = new Dictionary<string, string>();
-            CsController cs = new CsController(core);
+            CsModel cs = new CsModel(core);
             if (cs.openSQL("select name,FieldValue from ccsetup where (active>0) order by id")) {
                 do {
                     string name = cs.getText("name").Trim().ToLowerInvariant();

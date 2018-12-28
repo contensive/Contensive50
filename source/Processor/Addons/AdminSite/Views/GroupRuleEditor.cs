@@ -87,9 +87,9 @@ namespace Contensive.Addons.AdminSite {
                                 }
                             }
                             string relatedButtonList = "";
-                            relatedButtonList += AdminUIController.getButtonPrimaryAnchor("Edit", "?af=4&cid=" + CdefController.getContentId(core, "Groups") + "&id=" + GroupID);
-                            relatedButtonList += AdminUIController.getButtonPrimaryAnchor("Members", "?af=1&cid=" + CdefController.getContentId(core, "people") + "&IndexFilterAddGroup=" + GenericController.encodeURL(GroupName));
-                            //relatedButtonList += "[<a href=\"?af=4&cid=" + CdefController.getContentId(core, "Groups") + "&id=" + GroupID + "\">Edit&nbsp;Group</a>]";
+                            relatedButtonList += AdminUIController.getButtonPrimaryAnchor("Edit", "?af=4&cid=" + CDefDomainModel.getContentId(core, "Groups") + "&id=" + GroupID);
+                            relatedButtonList += AdminUIController.getButtonPrimaryAnchor("Members", "?af=1&cid=" + CDefDomainModel.getContentId(core, "people") + "&IndexFilterAddGroup=" + GenericController.encodeURL(GroupName));
+                            //relatedButtonList += "[<a href=\"?af=4&cid=" + CDefDomainModel.getContentId(core, "Groups") + "&id=" + GroupID + "\">Edit&nbsp;Group</a>]";
                             //relatedButtonList += "&nbsp;[<a href=\"?af=12&rid=35&recordid=" + GroupID + "\">Group&nbsp;Report</a>]";
                             //relatedButtonList += "&nbsp;[<a href=\"\">People</a>]";
                             //
@@ -119,7 +119,7 @@ namespace Contensive.Addons.AdminSite {
                 // -- add a row for group count and Add Group button
                 groupRuleEditor.rowList.Add(new GroupRuleEditorRowModel() {
                     idHidden = HtmlController.inputHidden("MemberRules.RowCount", GroupCount),
-                    checkboxInput = AdminUIController.getButtonPrimaryAnchor("Add Group", "?af=4&cid=" + CdefController.getContentId(core, "Groups")),
+                    checkboxInput = AdminUIController.getButtonPrimaryAnchor("Add Group", "?af=4&cid=" + CDefDomainModel.getContentId(core, "Groups")),
                     groupCaption = "",
                     expiresInput = "",
                     relatedButtonList = "",
@@ -132,7 +132,7 @@ namespace Contensive.Addons.AdminSite {
                 //}
                 //body.Add("<tr>");
                 //body.Add("<td class=\"ccAdminEditCaption\">&nbsp;</td>");
-                //body.Add("<td class=\"ccAdminEditField\">" + SpanClassAdminNormal + "[<a href=?cid=" + CdefController.getContentId(core, "Groups") + " target=_blank>Manage Groups</a>]</span></td>");
+                //body.Add("<td class=\"ccAdminEditField\">" + SpanClassAdminNormal + "[<a href=?cid=" + CDefDomainModel.getContentId(core, "Groups") + " target=_blank>Manage Groups</a>]</span></td>");
                 //body.Add("</tr>");
 
                 result = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), "Group Membership", "", body.Text );

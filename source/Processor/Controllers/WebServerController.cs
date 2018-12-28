@@ -1111,7 +1111,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // ----- if a content watch record is blocked, delete the content tracking
                                 //
-                                core.db.deleteContentRules(CdefController.getContentId(core, HostContentName), HostRecordID);
+                                core.db.deleteContentRules(CDefDomainModel.getContentId(core, HostContentName), HostRecordID);
                             }
                             break;
                     }

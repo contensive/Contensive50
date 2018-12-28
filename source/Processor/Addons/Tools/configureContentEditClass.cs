@@ -240,7 +240,7 @@ namespace Contensive.Addons.Tools {
                     //
                     // content tables that have edit forms to Configure
                     bool isEmptyList = false;
-                    Stream.Add(AdminUIController.getToolFormInputRow(core, "Select a Content Definition to Configure", AdminUIController.getDefaultEditor_LookupContent(core,RequestNameToolContentID, ContentID, CdefController.getContentId( core,"Content" ), ref isEmptyList)));
+                    Stream.Add(AdminUIController.getToolFormInputRow(core, "Select a Content Definition to Configure", AdminUIController.getDefaultEditor_LookupContent(core,RequestNameToolContentID, ContentID, CDefDomainModel.getContentId( core,"Content" ), ref isEmptyList)));
                 } else {
                     //
                     // Configure edit form
@@ -327,7 +327,7 @@ Stream.Add(core.html.getPanelTop());
                         }
                         fieldList.Sort((p1, p2) => p1.sort.CompareTo(p2.sort));
                         StringBuilderLegacyController StreamValidRows = new StringBuilderLegacyController();
-                        var contentFieldsCdef = Processor.Models.Domain.CDefDomainModel.create(core, "content fields");
+                        var contentFieldsCdef = Processor.Models.Domain.CDefDomainModel.createByUniqueName(core, "content fields");
                         foreach (fieldSortClass fieldsort in fieldList) {
                             StringBuilderLegacyController streamRow = new StringBuilderLegacyController();
                             bool rowValid = true;

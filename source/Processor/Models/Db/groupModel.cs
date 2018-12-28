@@ -146,7 +146,7 @@ namespace Contensive.Processor.Models.Db {
                         result.save(core);
                     }
                 } else {
-                    var groupCdef = Models.Domain.CDefDomainModel.create(core, "groups");
+                    var groupCdef = Models.Domain.CDefDomainModel.createByUniqueName(core, "groups");
                     result = Models.Db.GroupModel.addDefault(core, groupCdef);
                     result.name = groupName;
                     result.caption = groupCaption;

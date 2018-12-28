@@ -23,7 +23,7 @@ namespace Contensive.Addons.AdminSite {
                     int fieldId = cp.Doc.GetInteger("fieldId");
                     ContentFieldHelpModel help = ContentFieldHelpModel.createByFieldId(core, fieldId);
                     if (help == null) {
-                        help = ContentFieldHelpModel.addDefault(core, Processor.Models.Domain.CDefDomainModel.create(core, ContentFieldHelpModel.contentName));
+                        help = ContentFieldHelpModel.addDefault(core, Processor.Models.Domain.CDefDomainModel.createByUniqueName(core, ContentFieldHelpModel.contentName));
                         help.fieldID = fieldId;
                     }
                     help.helpCustom = cp.Doc.GetText("helpcustom");

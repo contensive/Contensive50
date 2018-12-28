@@ -114,7 +114,7 @@ namespace Contensive.Processor.Models.Db {
         public static Dictionary<string, DataSourceModel> getNameDict(CoreController core) {
             Dictionary<string, DataSourceModel> result = new Dictionary<string, DataSourceModel>();
             try {
-                CsController cs = new CsController(core);
+                CsModel cs = new CsModel(core);
                 List<string> ignoreCacheNames = new List<string>();
                 if ( cs.openSQL( "select id from ccdatasources where active>0")) {
                     do {

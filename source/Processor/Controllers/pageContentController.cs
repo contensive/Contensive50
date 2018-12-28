@@ -237,7 +237,7 @@ namespace Contensive.Processor.Controllers {
                 // ----- Do not allow blank message - if still nothing, create default
                 if (string.IsNullOrEmpty(result)) {
                     result = "<p>The content on this page has restricted access. If you have a username and password for this system, <a href=\"?method=login\" rel=\"nofollow\">Click Here</a>. For more information, please contact the administrator.</p>";
-                    copyRecord = CopyContentModel.addDefault(core, Models.Domain.CDefDomainModel.create(core, CopyContentModel.contentName));
+                    copyRecord = CopyContentModel.addDefault(core, Models.Domain.CDefDomainModel.createByUniqueName(core, CopyContentModel.contentName));
                     copyRecord.name = ContentBlockCopyName;
                     copyRecord.copy = result;
                     copyRecord.save(core);
@@ -362,7 +362,7 @@ namespace Contensive.Processor.Controllers {
                     if (core.doc.pageController.pageToRootList.Count == 0) {
                         //
                         // -- attempt failed, create default page
-                        core.doc.pageController.page = PageContentModel.addDefault(core, Models.Domain.CDefDomainModel.create(core, PageContentModel.contentName));
+                        core.doc.pageController.page = PageContentModel.addDefault(core, Models.Domain.CDefDomainModel.createByUniqueName(core, PageContentModel.contentName));
                         core.doc.pageController.page.name = DefaultNewLandingPageName + ", " + domain.name;
                         core.doc.pageController.page.copyfilename.content = landingPageDefaultHtml;
                         core.doc.pageController.page.save(core);
@@ -413,7 +413,7 @@ namespace Contensive.Processor.Controllers {
                             if (core.doc.pageController.template == null) {
                                 //
                                 // -- ceate new template named Default
-                                core.doc.pageController.template = PageTemplateModel.addDefault(core, Models.Domain.CDefDomainModel.create(core, PageTemplateModel.contentName));
+                                core.doc.pageController.template = PageTemplateModel.addDefault(core, Models.Domain.CDefDomainModel.createByUniqueName(core, PageTemplateModel.contentName));
                                 core.doc.pageController.template.name = defaultTemplateName;
                                 core.doc.pageController.template.bodyHTML = core.appRootFiles.readFileText(defaultTemplateHomeFilename);
                                 core.doc.pageController.template.save(core);
@@ -476,7 +476,7 @@ namespace Contensive.Processor.Controllers {
                         if (landingPage == null) {
                             //
                             // -- create detault landing page
-                            landingPage = PageContentModel.addDefault(core, Models.Domain.CDefDomainModel.create(core, PageContentModel.contentName));
+                            landingPage = PageContentModel.addDefault(core, Models.Domain.CDefDomainModel.createByUniqueName(core, PageContentModel.contentName));
                             landingPage.name = DefaultNewLandingPageName + ", " + domain.name;
                             landingPage.copyfilename.content = landingPageDefaultHtml;
                             landingPage.save(core);
@@ -701,7 +701,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 result = (ChildRecordID == ParentRecordID);
                 if (!result) {
-                    Models.Domain.CDefDomainModel CDef = Models.Domain.CDefDomainModel.create(core, ContentName);
+                    Models.Domain.CDefDomainModel CDef = Models.Domain.CDefDomainModel.createByUniqueName(core, ContentName);
                     if (GenericController.isInDelimitedString(CDef.selectCommaList.ToUpper(), "PARENTID", ",")) {
                         result = main_IsChildRecord_Recurse(core, CDef.dataSourceName, CDef.tableName, ChildRecordID, ParentRecordID, "");
                     }
@@ -2400,7 +2400,7 @@ namespace Contensive.Processor.Controllers {
             string result = "";
             try {
                 if (RecordID > 0) {
-                    int ContentID = CdefController.getContentId(core, ContentName);
+                    int ContentID = CDefDomainModel.getContentId(core, ContentName);
                     bool IsEditingLocal = false;
                     if (ContentID > 0) {
                         //
@@ -2409,7 +2409,7 @@ namespace Contensive.Processor.Controllers {
                     } else {
                         //
                         // ----- if iContentName was bad, maybe they put table in, no authoring
-                        ContentID = CdefController.getContentIDByTablename(core, ContentName);
+                        ContentID = CDefDomainModel.getContentIdByTablename(core, ContentName);
                     }
                     int SeeAlsoCount = 0;
                     if (ContentID > 0) {
@@ -2784,7 +2784,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 if (core.db.csOk(CS)) {
-                    int ContentID = CdefController.getContentId(core, "Content Watch");
+                    int ContentID = CDefDomainModel.getContentId(core, "Content Watch");
                     while (core.db.csOk(CS)) {
                         string Link = core.db.csGetText(CS, "link");
                         string LinkLabel = core.db.csGetText(CS, "LinkLabel");
@@ -2822,7 +2822,7 @@ namespace Contensive.Processor.Controllers {
             int recordId = (core.docProperties.getInteger("ID"));
             string button = core.docProperties.getText("Button");
             if ((!string.IsNullOrEmpty(button)) && (recordId != 0) && (core.session.isAuthenticatedContentManager(core, PageContentModel.contentName))) {
-                var pageCdef = Models.Domain.CDefDomainModel.create(core, "page content");
+                var pageCdef = Models.Domain.CDefDomainModel.createByUniqueName(core, "page content");
                 var pageTable = Models.Db.TableModel.createByContentName(core, pageCdef.name);
                 WorkflowController.editLockClass editLock = WorkflowController.getEditLock(core, pageTable.id, recordId);
                 WorkflowController.clearEditLock(core, pageTable.id, recordId);
@@ -2979,7 +2979,7 @@ namespace Contensive.Processor.Controllers {
                 CSPointer = core.db.csOpenWhatsNew(core, SortFieldList);
                 //
                 if (core.db.csOk(CSPointer)) {
-                    ContentID = CdefController.getContentId(core, "Content Watch");
+                    ContentID = CDefDomainModel.getContentId(core, "Content Watch");
                     while (core.db.csOk(CSPointer)) {
                         Link = core.db.csGetText(CSPointer, "link");
                         LinkLabel = core.db.csGetText(CSPointer, "LinkLabel");

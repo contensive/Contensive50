@@ -1247,7 +1247,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                         EditorString += "&nbsp;[Edit <a TabIndex=-1 href=\"?af=4&cid=" + selectedUser.contentControlID.ToString() + "&id=" + selectedRecordId.ToString() + "\">" + HtmlController.encodeHtml( recordName ) + "</a>]";
                     }
                 }
-                EditorString += ("&nbsp;[Select from members of <a TabIndex=-1 href=\"?cid=" + CdefController.getContentId(core, "groups") + "\">" + groupName + "</a>]");
+                EditorString += ("&nbsp;[Select from members of <a TabIndex=-1 href=\"?cid=" + CDefDomainModel.getContentId(core, "groups") + "\">" + groupName + "</a>]");
             }
             return EditorString;
         }
@@ -1564,7 +1564,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                         throw (new GenericException("RecordID [" + recordID + "] is invalid"));
                     } else {
                         if (IsEditing) {
-                            var cdef = CDefDomainModel.create(core, contentName);
+                            var cdef = CDefDomainModel.createByUniqueName(core, contentName);
                             if ( cdef==null) {
                                 throw new GenericException("getRecordEditLink called with contentName [" + contentName + "], but no content found with this name.");
                             } else {
