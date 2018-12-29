@@ -950,9 +950,7 @@ namespace Contensive.Addons.AdminSite {
                 //
                 //
                 object DBValueVariant = null;
-                int CSEditRecord = 0;
                 object NullVariant = null;
-                int CSPointer = 0;
                 //
                 // ----- test for content problem
                 //
@@ -1002,161 +1000,153 @@ namespace Contensive.Addons.AdminSite {
                     //
                     //   Open Content Sets with the data
                     //
-                    CSEditRecord = csXfer.csOpen2(adminContent.name, editRecord.id, true, true);
-                    //
-                    //
-                    // store fieldvalues in RecordValuesVariant
-                    //
-                    if (!(csXfer.csOk(CSEditRecord))) {
+                    using (var csXfer = new CsModel(core)) {
+                        csXfer.csOpenRecord(adminContent.name, editRecord.id);
                         //
-                        //   Live or Edit records were not found
                         //
-                        BlockEditForm = true;
-                        Processor.Controllers.ErrorController.addUserError(core, "The information you have requested could not be found. The record could have been deleted, Or there may be a system Error.");
-                        // removed because it was throwing too many false positives (1/14/04 - tried to do it again)
-                        // If a CM hits the edit tag for a deleted record, this is hit. It should not cause the Developers to spend hours running down.
-                        //Call HandleInternalError("AdminClass.LoadEditRecord_Dbase", "Content edit record For [" & adminContent.Name & "." & EditRecord.ID & "] was not found.")
-                    } else {
+                        // store fieldvalues in RecordValuesVariant
                         //
-                        // Read database values into RecordValuesVariant array
-                        //
-                        NullVariant = null;
-                        foreach (var keyValuePair in adminContent.fields) {
-                            CDefFieldModel adminContentcontent = keyValuePair.Value;
-                            string fieldNameLc = adminContentcontent.nameLc;
-                            EditRecordFieldClass editRecordField = null;
+                        if (!(csXfer.csOk())) {
                             //
-                            // set editRecord.field to editRecordField and set values
+                            //   Live or Edit records were not found
                             //
-                            if (!editRecord.fieldsLc.ContainsKey(fieldNameLc)) {
-                                editRecordField = new EditRecordFieldClass();
-                                editRecord.fieldsLc.Add(fieldNameLc, editRecordField);
-                            } else {
-                                editRecordField = editRecord.fieldsLc[fieldNameLc];
-                            }
+                            BlockEditForm = true;
+                            Processor.Controllers.ErrorController.addUserError(core, "The information you have requested could not be found. The record could have been deleted, Or there may be a system Error.");
+                            // removed because it was throwing too many false positives (1/14/04 - tried to do it again)
+                            // If a CM hits the edit tag for a deleted record, this is hit. It should not cause the Developers to spend hours running down.
+                            //Call HandleInternalError("AdminClass.LoadEditRecord_Dbase", "Content edit record For [" & adminContent.Name & "." & EditRecord.ID & "] was not found.")
+                        } else {
                             //
-                            // 1/21/2007 - added clause if required and null, set to default value
+                            // Read database values into RecordValuesVariant array
                             //
-                            object fieldValue = NullVariant;
-                            if (adminContentcontent.readOnly || adminContentcontent.notEditable) {
+                            NullVariant = null;
+                            foreach (var keyValuePair in adminContent.fields) {
+                                CDefFieldModel adminContentcontent = keyValuePair.Value;
+                                string fieldNameLc = adminContentcontent.nameLc;
+                                EditRecordFieldClass editRecordField = null;
                                 //
-                                // 202-31245: quick fix. The CS should handle this instead.
-                                // Workflowauthoring, If read only, use the live record data
+                                // set editRecord.field to editRecordField and set values
                                 //
-                                CSPointer = CSEditRecord;
-                            } else {
-                                CSPointer = CSEditRecord;
-                            }
-                            //
-                            // Load the current Database value
-                            //
-                            switch (adminContentcontent.fieldTypeId) {
-                                case _fieldTypeIdRedirect:
-                                case _fieldTypeIdManyToMany:
-                                    DBValueVariant = "";
-                                    break;
-                                case _fieldTypeIdFileText:
-                                case _fieldTypeIdFileCSS:
-                                case _fieldTypeIdFileXML:
-                                case _fieldTypeIdFileJavascript:
-                                case _fieldTypeIdFileHTML:
-                                    DBValueVariant = csXfer.csGet(adminContentcontent.nameLc);
-                                    break;
-                                default:
-                                    DBValueVariant = csXfer.csGetValue(CSPointer, adminContentcontent.nameLc);
-                                    break;
-                            }
-                            //
-                            // Check for required and null case loading error
-                            //
-                            if (CheckUserErrors && adminContentcontent.required & (GenericController.IsNull(DBValueVariant))) {
-                                //
-                                // if required and null
-                                //
-                                if (string.IsNullOrEmpty(adminContentcontent.defaultValue)) {
-                                    //
-                                    // default is null
-                                    //
-                                    if (adminContentcontent.editTabName == "") {
-                                        Processor.Controllers.ErrorController.addUserError(core, "The value for [" + adminContentcontent.caption + "] was empty but is required. This must be set before you can save this record.");
-                                    } else {
-                                        Processor.Controllers.ErrorController.addUserError(core, "The value for [" + adminContentcontent.caption + "] in tab [" + adminContentcontent.editTabName + "] was empty but is required. This must be set before you can save this record.");
-                                    }
+                                if (!editRecord.fieldsLc.ContainsKey(fieldNameLc)) {
+                                    editRecordField = new EditRecordFieldClass();
+                                    editRecord.fieldsLc.Add(fieldNameLc, editRecordField);
                                 } else {
+                                    editRecordField = editRecord.fieldsLc[fieldNameLc];
+                                }
+                                //
+                                // 1/21/2007 - added clause if required and null, set to default value
+                                //
+                                object fieldValue = NullVariant;
+                                //
+                                // Load the current Database value
+                                //
+                                switch (adminContentcontent.fieldTypeId) {
+                                    case _fieldTypeIdRedirect:
+                                    case _fieldTypeIdManyToMany:
+                                        DBValueVariant = "";
+                                        break;
+                                    case _fieldTypeIdFileText:
+                                    case _fieldTypeIdFileCSS:
+                                    case _fieldTypeIdFileXML:
+                                    case _fieldTypeIdFileJavascript:
+                                    case _fieldTypeIdFileHTML:
+                                        DBValueVariant = csXfer.csGet(adminContentcontent.nameLc);
+                                        break;
+                                    default:
+                                        DBValueVariant = csXfer.csGetValue(adminContentcontent.nameLc);
+                                        break;
+                                }
+                                //
+                                // Check for required and null case loading error
+                                //
+                                if (CheckUserErrors && adminContentcontent.required & (GenericController.IsNull(DBValueVariant))) {
                                     //
-                                    // if required and null, set value to the default
+                                    // if required and null
                                     //
-                                    DBValueVariant = adminContentcontent.defaultValue;
-                                    if (adminContentcontent.editTabName == "") {
-                                        Processor.Controllers.ErrorController.addUserError(core, "The value for [" + adminContentcontent.caption + "] was null but is required. The default value Is shown, And will be saved if you save this record.");
+                                    if (string.IsNullOrEmpty(adminContentcontent.defaultValue)) {
+                                        //
+                                        // default is null
+                                        //
+                                        if (adminContentcontent.editTabName == "") {
+                                            Processor.Controllers.ErrorController.addUserError(core, "The value for [" + adminContentcontent.caption + "] was empty but is required. This must be set before you can save this record.");
+                                        } else {
+                                            Processor.Controllers.ErrorController.addUserError(core, "The value for [" + adminContentcontent.caption + "] in tab [" + adminContentcontent.editTabName + "] was empty but is required. This must be set before you can save this record.");
+                                        }
                                     } else {
-                                        Processor.Controllers.ErrorController.addUserError(core, "The value for [" + adminContentcontent.caption + "] in tab [" + adminContentcontent.editTabName + "] was null but is required. The default value Is shown, And will be saved if you save this record.");
+                                        //
+                                        // if required and null, set value to the default
+                                        //
+                                        DBValueVariant = adminContentcontent.defaultValue;
+                                        if (adminContentcontent.editTabName == "") {
+                                            Processor.Controllers.ErrorController.addUserError(core, "The value for [" + adminContentcontent.caption + "] was null but is required. The default value Is shown, And will be saved if you save this record.");
+                                        } else {
+                                            Processor.Controllers.ErrorController.addUserError(core, "The value for [" + adminContentcontent.caption + "] in tab [" + adminContentcontent.editTabName + "] was null but is required. The default value Is shown, And will be saved if you save this record.");
+                                        }
                                     }
                                 }
-                            }
-                            //
-                            // Save EditRecord values
-                            //
-                            switch (GenericController.vbUCase(adminContentcontent.nameLc)) {
-                                case "DATEADDED":
-                                    editRecord.dateAdded = csXfer.csGetDate(CSEditRecord, adminContentcontent.nameLc);
-                                    break;
-                                case "MODIFIEDDATE":
-                                    editRecord.modifiedDate = csXfer.csGetDate(CSEditRecord, adminContentcontent.nameLc);
-                                    break;
-                                case "CREATEDBY":
-                                    int createdByPersonId = csXfer.csGetInteger(CSEditRecord, adminContentcontent.nameLc);
-                                    if (createdByPersonId == 0) {
-                                        editRecord.createdBy = new PersonModel() { name = "system" };
-                                    } else {
-                                        editRecord.createdBy = PersonModel.create(core, createdByPersonId);
-                                        if (editRecord.createdBy == null) {
-                                            editRecord.createdBy = new PersonModel() { name = "deleted #" + createdByPersonId.ToString() };
+                                //
+                                // Save EditRecord values
+                                //
+                                switch (GenericController.vbUCase(adminContentcontent.nameLc)) {
+                                    case "DATEADDED":
+                                        editRecord.dateAdded = csXfer.csGetDate(adminContentcontent.nameLc);
+                                        break;
+                                    case "MODIFIEDDATE":
+                                        editRecord.modifiedDate = csXfer.csGetDate(adminContentcontent.nameLc);
+                                        break;
+                                    case "CREATEDBY":
+                                        int createdByPersonId = csXfer.csGetInteger(adminContentcontent.nameLc);
+                                        if (createdByPersonId == 0) {
+                                            editRecord.createdBy = new PersonModel() { name = "system" };
+                                        } else {
+                                            editRecord.createdBy = PersonModel.create(core, createdByPersonId);
+                                            if (editRecord.createdBy == null) {
+                                                editRecord.createdBy = new PersonModel() { name = "deleted #" + createdByPersonId.ToString() };
+                                            }
                                         }
-                                    }
-                                    break;
-                                case "MODIFIEDBY":
-                                    int modifiedByPersonId = csXfer.csGetInteger(CSEditRecord, adminContentcontent.nameLc);
-                                    if (modifiedByPersonId == 0) {
-                                        editRecord.modifiedBy = new PersonModel() { name = "system" };
-                                    } else {
-                                        editRecord.modifiedBy = PersonModel.create(core, modifiedByPersonId);
-                                        if (editRecord.modifiedBy == null) {
-                                            editRecord.modifiedBy = new PersonModel() { name = "deleted #" + modifiedByPersonId.ToString() };
+                                        break;
+                                    case "MODIFIEDBY":
+                                        int modifiedByPersonId = csXfer.csGetInteger(adminContentcontent.nameLc);
+                                        if (modifiedByPersonId == 0) {
+                                            editRecord.modifiedBy = new PersonModel() { name = "system" };
+                                        } else {
+                                            editRecord.modifiedBy = PersonModel.create(core, modifiedByPersonId);
+                                            if (editRecord.modifiedBy == null) {
+                                                editRecord.modifiedBy = new PersonModel() { name = "deleted #" + modifiedByPersonId.ToString() };
+                                            }
                                         }
-                                    }
-                                    break;
-                                case "ACTIVE":
-                                    editRecord.active = csXfer.csGetBoolean(CSEditRecord, adminContentcontent.nameLc);
-                                    break;
-                                case "CONTENTCONTROLID":
-                                    editRecord.contentControlId = csXfer.csGetInteger(CSEditRecord, adminContentcontent.nameLc);
-                                    if (editRecord.contentControlId.Equals(0)) {
-                                        editRecord.contentControlId = adminContent.id;
-                                    }
-                                    editRecord.contentControlId_Name = MetaController.getContentNameByID(core, editRecord.contentControlId);
-                                    break;
-                                case "ID":
-                                    editRecord.id = csXfer.csGetInteger(CSEditRecord, adminContentcontent.nameLc);
-                                    break;
-                                case "MENUHEADLINE":
-                                    editRecord.menuHeadline = csXfer.csGetText(CSEditRecord, adminContentcontent.nameLc);
-                                    break;
-                                case "NAME":
-                                    editRecord.nameLc = csXfer.csGetText(CSEditRecord, adminContentcontent.nameLc);
-                                    break;
-                                case "PARENTID":
-                                    editRecord.parentID = csXfer.csGetInteger(CSEditRecord, adminContentcontent.nameLc);
-                                    //Case Else
-                                    //    EditRecordValuesVariant(FieldPointer) = DBValueVariant
-                                    break;
+                                        break;
+                                    case "ACTIVE":
+                                        editRecord.active = csXfer.csGetBoolean(adminContentcontent.nameLc);
+                                        break;
+                                    case "CONTENTCONTROLID":
+                                        editRecord.contentControlId = csXfer.csGetInteger(adminContentcontent.nameLc);
+                                        if (editRecord.contentControlId.Equals(0)) {
+                                            editRecord.contentControlId = adminContent.id;
+                                        }
+                                        editRecord.contentControlId_Name = MetaController.getContentNameByID(core, editRecord.contentControlId);
+                                        break;
+                                    case "ID":
+                                        editRecord.id = csXfer.csGetInteger(adminContentcontent.nameLc);
+                                        break;
+                                    case "MENUHEADLINE":
+                                        editRecord.menuHeadline = csXfer.csGetText(adminContentcontent.nameLc);
+                                        break;
+                                    case "NAME":
+                                        editRecord.nameLc = csXfer.csGetText(adminContentcontent.nameLc);
+                                        break;
+                                    case "PARENTID":
+                                        editRecord.parentID = csXfer.csGetInteger(adminContentcontent.nameLc);
+                                        //Case Else
+                                        //    EditRecordValuesVariant(FieldPointer) = DBValueVariant
+                                        break;
+                                }
+                                //
+                                editRecordField.dbValue = DBValueVariant;
+                                editRecordField.value = DBValueVariant;
                             }
-                            //
-                            editRecordField.dbValue = DBValueVariant;
-                            editRecordField.value = DBValueVariant;
                         }
                     }
-                    csXfer.csClose(ref CSEditRecord);
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
@@ -1270,13 +1260,11 @@ namespace Contensive.Addons.AdminSite {
                     string lcaseCopy = null;
                     int EditorPixelHeight = 0;
                     int EditorRowHeight = 0;
-                    int CSPointer = 0;
                     bool ResponseFieldIsEmpty = false;
                     HtmlParserController HTML = new HtmlParserController(core);
                     int ParentID = 0;
                     string UsedIDs = null;
                     int LoopPtr = 0;
-                    int CS = 0;
                     bool ResponseFieldValueIsOKToSave = true;
                     bool InEmptyFieldList = FormEmptyFieldLcList.Contains(field.nameLc);
                     bool InLoadedFieldList = FormFieldLcListToBeLoaded.Contains(field.nameLc);
@@ -1547,13 +1535,14 @@ namespace Contensive.Addons.AdminSite {
                                     UsedIDs = editRecord.id.ToString();
                                     while ((LoopPtr < LoopPtrMax) && (ParentID != 0) && (("," + UsedIDs + ",").IndexOf("," + ParentID.ToString() + ",") == -1)) {
                                         UsedIDs = UsedIDs + "," + ParentID.ToString();
-                                        csXfer.csOpen(adminContent.name, "ID=" + ParentID, "", true, 0, false, false, "ParentID");
-                                        if (!csXfer.csOk()) {
-                                            ParentID = 0;
-                                        } else {
-                                            ParentID = csXfer.csGetInteger(CS, "ParentID");
+                                        using (var csXfer = new CsModel(core)) {
+                                            csXfer.csOpen(adminContent.name, "ID=" + ParentID, "", true, 0, "ParentID");
+                                            if (!csXfer.csOk()) {
+                                                ParentID = 0;
+                                            } else {
+                                                ParentID = csXfer.csGetInteger("ParentID");
+                                            }
                                         }
-                                        csXfer.csClose();
                                         LoopPtr = LoopPtr + 1;
                                     }
                                     if (LoopPtr == LoopPtrMax) {
@@ -1610,31 +1599,31 @@ namespace Contensive.Addons.AdminSite {
                                         // --editing record
                                         SQLUnique = SQLUnique + "and(id<>" + editRecord.id + ")";
                                     }
-                                    CSPointer = csXfer.csOpenSql(SQLUnique, adminContent.dataSourceName);
-                                    if (csXfer.csOk()) {
-                                        //
-                                        // field is not unique, skip it and flag error
-                                        //
-                                        if (blockDuplicateUsername) {
+                                    using (var csXfer = new CsModel(core)) {
+                                        csXfer.csOpenSql(SQLUnique, adminContent.dataSourceName);
+                                        if (csXfer.csOk()) {
                                             //
+                                            // field is not unique, skip it and flag error
                                             //
-                                            //
-                                            Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " must be unique and there Is another record with [" + ResponseFieldValueText + "]. This must be unique because the preference 'Allow Duplicate Usernames' is Not checked.");
-                                        } else if (blockDuplicateEmail) {
-                                            //
-                                            //
-                                            //
-                                            Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " must be unique and there is another record with [" + ResponseFieldValueText + "]. This must be unique because the preference 'Allow Email Login' is checked.");
-                                        } else if (false) {
-                                        } else {
-                                            //
-                                            // non-workflow
-                                            //
-                                            Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " must be unique and there is another record with [" + ResponseFieldValueText + "].");
+                                            if (blockDuplicateUsername) {
+                                                //
+                                                //
+                                                //
+                                                Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " must be unique and there Is another record with [" + ResponseFieldValueText + "]. This must be unique because the preference 'Allow Duplicate Usernames' is Not checked.");
+                                            } else if (blockDuplicateEmail) {
+                                                //
+                                                //
+                                                //
+                                                Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " must be unique and there is another record with [" + ResponseFieldValueText + "]. This must be unique because the preference 'Allow Email Login' is checked.");
+                                            } else {
+                                                //
+                                                // non-workflow
+                                                //
+                                                Processor.Controllers.ErrorController.addUserError(core, "This record cannot be saved because the field [" + field.caption + "]" + TabCopy + " must be unique and there is another record with [" + ResponseFieldValueText + "].");
+                                            }
+                                            ResponseFieldValueIsOKToSave = false;
                                         }
-                                        ResponseFieldValueIsOKToSave = false;
                                     }
-                                    csXfer.csClose();
                                 }
                             }
                             // end case

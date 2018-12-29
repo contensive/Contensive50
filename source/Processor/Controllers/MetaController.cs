@@ -1595,7 +1595,7 @@ namespace Contensive.Processor.Controllers {
             //        if (csOk(CSPointer)) {
             //            result = csXfer.csGetText(CSPointer, "Link");
             //        }
-            //        csXfer.csClose(ref CSPointer);
+            //        csXfer.csClose();
             //        //
             //        if (string.IsNullOrEmpty(result)) {
             //            //
@@ -1615,7 +1615,7 @@ namespace Contensive.Processor.Controllers {
             //                                templateId = csGetInteger(CSPointer, "TemplateID");
             //                                ParentID = csGetInteger(CSPointer, "ParentID");
             //                            }
-            //                            csClose(ref CSPointer);
+            //                            csClose();
             //                            if (!recordfound) {
             //                                //
             //                                // This content record does not exist - remove any records with this ContentRecordKey pointer
@@ -1629,7 +1629,7 @@ namespace Contensive.Processor.Controllers {
             //                                    if (csOk(CSPointer)) {
             //                                        result = csGetText(CSPointer, "Link");
             //                                    }
-            //                                    csClose(ref CSPointer);
+            //                                    csClose();
             //                                }
             //                                if (string.IsNullOrEmpty(result) && ParentID != 0) {
             //                                    TableName = ContentMetaController.getContentTablename(core, ContentName);
@@ -1638,7 +1638,7 @@ namespace Contensive.Processor.Controllers {
             //                                    if (csOk(CSPointer)) {
             //                                        ParentContentID = GenericController.encodeInteger(csGetText(CSPointer, "ContentControlID"));
             //                                    }
-            //                                    csClose(ref CSPointer);
+            //                                    csClose();
             //                                    if (ParentContentID != 0) {
             //                                        result = getLinkByContentRecordKey(encodeText(ParentContentID + "." + ParentID), "");
             //                                    }

@@ -318,63 +318,63 @@ namespace Contensive.Addons.Housekeeping {
                                     HoursPerDay = csXfer.csGetInteger("HoursPerDay");
                                 }
                                 csXfer.csClose();
-                            if (HoursPerDay < 24) {
-                                DateofMissingSummary = DateTime.FromOADate(PeriodDatePtr);
-                                break;
+                                if (HoursPerDay < 24) {
+                                    DateofMissingSummary = DateTime.FromOADate(PeriodDatePtr);
+                                    break;
+                                }
+                            }
+                            if ((DateofMissingSummary != DateTime.MinValue) && (DateofMissingSummary < NextSummaryStartDate)) {
+                                logHousekeeping(core, "Found a missing hourly period in the visit summary table [" + DateofMissingSummary + "], it only has [" + HoursPerDay + "] hourly summaries.");
+                                NextSummaryStartDate = DateofMissingSummary;
+                            }
+                            //
+                            // Now summarize all visits during all hourly periods between OldestDateAdded and the previous Hour
+                            //
+                            logHousekeeping(core, "Summaryize visits hourly, starting [" + NextSummaryStartDate + "]");
+                            PeriodStep = (double)1 / (double)24;
+                            //PeriodStart = (Int(OldestDateAdded * 24) / 24)
+                            houseKeep_VisitSummary(core, NextSummaryStartDate, rightNow, 1, core.siteProperties.dataBuildVersion, OldestVisitSummaryWeCareAbout);
+                        }
+                        //
+                        // OK to run archive
+                        // During archive, non-cookie records are removed, so this has to run after summarizing
+                        // and we can only delete non-cookie records older than 2 days (so we can be sure they have been summarized)
+                        //
+                        if (force) {
+                            //
+                            // debug mode - run achive if no times are given
+                            //
+                            HouseKeep_App_Daily(core, VisitArchiveAgeDays, GuestArchiveAgeDays, EmailDropArchiveAgeDays, DefaultMemberName, core.siteProperties.dataBuildVersion);
+                        } else {
+                            //
+                            // Check for site's archive time of day
+                            //
+                            string AlarmTimeString = core.siteProperties.getText("ArchiveTimeOfDay", "12:00:00 AM");
+                            if (string.IsNullOrEmpty(AlarmTimeString)) {
+                                AlarmTimeString = "12:00:00 AM";
+                                core.siteProperties.setProperty("ArchiveTimeOfDate", AlarmTimeString);
+                            }
+                            if (!GenericController.IsDate(AlarmTimeString)) {
+                                AlarmTimeString = "12:00:00 AM";
+                                core.siteProperties.setProperty("ArchiveTimeOfDate", AlarmTimeString);
+                            }
+                            //AlarmTimeMinutesSinceMidnight = genericController.encodeDate(AlarmTimeString).TimeOfDay.TotalMinutes;
+                            double minutesSinceMidnight = rightNow.TimeOfDay.TotalMinutes;
+                            double LastCheckMinutesFromMidnight = LastCheckDateTime.TimeOfDay.TotalMinutes;
+                            if ((minutesSinceMidnight > LastCheckMinutesFromMidnight) && (LastCheckMinutesFromMidnight < minutesSinceMidnight)) {
+                                //
+                                // Same Day - Midnight is before last and after current
+                                //
+                                HouseKeep_App_Daily(core, VisitArchiveAgeDays, GuestArchiveAgeDays, EmailDropArchiveAgeDays, DefaultMemberName, core.siteProperties.dataBuildVersion);
+                            } else if ((LastCheckMinutesFromMidnight > minutesSinceMidnight) && ((LastCheckMinutesFromMidnight < minutesSinceMidnight))) {
+                                //
+                                // New Day - Midnight is between Last and Set
+                                //
+                                HouseKeep_App_Daily(core, VisitArchiveAgeDays, GuestArchiveAgeDays, EmailDropArchiveAgeDays, DefaultMemberName, core.siteProperties.dataBuildVersion);
                             }
                         }
-                        if ((DateofMissingSummary != DateTime.MinValue) && (DateofMissingSummary < NextSummaryStartDate)) {
-                            logHousekeeping(core, "Found a missing hourly period in the visit summary table [" + DateofMissingSummary + "], it only has [" + HoursPerDay + "] hourly summaries.");
-                            NextSummaryStartDate = DateofMissingSummary;
-                        }
-                        //
-                        // Now summarize all visits during all hourly periods between OldestDateAdded and the previous Hour
-                        //
-                        logHousekeeping(core, "Summaryize visits hourly, starting [" + NextSummaryStartDate + "]");
-                        PeriodStep = (double)1 / (double)24;
-                        //PeriodStart = (Int(OldestDateAdded * 24) / 24)
-                        houseKeep_VisitSummary(core, NextSummaryStartDate, rightNow, 1, core.siteProperties.dataBuildVersion, OldestVisitSummaryWeCareAbout);
                     }
-                    //
-                    // OK to run archive
-                    // During archive, non-cookie records are removed, so this has to run after summarizing
-                    // and we can only delete non-cookie records older than 2 days (so we can be sure they have been summarized)
-                    //
-                    if (force) {
-                        //
-                        // debug mode - run achive if no times are given
-                        //
-                        HouseKeep_App_Daily(core, VisitArchiveAgeDays, GuestArchiveAgeDays, EmailDropArchiveAgeDays, DefaultMemberName, core.siteProperties.dataBuildVersion);
-                    } else {
-                        //
-                        // Check for site's archive time of day
-                        //
-                        string AlarmTimeString = core.siteProperties.getText("ArchiveTimeOfDay", "12:00:00 AM");
-                        if (string.IsNullOrEmpty(AlarmTimeString)) {
-                            AlarmTimeString = "12:00:00 AM";
-                            core.siteProperties.setProperty("ArchiveTimeOfDate", AlarmTimeString);
-                        }
-                        if (!GenericController.IsDate(AlarmTimeString)) {
-                            AlarmTimeString = "12:00:00 AM";
-                            core.siteProperties.setProperty("ArchiveTimeOfDate", AlarmTimeString);
-                        }
-                        //AlarmTimeMinutesSinceMidnight = genericController.encodeDate(AlarmTimeString).TimeOfDay.TotalMinutes;
-                        double minutesSinceMidnight = rightNow.TimeOfDay.TotalMinutes;
-                        double LastCheckMinutesFromMidnight = LastCheckDateTime.TimeOfDay.TotalMinutes;
-                        if ((minutesSinceMidnight > LastCheckMinutesFromMidnight) && (LastCheckMinutesFromMidnight < minutesSinceMidnight)) {
-                            //
-                            // Same Day - Midnight is before last and after current
-                            //
-                            HouseKeep_App_Daily(core, VisitArchiveAgeDays, GuestArchiveAgeDays, EmailDropArchiveAgeDays, DefaultMemberName, core.siteProperties.dataBuildVersion);
-                        } else if ((LastCheckMinutesFromMidnight > minutesSinceMidnight) && ((LastCheckMinutesFromMidnight < minutesSinceMidnight))) {
-                            //
-                            // New Day - Midnight is between Last and Set
-                            //
-                            HouseKeep_App_Daily(core, VisitArchiveAgeDays, GuestArchiveAgeDays, EmailDropArchiveAgeDays, DefaultMemberName, core.siteProperties.dataBuildVersion);
-                        }
-                    }
-                }
-            } catch (Exception) {
+                } catch (Exception) {
                 throw;
             }
         }
@@ -1306,11 +1306,12 @@ namespace Contensive.Addons.Housekeeping {
                             + " and (v.dateadded<" + DbController.encodeSQLDate(DateEnd) + ")"
                             + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
                             + "";
-                        csXfer.csOpenSql(SQL, "Default");
-                        if (csXfer.csOk()) {
-                            NoCookieVisits = csXfer.csGetInteger(CS, "NoCookieVisits");
+                        using (var csXfer = new CsModel(core)) {
+                            csXfer.csOpenSql(SQL, "Default");
+                            if (csXfer.csOk()) {
+                                NoCookieVisits = csXfer.csGetInteger("NoCookieVisits");
+                            }
                         }
-                        csXfer.csClose();
                         //
                         // Total Visits
                         //
@@ -1321,13 +1322,14 @@ namespace Contensive.Addons.Housekeeping {
                             + " and (v.dateadded<" + DbController.encodeSQLDate(DateEnd) + ")"
                             + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
                             + "";
-                        csXfer.csOpenSql(SQL, "Default");
-                        if (csXfer.csOk()) {
-                            VisitCnt = csXfer.csGetInteger(CS, "VisitCnt");
-                            HitCnt = csXfer.csGetInteger(CS, "HitCnt");
-                            TimeOnSite = csXfer.csGetNumber(CS, "TimeOnSite");
+                        using (var csXfer = new CsModel(core)) {
+                            csXfer.csOpenSql(SQL, "Default");
+                            if (csXfer.csOk()) {
+                                VisitCnt = csXfer.csGetInteger("VisitCnt");
+                                HitCnt = csXfer.csGetInteger("HitCnt");
+                                TimeOnSite = csXfer.csGetNumber("TimeOnSite");
+                            }
                         }
-                        csXfer.csClose();
                         //
                         // Visits by new visitors
                         //
@@ -1340,11 +1342,12 @@ namespace Contensive.Addons.Housekeeping {
                                 + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
                                 + " and(v.VisitorNew<>0)"
                                 + "";
-                            csXfer.csOpenSql(SQL, "Default");
-                            if (csXfer.csOk()) {
-                                NewVisitorVisits = csXfer.csGetInteger(CS, "NewVisitorVisits");
+                            using (var csXfer = new CsModel(core)) {
+                                csXfer.csOpenSql(SQL, "Default");
+                                if (csXfer.csOk()) {
+                                    NewVisitorVisits = csXfer.csGetInteger("NewVisitorVisits");
+                                }
                             }
-                            csXfer.csClose();
                             //
                             // Single Page Visits
                             //
@@ -1356,11 +1359,12 @@ namespace Contensive.Addons.Housekeeping {
                                 + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
                                 + " and(v.PageVisits=1)"
                                 + "";
-                            csXfer.csOpenSql(SQL, "Default");
-                            if (csXfer.csOk()) {
-                                SinglePageVisits = csXfer.csGetInteger(CS, "SinglePageVisits");
+                            using (var csXfer = new CsModel(core)) {
+                                csXfer.csOpenSql(SQL, "Default");
+                                if (csXfer.csOk()) {
+                                    SinglePageVisits = csXfer.csGetInteger("SinglePageVisits");
+                                }
                             }
-                            csXfer.csClose();
                             //
                             // Multipage Visits
                             //
@@ -1372,13 +1376,14 @@ namespace Contensive.Addons.Housekeeping {
                                 + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
                                 + " and(PageVisits>1)"
                                 + "";
-                            csXfer.csOpenSql(SQL, "Default");
-                            if (csXfer.csOk()) {
-                                MultiPageVisitCnt = csXfer.csGetInteger(CS, "VisitCnt");
-                                MultiPageHitCnt = csXfer.csGetInteger(CS, "HitCnt");
-                                MultiPageTimetoLastHitSum = csXfer.csGetNumber(CS, "TimetoLastHitSum");
+                            using (var csXfer = new CsModel(core)) {
+                                csXfer.csOpenSql(SQL, "Default");
+                                if (csXfer.csOk()) {
+                                    MultiPageVisitCnt = csXfer.csGetInteger("VisitCnt");
+                                    MultiPageHitCnt = csXfer.csGetInteger("HitCnt");
+                                    MultiPageTimetoLastHitSum = csXfer.csGetNumber("TimetoLastHitSum");
+                                }
                             }
-                            csXfer.csClose();
                             //
                             // Authenticated Visits
                             //
@@ -1390,11 +1395,12 @@ namespace Contensive.Addons.Housekeeping {
                                 + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
                                 + " and(VisitAuthenticated<>0)"
                                 + "";
-                            csXfer.csOpenSql(SQL, "Default");
-                            if (csXfer.csOk()) {
-                                AuthenticatedVisits = csXfer.csGetInteger(CS, "AuthenticatedVisits");
+                            using (var csXfer = new CsModel(core)) {
+                                csXfer.csOpenSql(SQL, "Default");
+                                if (csXfer.csOk()) {
+                                    AuthenticatedVisits = csXfer.csGetInteger("AuthenticatedVisits");
+                                }
                             }
-                            csXfer.csClose();
                             // 
                             //
                             // Mobile Visits
@@ -1407,12 +1413,12 @@ namespace Contensive.Addons.Housekeeping {
                                 + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
                                 + " and(Mobile<>0)"
                                 + "";
-                            //SQL = "select count(id) as AuthenticatedVisits from ccvisits where (CookieSupport<>0)and(VisitAuthenticated<>0)and(dateadded>=" & encodeSQLDate(DateStart) & ")and(dateadded<" & encodeSQLDate(DateEnd) & ")"
-                            csXfer.csOpenSql(SQL, "Default");
-                            if (csXfer.csOk()) {
-                                MobileVisits = csXfer.csGetInteger(CS, "cnt");
+                            using (var csXfer = new CsModel(core)) {
+                                csXfer.csOpenSql(SQL, "Default");
+                                if (csXfer.csOk()) {
+                                    MobileVisits = csXfer.csGetInteger("cnt");
+                                }
                             }
-                            csXfer.csClose();
                             //
                             // Bot Visits
                             //
@@ -1424,11 +1430,12 @@ namespace Contensive.Addons.Housekeeping {
                                 + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
                                 + " and(Bot<>0)"
                                 + "";
-                            csXfer.csOpenSql(SQL, "Default");
-                            if (csXfer.csOk()) {
-                                BotVisits = csXfer.csGetInteger(CS, "cnt");
+                            using (var csXfer = new CsModel(core)) {
+                                csXfer.csOpenSql(SQL, "Default");
+                                if (csXfer.csOk()) {
+                                    BotVisits = csXfer.csGetInteger("cnt");
+                                }
                             }
-                            csXfer.csClose();
                             //
                             if ((MultiPageHitCnt > MultiPageVisitCnt) && (HitCnt > 0)) {
                                 AveReadTime = encodeInteger(MultiPageTimetoLastHitSum / (MultiPageHitCnt - MultiPageVisitCnt));
@@ -1439,30 +1446,31 @@ namespace Contensive.Addons.Housekeeping {
                         //
                         // Add or update the Visit Summary Record
                         //
-                        csXfer.csOpen("Visit Summary", "(timeduration=" + HourDuration + ")and(DateNumber=" + DateNumber + ")and(TimeNumber=" + TimeNumber + ")");
-                        if (!csXfer.csOk()) {
-                            csXfer.csClose();
-                            csXfer.csInsert("Visit Summary", 0);
-                        }
-                        //
-                        if (csXfer.csOk()) {
-                            csXfer.csSet(CS, "name", HourDuration + " hr summary for " + DateTime.FromOADate(DateNumber).ToShortDateString() + " " + TimeNumber + ":00");
-                            csXfer.csSet(CS, "DateNumber", DateNumber);
-                            csXfer.csSet(CS, "TimeNumber", TimeNumber);
-                            csXfer.csSet(CS, "Visits", VisitCnt);
-                            csXfer.csSet(CS, "PagesViewed", HitCnt);
-                            csXfer.csSet(CS, "TimeDuration", HourDuration);
-                            csXfer.csSet(CS, "NewVisitorVisits", NewVisitorVisits);
-                            csXfer.csSet(CS, "SinglePageVisits", SinglePageVisits);
-                            csXfer.csSet(CS, "AuthenticatedVisits", AuthenticatedVisits);
-                            csXfer.csSet(CS, "NoCookieVisits", NoCookieVisits);
-                            csXfer.csSet(CS, "AveTimeOnSite", AveTimeOnSite);
-                            if (true) {
-                                csXfer.csSet(CS, "MobileVisits", MobileVisits);
-                                csXfer.csSet(CS, "BotVisits", BotVisits);
+                        using (var csXfer = new CsModel(core)) {
+                            csXfer.csOpen("Visit Summary", "(timeduration=" + HourDuration + ")and(DateNumber=" + DateNumber + ")and(TimeNumber=" + TimeNumber + ")");
+                            if (!csXfer.csOk()) {
+                                csXfer.csClose();
+                                csXfer.csInsert("Visit Summary", 0);
+                            }
+                            //
+                            if (csXfer.csOk()) {
+                                csXfer.csSet("name", HourDuration + " hr summary for " + DateTime.FromOADate(DateNumber).ToShortDateString() + " " + TimeNumber + ":00");
+                                csXfer.csSet("DateNumber", DateNumber);
+                                csXfer.csSet("TimeNumber", TimeNumber);
+                                csXfer.csSet("Visits", VisitCnt);
+                                csXfer.csSet("PagesViewed", HitCnt);
+                                csXfer.csSet("TimeDuration", HourDuration);
+                                csXfer.csSet("NewVisitorVisits", NewVisitorVisits);
+                                csXfer.csSet("SinglePageVisits", SinglePageVisits);
+                                csXfer.csSet("AuthenticatedVisits", AuthenticatedVisits);
+                                csXfer.csSet("NoCookieVisits", NoCookieVisits);
+                                csXfer.csSet("AveTimeOnSite", AveTimeOnSite);
+                                if (true) {
+                                    csXfer.csSet("MobileVisits", MobileVisits);
+                                    csXfer.csSet("BotVisits", BotVisits);
+                                }
                             }
                         }
-                        csXfer.csClose();
                         PeriodDatePtr = PeriodDatePtr.AddHours(HourDuration);
                     }
                 }

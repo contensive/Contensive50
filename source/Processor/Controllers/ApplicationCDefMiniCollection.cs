@@ -431,67 +431,68 @@ namespace Contensive.Processor.Controllers {
                     + " select D.name as DataSourceName,T.name as TableName"
                     + " from cctables T left join ccDataSources d on D.ID=T.DataSourceID"
                     + " where t.active<>0";
-                int csXfer.csOpenSql(SQL);
-                while (csXfer.csOk()) {
-                    string DataSourceName = csXfer.csGetText(CS, "DataSourceName");
-                    string TableName = csXfer.csGetText(CS, "TableName");
-                    string IndexList = core.db.getSQLIndexList(DataSourceName, TableName);
-                    //
-                    if (!string.IsNullOrEmpty(IndexList)) {
-                        string[] ListRows = GenericController.stringSplit(IndexList, "\r\n");
-                        string IndexName = "";
-                        int tempVar = ListRows.GetUpperBound(0) + 1;
-                        string IndexFields = "";
-                        for (int Ptr = 0; Ptr <= tempVar; Ptr++) {
-                            string[] ListRowSplit = null;
-                            if (Ptr <= ListRows.GetUpperBound(0)) {
-                                //
-                                // ListRowSplit has the indexname and field for this index
-                                //
-                                ListRowSplit = ListRows[Ptr].Split(',');
-                            } else {
-                                //
-                                // one past the last row, ListRowSplit gets a dummy entry to force the output of the last line
-                                //
-                                ListRowSplit = ("-,-").Split(',');
-                            }
-                            if (ListRowSplit.GetUpperBound(0) > 0) {
-                                if (!string.IsNullOrEmpty(ListRowSplit[0])) {
-                                    if (string.IsNullOrEmpty(IndexName)) {
-                                        //
-                                        // first line of the first index description
-                                        //
-                                        IndexName = ListRowSplit[0];
-                                        IndexFields = ListRowSplit[1];
-                                    } else if (IndexName == ListRowSplit[0]) {
-                                        //
-                                        // next line of the index description
-                                        //
-                                        IndexFields = IndexFields + "," + ListRowSplit[1];
-                                    } else {
-                                        //
-                                        // first line of a new index description
-                                        // save previous line
-                                        //
-                                        if (!string.IsNullOrEmpty(IndexName) & !string.IsNullOrEmpty(IndexFields)) {
-                                            sb.Append("<SQLIndex");
-                                            sb.Append(" Indexname=\"" + encodeXMLattribute(IndexName) + "\"");
-                                            sb.Append(" DataSourceName=\"" + encodeXMLattribute(DataSourceName) + "\"");
-                                            sb.Append(" TableName=\"" + encodeXMLattribute(TableName) + "\"");
-                                            sb.Append(" FieldNameList=\"" + encodeXMLattribute(IndexFields) + "\"");
-                                            sb.Append("></SQLIndex>\r\n");
+                using (var csXfer = new CsModel(core)) {
+                    csXfer.csOpenSql(SQL);
+                    while (csXfer.csOk()) {
+                        string DataSourceName = csXfer.csGetText("DataSourceName");
+                        string TableName = csXfer.csGetText("TableName");
+                        string IndexList = core.db.getSQLIndexList(DataSourceName, TableName);
+                        //
+                        if (!string.IsNullOrEmpty(IndexList)) {
+                            string[] ListRows = GenericController.stringSplit(IndexList, "\r\n");
+                            string IndexName = "";
+                            int tempVar = ListRows.GetUpperBound(0) + 1;
+                            string IndexFields = "";
+                            for (int Ptr = 0; Ptr <= tempVar; Ptr++) {
+                                string[] ListRowSplit = null;
+                                if (Ptr <= ListRows.GetUpperBound(0)) {
+                                    //
+                                    // ListRowSplit has the indexname and field for this index
+                                    //
+                                    ListRowSplit = ListRows[Ptr].Split(',');
+                                } else {
+                                    //
+                                    // one past the last row, ListRowSplit gets a dummy entry to force the output of the last line
+                                    //
+                                    ListRowSplit = ("-,-").Split(',');
+                                }
+                                if (ListRowSplit.GetUpperBound(0) > 0) {
+                                    if (!string.IsNullOrEmpty(ListRowSplit[0])) {
+                                        if (string.IsNullOrEmpty(IndexName)) {
+                                            //
+                                            // first line of the first index description
+                                            //
+                                            IndexName = ListRowSplit[0];
+                                            IndexFields = ListRowSplit[1];
+                                        } else if (IndexName == ListRowSplit[0]) {
+                                            //
+                                            // next line of the index description
+                                            //
+                                            IndexFields = IndexFields + "," + ListRowSplit[1];
+                                        } else {
+                                            //
+                                            // first line of a new index description
+                                            // save previous line
+                                            //
+                                            if (!string.IsNullOrEmpty(IndexName) & !string.IsNullOrEmpty(IndexFields)) {
+                                                sb.Append("<SQLIndex");
+                                                sb.Append(" Indexname=\"" + encodeXMLattribute(IndexName) + "\"");
+                                                sb.Append(" DataSourceName=\"" + encodeXMLattribute(DataSourceName) + "\"");
+                                                sb.Append(" TableName=\"" + encodeXMLattribute(TableName) + "\"");
+                                                sb.Append(" FieldNameList=\"" + encodeXMLattribute(IndexFields) + "\"");
+                                                sb.Append("></SQLIndex>\r\n");
+                                            }
+                                            //
+                                            IndexName = ListRowSplit[0];
+                                            IndexFields = ListRowSplit[1];
                                         }
-                                        //
-                                        IndexName = ListRowSplit[0];
-                                        IndexFields = ListRowSplit[1];
                                     }
                                 }
                             }
                         }
+                        csXfer.csGoNext();
                     }
-                    csXfer.csGoNext(CS);
                 }
-                csXfer.csClose();
                 result = sb.ToString();
             } catch( Exception ex ) {
                 LogController.handleError( core,ex);

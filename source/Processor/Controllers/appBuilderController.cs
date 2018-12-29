@@ -1082,19 +1082,20 @@ namespace Contensive.Processor.Controllers {
                                 Criteria += "and(Parentid=" + parentRecordId + ")";
                             }
                             int RecordID = 0;
-                            int csXfer.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, Criteria, "ID", true, 0, false, false, "ID", 1);
-                            if (csXfer.csOk()) {
-                                RecordID = (csXfer.csGetInteger(CS, "ID"));
-                            }
-                            csXfer.csClose();
-                            if (RecordID == 0) {
-                                csXfer.csInsert(Processor.Models.Db.NavigatorEntryModel.contentName, SystemMemberID);
+                            using (var csXfer = new CsModel(core)) {
+                                csXfer.csOpen(NavigatorEntryModel.contentName, Criteria, "ID", true, 0,  "ID", 1);
                                 if (csXfer.csOk()) {
-                                    RecordID = csXfer.csGetInteger(CS, "ID");
-                                    csXfer.csSet(CS, "name", recordName);
-                                    csXfer.csSet(CS, "parentID", parentRecordId);
+                                    RecordID = (csXfer.csGetInteger("ID"));
                                 }
                                 csXfer.csClose();
+                                if (RecordID == 0) {
+                                    csXfer.csInsert(NavigatorEntryModel.contentName, SystemMemberID);
+                                    if (csXfer.csOk()) {
+                                        RecordID = csXfer.csGetInteger("ID");
+                                        csXfer.csSet("name", recordName);
+                                        csXfer.csSet("parentID", parentRecordId);
+                                    }
+                                }
                             }
                             parentRecordId = RecordID;
                         }

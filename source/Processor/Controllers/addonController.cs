@@ -717,7 +717,6 @@ namespace Contensive.Processor.Controllers {
                 string Name = "";
                 string Description = "";
                 XmlDocument Doc = new XmlDocument();
-                int CS = 0;
                 string FieldName = null;
                 string FieldCaption = null;
                 string FieldAddon = null;
@@ -880,28 +879,28 @@ namespace Contensive.Processor.Controllers {
                                                                 } else {
                                                                     FieldValue = core.docProperties.getText(FieldName);
                                                                 }
-
-                                                                csXfer.csOpen("Copy Content", "name=" + DbController.encodeSQLText(FieldName), "ID");
-                                                                if (!csXfer.csOk()) {
-                                                                    csXfer.csClose();
-                                                                    csXfer.csInsert("Copy Content", core.session.user.id);
-                                                                }
-                                                                if (csXfer.csOk()) {
-                                                                    csXfer.csSet(CS, "name", FieldName);
-                                                                    //
-                                                                    // Set copy
-                                                                    //
-                                                                    csXfer.csSet(CS, "copy", FieldValue);
-                                                                    //
-                                                                    // delete duplicates
-                                                                    //
-                                                                    csXfer.csGoNext(CS);
-                                                                    while (csXfer.csOk()) {
-                                                                        csXfer.csDeleteRecord(CS);
-                                                                        csXfer.csGoNext(CS);
+                                                                using (var csXfer = new CsModel(core)) {
+                                                                    csXfer.csOpen("Copy Content", "name=" + DbController.encodeSQLText(FieldName), "ID");
+                                                                    if (!csXfer.csOk()) {
+                                                                        csXfer.csClose();
+                                                                        csXfer.csInsert("Copy Content", core.session.user.id);
+                                                                    }
+                                                                    if (csXfer.csOk()) {
+                                                                        csXfer.csSet("name", FieldName);
+                                                                        //
+                                                                        // Set copy
+                                                                        //
+                                                                        csXfer.csSet("copy", FieldValue);
+                                                                        //
+                                                                        // delete duplicates
+                                                                        //
+                                                                        csXfer.csGoNext();
+                                                                        while (csXfer.csOk()) {
+                                                                            csXfer.csDeleteRecord();
+                                                                            csXfer.csGoNext();
+                                                                        }
                                                                     }
                                                                 }
-                                                                csXfer.csClose();
                                                             }
 
                                                             break;
@@ -1166,20 +1165,21 @@ namespace Contensive.Processor.Controllers {
                                                             FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "");
                                                             FieldHTML = GenericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", ""));
                                                             //
-                                                            csXfer.csOpen("Copy Content", "Name=" + DbController.encodeSQLText(FieldName), "ID", false, 0, false, false, "id,name,Copy");
-                                                            if (!csXfer.csOk()) {
-                                                                csXfer.csClose();
-                                                                csXfer.csInsert("Copy Content", core.session.user.id);
-                                                                if (csXfer.csOk()) {
-                                                                    int RecordID = csXfer.csGetInteger(CS, "ID");
-                                                                    csXfer.csSet(CS, "name", FieldName);
-                                                                    csXfer.csSet(CS, "copy", GenericController.encodeText(TabNode.InnerText));
-                                                                    csXfer.csSave(CS);
-                                                                    // Call WorkflowController.publishEdit("Copy Content", RecordID)
+                                                            using (var csXfer = new CsModel(core)) {
+                                                                csXfer.csOpen("Copy Content", "Name=" + DbController.encodeSQLText(FieldName), "ID", false, 0, "id,name,Copy");
+                                                                if (!csXfer.csOk()) {
+                                                                    csXfer.csClose();
+                                                                    csXfer.csInsert("Copy Content", core.session.user.id);
+                                                                    if (csXfer.csOk()) {
+                                                                        int RecordID = csXfer.csGetInteger("ID");
+                                                                        csXfer.csSet("name", FieldName);
+                                                                        csXfer.csSet("copy", GenericController.encodeText(TabNode.InnerText));
+                                                                        csXfer.csSave();
+                                                                    }
                                                                 }
-                                                            }
-                                                            if (csXfer.csOk()) {
-                                                                FieldValue = csXfer.csGetText(CS, "copy");
+                                                                if (csXfer.csOk()) {
+                                                                    FieldValue = csXfer.csGetText("copy");
+                                                                }
                                                             }
                                                             if (FieldHTML) {
                                                                 Copy = AdminUIController.getDefaultEditor_Html(core, FieldName, FieldValue, "", "", "", FieldReadOnly);
@@ -2518,7 +2518,6 @@ namespace Contensive.Processor.Controllers {
             try {
                 //
                 int Pos = 0;
-                int CS = 0;
                 string JSFilename = null;
                 string Copy = null;
                 string SelectFieldList = null;
@@ -2529,47 +2528,49 @@ namespace Contensive.Processor.Controllers {
                 //
                 s = Content;
                 SelectFieldList = "name,copytext,javascriptonload,javascriptbodyend,stylesfilename,otherheadtags,JSFilename,targetString";
-                csXfer.csOpenRecord("Wrappers", WrapperID, false, false, SelectFieldList);
-                if (csXfer.csOk()) {
-                    Wrapper = csXfer.csGetText(CS, "copytext");
-                    wrapperName = csXfer.csGetText(CS, "name");
-                    TargetString = csXfer.csGetText(CS, "targetString");
-                    //
-                    SourceComment = "wrapper " + wrapperName;
-                    if (!string.IsNullOrEmpty(WrapperSourceForComment)) {
-                        SourceComment = SourceComment + " for " + WrapperSourceForComment;
-                    }
-                    core.html.addScriptCode_onLoad(csXfer.csGetText(CS, "javascriptonload"), SourceComment);
-                    core.html.addScriptCode(csXfer.csGetText(CS, "javascriptbodyend"), SourceComment);
-                    core.html.addHeadTag(csXfer.csGetText(CS, "OtherHeadTags"), SourceComment);
-                    //
-                    JSFilename = csXfer.csGetText(CS, "jsfilename");
-                    if (!string.IsNullOrEmpty(JSFilename)) {
-                        JSFilename = GenericController.getCdnFileLink(core, JSFilename);
-                        core.html.addScriptLinkSrc(JSFilename, SourceComment);
-                    }
-                    Copy = csXfer.csGetText(CS, "stylesfilename");
-                    if (!string.IsNullOrEmpty(Copy)) {
-                        if (GenericController.vbInstr(1, Copy, "://") != 0) {
-                        } else if (Copy.Left(1) == "/") {
-                        } else {
-                            Copy = GenericController.getCdnFileLink(core, Copy);
+                using (var csXfer = new CsModel(core)) {
+                    csXfer.csOpenRecord("Wrappers", WrapperID, SelectFieldList);
+                    if (csXfer.csOk()) {
+                        Wrapper = csXfer.csGetText("copytext");
+                        wrapperName = csXfer.csGetText("name");
+                        TargetString = csXfer.csGetText("targetString");
+                        //
+                        SourceComment = "wrapper " + wrapperName;
+                        if (!string.IsNullOrEmpty(WrapperSourceForComment)) {
+                            SourceComment = SourceComment + " for " + WrapperSourceForComment;
                         }
-                        core.html.addStyleLink(Copy, SourceComment);
-                    }
-                    //
-                    if (!string.IsNullOrEmpty(Wrapper)) {
-                        Pos = GenericController.vbInstr(1, Wrapper, TargetString, 1);
-                        if (Pos != 0) {
-                            s = GenericController.vbReplace(Wrapper, TargetString, s, 1, 99, 1);
-                        } else {
-                            s = ""
-                                + "<!-- the selected wrapper does not include the Target String marker to locate the position of the content. -->"
-                                + Wrapper + s;
+                        core.html.addScriptCode_onLoad(csXfer.csGetText("javascriptonload"), SourceComment);
+                        core.html.addScriptCode(csXfer.csGetText("javascriptbodyend"), SourceComment);
+                        core.html.addHeadTag(csXfer.csGetText("OtherHeadTags"), SourceComment);
+                        //
+                        JSFilename = csXfer.csGetText("jsfilename");
+                        if (!string.IsNullOrEmpty(JSFilename)) {
+                            JSFilename = GenericController.getCdnFileLink(core, JSFilename);
+                            core.html.addScriptLinkSrc(JSFilename, SourceComment);
+                        }
+                        Copy = csXfer.csGetText("stylesfilename");
+                        if (!string.IsNullOrEmpty(Copy)) {
+                            if (GenericController.vbInstr(1, Copy, "://") != 0) {
+                            } else if (Copy.Left(1) == "/") {
+                            } else {
+                                Copy = GenericController.getCdnFileLink(core, Copy);
+                            }
+                            core.html.addStyleLink(Copy, SourceComment);
+                        }
+                        //
+                        if (!string.IsNullOrEmpty(Wrapper)) {
+                            Pos = GenericController.vbInstr(1, Wrapper, TargetString, 1);
+                            if (Pos != 0) {
+                                s = GenericController.vbReplace(Wrapper, TargetString, s, 1, 99, 1);
+                            } else {
+                                s = ""
+                                    + "<!-- the selected wrapper does not include the Target String marker to locate the position of the content. -->"
+                                    + Wrapper + s;
+                            }
                         }
                     }
+                    csXfer.csClose();
                 }
-                csXfer.csClose();
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
             }

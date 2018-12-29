@@ -428,13 +428,14 @@ namespace Contensive.Addons.Tools {
                             rowValid = rowValid && (fieldsort.field.fieldTypeId > 0);
                             streamRow.Add("<td class=\"ccPanelInput\" align=\"left\"><nobr>");
                             if (fieldsort.field.inherited) {
-                                CSPointer = csXfer.csOpenRecord("Content Field Types", fieldsort.field.fieldTypeId);
-                                if (!csXfer.csOk()) {
-                                    streamRow.Add(SpanClassAdminSmall + "Unknown[" + fieldsort.field.fieldTypeId + "]</SPAN>");
-                                } else {
-                                    streamRow.Add(SpanClassAdminSmall + csXfer.csGetText(CSPointer, "Name") + "</SPAN>");
+                                using (var csXfer = new CsModel(core)) {
+                                    csXfer.csOpenRecord("Content Field Types", fieldsort.field.fieldTypeId);
+                                    if (!csXfer.csOk()) {
+                                        streamRow.Add(SpanClassAdminSmall + "Unknown[" + fieldsort.field.fieldTypeId + "]</SPAN>");
+                                    } else {
+                                        streamRow.Add(SpanClassAdminSmall + csXfer.csGetText(CSPointer, "Name") + "</SPAN>");
+                                    }
                                 }
-                                csXfer.csClose();
                             } else if (FieldLocked) {
                                 streamRow.Add(MetaController.getRecordName(core, "content field types", fieldsort.field.fieldTypeId) + HtmlController.inputHidden("dtfaType." + RecordCount, fieldsort.field.fieldTypeId));
                             } else {

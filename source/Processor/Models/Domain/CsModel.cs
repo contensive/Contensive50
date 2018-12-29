@@ -240,8 +240,7 @@ namespace Contensive.Processor {
         /// <summary>
         /// csv_DeleteCSRecord
         /// </summary>
-        /// <param name="ignore"></param>
-        public void csDeleteRecord(int ignore) {
+        public void csDeleteRecord() {
             try {
                 if (!csOk(0)) { throw new ArgumentException("csv_ContentSet Is empty Or at End-Of-file"); }
 
@@ -303,6 +302,8 @@ namespace Contensive.Processor {
                 throw;
             }
         }
+        //
+        public void csDeleteRecord(int ignore) => csDeleteRecord();
         //
         //========================================================================
         /// <summary>
@@ -636,9 +637,9 @@ namespace Contensive.Processor {
         //
         //========================================================================
         //
-        public void csGoFirst(int CSPointer, bool AsyncSave = false) {
+        public void csGoFirst(bool asyncSave) {
             try {
-                csSave(CSPointer, AsyncSave);
+                csSave(asyncSave);
                 this.writeCache = new Dictionary<string, string>();
                 this.readCacheRowPtr = 0;
             } catch (Exception ex) {
@@ -646,6 +647,12 @@ namespace Contensive.Processor {
                 throw;
             }
         }
+        //
+        public void csGoFirst(int CSPointer, bool AsyncSave) => csGoFirst(AsyncSave);
+        //
+        public void csGoFirst(int CSPointer) => csGoFirst(false);
+        //
+        public void csGoFirst() => csGoFirst(false);
         //
         //========================================================================
         /// <summary>
@@ -1933,10 +1940,10 @@ namespace Contensive.Processor {
         /// <param name="CSPointer"></param>
         /// <returns></returns>
         //
-        public int csGetRowCount(int CSPointer) {
+        public int csGetRowCount() {
             int returnResult = 0;
             try {
-                if (csOk(CSPointer)) {
+                if (csOk()) {
                     returnResult = this.readCacheRowCnt;
                 }
             } catch (Exception ex) {
@@ -1945,6 +1952,8 @@ namespace Contensive.Processor {
             }
             return returnResult;
         }
+        //
+        public int csGetRowCount(int ignore) => csGetRowCount();
         //
         //========================================================================
         /// <summary>
