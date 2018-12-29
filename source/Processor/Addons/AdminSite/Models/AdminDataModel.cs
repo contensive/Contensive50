@@ -227,12 +227,7 @@ namespace Contensive.Addons.AdminSite {
         /// <param name="adminInfo"></param>
         public void LoadContentTrackingDataBase(CoreController core) {
             try {
-                // todo
-                //AdminUIController.EditRecordClass editRecord = adminInfo.editRecord;
-                //
                 int ContentID = 0;
-                int CSPointer = 0;
-                // converted array to dictionary - Dim FieldPointer As Integer
                 //
                 // ----- check if admin record is present
                 //
@@ -249,8 +244,8 @@ namespace Contensive.Addons.AdminSite {
                             ContentWatchLink = (csXfer.csGet("Link"));
                             ContentWatchClicks = (csXfer.csGetInteger("Clicks"));
                             ContentWatchLinkLabel = (csXfer.csGet("LinkLabel"));
-                            ContentWatchExpires = (csXfer.csGetDate(CSPointer, "WhatsNewDateExpires"));
-                            csXfer.csClose();
+                            ContentWatchExpires = (csXfer.csGetDate("WhatsNewDateExpires"));
+                            csXfer.close();
                         }
 
                     }
@@ -267,10 +262,7 @@ namespace Contensive.Addons.AdminSite {
         /// <param name="adminContext"></param>
         public void LoadContentTrackingResponse(CoreController core) {
             try {
-                //
-                int CSContentWatchList = 0;
                 int RecordID = 0;
-                //
                 ContentWatchListIDCount = 0;
                 if ((core.docProperties.getText("WhatsNewResponse") != "") && (adminContent.allowContentTracking)) {
                     //
@@ -283,8 +275,8 @@ namespace Contensive.Addons.AdminSite {
                     //
                     using (var csXfer = new CsModel(core)) {
                         csXfer.csOpen("Content Watch Lists");
-                        while (csXfer.csOk(CSContentWatchList)) {
-                            RecordID = (csXfer.csGetInteger(CSContentWatchList, "ID"));
+                        while (csXfer.csOk()) {
+                            RecordID = (csXfer.csGetInteger("ID"));
                             if (core.docProperties.getBoolean("ContentWatchList." + RecordID)) {
                                 if (ContentWatchListIDCount >= ContentWatchListIDSize) {
                                     ContentWatchListIDSize = ContentWatchListIDSize + 50;
@@ -293,9 +285,9 @@ namespace Contensive.Addons.AdminSite {
                                 ContentWatchListID[ContentWatchListIDCount] = RecordID;
                                 ContentWatchListIDCount = ContentWatchListIDCount + 1;
                             }
-                            csXfer.csGoNext(CSContentWatchList);
+                            csXfer.csGoNext();
                         }
-                        csXfer.csClose();
+                        csXfer.close();
                     }
                 }
             } catch (Exception ex) {
@@ -476,13 +468,13 @@ namespace Contensive.Addons.AdminSite {
                         csXfer.csOpenRecord(adminContent.name, requestedRecordId, "ContentControlID");
                         if (csXfer.csOk()) {
                             editRecord.id = requestedRecordId;
-                            int recordContentId = csXfer.csGetInteger(CS, "ContentControlID");
-                            //adminContent.id = csXfer.csGetInteger(CS, "ContentControlID");
+                            int recordContentId = csXfer.csGetInteger("ContentControlID");
+                            //adminContent.id = csXfer.csGetInteger("ContentControlID");
                             if ((recordContentId > 0) && (recordContentId != adminContent.id)) {
                                 adminContent = MetaModel.create(core, recordContentId);
                             }
                         }
-                        csXfer.csClose();
+                        csXfer.close();
                     }
                 }
                 //
@@ -790,7 +782,7 @@ namespace Contensive.Addons.AdminSite {
                 int Ptr = 0;
                 string defaultValue = null;
                 EditRecordFieldClass editRecordField = null;
-                CDefFieldModel field = null;
+                MetaFieldModel field = null;
                 editRecord.active = true;
                 editRecord.contentControlId = adminContent.id;
                 editRecord.contentControlId_Name = adminContent.name;
@@ -901,7 +893,7 @@ namespace Contensive.Addons.AdminSite {
                 // todo refactor out
                 string DefaultValueText = null;
                 foreach (var keyValuePair in adminContent.fields) {
-                    CDefFieldModel field = keyValuePair.Value;
+                    MetaFieldModel field = keyValuePair.Value;
                     DefaultValueText = getWherePairValue(field.nameLc);
                     if (field.active & (!string.IsNullOrEmpty(DefaultValueText))) {
                         switch (field.fieldTypeId) {
@@ -1021,7 +1013,7 @@ namespace Contensive.Addons.AdminSite {
                             //
                             NullVariant = null;
                             foreach (var keyValuePair in adminContent.fields) {
-                                CDefFieldModel adminContentcontent = keyValuePair.Value;
+                                MetaFieldModel adminContentcontent = keyValuePair.Value;
                                 string fieldNameLc = adminContentcontent.nameLc;
                                 EditRecordFieldClass editRecordField = null;
                                 //
@@ -1204,7 +1196,7 @@ namespace Contensive.Addons.AdminSite {
                     DataSourceModel datasource = DataSourceModel.create(core, adminContent.dataSourceId, ref tmpList);
                     //DataSourceName = core.db.getDataSourceNameByID(adminContext.content.dataSourceId)
                     foreach (var keyValuePair in adminContent.fields) {
-                        CDefFieldModel field = keyValuePair.Value;
+                        MetaFieldModel field = keyValuePair.Value;
                         LoadEditRecord_RequestField(core, field, datasource.name, FormFieldLcListToBeLoaded, FormEmptyFieldLcList);
                     }
                     //
@@ -1250,7 +1242,7 @@ namespace Contensive.Addons.AdminSite {
         // ====================================================================================================
         //   Read the Form into the fields array
         //
-        public void LoadEditRecord_RequestField(CoreController core, CDefFieldModel field, string ignore, List<string> FormFieldLcListToBeLoaded, List<string> FormEmptyFieldLcList) {
+        public void LoadEditRecord_RequestField(CoreController core, MetaFieldModel field, string ignore, List<string> FormFieldLcListToBeLoaded, List<string> FormEmptyFieldLcList) {
             try {
                 // todo
                 if (field.active) {
@@ -1593,7 +1585,7 @@ namespace Contensive.Addons.AdminSite {
                                     //
                                     // ----- Do the unique check for this field
                                     //
-                                    string SQLUnique = "select id from " + adminContent.tableName + " where (" + field.nameLc + "=" + DbController.encodeSQL(ResponseFieldValueText, field.fieldTypeId) + ")and(" + MetaController.getContentControlCriteria(core, adminContent.name) + ")";
+                                    string SQLUnique = "select id from " + adminContent.tableName + " where (" + field.nameLc + "=" + MetaController.encodeSQL(ResponseFieldValueText, field.fieldTypeId) + ")and(" + MetaController.getContentControlCriteria(core, adminContent.name) + ")";
                                     if (editRecord.id > 0) {
                                         //
                                         // --editing record

@@ -18,7 +18,6 @@ namespace Contensive.Processor.Controllers {
                 string Delimiter = null;
                 string Copy = "";
                 string TableName = null;
-                int CSPointer = 0;
                 string FieldNameVariant = null;
                 string FieldName = null;
                 string UcaseFieldName = null;
@@ -49,54 +48,54 @@ namespace Contensive.Processor.Controllers {
                         if (!core.session.isAuthenticatedAdmin(core)) {
                             sb.Append("Warning: You must be a site administrator to export this information.");
                         } else {
-                            CSPointer = csXfer.csOpen(iContentName, "", "ID", false, 0, false, false, "", PageSize, PageNumber);
-                            //
-                            // ----- print out the field names
-                            //
-                            if (csXfer.csOk()) {
-                                sb.Append("\"EID\"");
-                                Delimiter = ",";
-                                FieldNameVariant = csXfer.csGetFirstFieldName(CSPointer);
-                                while (!string.IsNullOrEmpty(FieldNameVariant)) {
-                                    FieldName = GenericController.encodeText(FieldNameVariant);
-                                    UcaseFieldName = GenericController.vbUCase(FieldName);
-                                    if ((UcaseFieldName != "USERNAME") && (UcaseFieldName != "PASSWORD")) {
-                                        sb.Append(Delimiter + "\"" + FieldName + "\"");
-                                    }
-                                    FieldNameVariant = csXfer.csGetNextFieldName(CSPointer);
-                                    ///DoEvents
-                                }
-                                sb.Append("\r\n");
-                            }
-                            //
-                            // ----- print out the values
-                            //
-                            while (csXfer.csOk()) {
-                                if (!(csXfer.csGetBoolean( "Developer"))) {
-                                    Copy = SecurityController.encodeToken(core, csXfer.csGetInteger( "ID"), core.doc.profileStartTime);
-                                    sb.Append("\"" + Copy + "\"");
+                            using (var csXfer = new CsModel(core)) {
+                                csXfer.csOpen(iContentName, "", "ID", false, 0, "", PageSize, PageNumber);
+                                //
+                                // ----- print out the field names
+                                //
+                                if (csXfer.csOk()) {
+                                    sb.Append("\"EID\"");
                                     Delimiter = ",";
-                                    FieldNameVariant = csXfer.csGetFirstFieldName(CSPointer);
+                                    FieldNameVariant = csXfer.csGetFirstFieldName();
                                     while (!string.IsNullOrEmpty(FieldNameVariant)) {
                                         FieldName = GenericController.encodeText(FieldNameVariant);
                                         UcaseFieldName = GenericController.vbUCase(FieldName);
                                         if ((UcaseFieldName != "USERNAME") && (UcaseFieldName != "PASSWORD")) {
-                                            Copy = csXfer.csGet( FieldName);
-                                            if (!string.IsNullOrEmpty(Copy)) {
-                                                Copy = GenericController.vbReplace(Copy, "\"", "'");
-                                                Copy = GenericController.vbReplace(Copy, "\r\n", " ");
-                                                Copy = GenericController.vbReplace(Copy, "\r", " ");
-                                                Copy = GenericController.vbReplace(Copy, "\n", " ");
-                                            }
-                                            sb.Append(Delimiter + "\"" + Copy + "\"");
+                                            sb.Append(Delimiter + "\"" + FieldName + "\"");
                                         }
-                                        FieldNameVariant = csXfer.csGetNextFieldName(CSPointer);
+                                        FieldNameVariant = csXfer.csGetNextFieldName();
                                         ///DoEvents
                                     }
                                     sb.Append("\r\n");
                                 }
-                                csXfer.csGoNext();
-                                ///DoEvents
+                                //
+                                // ----- print out the values
+                                //
+                                while (csXfer.csOk()) {
+                                    if (!(csXfer.csGetBoolean("Developer"))) {
+                                        Copy = SecurityController.encodeToken(core, csXfer.csGetInteger("ID"), core.doc.profileStartTime);
+                                        sb.Append("\"" + Copy + "\"");
+                                        Delimiter = ",";
+                                        FieldNameVariant = csXfer.csGetFirstFieldName();
+                                        while (!string.IsNullOrEmpty(FieldNameVariant)) {
+                                            FieldName = GenericController.encodeText(FieldNameVariant);
+                                            UcaseFieldName = GenericController.vbUCase(FieldName);
+                                            if ((UcaseFieldName != "USERNAME") && (UcaseFieldName != "PASSWORD")) {
+                                                Copy = csXfer.csGet(FieldName);
+                                                if (!string.IsNullOrEmpty(Copy)) {
+                                                    Copy = GenericController.vbReplace(Copy, "\"", "'");
+                                                    Copy = GenericController.vbReplace(Copy, "\r\n", " ");
+                                                    Copy = GenericController.vbReplace(Copy, "\r", " ");
+                                                    Copy = GenericController.vbReplace(Copy, "\n", " ");
+                                                }
+                                                sb.Append(Delimiter + "\"" + Copy + "\"");
+                                            }
+                                            FieldNameVariant = csXfer.csGetNextFieldName();
+                                        }
+                                        sb.Append("\r\n");
+                                    }
+                                    csXfer.csGoNext();
+                                }
                             }
                         }
                         // End Case
@@ -108,60 +107,58 @@ namespace Contensive.Processor.Controllers {
                         if (!core.session.isAuthenticatedContentManager(core, iContentName)) {
                             sb.Append("Error: You must be a content manager to export this data.");
                         } else {
-                            CSPointer = csXfer.csOpen(iContentName, "", "ID", false, 0, false, false, "", PageSize, PageNumber);
-                            //
-                            // ----- print out the field names
-                            //
-                            if (csXfer.csOk()) {
-                                Delimiter = "";
-                                FieldNameVariant = csXfer.csGetFirstFieldName(CSPointer);
-                                while (!string.IsNullOrEmpty(FieldNameVariant)) {
-                                    core.appRootFiles.appendFile(TestFilename, Delimiter + "\"" + FieldNameVariant + "\"");
-                                    Delimiter = ",";
-                                    FieldNameVariant = csXfer.csGetNextFieldName(CSPointer);
-                                    ///DoEvents
-                                }
-                                core.appRootFiles.appendFile(TestFilename, "\r\n");
-                            }
-                            //
-                            // ----- print out the values
-                            //
-                            while (csXfer.csOk()) {
-                                Delimiter = "";
-                                FieldNameVariant = csXfer.csGetFirstFieldName(CSPointer);
-                                while (!string.IsNullOrEmpty(FieldNameVariant)) {
-                                    switch (csXfer.csGetFieldTypeId(CSPointer, GenericController.encodeText(FieldNameVariant))) {
-                                        case _fieldTypeIdFileText:
-                                        case _fieldTypeIdFileCSS:
-                                        case _fieldTypeIdFileXML:
-                                        case _fieldTypeIdFileJavascript:
-                                        case _fieldTypeIdFileHTML:
-                                            Copy = CsModel.getTextEncoded(core, CSPointer, GenericController.encodeText(FieldNameVariant));
-                                            break;
-                                        case _fieldTypeIdLookup:
-                                            Copy = csXfer.csGetLookup(CSPointer, GenericController.encodeText(FieldNameVariant));
-                                            break;
-                                        case _fieldTypeIdRedirect:
-                                        case _fieldTypeIdManyToMany:
-                                            break;
-                                        default:
-                                            Copy = csXfer.csGetText(CSPointer, GenericController.encodeText(FieldNameVariant));
-                                            break;
+                            using (var csXfer = new CsModel(core)) {
+                                csXfer.csOpen(iContentName, "", "ID", false, 0, "", PageSize, PageNumber);
+                                //
+                                // ----- print out the field names
+                                if (csXfer.csOk()) {
+                                    Delimiter = "";
+                                    FieldNameVariant = csXfer.csGetFirstFieldName();
+                                    while (!string.IsNullOrEmpty(FieldNameVariant)) {
+                                        core.appRootFiles.appendFile(TestFilename, Delimiter + "\"" + FieldNameVariant + "\"");
+                                        Delimiter = ",";
+                                        FieldNameVariant = csXfer.csGetNextFieldName();
                                     }
-                                    if (!string.IsNullOrEmpty(Copy)) {
-                                        Copy = GenericController.vbReplace(Copy, "\"", "'");
-                                        Copy = GenericController.vbReplace(Copy, "\r\n", " ");
-                                        Copy = GenericController.vbReplace(Copy, "\r", " ");
-                                        Copy = GenericController.vbReplace(Copy, "\n", " ");
-                                    }
-                                    core.appRootFiles.appendFile(TestFilename, Delimiter + "\"" + Copy + "\"");
-                                    Delimiter = ",";
-                                    FieldNameVariant = csXfer.csGetNextFieldName(CSPointer);
-                                    ///DoEvents
+                                    core.appRootFiles.appendFile(TestFilename, "\r\n");
                                 }
-                                core.appRootFiles.appendFile(TestFilename, "\r\n");
-                                csXfer.csGoNext();
-                                ///DoEvents
+                                //
+                                // ----- print out the values
+                                while (csXfer.csOk()) {
+                                    Delimiter = "";
+                                    FieldNameVariant = csXfer.csGetFirstFieldName();
+                                    while (!string.IsNullOrEmpty(FieldNameVariant)) {
+                                        switch (csXfer.csGetFieldTypeId(GenericController.encodeText(FieldNameVariant))) {
+                                            case _fieldTypeIdFileText:
+                                            case _fieldTypeIdFileCSS:
+                                            case _fieldTypeIdFileXML:
+                                            case _fieldTypeIdFileJavascript:
+                                            case _fieldTypeIdFileHTML:
+                                                Copy = csXfer.getTextEncoded(GenericController.encodeText(FieldNameVariant));
+                                                break;
+                                            case _fieldTypeIdLookup:
+                                                Copy = csXfer.csGetLookup(GenericController.encodeText(FieldNameVariant));
+                                                break;
+                                            case _fieldTypeIdRedirect:
+                                            case _fieldTypeIdManyToMany:
+                                                break;
+                                            default:
+                                                Copy = csXfer.csGetText(GenericController.encodeText(FieldNameVariant));
+                                                break;
+                                        }
+                                        if (!string.IsNullOrEmpty(Copy)) {
+                                            Copy = GenericController.vbReplace(Copy, "\"", "'");
+                                            Copy = GenericController.vbReplace(Copy, "\r\n", " ");
+                                            Copy = GenericController.vbReplace(Copy, "\r", " ");
+                                            Copy = GenericController.vbReplace(Copy, "\n", " ");
+                                        }
+                                        core.appRootFiles.appendFile(TestFilename, Delimiter + "\"" + Copy + "\"");
+                                        Delimiter = ",";
+                                        FieldNameVariant = csXfer.csGetNextFieldName();
+                                        ///DoEvents
+                                    }
+                                    core.appRootFiles.appendFile(TestFilename, "\r\n");
+                                    csXfer.csGoNext();
+                                }
                             }
                         }
                         break;

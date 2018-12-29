@@ -1306,21 +1306,21 @@ namespace Contensive.Processor {
         internal const int main_IPosPeopleField = 3;
         internal const int main_IPosGroupName = 3;
         //
-        public class  Main_FormPagetype_InstType {
+        public class  PageFormFieldModel {
             public int Type;
             public string Caption;
             public bool REquired;
-            public string PeopleField;
+            public string peopleFieldName;
             public string GroupName;
         }
         //
-        public class  Main_FormPagetype {
+        public class  PageFormModel {
             public string PreRepeat;
             public string PostRepeat;
             public string RepeatCell;
             public string AddGroupNameList;
             public bool AuthenticateOnFormProcess;
-            public List<Main_FormPagetype_InstType> IDontKnowWhatList = new List<Main_FormPagetype_InstType>();
+            public List<PageFormFieldModel> formFieldList = new List<PageFormFieldModel>();
         }
         //
         // Cache the input selects (admin uses the same ones over and over)

@@ -76,23 +76,19 @@ namespace Contensive.Addons.AdminSite {
                             string EditorStyleRulesFilename = GenericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", "0", 1, 99, 1);
                             core.privateFiles.deleteFile(EditorStyleRulesFilename);
                             //
-                            int csXfer.csOpenSql("select id from cctemplates");
-                            while (csXfer.csOk()) {
-                                EditorStyleRulesFilename = GenericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", csXfer.csGet(CS, "ID"), 1, 99, 1);
-                                core.privateFiles.deleteFile(EditorStyleRulesFilename);
-                                csXfer.csGoNext(CS);
+                            using (var csXfer = new CsModel(core)) {
+                                while (csXfer.csOpenSql("select id from cctemplates")) {
+                                    EditorStyleRulesFilename = GenericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", csXfer.csGet("ID"), 1, 99, 1);
+                                    core.privateFiles.deleteFile(EditorStyleRulesFilename);
+                                    csXfer.csGoNext();
+                                }
                             }
-                            csXfer.csClose();
-
                         }
-                        if (Button == ButtonOK) {
-                            //
-                            // exit with blank page
-                        } else {
+                        if (Button != ButtonOK) {
                             //
                             // Draw the form
                             string FeatureList = core.cdnFiles.readFileText(InnovaEditorFeaturefilename);
-                           if (string.IsNullOrEmpty(FeatureList)) {
+                            if (string.IsNullOrEmpty(FeatureList)) {
                                 FeatureList = "admin:" + InnovaEditorFeatureList + "\r\ncontentmanager:" + InnovaEditorFeatureList + "\r\npublic:" + InnovaEditorPublicFeatureList;
                             }
                             if (!string.IsNullOrEmpty(FeatureList)) {

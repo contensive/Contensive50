@@ -825,9 +825,9 @@ namespace Contensive.Processor.Controllers {
                     //if (core.docProperties.getInteger("ContensiveUserForm") == 1) {
                     //    string FromAddress = core.siteProperties.getText("EmailFromAddress", "info@" + core.webServer.requestDomain);
                     //    EmailController.queueFormEmail(core, core.siteProperties.emailAdmin, FromAddress, "Form Submitted on " + core.webServer.requestReferer);
-                    //    int csXfer.csInsert("User Form Response");
+                    //    csXfer.csInsert("User Form Response");
                     //    if (csXfer.csOk()) {
-                    //        csXfer.csSet(cs, "name", "Form " + core.webServer.requestReferrer);
+                    //        csXfer.csSet("name", "Form " + core.webServer.requestReferrer);
                     //        string Copy = "";
 
                     //        foreach (string key in core.docProperties.getKeyList()) {
@@ -836,8 +836,8 @@ namespace Contensive.Processor.Controllers {
                     //                Copy += docProperty.Name + "=" + docProperty.Value + "\r\n";
                     //            }
                     //        }
-                    //        csXfer.csSet(cs, "copy", Copy);
-                    //        csXfer.csSet(cs, "VisitId", core.session.visit.id);
+                    //        csXfer.csSet("copy", Copy);
+                    //        csXfer.csSet("VisitId", core.session.visit.id);
                     //    }
                     //    csXfer.csClose();
                     //}
@@ -1171,7 +1171,7 @@ namespace Contensive.Processor.Controllers {
                                 // Add a new Link Forward entry
                                 //
                                 using (var csXfer = new CsModel(core)) {
-                                    csXfer.csInsert("Link Forwards");
+                                    csXfer.insert("Link Forwards");
                                     if (csXfer.csOk()) {
                                         csXfer.csSet("Name", core.webServer.requestPathPage);
                                         csXfer.csSet("sourcelink", core.webServer.requestPathPage);
@@ -1311,23 +1311,22 @@ namespace Contensive.Processor.Controllers {
             try {
                 //
                 // main_Get the instructions from the record
-                //
+                string Formhtml = "";
+                string FormInstructions = "";
                 using (var csXfer = new CsModel(core)) {
                     csXfer.csOpenRecord("Form Pages", FormPageID);
-                    string Formhtml = "";
-                    string FormInstructions = "";
                     if (csXfer.csOk()) {
                         Formhtml = csXfer.csGetText("Body");
                         FormInstructions = csXfer.csGetText("Instructions");
                     }
                 }
-                Main_FormPagetype f;
+                PageFormModel pageForm;
                 if (!string.IsNullOrEmpty(FormInstructions)) {
                     //
                     // Load the instructions
                     //
-                    f = loadFormPageInstructions(core, FormInstructions, Formhtml);
-                    if (f.AuthenticateOnFormProcess & !core.session.isAuthenticated & core.session.isRecognized(core)) {
+                    pageForm = loadFormPageInstructions(core, FormInstructions, Formhtml);
+                    if (pageForm.AuthenticateOnFormProcess & !core.session.isAuthenticated & core.session.isRecognized(core)) {
                         //
                         // If this form will authenticate when done, and their is a current, non-authenticated account -- logout first
                         //
@@ -1338,68 +1337,73 @@ namespace Contensive.Processor.Controllers {
                     string PeopleFirstName = "";
                     string PeopleLastName = "";
                     string PeopleName = "";
-                    foreach ( var IDontKnowWhat in f.IDontKnowWhatList) {
+                    Models.Domain.MetaModel peopleMeta = null;
+                    foreach ( var formField in pageForm.formFieldList) {
                         bool IsInGroup = false;
                         bool WasInGroup = false;
                         string FormValue = null;
-                        switch (IDontKnowWhat.Type) {
+                        switch (formField.Type) {
                             case 1:
                                 //
                                 // People Record
                                 //
-                                FormValue = core.docProperties.getText(IDontKnowWhat.PeopleField);
-                                if ((!string.IsNullOrEmpty(FormValue)) & GenericController.encodeBoolean(MetaController.getContentFieldProperty(core, "people", IDontKnowWhat.PeopleField, "uniquename"))) {
-                                    using (var csXfer = new CsModel(core)) {
-                                        string SQL = "select count(*) from ccMembers where " + IDontKnowWhat.PeopleField + "=" + DbController.encodeSQLText(FormValue);
-                                        csXfer.csOpenSql(SQL);
-                                        if (csXfer.csOk()) {
-                                            Success = csXfer.csGetInteger("cnt") == 0;
+                                if (peopleMeta == null) { peopleMeta = Models.Domain.MetaModel.createByUniqueName(core, "people"); }
+                                var peopleFieldMeta = Models.Domain.MetaModel.getField(core, peopleMeta, formField.peopleFieldName);
+                                if ( peopleFieldMeta != null ) {
+                                    FormValue = core.docProperties.getText(formField.peopleFieldName);
+                                    if ((!string.IsNullOrEmpty(FormValue)) & peopleFieldMeta.uniqueName) {
+                                        using (var csXfer = new CsModel(core)) {
+                                            string SQL = "select count(*) from ccMembers where " + formField.peopleFieldName + "=" + DbController.encodeSQLText(FormValue);
+                                            csXfer.csOpenSql(SQL);
+                                            if (csXfer.csOk()) {
+                                                Success = csXfer.csGetInteger("cnt") == 0;
+                                            }
+                                        }
+                                        if (!Success) {
+                                            ErrorController.addUserError(core, "The field [" + formField.Caption + "] must be unique, and the value [" + HtmlController.encodeHtml(FormValue) + "] has already been used.");
                                         }
                                     }
-                                    if (!Success) {
-                                        ErrorController.addUserError(core, "The field [" + IDontKnowWhat.Caption + "] must be unique, and the value [" + HtmlController.encodeHtml(FormValue) + "] has already been used.");
-                                    }
-                                }
-                                if ((IDontKnowWhat.REquired || GenericController.encodeBoolean(MetaController.getContentFieldProperty(core, "people", IDontKnowWhat.PeopleField, "required"))) && string.IsNullOrEmpty(FormValue)) {
-                                    Success = false;
-                                    ErrorController.addUserError(core, "The field [" + HtmlController.encodeHtml(IDontKnowWhat.Caption) + "] is required.");
-                                } else {
-                                    using (var csXfer = new CsModel(core)) {
-                                        if (!csXfer.csOk()) {
-                                            csXfer.csOpenRecord("people", core.session.user.id);
-                                        }
-                                        if (csXfer.csOk()) {
-                                            string PeopleUsername = null;
-                                            string PeoplePassword = null;
-                                            string PeopleEmail = "";
-                                            switch (GenericController.vbUCase(IDontKnowWhat.PeopleField)) {
-                                                case "NAME":
-                                                    PeopleName = FormValue;
-                                                    csXfer.csSet(IDontKnowWhat.PeopleField, FormValue);
-                                                    break;
-                                                case "FIRSTNAME":
-                                                    PeopleFirstName = FormValue;
-                                                    csXfer.csSet(IDontKnowWhat.PeopleField, FormValue);
-                                                    break;
-                                                case "LASTNAME":
-                                                    PeopleLastName = FormValue;
-                                                    csXfer.csSet(IDontKnowWhat.PeopleField, FormValue);
-                                                    break;
-                                                case "EMAIL":
-                                                    PeopleEmail = FormValue;
-                                                    csXfer.csSet(IDontKnowWhat.PeopleField, FormValue);
-                                                    break;
-                                                case "USERNAME":
-                                                    PeopleUsername = FormValue;
-                                                    csXfer.csSet(IDontKnowWhat.PeopleField, FormValue);
-                                                    break;
-                                                case "PASSWORD":
-                                                    PeoplePassword = FormValue;
-                                                    csXfer.csSet(IDontKnowWhat.PeopleField, FormValue);
-                                                    break;
-                                                default:
-                                                    csXfer.csSet(IDontKnowWhat.PeopleField, FormValue);
-                                                    break;
+                                    if ((formField.REquired || peopleFieldMeta.required) && string.IsNullOrEmpty(FormValue)) {
+                                        Success = false;
+                                        ErrorController.addUserError(core, "The field [" + HtmlController.encodeHtml(formField.Caption) + "] is required.");
+                                    } else {
+                                        using (var csXfer = new CsModel(core)) {
+                                            if (!csXfer.csOk()) {
+                                                csXfer.csOpenRecord("people", core.session.user.id);
+                                            }
+                                            if (csXfer.csOk()) {
+                                                string PeopleUsername = null;
+                                                string PeoplePassword = null;
+                                                string PeopleEmail = "";
+                                                switch (GenericController.vbUCase(formField.peopleFieldName)) {
+                                                    case "NAME":
+                                                        PeopleName = FormValue;
+                                                        csXfer.csSet(formField.peopleFieldName, FormValue);
+                                                        break;
+                                                    case "FIRSTNAME":
+                                                        PeopleFirstName = FormValue;
+                                                        csXfer.csSet(formField.peopleFieldName, FormValue);
+                                                        break;
+                                                    case "LASTNAME":
+                                                        PeopleLastName = FormValue;
+                                                        csXfer.csSet(formField.peopleFieldName, FormValue);
+                                                        break;
+                                                    case "EMAIL":
+                                                        PeopleEmail = FormValue;
+                                                        csXfer.csSet(formField.peopleFieldName, FormValue);
+                                                        break;
+                                                    case "USERNAME":
+                                                        PeopleUsername = FormValue;
+                                                        csXfer.csSet(formField.peopleFieldName, FormValue);
+                                                        break;
+                                                    case "PASSWORD":
+                                                        PeoplePassword = FormValue;
+                                                        csXfer.csSet(formField.peopleFieldName, FormValue);
+                                                        break;
+                                                    default:
+                                                        csXfer.csSet(formField.peopleFieldName, FormValue);
+                                                        break;
+                                                }
                                             }
                                         }
                                     }
@@ -1409,12 +1413,12 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // Group main_MemberShip
                                 //
-                                IsInGroup = core.docProperties.getBoolean("Group" + IDontKnowWhat.GroupName);
-                                WasInGroup = GroupController.isMemberOfGroup(core, IDontKnowWhat.GroupName);
+                                IsInGroup = core.docProperties.getBoolean("Group" + formField.GroupName);
+                                WasInGroup = GroupController.isMemberOfGroup(core, formField.GroupName);
                                 if (WasInGroup && !IsInGroup) {
-                                    GroupController.removeUser(core, IDontKnowWhat.GroupName);
+                                    GroupController.removeUser(core, formField.GroupName);
                                 } else if (IsInGroup && !WasInGroup) {
-                                    GroupController.addUser(core, IDontKnowWhat.GroupName);
+                                    GroupController.addUser(core, formField.GroupName);
                                 }
                                 break;
                         }
@@ -1422,10 +1426,10 @@ namespace Contensive.Processor.Controllers {
                     //
                     // Create People Name
                     //
-                    if (string.IsNullOrEmpty(PeopleName) && !string.IsNullOrEmpty(PeopleFirstName) & !string.IsNullOrEmpty(PeopleLastName)) {
+                    if (string.IsNullOrWhiteSpace(PeopleName) && !string.IsNullOrWhiteSpace(PeopleFirstName) & !string.IsNullOrWhiteSpace(PeopleLastName)) {
                         using (var csXfer = new CsModel(core)) {
                             if (csXfer.csOpenRecord("people", core.session.user.id)) {
-                                csXfer.csSet(CSPeople, "name", PeopleFirstName + " " + PeopleLastName);
+                                csXfer.csSet("name", PeopleFirstName + " " + PeopleLastName);
                             }
                         }
                     }
@@ -1436,7 +1440,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // Authenticate
                         //
-                        if (f.AuthenticateOnFormProcess) {
+                        if (pageForm.AuthenticateOnFormProcess) {
                             SessionController.authenticateById(core, core.session.user.id, core.session);
                         }
                         //
@@ -1447,8 +1451,8 @@ namespace Contensive.Processor.Controllers {
                         }
                         //
                         // Join Groups requested by pageform
-                        if (f.AddGroupNameList != "") {
-                            string[] Groups = (encodeText(f.AddGroupNameList).Trim(' ')).Split(',');
+                        if (pageForm.AddGroupNameList != "") {
+                            string[] Groups = (encodeText(pageForm.AddGroupNameList).Trim(' ')).Split(',');
                             for (Ptr = 0; Ptr <= Groups.GetUpperBound(0); Ptr++) {
                                 string GroupName = Groups[Ptr].Trim(' ');
                                 if (!string.IsNullOrEmpty(GroupName)) {
@@ -1485,8 +1489,8 @@ namespace Contensive.Processor.Controllers {
         //   {{CAPTION}} tags -- main_Gets the caption for each instruction line
         //   {{FIELD}} tags -- main_Gets the form field for each instruction line
         //
-        internal static Main_FormPagetype loadFormPageInstructions(CoreController core, string FormInstructions, string Formhtml) {
-            Main_FormPagetype result = new Main_FormPagetype();
+        internal static PageFormModel loadFormPageInstructions(CoreController core, string FormInstructions, string Formhtml) {
+            PageFormModel result = new PageFormModel();
             try {
                 //
                 if (true) {
@@ -1521,7 +1525,7 @@ namespace Contensive.Processor.Controllers {
                                         //Array.Resize(ref result.IDontKnowWhatList, i.GetUpperBound(0));
                                         int IPtr = 0;
                                         for (IPtr = 0; IPtr <= i.GetUpperBound(0) - IStart; IPtr++) {
-                                            var tempVar = result.IDontKnowWhatList[IPtr];
+                                            var tempVar = result.formFieldList[IPtr];
                                             string[] IArgs = i[IPtr + IStart].Split(',');
                                             if (IArgs.GetUpperBound(0) >= main_IPosMax) {
                                                 tempVar.Caption = IArgs[main_IPosCaption];
@@ -1532,7 +1536,7 @@ namespace Contensive.Processor.Controllers {
                                                         //
                                                         // People Record
                                                         //
-                                                        tempVar.PeopleField = IArgs[main_IPosPeopleField];
+                                                        tempVar.peopleFieldName = IArgs[main_IPosPeopleField];
                                                         break;
                                                     case 2:
                                                         //
@@ -1561,52 +1565,52 @@ namespace Contensive.Processor.Controllers {
         internal static string getFormPage(CoreController core, string FormPageName, int GroupIDToJoinOnSuccess) {
             string result = null;
             try {
-                Main_FormPagetype f;
+                PageFormModel pageForm;
                 string Formhtml = "";
                 string FormInstructions = "";
                 bool IsRetry =  (core.docProperties.getInteger("ContensiveFormPageID") != 0);
+                int FormPageID = 0;
                 using (var csXfer = new CsModel(core)) {
                     csXfer.csOpen("Form Pages", "name=" + DbController.encodeSQLText(FormPageName));
-                    int FormPageID = 0;
                     if (csXfer.csOk()) {
                         FormPageID = csXfer.csGetInteger("ID");
                         Formhtml = csXfer.csGetText("Body");
                         FormInstructions = csXfer.csGetText("Instructions");
                     }
                 }
-                f = loadFormPageInstructions(core, FormInstructions, Formhtml);
+                pageForm = loadFormPageInstructions(core, FormInstructions, Formhtml);
                 string RepeatBody = "";
-                int CSPeople = -1;
-                //int IPtr = 0;
                 string Body = null;
                 bool HasRequiredFields = false;
-                foreach( var tempVar in f.IDontKnowWhatList) {                 
+                var peopleMeta = Models.Domain.MetaModel.createByUniqueName(core, "people");
+                foreach ( var formField in pageForm.formFieldList) {                 
                     bool GroupValue = false;
                     int GroupRowPtr = 0;
                     string CaptionSpan = null;
                     string Caption = null;
-                    switch (tempVar.Type) {
+                    switch (formField.Type) {
                         case 1:
                             //
                             // People Record
                             //
-                            if (IsRetry && core.docProperties.getText(tempVar.PeopleField) == "") {
+                            var peopleMetaField = Models.Domain.MetaModel.getField(core, peopleMeta, formField.peopleFieldName);
+                            if (IsRetry && core.docProperties.getText(formField.peopleFieldName) == "") {
                                 CaptionSpan = "<span class=\"ccError\">";
                             } else {
                                 CaptionSpan = "<span>";
                             }
-                            Caption = tempVar.Caption;
-                            if (tempVar.REquired || GenericController.encodeBoolean(MetaController.getContentFieldProperty(core, "People", tempVar.PeopleField, "Required"))) {
+                            Caption = formField.Caption;
+                            if (formField.REquired || peopleMetaField.required ) {
                                 Caption = "*" + Caption;
                             }
-                            using (var csXfer = new CsModel(core)) {
-                                csXfer.csOpenRecord("people", core.session.user.id);
-                                if (csXfer.csOk()) {
-                                    Body = f.RepeatCell;
+                            using (var csPeople = new CsModel(core)) {
+                                csPeople.csOpenRecord("people", core.session.user.id);
+                                if (csPeople.csOk()) {
+                                    Body = pageForm.RepeatCell;
                                     Body = GenericController.vbReplace(Body, "{{CAPTION}}", CaptionSpan + Caption + "</span>", 1, 99, 1);
-                                    Body = GenericController.vbReplace(Body, "{{FIELD}}", core.html.inputCs("People", tempVar.PeopleField), 1, 99, 1);
+                                    Body = GenericController.vbReplace(Body, "{{FIELD}}", core.html.inputCs( csPeople, "People", formField.peopleFieldName), 1, 99, 1);
                                     RepeatBody = RepeatBody + Body;
-                                    HasRequiredFields = HasRequiredFields || tempVar.REquired;
+                                    HasRequiredFields = HasRequiredFields || formField.REquired;
                                 }
                             }
 
@@ -1615,18 +1619,18 @@ namespace Contensive.Processor.Controllers {
                             //
                             // Group main_MemberShip
                             //
-                            GroupValue = GroupController.isMemberOfGroup(core, tempVar.GroupName);
-                            Body = f.RepeatCell;
-                            Body = GenericController.vbReplace(Body, "{{CAPTION}}", HtmlController.checkbox("Group" + tempVar.GroupName, GroupValue), 1, 99, 1);
-                            Body = GenericController.vbReplace(Body, "{{FIELD}}", tempVar.Caption);
+                            GroupValue = GroupController.isMemberOfGroup(core, formField.GroupName);
+                            Body = pageForm.RepeatCell;
+                            Body = GenericController.vbReplace(Body, "{{CAPTION}}", HtmlController.checkbox("Group" + formField.GroupName, GroupValue), 1, 99, 1);
+                            Body = GenericController.vbReplace(Body, "{{FIELD}}", formField.Caption);
                             RepeatBody = RepeatBody + Body;
                             GroupRowPtr = GroupRowPtr + 1;
-                            HasRequiredFields = HasRequiredFields || tempVar.REquired;
+                            HasRequiredFields = HasRequiredFields || formField.REquired;
                             break;
                     }
                 }
                 if (HasRequiredFields) {
-                    Body = f.RepeatCell;
+                    Body = pageForm.RepeatCell;
                     Body = GenericController.vbReplace(Body, "{{CAPTION}}", "&nbsp;", 1, 99, 1);
                     Body = GenericController.vbReplace(Body, "{{FIELD}}", "*&nbsp;Required Fields");
                     RepeatBody = RepeatBody + Body;
@@ -1635,9 +1639,9 @@ namespace Contensive.Processor.Controllers {
                 string innerHtml = ""
                     + HtmlController.inputHidden("ContensiveFormPageID", FormPageID) 
                     + HtmlController.inputHidden("SuccessID", SecurityController.encodeToken(core, GroupIDToJoinOnSuccess, core.doc.profileStartTime)) 
-                    + f.PreRepeat 
+                    + pageForm.PreRepeat 
                     + RepeatBody 
-                    + f.PostRepeat;
+                    + pageForm.PostRepeat;
                 result = ""
                     + ErrorController.getUserError(core)
                     + HtmlController.formMultipart(core, innerHtml, core.doc.refreshQueryString, "", "ccForm");
@@ -1682,7 +1686,6 @@ namespace Contensive.Processor.Controllers {
                         BlockedRecordIDList = BlockedRecordIDList.Substring(1);
                     }
                 }
-                int CS = 0;
                 bool ContentBlocked = false;
                 //
                 // ----- Content Blocking
@@ -1714,10 +1717,10 @@ namespace Contensive.Processor.Controllers {
                             csXfer.csOpenSql(SQL);
                             BlockedRecordIDList = "," + BlockedRecordIDList;
                             while (csXfer.csOk()) {
-                                BlockedRecordIDList = GenericController.vbReplace(BlockedRecordIDList, "," + csXfer.csGetText(CS, "RecordID"), "");
-                                csXfer.csGoNext(CS);
+                                BlockedRecordIDList = GenericController.vbReplace(BlockedRecordIDList, "," + csXfer.csGetText("RecordID"), "");
+                                csXfer.csGoNext();
                             }
-                            csXfer.csClose();
+                            csXfer.close();
                         }
                         if (!string.IsNullOrEmpty(BlockedRecordIDList)) {
                             //
@@ -1740,7 +1743,7 @@ namespace Contensive.Processor.Controllers {
                                 csXfer.csOpenSql(SQL);
                                 while (csXfer.csOk()) {
                                     BlockedRecordIDList = GenericController.vbReplace(BlockedRecordIDList, "," + csXfer.csGetText("RecordID"), "");
-                                    csXfer.csGoNext(CS);
+                                    csXfer.csGoNext();
                                 }
                             }
                         }
@@ -2403,33 +2406,33 @@ namespace Contensive.Processor.Controllers {
                     } else {
                         //
                         // ----- if iContentName was bad, maybe they put table in, no authoring
-                        ContentID = Models.Domain.MetaModel.getContentIdByTablename(core, ContentName);
+                        ContentID = MetaController.getContentIdByTablename(core, ContentName);
                     }
                     int SeeAlsoCount = 0;
                     if (ContentID > 0) {
-                        //
-                        int csXfer.csOpen("See Also", "((active<>0)AND(ContentID=" + ContentID + ")AND(RecordID=" + RecordID + "))");
-                        while (csXfer.csOk()) {
-                            string SeeAlsoLink = (csXfer.csGetText(CS, "Link"));
-                            if (!string.IsNullOrEmpty(SeeAlsoLink)) {
-                                result += "\r<li class=\"ccListItem\">";
-                                if (GenericController.vbInstr(1, SeeAlsoLink, "://") == 0) {
-                                    SeeAlsoLink = core.webServer.requestProtocol + SeeAlsoLink;
+                        using (var csXfer = new CsModel(core)) {
+                            csXfer.csOpen("See Also", "((active<>0)AND(ContentID=" + ContentID + ")AND(RecordID=" + RecordID + "))");
+                            while (csXfer.csOk()) {
+                                string SeeAlsoLink = (csXfer.csGetText("Link"));
+                                if (!string.IsNullOrEmpty(SeeAlsoLink)) {
+                                    result += "\r<li class=\"ccListItem\">";
+                                    if (GenericController.vbInstr(1, SeeAlsoLink, "://") == 0) {
+                                        SeeAlsoLink = core.webServer.requestProtocol + SeeAlsoLink;
+                                    }
+                                    if (IsEditingLocal) {
+                                        result += AdminUIController.getRecordEditLink(core, "See Also", (csXfer.csGetInteger("ID")), false, "", core.session.isEditing("See Also"));
+                                    }
+                                    result += "<a href=\"" + HtmlController.encodeHtml(SeeAlsoLink) + "\" target=\"_blank\">" + (csXfer.csGetText("Name")) + "</A>";
+                                    string Copy = (csXfer.csGetText("Brief"));
+                                    if (!string.IsNullOrEmpty(Copy)) {
+                                        result += "<br>" + HtmlController.span(Copy, "ccListCopy");
+                                    }
+                                    SeeAlsoCount = SeeAlsoCount + 1;
+                                    result += "</li>";
                                 }
-                                if (IsEditingLocal) {
-                                    result += AdminUIController.getRecordEditLink(core, "See Also", (csXfer.csGetInteger(CS, "ID")), false, "", core.session.isEditing("See Also"));
-                                }
-                                result += "<a href=\"" + HtmlController.encodeHtml(SeeAlsoLink) + "\" target=\"_blank\">" + (csXfer.csGetText(CS, "Name")) + "</A>";
-                                string Copy = (csXfer.csGetText(CS, "Brief"));
-                                if (!string.IsNullOrEmpty(Copy)) {
-                                    result += "<br>" + HtmlController.span(Copy, "ccListCopy");
-                                }
-                                SeeAlsoCount = SeeAlsoCount + 1;
-                                result += "</li>";
+                                csXfer.csGoNext();
                             }
-                            csXfer.csGoNext(CS);
                         }
-                        csXfer.csClose();
                         //
                         if (IsEditingLocal) {
                             SeeAlsoCount = SeeAlsoCount + 1;
@@ -2469,7 +2472,6 @@ namespace Contensive.Processor.Controllers {
                 string NoteCopy = "";
                 string NoteFromEmail = null;
                 string NoteFromName = null;
-                int CS = 0;
                 switch (FeedbackButton) {
                     case FeedbackButtonSubmit:
                         //
@@ -2502,7 +2504,7 @@ namespace Contensive.Processor.Controllers {
                             csXfer.csOpen(ContentName, "ID=" + RecordID);
                             Copy = "[the content of this page is not available]" + BR;
                             if (csXfer.csOk()) {
-                                Copy = (csXfer.csGet(CS, "copyFilename"));
+                                Copy = (csXfer.csGet("copyFilename"));
                             }
                             NoteCopy = NoteCopy + Copy + BR;
                         }
@@ -2866,7 +2868,7 @@ namespace Contensive.Processor.Controllers {
                 string Link = null;
                 if (button == ButtonAddChildPage) {
                     using (var csXfer = new CsModel(core)) {
-                        csXfer.csInsert(pageCdef.name);
+                        csXfer.insert(pageCdef.name);
                         if (csXfer.csOk()) {
                             csXfer.csSet("active", true);
                             csXfer.csSet("ParentID", recordId);
@@ -2892,7 +2894,7 @@ namespace Contensive.Processor.Controllers {
                             ParentID = csXfer.csGetInteger("ParentID");
                         }
                         if (ParentID != 0) {
-                            csXfer.csInsert(pageCdef.name);
+                            csXfer.insert(pageCdef.name);
                             if (csXfer.csOk()) {
                                 csXfer.csSet("active", true);
                                 csXfer.csSet("ParentID", ParentID);
@@ -2978,7 +2980,7 @@ namespace Contensive.Processor.Controllers {
                         }
                         result = "\r<ul class=\"ccWatchList\">" + nop(result) + "\r</ul>";
                     }
-                    csXfer.csClose();
+                    csXfer.close();
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);

@@ -284,7 +284,7 @@
     <Compile Include="Views\CPVisitClass.cs" />
     <Compile Include="Views\CPVisitorClass.cs" />
     <Compile Include="Views\mainCsvCompatibilityClass.cs" />
-    <Compile Include="Models\Domain\CDefFieldModel.cs" />
+    <Compile Include="Models\Domain\MetaFieldModel.cs" />
     <Compile Include="Models\Domain\MetaModel.cs" />
     <Compile Include="Models\Domain\RouteMapModel.cs" />
     <Compile Include="Models\Domain\TableSchemeModel.cs" />

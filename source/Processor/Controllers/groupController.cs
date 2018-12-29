@@ -282,8 +282,7 @@ namespace Contensive.Processor.Controllers {
             bool returnREsult = false;
             try {
                 //
-                int CS = 0;
-                string SQL = null;
+                string sql = null;
                 string Criteria = null;
                 string WorkingIDList = null;
                 //
@@ -317,7 +316,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // check if memberid is admin
                             //
-                            SQL = "select top 1 m.id"
+                            sql = "select top 1 m.id"
                                 + " from ccmembers m"
                                 + " where"
                                 + " (m.id=" + MemberID + ")"
@@ -327,9 +326,9 @@ namespace Contensive.Processor.Controllers {
                                 + " or(m.developer<>0)"
                                 + " )"
                                 + " ";
-                            csXfer.csOpenSql(SQL, "Default");
-                            returnREsult = csXfer.csOk();
-                            csXfer.csClose();
+                            using (var csXfer = new CsModel(core)) {
+                                returnREsult = csXfer.csOpenSql(sql);
+                            }
                         }
                     } else {
                         //
@@ -353,13 +352,14 @@ namespace Contensive.Processor.Controllers {
                             + " and(m.active<>0)"
                             + " and(m.id=" + MemberID + ")";
                         //
-                        SQL = "select top 1 m.id"
+                        sql = "select top 1 m.id"
                             + " from ccmembers m"
                             + " left join ccMemberRules r on r.Memberid=m.id"
                             + " where" + Criteria;
-                        csXfer.csOpenSql(SQL, "Default");
-                        returnREsult = csXfer.csOk();
-                        csXfer.csClose();
+                        using (var csXfer = new CsModel(core)) {
+                            csXfer.csOpenSql(sql, "Default");
+                            returnREsult = csXfer.csOk();
+                        }
                     }
                 }
 

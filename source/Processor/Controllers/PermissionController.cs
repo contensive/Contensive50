@@ -167,8 +167,8 @@ namespace Contensive.Processor.Controllers {
                     //
                     result.allowEdit = true;
                     result.allowSave = true;
-                    result.allowAdd = core.doc.contentAccessRights_AllowAddList.Contains( cdef.id );
-                    result.allowDelete = core.doc.contentAccessRights_AllowDeleteList.Contains( cdef.id );
+                    result.allowAdd = core.doc.contentAccessRights_AllowAddList.Contains(cdef.id);
+                    result.allowDelete = core.doc.contentAccessRights_AllowDeleteList.Contains(cdef.id);
                 } else {
                     //
                     // ----- Must test it
@@ -182,14 +182,15 @@ namespace Contensive.Processor.Controllers {
                         + " AND(ccGroupRules.ContentID=" + cdef.id + ")"
                         + " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + DbController.encodeSQLDate(core.doc.profileStartTime) + "))"
                         + ");";
-                    csXfer.csOpenSql(SQL);
-                    if (csXfer.csOk()) {
-                        result.allowEdit = true;
-                        result.allowSave = true;
-                        result.allowAdd = csXfer.csGetBoolean( "allowAdd");
-                        result.allowDelete = csXfer.csGetBoolean( "allowDelete");
+                    using (var csXfer = new CsModel(core)) {
+                        csXfer.csOpenSql(SQL);
+                        if (csXfer.csOk()) {
+                            result.allowEdit = true;
+                            result.allowSave = true;
+                            result.allowAdd = csXfer.csGetBoolean("allowAdd");
+                            result.allowDelete = csXfer.csGetBoolean("allowDelete");
+                        }
                     }
-                    csXfer.csClose();
                     //
                     if (!result.allowEdit) {
                         //
@@ -206,10 +207,10 @@ namespace Contensive.Processor.Controllers {
                         //
                         core.doc.contentAccessRights_List.Add(cdef.id);
                         if (result.allowEdit) {
-                            core.doc.contentAccessRights_AllowAddList.Add( cdef.id );
+                            core.doc.contentAccessRights_AllowAddList.Add(cdef.id);
                         }
                         if (result.allowDelete) {
-                            core.doc.contentAccessRights_AllowDeleteList.Add( cdef.id );
+                            core.doc.contentAccessRights_AllowDeleteList.Add(cdef.id);
                         }
                     } else {
                         //
@@ -266,7 +267,7 @@ namespace Contensive.Processor.Controllers {
             GC.SuppressFinalize(this);
         }
         //
-        ~ PermissionController() {
+        ~PermissionController() {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(false);
         }

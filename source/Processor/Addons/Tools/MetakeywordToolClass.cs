@@ -33,9 +33,9 @@ namespace Contensive.Addons.Tools {
         // Tool to enter multiple Meta Keywords
         //========================================================================
         //
-        private string GetForm_MetaKeywordTool( CPClass cp) {
+        private string GetForm_MetaKeywordTool(CPClass cp) {
             string tempGetForm_MetaKeywordTool = "";
-                CoreController core = cp.core;
+            CoreController core = cp.core;
             try {
                 StringBuilderLegacyController Content = new StringBuilderLegacyController();
                 string Copy = null;
@@ -68,8 +68,6 @@ namespace Contensive.Addons.Tools {
                             string Keyword = null;
                             int Cnt = 0;
                             int Ptr = 0;
-                            DataTable dt = null;
-                            int CS = 0;
                             KeywordList = core.docProperties.getText("KeywordList");
                             if (!string.IsNullOrEmpty(KeywordList)) {
                                 KeywordList = GenericController.vbReplace(KeywordList, "\r\n", ",");
@@ -78,15 +76,14 @@ namespace Contensive.Addons.Tools {
                                 for (Ptr = 0; Ptr < Cnt; Ptr++) {
                                     Keyword = Keywords[Ptr].Trim(' ');
                                     if (!string.IsNullOrEmpty(Keyword)) {
-                                        //Dim dt As DataTable
-
-                                        dt = core.db.executeQuery("select top 1 ID from ccMetaKeywords where name=" + DbController.encodeSQLText(Keyword));
+                                        DataTable dt = core.db.executeQuery("select top 1 ID from ccMetaKeywords where name=" + DbController.encodeSQLText(Keyword));
                                         if (dt.Rows.Count == 0) {
-                                            csXfer.csInsert("Meta Keywords");
-                                            if (csXfer.csOk()) {
-                                                csXfer.csSet(CS, "name", Keyword);
+                                            using (var csXfer = new CsModel(core)) {
+                                                csXfer.insert("Meta Keywords");
+                                                if (csXfer.csOk()) {
+                                                    csXfer.csSet("name", Keyword);
+                                                }
                                             }
-                                            csXfer.csClose();
                                         }
                                     }
                                 }

@@ -493,7 +493,7 @@ namespace Contensive.Processor.Controllers {
                                 // lazy create a user if/when it is needed
                                 string DefaultMemberName = resultSessionContext.visit.name;
                                 if (DefaultMemberName.Left(5).ToLowerInvariant() == "visit") {
-                                    DefaultMemberName = MetaController.getContentFieldProperty(core, "people", "name", "default");
+                                    DefaultMemberName = "Guest";
                                 }
                                 resultSessionContext.user = new PersonModel {
                                     name = DefaultMemberName
@@ -685,18 +685,18 @@ namespace Contensive.Processor.Controllers {
                 //
                 // Is a CM for any content def
                 if ((!_isAuthenticatedContentManagerAnything_loaded) || (_isAuthenticatedContentManagerAnything_userId != user.id)) {
-                    string SQL = "SELECT ccGroupRules.ContentID"
-                        + " FROM ccGroupRules RIGHT JOIN ccMemberRules ON ccGroupRules.GroupID = ccMemberRules.GroupID"
-                        + " WHERE ("
-                            + "(ccMemberRules.MemberID=" + DbController.encodeSQLNumber(user.id) + ")"
-                            + " AND(ccMemberRules.active<>0)"
-                            + " AND(ccGroupRules.active<>0)"
-                            + " AND(ccGroupRules.ContentID Is not Null)"
-                            + " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + DbController.encodeSQLDate(core.doc.profileStartTime) + "))"
-                            + ")";
-                    int csXfer.csOpenSql(SQL);
-                    _isAuthenticatedContentManagerAnything = csXfer.csOk();
-                    csXfer.csClose();
+                    using (var csXfer = new CsModel(core)) {
+                        string sql = "SELECT ccGroupRules.ContentID"
+                            + " FROM ccGroupRules RIGHT JOIN ccMemberRules ON ccGroupRules.GroupID = ccMemberRules.GroupID"
+                            + " WHERE ("
+                                + "(ccMemberRules.MemberID=" + DbController.encodeSQLNumber(user.id) + ")"
+                                + " AND(ccMemberRules.active<>0)"
+                                + " AND(ccGroupRules.active<>0)"
+                                + " AND(ccGroupRules.ContentID Is not Null)"
+                                + " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + DbController.encodeSQLDate(core.doc.profileStartTime) + "))"
+                                + ")";
+                        _isAuthenticatedContentManagerAnything = csXfer.csOpenSql(sql);
+                    }
                     //
                     _isAuthenticatedContentManagerAnything_userId = user.id;
                     _isAuthenticatedContentManagerAnything_loaded = true;
@@ -753,7 +753,6 @@ namespace Contensive.Processor.Controllers {
                 bool recordIsAdmin = false;
                 bool recordIsDeveloper = false;
                 string Criteria = null;
-                int CS = 0;
                 string iPassword = null;
                 bool allowEmailLogin = false;
                 bool allowNoPasswordLogin = false;
@@ -796,73 +795,71 @@ namespace Contensive.Processor.Controllers {
                         //
                         Criteria = "(username=" + DbController.encodeSQLText(iLoginFieldValue) + ")";
                     }
-                    if (true) {
-                        Criteria = Criteria + "and((dateExpires is null)or(dateExpires>" + DbController.encodeSQLDate(DateTime.Now) + "))";
-                    }
-                    csXfer.csOpen("People", Criteria, "id", sqlSelectFieldList: "ID ,password,admin,developer", PageSize: 2);
-                    if (!csXfer.csOk()) {
-                        //
-                        // ----- loginFieldValue not found, stop here
-                        //
-                        ErrorController.addUserError(core, badLoginUserError);
-                    } else if ((!GenericController.encodeBoolean(core.siteProperties.getBoolean("AllowDuplicateUsernames", false))) && (csXfer.csGetRowCount(CS) > 1)) {
-                        //
-                        // ----- AllowDuplicates is false, and there are more then one record
-                        //
-                        ErrorController.addUserError(core, "This user account can not be used because the username is not unique on this website. Please contact the site administrator.");
-                    } else {
-                        //
-                        // ----- search all found records for the correct password
-                        //
-                        while (csXfer.csOk()) {
-                            returnUserId = 0;
+                    Criteria = Criteria + "and((dateExpires is null)or(dateExpires>" + DbController.encodeSQLDate(DateTime.Now) + "))";
+                    using (var csXfer = new CsModel(core)) {
+                        csXfer.csOpen("People", Criteria, "id",true, user.id, "ID,password,admin,developer", PageSize: 2);
+                        if (!csXfer.csOk()) {
                             //
-                            // main_Get Id if password good
+                            // ----- loginFieldValue not found, stop here
                             //
-                            if (string.IsNullOrEmpty(iPassword)) {
-                                //
-                                // no-password-login -- allowNoPassword + no password given + account has no password + account not admin/dev/cm
-                                //
-                                recordIsAdmin = csXfer.csGetBoolean(CS, "admin");
-                                recordIsDeveloper = !csXfer.csGetBoolean(CS, "admin");
-                                if (allowNoPasswordLogin && (csXfer.csGetText(CS, "password") == "") && (!recordIsAdmin) && (recordIsDeveloper)) {
-                                    returnUserId = csXfer.csGetInteger(CS, "ID");
-                                    //
-                                    // verify they are in no content manager groups
-                                    //
-                                    SQL = "SELECT ccGroupRules.ContentID"
-                                    + " FROM ccGroupRules RIGHT JOIN ccMemberRules ON ccGroupRules.GroupID = ccMemberRules.GroupID"
-                                    + " WHERE ("
-                                        + "(ccMemberRules.MemberID=" + DbController.encodeSQLNumber(returnUserId) + ")"
-                                        + " AND(ccMemberRules.active<>0)"
-                                        + " AND(ccGroupRules.active<>0)"
-                                        + " AND(ccGroupRules.ContentID Is not Null)"
-                                        + " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + DbController.encodeSQLDate(core.doc.profileStartTime) + "))"
-                                        + ");";
-                                    csXfer.csOpenSql(SQL);
-                                    if (csXfer.csOk()) {
-                                        returnUserId = 0;
-                                    }
-                                    csXfer.csClose();
-                                }
-                            } else {
-                                //
-                                // password login
-                                //
-                                if (GenericController.vbLCase(csXfer.csGetText(CS, "password")) == GenericController.vbLCase(iPassword)) {
-                                    returnUserId = csXfer.csGetInteger(CS, "ID");
-                                }
-                            }
-                            if (returnUserId != 0) {
-                                break;
-                            }
-                            csXfer.csGoNext(CS);
-                        }
-                        if (returnUserId == 0) {
                             ErrorController.addUserError(core, badLoginUserError);
+                        } else if ((!GenericController.encodeBoolean(core.siteProperties.getBoolean("AllowDuplicateUsernames", false))) && (csXfer.csGetRowCount() > 1)) {
+                            //
+                            // ----- AllowDuplicates is false, and there are more then one record
+                            //
+                            ErrorController.addUserError(core, "This user account can not be used because the username is not unique on this website. Please contact the site administrator.");
+                        } else {
+                            //
+                            // ----- search all found records for the correct password
+                            //
+                            while (csXfer.csOk()) {
+                                returnUserId = 0;
+                                //
+                                // main_Get Id if password good
+                                //
+                                if (string.IsNullOrEmpty(iPassword)) {
+                                    //
+                                    // no-password-login -- allowNoPassword + no password given + account has no password + account not admin/dev/cm
+                                    //
+                                    recordIsAdmin = csXfer.csGetBoolean("admin");
+                                    recordIsDeveloper = !csXfer.csGetBoolean("admin");
+                                    if (allowNoPasswordLogin && (csXfer.csGetText("password") == "") && (!recordIsAdmin) && (recordIsDeveloper)) {
+                                        returnUserId = csXfer.csGetInteger("ID");
+                                        //
+                                        // verify they are in no content manager groups
+                                        //
+                                        using (var csRules = new CsModel(core)) {
+                                            SQL = "SELECT ccGroupRules.ContentID"
+                                                + " FROM ccGroupRules RIGHT JOIN ccMemberRules ON ccGroupRules.GroupID = ccMemberRules.GroupID"
+                                                + " WHERE ("
+                                                + "(ccMemberRules.MemberID=" + DbController.encodeSQLNumber(returnUserId) + ")"
+                                                + " AND(ccMemberRules.active<>0)"
+                                                + " AND(ccGroupRules.active<>0)"
+                                                + " AND(ccGroupRules.ContentID Is not Null)"
+                                                + " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + DbController.encodeSQLDate(core.doc.profileStartTime) + "))"
+                                                + ");";
+                                            if (csRules.csOpenSql(SQL)) { returnUserId = 0; }
+                                        }
+                                    }
+                                } else {
+                                    //
+                                    // password login
+                                    //
+                                    if (GenericController.vbLCase(csXfer.csGetText("password")) == GenericController.vbLCase(iPassword)) {
+                                        returnUserId = csXfer.csGetInteger("ID");
+                                    }
+                                }
+                                if (returnUserId != 0) {
+                                    break;
+                                }
+                                csXfer.csGoNext();
+                            }
+                            if (returnUserId == 0) {
+                                ErrorController.addUserError(core, badLoginUserError);
+                            }
                         }
+                        csXfer.close();
                     }
-                    csXfer.csClose();
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -884,8 +881,6 @@ namespace Contensive.Processor.Controllers {
         public bool isNewCredentialOK(CoreController core, string Username, string Password, ref string returnErrorMessage, ref int returnErrorCode) {
             bool returnOk = false;
             try {
-                int CSPointer = 0;
-                //
                 returnOk = false;
                 if (string.IsNullOrEmpty(Username)) {
                     //
@@ -906,18 +901,16 @@ namespace Contensive.Processor.Controllers {
                     //        errorCode = 2
                     //        errorMessage = "You currently have cookie support disabled in your browser. Without cookies, your browser can not support the level of security required to login."
                 } else {
-
-                    CSPointer = csXfer.csOpen("People", "username=" + DbController.encodeSQLText(Username), "", false, sqlSelectFieldList: "ID", PageSize: 2);
-                    if (csXfer.csOk()) {
-                        //
-                        // ----- username was found, stop here
-                        //
-                        returnErrorCode = 3;
-                        returnErrorMessage = "The username you supplied is currently in use.";
-                    } else {
-                        returnOk = true;
+                    using (var csXfer = new CsModel(core)) {
+                        if (csXfer.csOpen("People", "username=" + DbController.encodeSQLText(Username), "id", false, 2, "ID")) {
+                            //
+                            // ----- username was found, stop here
+                            returnErrorCode = 3;
+                            returnErrorMessage = "The username you supplied is currently in use.";
+                        } else {
+                            returnOk = true;
+                        }
                     }
-                    csXfer.csClose();
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);

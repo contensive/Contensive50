@@ -449,7 +449,7 @@ namespace Contensive.Addons.AdminSite {
                         //while (csXfer.csOk()) {
                         //    IncludeID = csXfer.csGetInteger("IncludedAddonID");
                         //    IncludeHelp = IncludeHelp + GetAddonHelp(cp, IncludeID, HelpAddonID + "," + IncludeID.ToString());
-                        //    csXfer.csGoNext(CS);
+                        //    csXfer.csGoNext();
                         //}
                         //csXfer.csClose();
                         //
@@ -758,7 +758,7 @@ namespace Contensive.Addons.AdminSite {
                                                 } else {
                                                     csXfer.csSet("submitted", false);
                                                 }
-                                                csXfer.csClose();
+                                                csXfer.close();
                                             }
                                         }
                                     }
@@ -839,7 +839,7 @@ namespace Contensive.Addons.AdminSite {
                                                 csXfer.csOpenRecord(adminData.adminContent.name, cp.core.docProperties.getInteger("rowid" + RowPtr));
                                                 if (csXfer.csOk()) {
                                                     RecordID = csXfer.csGetInteger("ID");
-                                                    csXfer.csDeleteRecord();
+                                                    csXfer.deleteRecord();
                                                     //
                                                     // non-Workflow Delete
                                                     //
@@ -955,7 +955,7 @@ namespace Contensive.Addons.AdminSite {
                             }
                             if (RuleNeeded && !RuleFound) {
                                 using (var CSNew = new CsModel(cp.core)) {
-                                    CSNew.csInsert("Group Rules");
+                                    CSNew.insert("Group Rules");
                                     if (CSNew.csOk()) {
                                         CSNew.csSet("GroupID", GroupID);
                                         CSNew.csSet("ContentID", ContentID);
@@ -1019,8 +1019,6 @@ namespace Contensive.Addons.AdminSite {
         //
         private void LoadAndSaveGroupRules_ForContentAndChildren(CPClass cp, int ContentID, string ParentIDString) {
             try {
-                //
-                int CSPointer = 0;
                 string MyParentIDString = null;
                 //
                 // --- Create Group Rules for this content
@@ -1098,7 +1096,7 @@ namespace Contensive.Addons.AdminSite {
                             }
                             if (RuleNeeded && !RuleFound) {
                                 using (var CSNew = new CsModel(cp.core)) {
-                                    CSNew.csInsert("Group Rules");
+                                    CSNew.insert("Group Rules");
                                     if (CSNew.csOk()) {
                                         CSNew.csSet("ContentID", ContentID);
                                         CSNew.csSet("GroupID", GroupID);
@@ -1108,7 +1106,7 @@ namespace Contensive.Addons.AdminSite {
                                 }
                                 RecordChanged = true;
                             } else if (RuleFound && !RuleNeeded) {
-                                csXfer.csDeleteRecord();
+                                csXfer.deleteRecord();
                                 RecordChanged = true;
                             } else if (RuleFound && RuleNeeded) {
                                 if (AllowAdd != csXfer.csGetBoolean("AllowAdd")) {
@@ -1165,7 +1163,7 @@ namespace Contensive.Addons.AdminSite {
                     using (var csXfer = new CsModel(cp.core)) {
                         csXfer.csOpen("Content Watch", "(ContentID=" + DbController.encodeSQLNumber(ContentID) + ")And(RecordID=" + DbController.encodeSQLNumber(editRecord.id) + ")");
                         if (!csXfer.csOk()) {
-                            csXfer.csInsert("Content Watch");
+                            csXfer.insert("Content Watch");
                             csXfer.csSet("contentid", ContentID);
                             csXfer.csSet("recordid", editRecord.id);
                             csXfer.csSet("ContentRecordKey", ContentID + "." + editRecord.id);
@@ -1184,10 +1182,10 @@ namespace Contensive.Addons.AdminSite {
                             using (var CSPointer = new CsModel(cp.core)) {
                                 CSPointer.csOpen("Content Watch List Rules", "(ContentWatchID=" + ContentWatchID + ")");
                                 while (CSPointer.csOk()) {
-                                    CSPointer.csDeleteRecord();
+                                    CSPointer.deleteRecord();
                                     CSPointer.csGoNext();
                                 }
-                                CSPointer.csClose();
+                                CSPointer.close();
                             }
                             //
                             // ----- Update ContentWatchListRules for all entries in ContentWatchListID( ContentWatchListIDCount )
@@ -1196,7 +1194,7 @@ namespace Contensive.Addons.AdminSite {
                             if (adminData.ContentWatchListIDCount > 0) {
                                 for (ListPointer = 0; ListPointer < adminData.ContentWatchListIDCount; ListPointer++) {
                                     using (var CSRules = new CsModel(cp.core)) {
-                                        CSRules.csInsert("Content Watch List Rules");
+                                        CSRules.insert("Content Watch List Rules");
                                         if (CSRules.csOk()) {
                                             CSRules.csSet("ContentWatchID", ContentWatchID);
                                             CSRules.csSet("ContentWatchListID", adminData.ContentWatchListID[ListPointer]);
@@ -1246,7 +1244,7 @@ namespace Contensive.Addons.AdminSite {
                                     isDupError = true;
                                     ErrorController.addUserError(cp.core, "The Link Alias you entered can not be used because another record uses this value [" + linkAlias + "]. Enter a different Link Alias, or check the Override Duplicates checkbox in the Link Alias tab.");
                                 }
-                                csXfer.csClose();
+                                csXfer.close();
                             }
                         }
                         if (!isDupError) {
@@ -1297,7 +1295,7 @@ namespace Contensive.Addons.AdminSite {
                         if (editRecord.id == 0) {
                             NewRecord = true;
                             recordChanged = true;
-                            csXfer.csInsert(adminData.adminContent.name);
+                            csXfer.insert(adminData.adminContent.name);
                         } else {
                             NewRecord = false;
                             csXfer.csOpenRecord(adminData.adminContent.name, editRecord.id);
@@ -1327,7 +1325,7 @@ namespace Contensive.Addons.AdminSite {
                             //
                             bool fieldChanged = false;
                             foreach (var keyValuePair in adminData.adminContent.fields) {
-                                CDefFieldModel field = keyValuePair.Value;
+                                MetaFieldModel field = keyValuePair.Value;
                                 EditRecordFieldClass editRecordField = editRecord.fieldsLc[field.nameLc];
                                 object fieldValueObject = editRecordField.value;
                                 string FieldValueText = GenericController.encodeText(fieldValueObject);
@@ -1441,7 +1439,7 @@ namespace Contensive.Addons.AdminSite {
                                                 string filename = GenericController.encodeText(fieldValueObject);
                                                 if (!string.IsNullOrWhiteSpace(filename)) {
                                                     filename = FileController.encodeDosFilename(filename);
-                                                    string unixPathFilename = cp.core.db.getFieldFilename(fieldName, filename, adminData.adminContent.name);
+                                                    string unixPathFilename = csXfer.getFieldFilename(fieldName, filename);
                                                     string dosPathFilename = GenericController.convertToDosSlash(unixPathFilename);
                                                     string dosPath = GenericController.getPath(dosPathFilename);
                                                     cp.core.cdnFiles.upload(fieldName, dosPath, ref filename);
@@ -1795,7 +1793,6 @@ namespace Contensive.Addons.AdminSite {
                 //
                 //
                 if (adminData.AdminSourceForm != 0) {
-                    int CS = 0;
                     string EditorStyleRulesFilename = null;
                     switch (adminData.AdminSourceForm) {
                         case AdminFormReports:
@@ -1999,7 +1996,7 @@ namespace Contensive.Addons.AdminSite {
                                             cp.core.cdnFiles.deleteFile(EditorStyleRulesFilename);
                                             csXfer.csGoNext();
                                         }
-                                        csXfer.csClose();
+                                        csXfer.close();
                                     }
                                     break;
                             }
@@ -2290,8 +2287,8 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 // block fields that must be unique
                                 //
-                                foreach (KeyValuePair<string, Contensive.Processor.Models.Domain.CDefFieldModel> keyValuePair in adminData.adminContent.fields) {
-                                    CDefFieldModel field = keyValuePair.Value;
+                                foreach (KeyValuePair<string, Contensive.Processor.Models.Domain.MetaFieldModel> keyValuePair in adminData.adminContent.fields) {
+                                    MetaFieldModel field = keyValuePair.Value;
                                     if (GenericController.vbLCase(field.nameLc) == "email") {
                                         if ((adminData.adminContent.tableName.ToLowerInvariant() == "ccmembers") && (GenericController.encodeBoolean(cp.core.siteProperties.getBoolean("allowemaillogin", false)))) {
                                             editRecord.fieldsLc[field.nameLc].value = "";
@@ -2362,7 +2359,7 @@ namespace Contensive.Addons.AdminSite {
                                     //
                                     // No record, Rule needed, add it
                                     //
-                                    csXfer.csInsert("Member Rules");
+                                    csXfer.insert("Member Rules");
                                     if (csXfer.csOk()) {
                                         csXfer.csSet("Active", true);
                                         csXfer.csSet("MemberID", PeopleID);
@@ -2482,8 +2479,8 @@ namespace Contensive.Addons.AdminSite {
                                         GroupID = csXfer.csGetInteger("ID");
                                     } else {
                                         Description = Description + "<div>Creating new group [" + NewGroupName + "]</div>";
-                                        csXfer.csClose();
-                                        csXfer.csInsert("Groups");
+                                        csXfer.close();
+                                        csXfer.insert("Groups");
                                         if (csXfer.csOk()) {
                                             GroupID = csXfer.csGetInteger("ID");
                                             csXfer.csSet("Name", NewGroupName);
@@ -2494,7 +2491,7 @@ namespace Contensive.Addons.AdminSite {
                             }
                             if (GroupID != 0) {
                                 using (var csXfer = new CsModel(cp.core)) {
-                                    csXfer.csInsert("Group Rules");
+                                    csXfer.insert("Group Rules");
                                     if (csXfer.csOk()) {
                                         Description = Description + "<div>Assigning group [" + MetaController.getRecordName(cp.core, "Groups", GroupID) + "] to edit content [" + ChildContentName + "].</div>";
                                         csXfer.csSet("GroupID", GroupID);
@@ -2646,7 +2643,7 @@ namespace Contensive.Addons.AdminSite {
                         returnOptions = returnOptions + GetContentChildTool_Options(cp, RecordID, DefaultValue);
                         csXfer.csGoNext();
                     }
-                    csXfer.csClose();
+                    csXfer.close();
                 }
             } catch (Exception ex) {
                 LogController.handleError(cp.core, ex);
@@ -2765,7 +2762,7 @@ namespace Contensive.Addons.AdminSite {
                         if (csXfer.csOk()) {
                             PagesTotal = csXfer.csGetInteger("Result");
                         }
-                        csXfer.csClose();
+                        csXfer.close();
                     }
                     tableBody += (AdminUIController.getEditRowLegacy(cp.core, SpanClassAdminNormal + PagesTotal, "Viewings Found", "", false, false, ""));
                     //

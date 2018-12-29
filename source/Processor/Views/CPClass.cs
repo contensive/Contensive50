@@ -497,7 +497,7 @@ namespace Contensive.Processor {
         public override CPFileSystemBaseClass TempFiles {
             get {
                 if (_tempFiles == null) {
-                    _wwwFiles = new CPFileSystemClass(this, core.tempFiles);
+                    _tempFiles = new CPFileSystemClass(this, core.tempFiles);
                 }
                 return _tempFiles;
             }

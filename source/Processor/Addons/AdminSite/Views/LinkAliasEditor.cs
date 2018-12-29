@@ -10,23 +10,18 @@ namespace Contensive.Addons.AdminSite {
         //
         //========================================================================
         //
-        public static string GetForm_Edit_LinkAliases( CoreController core, AdminDataModel adminData, bool readOnlyField) {
+        public static string GetForm_Edit_LinkAliases(CoreController core, AdminDataModel adminData, bool readOnlyField) {
             string tempGetForm_Edit_LinkAliases = null;
             try {
                 // todo
                 AdminUIController.EditRecordClass editRecord = adminData.editRecord;
-                //
-                //
                 int LinkCnt = 0;
                 string LinkList = "";
                 StringBuilderLegacyController f = new StringBuilderLegacyController();
-                //adminUIController Adminui = new adminUIController(core);
                 string linkAlias = null;
                 string Link = null;
-                int CS = 0;
                 string tabContent = null;
                 string TabDescription;
-                //
                 //
                 // Link Alias value from the admin data
                 //
@@ -68,20 +63,21 @@ namespace Contensive.Addons.AdminSite {
                     // Table of old Link Aliases
                     //
                     Link = core.doc.main_GetPageDynamicLink(editRecord.id, false);
-                    csXfer.csOpen("Link Aliases", "pageid=" + editRecord.id, "ID Desc", true, 0, false, false, "name");
-                    while (csXfer.csOk()) {
-                        LinkList = LinkList + "<div style=\"margin-left:4px;margin-bottom:4px;\">" + HtmlController.encodeHtml(csXfer.csGetText(CS, "name")) + "</div>";
-                        LinkCnt = LinkCnt + 1;
-                        csXfer.csGoNext(CS);
+                    using (var csXfer = new CsModel(core)) {
+                        csXfer.csOpen("Link Aliases", "pageid=" + editRecord.id, "ID Desc", true, 0, "name");
+                        while (csXfer.csOk()) {
+                            LinkList = LinkList + "<div style=\"margin-left:4px;margin-bottom:4px;\">" + HtmlController.encodeHtml(csXfer.csGetText("name")) + "</div>";
+                            LinkCnt = LinkCnt + 1;
+                            csXfer.csGoNext();
+                        }
                     }
-                    csXfer.csClose();
                     if (LinkCnt > 0) {
                         f.Add("<tr><td class=\"ccAdminEditCaption\">" + SpanClassAdminSmall + "Previous Link Alias List</td>");
                         f.Add("<td class=\"ccAdminEditField\" align=\"left\" colspan=\"2\">" + SpanClassAdminNormal);
                         f.Add(LinkList);
                         f.Add("</span></td></tr>");
                     }
-                    tabContent = AdminUIController.editTable( f.Text );
+                    tabContent = AdminUIController.editTable(f.Text);
                 }
                 //
                 tempGetForm_Edit_LinkAliases = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), "Link Aliases", TabDescription, tabContent);

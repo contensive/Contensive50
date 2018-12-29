@@ -176,7 +176,7 @@ namespace Contensive.Processor.Models.Db {
                     cs.goNext();
                 } while (cs.ok());
             }
-            cs.csClose();
+            cs.close();
             return result;
         }
     }

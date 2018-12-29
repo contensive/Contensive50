@@ -1,19 +1,8 @@
 ﻿
 using System;
-using System.Reflection;
-using System.Xml;
-using System.Diagnostics;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
-using Contensive.Processor;
-using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.Constants;
-//
+
 namespace Contensive.Processor.Models.Domain {
     //
     //====================================================================================================
@@ -25,7 +14,7 @@ namespace Contensive.Processor.Models.Domain {
     /// that content. This model has the content 'name'
     /// </summary>
     [Serializable]
-    public class CDefFieldModel : ICloneable, IComparable {
+    public class MetaFieldModel : ICloneable, IComparable {
         //
         //====================================================================================================
         /// <summary>
@@ -430,7 +419,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="obj"></param>
         /// <returns></returns>
         public int CompareTo(object obj) {
-            Models.Domain.CDefFieldModel c = (Models.Domain.CDefFieldModel)obj;
+            Models.Domain.MetaFieldModel c = (Models.Domain.MetaFieldModel)obj;
             return string.Compare(this.nameLc.ToLowerInvariant(), c.nameLc.ToLowerInvariant());
         }
     }

@@ -277,7 +277,6 @@ namespace Contensive.Processor.Controllers {
                                                             //
                                                             string AddonContentName = Models.Db.AddonModel.contentName;
                                                             string SelectList = "Name,Link,ID,ArgumentList,ObjectProgramID,IconFilename,IconWidth,IconHeight,IconSprites,IsInline,ccGuid";
-                                                            string Criteria = "";
                                                             int IconWidth = 0;
                                                             int IconHeight = 0;
                                                             int IconSprites = 0;
@@ -286,56 +285,58 @@ namespace Contensive.Processor.Controllers {
                                                             bool AddonIsInline = false;
                                                             string SrcOptionList = "";
                                                             string IconFilename = "";
-                                                            if (!string.IsNullOrEmpty(ACGuid)) {
-                                                                Criteria = "ccguid=" + DbController.encodeSQLText(ACGuid);
-                                                            } else {
-                                                                Criteria = "name=" + DbController.encodeSQLText(ACName.ToUpper());
-                                                            }
-                                                            int csXfer.csOpen(AddonContentName, Criteria, "Name,ID", false, 0, false, false, SelectList);
-                                                            if (csXfer.csOk()) {
-                                                                IconFilename = csXfer.csGet(CS, "IconFilename");
-                                                                SrcOptionList = csXfer.csGet(CS, "ArgumentList");
-                                                                IconWidth = csXfer.csGetInteger(CS, "IconWidth");
-                                                                IconHeight = csXfer.csGetInteger(CS, "IconHeight");
-                                                                IconSprites = csXfer.csGetInteger(CS, "IconSprites");
-                                                                AddonIsInline = csXfer.csGetBoolean(CS, "IsInline");
-                                                                ACGuid = csXfer.csGetText(CS, "ccGuid");
-                                                                IconAlt = ACName;
-                                                                IconTitle = "Rendered as the Add-on [" + ACName + "]";
-                                                            } else {
-                                                                switch (GenericController.vbLCase(ACName)) {
-                                                                    case "block text":
-                                                                        IconFilename = "";
-                                                                        SrcOptionList = AddonOptionConstructor_ForBlockText;
-                                                                        IconWidth = 0;
-                                                                        IconHeight = 0;
-                                                                        IconSprites = 0;
-                                                                        AddonIsInline = true;
-                                                                        ACGuid = "";
-                                                                        break;
-                                                                    case "block text end":
-                                                                        IconFilename = "";
-                                                                        SrcOptionList = "";
-                                                                        IconWidth = 0;
-                                                                        IconHeight = 0;
-                                                                        IconSprites = 0;
-                                                                        AddonIsInline = true;
-                                                                        ACGuid = "";
-                                                                        break;
-                                                                    default:
-                                                                        IconFilename = "";
-                                                                        SrcOptionList = "";
-                                                                        IconWidth = 0;
-                                                                        IconHeight = 0;
-                                                                        IconSprites = 0;
-                                                                        AddonIsInline = false;
-                                                                        IconAlt = "Unknown Add-on [" + ACName + "]";
-                                                                        IconTitle = "Unknown Add-on [" + ACName + "]";
-                                                                        ACGuid = "";
-                                                                        break;
+                                                            using (var csXfer = new CsModel(core)) {
+                                                                string Criteria = "";
+                                                                if (!string.IsNullOrEmpty(ACGuid)) {
+                                                                    Criteria = "ccguid=" + DbController.encodeSQLText(ACGuid);
+                                                                } else {
+                                                                    Criteria = "name=" + DbController.encodeSQLText(ACName.ToUpper());
                                                                 }
+                                                                if (csXfer.csOpen(AddonContentName, Criteria, "Name,ID", false, 0, SelectList)) {
+                                                                    IconFilename = csXfer.csGet("IconFilename");
+                                                                    SrcOptionList = csXfer.csGet("ArgumentList");
+                                                                    IconWidth = csXfer.csGetInteger("IconWidth");
+                                                                    IconHeight = csXfer.csGetInteger("IconHeight");
+                                                                    IconSprites = csXfer.csGetInteger("IconSprites");
+                                                                    AddonIsInline = csXfer.csGetBoolean("IsInline");
+                                                                    ACGuid = csXfer.csGetText("ccGuid");
+                                                                    IconAlt = ACName;
+                                                                    IconTitle = "Rendered as the Add-on [" + ACName + "]";
+                                                                } else {
+                                                                    switch (GenericController.vbLCase(ACName)) {
+                                                                        case "block text":
+                                                                            IconFilename = "";
+                                                                            SrcOptionList = AddonOptionConstructor_ForBlockText;
+                                                                            IconWidth = 0;
+                                                                            IconHeight = 0;
+                                                                            IconSprites = 0;
+                                                                            AddonIsInline = true;
+                                                                            ACGuid = "";
+                                                                            break;
+                                                                        case "block text end":
+                                                                            IconFilename = "";
+                                                                            SrcOptionList = "";
+                                                                            IconWidth = 0;
+                                                                            IconHeight = 0;
+                                                                            IconSprites = 0;
+                                                                            AddonIsInline = true;
+                                                                            ACGuid = "";
+                                                                            break;
+                                                                        default:
+                                                                            IconFilename = "";
+                                                                            SrcOptionList = "";
+                                                                            IconWidth = 0;
+                                                                            IconHeight = 0;
+                                                                            IconSprites = 0;
+                                                                            AddonIsInline = false;
+                                                                            IconAlt = "Unknown Add-on [" + ACName + "]";
+                                                                            IconTitle = "Unknown Add-on [" + ACName + "]";
+                                                                            ACGuid = "";
+                                                                            break;
+                                                                    }
+                                                                }
+                                                                csXfer.close();
                                                             }
-                                                            csXfer.csClose();
                                                             //
                                                             // Build AddonOptionStringHTMLEncoded from SrcOptionList (for names), itself (for current settings), and SrcOptionList (for select options)
                                                             //

@@ -223,7 +223,7 @@ namespace Contensive.Processor.Models.Domain {
             CDefMiniCollectionModel result = null;
             try {
                 Models.Domain.MetaModel DefaultCDef = null;
-                Models.Domain.CDefFieldModel DefaultCDefField = null;
+                Models.Domain.MetaFieldModel DefaultCDefField = null;
                 string contentNameLc = null;
                 string Collectionname = null;
                 string ContentTableName = null;
@@ -387,7 +387,7 @@ namespace Contensive.Processor.Models.Domain {
                                             targetCdef.developerOnly = XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "DeveloperOnly", DefaultCDef.developerOnly);
                                             targetCdef.dropDownFieldList = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "DropDownFieldList", DefaultCDef.dropDownFieldList);
                                             targetCdef.editorGroupName = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "EditorGroupName", DefaultCDef.editorGroupName);
-                                            targetCdef.fields = new Dictionary<string, Models.Domain.CDefFieldModel>();
+                                            targetCdef.fields = new Dictionary<string, Models.Domain.MetaFieldModel>();
                                             targetCdef.iconLink = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "IconLink", DefaultCDef.iconLink);
                                             targetCdef.iconHeight = XmlController.GetXMLAttributeInteger(core, Found, CDef_NodeWithinLoop, "IconHeight", DefaultCDef.iconHeight);
                                             targetCdef.iconWidth = XmlController.GetXMLAttributeInteger(core, Found, CDef_NodeWithinLoop, "IconWidth", DefaultCDef.iconWidth);
@@ -417,11 +417,11 @@ namespace Contensive.Processor.Models.Domain {
                                                     if (DefaultCDef.fields.ContainsKey(FieldName)) {
                                                         DefaultCDefField = DefaultCDef.fields[FieldName];
                                                     } else {
-                                                        DefaultCDefField = new Models.Domain.CDefFieldModel();
+                                                        DefaultCDefField = new Models.Domain.MetaFieldModel();
                                                     }
                                                     //
                                                     if (!(result.cdef[ContentName.ToLowerInvariant()].fields.ContainsKey(FieldName.ToLowerInvariant()))) {
-                                                        result.cdef[ContentName.ToLowerInvariant()].fields.Add(FieldName.ToLowerInvariant(), new Models.Domain.CDefFieldModel());
+                                                        result.cdef[ContentName.ToLowerInvariant()].fields.Add(FieldName.ToLowerInvariant(), new Models.Domain.MetaFieldModel());
                                                     }
                                                     var cdefField = result.cdef[ContentName.ToLowerInvariant()].fields[FieldName.ToLowerInvariant()];
                                                     cdefField.nameLc = FieldName.ToLowerInvariant();
@@ -437,18 +437,9 @@ namespace Contensive.Processor.Models.Domain {
                                                     //
                                                     // Convert Field Descriptor (text) to field type (integer)
                                                     //
-                                                    string defaultFieldTypeName = core.db.getFieldTypeNameFromFieldTypeId(DefaultCDefField.fieldTypeId);
+                                                    string defaultFieldTypeName = MetaController.getFieldTypeNameFromFieldTypeId(core, DefaultCDefField.fieldTypeId);
                                                     string fieldTypeName = XmlController.GetXMLAttribute(core, Found, CDefChildNode, "FieldType", defaultFieldTypeName);
                                                     cdefField.fieldTypeId = core.db.getFieldTypeIdFromFieldTypeName(fieldTypeName);
-                                                    //FieldTypeDescriptor =xmlController.GetXMLAttribute(core,Found, CDefChildNode, "FieldType", DefaultCDefField.fieldType)
-                                                    //If genericController.vbIsNumeric(FieldTypeDescriptor) Then
-                                                    //    .fieldType = genericController.EncodeInteger(FieldTypeDescriptor)
-                                                    //Else
-                                                    //    .fieldType = core.app.csv_GetFieldTypeByDescriptor(FieldTypeDescriptor)
-                                                    //End If
-                                                    //If .fieldType = 0 Then
-                                                    //    .fieldType = FieldTypeText
-                                                    //End If
                                                     cdefField.editSortPriority = XmlController.GetXMLAttributeInteger(core, Found, CDefChildNode, "EditSortPriority", DefaultCDefField.editSortPriority);
                                                     cdefField.authorable = XmlController.GetXMLAttributeBoolean(core, Found, CDefChildNode, "Authorable", DefaultCDefField.authorable);
                                                     cdefField.caption = XmlController.GetXMLAttribute(core, Found, CDefChildNode, "Caption", DefaultCDefField.caption);
@@ -749,7 +740,7 @@ namespace Contensive.Processor.Models.Domain {
                                     core.db.createSQLTable(workingCdef.dataSourceName, TableName);
                                 }
                                 foreach (var fieldNvp in workingCdef.fields) {
-                                    CDefFieldModel field = fieldNvp.Value;
+                                    MetaFieldModel field = fieldNvp.Value;
                                     core.db.createSQLTableField(workingCdef.dataSourceName, TableName, field.nameLc, field.fieldTypeId);
                                 }
                             }
@@ -835,7 +826,7 @@ namespace Contensive.Processor.Models.Domain {
                     Models.Domain.MetaModel workingCdef = keypairvalue.Value;
                     //ContentName = workingCdef.name;
                     foreach (var fieldKeyValuePair in workingCdef.fields) {
-                        Models.Domain.CDefFieldModel workingField = fieldKeyValuePair.Value;
+                        Models.Domain.MetaFieldModel workingField = fieldKeyValuePair.Value;
                         //string FieldName = field.nameLc;
                         //var field2 = Collection.cdef[ContentName.ToLowerInvariant()].fields[((string)null).ToLowerInvariant()];
                         if (workingField.HelpChanged) {
@@ -1040,7 +1031,7 @@ namespace Contensive.Processor.Models.Domain {
                                 tempVar.isBaseContent = false;
                                 tempVar.dataChanged = true;
                                 foreach (var dstFieldKeyValuePair in tempVar.fields) {
-                                    Models.Domain.CDefFieldModel field = dstFieldKeyValuePair.Value;
+                                    Models.Domain.MetaFieldModel field = dstFieldKeyValuePair.Value;
                                     if (field.isBaseField) {
                                         field.isBaseField = false;
                                         //field.Changed = True
@@ -1156,7 +1147,7 @@ namespace Contensive.Processor.Models.Domain {
                     //
                     //Call AppendClassLogFile(core.app.config.name,"UpgradeCDef_AddSrcToDst", "CollectionSrc.CDef[SrcPtr].fields.count=" & CollectionSrc.CDef[SrcPtr].fields.count)
                     foreach (var srcFieldKeyValuePair in srcCdef.fields) {
-                        Models.Domain.CDefFieldModel srcCdefField = srcFieldKeyValuePair.Value;
+                        Models.Domain.MetaFieldModel srcCdefField = srcFieldKeyValuePair.Value;
                         SrcFieldName = srcCdefField.nameLc;
                         updateDst = false;
                         if (!dstCollection.cdef.ContainsKey(srcName.ToLowerInvariant())) {
@@ -1167,7 +1158,7 @@ namespace Contensive.Processor.Models.Domain {
                         } else {
                             dstCdef = dstCollection.cdef[srcName.ToLowerInvariant()];
                             bool HelpChanged = false;
-                            Models.Domain.CDefFieldModel dstCdefField = null;
+                            Models.Domain.MetaFieldModel dstCdefField = null;
                             if (dstCdef.fields.ContainsKey(SrcFieldName.ToLowerInvariant())) {
                                 //
                                 // Src field was found in Dst fields
@@ -1227,7 +1218,7 @@ namespace Contensive.Processor.Models.Domain {
                                 //
                                 // field was not found in dst, add it and populate
                                 //
-                                dstCdef.fields.Add(SrcFieldName.ToLowerInvariant(), new Models.Domain.CDefFieldModel());
+                                dstCdef.fields.Add(SrcFieldName.ToLowerInvariant(), new Models.Domain.MetaFieldModel());
                                 dstCdefField = dstCdef.fields[SrcFieldName.ToLowerInvariant()];
                                 updateDst = true;
                                 HelpChanged = true;
@@ -1582,7 +1573,7 @@ namespace Contensive.Processor.Models.Domain {
                     // -- update Content Field Records and Content Field Help records
                     MetaModel cdefFieldHelp = MetaModel.createByUniqueName(core, ContentFieldHelpModel.contentName);
                     foreach (var nameValuePair in cdef.fields) {
-                        CDefFieldModel field = nameValuePair.Value;
+                        MetaFieldModel field = nameValuePair.Value;
                         int fieldId = 0;
                         if (field.dataChanged) {
                             fieldId = MetaController.verifyContentField_returnId(core, cdef.name, field);

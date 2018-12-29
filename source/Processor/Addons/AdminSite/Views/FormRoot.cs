@@ -3,6 +3,8 @@ using System;
 using Contensive.Processor.Models.Db;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Constants;
+using Contensive.Processor.Models.Domain;
+using Contensive.Processor;
 
 namespace Contensive.Addons.AdminSite {
     public class FormRoot {
@@ -13,7 +15,6 @@ namespace Contensive.Addons.AdminSite {
         public static string GetForm_Root(CoreController core) {
             string returnHtml = "";
             try {
-                int CS = 0;
                 StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 int addonId = 0;
                 string AddonIDText = null;
@@ -23,12 +24,13 @@ namespace Contensive.Addons.AdminSite {
                 addonId = 0;
                 if (core.session.visit.id == core.docProperties.getInteger(RequestNameDashboardReset)) {
                     //$$$$$ cache this
-                    csXfer.csOpen(Processor.Models.Db.AddonModel.contentName, "ccguid=" + DbController.encodeSQLText(addonGuidDashboard));
-                    if (csXfer.csOk()) {
-                        addonId = csXfer.csGetInteger(CS, "id");
-                        core.siteProperties.setProperty("AdminRootAddonID", GenericController.encodeText(addonId));
+                    using (var csXfer = new CsModel(core)) {
+                        csXfer.csOpen(Processor.Models.Db.AddonModel.contentName, "ccguid=" + DbController.encodeSQLText(addonGuidDashboard));
+                        if (csXfer.csOk()) {
+                            addonId = csXfer.csGetInteger("id");
+                            core.siteProperties.setProperty("AdminRootAddonID", GenericController.encodeText(addonId));
+                        }
                     }
-                    csXfer.csClose();
                 }
                 if (addonId == 0) {
                     //

@@ -142,14 +142,14 @@ namespace Contensive.Processor.Controllers {
                             //
                             // Make sure there is one here for this
                             //
-
+                            int linkAliasId = 0;
                             using (var csXfer = new CsModel(core)) {
                                 csXfer.csOpen("Link Aliases", "name=" + DbController.encodeSQLText(WorkingLinkAlias), "", false, 0, "Name,PageID,QueryStringSuffix");
                                 if (!csXfer.csOk()) {
                                     //
                                     // Alias not found, create a Link Aliases
                                     //
-                                    csXfer.csClose();
+                                    csXfer.close();
                                     csXfer.csInsert("Link Aliases", 0);
                                     if (csXfer.csOk()) {
                                         csXfer.csSet("Name", WorkingLinkAlias);
@@ -177,10 +177,10 @@ namespace Contensive.Processor.Controllers {
                                             if (CS2.csOk()) {
                                                 resaveLinkAlias = (CurrentLinkAliasID != CS2.csGetInteger("id"));
                                             }
-                                            CS2.csClose();
+                                            CS2.close();
                                             if (resaveLinkAlias) {
                                                 core.db.executeQuery("delete from ccLinkAliases where id=" + CurrentLinkAliasID);
-                                                CS2.csClose();
+                                                CS2.close();
                                                 CS2.csInsert("Link Aliases", 0);
                                                 if (CS2.csOk()) {
                                                     CS2.csSet("Name", WorkingLinkAlias);
@@ -197,12 +197,8 @@ namespace Contensive.Processor.Controllers {
                                         if (OverRideDuplicate) {
                                             //
                                             // change the Link Alias to the new link
-                                            //
-                                            //Call app.csv_SetCS(CS, "Link", Link)
-                                            csXfer.csSet(csXfer, "Pageid", PageID);
-                                            if (true) {
-                                                csXfer.csSet(csXfer, "QueryStringSuffix", QueryStringSuffix);
-                                            }
+                                            csXfer.csSet("Pageid", PageID);
+                                            csXfer.csSet("QueryStringSuffix", QueryStringSuffix);
                                         } else if (AllowLinkAlias) {
                                             //
                                             // This alias points to a different link, and link aliasing is in use, call it an error (but save record anyway)
@@ -223,8 +219,8 @@ namespace Contensive.Processor.Controllers {
                                         }
                                     }
                                 }
-                                int linkAliasId = csXfer.csGetInteger(csXfer, "id");
-                                csXfer.csClose();
+                                linkAliasId = csXfer.csGetInteger("id");
+                                csXfer.close();
                             }
                             core.cache.invalidateDbRecord(linkAliasId, LinkAliasModel.contentTableName);
                             //

@@ -205,13 +205,13 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// field for this content
         /// </summary>
-        public Dictionary<string, Models.Domain.CDefFieldModel> fields { get; set; } = new Dictionary<string, Models.Domain.CDefFieldModel>();
+        public Dictionary<string, Models.Domain.MetaFieldModel> fields { get; set; } = new Dictionary<string, Models.Domain.MetaFieldModel>();
         //
         /// <summary>
         /// metadata for admin site editing columns
         /// !!!!! changed to string because dotnet json cannot serialize an integer key
         /// </summary>
-        public SortedList<string, CDefAdminColumnClass> adminColumns { get; set; } = new SortedList<string, CDefAdminColumnClass>();
+        public SortedList<string, MetaAdminColumnClass> adminColumns { get; set; } = new SortedList<string, MetaAdminColumnClass>();
         //
         /// <summary>
         /// consider deprection - string created from ParentIDs used to select records. If we eliminate parentId, then the whole table belongs to the content. This will speed queries and simplify concepts
@@ -253,7 +253,7 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         //
         [Serializable]
-        public class CDefAdminColumnClass {
+        public class MetaAdminColumnClass {
             public string Name;
             //Public FieldPointer As Integer
             public int Width;
@@ -328,9 +328,9 @@ namespace Contensive.Processor.Models.Domain {
                             //
                         } else {
                             result = new Models.Domain.MetaModel();
-                            result.fields = new Dictionary<string, Models.Domain.CDefFieldModel>();
+                            result.fields = new Dictionary<string, Models.Domain.MetaFieldModel>();
                             result.selectList = new List<string>();
-                            result.adminColumns = new SortedList<string, CDefAdminColumnClass>();
+                            result.adminColumns = new SortedList<string, MetaAdminColumnClass>();
                             //
                             // ----- save values in definition
                             //
@@ -369,9 +369,9 @@ namespace Contensive.Processor.Models.Domain {
                             } else {
                                 Models.Domain.MetaModel parentCdef = create(core, result.parentID, loadInvalidFields, forceDbLoad);
                                 foreach (var keyvaluepair in parentCdef.fields) {
-                                    Models.Domain.CDefFieldModel parentField = keyvaluepair.Value;
-                                    Models.Domain.CDefFieldModel childField = new Models.Domain.CDefFieldModel();
-                                    childField = (Models.Domain.CDefFieldModel)parentField.Clone();
+                                    Models.Domain.MetaFieldModel parentField = keyvaluepair.Value;
+                                    Models.Domain.MetaFieldModel childField = new Models.Domain.MetaFieldModel();
+                                    childField = (Models.Domain.MetaFieldModel)parentField.Clone();
                                     childField.inherited = true;
                                     result.fields.Add(childField.nameLc.ToLowerInvariant(), childField);
                                     if (!((parentField.fieldTypeId == fieldTypeIdManyToMany) || (parentField.fieldTypeId == fieldTypeIdRedirect))) {
@@ -486,7 +486,7 @@ namespace Contensive.Processor.Models.Domain {
                                                 //
                                                 result.fields.Remove(fieldNameLower);
                                             }
-                                            Models.Domain.CDefFieldModel field = new Models.Domain.CDefFieldModel();
+                                            Models.Domain.MetaFieldModel field = new Models.Domain.MetaFieldModel();
                                             int fieldIndexColumn = -1;
                                             int fieldTypeId = GenericController.encodeInteger(fieldRow[15]);
                                             if (GenericController.encodeText(fieldRow[4]) != "") {
@@ -694,14 +694,14 @@ namespace Contensive.Processor.Models.Domain {
                 if (cdef.id > 0) {
                     int cnt = 0;
                     int FieldWidthTotal = 0;
-                    CDefAdminColumnClass adminColumn = null;
-                    foreach (KeyValuePair<string, Models.Domain.CDefFieldModel> keyValuePair in cdef.fields) {
-                        CDefFieldModel field = keyValuePair.Value;
+                    MetaAdminColumnClass adminColumn = null;
+                    foreach (KeyValuePair<string, Models.Domain.MetaFieldModel> keyValuePair in cdef.fields) {
+                        MetaFieldModel field = keyValuePair.Value;
                         bool FieldActive = field.active;
                         int FieldWidth = GenericController.encodeInteger(field.indexWidth);
                         if (FieldActive && (FieldWidth > 0)) {
                             FieldWidthTotal = FieldWidthTotal + FieldWidth;
-                            adminColumn = new CDefAdminColumnClass();
+                            adminColumn = new MetaAdminColumnClass();
                             adminColumn.Name = field.nameLc;
                             adminColumn.SortDirection = field.indexSortDirection;
                             adminColumn.SortPriority = GenericController.encodeInteger(field.indexSortOrder);
@@ -720,7 +720,7 @@ namespace Contensive.Processor.Models.Domain {
                             // Force the Name field as the only column
                             //
                             if (cdef.fields.ContainsKey("name")) {
-                                adminColumn = new CDefAdminColumnClass();
+                                adminColumn = new MetaAdminColumnClass();
                                 adminColumn.Name = "Name";
                                 adminColumn.SortDirection = 1;
                                 adminColumn.SortPriority = 1;
@@ -816,6 +816,20 @@ namespace Contensive.Processor.Models.Domain {
                 LogController.handleError(core, ex);
                 throw;
             }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// return the meta field object specified in the fieldname. If it does not exist, return null
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="meta"></param>
+        /// <param name="fieldName"></param>
+        /// <returns></returns>
+        public static MetaFieldModel getField( CoreController core, MetaModel meta, string fieldName  ) {
+            if (meta == null) return null;
+            if (!meta.fields.ContainsKey(fieldName.ToLower())) return null;
+            return meta.fields[fieldName.ToLower()];
         }
         //
         //====================================================================================================

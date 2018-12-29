@@ -63,7 +63,16 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
+        [Obsolete("deprecated, instead create contentMeta, lookup field and use property of field", true)]
         public override string GetFieldProperty(string contentName, string fieldName, string propertyName) {
+            // todo expose meta and fieldmeta
+            //var meta = Contensive.Processor.Models.Domain.MetaModel.createByUniqueName(cp.core, contentName);
+            //if ( meta != null ) {
+            //    var fieldMeta = Contensive.Processor.Models.Domain.MetaModel.getField(cp.core, fieldName);
+            //    if ( fieldMeta != null ) {
+            //        return fieldMeta.
+            //    }
+            //}
             return MetaController.getContentFieldProperty(cp.core, contentName, fieldName, propertyName);
         }
         //
@@ -108,7 +117,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override int GetRecordID(string contentName, string recordName) {
-            return cp.MetaController.getRecordId( core,contentName, recordName);
+            return MetaController.getRecordId( cp.core,contentName, recordName);
         }
         //
         //====================================================================================================
@@ -119,7 +128,7 @@ namespace Contensive.Processor {
         /// <param name="recordID"></param>
         /// <returns></returns>
         public override string GetRecordName(string contentName, int recordID) {
-            return MetaController.getRecordName( core,contentName, recordID);
+            return MetaController.getRecordName( cp.core,contentName, recordID);
         }
         //
         //====================================================================================================
@@ -153,12 +162,12 @@ namespace Contensive.Processor {
         public override string getLayout(string layoutName) {
             string result = "";
             try {
-                CsModel cs = new CsModel(cp.core);
-                cs.csOpen("layouts", "name=" + DbController.encodeSQLText(layoutName), "id", false, "layout");
-                if (cs.ok()) {
-                    result = cs.getText("layout");
+                using (var cs = new CsModel(cp.core)) {
+                    cs.csOpen("layouts", "name=" + DbController.encodeSQLText(layoutName), "id", false, cp.core.session.user.id, "layout");
+                    if (cs.ok()) {
+                        result = cs.getText("layout");
+                    }
                 }
-                cs.csClose();
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -172,11 +181,11 @@ namespace Contensive.Processor {
             int recordId = 0;
             try {
                 CsModel cs = new CsModel(cp.core);
-                if (cs.csInsert(contentName)) {
+                if (cs.insert(contentName)) {
                     cs.setField("name", recordName);
                     recordId = cs.getInteger("id");
                 }
-                cs.csClose();
+                cs.close();
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -190,10 +199,10 @@ namespace Contensive.Processor {
             int result = 0;
             try {
                 CsModel cs = new CsModel(cp.core);
-                if (cs.csInsert(contentName)) {
+                if (cs.insert(contentName)) {
                     result = cs.getInteger("id");
                 }
-                cs.csClose();
+                cs.close();
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -216,7 +225,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override int AddContentField(string contentName, string fieldName, int fieldType) {
-            Models.Domain.CDefFieldModel field = new Models.Domain.CDefFieldModel();
+            Models.Domain.MetaFieldModel field = new Models.Domain.MetaFieldModel();
             field.active = true;
             field.adminOnly = false;
             field.authorable = true;

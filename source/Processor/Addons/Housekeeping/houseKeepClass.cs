@@ -106,7 +106,7 @@ namespace Contensive.Addons.Housekeeping {
                         if (csXfer.csOk()) {
                             DefaultMemberName = csXfer.csGetText("defaultvalue");
                         }
-                        csXfer.csClose();
+                        csXfer.close();
                     }
                     //
                     // Get ArchiveAgeDays - use this as the oldest data they care about
@@ -164,7 +164,7 @@ namespace Contensive.Addons.Housekeeping {
                                     }
                                     csXfer.csGoNext();
                                 }
-                                csXfer.csClose();
+                                csXfer.close();
                             }
                             //
                             // Clear caches
@@ -219,7 +219,7 @@ namespace Contensive.Addons.Housekeeping {
                                     }
                                     datePtr = datePtr.AddDays(1).Date;
                                 }
-                                csXfer.csClose();
+                                csXfer.close();
                             }
                         }
                         //
@@ -256,7 +256,7 @@ namespace Contensive.Addons.Housekeeping {
                                 if (!csXfer.csOpenSql(core.db.getSQLSelect("default", "ccviewingsummary", "DateNumber", "TimeDuration=24 and DateNumber>=" + OldestVisitSummaryWeCareAbout.Date.ToOADate(), "DateNumber Desc", "", 1))) {
                                     datePtr = OldestVisitSummaryWeCareAbout;
                                 } else {
-                                    datePtr = DateTime.MinValue.AddDays(csXfer.csGetInteger(CS, "DateNumber"));
+                                    datePtr = DateTime.MinValue.AddDays(csXfer.csGetInteger("DateNumber"));
                                 }
                             }
                             if (datePtr < OldestVisitSummaryWeCareAbout) { datePtr = OldestVisitSummaryWeCareAbout; }
@@ -317,7 +317,7 @@ namespace Contensive.Addons.Housekeeping {
                                 if (csXfer.csOpenSql("select count(id) as HoursPerDay from ccVisitSummary where TimeDuration=1 and DateNumber=" + encodeInteger(PeriodDatePtr) + " group by DateNumber")) {
                                     HoursPerDay = csXfer.csGetInteger("HoursPerDay");
                                 }
-                                csXfer.csClose();
+                                csXfer.close();
                                 if (HoursPerDay < 24) {
                                     DateofMissingSummary = DateTime.FromOADate(PeriodDatePtr);
                                     break;
@@ -374,7 +374,8 @@ namespace Contensive.Addons.Housekeeping {
                             }
                         }
                     }
-                } catch (Exception) {
+                }
+            } catch (Exception) {
                 throw;
             }
         }
@@ -1262,7 +1263,6 @@ namespace Contensive.Addons.Housekeeping {
                 double AveTimeOnSite = 0;
                 int HitCnt = 0;
                 int VisitCnt = 0;
-                int CS = 0;
                 XmlDocument LibraryCollections = new XmlDocument();
                 XmlDocument LocalCollections = new XmlDocument();
                 XmlDocument Doc = new XmlDocument();
@@ -1449,7 +1449,7 @@ namespace Contensive.Addons.Housekeeping {
                         using (var csXfer = new CsModel(core)) {
                             csXfer.csOpen("Visit Summary", "(timeduration=" + HourDuration + ")and(DateNumber=" + DateNumber + ")and(TimeNumber=" + TimeNumber + ")");
                             if (!csXfer.csOk()) {
-                                csXfer.csClose();
+                                csXfer.close();
                                 csXfer.csInsert("Visit Summary", 0);
                             }
                             //
@@ -1616,8 +1616,8 @@ namespace Contensive.Addons.Housekeeping {
                                 // no hits found - add or update a single record for this day so we know it has been calculated
                                 csPages.csOpen("Page View Summary", "(timeduration=" + HourDuration + ")and(DateNumber=" + DateNumber + ")and(TimeNumber=" + TimeNumber + ")and(pageid=" + PageID + ")and(pagetitle=" + DbController.encodeSQLText(PageTitle) + ")");
                                 if (!csPages.csOk()) {
-                                    csPages.csClose();
-                                    csPages.csInsert("Page View Summary");
+                                    csPages.close();
+                                    csPages.insert("Page View Summary");
                                 }
                                 //
                                 if (csPages.csOk()) {
@@ -1635,7 +1635,7 @@ namespace Contensive.Addons.Housekeeping {
                                         csPages.csSet("BotPageViews", BotPageViews);
                                     }
                                 }
-                                csPages.csClose();
+                                csPages.close();
                                 hint = 4;
                             } else {
                                 hint = 5;
@@ -1720,7 +1720,7 @@ namespace Contensive.Addons.Housekeeping {
                                             + "";
                                         csBotVisits.csOpenSql(sql);
                                         if (csBotVisits.csOk()) {
-                                            BotPageViews = csBotVisits.csGetInteger(CS, "cnt");
+                                            BotPageViews = csBotVisits.csGetInteger("cnt");
                                         }
                                     }
                                     //
@@ -1728,7 +1728,7 @@ namespace Contensive.Addons.Housekeeping {
                                     //
                                     using (var csPVS = new CsModel(core)) {
                                         if (!csPVS.csOpen("Page View Summary", "(timeduration=" + HourDuration + ")and(DateNumber=" + DateNumber + ")and(TimeNumber=" + TimeNumber + ")and(pageid=" + PageID + ")and(pagetitle=" + DbController.encodeSQLText(PageTitle) + ")")) {
-                                            csPVS.csInsert("Page View Summary");
+                                            csPVS.insert("Page View Summary");
                                         }
                                         //
                                         if (csPVS.csOk()) {

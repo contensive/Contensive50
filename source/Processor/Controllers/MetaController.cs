@@ -360,12 +360,12 @@ namespace Contensive.Processor.Controllers {
                 //
                 // Verify Core Content Definition Fields
                 if (parentId < 1) {
-                    CDefFieldModel field = null;
+                    MetaFieldModel field = null;
                     //
                     // CDef does not inherit its fields, create what is needed for a non-inherited CDef
                     //
                     if (!MetaController.isCdefField(core, returnContentId, "ID")) {
-                        field = new Models.Domain.CDefFieldModel {
+                        field = new Models.Domain.MetaFieldModel {
                             nameLc = "id",
                             active = true,
                             fieldTypeId = fieldTypeIdAutoIdIncrement,
@@ -379,7 +379,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     //
                     if (!MetaController.isCdefField(core, returnContentId, "name")) {
-                        field = new Models.Domain.CDefFieldModel {
+                        field = new Models.Domain.MetaFieldModel {
                             nameLc = "name",
                             active = true,
                             fieldTypeId = fieldTypeIdText,
@@ -393,7 +393,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     //
                     if (!MetaController.isCdefField(core, returnContentId, "active")) {
-                        field = new Models.Domain.CDefFieldModel {
+                        field = new Models.Domain.MetaFieldModel {
                             nameLc = "active",
                             active = true,
                             fieldTypeId = fieldTypeIdBoolean,
@@ -407,7 +407,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     //
                     if (!MetaController.isCdefField(core, returnContentId, "sortorder")) {
-                        field = new Models.Domain.CDefFieldModel {
+                        field = new Models.Domain.MetaFieldModel {
                             nameLc = "sortorder",
                             active = true,
                             fieldTypeId = fieldTypeIdText,
@@ -421,7 +421,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     //
                     if (!MetaController.isCdefField(core, returnContentId, "dateadded")) {
-                        field = new Models.Domain.CDefFieldModel {
+                        field = new Models.Domain.MetaFieldModel {
                             nameLc = "dateadded",
                             active = true,
                             fieldTypeId = fieldTypeIdDate,
@@ -434,7 +434,7 @@ namespace Contensive.Processor.Controllers {
                         verifyContentField_returnId(core, cdef.name, field);
                     }
                     if (!MetaController.isCdefField(core, returnContentId, "createdby")) {
-                        field = new Models.Domain.CDefFieldModel {
+                        field = new Models.Domain.MetaFieldModel {
                             nameLc = "createdby",
                             active = true,
                             fieldTypeId = fieldTypeIdLookup,
@@ -448,7 +448,7 @@ namespace Contensive.Processor.Controllers {
                         verifyContentField_returnId(core, cdef.name, field);
                     }
                     if (!MetaController.isCdefField(core, returnContentId, "modifieddate")) {
-                        field = new Models.Domain.CDefFieldModel {
+                        field = new Models.Domain.MetaFieldModel {
                             nameLc = "modifieddate",
                             active = true,
                             fieldTypeId = fieldTypeIdDate,
@@ -461,7 +461,7 @@ namespace Contensive.Processor.Controllers {
                         verifyContentField_returnId(core, cdef.name, field);
                     }
                     if (!MetaController.isCdefField(core, returnContentId, "modifiedby")) {
-                        field = new Models.Domain.CDefFieldModel {
+                        field = new Models.Domain.MetaFieldModel {
                             nameLc = "modifiedby",
                             active = true,
                             fieldTypeId = fieldTypeIdLookup,
@@ -475,7 +475,7 @@ namespace Contensive.Processor.Controllers {
                         verifyContentField_returnId(core, cdef.name, field);
                     }
                     if (!MetaController.isCdefField(core, returnContentId, "ContentControlId")) {
-                        field = new Models.Domain.CDefFieldModel {
+                        field = new Models.Domain.MetaFieldModel {
                             nameLc = "contentcontrolid",
                             active = true,
                             fieldTypeId = fieldTypeIdLookup,
@@ -489,7 +489,7 @@ namespace Contensive.Processor.Controllers {
                         verifyContentField_returnId(core, cdef.name, field);
                     }
                     if (!MetaController.isCdefField(core, returnContentId, "CreateKey")) {
-                        field = new Models.Domain.CDefFieldModel {
+                        field = new Models.Domain.MetaFieldModel {
                             nameLc = "createkey",
                             active = true,
                             fieldTypeId = fieldTypeIdInteger,
@@ -502,7 +502,7 @@ namespace Contensive.Processor.Controllers {
                         verifyContentField_returnId(core, cdef.name, field);
                     }
                     if (!MetaController.isCdefField(core, returnContentId, "ccGuid")) {
-                        field = new Models.Domain.CDefFieldModel {
+                        field = new Models.Domain.MetaFieldModel {
                             nameLc = "ccguid",
                             active = true,
                             fieldTypeId = fieldTypeIdText,
@@ -516,7 +516,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     // -- 20171029 - had to un-deprecate because compatibility issues are too timeconsuming
                     if (!MetaController.isCdefField(core, returnContentId, "ContentCategoryId")) {
-                        field = new Models.Domain.CDefFieldModel {
+                        field = new Models.Domain.MetaFieldModel {
                             nameLc = "contentcategoryid",
                             active = true,
                             fieldTypeId = fieldTypeIdInteger,
@@ -551,7 +551,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="field"></param>
         /// <param name="blockCacheClear"></param>
         /// <returns></returns>
-        public static int verifyContentField_returnId(CoreController core, string ContentName, Models.Domain.CDefFieldModel field, bool blockCacheClear = false) {
+        public static int verifyContentField_returnId(CoreController core, string ContentName, Models.Domain.MetaFieldModel field, bool blockCacheClear = false) {
             int returnId = 0;
             try {
                 var content = ContentModel.createByUniqueName(core, ContentName);
@@ -758,7 +758,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public static int getContentIDByTablename(CoreController core, string tableName) {
+        public static int getContentIdByTablename(CoreController core, string tableName) {
             if (string.IsNullOrWhiteSpace(tableName)) { return 0; }
             using (var dt = core.db.executeQuery("select top 1 ContentControlID from " + tableName + " where (contentcontrolid is not null) order by contentcontrolid;")) {
                 if (dt != null) { return DbController.getDataRowFieldInteger(dt.Rows[0], "contentcontrolid"); }
@@ -807,8 +807,6 @@ namespace Contensive.Processor.Controllers {
                 }
             }
         }
-        //
-        // ====================================================================================================
         //
         [Obsolete("deprecated, instead create contentMeta, lookup field and use property of field",true)]
         public static string getContentFieldProperty(CoreController core, string ContentName, string FieldName, string PropertyName) {
@@ -1366,7 +1364,7 @@ namespace Contensive.Processor.Controllers {
         public static void createContentFieldFromTableField(CoreController core,  string ContentName, string FieldName, int ADOFieldType) {
             try {
                 //
-                CDefFieldModel field = new CDefFieldModel {
+                MetaFieldModel field = new MetaFieldModel {
                     fieldTypeId = core.db.getFieldTypeIdByADOType(ADOFieldType),
                     caption = FieldName,
                     editSortPriority = 1000,

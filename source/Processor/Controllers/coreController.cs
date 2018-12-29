@@ -1001,15 +1001,15 @@ namespace Contensive.Processor.Controllers {
                 //        //
                 //        // Use user definied query
                 //        //
-                //        string SQLQuery = db.csGetText(CS, "sqlquery");
+                //        string SQLQuery = db.csGetText("sqlquery");
                 //        //DataSource = dataSourceModel.create(Me, db.cs_getInteger(CS, "datasourceid"), New List(Of String))
-                //        maxRows = db.csGetInteger(CS, "maxrows");
-                //        QueryType = db.csGetInteger(CS, "QueryTypeID");
-                //        ContentName = db.csGet(CS, "ContentID");
-                //        Criteria = db.csGetText(CS, "Criteria");
-                //        SortFieldList = db.csGetText(CS, "SortFieldList");
-                //        AllowInactiveRecords2 = db.csGetBoolean(CS, "AllowInactiveRecords");
-                //        SelectFieldList = db.csGetText(CS, "SelectFieldList");
+                //        maxRows = db.csGetInteger("maxrows");
+                //        QueryType = db.csGetInteger("QueryTypeID");
+                //        ContentName = db.csGet("ContentID");
+                //        Criteria = db.csGetText("Criteria");
+                //        SortFieldList = db.csGetText("SortFieldList");
+                //        AllowInactiveRecords2 = db.csGetBoolean("AllowInactiveRecords");
+                //        SelectFieldList = db.csGetText("SelectFieldList");
                 //    } else {
                 //        //
                 //        // Try Hardcoded queries
@@ -1088,7 +1088,7 @@ namespace Contensive.Processor.Controllers {
                 //                                    string errorMessage = "result, QueryTypeUpdateContent, key [" + RemoteKey + "], bad field [" + FieldName + "] skipped";
                 //                                    throw (new GenericException(errorMessage));
                 //                                } else {
-                //                                    db.csSet(CS, FieldName, FieldValue);
+                //                                    db.csSet(FieldName, FieldValue);
                 //                                }
                 //                            }
                 //                        }
@@ -1214,7 +1214,6 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- invalidate the specific cache for this record
                 cache.invalidateDbRecord(RecordID, TableName);
-                int CS = 0;
                 int ActivityLogOrganizationID = 0;
                 //
                 switch (GenericController.vbLCase(TableName)) {
@@ -1237,11 +1236,12 @@ namespace Contensive.Processor.Controllers {
                         break;
                     case PersonModel.contentTableName:
                         //
-                        CS = db.csOpen2("people", RecordID, false, false, "Name,OrganizationID");
-                        if (db.csOk()) {
-                            ActivityLogOrganizationID = db.csGetInteger(CS, "OrganizationID");
+                        using (var csXfer = new CsModel(this)) {
+                            csXfer.csOpenRecord("people", RecordID, "Name,OrganizationID");
+                            if (csXfer.csOk()) {
+                                ActivityLogOrganizationID = csXfer.csGetInteger("OrganizationID");
+                            }
                         }
-                        db.csClose();
                         if (IsDelete) {
                             LogController.addSiteActivity(this, "deleting user #" + RecordID + " (" + RecordName + ")", RecordID, ActivityLogOrganizationID);
                         } else {
@@ -1311,18 +1311,17 @@ namespace Contensive.Processor.Controllers {
                         // if a AltSizeList is blank, make large,medium,small and thumbnails
                         //
                         //hint = hint & ",180"
-                        if (siteProperties.getBoolean("ImageAllowSFResize", true)) {
-                            if (!IsDelete) {
-                                CS = db.csOpenRecord("library files", RecordID);
-                                if (db.csOk()) {
-                                    string Filename = db.csGet(CS, "filename");
+                        if (siteProperties.getBoolean("ImageAllowSFResize", true) && (!IsDelete)) {
+                            using (var csXfer = new CsModel(this)) {
+                                if (csXfer.csOpenRecord("library files", RecordID)) {
+                                    string Filename = csXfer.csGet("filename");
                                     int Pos = Filename.LastIndexOf("/") + 1;
                                     string FilePath = "";
                                     if (Pos > 0) {
                                         FilePath = Filename.Left(Pos);
                                         Filename = Filename.Substring(Pos);
                                     }
-                                    db.csSet(CS, "filesize", appRootFiles.getFileSize(FilePath + Filename));
+                                    csXfer.csSet("filesize", appRootFiles.getFileSize(FilePath + Filename));
                                     Pos = Filename.LastIndexOf(".") + 1;
                                     if (Pos > 0) {
                                         string FilenameExt = Filename.Substring(Pos);
@@ -1333,9 +1332,9 @@ namespace Contensive.Processor.Controllers {
                                                 //
                                                 //
                                                 //
-                                                db.csSet(CS, "height", sf.height);
-                                                db.csSet(CS, "width", sf.width);
-                                                string AltSizeList = db.csGetText(CS, "AltSizeList");
+                                                csXfer.csSet("height", sf.height);
+                                                csXfer.csSet("width", sf.width);
+                                                string AltSizeList = csXfer.csGetText("AltSizeList");
                                                 bool RebuildSizes = (string.IsNullOrEmpty(AltSizeList));
                                                 if (RebuildSizes) {
                                                     AltSizeList = "";
@@ -1376,67 +1375,14 @@ namespace Contensive.Processor.Controllers {
                                                         sf.save(FilePath + FilenameNoExt + "-180x" + sf.height + "." + FilenameExt, appRootFiles);
                                                         AltSizeList = AltSizeList + "\r\n80x" + sf.height;
                                                     }
-                                                    db.csSet(CS, "AltSizeList", AltSizeList);
+                                                    csXfer.csSet("AltSizeList", AltSizeList);
                                                 }
                                                 sf.Dispose();
                                                 sf = null;
                                             }
-                                            //                                sf.Algorithm = genericController.EncodeInteger(main_GetSiteProperty("ImageResizeSFAlgorithm", "5"))
-                                            //                                //On Error //Resume Next
-                                            //                                sf.LoadFromFile (app.publicFiles.rootFullPath & FilePath & Filename)
-                                            //                                If Err.Number = 0 Then
-                                            //                                    Call app.SetCS(CS, "height", sf.Height)
-                                            //                                    Call app.SetCS(CS, "width", sf.Width)
-                                            //                                Else
-                                            //                                    Err.Clear
-                                            //                                End If
-                                            //                                AltSizeList = cs_getText(CS, "AltSizeList")
-                                            //                                RebuildSizes = (AltSizeList = "")
-                                            //                                If RebuildSizes Then
-                                            //                                    AltSizeList = ""
-                                            //                                    '
-                                            //                                    ' Attempt to make 640x
-                                            //                                    '
-                                            //                                    If sf.Width >= 640 Then
-                                            //                                        sf.Width = 640
-                                            //                                        Call sf.DoResize
-                                            //                                        Call sf.SaveToFile(app.publicFiles.rootFullPath & FilePath & FilenameNoExt & "-640x" & sf.Height & "." & FilenameExt)
-                                            //                                        AltSizeList = AltSizeList & vbCrLf & "640x" & sf.Height
-                                            //                                    End If
-                                            //                                    '
-                                            //                                    ' Attempt to make 320x
-                                            //                                    '
-                                            //                                    If sf.Width >= 320 Then
-                                            //                                        sf.Width = 320
-                                            //                                        Call sf.DoResize
-                                            //                                        Call sf.SaveToFile(app.publicFiles.rootFullPath & FilePath & FilenameNoExt & "-320x" & sf.Height & "." & FilenameExt)
-                                            //                                        AltSizeList = AltSizeList & vbCrLf & "320x" & sf.Height
-                                            //                                    End If
-                                            //                                    '
-                                            //                                    ' Attempt to make 160x
-                                            //                                    '
-                                            //                                    If sf.Width >= 160 Then
-                                            //                                        sf.Width = 160
-                                            //                                        Call sf.DoResize
-                                            //                                        Call sf.SaveToFile(app.publicFiles.rootFullPath & FilePath & FilenameNoExt & "-160x" & sf.Height & "." & FilenameExt)
-                                            //                                        AltSizeList = AltSizeList & vbCrLf & "160x" & sf.Height
-                                            //                                    End If
-                                            //                                    '
-                                            //                                    ' Attempt to make 80x
-                                            //                                    '
-                                            //                                    If sf.Width >= 80 Then
-                                            //                                        sf.Width = 80
-                                            //                                        Call sf.DoResize
-                                            //                                        Call sf.SaveToFile(app.publicFiles.rootFullPath & FilePath & FilenameNoExt & "-80x" & sf.Height & "." & FilenameExt)
-                                            //                                        AltSizeList = AltSizeList & vbCrLf & "80x" & sf.Height
-                                            //                                    End If
-                                            //                                    Call app.SetCS(CS, "AltSizeList", AltSizeList)
-                                            //                                End If
-                                            //                                sf = Nothing
                                         }
                                     }
                                 }
-                                db.csClose();
                             }
                         }
                         break;
@@ -1448,51 +1394,50 @@ namespace Contensive.Processor.Controllers {
                 //
                 Dictionary<string, string> instanceArguments;
                 bool onChangeAddonsAsync = siteProperties.getBoolean("execute oncontentchange addons async", false);
-                CS = db.csOpen("Add-on Content Trigger Rules", "ContentID=" + ContentID, "", false, 0, false, false, "addonid");
-                string Option_String = null;
-                if (IsDelete) {
-                    instanceArguments = new Dictionary<string, string>() {
-                    {"action","contentdelete"},
-                    {"contentid",ContentID.ToString()},
-                    {"recordid",RecordID.ToString()}
-                };
-                    Option_String = ""
-                        + "\r\naction=contentdelete"
-                        + "\r\ncontentid=" + ContentID
-                        + "\r\nrecordid=" + RecordID + "";
-                } else {
-                    instanceArguments = new Dictionary<string, string>() {
-                    {"action","contentchange"},
-                    {"contentid",ContentID.ToString()},
-                    {"recordid",RecordID.ToString()}
-                };
-                    Option_String = ""
-                        + "\r\naction=contentchange"
-                        + "\r\ncontentid=" + ContentID
-                        + "\r\nrecordid=" + RecordID + "";
-                }
-                while (db.csOk()) {
-                    int addonId = db.csGetInteger(CS, "Addonid");
-                    //hint = hint & ",210 addonid=[" & addonId & "]"
-                    // convert for forground execution for now
-                    if (onChangeAddonsAsync) {
-                        //
-                        // -- execute addon async
-                        addon.executeAsync(AddonModel.create(this, addonId), instanceArguments);
+                using (var csXfer = new CsModel(this)) {
+                    csXfer.csOpen("Add-on Content Trigger Rules", "ContentID=" + ContentID, "", false, 0, "addonid");
+                    string Option_String = null;
+                    if (IsDelete) {
+                        instanceArguments = new Dictionary<string, string>() {
+                            {"action","contentdelete"},
+                            {"contentid",ContentID.ToString()},
+                            {"recordid",RecordID.ToString()}
+                        };
+                        Option_String = ""
+                            + "\r\naction=contentdelete"
+                            + "\r\ncontentid=" + ContentID
+                            + "\r\nrecordid=" + RecordID + "";
                     } else {
-                        //
-                        // -- execute addon
-                        addon.execute(addonId, new CPUtilsBaseClass.addonExecuteContext() {
-                            addonType = CPUtilsBaseClass.addonContext.ContextOnContentChange,
-                            backgroundProcess = false,
-                            errorContextMessage = "",
-                            argumentKeyValuePairs = instanceArguments,
-                            personalizationPeopleId = session.user.id
-                        });
+                        instanceArguments = new Dictionary<string, string>() {
+                            {"action","contentchange"},
+                            {"contentid",ContentID.ToString()},
+                            {"recordid",RecordID.ToString()}
+                        };
+                        Option_String = ""
+                            + "\r\naction=contentchange"
+                            + "\r\ncontentid=" + ContentID
+                            + "\r\nrecordid=" + RecordID + "";
                     }
-                    db.csGoNext(CS);
+                    while (csXfer.csOk()) {
+                        int addonId = csXfer.csGetInteger("Addonid");
+                        if (onChangeAddonsAsync) {
+                            //
+                            // -- execute addon async
+                            addon.executeAsync(AddonModel.create(this, addonId), instanceArguments);
+                        } else {
+                            //
+                            // -- execute addon
+                            addon.execute(addonId, new CPUtilsBaseClass.addonExecuteContext() {
+                                addonType = CPUtilsBaseClass.addonContext.ContextOnContentChange,
+                                backgroundProcess = false,
+                                errorContextMessage = "",
+                                argumentKeyValuePairs = instanceArguments,
+                                personalizationPeopleId = session.user.id
+                            });
+                        }
+                        csXfer.csGoNext();
+                    }
                 }
-                db.csClose();
             } catch (Exception ex) {
                 LogController.handleError(this, ex);
             }

@@ -91,31 +91,31 @@ namespace Contensive.Addons.Email {
                                     csDrop.csSet("Name", "Drop " + EmailDropID + " - Scheduled for " + ScheduleDate.ToString("") + " " + ScheduleDate.ToString(""));
                                     csDrop.csSet("EmailID", emailID);
                                 }
-                                csDrop.csClose();
+                                csDrop.close();
                             }
-                            //
-                            // Select all people in the groups for this email
-                            string SQL = "select Distinct ccMembers.ID as MemberID,ccMembers.email"
-                                + " From ((((ccemail"
-                                + " left join ccEmailGroups on ccEmailGroups.EmailID=ccEmail.ID)"
-                                + " left join ccGroups on ccGroups.ID = ccEmailGroups.GroupID)"
-                                + " left join ccMemberRules on ccGroups.ID = ccMemberRules.GroupID)"
-                                + " left join ccMembers on ccMembers.ID = ccMemberRules.MemberID)"
-                                + " Where (ccEmail.ID=" + emailID + ")"
-                                + " and (ccGroups.active<>0)"
-                                + " and (ccGroups.AllowBulkEmail<>0)"
-                                + " and (ccMembers.active<>0)"
-                                + " and (ccMembers.AllowBulkEmail<>0)"
-                                + " and (ccMembers.email<>'')"
-                                + " and ((ccMemberRules.DateExpires is null)or(ccMemberRules.DateExpires>" + SQLDateNow + "))"
-                                + " order by ccMembers.email,ccMembers.id";
+                            string EmailStatusList = "";
                             using (var csPerson = new CsModel(core)) {
+                                //
+                                // Select all people in the groups for this email
+                                string SQL = "select Distinct ccMembers.ID as MemberID,ccMembers.email"
+                                    + " From ((((ccemail"
+                                    + " left join ccEmailGroups on ccEmailGroups.EmailID=ccEmail.ID)"
+                                    + " left join ccGroups on ccGroups.ID = ccEmailGroups.GroupID)"
+                                    + " left join ccMemberRules on ccGroups.ID = ccMemberRules.GroupID)"
+                                    + " left join ccMembers on ccMembers.ID = ccMemberRules.MemberID)"
+                                    + " Where (ccEmail.ID=" + emailID + ")"
+                                    + " and (ccGroups.active<>0)"
+                                    + " and (ccGroups.AllowBulkEmail<>0)"
+                                    + " and (ccMembers.active<>0)"
+                                    + " and (ccMembers.AllowBulkEmail<>0)"
+                                    + " and (ccMembers.email<>'')"
+                                    + " and ((ccMemberRules.DateExpires is null)or(ccMemberRules.DateExpires>" + SQLDateNow + "))"
+                                    + " order by ccMembers.email,ccMembers.id";
                                 csPerson.csOpenSql(SQL, "Default");
                                 //
                                 // Send the email to all selected people
                                 //
                                 string LastEmail = null;
-                                string EmailStatusList = "";
                                 LastEmail = "empty";
                                 while (csPerson.csOk()) {
                                     int PeopleID = csPerson.csGetInteger("MemberID");
@@ -132,7 +132,7 @@ namespace Contensive.Addons.Email {
                                     LastEmail = Email;
                                     csPerson.csGoNext();
                                 }
-                                csPerson.csClose();
+                                csPerson.close();
                             }
                             //
                             // Send the confirmation
@@ -143,7 +143,7 @@ namespace Contensive.Addons.Email {
                             CSEmail.csGoNext();
                         }
                     }
-                    CSEmail.csClose();
+                    CSEmail.close();
                 }
                 //
                 return;
@@ -217,12 +217,12 @@ namespace Contensive.Addons.Email {
                                 string EmailStatus = queueEmailRecord(core, EmailMemberID, emailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, EmailSubject, EmailCopy, csEmail.csGetBoolean("AllowSpamFooter"), EmailAddLinkEID, "");
                                 queueConfirmationEmail(core, ConfirmationMemberID, 0, EmailTemplate, EmailAddLinkEID, "", EmailSubject, EmailCopy, "", FromAddress, EmailStatus + "<BR>");
                             }
-                            csEmail.csClose();
+                            csEmail.close();
                         }
                         //
                         csEmailList.csGoNext();
                     }
-                    csEmailList.csClose();
+                    csEmailList.close();
                 }
                 //
                 // Send Conditional Email - Offset days Before Expiration
@@ -280,17 +280,17 @@ namespace Contensive.Addons.Email {
                                     string EmailStatus = queueEmailRecord(core, EmailMemberID, emailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, csEmail.csGet("Subject"), csEmail.csGet("CopyFilename"), csEmail.csGetBoolean("AllowSpamFooter"), csEmail.csGetBoolean("AddLinkEID"), "");
                                     queueConfirmationEmail(core, ConfirmationMemberID, 0, EmailTemplate, EmailAddLinkEID, "", EmailSubject, EmailCopy, "", FromAddress, EmailStatus + "<BR>");
                                 }
-                                csEmail.csClose();
+                                csEmail.close();
                             }
                             //
                             csList.csGoNext();
                         }
-                        csList.csClose();
+                        csList.close();
                     }
                     //
                     // Send Conditional Email - Birthday
                     //
-                    using (var csXfer = new CsModel(core)) {
+                    using (var CSEmailBig = new CsModel(core)) {
                         string FieldList = "ccEmail.TestMemberID AS TestMemberID,ccEmail.ID AS EmailID, ccMembers.ID AS MemberID, ccMemberRules.DateExpires AS DateExpires,ccEmail.BlockSiteStyles,ccEmail.stylesFilename";
                         string SQL = "SELECT DISTINCT " + FieldList + " FROM ((((ccEmail"
                             + " LEFT JOIN ccEmailGroups ON ccEmail.ID = ccEmailGroups.EmailID)"
@@ -311,31 +311,30 @@ namespace Contensive.Addons.Email {
                             + " AND (ccMembers.BirthdayMonth=" + DateTime.Now.Month + ")"
                             + " AND (ccMembers.BirthdayDay=" + DateTime.Now.Day + ")"
                             + " AND (ccEmail.ID Not In (Select ccEmailLog.EmailID from ccEmailLog where ccEmailLog.MemberID=ccMembers.ID and ccEmailLog.DateAdded>=" + DbController.encodeSQLDate(DateTime.Now.Date) + "))";
-                        int CSEmailBig = csXfer.csOpenSql(SQL, "Default");
-                        while (csXfer.csOk(CSEmailBig)) {
-                            int emailID = csXfer.csGetInteger(CSEmailBig, "EmailID");
-                            int EmailMemberID = csXfer.csGetInteger(CSEmailBig, "MemberID");
-                            DateTime EmailDateExpires = csXfer.csGetDate(CSEmailBig, "DateExpires");
+                        CSEmailBig.csOpenSql(SQL, "Default");
+                        while (CSEmailBig.csOk()) {
+                            int emailID = CSEmailBig.csGetInteger("EmailID");
+                            int EmailMemberID = CSEmailBig.csGetInteger("MemberID");
+                            DateTime EmailDateExpires = CSEmailBig.csGetDate( "DateExpires");
                             //
                             //
-                            int CSEmail = csXfer.csOpenContentRecord("Conditional Email", emailID);
-                            if (csXfer.csOk(CSEmail)) {
-                                int EmailTemplateID = csXfer.csGetInteger("EmailTemplateID");
-                                string EmailTemplate = getEmailTemplate(core, EmailTemplateID);
-                                string FromAddress = csXfer.csGetText("FromAddress");
-                                int ConfirmationMemberID = csXfer.csGetInteger("testmemberid");
-                                bool EmailAddLinkEID = csXfer.csGetBoolean("AddLinkEID");
-                                string EmailSubject = csXfer.csGet("Subject");
-                                string EmailCopy = csXfer.csGet("CopyFilename");
-                                string EmailStatus = queueEmailRecord(core, EmailMemberID, emailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, csXfer.csGet("Subject"), csXfer.csGet("CopyFilename"), csXfer.csGetBoolean("AllowSpamFooter"), csXfer.csGetBoolean("AddLinkEID"), "");
-                                queueConfirmationEmail(core, ConfirmationMemberID, 0, EmailTemplate, EmailAddLinkEID, "", EmailSubject, EmailCopy, "", FromAddress, EmailStatus + "<BR>");
+
+                            using (var CSEmail = new CsModel(core)) {
+                                CSEmail.csOpenContentRecord("Conditional Email", emailID);
+                                if (CSEmail.csOk()) {
+                                    int EmailTemplateID = CSEmail.csGetInteger("EmailTemplateID");
+                                    string EmailTemplate = getEmailTemplate(core, EmailTemplateID);
+                                    string FromAddress = CSEmail.csGetText("FromAddress");
+                                    int ConfirmationMemberID = CSEmail.csGetInteger("testmemberid");
+                                    bool EmailAddLinkEID = CSEmail.csGetBoolean("AddLinkEID");
+                                    string EmailSubject = CSEmail.csGet("Subject");
+                                    string EmailCopy = CSEmail.csGet("CopyFilename");
+                                    string EmailStatus = queueEmailRecord(core, EmailMemberID, emailID, EmailDateExpires, 0, BounceAddress, FromAddress, EmailTemplate, FromAddress, CSEmail.csGet("Subject"), CSEmail.csGet("CopyFilename"), CSEmail.csGetBoolean("AllowSpamFooter"), CSEmail.csGetBoolean("AddLinkEID"), "");
+                                    queueConfirmationEmail(core, ConfirmationMemberID, 0, EmailTemplate, EmailAddLinkEID, "", EmailSubject, EmailCopy, "", FromAddress, EmailStatus + "<BR>");
+                                }
                             }
-                            csXfer.csClose(ref CSEmail);
-                            //
-                            //
-                            csXfer.csGoNext(CSEmailBig);
+                            CSEmailBig.csGoNext();
                         }
-                        csXfer.csClose(ref CSEmailBig);
                     }
                 }
             } catch (Exception ex) {
@@ -534,9 +533,9 @@ namespace Contensive.Addons.Email {
             //string tempGetEmailTemplate = "";
             //try {
             //    if (EmailTemplateID != 0) {
-            //        int csXfer.csOpenContentRecord("Email Templates", EmailTemplateID, 0, false, false, "BodyHTML");
+            //        csXfer.csOpenContentRecord("Email Templates", EmailTemplateID, 0, false, false, "BodyHTML");
             //        if (csXfer.csOk()) {
-            //            tempGetEmailTemplate = csXfer.csGet(CS, "BodyHTML");
+            //            tempGetEmailTemplate = csXfer.csGet("BodyHTML");
             //        }
             //        csXfer.csClose();
             //    }

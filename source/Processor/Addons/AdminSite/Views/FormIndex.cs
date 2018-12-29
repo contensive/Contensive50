@@ -347,13 +347,13 @@ namespace Contensive.Addons.AdminSite {
                                             if (FieldUsedInColumns.ContainsKey(columnNameLc)) {
                                                 if (FieldUsedInColumns[columnNameLc]) {
                                                     DataTable_DataRows += ("\r\n<td valign=\"middle\" " + RowColor + " align=\"left\">" + SpanClassAdminNormal);
-                                                    DataTable_DataRows += getForm_Index_GetCell(core, adminData, column.Name, CS, IsLookupFieldValid[columnNameLc], GenericController.vbLCase(adminData.adminContent.tableName) == "ccemail");
+                                                    DataTable_DataRows += getForm_Index_GetCell(core, adminData, column.Name, csXfer, IsLookupFieldValid[columnNameLc], GenericController.vbLCase(adminData.adminContent.tableName) == "ccemail");
                                                     DataTable_DataRows += ("&nbsp;</span></td>");
                                                 }
                                             }
                                         }
                                         DataTable_DataRows += ("\n    </tr>");
-                                        csXfer.csGoNext(CS);
+                                        csXfer.csGoNext();
                                         RecordPointer = RecordPointer + 1;
                                     }
                                     DataTable_DataRows += "<input type=hidden name=rowcnt value=" + RecordPointer + ">";
@@ -516,7 +516,8 @@ namespace Contensive.Addons.AdminSite {
             foreach (var kvp in IndexConfig.findWords) {
                 IndexConfigClass.IndexConfigFindWordClass findWord = kvp.Value;
                 if (!string.IsNullOrEmpty(findWord.Name)) {
-                    string FieldCaption = MetaController.getContentFieldProperty(core, content.name, findWord.Name, "caption");
+                    var fieldMeta = MetaModel.getField(core, content, findWord.Name);
+                    string FieldCaption = fieldMeta.caption;
                     switch (findWord.MatchOption) {
                         case FindWordMatchEnum.MatchEmpty:
                             filterLine = filterLine + ", " + FieldCaption + " is empty";
@@ -712,7 +713,7 @@ namespace Contensive.Addons.AdminSite {
                                                     if (IndexConfig.findWords.ContainsKey(FindName)) {
                                                         IndexConfig.findWords[FindName].Value = FindValue;
                                                     } else {
-                                                        CDefFieldModel field = adminData.adminContent.fields[FindName.ToLowerInvariant()];
+                                                        MetaFieldModel field = adminData.adminContent.fields[FindName.ToLowerInvariant()];
                                                         var findWord = new IndexConfigClass.IndexConfigFindWordClass {
                                                             Name = FindName,
                                                             Value = FindValue
@@ -989,8 +990,8 @@ namespace Contensive.Addons.AdminSite {
                 // ----- From Clause - build joins for Lookup fields in columns, in the findwords, and in sorts
                 //
                 return_sqlFrom = adminData.adminContent.tableName;
-                foreach (KeyValuePair<string, CDefFieldModel> keyValuePair in adminData.adminContent.fields) {
-                    CDefFieldModel field = keyValuePair.Value;
+                foreach (KeyValuePair<string, MetaFieldModel> keyValuePair in adminData.adminContent.fields) {
+                    MetaFieldModel field = keyValuePair.Value;
                     FieldPtr = field.id; // quick fix for a replacement for the old fieldPtr (so multiple for loops will always use the same "table"+ptr string
                     IncludedInColumns = false;
                     IncludedInLeftJoin = false;
@@ -1200,8 +1201,8 @@ namespace Contensive.Addons.AdminSite {
                         // Verify that the fieldname called out is in this table
                         //
                         if (adminData.adminContent.fields.Count > 0) {
-                            foreach (KeyValuePair<string, CDefFieldModel> keyValuePair in adminData.adminContent.fields) {
-                                CDefFieldModel field = keyValuePair.Value;
+                            foreach (KeyValuePair<string, MetaFieldModel> keyValuePair in adminData.adminContent.fields) {
+                                MetaFieldModel field = keyValuePair.Value;
                                 if (GenericController.vbUCase(field.nameLc) == GenericController.vbUCase(adminData.WherePair[0, WCount])) {
                                     //
                                     // found it, add it in the sql
@@ -1232,8 +1233,8 @@ namespace Contensive.Addons.AdminSite {
                             // Get FieldType
                             //
                             if (adminData.adminContent.fields.Count > 0) {
-                                foreach (KeyValuePair<string, CDefFieldModel> keyValuePair in adminData.adminContent.fields) {
-                                    CDefFieldModel field = keyValuePair.Value;
+                                foreach (KeyValuePair<string, MetaFieldModel> keyValuePair in adminData.adminContent.fields) {
+                                    MetaFieldModel field = keyValuePair.Value;
                                     // quick fix for a replacement for the old fieldPtr (so multiple for loops will always use the same "table"+ptr string
                                     FieldPtr = field.id;
                                     if (GenericController.vbLCase(field.nameLc) == FindWordName) {
@@ -1687,7 +1688,7 @@ namespace Contensive.Addons.AdminSite {
                     using (var csXfer = new CsModel(core)) {
                         csXfer.csOpenSql(core.db.getSQLSelect("default", "ccGroups", "ID,Caption,Name", "(active<>0)", "Caption,Name"));
                         while (csXfer.csOk()) {
-                            string Name = csXfer.csGetText(CS, "Name");
+                            string Name = csXfer.csGetText("Name");
                             Ptr = 0;
                             if (IndexConfig.groupListCnt > 0) {
                                 for (Ptr = 0; Ptr < IndexConfig.groupListCnt; Ptr++) {
@@ -1697,8 +1698,8 @@ namespace Contensive.Addons.AdminSite {
                                 }
                             }
                             if (Ptr == IndexConfig.groupListCnt) {
-                                int RecordID = csXfer.csGetInteger(CS, "ID");
-                                Caption = csXfer.csGetText(CS, "Caption");
+                                int RecordID = csXfer.csGetInteger("ID");
+                                Caption = csXfer.csGetText("Caption");
                                 if (string.IsNullOrEmpty(Caption)) {
                                     Caption = Name;
                                     if (string.IsNullOrEmpty(Caption)) {
@@ -1718,7 +1719,7 @@ namespace Contensive.Addons.AdminSite {
                                 Link = "/" + core.appConfig.adminRoute + "?" + QS;
                                 SubFilterList = SubFilterList + "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\">" + Caption + "</a></div>";
                             }
-                            csXfer.csGoNext(CS);
+                            csXfer.csGoNext();
                         }
                     }
                 }

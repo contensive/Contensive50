@@ -138,7 +138,7 @@ namespace Contensive.Addons.AdminSite {
                 {
                     string HTMLFieldString = "";
                     string FieldHelp = "The content in which this record is stored. This is similar to a database table.";
-                    CDefFieldModel field = null;
+                    MetaFieldModel field = null;
                     if (adminData.adminContent.fields.ContainsKey("contentcontrolid")) {
                         field = adminData.adminContent.fields["contentcontrolid"];
                         //
@@ -179,7 +179,7 @@ namespace Contensive.Addons.AdminSite {
                                         if (csXfer.csOk()) {
                                             LimitContentSelectToThisID = csXfer.csGetInteger("ContentControlID");
                                         }
-                                        csXfer.csClose();
+                                        csXfer.close();
                                     }
                                 }
 
@@ -198,9 +198,9 @@ namespace Contensive.Addons.AdminSite {
                                 RecordContentName = editRecord.contentControlId_Name;
                                 TableName2 = MetaController.getContentTablename(core, RecordContentName);
                                 TableID = MetaController.getRecordId(core, "Tables", TableName2);
+                                string CIDList = "";
                                 using (var csXfer = new CsModel(core)) {
                                     csXfer.csOpen("Content", "ContentTableID=" + TableID, "", true, 0, "ContentControlID");
-                                    string CIDList = "";
                                     while (csXfer.csOk()) {
                                         int ChildCID = csXfer.csGetInteger("ID");
                                         if (MetaController.isWithinContent(core, ChildCID, LimitContentSelectToThisID)) {
@@ -210,7 +210,7 @@ namespace Contensive.Addons.AdminSite {
                                         }
                                         csXfer.csGoNext();
                                     }
-                                    csXfer.csClose();
+                                    csXfer.close();
                                 }
 
                                 if (!string.IsNullOrEmpty(CIDList)) {
@@ -250,7 +250,7 @@ namespace Contensive.Addons.AdminSite {
                                         fieldValue += " (inactive)";
                                     }
                                 }
-                                csXfer.csClose();
+                                csXfer.close();
                             }
                         }
                     }
@@ -297,7 +297,7 @@ namespace Contensive.Addons.AdminSite {
                                         fieldValue += " (inactive)";
                                     }
                                 }
-                                csXfer.csClose();
+                                csXfer.close();
                             }
                         }
                     }

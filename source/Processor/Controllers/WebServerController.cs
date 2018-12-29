@@ -1035,7 +1035,6 @@ namespace Contensive.Processor.Controllers {
         //
         public static bool main_RedirectByRecord_ReturnStatus(CoreController core, string ContentName, int RecordID, string FieldName = "") {
             bool tempmain_RedirectByRecord_ReturnStatus = false;
-            int CSPointer = 0;
             string MethodName = null;
             int ContentID = 0;
             string HostContentName = null;
@@ -1061,7 +1060,7 @@ namespace Contensive.Processor.Controllers {
                 if (csXfer.csOk()) {
                     //
                     // Assume all Link fields are already encoded -- as this is how they would appear if the admin cut and pasted
-                    EncodedLink = encodeText(csXfer.csGetText(CSPointer, iFieldName)).Trim(' ');
+                    EncodedLink = encodeText(csXfer.csGetText(iFieldName)).Trim(' ');
                     if (string.IsNullOrEmpty(EncodedLink)) {
                         BlockRedirect = true;
                     } else {
@@ -1084,7 +1083,7 @@ namespace Contensive.Processor.Controllers {
                                     // ----- Content Watch with a bad ContentID, mark inactive
                                     //
                                     BlockRedirect = true;
-                                    csXfer.csSet(CSPointer, "active", 0);
+                                    csXfer.csSet("active", 0);
                                 } else {
                                     HostRecordID = (csXfer.csGetInteger("RecordID"));
                                     if (HostRecordID == 0) {
@@ -1092,7 +1091,7 @@ namespace Contensive.Processor.Controllers {
                                         // ----- Content Watch with a bad iRecordID, mark inactive
                                         //
                                         BlockRedirect = true;
-                                        csXfer.csSet(CSPointer, "active", 0);
+                                        csXfer.csSet("active", 0);
                                     } else {
                                         using (var CSHost = new CsModel(core)) {
                                             CSHost.csOpen(HostContentName, "ID=" + HostRecordID);
@@ -1101,7 +1100,7 @@ namespace Contensive.Processor.Controllers {
                                                 // ----- Content Watch host record not found, mark inactive
                                                 //
                                                 BlockRedirect = true;
-                                                csXfer.csSet(CSPointer, "active", 0);
+                                                csXfer.csSet("active", 0);
                                             }
                                         }
                                     }
@@ -1120,8 +1119,8 @@ namespace Contensive.Processor.Controllers {
                         // If link incorrectly includes the LinkPrefix, take it off first, then add it back
                         //
                         NonEncodedLink = GenericController.removeUrlPrefix(NonEncodedLink, LinkPrefix);
-                        if (csXfer.csIsFieldSupported(CSPointer, "Clicks")) {
-                            csXfer.csSet(CSPointer, "Clicks", (csXfer.csGetNumber(CSPointer, "Clicks")) + 1);
+                        if (csXfer.csIsFieldSupported("Clicks")) {
+                            csXfer.csSet("Clicks", (csXfer.csGetNumber("Clicks")) + 1);
                         }
                         core.webServer.redirect(LinkPrefix + NonEncodedLink, "Call to " + MethodName + ", no reason given.", false, false);
                         tempmain_RedirectByRecord_ReturnStatus = true;

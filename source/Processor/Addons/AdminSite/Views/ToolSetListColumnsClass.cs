@@ -70,8 +70,8 @@ namespace Contensive.Addons.AdminSite {
                         // Make sure the FieldNameToAdd is not-inherited, if not, create new field
                         //
                         if (FieldIDToAdd != 0) {
-                            foreach (KeyValuePair<string, CDefFieldModel> keyValuePair in adminContent.fields) {
-                                CDefFieldModel field = keyValuePair.Value;
+                            foreach (KeyValuePair<string, MetaFieldModel> keyValuePair in adminContent.fields) {
+                                MetaFieldModel field = keyValuePair.Value;
                                 if (field.id == FieldIDToAdd) {
                                     if (field.inherited) {
                                         SourceContentID = field.contentId;
@@ -81,8 +81,8 @@ namespace Contensive.Addons.AdminSite {
                                         using (var CSSource = new CsModel(core)) {
                                             if (CSSource.csOpen("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + DbController.encodeSQLText(SourceName) + ")")) {
                                                 using (var CSTarget = new CsModel(core)) {
-                                                    if (CSTarget.csInsert("Content Fields")) {
-                                                        CSSource.csCopyRecord(CSTarget);
+                                                    if (CSTarget.insert("Content Fields")) {
+                                                        CSSource.copyRecord(CSTarget);
                                                         CSTarget.csSet("ContentID", adminContent.id);
                                                         reloadMetadata = true;
                                                     }
@@ -98,15 +98,15 @@ namespace Contensive.Addons.AdminSite {
                         // Make sure all fields are not-inherited, if not, create new fields
                         //
                         foreach (var column in IndexConfig.columns) {
-                            CDefFieldModel field = adminContent.fields[column.Name.ToLowerInvariant()];
+                            MetaFieldModel field = adminContent.fields[column.Name.ToLowerInvariant()];
                             if (field.inherited) {
                                 SourceContentID = field.contentId;
                                 SourceName = field.nameLc;
                                 using (var CSSource = new CsModel(core)) {
                                     if (CSSource.csOpen("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + DbController.encodeSQLText(SourceName) + ")")) {
                                         using (var CSTarget = new CsModel(core)) {
-                                            if (CSTarget.csInsert("Content Fields")) {
-                                                CSSource.csCopyRecord(CSTarget);
+                                            if (CSTarget.insert("Content Fields")) {
+                                                CSSource.copyRecord(CSTarget);
                                                 CSTarget.csSet("ContentID", adminContent.id);
                                                 reloadMetadata = true;
                                             }
@@ -298,7 +298,7 @@ namespace Contensive.Addons.AdminSite {
                                 // print column headers - anchored so they sort columns
                                 //
                                 ColumnWidth = encodeInteger(100 * (column.Width / (double)ColumnWidthTotal));
-                                CDefFieldModel field = adminContent.fields[column.Name.ToLowerInvariant()];
+                                MetaFieldModel field = adminContent.fields[column.Name.ToLowerInvariant()];
                                 fieldId = field.id;
                                 Caption = field.caption;
                                 if (field.inherited) {
@@ -316,7 +316,7 @@ namespace Contensive.Addons.AdminSite {
                                 // print column headers - anchored so they sort columns
                                 //
                                 ColumnWidth = encodeInteger(100 * (column.Width / (double)ColumnWidthTotal));
-                                CDefFieldModel field = adminContent.fields[column.Name.ToLowerInvariant()];
+                                MetaFieldModel field = adminContent.fields[column.Name.ToLowerInvariant()];
                                 fieldId = field.id;
                                 Caption = field.caption;
                                 if (field.inherited) {
@@ -353,8 +353,8 @@ namespace Contensive.Addons.AdminSite {
                     if (CDef.fields.Count == 0) {
                         Stream.Add(SpanClassAdminNormal + "This Content Definition has no fields</span><br>");
                     } else {
-                        foreach (KeyValuePair<string, CDefFieldModel> keyValuePair in adminContent.fields) {
-                            CDefFieldModel field = keyValuePair.Value;
+                        foreach (KeyValuePair<string, MetaFieldModel> keyValuePair in adminContent.fields) {
+                            MetaFieldModel field = keyValuePair.Value;
                             //
                             // display the column if it is not in use
                             if ((IndexConfig.columns.Find(x => x.Name == field.nameLc) == null)) {

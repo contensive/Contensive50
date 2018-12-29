@@ -32,19 +32,17 @@ namespace Contensive.Addons.Primitives {
                 //
                 bool InsertTestOK = false;
                 int TrapID = 0;
-                int csXfer.csInsert("Trap Log");
-                if (!csXfer.csOk()) {
-                    //throw new GenericException("Unexpected exception"); // todo - remove this - handleLegacyError10(ignoreInteger, "dll", "Error during Status. Called InsertCSRecord to insert 'Trap Log' test, record set was not OK.", "Init", False, True)
-                } else {
-                    InsertTestOK = true;
-                    TrapID = csXfer.csGetInteger(CS, "ID");
+                using (var csXfer = new CsModel(core)) {
+                    if (csXfer.insert("Trap Log")) {
+                        InsertTestOK = true;
+                        TrapID = csXfer.csGetInteger("ID");
+                    }
                 }
-                csXfer.csClose();
                 if (InsertTestOK) {
                     if (TrapID == 0) {
                         //throw new GenericException("Unexpected exception"); // todo - remove this - handleLegacyError10(ignoreInteger, "dll", "Error during Status. Called InsertCSRecord to insert 'Trap Log' test, record set was OK, but ID=0.", "Init", False, True)
                     } else {
-                        core.db.deleteContentRecord("Trap Log", TrapID);
+                        MetaController.deleteContentRecord(core, "Trap Log", TrapID);
                     }
                 }
                 //

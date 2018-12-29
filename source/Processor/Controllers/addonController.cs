@@ -882,7 +882,7 @@ namespace Contensive.Processor.Controllers {
                                                                 using (var csXfer = new CsModel(core)) {
                                                                     csXfer.csOpen("Copy Content", "name=" + DbController.encodeSQLText(FieldName), "ID");
                                                                     if (!csXfer.csOk()) {
-                                                                        csXfer.csClose();
+                                                                        csXfer.close();
                                                                         csXfer.csInsert("Copy Content", core.session.user.id);
                                                                     }
                                                                     if (csXfer.csOk()) {
@@ -896,7 +896,7 @@ namespace Contensive.Processor.Controllers {
                                                                         //
                                                                         csXfer.csGoNext();
                                                                         while (csXfer.csOk()) {
-                                                                            csXfer.csDeleteRecord();
+                                                                            csXfer.deleteRecord();
                                                                             csXfer.csGoNext();
                                                                         }
                                                                     }
@@ -1168,7 +1168,7 @@ namespace Contensive.Processor.Controllers {
                                                             using (var csXfer = new CsModel(core)) {
                                                                 csXfer.csOpen("Copy Content", "Name=" + DbController.encodeSQLText(FieldName), "ID", false, 0, "id,name,Copy");
                                                                 if (!csXfer.csOk()) {
-                                                                    csXfer.csClose();
+                                                                    csXfer.close();
                                                                     csXfer.csInsert("Copy Content", core.session.user.id);
                                                                     if (csXfer.csOk()) {
                                                                         int RecordID = csXfer.csGetInteger("ID");
@@ -2569,7 +2569,7 @@ namespace Contensive.Processor.Controllers {
                             }
                         }
                     }
-                    csXfer.csClose();
+                    csXfer.close();
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
@@ -2856,16 +2856,16 @@ namespace Contensive.Processor.Controllers {
                         //
                         // create event with Guid and id for name
                         //
-                        cs.csClose();
-                        cs.csInsert("add-on Events");
+                        cs.close();
+                        cs.insert("add-on Events");
                         cs.setField("ccguid", eventNameIdOrGuid);
                         cs.setField("name", "Event " + cs.getInteger("id").ToString());
                     } else if (!string.IsNullOrEmpty(eventNameIdOrGuid)) {
                         //
                         // create event with name
                         //
-                        cs.csClose();
-                        cs.csInsert("add-on Events");
+                        cs.close();
+                        cs.insert("add-on Events");
                         cs.setField("name", eventNameIdOrGuid);
                     }
                 } else {
@@ -2881,7 +2881,7 @@ namespace Contensive.Processor.Controllers {
                         cs.goNext();
                     }
                 }
-                cs.csClose();
+                cs.close();
                 //
             } catch (Exception ex) {
                 LogController.handleError(core, ex);

@@ -358,36 +358,6 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
     public class CPClassUnitTests {
         //
         //====================================================================================================
-        // unit test - cp.addVar
-        //
-        [TestMethod]
-        public void Views_cpBlock_AddVar_unit() {
-            // arrange
-            CPClass cp = new CPClass();
-            CPClass cpApp = new CPClass(testAppName);
-            // act
-            cp.AddVar("a", "1");
-            cp.AddVar("b", "2");
-            cp.AddVar("b", "3");
-            cpApp.AddVar("a", "4");
-            cpApp.AddVar("b", "5");
-            for (var ptr = 1; ptr <= 10; ptr++) {
-                cpApp.AddVar("key" + ptr.ToString(), "value" + ptr.ToString());
-            }
-            // assert
-            Assert.AreEqual(cp.Doc.GetText("a"), "1");
-            Assert.AreEqual(cp.Doc.GetText("b"), "3");
-            Assert.AreEqual(cpApp.Doc.GetText("a"), "4");
-            Assert.AreEqual(cpApp.Doc.GetText("b"), "5");
-            for (var ptr = 1; ptr <= 10; ptr++) {
-                Assert.AreEqual(cpApp.Doc.GetText("key" + ptr.ToString()), "value" + ptr.ToString());
-            }
-            // dispose
-            cp.Dispose();
-            cpApp.Dispose();
-        }
-        //
-        //====================================================================================================
         // unit test - cp.appOk
         //
         [TestMethod]

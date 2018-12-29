@@ -49,7 +49,7 @@ namespace Contensive.Addons.AdminSite {
                     // xx  I do not know why the following section says "reload even if it is loaded", but lets try this
                     //
                     foreach (var keyValuePair in adminData.adminContent.fields) {
-                        CDefFieldModel field = keyValuePair.Value;
+                        MetaFieldModel field = keyValuePair.Value;
                         if ((keyValuePair.Value.fieldTypeId== _fieldTypeIdFile) || (keyValuePair.Value.fieldTypeId == _fieldTypeIdFileImage)) {
                             adminData.editRecord.fieldsLc[field.nameLc].value = adminData.editRecord.fieldsLc[field.nameLc].dbValue;
                         }
@@ -637,7 +637,6 @@ namespace Contensive.Addons.AdminSite {
                 bool IsLongHelp = false;
                 bool IsEmptyHelp = false;
                 string HelpMsg = null;
-                int CS = 0;
                 string HelpClosedContentID = null;
                 string EditorHelp = null;
                 string HelpEditorID = null;
@@ -656,7 +655,6 @@ namespace Contensive.Addons.AdminSite {
                 string EncodedLink = null;
                 string fieldCaption = null;
                 //string[] lookups = null;
-                //int CSPointer = 0;
                 string fieldValue_text = null;
                 //int FieldValueInteger = 0;
                 double FieldValueNumber = 0;
@@ -682,9 +680,9 @@ namespace Contensive.Addons.AdminSite {
                 } else {
                     //
                     // ----- Build an index to sort the fields by EditSortOrder
-                    Dictionary<string, CDefFieldModel> sortingFields = new Dictionary<string, CDefFieldModel>();
+                    Dictionary<string, MetaFieldModel> sortingFields = new Dictionary<string, MetaFieldModel>();
                     foreach (var keyValuePair in adminData.adminContent.fields) {
-                        CDefFieldModel field = keyValuePair.Value;
+                        MetaFieldModel field = keyValuePair.Value;
                         if (field.editTabName.ToLowerInvariant() == EditTab.ToLowerInvariant()) {
                             if (AdminDataModel.IsVisibleUserField(core, field.adminOnly, field.developerOnly, field.active, field.authorable, field.nameLc, adminData.adminContent.tableName)) {
                                 AlphaSort = GenericController.getIntegerString(field.editSortPriority, 10) + "-" + GenericController.getIntegerString(field.id, 10);
@@ -697,7 +695,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     AllowHelpIcon = core.visitProperty.getBoolean("AllowHelpIcon");
                     foreach (var kvp in sortingFields) {
-                        CDefFieldModel field = kvp.Value;
+                        MetaFieldModel field = kvp.Value;
                         fieldId = field.id;
                         WhyReadOnlyMsg = "";
                         fieldTypeId = field.fieldTypeId;
@@ -1575,8 +1573,8 @@ namespace Contensive.Addons.AdminSite {
                 // ----- read in help
                 //
                 IDList = "";
-                foreach (KeyValuePair<string, CDefFieldModel> keyValuePair in adminData.adminContent.fields) {
-                    CDefFieldModel field = keyValuePair.Value;
+                foreach (KeyValuePair<string, MetaFieldModel> keyValuePair in adminData.adminContent.fields) {
+                    MetaFieldModel field = keyValuePair.Value;
                     IDList = IDList + "," + field.id;
                 }
                 if (!string.IsNullOrEmpty(IDList)) {
@@ -1605,8 +1603,8 @@ namespace Contensive.Addons.AdminSite {
                 }
                 //
                 FormFieldList = ",";
-                foreach (KeyValuePair<string, CDefFieldModel> keyValuePair in adminData.adminContent.fields) {
-                    CDefFieldModel field = keyValuePair.Value;
+                foreach (KeyValuePair<string, MetaFieldModel> keyValuePair in adminData.adminContent.fields) {
+                    MetaFieldModel field = keyValuePair.Value;
                     if ((field.authorable) && (field.active) && (!TabsFound.Contains(field.editTabName.ToLowerInvariant()))) {
                         TabsFound.Add(field.editTabName.ToLowerInvariant());
                         fieldNameLc = field.nameLc;
@@ -1810,7 +1808,7 @@ namespace Contensive.Addons.AdminSite {
                                 int GroupRulesPointer = 0;
                                 if (GroupRulesCount != 0) {
                                     for (GroupRulesPointer = 0; GroupRulesPointer < GroupRulesCount; GroupRulesPointer++) {
-                                        if (GroupRules[GroupRulesPointer].GroupID == csXfer.csGetInteger(CS, "ID")) {
+                                        if (GroupRules[GroupRulesPointer].GroupID == csXfer.csGetInteger("ID")) {
                                             GroupFound = true;
                                             break;
                                         }

@@ -357,7 +357,7 @@ namespace Contensive.Processor.Controllers {
                                         FastString.Add(">" + HtmlController.encodeHtml(Copy) + "</option>");
                                     }
                                     if (!SelectedFound && (CurrentValue != 0)) {
-                                        csXfer.csClose();
+                                        csXfer.close();
                                         if (!string.IsNullOrEmpty(Criteria)) {
                                             Criteria = Criteria + "and";
                                         }
@@ -1134,14 +1134,13 @@ namespace Contensive.Processor.Controllers {
                 string FieldLookupContentName = null;
                 Models.Domain.MetaModel Contentdefinition = null;
                 bool FieldHTMLContent = false;
-                int CSLookup = 0;
                 string FieldLookupList = "";
                 //
                 if (true) {
                     fieldFound = false;
                     Contentdefinition = Models.Domain.MetaModel.createByUniqueName(core, ContentName);
-                    foreach (KeyValuePair<string, Models.Domain.CDefFieldModel> keyValuePair in Contentdefinition.fields) {
-                        Models.Domain.CDefFieldModel field = keyValuePair.Value;
+                    foreach (KeyValuePair<string, Models.Domain.MetaFieldModel> keyValuePair in Contentdefinition.fields) {
+                        Models.Domain.MetaFieldModel field = keyValuePair.Value;
                         if (GenericController.vbUCase(field.nameLc) == GenericController.vbUCase(fieldName)) {
                             FieldValueVariant = field.defaultValue;
                             fieldTypeId = field.fieldTypeId;
@@ -2135,7 +2134,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             FieldName = csXfer.csGetFirstFieldName();
                             while (!string.IsNullOrEmpty(FieldName)) {
-                                fieldType = csXfer.csGetFieldTypeId(CS, FieldName);
+                                fieldType = csXfer.csGetFieldTypeId(FieldName);
                                 switch (fieldType) {
                                     case _fieldTypeIdLongText:
                                     case _fieldTypeIdText:
@@ -2145,7 +2144,7 @@ namespace Contensive.Processor.Controllers {
                                     case _fieldTypeIdFileJavascript:
                                     case _fieldTypeIdHTML:
                                     case _fieldTypeIdFileHTML:
-                                        Copy = csXfer.csGet(CS, FieldName);
+                                        Copy = csXfer.csGet(FieldName);
                                         PosACInstanceID = GenericController.vbInstr(1, Copy, "ACInstanceID=\"" + ACInstanceID + "\"", 1);
                                         if (PosACInstanceID != 0) {
                                             //
@@ -2158,7 +2157,7 @@ namespace Contensive.Processor.Controllers {
                                         }
                                         break;
                                 }
-                                FieldName = csXfer.csGetNextFieldName(CS);
+                                FieldName = csXfer.csGetNextFieldName();
                             }
                             ExitLabel1:;
                         }
@@ -2258,7 +2257,7 @@ namespace Contensive.Processor.Controllers {
                                         if (PosIDEnd != 0) {
                                             ParseOK = true;
                                             Copy = Copy.Left(PosIDStart - 1) + HtmlController.encodeHtml(addonOption_String) + Copy.Substring(PosIDEnd - 1);
-                                            csXfer.csSet(CS, FieldName, Copy);
+                                            csXfer.csSet(FieldName, Copy);
                                             needToClearCache = true;
                                         }
                                     }
@@ -3365,7 +3364,7 @@ namespace Contensive.Processor.Controllers {
                 // honestly, not sure what to do with 'return_ErrorMessage'
                 using (var csXfer = new CsModel(core)) {
                     if (!csXfer.csOpen("copy content", "Name=" + DbController.encodeSQLText(CopyName), "ID", true, 0, "Name,ID,Copy,modifiedBy")) {
-                        csXfer.csClose();
+                        csXfer.close();
                         csXfer.csInsert("copy content", 0);
                         if (csXfer.csOk()) {
                             RecordID = csXfer.csGetInteger("ID");
@@ -3401,34 +3400,16 @@ namespace Contensive.Processor.Controllers {
         //
         // ====================================================================================================
         //
-        public void setContentCopy(string CopyName, string Content) {
-            //
-            int CS = 0;
-            string iCopyName = null;
-            string iContent = null;
-            const string ContentName = "Copy Content";
-            //
-            //  BuildVersion = app.dataBuildVersion
-            if (false) //.3.210" Then
-            {
-                throw (new Exception("Contensive database was created with version " + core.siteProperties.dataBuildVersion + ". main_SetContentCopy requires an builder."));
-            } else {
-                iCopyName = GenericController.encodeText(CopyName);
-                iContent = GenericController.encodeText(Content);
-                CS = csOpen(ContentName, "name=" + encodeSQLText(iCopyName));
-                if (!csOk(CS)) {
-                    csClose(ref CS);
-                    CS = csInsert(ContentName);
+        public void setContentCopy(string copyName, string content) {
+            using (var csXfer = new CsModel(core)) {
+                csXfer.csOpen("Copy Content", "name=" + DbController.encodeSQLText(copyName));
+                if (!csXfer.csOk()) {
+                    csXfer.insert("Copy Content");
                 }
-                if (csOk(CS)) {
-                    csSet(CS, "name", iCopyName);
-                    csSet(CS, "Copy", iContent);
-                }
-                csClose(ref CS);
+                csXfer.csSet("name", copyName);
+                csXfer.csSet("Copy", content);
             }
         }
-
-
         //
         //====================================================================================================
         //
@@ -3518,7 +3499,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // No record exists, and one is needed                        
                         using (var csXfer = new CsModel(core)) {
-                            csXfer.csInsert(rulesContentName);
+                            csXfer.insert(rulesContentName);
                             if (csXfer.csOk()) {
                                 csXfer.csSet("Active", RuleNeeded);
                                 csXfer.csSet(rulesPrimaryFieldname, primaryRecordID);

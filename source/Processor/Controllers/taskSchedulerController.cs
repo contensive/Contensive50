@@ -213,10 +213,10 @@ namespace Contensive.Processor.Controllers {
         //                            + " )";
         //                        int CS = coreApp.db.csOpen(Models.Db.AddonModel.contentName, sqlAddonsCriteria);
         //                        while (coreApp.db.csOk()) {
-        //                            int addonProcessInterval = coreApp.db.csGetInteger(CS, "ProcessInterval");
-        //                            string addonName = coreApp.db.csGetText(CS, "name");
-        //                            bool addonProcessRunOnce = coreApp.db.csGetBoolean(CS, "ProcessRunOnce");
-        //                            DateTime addonProcessNextRun = coreApp.db.csGetDate(CS, "ProcessNextRun");
+        //                            int addonProcessInterval = coreApp.db.csGetInteger("ProcessInterval");
+        //                            string addonName = coreApp.db.csGetText("name");
+        //                            bool addonProcessRunOnce = coreApp.db.csGetBoolean("ProcessRunOnce");
+        //                            DateTime addonProcessNextRun = coreApp.db.csGetDate("ProcessNextRun");
         //                            DateTime nextRun = DateTime.MinValue;
         //                            if (addonProcessInterval > 0) {
         //                                nextRun = RightNow.AddMinutes(addonProcessInterval);
@@ -226,26 +226,26 @@ namespace Contensive.Processor.Controllers {
         //                                LogController.logTrace(coreApp, "scheduleTasks, addon [" + addonName + "], add task, addonProcessRunOnce [" + addonProcessRunOnce + "], addonProcessNextRun [" + addonProcessNextRun + "]");
         //                                //
         //                                // -- resolve triggering state
-        //                                coreApp.db.csSet(CS, "ProcessRunOnce", false);
+        //                                coreApp.db.csSet("ProcessRunOnce", false);
         //                                if (addonProcessNextRun < RightNow) {
-        //                                    coreApp.db.csSet(CS, "ProcessNextRun", nextRun);
+        //                                    coreApp.db.csSet("ProcessNextRun", nextRun);
         //                                }
         //                                coreApp.db.csSave(CS);
         //                                //
         //                                // -- add task to queue for runner
         //                                var cmdDetail = new TaskModel.CmdDetailClass();
-        //                                cmdDetail.addonId = coreApp.db.csGetInteger(CS, "ID");
+        //                                cmdDetail.addonId = coreApp.db.csGetInteger("ID");
         //                                cmdDetail.addonName = addonName;
-        //                                cmdDetail.args = GenericController.convertAddonArgumentstoDocPropertiesList(coreApp, coreApp.db.csGetText(CS, "argumentlist"));
+        //                                cmdDetail.args = GenericController.convertAddonArgumentstoDocPropertiesList(coreApp, coreApp.db.csGetText("argumentlist"));
         //                                addTaskToQueue(coreApp, cmdDetail, false);
-        //                            } else if (coreApp.db.csGetDate(CS, "ProcessNextRun") == DateTime.MinValue) {
+        //                            } else if (coreApp.db.csGetDate("ProcessNextRun") == DateTime.MinValue) {
         //                                //
         //                                LogController.logTrace(coreApp, "scheduleTasks, addon [" + addonName + "], setup next run, ProcessInterval set but no processNextRun, set processNextRun [" + nextRun + "]");
         //                                //
         //                                // -- Interval is OK but NextRun is 0, just set next run
-        //                                coreApp.db.csSet(CS, "ProcessNextRun", nextRun);
+        //                                coreApp.db.csSet("ProcessNextRun", nextRun);
         //                            }
-        //                            coreApp.db.csGoNext(CS);
+        //                            coreApp.db.csGoNext();
         //                        }
         //                        coreApp.db.csClose();
         //                    } catch (Exception ex) {
@@ -295,9 +295,9 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- Search for a duplicate
                     string sql = "select top 1 id from cctasks where ((cmdDetail=" + cmdDetailJson + ")and(datestarted is not null))";
-                    int csXfer.csOpenSql(sql);
-                    resultTaskAdded = !csXfer.csOk();
-                    csXfer.csClose();
+                    using (var csXfer = new CsModel(core)) {
+                        resultTaskAdded = !csXfer.csOpenSql(sql);
+                    }
                 }
                 //
                 // -- add it to the queue and shell out to the command

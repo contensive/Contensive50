@@ -18,7 +18,6 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         public static void processActiveEditor(CoreController core) {
             //
-            int CS = 0;
             string Button = null;
             int ContentID = 0;
             string ContentName = null;
@@ -53,9 +52,9 @@ namespace Contensive.Processor.Controllers {
                         using (var csXfer = new CsModel(core)) {
                             csXfer.csOpen(ContentName, "ID=" + DbController.encodeSQLNumber(RecordID), "", false);
                             if (csXfer.csOk()) {
-                                csXfer.csSet(CS, FieldName, ContentCopy);
+                                csXfer.csSet(FieldName, ContentCopy);
                             }
-                            csXfer.csClose();
+                            csXfer.close();
                         }
                     }
                     break;
@@ -67,13 +66,11 @@ namespace Contensive.Processor.Controllers {
         public static string getActiveEditor(CoreController core, string ContentName, int RecordID, string FieldName, string FormElements = "") {
             //
             int ContentID = 0;
-            int CSPointer = 0;
             string Copy = null;
             string Stream = "";
             string ButtonPanel = null;
             string EditorPanel = null;
             string PanelCopy = null;
-            //
             string intContentName = null;
             int intRecordId = 0;
             string strFieldName = null;
@@ -107,7 +104,7 @@ namespace Contensive.Processor.Controllers {
                             ButtonPanel = core.html.getPanelButtons(ButtonCancel + "," + ButtonSave, "button");
                             EditorPanel = EditorPanel + ButtonPanel;
                         }
-                        csXfer.csClose();
+                        csXfer.close();
                     }
                 }
             }

@@ -286,16 +286,16 @@ namespace Contensive.Processor.Controllers {
                 //
                 if (Message.Length > 255) Message = Message.Substring(0, 255);
                 if (Link.Length > 255) Message = Link.Substring(0, 255);
-                int csXfer.csInsert("Activity Log", ByMemberID);
-                if (csXfer.csOk()) {
-                    csXfer.csSet(CS, "MemberID", SubjectMemberID);
-                    csXfer.csSet(CS, "OrganizationID", SubjectOrganizationID);
-                    csXfer.csSet(CS, "Message", Message);
-                    csXfer.csSet(CS, "Link", Link);
-                    csXfer.csSet(CS, "VisitorID", VisitorID);
-                    csXfer.csSet(CS, "VisitID", VisitID);
+                using (var csXfer = new CsModel(core)) {
+                    if (csXfer.csInsert("Activity Log", ByMemberID)) {
+                        csXfer.csSet("MemberID", SubjectMemberID);
+                        csXfer.csSet("OrganizationID", SubjectOrganizationID);
+                        csXfer.csSet("Message", Message);
+                        csXfer.csSet("Link", Link);
+                        csXfer.csSet("VisitorID", VisitorID);
+                        csXfer.csSet("VisitID", VisitID);
+                    }
                 }
-                csXfer.csClose();
                 //
                 return;
                 //
@@ -353,12 +353,10 @@ namespace Contensive.Processor.Controllers {
         /// <param name="specificKey"></param>
         //
         public static void addSiteWarning(CoreController core, string Name, string shortDescription, string location, int PageID, string Description, string generalKey, string specificKey) {
-            string SQL = null;
             int warningId = 0;
-            int CS = 0;
             //
             warningId = 0;
-            SQL = "select top 1 ID from ccSiteWarnings"
+            string SQL = "select top 1 ID from ccSiteWarnings"
                 + " where (generalKey=" + DbController.encodeSQLText(generalKey) + ")"
                 + " and(specificKey=" + DbController.encodeSQLText(specificKey) + ")"
                 + "";
@@ -377,21 +375,19 @@ namespace Contensive.Processor.Controllers {
                 //
                 // insert new record
                 //
-                csXfer.csInsert("Site Warnings", 0);
-                if (csXfer.csOk()) {
-                    csXfer.csSet(CS, "name", Name);
-                    csXfer.csSet(CS, "description", Description);
-                    csXfer.csSet(CS, "generalKey", generalKey);
-                    csXfer.csSet(CS, "specificKey", specificKey);
-                    csXfer.csSet(CS, "count", 1);
-                    csXfer.csSet(CS, "DateLastReported", DateTime.Now);
-                    if (true) {
-                        csXfer.csSet(CS, "shortDescription", shortDescription);
-                        csXfer.csSet(CS, "location", location);
-                        csXfer.csSet(CS, "pageId", PageID);
+                using (var csXfer = new CsModel(core)) {
+                    if (csXfer.insert("Site Warnings")) {
+                        csXfer.csSet("name", Name);
+                        csXfer.csSet("description", Description);
+                        csXfer.csSet("generalKey", generalKey);
+                        csXfer.csSet("specificKey", specificKey);
+                        csXfer.csSet("count", 1);
+                        csXfer.csSet("DateLastReported", DateTime.Now);
+                        csXfer.csSet("shortDescription", shortDescription);
+                        csXfer.csSet("location", location);
+                        csXfer.csSet("pageId", PageID);
                     }
                 }
-                csXfer.csClose();
             }
             //
         }

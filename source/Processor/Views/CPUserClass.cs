@@ -190,6 +190,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
+        [Obsolete("deprecated",true)]
         public override bool IsMember {
             get {
                 return cp.core.session.isAuthenticatedMember(cp.core);
@@ -212,6 +213,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
+        [Obsolete("deprecated",true)]
         public override bool IsWorkflowRendering {
             get {
                 return cp.core.session.isWorkflowRendering();
@@ -302,14 +304,6 @@ namespace Contensive.Processor {
         public override int OrganizationID {
             get {
                 return cp.core.session.user.organizationID;
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public override string Password {
-            get {
-                return cp.core.session.user.password;
             }
         }
         //
@@ -421,6 +415,13 @@ namespace Contensive.Processor {
         [Obsolete("Use Get with correct type", true)]
         public override string GetProperty(string PropertyName) {
             return cp.core.userProperty.getText(PropertyName);
+        }
+        //
+        [Obsolete("deprecated", true)]
+        public override string Password {
+            get {
+                return cp.core.session.user.password;
+            }
         }
         //
         //====================================================================================================

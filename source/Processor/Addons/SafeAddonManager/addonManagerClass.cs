@@ -836,7 +836,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                         csXfer.csGoNext();
                                         RowPtr = RowPtr + 1;
                                     }
-                                    csXfer.csClose();
+                                    csXfer.close();
                                 }
                                 BodyHTML = "<div style=\"width:100%\">" + AdminUIController.getReport2(core, RowPtr, ColCaption, ColAlign, ColWidth, Cells, RowPtr, 1, "", PostTableCopy, RowPtr, "ccAdmin", ColSortable, 0) + "</div>";
                                 BodyHTML = AdminUIController.getEditPanel(core,true, "Add-on Collections", "Use this form to review and delete current add-on collections.", BodyHTML);
@@ -918,7 +918,7 @@ namespace Contensive.Addons.SafeAddonManager {
                     if (csXfer.csOk()) {
                         EntryID = csXfer.csGetInteger("ID");
                     }
-                    csXfer.csClose();
+                    csXfer.close();
                 }
                 //
                 if (EntryID != 0) {
@@ -928,7 +928,7 @@ namespace Contensive.Addons.SafeAddonManager {
                             GetForm_SafeModeAddonManager_DeleteNavigatorBranch(csXfer.csGetText("name"), EntryID);
                             csXfer.csGoNext();
                         }
-                        csXfer.csClose();
+                        csXfer.close();
                     }
                     MetaController.deleteContentRecord(core,NavigatorEntryModel.contentName, EntryID);
                 }
@@ -1021,7 +1021,7 @@ namespace Contensive.Addons.SafeAddonManager {
                             if (csXfer.csOk()) {
                                 tempGetParentIDFromNameSpace = csXfer.csGetInteger("ID");
                             }
-                            csXfer.csClose();
+                            csXfer.close();
                         }
                     } else {
                         ParentID = getParentIDFromNameSpace(ContentName, ParentNameSpace);

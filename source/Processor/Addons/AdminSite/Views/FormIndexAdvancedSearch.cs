@@ -139,8 +139,8 @@ namespace Contensive.Addons.AdminSite {
                 Array.Resize(ref FieldMatchOptions, FieldSize + 1);
                 Array.Resize(ref FieldLookupContentName, FieldSize + 1);
                 Array.Resize(ref FieldLookupList, FieldSize + 1);
-                foreach (KeyValuePair<string, CDefFieldModel> keyValuePair in adminData.adminContent.fields) {
-                    CDefFieldModel field = keyValuePair.Value;
+                foreach (KeyValuePair<string, MetaFieldModel> keyValuePair in adminData.adminContent.fields) {
+                    MetaFieldModel field = keyValuePair.Value;
                     if (FieldPtr >= FieldSize) {
                         FieldSize = FieldSize + 100;
                         Array.Resize(ref FieldNames, FieldSize + 1);

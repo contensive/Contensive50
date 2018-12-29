@@ -54,7 +54,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override int GetTableID(string TableName) {
-            return cp.core.db.getTableID(TableName);
+            return DbController.getTableID(cp.core, TableName);
         }
         //
         //====================================================================================================

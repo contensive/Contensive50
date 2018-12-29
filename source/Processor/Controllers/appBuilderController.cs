@@ -809,20 +809,20 @@ namespace Contensive.Processor.Controllers {
                 using (var csXfer = new CsModel(core)) {
                     csXfer.csOpen("Countries", "name=" + DbController.encodeSQLText(name));
                     if (!csXfer.csOk()) {
-                        csXfer.csClose();
+                        csXfer.close();
                         csXfer.csInsert("Countries", SystemMemberID);
                         if (csXfer.csOk()) {
-                            csXfer.csSet(CS, "ACTIVE", true);
+                            csXfer.csSet("ACTIVE", true);
                         }
                     }
                     if (csXfer.csOk()) {
-                        csXfer.csSet(CS, "NAME", name);
-                        csXfer.csSet(CS, "Abbreviation", abbreviation);
+                        csXfer.csSet("NAME", name);
+                        csXfer.csSet("Abbreviation", abbreviation);
                         if (GenericController.vbLCase(name) == "united states") {
-                            csXfer.csSet(CS, "DomesticShipping", "1");
+                            csXfer.csSet("DomesticShipping", "1");
                         }
                     }
-                    csXfer.csClose();
+                    csXfer.close();
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -1087,7 +1087,7 @@ namespace Contensive.Processor.Controllers {
                                 if (csXfer.csOk()) {
                                     RecordID = (csXfer.csGetInteger("ID"));
                                 }
-                                csXfer.csClose();
+                                csXfer.close();
                                 if (RecordID == 0) {
                                     csXfer.csInsert(NavigatorEntryModel.contentName, SystemMemberID);
                                     if (csXfer.csOk()) {

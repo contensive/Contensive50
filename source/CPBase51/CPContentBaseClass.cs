@@ -3,6 +3,15 @@ using System;
 
 namespace Contensive.BaseClasses {
     public abstract class CPContentBaseClass {
+        // todo - expose a MetaModel to expose properties
+        ////
+        ////====================================================================================================
+        ////
+        //public abstract MetaBaseModel GetContentMeta(string contentName);
+        ////
+        ////====================================================================================================
+        ////
+        //public abstract MetaFieldBaseModel GetContentFieldMeta(string contentName);
         //
         //====================================================================================================
         /// <summary>
@@ -56,17 +65,6 @@ namespace Contensive.BaseClasses {
         /// <returns></returns>
         /// <remarks></remarks>
         public abstract string GetContentControlCriteria(string ContentName);
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Returns a named field property. Valid values for PropertyName are the field names of the 'Content Fields' content definition, also found as the columns in the ccfields table.
-        /// </summary>
-        /// <param name="ContentName"></param>
-        /// <param name="FieldName"></param>
-        /// <param name="PropertyName"></param>
-        /// <returns></returns>
-        /// <remarks></remarks>
-        public abstract string GetFieldProperty(string ContentName, string FieldName, string PropertyName);
         //
         //====================================================================================================
         /// <summary>
@@ -298,6 +296,9 @@ namespace Contensive.BaseClasses {
         //
         [Obsolete("Use models to access record fields)", true)]
         public abstract string GetProperty(string ContentName, string PropertyName);
+        //
+        [Obsolete("deprecated, use GetFieldMeta and use the property", true)]
+        public abstract string GetFieldProperty(string ContentName, string FieldName, string PropertyName);
     }
 
 }

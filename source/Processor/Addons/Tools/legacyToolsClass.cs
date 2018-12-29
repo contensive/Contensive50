@@ -81,7 +81,7 @@ namespace Contensive.Addons.Tools {
         private int DiagActionCount;
         private const int DiagActionCountMax = 10;
         //
-        private class  DiagActionType {
+        private class DiagActionType {
             public string Name;
             public string Command;
         }
@@ -211,10 +211,10 @@ namespace Contensive.Addons.Tools {
                         //
                         // -- Print out the page
                         switch (AdminFormTool) {
-                            case AdminFormToolContentDiagnostic:
-                                //
-                                Stream.Add(GetForm_ContentDiagnostic());
-                                break;
+                            //case AdminFormToolContentDiagnostic:
+                            //    //
+                            //    Stream.Add(GetForm_ContentDiagnostic());
+                            //    break;
                             case AdminFormToolCreateContentDefinition:
                                 //
                                 Stream.Add(GetForm_CreateContentDefinition());
@@ -388,7 +388,6 @@ namespace Contensive.Addons.Tools {
             string result = "";
             try {
                 //
-                int CS = 0;
                 int ContentID = 0;
                 string TableName = "";
                 string ContentName = "";
@@ -435,8 +434,8 @@ namespace Contensive.Addons.Tools {
                                 using (var csDest = new CsModel(core)) {
                                     csDest.csOpen(NavigatorEntryModel.contentName, "(name=" + DbController.encodeSQLText(ContentName) + ")and(parentid=" + NavID + ")");
                                     if (!csDest.csOk()) {
-                                        csDest.csClose();
-                                        csDest.csInsert(NavigatorEntryModel.contentName);
+                                        csDest.close();
+                                        csDest.insert(NavigatorEntryModel.contentName);
                                     }
                                     if (csDest.csOk()) {
                                         csDest.csSet("name", ContentName);
@@ -518,7 +517,7 @@ namespace Contensive.Addons.Tools {
                         //
                         if (FieldIDToAdd != 0) {
                             foreach (var keyValuePair in CDef.fields) {
-                                Processor.Models.Domain.CDefFieldModel field = keyValuePair.Value;
+                                Processor.Models.Domain.MetaFieldModel field = keyValuePair.Value;
                                 if (field.id == FieldIDToAdd) {
                                     //If field.Name = FieldNameToAdd Then
                                     if (field.inherited) {
@@ -528,9 +527,9 @@ namespace Contensive.Addons.Tools {
                                             CSSource.csOpen("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + DbController.encodeSQLText(SourceName) + ")");
                                             if (CSSource.csOk()) {
                                                 using (var CSTarget = new CsModel(core)) {
-                                                    CSTarget.csInsert("Content Fields");
+                                                    CSTarget.insert("Content Fields");
                                                     if (CSTarget.csOk()) {
-                                                        CSSource.csCopyRecord(CSTarget);
+                                                        CSSource.copyRecord(CSTarget);
                                                         CSTarget.csSet("ContentID", ContentID);
                                                         ReloadCDef = true;
                                                     }
@@ -547,16 +546,16 @@ namespace Contensive.Addons.Tools {
                         //
                         int ColumnNumberMax = 0;
                         foreach (var keyValuePair in CDef.adminColumns) {
-                            Processor.Models.Domain.MetaModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
-                            Processor.Models.Domain.CDefFieldModel field = CDef.fields[adminColumn.Name];
+                            Processor.Models.Domain.MetaModel.MetaAdminColumnClass adminColumn = keyValuePair.Value;
+                            Processor.Models.Domain.MetaFieldModel field = CDef.fields[adminColumn.Name];
                             if (field.inherited) {
                                 SourceContentID = field.contentId;
                                 SourceName = field.nameLc;
                                 using (var CSSource = new CsModel(core)) {
                                     if (CSSource.csOpen("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + DbController.encodeSQLText(SourceName) + ")")) {
                                         using (var CSTarget = new CsModel(core)) {
-                                            if (CSTarget.csInsert("Content Fields")) {
-                                                CSSource.csCopyRecord(CSTarget);
+                                            if (CSTarget.insert("Content Fields")) {
+                                                CSSource.copyRecord(CSTarget);
                                                 CSTarget.csSet("ContentID", ContentID);
                                                 ReloadCDef = true;
                                             }
@@ -584,8 +583,8 @@ namespace Contensive.Addons.Tools {
                                         columnPtr = 0;
                                         if (CDef.adminColumns.Count > 1) {
                                             foreach (var keyValuePair in CDef.adminColumns) {
-                                                Processor.Models.Domain.MetaModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
-                                                Processor.Models.Domain.CDefFieldModel field = CDef.fields[adminColumn.Name];
+                                                Processor.Models.Domain.MetaModel.MetaAdminColumnClass adminColumn = keyValuePair.Value;
+                                                Processor.Models.Domain.MetaFieldModel field = CDef.fields[adminColumn.Name];
                                                 using (var csXfer = new CsModel(core)) {
                                                     csXfer.csOpenRecord("Content Fields", field.id);
                                                     csXfer.csSet("IndexColumn", (columnPtr) * 10);
@@ -614,8 +613,8 @@ namespace Contensive.Addons.Tools {
                                     if (CDef.adminColumns.Count > 1) {
                                         columnPtr = 0;
                                         foreach (var keyValuePair in CDef.adminColumns) {
-                                            Processor.Models.Domain.MetaModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
-                                            Processor.Models.Domain.CDefFieldModel field = CDef.fields[adminColumn.Name];
+                                            Processor.Models.Domain.MetaModel.MetaAdminColumnClass adminColumn = keyValuePair.Value;
+                                            Processor.Models.Domain.MetaFieldModel field = CDef.fields[adminColumn.Name];
                                             using (var csXfer = new CsModel(core)) {
                                                 csXfer.csOpenRecord("Content Fields", field.id);
                                                 if (fieldId == TargetFieldID) {
@@ -642,8 +641,8 @@ namespace Contensive.Addons.Tools {
                                         MoveNextColumn = false;
                                         columnPtr = 0;
                                         foreach (var keyValuePair in CDef.adminColumns) {
-                                            Processor.Models.Domain.MetaModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
-                                            Processor.Models.Domain.CDefFieldModel field = CDef.fields[adminColumn.Name];
+                                            Processor.Models.Domain.MetaModel.MetaAdminColumnClass adminColumn = keyValuePair.Value;
+                                            Processor.Models.Domain.MetaFieldModel field = CDef.fields[adminColumn.Name];
                                             FieldName = adminColumn.Name;
                                             using (var csXfer = new CsModel(core)) {
                                                 csXfer.csOpenRecord("Content Fields", field.id);
@@ -681,8 +680,8 @@ namespace Contensive.Addons.Tools {
                                         MoveNextColumn = false;
                                         columnPtr = 0;
                                         foreach (var keyValuePair in CDef.adminColumns.Reverse()) {
-                                            Processor.Models.Domain.MetaModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
-                                            Processor.Models.Domain.CDefFieldModel field = CDef.fields[adminColumn.Name];
+                                            Processor.Models.Domain.MetaModel.MetaAdminColumnClass adminColumn = keyValuePair.Value;
+                                            Processor.Models.Domain.MetaFieldModel field = CDef.fields[adminColumn.Name];
                                             FieldName = adminColumn.Name;
                                             using (var csXfer = new CsModel(core)) {
                                                 csXfer.csOpenRecord("Content Fields", field.id);
@@ -767,7 +766,7 @@ namespace Contensive.Addons.Tools {
                         //
                         // Calc total width
                         //
-                        foreach (KeyValuePair<string, Processor.Models.Domain.MetaModel.CDefAdminColumnClass> kvp in CDef.adminColumns) {
+                        foreach (KeyValuePair<string, Processor.Models.Domain.MetaModel.MetaAdminColumnClass> kvp in CDef.adminColumns) {
                             ColumnWidthTotal += kvp.Value.Width;
                         }
                         //For ColumnCount = 0 To CDef.adminColumns.Count - 1
@@ -776,7 +775,7 @@ namespace Contensive.Addons.Tools {
                         if (ColumnWidthTotal > 0) {
                             Stream.Add("<table border=\"0\" cellpadding=\"5\" cellspacing=\"0\" width=\"90%\">");
                             int ColumnCount = 0;
-                            foreach (KeyValuePair<string, Processor.Models.Domain.MetaModel.CDefAdminColumnClass> kvp in CDef.adminColumns) {
+                            foreach (KeyValuePair<string, Processor.Models.Domain.MetaModel.MetaAdminColumnClass> kvp in CDef.adminColumns) {
                                 //
                                 // print column headers - anchored so they sort columns
                                 //
@@ -820,15 +819,15 @@ namespace Contensive.Addons.Tools {
                     } else {
                         Stream.Add(SpanClassAdminNormal + "<br>");
                         bool skipField = false;
-                        foreach (KeyValuePair<string, Processor.Models.Domain.CDefFieldModel> keyValuePair in CDef.fields) {
-                            Processor.Models.Domain.CDefFieldModel field = keyValuePair.Value;
+                        foreach (KeyValuePair<string, Processor.Models.Domain.MetaFieldModel> keyValuePair in CDef.fields) {
+                            Processor.Models.Domain.MetaFieldModel field = keyValuePair.Value;
                             //
                             // test if this column is in use
                             //
                             skipField = false;
                             //ColumnPointer = CDef.adminColumns.Count
                             if (CDef.adminColumns.Count > 0) {
-                                foreach (KeyValuePair<string, Processor.Models.Domain.MetaModel.CDefAdminColumnClass> kvp in CDef.adminColumns) {
+                                foreach (KeyValuePair<string, Processor.Models.Domain.MetaModel.MetaAdminColumnClass> kvp in CDef.adminColumns) {
                                     if (field.nameLc == kvp.Value.Name) {
                                         skipField = true;
                                         break;
@@ -1000,10 +999,10 @@ namespace Contensive.Addons.Tools {
         //                        using (var csXfer = new CsModel(core)) {
         //                            csXfer.csOpen("Content", "name=" + DbController.encodeSQLText(ContentName), "ID");
         //                            if (csXfer.csOk()) {
-        //                                csXfer.csGoNext(CS);
+        //                                csXfer.csGoNext();
         //                                while (csXfer.csOk()) {
         //                                    csXfer.csSet("active", 0);
-        //                                    csXfer.csGoNext(CS);
+        //                                    csXfer.csGoNext();
         //                                }
         //                            }
         //                        }
@@ -1017,7 +1016,7 @@ namespace Contensive.Addons.Tools {
         //                        RecordID = GenericController.encodeInteger(DiagArgument(DiagAction, 2));
         //                        csXfer.csOpen(ContentName, "(ID=" + RecordID + ")");
         //                        if (csXfer.csOk()) {
-        //                            csXfer.csSet(CS, "active", 0);
+        //                            csXfer.csSet("active", 0);
         //                        }
         //                        csXfer.csClose();
         //                        //end case
@@ -1030,7 +1029,7 @@ namespace Contensive.Addons.Tools {
         //                        RecordID = GenericController.encodeInteger(DiagArgument(DiagAction, 2));
         //                        csXfer.csOpen(ContentName, "(ID=" + RecordID + ")");
         //                        if (csXfer.csOk()) {
-        //                            csXfer.csSet(CS, "required", 0);
+        //                            csXfer.csSet("required", 0);
         //                        }
         //                        csXfer.csClose();
         //                        //end case
@@ -1093,13 +1092,13 @@ namespace Contensive.Addons.Tools {
         //                        Stream.Add(GetDiagError(DiagProblem, DiagActions));
         //                    } else {
         //                        while (csXfer.csOk() && (DiagActionCount < DiagActionCountMax)) {
-        //                            FieldName = csXfer.csGetText(CS, "FieldName");
-        //                            fieldType = csXfer.csGetInteger(CS, "FieldType");
-        //                            FieldRequired = csXfer.csGetBoolean(CS, "FieldRequired");
-        //                            FieldAuthorable = csXfer.csGetBoolean(CS, "FieldAuthorable");
-        //                            ContentName = csXfer.csGetText(CS, "ContentName");
-        //                            TableName = csXfer.csGetText(CS, "TableName");
-        //                            DataSourceName = csXfer.csGetText(CS, "DataSourceName");
+        //                            FieldName = csXfer.csGetText("FieldName");
+        //                            fieldType = csXfer.csGetInteger("FieldType");
+        //                            FieldRequired = csXfer.csGetBoolean("FieldRequired");
+        //                            FieldAuthorable = csXfer.csGetBoolean("FieldAuthorable");
+        //                            ContentName = csXfer.csGetText("ContentName");
+        //                            TableName = csXfer.csGetText("TableName");
+        //                            DataSourceName = csXfer.csGetText("DataSourceName");
         //                            if (string.IsNullOrEmpty(DataSourceName)) {
         //                                DataSourceName = "Default";
         //                            }
@@ -1128,7 +1127,7 @@ namespace Contensive.Addons.Tools {
         //                                }
         //                            }
         //                            csXfer.csClose(ref CSTest);
-        //                            csXfer.csGoNext(CS);
+        //                            csXfer.csGoNext();
         //                        }
         //                    }
         //                    csXfer.csClose();
@@ -1259,7 +1258,7 @@ namespace Contensive.Addons.Tools {
         //                                }
         //                                csXfer.csClose(ref CSFields);
         //                                csXfer.csClose(ref CSTestRecord);
-        //                                core.db.deleteContentRecord(ContentName, TestRecordID);
+        //                                MetaController.deleteContentRecord( core,ContentName, TestRecordID);
         //                            }
         //                            csXfer.csGoNext(CSContent);
         //                        }
@@ -1598,7 +1597,7 @@ namespace Contensive.Addons.Tools {
                                 core.db.createSQLTable(CD.dataSourceName, TableName);
                                 if (CD.fields.Count > 0) {
                                     foreach (var keyValuePair in CD.fields) {
-                                        Processor.Models.Domain.CDefFieldModel field = keyValuePair.Value;
+                                        Processor.Models.Domain.MetaFieldModel field = keyValuePair.Value;
                                         Stream.Add("...Field " + field.nameLc + "<br>");
                                         core.db.createSQLTableField(CD.dataSourceName, TableName, field.nameLc, field.fieldTypeId);
                                     }

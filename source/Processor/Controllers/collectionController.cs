@@ -1307,7 +1307,7 @@ namespace Contensive.Processor.Controllers {
                                                                                                 // Insert the new record
                                                                                                 //
                                                                                                 recordfound = false;
-                                                                                                csXfer.csClose();
+                                                                                                csXfer.close();
                                                                                                 csXfer.csInsert(ContentName, 0);
                                                                                             }
                                                                                             if (csXfer.csOk()) {
@@ -1376,14 +1376,14 @@ namespace Contensive.Processor.Controllers {
                                                                         if (csXfer.csOk()) {
                                                                             ChildCollectionID = csXfer.csGetInteger("id");
                                                                         }
-                                                                        csXfer.csClose();
+                                                                        csXfer.close();
                                                                         if (ChildCollectionID != 0) {
                                                                             csXfer.csInsert("Add-on Collection Parent Rules", 0);
                                                                             if (csXfer.csOk()) {
                                                                                 csXfer.csSet("ParentID", collection.id);
                                                                                 csXfer.csSet("ChildID", ChildCollectionID);
                                                                             }
-                                                                            csXfer.csClose();
+                                                                            csXfer.close();
                                                                         }
                                                                     }
                                                                 }
@@ -1624,7 +1624,7 @@ namespace Contensive.Processor.Controllers {
                                                                                                 int fieldTypeId = -1;
                                                                                                 int FieldLookupContentID = -1;
                                                                                                 foreach (var keyValuePair in CDef.fields) {
-                                                                                                    Models.Domain.CDefFieldModel field = keyValuePair.Value;
+                                                                                                    Models.Domain.MetaFieldModel field = keyValuePair.Value;
                                                                                                     if (GenericController.vbLCase(field.nameLc) == FieldName) {
                                                                                                         fieldTypeId = field.fieldTypeId;
                                                                                                         FieldLookupContentID = field.lookupContentID;
@@ -2130,375 +2130,372 @@ namespace Contensive.Processor.Controllers {
                     if (navTypeId == 0) {
                         navTypeId = NavTypeIDAddon;
                     }
-                    using (var csXfer = new CsModel(core)) {
-                    }
-                    string Criteria = "(" + AddonGuidFieldName + "=" + DbController.encodeSQLText(addonGuid) + ")";
-                    int csXfer.csOpen(Models.Db.AddonModel.contentName, Criteria, "", false);
-                    if (csXfer.csOk()) {
-                        //
-                        // Update the Addon
-                        //
-                        LogController.logInfo(core, "UpgradeAppFromLocalCollection, GUID match with existing Add-on, Updating Add-on [" + addonName + "], Guid [" + addonGuid + "]");
-                    } else {
-                        //
-                        // not found by GUID - search name against name to update legacy Add-ons
-                        //
-                        csXfer.csClose();
-                        Criteria = "(name=" + DbController.encodeSQLText(addonName) + ")and(" + AddonGuidFieldName + " is null)";
-                        csXfer.csOpen(Models.Db.AddonModel.contentName, Criteria,"", false);
-                        if (csXfer.csOk()) {
-                            LogController.logInfo(core, "UpgradeAppFromLocalCollection, Add-on name matched an existing Add-on that has no GUID, Updating legacy Aggregate Function to Add-on [" + addonName + "], Guid [" + addonGuid + "]");
+                    using (var cs = new CsModel(core)) {
+                        string Criteria = "(" + AddonGuidFieldName + "=" + DbController.encodeSQLText(addonGuid) + ")";
+                        cs.csOpen(Models.Db.AddonModel.contentName, Criteria, "", false);
+                        if (cs.csOk()) {
+                            //
+                            // Update the Addon
+                            //
+                            LogController.logInfo(core, "UpgradeAppFromLocalCollection, GUID match with existing Add-on, Updating Add-on [" + addonName + "], Guid [" + addonGuid + "]");
+                        } else {
+                            //
+                            // not found by GUID - search name against name to update legacy Add-ons
+                            //
+                            cs.close();
+                            Criteria = "(name=" + DbController.encodeSQLText(addonName) + ")and(" + AddonGuidFieldName + " is null)";
+                            cs.csOpen(Models.Db.AddonModel.contentName, Criteria, "", false);
+                            if (cs.csOk()) {
+                                LogController.logInfo(core, "UpgradeAppFromLocalCollection, Add-on name matched an existing Add-on that has no GUID, Updating legacy Aggregate Function to Add-on [" + addonName + "], Guid [" + addonGuid + "]");
+                            }
                         }
-                    }
-                    if (!csXfer.csOk()) {
-                        //
-                        // not found by GUID or by name, Insert a new addon
-                        //
-                        csXfer.csClose();
-                        csXfer.csInsert(Models.Db.AddonModel.contentName, 0);
-                        if (csXfer.csOk()) {
-                            LogController.logInfo(core, "UpgradeAppFromLocalCollection, Creating new Add-on [" + addonName + "], Guid [" + addonGuid + "]");
+                        if (!cs.csOk()) {
+                            //
+                            // not found by GUID or by name, Insert a new addon
+                            //
+                            cs.close();
+                            cs.csInsert(Models.Db.AddonModel.contentName, 0);
+                            if (cs.csOk()) {
+                                LogController.logInfo(core, "UpgradeAppFromLocalCollection, Creating new Add-on [" + addonName + "], Guid [" + addonGuid + "]");
+                            }
                         }
-                    }
-                    if (!csXfer.csOk()) {
-                        //
-                        // Could not create new Add-on
-                        //
-                        LogController.logInfo(core, "UpgradeAppFromLocalCollection, Add-on could not be created, skipping Add-on [" + addonName + "], Guid [" + addonGuid + "]");
-                    } else {
-                        int addonId = csXfer.csGetInteger(CS, "ID");
-                        //
-                        // Initialize the add-on
-                        // Delete any existing related records - so if this is an update with removed relationships, those are removed
-                        //
-                        //Call MetaController.deleteContentRecords(core, "Shared Styles Add-on Rules", "addonid=" & addonId)
-                        //Call MetaController.deleteContentRecords(core, "Add-on Scripting Module Rules", "addonid=" & addonId)
-                        MetaController.deleteContentRecords(core, "Add-on Include Rules", "addonid=" + addonId);
-                        MetaController.deleteContentRecords(core, "Add-on Content Trigger Rules", "addonid=" + addonId);
-                        //
-                        csXfer.csSet(CS, "collectionid", CollectionID);
-                        csXfer.csSet(CS, AddonGuidFieldName, addonGuid);
-                        csXfer.csSet(CS, "name", addonName);
-                        csXfer.csSet(CS, "navTypeId", navTypeId);
-                        string ArgumentList = "";
-                        string StyleSheet = "";
-                        if (AddonNode.ChildNodes.Count > 0) {
-                            foreach (XmlNode PageInterfaceWithinLoop in AddonNode.ChildNodes) {
-                                if (!(PageInterfaceWithinLoop is XmlComment)) {
-                                    XmlNode PageInterface = PageInterfaceWithinLoop;
-                                    string test = null;
-                                    int scriptinglanguageid = 0;
-                                    string ScriptingCode = null;
-                                    string FieldName = null;
-                                    string NodeName = null;
-                                    string NewValue = null;
-                                    string menuNameSpace = null;
-                                    string FieldValue = "";
-                                    int CS2 = 0;
-                                    string ScriptingEntryPoint = null;
-                                    int ScriptingTimeout = 0;
-                                    string ScriptingLanguage = null;
-                                    switch (GenericController.vbLCase(PageInterfaceWithinLoop.Name)) {
-                                        case "activexdll":
-                                            //
-                                            // This is handled in BuildLocalCollectionFolder
-                                            //
-                                            break;
-                                        case "editors":
-                                            //
-                                            // list of editors
-                                            //
-                                            foreach (XmlNode TriggerNode in PageInterfaceWithinLoop.ChildNodes) {
+                        if (!cs.csOk()) {
+                            //
+                            // Could not create new Add-on
+                            //
+                            LogController.logInfo(core, "UpgradeAppFromLocalCollection, Add-on could not be created, skipping Add-on [" + addonName + "], Guid [" + addonGuid + "]");
+                        } else {
+                            int addonId = cs.csGetInteger("ID");
+                            //
+                            // Initialize the add-on
+                            // Delete any existing related records - so if this is an update with removed relationships, those are removed
+                            //
+                            //Call MetaController.deleteContentRecords(core, "Shared Styles Add-on Rules", "addonid=" & addonId)
+                            //Call MetaController.deleteContentRecords(core, "Add-on Scripting Module Rules", "addonid=" & addonId)
+                            MetaController.deleteContentRecords(core, "Add-on Include Rules", "addonid=" + addonId);
+                            MetaController.deleteContentRecords(core, "Add-on Content Trigger Rules", "addonid=" + addonId);
+                            //
+                            cs.csSet("collectionid", CollectionID);
+                            cs.csSet(AddonGuidFieldName, addonGuid);
+                            cs.csSet("name", addonName);
+                            cs.csSet("navTypeId", navTypeId);
+                            string ArgumentList = "";
+                            string StyleSheet = "";
+                            if (AddonNode.ChildNodes.Count > 0) {
+                                foreach (XmlNode PageInterfaceWithinLoop in AddonNode.ChildNodes) {
+                                    if (!(PageInterfaceWithinLoop is XmlComment)) {
+                                        XmlNode PageInterface = PageInterfaceWithinLoop;
+                                        string test = null;
+                                        int scriptinglanguageid = 0;
+                                        string ScriptingCode = null;
+                                        string FieldName = null;
+                                        string NodeName = null;
+                                        string NewValue = null;
+                                        string menuNameSpace = null;
+                                        string FieldValue = "";
+                                        string ScriptingEntryPoint = null;
+                                        int ScriptingTimeout = 0;
+                                        string ScriptingLanguage = null;
+                                        switch (GenericController.vbLCase(PageInterfaceWithinLoop.Name)) {
+                                            case "activexdll":
                                                 //
-                                                int fieldTypeID = 0;
-                                                string fieldType = null;
-                                                switch (GenericController.vbLCase(TriggerNode.Name)) {
-                                                    case "type":
-                                                        fieldType = TriggerNode.InnerText;
-                                                        fieldTypeID = MetaController.getRecordId( core,"Content Field Types", fieldType);
-                                                        if (fieldTypeID > 0) {
-                                                            Criteria = "(addonid=" + addonId + ")and(contentfieldTypeID=" + fieldTypeID + ")";
-                                                            CS2 = csXfer.csOpen("Add-on Content Field Type Rules", Criteria);
-                                                            if (!csXfer.csOk(CS2)) {
-                                                                csXfer.csClose(ref CS2);
-                                                                CS2 = csXfer.csInsert("Add-on Content Field Type Rules", 0);
-                                                            }
-                                                            if (csXfer.csOk(CS2)) {
-                                                                csXfer.csSet(CS2, "addonid", addonId);
-                                                                csXfer.csSet(CS2, "contentfieldTypeID", fieldTypeID);
-                                                            }
-                                                            csXfer.csClose(ref CS2);
-                                                        }
-                                                        break;
-                                                }
-                                            }
-                                            break;
-                                        case "processtriggers":
-                                            //
-                                            // list of events that trigger a process run for this addon
-                                            //
-                                            foreach (XmlNode TriggerNode in PageInterfaceWithinLoop.ChildNodes) {
-                                                int TriggerContentID = 0;
-                                                string ContentNameorGuid = null;
-                                                switch (GenericController.vbLCase(TriggerNode.Name)) {
-                                                    case "contentchange":
-                                                        TriggerContentID = 0;
-                                                        ContentNameorGuid = TriggerNode.InnerText;
-                                                        if (string.IsNullOrEmpty(ContentNameorGuid)) {
-                                                            ContentNameorGuid = XmlController.GetXMLAttribute(core, IsFound, TriggerNode, "guid", "");
-                                                            if (string.IsNullOrEmpty(ContentNameorGuid)) {
-                                                                ContentNameorGuid = XmlController.GetXMLAttribute(core, IsFound, TriggerNode, "name", "");
-                                                            }
-                                                        }
-                                                        Criteria = "(ccguid=" + DbController.encodeSQLText(ContentNameorGuid) + ")";
-                                                        CS2 = csXfer.csOpen("Content", Criteria);
-                                                        if (!csXfer.csOk(CS2)) {
-                                                            csXfer.csClose(ref CS2);
-                                                            Criteria = "(ccguid is null)and(name=" + DbController.encodeSQLText(ContentNameorGuid) + ")";
-                                                            CS2 = csXfer.csOpen("content", Criteria);
-                                                        }
-                                                        if (csXfer.csOk(CS2)) {
-                                                            TriggerContentID = csXfer.csGetInteger(CS2, "ID");
-                                                        }
-                                                        csXfer.csClose(ref CS2);
-                                                        if (TriggerContentID == 0) {
-                                                            //
-                                                            // could not find the content
-                                                        } else {
-                                                            Criteria = "(addonid=" + addonId + ")and(contentid=" + TriggerContentID + ")";
-                                                            CS2 = csXfer.csOpen("Add-on Content Trigger Rules", Criteria);
-                                                            if (!csXfer.csOk(CS2)) {
-                                                                csXfer.csClose(ref CS2);
-                                                                CS2 = csXfer.csInsert("Add-on Content Trigger Rules", 0);
-                                                                if (csXfer.csOk(CS2)) {
-                                                                    csXfer.csSet(CS2, "addonid", addonId);
-                                                                    csXfer.csSet(CS2, "contentid", TriggerContentID);
+                                                // This is handled in BuildLocalCollectionFolder
+                                                //
+                                                break;
+                                            case "editors":
+                                                //
+                                                // list of editors
+                                                //
+                                                foreach (XmlNode TriggerNode in PageInterfaceWithinLoop.ChildNodes) {
+                                                    //
+                                                    int fieldTypeID = 0;
+                                                    string fieldType = null;
+                                                    switch (GenericController.vbLCase(TriggerNode.Name)) {
+                                                        case "type":
+                                                            fieldType = TriggerNode.InnerText;
+                                                            fieldTypeID = MetaController.getRecordId(core, "Content Field Types", fieldType);
+                                                            if (fieldTypeID > 0) {
+                                                                using (var CS2 = new CsModel(core)) {
+                                                                    Criteria = "(addonid=" + addonId + ")and(contentfieldTypeID=" + fieldTypeID + ")";
+                                                                    CS2.csOpen("Add-on Content Field Type Rules", Criteria);
+                                                                    if (!CS2.csOk()) {
+                                                                        CS2.csInsert("Add-on Content Field Type Rules", 0);
+                                                                    }
+                                                                    if (CS2.csOk()) {
+                                                                        CS2.csSet("addonid", addonId);
+                                                                        CS2.csSet("contentfieldTypeID", fieldTypeID);
+                                                                    }
                                                                 }
                                                             }
-                                                            csXfer.csClose(ref CS2);
-                                                        }
-                                                        break;
+                                                            break;
+                                                    }
                                                 }
-                                            }
-                                            break;
-                                        case "scripting":
-                                            //
-                                            // include add-ons - NOTE - import collections must be run before interfaces
-                                            // when importing a collectin that will be used for an include
-                                            //
-                                            ScriptingLanguage = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "language", "");
-                                            if (ScriptingLanguage.ToLower() == "jscript") {
-                                                scriptinglanguageid = (int)AddonController.ScriptLanguages.Javascript;
-                                            } else {
-                                                scriptinglanguageid = (int)AddonController.ScriptLanguages.VBScript;
-                                            }
-                                            csXfer.csSet(CS, "scriptinglanguageid", scriptinglanguageid);
-                                            ScriptingEntryPoint = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "entrypoint", "");
-                                            csXfer.csSet(CS, "ScriptingEntryPoint", ScriptingEntryPoint);
-                                            ScriptingTimeout = GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "timeout", "5000"));
-                                            csXfer.csSet(CS, "ScriptingTimeout", ScriptingTimeout);
-                                            ScriptingCode = "";
-                                            foreach (XmlNode ScriptingNode in PageInterfaceWithinLoop.ChildNodes) {
-                                                switch (GenericController.vbLCase(ScriptingNode.Name)) {
-                                                    case "code":
-                                                        ScriptingCode += ScriptingNode.InnerText;
-                                                        break;
-                                                }
-                                            }
-                                            csXfer.csSet(CS, "ScriptingCode", ScriptingCode);
-                                            break;
-                                        case "activexprogramid":
-                                            //
-                                            // save program id
-                                            //
-                                            FieldValue = PageInterfaceWithinLoop.InnerText;
-                                            csXfer.csSet(CS, "ObjectProgramID", FieldValue);
-                                            break;
-                                        case "navigator":
-                                            //
-                                            // create a navigator entry with a parent set to this
-                                            //
-                                            csXfer.csSave(CS);
-                                            menuNameSpace = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "NameSpace", "");
-                                            if (!string.IsNullOrEmpty(menuNameSpace)) {
-                                                string NavIconTypeString = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "type", "");
-                                                if (string.IsNullOrEmpty(NavIconTypeString)) {
-                                                    NavIconTypeString = "Addon";
-                                                }
-                                                //Dim builder As New coreBuilderClass(core)
-                                                AppBuilderController.verifyNavigatorEntry(core, "", menuNameSpace, addonName, "", "", "", false, false, false, true, addonName, NavIconTypeString, addonName, CollectionID);
-                                            }
-                                            break;
-                                        case "argument":
-                                        case "argumentlist":
-                                            //
-                                            // multiple argumentlist elements are concatinated with crlf
-                                            //
-                                            NewValue = encodeText(PageInterfaceWithinLoop.InnerText).Trim(' ');
-                                            if (!string.IsNullOrEmpty(NewValue)) {
-                                                if (string.IsNullOrEmpty(ArgumentList)) {
-                                                    ArgumentList = NewValue;
-                                                } else if (NewValue != FieldValue) {
-                                                    ArgumentList = ArgumentList + "\r\n" + NewValue;
-                                                }
-                                            }
-                                            break;
-                                        case "style":
-                                            //
-                                            // import exclusive style
-                                            //
-                                            NodeName = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "name", "");
-                                            NewValue = encodeText(PageInterfaceWithinLoop.InnerText).Trim(' ');
-                                            if (NewValue.Left(1) != "{") {
-                                                NewValue = "{" + NewValue;
-                                            }
-                                            if (NewValue.Substring(NewValue.Length - 1) != "}") {
-                                                NewValue = NewValue + "}";
-                                            }
-                                            StyleSheet = StyleSheet + "\r\n" + NodeName + " " + NewValue;
-                                            break;
-                                        case "stylesheet":
-                                        case "styles":
-                                            //
-                                            // import exclusive stylesheet if more then whitespace
-                                            //
-                                            test = PageInterfaceWithinLoop.InnerText;
-                                            test = GenericController.vbReplace(test, " ", "");
-                                            test = GenericController.vbReplace(test, "\r", "");
-                                            test = GenericController.vbReplace(test, "\n", "");
-                                            test = GenericController.vbReplace(test, "\t", "");
-                                            if (!string.IsNullOrEmpty(test)) {
-                                                StyleSheet = StyleSheet + "\r\n" + PageInterfaceWithinLoop.InnerText;
-                                            }
-                                            break;
-                                        case "template":
-                                        case "content":
-                                        case "admin":
-                                            //
-                                            // these add-ons will be "non-developer only" in navigation
-                                            //
-                                            FieldName = PageInterfaceWithinLoop.Name;
-                                            FieldValue = PageInterfaceWithinLoop.InnerText;
-                                            if (!csXfer.csIsFieldSupported(CS, FieldName)) {
+                                                break;
+                                            case "processtriggers":
                                                 //
-                                                // Bad field name - need to report it somehow
+                                                // list of events that trigger a process run for this addon
                                                 //
-                                            } else {
-                                                csXfer.csSet(CS, FieldName, FieldValue);
-                                                if (GenericController.encodeBoolean(PageInterfaceWithinLoop.InnerText)) {
+                                                foreach (XmlNode TriggerNode in PageInterfaceWithinLoop.ChildNodes) {
+                                                    int TriggerContentID = 0;
+                                                    string ContentNameorGuid = null;
+                                                    switch (GenericController.vbLCase(TriggerNode.Name)) {
+                                                        case "contentchange":
+                                                            TriggerContentID = 0;
+                                                            ContentNameorGuid = TriggerNode.InnerText;
+                                                            if (string.IsNullOrEmpty(ContentNameorGuid)) {
+                                                                ContentNameorGuid = XmlController.GetXMLAttribute(core, IsFound, TriggerNode, "guid", "");
+                                                                if (string.IsNullOrEmpty(ContentNameorGuid)) {
+                                                                    ContentNameorGuid = XmlController.GetXMLAttribute(core, IsFound, TriggerNode, "name", "");
+                                                                }
+                                                            }
+                                                            using (var CS2 = new CsModel(core)) {
+                                                                Criteria = "(ccguid=" + DbController.encodeSQLText(ContentNameorGuid) + ")";
+                                                                CS2.csOpen("Content", Criteria);
+                                                                if (!CS2.csOk()) {
+                                                                    Criteria = "(ccguid is null)and(name=" + DbController.encodeSQLText(ContentNameorGuid) + ")";
+                                                                    CS2.csOpen("content", Criteria);
+                                                                }
+                                                                if (CS2.csOk()) {
+                                                                    TriggerContentID = CS2.csGetInteger("ID");
+                                                                }
+                                                            }
+                                                            if (TriggerContentID != 0) {
+                                                                using (var CS2 = new CsModel(core)) {
+                                                                    Criteria = "(addonid=" + addonId + ")and(contentid=" + TriggerContentID + ")";
+                                                                    CS2.csOpen("Add-on Content Trigger Rules", Criteria);
+                                                                    if (!CS2.csOk()) {
+                                                                        CS2.csInsert("Add-on Content Trigger Rules", 0);
+                                                                        if (CS2.csOk()) {
+                                                                            CS2.csSet("addonid", addonId);
+                                                                            CS2.csSet("contentid", TriggerContentID);
+                                                                        }
+                                                                    }
+                                                                    CS2.close();
+                                                                }
+                                                            }
+                                                            break;
+                                                    }
+                                                }
+                                                break;
+                                            case "scripting":
+                                                //
+                                                // include add-ons - NOTE - import collections must be run before interfaces
+                                                // when importing a collectin that will be used for an include
+                                                //
+                                                ScriptingLanguage = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "language", "");
+                                                if (ScriptingLanguage.ToLower() == "jscript") {
+                                                    scriptinglanguageid = (int)AddonController.ScriptLanguages.Javascript;
+                                                } else {
+                                                    scriptinglanguageid = (int)AddonController.ScriptLanguages.VBScript;
+                                                }
+                                                cs.csSet("scriptinglanguageid", scriptinglanguageid);
+                                                ScriptingEntryPoint = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "entrypoint", "");
+                                                cs.csSet("ScriptingEntryPoint", ScriptingEntryPoint);
+                                                ScriptingTimeout = GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "timeout", "5000"));
+                                                cs.csSet("ScriptingTimeout", ScriptingTimeout);
+                                                ScriptingCode = "";
+                                                foreach (XmlNode ScriptingNode in PageInterfaceWithinLoop.ChildNodes) {
+                                                    switch (GenericController.vbLCase(ScriptingNode.Name)) {
+                                                        case "code":
+                                                            ScriptingCode += ScriptingNode.InnerText;
+                                                            break;
+                                                    }
+                                                }
+                                                cs.csSet("ScriptingCode", ScriptingCode);
+                                                break;
+                                            case "activexprogramid":
+                                                //
+                                                // save program id
+                                                //
+                                                FieldValue = PageInterfaceWithinLoop.InnerText;
+                                                cs.csSet("ObjectProgramID", FieldValue);
+                                                break;
+                                            case "navigator":
+                                                //
+                                                // create a navigator entry with a parent set to this
+                                                //
+                                                cs.csSave();
+                                                menuNameSpace = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "NameSpace", "");
+                                                if (!string.IsNullOrEmpty(menuNameSpace)) {
+                                                    string NavIconTypeString = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "type", "");
+                                                    if (string.IsNullOrEmpty(NavIconTypeString)) {
+                                                        NavIconTypeString = "Addon";
+                                                    }
+                                                    //Dim builder As New coreBuilderClass(core)
+                                                    AppBuilderController.verifyNavigatorEntry(core, "", menuNameSpace, addonName, "", "", "", false, false, false, true, addonName, NavIconTypeString, addonName, CollectionID);
+                                                }
+                                                break;
+                                            case "argument":
+                                            case "argumentlist":
+                                                //
+                                                // multiple argumentlist elements are concatinated with crlf
+                                                //
+                                                NewValue = encodeText(PageInterfaceWithinLoop.InnerText).Trim(' ');
+                                                if (!string.IsNullOrEmpty(NewValue)) {
+                                                    if (string.IsNullOrEmpty(ArgumentList)) {
+                                                        ArgumentList = NewValue;
+                                                    } else if (NewValue != FieldValue) {
+                                                        ArgumentList = ArgumentList + "\r\n" + NewValue;
+                                                    }
+                                                }
+                                                break;
+                                            case "style":
+                                                //
+                                                // import exclusive style
+                                                //
+                                                NodeName = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "name", "");
+                                                NewValue = encodeText(PageInterfaceWithinLoop.InnerText).Trim(' ');
+                                                if (NewValue.Left(1) != "{") {
+                                                    NewValue = "{" + NewValue;
+                                                }
+                                                if (NewValue.Substring(NewValue.Length - 1) != "}") {
+                                                    NewValue = NewValue + "}";
+                                                }
+                                                StyleSheet = StyleSheet + "\r\n" + NodeName + " " + NewValue;
+                                                break;
+                                            case "stylesheet":
+                                            case "styles":
+                                                //
+                                                // import exclusive stylesheet if more then whitespace
+                                                //
+                                                test = PageInterfaceWithinLoop.InnerText;
+                                                test = GenericController.vbReplace(test, " ", "");
+                                                test = GenericController.vbReplace(test, "\r", "");
+                                                test = GenericController.vbReplace(test, "\n", "");
+                                                test = GenericController.vbReplace(test, "\t", "");
+                                                if (!string.IsNullOrEmpty(test)) {
+                                                    StyleSheet = StyleSheet + "\r\n" + PageInterfaceWithinLoop.InnerText;
+                                                }
+                                                break;
+                                            case "template":
+                                            case "content":
+                                            case "admin":
+                                                //
+                                                // these add-ons will be "non-developer only" in navigation
+                                                //
+                                                FieldName = PageInterfaceWithinLoop.Name;
+                                                FieldValue = PageInterfaceWithinLoop.InnerText;
+                                                if (!cs.csIsFieldSupported(FieldName)) {
                                                     //
-                                                    // if template, admin or content - let non-developers have navigator entry
-                                                    //
-                                                }
-                                            }
-                                            break;
-                                        case "icon":
-                                            //
-                                            // icon
-                                            //
-                                            FieldValue = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "link", "");
-                                            if (!string.IsNullOrEmpty(FieldValue)) {
-                                                //
-                                                // Icons can be either in the root of the website or in content files
-                                                //
-                                                FieldValue = GenericController.vbReplace(FieldValue, "\\", "/"); // make it a link, not a file
-                                                if (GenericController.vbInstr(1, FieldValue, "://") != 0) {
-                                                    //
-                                                    // the link is an absolute URL, leave it link this
+                                                    // Bad field name - need to report it somehow
                                                     //
                                                 } else {
-                                                    if (FieldValue.Left(1) != "/") {
+                                                    cs.csSet(FieldName, FieldValue);
+                                                    if (GenericController.encodeBoolean(PageInterfaceWithinLoop.InnerText)) {
                                                         //
-                                                        // make sure it starts with a slash to be consistance
+                                                        // if template, admin or content - let non-developers have navigator entry
                                                         //
-                                                        FieldValue = "/" + FieldValue;
-                                                    }
-                                                    if (FieldValue.Left(17) == "/contensivefiles/") {
-                                                        //
-                                                        // in content files, start link without the slash
-                                                        //
-                                                        FieldValue = FieldValue.Substring(17);
                                                     }
                                                 }
-                                                csXfer.csSet(CS, "IconFilename", FieldValue);
+                                                break;
+                                            case "icon":
+                                                //
+                                                // icon
+                                                //
+                                                FieldValue = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "link", "");
+                                                if (!string.IsNullOrEmpty(FieldValue)) {
+                                                    //
+                                                    // Icons can be either in the root of the website or in content files
+                                                    //
+                                                    FieldValue = GenericController.vbReplace(FieldValue, "\\", "/"); // make it a link, not a file
+                                                    if (GenericController.vbInstr(1, FieldValue, "://") != 0) {
+                                                        //
+                                                        // the link is an absolute URL, leave it link this
+                                                        //
+                                                    } else {
+                                                        if (FieldValue.Left(1) != "/") {
+                                                            //
+                                                            // make sure it starts with a slash to be consistance
+                                                            //
+                                                            FieldValue = "/" + FieldValue;
+                                                        }
+                                                        if (FieldValue.Left(17) == "/contensivefiles/") {
+                                                            //
+                                                            // in content files, start link without the slash
+                                                            //
+                                                            FieldValue = FieldValue.Substring(17);
+                                                        }
+                                                    }
+                                                    cs.csSet("IconFilename", FieldValue);
+                                                    if (true) {
+                                                        cs.csSet("IconWidth", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "width", "0")));
+                                                        cs.csSet("IconHeight", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "height", "0")));
+                                                        cs.csSet("IconSprites", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "sprites", "0")));
+                                                    }
+                                                }
+                                                break;
+                                            case "includeaddon":
+                                            case "includeadd-on":
+                                            case "include addon":
+                                            case "include add-on":
+                                                //
+                                                // processed in phase2 of this routine, after all the add-ons are installed
+                                                //
+                                                break;
+                                            case "form":
+                                                //
+                                                // The value of this node is the xml instructions to create a form. Take then
+                                                //   entire node, children and all, and save them in the formxml field.
+                                                //   this replaces the settings add-on type, and soo to be report add-on types as well.
+                                                //   this removes the ccsettingpages and settingcollectionrules, etc.
+                                                //
                                                 if (true) {
-                                                    csXfer.csSet(CS, "IconWidth", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "width", "0")));
-                                                    csXfer.csSet(CS, "IconHeight", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "height", "0")));
-                                                    csXfer.csSet(CS, "IconSprites", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "sprites", "0")));
+                                                    cs.csSet("formxml", PageInterfaceWithinLoop.InnerXml);
                                                 }
-                                            }
-                                            break;
-                                        case "includeaddon":
-                                        case "includeadd-on":
-                                        case "include addon":
-                                        case "include add-on":
-                                            //
-                                            // processed in phase2 of this routine, after all the add-ons are installed
-                                            //
-                                            break;
-                                        case "form":
-                                            //
-                                            // The value of this node is the xml instructions to create a form. Take then
-                                            //   entire node, children and all, and save them in the formxml field.
-                                            //   this replaces the settings add-on type, and soo to be report add-on types as well.
-                                            //   this removes the ccsettingpages and settingcollectionrules, etc.
-                                            //
-                                            if (true) {
-                                                csXfer.csSet(CS, "formxml", PageInterfaceWithinLoop.InnerXml);
-                                            }
-                                            break;
-                                        case "javascript":
-                                        case "javascriptinhead":
-                                            //
-                                            // these all translate to JSFilename
-                                            //
-                                            FieldName = "jsfilename";
-                                            csXfer.csSet(CS, FieldName, PageInterfaceWithinLoop.InnerText);
+                                                break;
+                                            case "javascript":
+                                            case "javascriptinhead":
+                                                //
+                                                // these all translate to JSFilename
+                                                //
+                                                FieldName = "jsfilename";
+                                                cs.csSet(FieldName, PageInterfaceWithinLoop.InnerText);
 
-                                            break;
-                                        case "iniframe":
-                                            //
-                                            // typo - field is inframe
-                                            //
-                                            FieldName = "inframe";
-                                            csXfer.csSet(CS, FieldName, PageInterfaceWithinLoop.InnerText);
-                                            break;
-                                        default:
-                                            //
-                                            // All the other fields should match the Db fields
-                                            //
-                                            FieldName = PageInterfaceWithinLoop.Name;
-                                            FieldValue = PageInterfaceWithinLoop.InnerText;
-                                            if (!csXfer.csIsFieldSupported(CS, FieldName)) {
+                                                break;
+                                            case "iniframe":
                                                 //
-                                                // Bad field name - need to report it somehow
+                                                // typo - field is inframe
                                                 //
-                                                LogController.handleError(core, new ApplicationException("bad field found [" + FieldName + "], in addon node [" + addonName + "], of collection [" + MetaController.getRecordName( core,"add-on collections", CollectionID) + "]"));
-                                            } else {
-                                                csXfer.csSet(CS, FieldName, FieldValue);
-                                            }
-                                            break;
+                                                FieldName = "inframe";
+                                                cs.csSet(FieldName, PageInterfaceWithinLoop.InnerText);
+                                                break;
+                                            default:
+                                                //
+                                                // All the other fields should match the Db fields
+                                                //
+                                                FieldName = PageInterfaceWithinLoop.Name;
+                                                FieldValue = PageInterfaceWithinLoop.InnerText;
+                                                if (!cs.csIsFieldSupported(FieldName)) {
+                                                    //
+                                                    // Bad field name - need to report it somehow
+                                                    //
+                                                    LogController.handleError(core, new ApplicationException("bad field found [" + FieldName + "], in addon node [" + addonName + "], of collection [" + MetaController.getRecordName(core, "add-on collections", CollectionID) + "]"));
+                                                } else {
+                                                    cs.csSet(FieldName, FieldValue);
+                                                }
+                                                break;
+                                        }
                                     }
                                 }
                             }
+                            cs.csSet("ArgumentList", ArgumentList);
+                            cs.csSet("StylesFilename", StyleSheet);
+                            // these are dynamic now
+                            //            '
+                            //            ' Setup special setting/tool/report Navigator Entry
+                            //            '
+                            //            If navTypeId = NavTypeIDTool Then
+                            //                AddonNavID = GetNonRootNavigatorID(asv, AOName, GetNavIDByGuid(asv, "{801F1F07-20E6-4A5D-AF26-71007CCB834F}"), addonid, 0, NavIconTypeTool, AOName & " Add-on", NavDeveloperOnly, 0, "", 0, 0, CollectionID, navAdminOnly)
+                            //            End If
+                            //            If navTypeId = NavTypeIDReport Then
+                            //                AddonNavID = GetNonRootNavigatorID(asv, AOName, GetNavIDByGuid(asv, "{2ED078A2-6417-46CB-8572-A13F64C4BF18}"), addonid, 0, NavIconTypeReport, AOName & " Add-on", NavDeveloperOnly, 0, "", 0, 0, CollectionID, navAdminOnly)
+                            //            End If
+                            //            If navTypeId = NavTypeIDSetting Then
+                            //                AddonNavID = GetNonRootNavigatorID(asv, AOName, GetNavIDByGuid(asv, "{5FDDC758-4A15-4F98-8333-9CE8B8BFABC4}"), addonid, 0, NavIconTypeSetting, AOName & " Add-on", NavDeveloperOnly, 0, "", 0, 0, CollectionID, navAdminOnly)
+                            //            End If
                         }
-                        csXfer.csSet(CS, "ArgumentList", ArgumentList);
-                        csXfer.csSet(CS, "StylesFilename", StyleSheet);
-                        // these are dynamic now
-                        //            '
-                        //            ' Setup special setting/tool/report Navigator Entry
-                        //            '
-                        //            If navTypeId = NavTypeIDTool Then
-                        //                AddonNavID = GetNonRootNavigatorID(asv, AOName, GetNavIDByGuid(asv, "{801F1F07-20E6-4A5D-AF26-71007CCB834F}"), addonid, 0, NavIconTypeTool, AOName & " Add-on", NavDeveloperOnly, 0, "", 0, 0, CollectionID, navAdminOnly)
-                        //            End If
-                        //            If navTypeId = NavTypeIDReport Then
-                        //                AddonNavID = GetNonRootNavigatorID(asv, AOName, GetNavIDByGuid(asv, "{2ED078A2-6417-46CB-8572-A13F64C4BF18}"), addonid, 0, NavIconTypeReport, AOName & " Add-on", NavDeveloperOnly, 0, "", 0, 0, CollectionID, navAdminOnly)
-                        //            End If
-                        //            If navTypeId = NavTypeIDSetting Then
-                        //                AddonNavID = GetNonRootNavigatorID(asv, AOName, GetNavIDByGuid(asv, "{5FDDC758-4A15-4F98-8333-9CE8B8BFABC4}"), addonid, 0, NavIconTypeSetting, AOName & " Add-on", NavDeveloperOnly, 0, "", 0, 0, CollectionID, navAdminOnly)
-                        //            End If
+                        cs.close();
                     }
-                    csXfer.csClose();
                     //
                     // -- if this is needed, the installation xml files are available in the addon install folder. - I do not believe this is important
                     //       as if a collection is missing a dependancy, there is an error and you would expect to have to reinstall.
@@ -2510,9 +2507,9 @@ namespace Contensive.Processor.Controllers {
                     //   - if this addon is the target of another add-on's  "includeaddon" node
                     //
                     //Doc = New XmlDocument
-                    //csXfer.cs_open("Add-on Collections")
-                    //Do While csXfer.cs_ok(CS)
-                    //    CollectionFile = csXfer.cs_get(CS, "InstallFile")
+                    //csCollection.cs_open("Add-on Collections")
+                    //Do While csCollection.cs_ok(CS)
+                    //    CollectionFile = csCollection.cs_get("InstallFile")
                     //    If CollectionFile <> "" Then
                     //        Try
                     //            Call Doc.LoadXml(CollectionFile)
@@ -2553,27 +2550,27 @@ namespace Contensive.Processor.Controllers {
                     //                                                End If
                     //                                                If Criteria <> "" Then
                     //                                                    '$$$$$ cache this
-                    //                                                    CS2 = csXfer.cs_open(Models.Db.AddonModel.contentName, Criteria, "ID")
-                    //                                                    If csXfer.cs_ok(CS2) Then
-                    //                                                        SrcAddonID = csXfer.cs_getInteger(CS2, "ID")
+                    //                                                    CS2 = csAddon.cs_open(Models.Db.AddonModel.contentName, Criteria, "ID")
+                    //                                                    If csAddon.cs_ok(CS2) Then
+                    //                                                        SrcAddonID = csAddon.cs_getInteger(CS2, "ID")
                     //                                                    End If
-                    //                                                    Call csXfer.cs_Close(CS2)
+                    //                                                    Call csAddon.cs_Close(CS2)
                     //                                                    AddRule = False
                     //                                                    If SrcAddonID = 0 Then
                     //                                                        UserError = "The add-on being installed is referenced by another add-on in collection [], but this add-on could not be found by the respoective criteria [" & Criteria & "]"
                     //                                                        Call logcontroller.appendInstallLog(core,  "UpgradeAddFromLocalCollection_InstallAddonNode, UserError [" & UserError & "]")
                     //                                                    Else
-                    //                                                        CS2 = csXfer.cs_openCsSql_rev("default", "select ID from ccAddonIncludeRules where Addonid=" & SrcAddonID & " and IncludedAddonID=" & addonId)
-                    //                                                        AddRule = Not csXfer.cs_ok(CS2)
-                    //                                                        Call csXfer.cs_Close(CS2)
+                    //                                                        CS2 = csRules.cs_openCsSql_rev("default", "select ID from ccAddonIncludeRules where Addonid=" & SrcAddonID & " and IncludedAddonID=" & addonId)
+                    //                                                        AddRule = Not csRules.cs_ok(CS2)
+                    //                                                        Call csRules.cs_Close(CS2)
                     //                                                    End If
                     //                                                    If AddRule Then
-                    //                                                        CS2 = csXfer.cs_insertRecord("Add-on Include Rules", 0)
-                    //                                                        If csXfer.cs_ok(CS2) Then
-                    //                                                            Call csXfer.cs_set(CS2, "Addonid", SrcAddonID)
-                    //                                                            Call csXfer.cs_set(CS2, "IncludedAddonID", addonId)
+                    //                                                        CS2 = csRules.cs_insertRecord("Add-on Include Rules", 0)
+                    //                                                        If csRules.cs_ok(CS2) Then
+                    //                                                            Call csRules.cs_set(CS2, "Addonid", SrcAddonID)
+                    //                                                            Call csRules.cs_set(CS2, "IncludedAddonID", addonId)
                     //                                                        End If
-                    //                                                        Call csXfer.cs_Close(CS2)
+                    //                                                        Call csRules.cs_Close(CS2)
                     //                                                    End If
                     //                                                End If
                     //                                            End If
@@ -2591,9 +2588,9 @@ namespace Contensive.Processor.Controllers {
                     //            core.handleExceptionAndContinue(ex) : Throw
                     //        End Try
                     //    End If
-                    //    Call csXfer.cs_goNext(CS)
+                    //    Call csCollection.cs_goNext(CS)
                     //Loop
-                    //Call csXfer.cs_Close(CS)
+                    //Call csCollection.cs_Close(CS)
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -2646,7 +2643,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // not found by GUID - search name against name to update legacy Add-ons
                             //
-                            csXfer.csClose();
+                            csXfer.close();
                             Criteria = "(name=" + DbController.encodeSQLText(AOName) + ")and(" + AddonGuidFieldName + " is null)";
                             csXfer.csOpen(Models.Db.AddonModel.contentName, Criteria, "", false);
                         }

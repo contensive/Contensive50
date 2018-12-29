@@ -23,10 +23,6 @@ namespace Contensive.Processor {
         /// The dataset backing up this object
         /// </summary>
         private CsModel cs;
-        /// <summary>
-        /// user who opened the dataset
-        /// </summary>
-        private int legacy_openingMemberID;
         //
         //====================================================================================================
         /// <summary>
@@ -46,7 +42,7 @@ namespace Contensive.Processor {
         /// <returns></returns>
         public override bool Insert(string contentName) {
             try {
-                return cs.csInsert(contentName);
+                return cs.insert(contentName);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -66,7 +62,7 @@ namespace Contensive.Processor {
             try {
                 if (!cs.csOpenRecord(contentName, recordId,selectFieldList)) { return false; }
                 if ( !activeOnly || cs.getBoolean("active")) { return true; }
-                cs.csClose();
+                cs.close();
                 return false;
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex );
@@ -228,7 +224,7 @@ namespace Contensive.Processor {
         //
         public override void Close() {
             try {
-                cs.csClose();
+                cs.close();
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -254,7 +250,7 @@ namespace Contensive.Processor {
         //
         public override void Delete() {
             try {
-                cs.csDeleteRecord(0);
+                cs.deleteRecord();
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -265,7 +261,7 @@ namespace Contensive.Processor {
         //
         public override bool FieldOK(string fieldName) {
             try {
-                return cs.csIsFieldSupported(0, fieldName);
+                return cs.csIsFieldSupported(fieldName);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -276,7 +272,7 @@ namespace Contensive.Processor {
         //
         public override void GoFirst() {
             try {
-                cs.csGoFirst(0, false);
+                cs.csGoFirst(false);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -304,7 +300,7 @@ namespace Contensive.Processor {
         //
         public override bool GetBoolean(string FieldName) {
             try {
-                return cs.csGetBoolean(0, FieldName);
+                return cs.csGetBoolean(FieldName);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -315,7 +311,7 @@ namespace Contensive.Processor {
         //
         public override DateTime GetDate(string FieldName) {
             try {
-                return cs.csGetDate(0, FieldName);
+                return cs.csGetDate(FieldName);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -339,7 +335,7 @@ namespace Contensive.Processor {
         //
         public override string GetFilename(string fieldName, string OriginalFilename, string ContentName) {
             try {
-                return cs.getFieldFilename(0, fieldName, OriginalFilename, ContentName);
+                return cs.getFieldFilename(fieldName, OriginalFilename, ContentName, 0);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -356,7 +352,7 @@ namespace Contensive.Processor {
         //
         public override int GetInteger(string FieldName) {
             try {
-                return cs.csGetInteger(0, FieldName);
+                return cs.csGetInteger(FieldName);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -367,7 +363,7 @@ namespace Contensive.Processor {
         //
         public override double GetNumber(string FieldName) {
             try {
-                return cs.csGetNumber(0, FieldName);
+                return cs.csGetNumber(FieldName);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -378,7 +374,7 @@ namespace Contensive.Processor {
         //
         public override int GetRowCount() {
             try {
-                return cs.csGetRowCount(0);
+                return cs.csGetRowCount();
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -389,7 +385,7 @@ namespace Contensive.Processor {
         //
         public override string GetSQL() {
             try {
-                return cs.csGetSql(0);
+                return cs.csGetSql();
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -434,7 +430,7 @@ namespace Contensive.Processor {
         public override bool NextOK() {
             try {
                 cs.csGoNext(0);
-                return cs.csOk(0);
+                return cs.csOk();
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -445,7 +441,7 @@ namespace Contensive.Processor {
         //
         public override bool OK() {
             try {
-                return cs.csOk(0);
+                return cs.csOk();
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -456,7 +452,7 @@ namespace Contensive.Processor {
         //
         public override void Save() {
             try {
-                cs.csSave(0);
+                cs.csSave();
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -468,25 +464,25 @@ namespace Contensive.Processor {
         public override void SetField(string fieldName, object fieldValue) {
             try {
                 if (fieldValue is string fieldString) {
-                    cs.csSet(0, fieldName, fieldString);
+                    cs.csSet(fieldName, fieldString);
                     return;
                 }
                 int? fieldInt = fieldValue as int?;
                 if (fieldInt != null) {
-                    cs.csSet(0, fieldName, fieldInt.GetValueOrDefault());
+                    cs.csSet(fieldName, fieldInt.GetValueOrDefault());
                     return;
                 }
                 bool? fieldBool = fieldValue as bool?;
                 if (fieldBool != null) {
-                    cs.csSet(0, fieldName, fieldBool.GetValueOrDefault());
+                    cs.csSet(fieldName, fieldBool.GetValueOrDefault());
                     return;
                 }
                 DateTime? fieldDate = fieldValue as DateTime?;
                 if (fieldDate != null) {
-                    cs.csSet(0, fieldName, fieldDate.GetValueOrDefault());
+                    cs.csSet(fieldName, fieldDate.GetValueOrDefault());
                     return;
                 }
-                cs.csSet(0, fieldName, fieldValue.ToString());
+                cs.csSet(fieldName, fieldValue.ToString());
             } catch (Exception ex) {
                 LogController.handleError(cp.core, ex);
                 throw;
@@ -494,19 +490,19 @@ namespace Contensive.Processor {
         }
         //
         public override void SetField(string FieldName, int FieldValue) {
-            cs.csSet(0, FieldName, FieldValue);
+            cs.csSet(FieldName, FieldValue);
         }
         //
         public override void SetField(string FieldName, bool FieldValue) {
-            cs.csSet(0, FieldName, FieldValue);
+            cs.csSet(FieldName, FieldValue);
         }
         //
         public override void SetField(string FieldName, DateTime FieldValue) {
-            cs.csSet(0, FieldName, FieldValue);
+            cs.csSet(FieldName, FieldValue);
         }
         //
         public override void SetField(string FieldName, String FieldValue) {
-            cs.csSet(0, FieldName, FieldValue);
+            cs.csSet(FieldName, FieldValue);
         }
         //
         //====================================================================================================
@@ -581,7 +577,7 @@ namespace Contensive.Processor {
         [Obsolete("Use getText for copy. getFilename for filename", true)]
         public override string GetTextFile(string FieldName) {
             try {
-                return cs.csGetText(0, FieldName);
+                return cs.csGetText(FieldName);
             } catch (Exception ex) {
                 LogController.handleError(cp.core, ex);
                 throw;

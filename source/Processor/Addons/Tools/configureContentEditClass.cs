@@ -50,7 +50,6 @@ namespace Contensive.Addons.Tools {
                     }
                 }
                 int RecordCount = 0;
-                int CSPointer = 0;
                 int formFieldId = 0;
                 string StatusMessage = "";
                 string ErrorMessage = "";
@@ -80,7 +79,7 @@ namespace Contensive.Addons.Tools {
                                     // problem - looking for the name in the Db using the form's name, but it could have changed.
                                     // have to look field up by id
                                     //
-                                    foreach (KeyValuePair<string, Processor.Models.Domain.CDefFieldModel> cdefFieldKvp in CDef.fields) {
+                                    foreach (KeyValuePair<string, Processor.Models.Domain.MetaFieldModel> cdefFieldKvp in CDef.fields) {
                                         if (cdefFieldKvp.Value.id == formFieldId) {
                                             //
                                             // Field was found in CDef
@@ -90,14 +89,14 @@ namespace Contensive.Addons.Tools {
                                                 // Was inherited, but make a copy of the field
                                                 //
                                                 using (var CSTarget = new CsModel(core)) {
-                                                    if (CSTarget.csInsert("Content Fields")) {
+                                                    if (CSTarget.insert("Content Fields")) {
                                                         using (var CSSource = new CsModel(core)) {
-                                                            if (CSSource.csOpenContentRecord("Content Fields", formFieldId)) { CSSource.csCopyRecord(CSTarget); }
+                                                            if (CSSource.csOpenContentRecord("Content Fields", formFieldId)) { CSSource.copyRecord(CSTarget); }
                                                         }
                                                         formFieldId = CSTarget.csGetInteger( "ID");
                                                         CSTarget.csSet( "ContentID", ContentID);
                                                     }
-                                                    CSTarget.csClose();
+                                                    CSTarget.close();
                                                 }
                                                 ReloadCDef = true;
                                             } else if ((!cdefFieldKvp.Value.inherited) && (formFieldInherited)) {
@@ -105,7 +104,7 @@ namespace Contensive.Addons.Tools {
                                                 // Was a field, make it inherit from it's parent
                                                 //
                                                 //CSTarget = CSTarget;
-                                                core.db.deleteContentRecord("Content Fields", formFieldId);
+                                                MetaController.deleteContentRecord( core,"Content Fields", formFieldId);
                                                 ReloadCDef = true;
                                             } else if ((!cdefFieldKvp.Value.inherited) && (!formFieldInherited)) {
                                                 //
@@ -240,7 +239,7 @@ namespace Contensive.Addons.Tools {
                     //
                     // content tables that have edit forms to Configure
                     bool isEmptyList = false;
-                    Stream.Add(AdminUIController.getToolFormInputRow(core, "Select a Content Definition to Configure", AdminUIController.getDefaultEditor_LookupContent(core, RequestNameToolContentID, ContentID, Domain.MetaModel.getContentId(core, "Content"), ref isEmptyList)));
+                    Stream.Add(AdminUIController.getToolFormInputRow(core, "Select a Content Definition to Configure", AdminUIController.getDefaultEditor_LookupContent(core, RequestNameToolContentID, ContentID, MetaModel.getContentId(core, "Content"), ref isEmptyList)));
                 } else {
                     //
                     // Configure edit form
@@ -359,12 +358,12 @@ namespace Contensive.Addons.Tools {
                                 //
                                 streamRow.Add("<td class=\"ccPanelInput\" align=\"center\">" + HtmlController.checkbox("dtfaInherited." + RecordCount, fieldsort.field.inherited) + "</td>");
                             } else {
-                                Processor.Models.Domain.CDefFieldModel parentField = null;
+                                Processor.Models.Domain.MetaFieldModel parentField = null;
                                 //
                                 // CDef has a parent, but the field is non-inherited, test for a matching Parent Field
                                 //
                                 if (ParentCDef == null) {
-                                    foreach (KeyValuePair<string, Processor.Models.Domain.CDefFieldModel> kvp in ParentCDef.fields) {
+                                    foreach (KeyValuePair<string, Processor.Models.Domain.MetaFieldModel> kvp in ParentCDef.fields) {
                                         if (kvp.Value.nameLc == fieldsort.field.nameLc) {
                                             parentField = kvp.Value;
                                             break;
@@ -433,7 +432,7 @@ namespace Contensive.Addons.Tools {
                                     if (!csXfer.csOk()) {
                                         streamRow.Add(SpanClassAdminSmall + "Unknown[" + fieldsort.field.fieldTypeId + "]</SPAN>");
                                     } else {
-                                        streamRow.Add(SpanClassAdminSmall + csXfer.csGetText(CSPointer, "Name") + "</SPAN>");
+                                        streamRow.Add(SpanClassAdminSmall + csXfer.csGetText("Name") + "</SPAN>");
                                     }
                                 }
                             } else if (FieldLocked) {
@@ -554,7 +553,7 @@ namespace Contensive.Addons.Tools {
         //
         private class fieldSortClass {
             public string sort;
-            public Processor.Models.Domain.CDefFieldModel field;
+            public Processor.Models.Domain.MetaFieldModel field;
         }
     }
 }

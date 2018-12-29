@@ -15,7 +15,7 @@ namespace Contensive.Addons.AdminSite {
         //   Export the Admin List form results
         //=============================================================================
         //
-        public static string get( CoreController core, AdminDataModel adminData) {
+        public static string get(CoreController core, AdminDataModel adminData) {
             string result = "";
             try {
                 //
@@ -29,8 +29,6 @@ namespace Contensive.Addons.AdminSite {
                 string Button = null;
                 int RecordLimit = 0;
                 int recordCnt = 0;
-                //Dim DataSourceName As String
-                //Dim DataSourceType As Integer
                 string sqlFieldList = "";
                 string SQLFrom = "";
                 string SQLWhere = "";
@@ -41,7 +39,6 @@ namespace Contensive.Addons.AdminSite {
                 Dictionary<string, bool> IsLookupFieldValid = new Dictionary<string, bool>();
                 IndexConfigClass IndexConfig = null;
                 string SQL = null;
-                int CS = 0;
                 bool IsRecordLimitSet = false;
                 string RecordLimitText = null;
                 var cacheNameList = new List<string>();
@@ -110,11 +107,12 @@ namespace Contensive.Addons.AdminSite {
                             // Get the total record count
                             //
                             SQL = "select count(" + adminData.adminContent.tableName + ".ID) as cnt from " + SQLFrom + " where " + SQLWhere;
-                            csXfer.csOpenSql(SQL, datasource.name);
-                            if (csXfer.csOk()) {
-                                recordCnt = csXfer.csGetInteger(CS, "cnt");
+                            using (var csXfer = new CsModel(core)) {
+                                csXfer.csOpenSql(SQL, datasource.name);
+                                if (csXfer.csOk()) {
+                                    recordCnt = csXfer.csGetInteger("cnt");
+                                }
                             }
-                            csXfer.csClose();
                             //
                             // Build the SQL
                             //
