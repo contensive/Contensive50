@@ -363,8 +363,6 @@ namespace Contensive.Addons.Email {
         /// <returns>OK if successful, else returns user error.</returns>
         private string queueEmailRecord(CoreController core, int MemberID, int emailID, DateTime DateBlockExpires, int emailDropID, string BounceAddress, string ReplyToAddress, string EmailTemplate, string FromAddress, string EmailSubject, string EmailBody, bool AllowSpamFooter, bool EmailAllowLinkEID, string emailStyles) {
             string returnStatus = "";
-            int CSPeople = 0;
-            int CSLog = 0;
             try {
                 string defaultPage = null;
                 string emailToName = null;
@@ -402,10 +400,13 @@ namespace Contensive.Addons.Email {
                     //
                     // Get the Member
                     //
-                    CSPeople = csXfer.csOpenContentRecord("People", MemberID, 0, false, false, "Email,Name");
-                    if (csXfer.csOk(CSPeople)) {
-                        emailToAddress = csXfer.csGet(CSPeople, "Email");
-                        emailToName = csXfer.csGet(CSPeople, "Name");
+                    using (var CSPeople = new CsModel(core)) {
+                    }
+
+                    CSPeople.csOpenContentRecord("People", MemberID, 0, false, false, "Email,Name");
+                    if (CSPeople.csOk()) {
+                        emailToAddress = CSPeople.csGet("Email");
+                        emailToName = CSPeople.csGet("Name");
                         defaultPage = core.siteProperties.serverPageDefault;
                         urlProtocolDomainSlash = protocolHostLink + "/";
                         if (emailDropID != 0) {
@@ -519,7 +520,6 @@ namespace Contensive.Addons.Email {
             } catch (Exception) {
                 throw (new GenericException("Unexpected exception"));
             } finally {
-                csXfer.csClose(ref CSPeople);
                 csXfer.csClose(ref CSLog);
             }
 

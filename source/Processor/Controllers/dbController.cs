@@ -1277,30 +1277,34 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="DataSourceName"></param>
-        /// <param name="From"></param>
-        /// <param name="FieldList"></param>
-        /// <param name="Where"></param>
-        /// <param name="OrderBy"></param>
-        /// <param name="GroupBy"></param>
-        /// <param name="RecordLimit"></param>
+        /// <param name="dataSourceName"></param>
+        /// <param name="from"></param>
+        /// <param name="fieldList"></param>
+        /// <param name="where"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="groupBy"></param>
+        /// <param name="recordLimit"></param>
         /// <returns></returns>
-        public string getSQLSelect(string DataSourceName, string From, string FieldList = "", string Where = "", string OrderBy = "", string GroupBy = "", int RecordLimit = 0) {
-            string SQL = "SELECT";
-            if (RecordLimit != 0) {
-                SQL += " TOP " + RecordLimit;
-            }
-            if (string.IsNullOrEmpty(FieldList)) {
-                SQL += " *";
-            } else {
-                SQL += " " + FieldList;
-            }
-            SQL += " FROM " + From;
-            if (!string.IsNullOrEmpty(Where)) { SQL += " WHERE " + Where; }
-            if (!string.IsNullOrEmpty(OrderBy)) { SQL += " ORDER BY " + OrderBy; }
-            if (!string.IsNullOrEmpty(GroupBy)) { SQL += " GROUP BY " + GroupBy; }
-            return SQL;
+        public string getSQLSelect(string dataSourceName, string from, string fieldList, string where, string orderBy, string groupBy, int recordLimit) {
+            string sql = "select";
+            if (recordLimit != 0) { sql += " top " + recordLimit; }
+            sql += (string.IsNullOrWhiteSpace(fieldList)) ? " *" : " " + fieldList;
+            sql += " from " + from;
+            if (!string.IsNullOrWhiteSpace(where)) { sql += " where " + where; }
+            if (!string.IsNullOrWhiteSpace(orderBy)) { sql += " order by " + orderBy; }
+            if (!string.IsNullOrWhiteSpace(groupBy)) { sql += " group by " + groupBy; }
+            return sql;
         }
+        //
+        public string getSQLSelect(string dataSourceName, string from, string fieldList, string where, string orderBy, string groupBy) => getSQLSelect(dataSourceName, from, fieldList, where, orderBy, groupBy, 0);
+        //
+        public string getSQLSelect(string dataSourceName, string from, string fieldList, string where, string orderBy) => getSQLSelect(dataSourceName, from, fieldList, where, orderBy, "", 0);
+        //
+        public string getSQLSelect(string dataSourceName, string from, string fieldList, string where) => getSQLSelect(dataSourceName, from, fieldList, where, "", "", 0);
+        //
+        public string getSQLSelect(string dataSourceName, string from, string fieldList) => getSQLSelect(dataSourceName, from, fieldList, "", "", "", 0);
+        //
+        public string getSQLSelect(string dataSourceName, string from) => getSQLSelect(dataSourceName, from, "", "", "", "", 0);
         //
         //========================================================================
         /// <summary>

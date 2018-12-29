@@ -491,7 +491,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     csXfer.csGoNext(CS);
                 }
-                csXfer.csClose(ref CS);
+                csXfer.csClose();
                 result = sb.ToString();
             } catch( Exception ex ) {
                 LogController.handleError( core,ex);

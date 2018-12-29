@@ -506,7 +506,7 @@ namespace Contensive.Processor.Controllers {
                 string GroupNameList = null;
                 string Copy = null;
                 //
-                core.db.deleteContentRecords("Form Pages", "name=" + DbController.encodeSQLText("Registration Form"));
+                MetaController.deleteContentRecords(core, "Form Pages", "name=" + DbController.encodeSQLText("Registration Form"));
                 csXfer.csOpen("Form Pages", "name=" + DbController.encodeSQLText("Registration Form"));
                 if (!csXfer.csOk()) {
                     //

@@ -47,7 +47,7 @@ namespace Contensive.Processor.Controllers {
                     csXfer.csSet(CS, "QueryTypeID", QueryTypeSQL);
                     csXfer.csSet(CS, "VisitId", core.session.visit.id);
                 }
-                csXfer.csClose(ref CS);
+                csXfer.csClose();
             }
             //
             return RemoteKey;

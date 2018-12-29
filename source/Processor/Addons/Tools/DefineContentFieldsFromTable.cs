@@ -96,7 +96,7 @@ namespace Contensive.Addons.Tools {
                         if (ContentID == 0) {
                             Stream.Add("GetContentID failed. Fields were not changed.");
                         } else {
-                            core.db.deleteContentRecords("Content Fields", "ContentID=" + DbController.encodeSQLNumber(ContentID));
+                            MetaController.deleteContentRecords(core, "Content Fields", "ContentID=" + DbController.encodeSQLNumber(ContentID));
                             //
                             // todo -- looks like the tool code did not come with the migration ?
                             //

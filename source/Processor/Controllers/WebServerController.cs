@@ -1058,7 +1058,7 @@ namespace Contensive.Processor.Controllers {
             tempmain_RedirectByRecord_ReturnStatus = false;
             BlockRedirect = false;
             CSPointer = csXfer.csOpen(iContentName, "ID=" + iRecordID);
-            if (csXfer.csOk(CSPointer)) {
+            if (csXfer.csOk()) {
                 // 2/18/2008 - EncodeLink change
                 //
                 // Assume all Link fields are already encoded -- as this is how they would appear if the admin cut and pasted
@@ -1079,7 +1079,7 @@ namespace Contensive.Processor.Controllers {
                             //       inactive or expired before redirecting
                             //
                             LinkPrefix = core.webServer.requestContentWatchPrefix;
-                            ContentID = (csXfer.csGetInteger(CSPointer, "ContentID"));
+                            ContentID = (csXfer.csGetInteger( "ContentID"));
                             HostContentName = MetaController.getContentNameByID(core, ContentID);
                             if (string.IsNullOrEmpty(HostContentName)) {
                                 //
@@ -1088,7 +1088,7 @@ namespace Contensive.Processor.Controllers {
                                 BlockRedirect = true;
                                 csXfer.csSet(CSPointer, "active", 0);
                             } else {
-                                HostRecordID = (csXfer.csGetInteger(CSPointer, "RecordID"));
+                                HostRecordID = (csXfer.csGetInteger( "RecordID"));
                                 if (HostRecordID == 0) {
                                     //
                                     // ----- Content Watch with a bad iRecordID, mark inactive
@@ -1128,7 +1128,7 @@ namespace Contensive.Processor.Controllers {
                     tempmain_RedirectByRecord_ReturnStatus = true;
                 }
             }
-            csXfer.csClose(ref CSPointer);
+            csXfer.csClose();
             return tempmain_RedirectByRecord_ReturnStatus;
         }
         //

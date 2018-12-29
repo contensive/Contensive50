@@ -17,6 +17,7 @@ using static Contensive.Processor.Constants;
 using System.Threading;
 using Contensive.Processor.Exceptions;
 using Contensive.Addons.AdminSite.Controllers;
+using Contensive.Processor.Models.Domain;
 //
 namespace Contensive.Addons.Tools {
     public class legacyToolsClass {
@@ -424,27 +425,28 @@ namespace Contensive.Addons.Tools {
                         ContentID = Processor.Models.Domain.MetaModel.getContentId(core, ContentName);
                         ParentNavID = MetaController.getRecordId( core,Processor.Models.Db.NavigatorEntryModel.contentName, "Manage Site Content");
                         if (ParentNavID != 0) {
-                            csXfer.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, "(name=" + DbController.encodeSQLText("Advanced") + ")and(parentid=" + ParentNavID + ")");
                             ParentNavID = 0;
-                            if (csXfer.csOk()) {
-                                ParentNavID = csXfer.csGetInteger(CS, "ID");
+                            using (var csSrc = new CsModel(core)) {
+                                if (csSrc.csOpen(NavigatorEntryModel.contentName, "(name=" + DbController.encodeSQLText("Advanced") + ")and(parentid=" + ParentNavID + ")")) {
+                                    ParentNavID = csSrc.csGetInteger("ID");
+                                }
                             }
-                            csXfer.csClose(ref CS);
                             if (ParentNavID != 0) {
-                                csXfer.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, "(name=" + DbController.encodeSQLText(ContentName) + ")and(parentid=" + NavID + ")");
-                                if (!csXfer.csOk()) {
-                                    csXfer.csClose(ref CS);
-                                    csXfer.csInsert(Processor.Models.Db.NavigatorEntryModel.contentName);
+                                using (var csDest = new CsModel(core)) {
+                                    csDest.csOpen(NavigatorEntryModel.contentName, "(name=" + DbController.encodeSQLText(ContentName) + ")and(parentid=" + NavID + ")");
+                                    if (!csDest.csOk()) {
+                                        csDest.csClose();
+                                        csDest.csInsert(NavigatorEntryModel.contentName);
+                                    }
+                                    if (csDest.csOk()) {
+                                        csDest.csSet("name", ContentName);
+                                        csDest.csSet("parentid", ParentNavID);
+                                        csDest.csSet("contentid", ContentID);
+                                    }
                                 }
-                                if (csXfer.csOk()) {
-                                    csXfer.csSet(CS, "name", ContentName);
-                                    csXfer.csSet(CS, "parentid", ParentNavID);
-                                    csXfer.csSet(CS, "contentid", ContentID);
-                                }
-                                csXfer.csClose(ref CS);
                             }
                         }
-                        ContentID = Models.Domain.MetaModel.getContentId(core, ContentName);
+                        ContentID = MetaModel.getContentId(core, ContentName);
                         Stream.Add("<P>Content Definition was created. An admin menu entry for this definition has been added under 'Site Content', and will be visible on the next page view. Use the [<a href=\"?af=105&ContentID=" + ContentID + "\">Edit Content Definition Fields</a>] tool to review and edit this definition's fields.</P>");
                     } else {
                         Stream.Add("<P>Error, a required field is missing. Content not created.</P>");
@@ -476,50 +478,21 @@ namespace Contensive.Addons.Tools {
         private string GetForm_ConfigureListing() {
             string result = "";
             try {
-                int ColumnWidth = 0;
-                string FieldName = null;
-                string AStart = null;
-                int CSPointer = 0;
-                int ContentID = 0;
-                Processor.Models.Domain.MetaModel CDef = null;
-                string ContentName = null;
-                int CS1 = 0;
-                int TargetFieldID = 0;
-                int ColumnWidthTotal = 0;
-                int ColumnNumberMax = 0;
-                int fieldId = 0;
-                bool AllowContentAutoLoad = false;
-                bool MoveNextColumn = false;
-                string FieldNameToAdd = null;
-                int FieldIDToAdd = 0;
-                int CSSource = 0;
-                int CSTarget = 0;
-                int SourceContentID = 0;
-                string SourceName = null;
-                bool ReloadCDef = false;
-                int InheritedFieldCount = 0;
-                string Caption = null;
-                StringBuilderLegacyController Stream = new StringBuilderLegacyController();
-                string ButtonList = null;
-                string FormPanel = "";
                 //
                 const string RequestNameAddField = "addfield";
                 const string RequestNameAddFieldID = "addfieldID";
-                //
+                StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 Stream.Add(AdminUIController.getToolFormTitle("Configure Admin Listing", "Configure the Administration Content Listing Page."));
                 //
-                //--------------------------------------------------------------------------------
                 //   Load Request
-                //--------------------------------------------------------------------------------
-                //
                 ToolsAction = core.docProperties.getInteger("dta");
-                TargetFieldID = core.docProperties.getInteger("fi");
-                ContentID = core.docProperties.getInteger(RequestNameToolContentID);
-                //ColumnPointer = core.main_GetStreamInteger("dtcn")
-                FieldNameToAdd = GenericController.vbUCase(core.docProperties.getText(RequestNameAddField));
-                FieldIDToAdd = core.docProperties.getInteger(RequestNameAddFieldID);
-                ButtonList = ButtonCancel + "," + ButtonSelect;
-                ReloadCDef = core.docProperties.getBoolean("ReloadCDef");
+                int TargetFieldID = core.docProperties.getInteger("fi");
+                int ContentID = core.docProperties.getInteger(RequestNameToolContentID);
+                string FieldNameToAdd = GenericController.vbUCase(core.docProperties.getText(RequestNameAddField));
+                int FieldIDToAdd = core.docProperties.getInteger(RequestNameAddFieldID);
+                string ButtonList = ButtonCancel + "," + ButtonSelect;
+                bool ReloadCDef = core.docProperties.getBoolean("ReloadCDef");
+                bool AllowContentAutoLoad = false;
                 //
                 //--------------------------------------------------------------------------------
                 // Process actions
@@ -527,14 +500,19 @@ namespace Contensive.Addons.Tools {
                 //
                 if (ContentID != 0) {
                     ButtonList = ButtonCancel + "," + ButtonSaveandInvalidateCache;
-                    ContentName = Local_GetContentNameByID(ContentID);
-                    CDef = Processor.Models.Domain.MetaModel.create(core, ContentID, false, true );
+                    string ContentName = Local_GetContentNameByID(ContentID);
+                    Processor.Models.Domain.MetaModel CDef = Processor.Models.Domain.MetaModel.create(core, ContentID, false, true);
+                    string FieldName = null;
+                    int ColumnWidthTotal = 0;
+                    int fieldId = 0;
                     if (ToolsAction != 0) {
                         //
                         // Block contentautoload, then force a load at the end
                         //
                         AllowContentAutoLoad = (core.siteProperties.getBoolean("AllowContentAutoLoad", true));
                         core.siteProperties.setProperty("AllowContentAutoLoad", false);
+                        int SourceContentID = 0;
+                        string SourceName = null;
                         //
                         // Make sure the FieldNameToAdd is not-inherited, if not, create new field
                         //
@@ -546,17 +524,19 @@ namespace Contensive.Addons.Tools {
                                     if (field.inherited) {
                                         SourceContentID = field.contentId;
                                         SourceName = field.nameLc;
-                                        CSSource = csXfer.csOpen("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + DbController.encodeSQLText(SourceName) + ")");
-                                        if (csXfer.csOk(CSSource)) {
-                                            CSTarget = csXfer.csInsert("Content Fields");
-                                            if (csXfer.csOk(CSTarget)) {
-                                                csXfer.csCopyRecord(CSSource, CSTarget);
-                                                csXfer.csSet(CSTarget, "ContentID", ContentID);
-                                                ReloadCDef = true;
+                                        using (var CSSource = new CsModel(core)) {
+                                            CSSource.csOpen("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + DbController.encodeSQLText(SourceName) + ")");
+                                            if (CSSource.csOk()) {
+                                                using (var CSTarget = new CsModel(core)) {
+                                                    CSTarget.csInsert("Content Fields");
+                                                    if (CSTarget.csOk()) {
+                                                        CSSource.csCopyRecord(CSTarget);
+                                                        CSTarget.csSet("ContentID", ContentID);
+                                                        ReloadCDef = true;
+                                                    }
+                                                }
                                             }
-                                            csXfer.csClose(ref CSTarget);
                                         }
-                                        csXfer.csClose(ref CSSource);
                                     }
                                     break;
                                 }
@@ -565,24 +545,24 @@ namespace Contensive.Addons.Tools {
                         //
                         // Make sure all fields are not-inherited, if not, create new fields
                         //
-                        ColumnNumberMax = 0;
+                        int ColumnNumberMax = 0;
                         foreach (var keyValuePair in CDef.adminColumns) {
                             Processor.Models.Domain.MetaModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
                             Processor.Models.Domain.CDefFieldModel field = CDef.fields[adminColumn.Name];
                             if (field.inherited) {
                                 SourceContentID = field.contentId;
                                 SourceName = field.nameLc;
-                                CSSource = csXfer.csOpen("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + DbController.encodeSQLText(SourceName) + ")");
-                                if (csXfer.csOk(CSSource)) {
-                                    CSTarget = csXfer.csInsert("Content Fields");
-                                    if (csXfer.csOk(CSTarget)) {
-                                        csXfer.csCopyRecord(CSSource, CSTarget);
-                                        csXfer.csSet(CSTarget, "ContentID", ContentID);
-                                        ReloadCDef = true;
+                                using (var CSSource = new CsModel(core)) {
+                                    if (CSSource.csOpen("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + DbController.encodeSQLText(SourceName) + ")")) {
+                                        using (var CSTarget = new CsModel(core)) {
+                                            if (CSTarget.csInsert("Content Fields")) {
+                                                CSSource.csCopyRecord(CSTarget);
+                                                CSTarget.csSet("ContentID", ContentID);
+                                                ReloadCDef = true;
+                                            }
+                                        }
                                     }
-                                    csXfer.csClose(ref CSTarget);
                                 }
-                                csXfer.csClose(ref CSSource);
                             }
                             if (ColumnNumberMax < field.indexColumn) {
                                 ColumnNumberMax = field.indexColumn;
@@ -593,6 +573,7 @@ namespace Contensive.Addons.Tools {
                         // ----- Perform any actions first
                         //
                         int columnPtr = 0;
+                        bool MoveNextColumn = false;
                         switch (ToolsAction) {
                             case ToolsActionAddField: {
                                     //
@@ -605,21 +586,22 @@ namespace Contensive.Addons.Tools {
                                             foreach (var keyValuePair in CDef.adminColumns) {
                                                 Processor.Models.Domain.MetaModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
                                                 Processor.Models.Domain.CDefFieldModel field = CDef.fields[adminColumn.Name];
-                                                CSPointer = csXfer.csOpenRecord("Content Fields", field.id);
-                                                csXfer.csSet(CSPointer, "IndexColumn", (columnPtr) * 10);
-                                                csXfer.csSet(CSPointer, "IndexWidth", Math.Floor((adminColumn.Width * 80) / (double)ColumnWidthTotal));
-                                                csXfer.csClose(ref CSPointer);
+                                                using (var csXfer = new CsModel(core)) {
+                                                    csXfer.csOpenRecord("Content Fields", field.id);
+                                                    csXfer.csSet("IndexColumn", (columnPtr) * 10);
+                                                    csXfer.csSet("IndexWidth", Math.Floor((adminColumn.Width * 80) / (double)ColumnWidthTotal));
+                                                }
                                                 columnPtr += 1;
                                             }
                                         }
-                                        CSPointer = csXfer.csOpenRecord("Content Fields", FieldIDToAdd, false, false);
-                                        if (csXfer.csOk(CSPointer)) {
-                                            csXfer.csSet(CSPointer, "IndexColumn", columnPtr * 10);
-                                            csXfer.csSet(CSPointer, "IndexWidth", 20);
-                                            csXfer.csSet(CSPointer, "IndexSortPriority", 99);
-                                            csXfer.csSet(CSPointer, "IndexSortDirection", 1);
+                                        using (var csXfer = new CsModel(core)) {
+                                            if (csXfer.csOpenRecord("Content Fields", FieldIDToAdd)) {
+                                                csXfer.csSet("IndexColumn", columnPtr * 10);
+                                                csXfer.csSet("IndexWidth", 20);
+                                                csXfer.csSet("IndexSortPriority", 99);
+                                                csXfer.csSet("IndexSortDirection", 1);
+                                            }
                                         }
-                                        csXfer.csClose(ref CSPointer);
                                         ReloadCDef = true;
                                     }
                                     //
@@ -634,17 +616,18 @@ namespace Contensive.Addons.Tools {
                                         foreach (var keyValuePair in CDef.adminColumns) {
                                             Processor.Models.Domain.MetaModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
                                             Processor.Models.Domain.CDefFieldModel field = CDef.fields[adminColumn.Name];
-                                            CSPointer = csXfer.csOpenRecord("Content Fields", field.id);
-                                            if (fieldId == TargetFieldID) {
-                                                csXfer.csSet(CSPointer, "IndexColumn", 0);
-                                                csXfer.csSet(CSPointer, "IndexWidth", 0);
-                                                csXfer.csSet(CSPointer, "IndexSortPriority", 0);
-                                                csXfer.csSet(CSPointer, "IndexSortDirection", 0);
-                                            } else {
-                                                csXfer.csSet(CSPointer, "IndexColumn", (columnPtr) * 10);
-                                                csXfer.csSet(CSPointer, "IndexWidth", Math.Floor((adminColumn.Width * 100) / (double)ColumnWidthTotal));
+                                            using (var csXfer = new CsModel(core)) {
+                                                csXfer.csOpenRecord("Content Fields", field.id);
+                                                if (fieldId == TargetFieldID) {
+                                                    csXfer.csSet("IndexColumn", 0);
+                                                    csXfer.csSet("IndexWidth", 0);
+                                                    csXfer.csSet("IndexSortPriority", 0);
+                                                    csXfer.csSet("IndexSortDirection", 0);
+                                                } else {
+                                                    csXfer.csSet("IndexColumn", (columnPtr) * 10);
+                                                    csXfer.csSet("IndexWidth", Math.Floor((adminColumn.Width * 100) / (double)ColumnWidthTotal));
+                                                }
                                             }
-                                            csXfer.csClose(ref CSPointer);
                                             columnPtr += 1;
                                         }
                                         ReloadCDef = true;
@@ -662,26 +645,27 @@ namespace Contensive.Addons.Tools {
                                             Processor.Models.Domain.MetaModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
                                             Processor.Models.Domain.CDefFieldModel field = CDef.fields[adminColumn.Name];
                                             FieldName = adminColumn.Name;
-                                            CS1 = csXfer.csOpenRecord("Content Fields", field.id);
-                                            if ((CDef.fields[FieldName.ToLowerInvariant()].id == TargetFieldID) && (columnPtr < CDef.adminColumns.Count)) {
-                                                csXfer.csSet(CS1, "IndexColumn", (columnPtr + 1) * 10);
-                                                //
-                                                MoveNextColumn = true;
-                                            } else if (MoveNextColumn) {
-                                                //
-                                                // This is one past target
-                                                //
-                                                csXfer.csSet(CS1, "IndexColumn", (columnPtr - 1) * 10);
-                                                MoveNextColumn = false;
-                                            } else {
-                                                //
-                                                // not target or one past target
-                                                //
-                                                csXfer.csSet(CS1, "IndexColumn", (columnPtr) * 10);
-                                                MoveNextColumn = false;
+                                            using (var csXfer = new CsModel(core)) {
+                                                csXfer.csOpenRecord("Content Fields", field.id);
+                                                if ((CDef.fields[FieldName.ToLowerInvariant()].id == TargetFieldID) && (columnPtr < CDef.adminColumns.Count)) {
+                                                    csXfer.csSet("IndexColumn", (columnPtr + 1) * 10);
+                                                    //
+                                                    MoveNextColumn = true;
+                                                } else if (MoveNextColumn) {
+                                                    //
+                                                    // This is one past target
+                                                    //
+                                                    csXfer.csSet("IndexColumn", (columnPtr - 1) * 10);
+                                                    MoveNextColumn = false;
+                                                } else {
+                                                    //
+                                                    // not target or one past target
+                                                    //
+                                                    csXfer.csSet("IndexColumn", (columnPtr) * 10);
+                                                    MoveNextColumn = false;
+                                                }
+                                                csXfer.csSet("IndexWidth", Math.Floor((adminColumn.Width * 100) / (double)ColumnWidthTotal));
                                             }
-                                            csXfer.csSet(CS1, "IndexWidth", Math.Floor((adminColumn.Width * 100) / (double)ColumnWidthTotal));
-                                            csXfer.csClose(ref CS1);
                                             columnPtr += 1;
                                         }
                                         ReloadCDef = true;
@@ -700,173 +684,31 @@ namespace Contensive.Addons.Tools {
                                             Processor.Models.Domain.MetaModel.CDefAdminColumnClass adminColumn = keyValuePair.Value;
                                             Processor.Models.Domain.CDefFieldModel field = CDef.fields[adminColumn.Name];
                                             FieldName = adminColumn.Name;
-                                            CS1 = csXfer.csOpenRecord("Content Fields", field.id);
-                                            if ((field.id == TargetFieldID) && (columnPtr < CDef.adminColumns.Count)) {
-                                                csXfer.csSet(CS1, "IndexColumn", (columnPtr - 1) * 10);
-                                                //
-                                                MoveNextColumn = true;
-                                            } else if (MoveNextColumn) {
-                                                //
-                                                // This is one past target
-                                                //
-                                                csXfer.csSet(CS1, "IndexColumn", (columnPtr + 1) * 10);
-                                                MoveNextColumn = false;
-                                            } else {
-                                                //
-                                                // not target or one past target
-                                                //
-                                                csXfer.csSet(CS1, "IndexColumn", (columnPtr) * 10);
-                                                MoveNextColumn = false;
+                                            using (var csXfer = new CsModel(core)) {
+                                                csXfer.csOpenRecord("Content Fields", field.id);
+                                                if ((field.id == TargetFieldID) && (columnPtr < CDef.adminColumns.Count)) {
+                                                    csXfer.csSet("IndexColumn", (columnPtr - 1) * 10);
+                                                    //
+                                                    MoveNextColumn = true;
+                                                } else if (MoveNextColumn) {
+                                                    //
+                                                    // This is one past target
+                                                    //
+                                                    csXfer.csSet("IndexColumn", (columnPtr + 1) * 10);
+                                                    MoveNextColumn = false;
+                                                } else {
+                                                    //
+                                                    // not target or one past target
+                                                    //
+                                                    csXfer.csSet("IndexColumn", (columnPtr) * 10);
+                                                    MoveNextColumn = false;
+                                                }
+                                                csXfer.csSet("IndexWidth", Math.Floor((adminColumn.Width * 100) / (double)ColumnWidthTotal));
                                             }
-                                            csXfer.csSet(CS1, "IndexWidth", Math.Floor((adminColumn.Width * 100) / (double)ColumnWidthTotal));
-                                            csXfer.csClose(ref CS1);
                                             columnPtr += 1;
                                         }
                                         ReloadCDef = true;
                                     }
-                                    // end case
-                                    //Case ToolsActionSetAZ
-                                    //    '
-                                    //    ' Set Column as a-z sort
-                                    //    '
-                                    //    If CDef.adminColumns.Count > 1 Then
-                                    //        For ColumnPointer = 0 To CDef.adminColumns.Count - 1
-                                    //            FieldName = CDef.adminColumns(ColumnPointer).Name
-                                    //            fieldId = CDef.fields[FieldName.ToLowerInvariant()].Id
-                                    //            CSPointer = core.main_OpenCSContentRecord("Content Fields", fieldId)
-                                    //            If fieldId = TargetFieldID Then
-                                    //                Call core.app.SetCS(CSPointer, "IndexSortPriority", 0)
-                                    //                Call core.app.SetCS(CSPointer, "IndexSortDirection", 1)
-                                    //            Else
-                                    //                Call core.app.SetCS(CSPointer, "IndexSortPriority", 99)
-                                    //                Call core.app.SetCS(CSPointer, "IndexSortDirection", 0)
-                                    //            End If
-                                    //            Call core.app.SetCS(CSPointer, "IndexColumn", (ColumnPointer) * 10)
-                                    //            Call core.app.SetCS(CSPointer, "IndexWidth", Int((CDef.adminColumns(ColumnPointer).Width * 100) / ColumnWidthTotal))
-                                    //            Call core.app.closeCS(CSPointer)
-                                    //        Next
-                                    //        ReloadCDef = True
-                                    //    End If
-                                    //    ' end case
-                                    //Case ToolsActionSetZA
-                                    //    '
-                                    //    ' Set Column as a-z sort
-                                    //    '
-                                    //    If CDef.adminColumns.Count > 1 Then
-                                    //        For ColumnPointer = 0 To CDef.adminColumns.Count - 1
-                                    //            FieldName = CDef.adminColumns(ColumnPointer).Name
-                                    //            fieldId = CDef.fields[FieldName.ToLowerInvariant()].Id
-                                    //            CSPointer = core.main_OpenCSContentRecord("Content Fields", fieldId)
-                                    //            If fieldId = TargetFieldID Then
-                                    //                Call core.app.SetCS(CSPointer, "IndexSortPriority", 0)
-                                    //                Call core.app.SetCS(CSPointer, "IndexSortDirection", -1)
-                                    //            Else
-                                    //                Call core.app.SetCS(CSPointer, "IndexSortPriority", 99)
-                                    //                Call core.app.SetCS(CSPointer, "IndexSortDirection", 0)
-                                    //            End If
-                                    //            Call core.app.SetCS(CSPointer, "IndexColumn", (ColumnPointer) * 10)
-                                    //            Call core.app.SetCS(CSPointer, "IndexWidth", Int((CDef.adminColumns(ColumnPointer).Width * 100) / ColumnWidthTotal))
-                                    //            Call core.app.closeCS(CSPointer)
-                                    //        Next
-                                    //        ReloadCDef = True
-                                    //    End If
-                                    //    ' end case
-                                    //Case ToolsActionExpand
-                                    //    '
-                                    //    ' Expand column
-                                    //    '
-                                    //    ColumnWidthBalance = 0
-                                    //    If CDef.adminColumns.Count > 0 Then
-                                    //        '
-                                    //        ' Calculate the total width of the non-target columns
-                                    //        '
-                                    //        ColumnWidthIncrease = ColumnWidthTotal * 0.1
-                                    //        For ColumnPointer = 0 To CDef.adminColumns.Count - 1
-                                    //            FieldName = CDef.adminColumns(ColumnPointer).Name
-                                    //            fieldId = CDef.fields[FieldName.ToLowerInvariant()].Id
-                                    //            If fieldId <> TargetFieldID Then
-                                    //                ColumnWidthBalance = ColumnWidthBalance + CDef.adminColumns(ColumnPointer).Width
-                                    //            End If
-                                    //        Next
-                                    //        '
-                                    //        ' Adjust all columns
-                                    //        '
-                                    //        If ColumnWidthBalance > 0 Then
-                                    //            For ColumnPointer = 0 To CDef.adminColumns.Count - 1
-                                    //                FieldName = CDef.adminColumns(ColumnPointer).Name
-                                    //                fieldId = CDef.fields[FieldName.ToLowerInvariant()].Id
-                                    //                CSPointer = core.main_OpenCSContentRecord("Content Fields", fieldId)
-                                    //                If fieldId = TargetFieldID Then
-                                    //                    '
-                                    //                    ' Target gets 10% increase
-                                    //                    '
-                                    //                    Call core.app.SetCS(CSPointer, "IndexWidth", Int(CDef.adminColumns(ColumnPointer).Width + ColumnWidthIncrease))
-                                    //                Else
-                                    //                    '
-                                    //                    ' non-targets get their share of the shrinkage
-                                    //                    '
-                                    //                    FieldWidth = CDef.adminColumns(ColumnPointer).Width
-                                    //                    FieldWidth = FieldWidth - ((ColumnWidthIncrease * FieldWidth) / ColumnWidthBalance)
-                                    //                    Call core.app.SetCS(CSPointer, "IndexWidth", Int(FieldWidth))
-                                    //                End If
-                                    //                Call core.app.SetCS(CSPointer, "IndexColumn", (ColumnPointer) * 10)
-                                    //                Call core.app.closeCS(CSPointer)
-                                    //            Next
-                                    //            ReloadCDef = True
-                                    //        End If
-                                    //    End If
-
-                                    //    ' end case
-                                    //Case ToolsActionContract
-                                    //    '
-                                    //    ' Contract column
-                                    //    '
-                                    //    ColumnWidthBalance = 0
-                                    //    If CDef.adminColumns.Count > 0 Then
-                                    //        '
-                                    //        ' Calculate the total width of the non-target columns
-                                    //        '
-                                    //        ColumnWidthIncrease = -(ColumnWidthTotal * 0.1)
-                                    //        For ColumnPointer = 0 To CDef.adminColumns.Count - 1
-                                    //            FieldName = CDef.adminColumns(ColumnPointer).Name
-                                    //            fieldId = CDef.fields[FieldName.ToLowerInvariant()].Id
-                                    //            If fieldId = TargetFieldID Then
-                                    //                FieldWidth = CDef.adminColumns(ColumnPointer).Width
-                                    //                If (FieldWidth + ColumnWidthIncrease) < 10 Then
-                                    //                    ColumnWidthIncrease = 10 - FieldWidth
-                                    //                End If
-                                    //            Else
-                                    //                ColumnWidthBalance = ColumnWidthBalance + CDef.adminColumns(ColumnPointer).Width
-                                    //            End If
-                                    //        Next
-                                    //        '
-                                    //        ' Adjust all columns
-                                    //        '
-                                    //        If (ColumnWidthBalance > 0) And (ColumnWidthIncrease <> 0) Then
-                                    //            For ColumnPointer = 0 To CDef.adminColumns.Count - 1
-                                    //                FieldName = CDef.adminColumns(ColumnPointer).Name
-                                    //                fieldId = CDef.fields[FieldName.ToLowerInvariant()].Id
-                                    //                CSPointer = core.main_OpenCSContentRecord("Content Fields", fieldId)
-                                    //                If fieldId = TargetFieldID Then
-                                    //                    '
-                                    //                    ' Target gets 10% increase
-                                    //                    '
-                                    //                    FieldWidth = Int(CDef.adminColumns(ColumnPointer).Width + ColumnWidthIncrease)
-                                    //                    Call core.app.SetCS(CSPointer, "IndexWidth", FieldWidth)
-                                    //                Else
-                                    //                    '
-                                    //                    ' non-targets get their share of the shrinkage
-                                    //                    '
-                                    //                    FieldWidth = CDef.adminColumns(ColumnPointer).Width
-                                    //                    FieldWidth = FieldWidth - ((ColumnWidthIncrease * FieldWidth) / ColumnWidthBalance)
-                                    //                    Call core.app.SetCS(CSPointer, "IndexWidth", Int(FieldWidth))
-                                    //                End If
-                                    //                Call core.app.SetCS(CSPointer, "IndexColumn", (ColumnPointer) * 10)
-                                    //                Call core.app.closeCS(CSPointer)
-                                    //            Next
-                                    //            ReloadCDef = True
-                                    //        End If
-                                    //    End If
                                     break;
                                 }
                         }
@@ -920,6 +762,7 @@ namespace Contensive.Addons.Tools {
                     // print the column headers
                     //
                     ColumnWidthTotal = 0;
+                    int InheritedFieldCount = 0;
                     if (CDef.adminColumns.Count > 0) {
                         //
                         // Calc total width
@@ -937,16 +780,16 @@ namespace Contensive.Addons.Tools {
                                 //
                                 // print column headers - anchored so they sort columns
                                 //
-                                ColumnWidth = encodeInteger(100 * (kvp.Value.Width / (double)ColumnWidthTotal));
+                                int ColumnWidth = encodeInteger(100 * (kvp.Value.Width / (double)ColumnWidthTotal));
                                 FieldName = kvp.Value.Name;
                                 var tempVar = CDef.fields[FieldName.ToLowerInvariant()];
                                 fieldId = tempVar.id;
-                                Caption = tempVar.caption;
+                                string Caption = tempVar.caption;
                                 if (tempVar.inherited) {
                                     Caption = Caption + "*";
                                     InheritedFieldCount = InheritedFieldCount + 1;
                                 }
-                                AStart = "<A href=\"" + core.webServer.requestPage + "?" + RequestNameToolContentID + "=" + ContentID + "&af=" + AdminFormToolConfigureListing + "&fi=" + fieldId + "&dtcn=" + ColumnCount;
+                                string AStart = "<A href=\"" + core.webServer.requestPage + "?" + RequestNameToolContentID + "=" + ContentID + "&af=" + AdminFormToolConfigureListing + "&fi=" + fieldId + "&dtcn=" + ColumnCount;
                                 Stream.Add("<td width=\"" + ColumnWidth + "%\" valign=\"top\" align=\"left\">" + SpanClassAdminNormal + Caption + "<br>");
                                 Stream.Add("<IMG src=\"/ContensiveBase/images/black.GIF\" width=\"100%\" height=\"1\">");
                                 Stream.Add(AStart + "&dta=" + ToolsActionRemoveField + "\"><IMG src=\"/ContensiveBase/images/LibButtonDeleteUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A><br>");
@@ -1052,446 +895,438 @@ namespace Contensive.Addons.Tools {
                 // print the content tables that have Listing Pages to Configure
                 //--------------------------------------------------------------------------------
                 //
-                FormPanel = FormPanel + SpanClassAdminNormal + "Select a Content Definition to Configure its Listing Page<br>";
-                //FormPanel = FormPanel & core.main_GetFormInputHidden("af", AdminFormToolConfigureListing)
+                string FormPanel = SpanClassAdminNormal + "Select a Content Definition to Configure its Listing Page<br>";
                 FormPanel = FormPanel + core.html.selectFromContent("ContentID", ContentID, "Content");
                 Stream.Add(core.html.getPanel(FormPanel));
-                //
                 core.siteProperties.setProperty("AllowContentAutoLoad", AllowContentAutoLoad);
                 Stream.Add(HtmlController.inputHidden("ReloadCDef", ReloadCDef));
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
-                //result =  adminUIController.getToolFormOpen(core, ButtonList) +  + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
             }
             return result;
         }
-        //
-        //=============================================================================
-        // checks Content against Database tables
-        //=============================================================================
-        //
-        private string GetForm_ContentDiagnostic() {
-            string result = "";
-            try {
-                //
-                string SQL = null;
-                string DataSourceName = null;
-                string TableName = null;
-                string ContentName = null;
-                int RecordID = 0;
-                int CSContent = 0;
-                int CSPointer = 0;
-                int ErrorCount = 0;
-                string FieldName = null;
-                string bitBucket = null;
-                int ContentID = 0;
-                int CSFields = 0;
-                int CSTestRecord = 0;
-                int TestRecordID = 0;
-                int fieldType = 0;
-                int RedirectContentID = 0;
-                int LookupContentID = 0;
-                string LookupList = null;
-                string DiagProblem = null;
-                int iDiagActionCount = 0;
-                int DiagActionPointer = 0;
-                string DiagAction = null;
-                DiagActionType[] DiagActions = null;
-                int CS = 0;
-                int CSTest = 0;
-                string Button = null;
-                bool FieldRequired = false;
-                bool FieldAuthorable = false;
-                StringBuilderLegacyController Stream = new StringBuilderLegacyController();
-                string ButtonList = null;
-                //
-                const string ButtonFix = "Make Corrections";
-                const string ButtonFixAndRun = "Make Corrections and Run Diagnostic";
-                const string ButtonRun = "Run Diagnostic";
-                //
-                ButtonList = ButtonRun;
-                //
-                Stream.Add(AdminUIController.getToolFormTitle("Content Diagnostic", "This tool finds Content and Table problems. To run successfully, the Site Property 'TrapErrors' must be set to true."));
-                Stream.Add(SpanClassAdminNormal + "<br>");
-                //
-                iDiagActionCount = core.docProperties.getInteger("DiagActionCount");
-                Button = core.docProperties.getText("Button");
-                if ((iDiagActionCount != 0) && ((Button == ButtonFix) || (Button == ButtonFixAndRun))) {
-                    //
-                    //-----------------------------------------------------------------------------------------------
-                    // ----- Perform actions from previous Diagnostic
-                    //-----------------------------------------------------------------------------------------------
-                    //
-                    Stream.Add("<br>");
-                    for (DiagActionPointer = 0; DiagActionPointer <= iDiagActionCount; DiagActionPointer++) {
-                        DiagAction = core.docProperties.getText("DiagAction" + DiagActionPointer);
-                        Stream.Add("Perform Action " + DiagActionPointer + " - " + DiagAction + "<br>");
-                        switch (GenericController.encodeInteger(DiagArgument(DiagAction, 0))) {
-                            case DiagActionSetFieldType:
-                                //
-                                // ----- Set Field Type
-                                //
-                                ContentID = Local_GetContentID(DiagArgument(DiagAction, 1));
-                                csXfer.csOpen("Content Fields", "(ContentID=" + ContentID + ")and(Name=" + DbController.encodeSQLText(DiagArgument(DiagAction, 2)) + ")");
-                                if (csXfer.csOk()) {
-                                    csXfer.csSet(CS, "Type", DiagArgument(DiagAction, 3));
-                                }
-                                csXfer.csClose(ref CS);
-                                //end case
-                                break;
-                            case DiagActionSetFieldInactive:
-                                //
-                                // ----- Set Field Inactive
-                                //
-                                ContentID = Local_GetContentID(DiagArgument(DiagAction, 1));
-                                csXfer.csOpen("Content Fields", "(ContentID=" + ContentID + ")and(Name=" + DbController.encodeSQLText(DiagArgument(DiagAction, 2)) + ")");
-                                if (csXfer.csOk()) {
-                                    csXfer.csSet(CS, "active", 0);
-                                }
-                                csXfer.csClose(ref CS);
-                                //end case
-                                break;
-                            case DiagActionDeleteRecord:
-                                //
-                                // ----- Delete Record
-                                //
-                                ContentName = DiagArgument(DiagAction, 1);
-                                RecordID = GenericController.encodeInteger(DiagArgument(DiagAction, 2));
-                                core.db.deleteContentRecord(ContentName, RecordID);
-                                //end case
-                                break;
-                            case DiagActionContentDeDupe:
-                                ContentName = DiagArgument(DiagAction, 1);
-                                csXfer.csOpen("Content", "name=" + DbController.encodeSQLText(ContentName), "ID");
-                                if (csXfer.csOk()) {
-                                    csXfer.csGoNext(CS);
-                                    while (csXfer.csOk()) {
-                                        csXfer.csSet(CS, "active", 0);
-                                        csXfer.csGoNext(CS);
-                                    }
-                                }
-                                csXfer.csClose(ref CS);
-                                //end case
-                                break;
-                            case DiagActionSetRecordInactive:
-                                //
-                                // ----- Set Field Inactive
-                                //
-                                ContentName = DiagArgument(DiagAction, 1);
-                                RecordID = GenericController.encodeInteger(DiagArgument(DiagAction, 2));
-                                csXfer.csOpen(ContentName, "(ID=" + RecordID + ")");
-                                if (csXfer.csOk()) {
-                                    csXfer.csSet(CS, "active", 0);
-                                }
-                                csXfer.csClose(ref CS);
-                                //end case
-                                break;
-                            case DiagActionSetFieldNotRequired:
-                                //
-                                // ----- Set Field not-required
-                                //
-                                ContentName = DiagArgument(DiagAction, 1);
-                                RecordID = GenericController.encodeInteger(DiagArgument(DiagAction, 2));
-                                csXfer.csOpen(ContentName, "(ID=" + RecordID + ")");
-                                if (csXfer.csOk()) {
-                                    csXfer.csSet(CS, "required", 0);
-                                }
-                                csXfer.csClose(ref CS);
-                                //end case
-                                break;
-                        }
-                    }
-                }
-                if ((Button == ButtonRun) || (Button == ButtonFixAndRun)) {
-                    //
-                    // Process input
-                    //
-                    if (!core.siteProperties.trapErrors) {
-                        //
-                        // TrapErrors must be true to run this tools
-                        //
-                        Stream.Add("Site Property 'TrapErrors' is currently set false. This property must be true to run Content Diagnostics successfully.<br>");
-                    } else {
-                        core.html.enableOutputBuffer(false);
-                        //
-                        // ----- check Content Sources for duplicates
-                        //
-                        if (DiagActionCount < DiagActionCountMax) {
-                            Stream.Add(GetDiagHeader("Checking Content Definition Duplicates...<br>"));
-                            //
-                            SQL = "SELECT Count(ccContent.ID) AS RecordCount, ccContent.Name AS Name, ccContent.Active"
-                                    + " From ccContent"
-                                    + " GROUP BY ccContent.Name, ccContent.Active"
-                                    + " Having (((Count(ccContent.ID)) > 1) And ((ccContent.active) <> 0))"
-                                    + " ORDER BY Count(ccContent.ID) DESC;";
-                            CSPointer = csXfer.csOpenSql(SQL,"Default");
-                            if (csXfer.csOk(CSPointer)) {
-                                while (csXfer.csOk(CSPointer)) {
-                                    DiagProblem = "PROBLEM: There are " + csXfer.csGetText(CSPointer, "RecordCount") + " records in the Content table with the name [" + csXfer.csGetText(CSPointer, "Name") + "]";
-                                    DiagActions = new  DiagActionType[3];
-                                    DiagActions[0].Name = "Ignore, or handle this issue manually";
-                                    DiagActions[0].Command = "";
-                                    DiagActions[1].Name = "Mark all duplicate definitions inactive";
-                                    DiagActions[1].Command = DiagActionContentDeDupe.ToString() + "," + csXfer.csGetValue(CSPointer, "name");
-                                    Stream.Add(GetDiagError(DiagProblem, DiagActions));
-                                    csXfer.csGoNext(CSPointer);
-                                }
-                            }
-                            csXfer.csClose(ref CSPointer);
-                        }
-                        //
-                        // ----- Content Fields
-                        //
-                        if (DiagActionCount < DiagActionCountMax) {
-                            Stream.Add(GetDiagHeader("Checking Content Fields...<br>"));
-                            //
-                            SQL = "SELECT ccFields.required AS FieldRequired, ccFields.Authorable AS FieldAuthorable, ccFields.Type AS FieldType, ccFields.Name AS FieldName, ccContent.ID AS ContentID, ccContent.Name AS ContentName, ccTables.Name AS TableName, ccDataSources.Name AS DataSourceName"
-                                    + " FROM (ccFields LEFT JOIN ccContent ON ccFields.ContentID = ccContent.ID) LEFT JOIN (ccTables LEFT JOIN ccDataSources ON ccTables.DataSourceID = ccDataSources.ID) ON ccContent.ContentTableID = ccTables.ID"
-                                    + " WHERE (((ccFields.Active)<>0) AND ((ccContent.Active)<>0) AND ((ccTables.Active)<>0)) OR (((ccFields.Active)<>0) AND ((ccContent.Active)<>0) AND ((ccTables.Active)<>0));";
-                            csXfer.csOpenSql(SQL,"Default");
-                            if (!csXfer.csOk()) {
-                                DiagProblem = "PROBLEM: No Content entries were found in the content table.";
-                                DiagActions = new DiagActionType[2];
-                                DiagActions[0].Name = "Ignore, or handle this issue manually";
-                                DiagActions[0].Command = "";
-                                Stream.Add(GetDiagError(DiagProblem, DiagActions));
-                            } else {
-                                while (csXfer.csOk() && (DiagActionCount < DiagActionCountMax)) {
-                                    FieldName = csXfer.csGetText(CS, "FieldName");
-                                    fieldType = csXfer.csGetInteger(CS, "FieldType");
-                                    FieldRequired = csXfer.csGetBoolean(CS, "FieldRequired");
-                                    FieldAuthorable = csXfer.csGetBoolean(CS, "FieldAuthorable");
-                                    ContentName = csXfer.csGetText(CS, "ContentName");
-                                    TableName = csXfer.csGetText(CS, "TableName");
-                                    DataSourceName = csXfer.csGetText(CS, "DataSourceName");
-                                    if (string.IsNullOrEmpty(DataSourceName)) {
-                                        DataSourceName = "Default";
-                                    }
-                                    if (FieldRequired && (!FieldAuthorable)) {
-                                        DiagProblem = "PROBLEM: Field [" + FieldName + "] in Content Definition [" + ContentName + "] is required, but is not referenced on the Admin Editing page. This will prevent content definition records from being saved.";
-                                        DiagActions = new DiagActionType[2];
-                                        DiagActions[0].Name = "Ignore, or handle this issue manually";
-                                        DiagActions[0].Command = "";
-                                        DiagActions[1].Name = "Set this Field inactive";
-                                        DiagActions[1].Command = DiagActionSetFieldInactive.ToString() + "," + ContentName + "," + FieldName;
-                                        DiagActions[1].Name = "Set this Field not required";
-                                        DiagActions[1].Command = DiagActionSetFieldNotRequired.ToString() + "," + ContentName + "," + FieldName;
-                                        Stream.Add(GetDiagError(DiagProblem, DiagActions));
-                                    }
-                                    if ((!string.IsNullOrEmpty(FieldName)) && (fieldType != fieldTypeIdRedirect) && (fieldType != fieldTypeIdManyToMany)) {
-                                        SQL = "SELECT " + FieldName + " FROM " + TableName + " WHERE ID=0;";
-                                        CSTest = csXfer.csOpenSql( SQL, DataSourceName);
-                                        if (CSTest == -1) {
-                                            DiagProblem = "PROBLEM: Field [" + FieldName + "] in Content Definition [" + ContentName + "] could not be read from database table [" + TableName + "] on datasource [" + DataSourceName + "].";
-                                            DiagActions = new DiagActionType[2];
-                                            DiagActions[0].Name = "Ignore, or handle this issue manually";
-                                            DiagActions[0].Command = "";
-                                            DiagActions[1].Name = "Set this Content Definition Field inactive";
-                                            DiagActions[1].Command = DiagActionSetFieldInactive.ToString() + "," + ContentName + "," + FieldName;
-                                            Stream.Add(GetDiagError(DiagProblem, DiagActions));
-                                        }
-                                    }
-                                    csXfer.csClose(ref CSTest);
-                                    csXfer.csGoNext(CS);
-                                }
-                            }
-                            csXfer.csClose(ref CS);
-                        }
-                        //
-                        // ----- Insert Content Testing
-                        //
-                        if (DiagActionCount < DiagActionCountMax) {
-                            Stream.Add(GetDiagHeader("Checking Content Insertion...<br>"));
-                            //
-                            CSContent = csXfer.csOpen("Content");
-                            if (!csXfer.csOk(CSContent)) {
-                                DiagProblem = "PROBLEM: No Content entries were found in the content table.";
-                                DiagActions = new DiagActionType[2];
-                                DiagActions[0].Name = "Ignore, or handle this issue manually";
-                                DiagActions[0].Command = "";
-                                Stream.Add(GetDiagError(DiagProblem, DiagActions));
-                            } else {
-                                while (csXfer.csOk(CSContent) && (DiagActionCount < DiagActionCountMax)) {
-                                    ContentID = csXfer.csGetInteger(CSContent, "ID");
-                                    ContentName = csXfer.csGetText(CSContent, "name");
-                                    CSTestRecord = csXfer.csInsert(ContentName);
-                                    if (!csXfer.csOk(CSTestRecord)) {
-                                        DiagProblem = "PROBLEM: Could not insert a record using Content Definition [" + ContentName + "]";
-                                        DiagActions = new DiagActionType[2];
-                                        DiagActions[0].Name = "Ignore, or handle this issue manually";
-                                        DiagActions[0].Command = "";
-                                        Stream.Add(GetDiagError(DiagProblem, DiagActions));
-                                    } else {
-                                        TestRecordID = csXfer.csGetInteger(CSTestRecord, "id");
-                                        if (TestRecordID == 0) {
-                                            DiagProblem = "PROBLEM: Content Definition [" + ContentName + "] does not support the required field [ID]\"";
-                                            DiagActions = new DiagActionType[2];
-                                            DiagActions[0].Name = "Ignore, or handle this issue manually";
-                                            DiagActions[0].Command = "";
-                                            DiagActions[1].Name = "Set this Content Definition inactive";
-                                            DiagActions[1].Command = DiagActionSetRecordInactive.ToString() + ",Content," + ContentID;
-                                            Stream.Add(GetDiagError(DiagProblem, DiagActions));
-                                        } else {
-                                            CSFields = csXfer.csOpen("Content Fields", "ContentID=" + ContentID);
-                                            while (csXfer.csOk(CSFields)) {
-                                                //
-                                                // ----- read the value of the field to test its presents
-                                                //
-                                                FieldName = csXfer.csGetText(CSFields, "name");
-                                                fieldType = csXfer.csGetInteger(CSFields, "Type");
-                                                switch (fieldType) {
-                                                    case _fieldTypeIdManyToMany:
-                                                        //
-                                                        //   skip it
-                                                        //
-                                                        break;
-                                                    case _fieldTypeIdRedirect:
-                                                        //
-                                                        // ----- redirect type, check redirect contentid
-                                                        //
-                                                        RedirectContentID = csXfer.csGetInteger(CSFields, "RedirectContentID");
-                                                        ErrorCount = core.doc.errorCount;
-                                                        bitBucket = Local_GetContentNameByID(RedirectContentID);
-                                                        if (IsNull(bitBucket) || (ErrorCount != core.doc.errorCount)) {
-                                                            DiagProblem = "PROBLEM: Content Field [" + ContentName + "].[" + FieldName + "] is a Redirection type, but the ContentID [" + RedirectContentID + "] is not valid.";
-                                                            if (string.IsNullOrEmpty(FieldName)) {
-                                                                DiagProblem = DiagProblem + " Also, the field has no name attribute so these diagnostics can not automatically mark the field inactive.";
-                                                                DiagActions = new DiagActionType[2];
-                                                                DiagActions[0].Name = "Ignore, or handle this issue manually";
-                                                                DiagActions[0].Command = "";
-                                                                Stream.Add(GetDiagError(DiagProblem, DiagActions));
-                                                            } else {
-                                                                DiagActions = new DiagActionType[3];
-                                                                DiagActions[0].Name = "Ignore, or handle this issue manually";
-                                                                DiagActions[0].Command = "";
-                                                                DiagActions[1].Name = "Set this Content Definition Field inactive";
-                                                                DiagActions[1].Command = DiagActionSetFieldInactive.ToString() + "," + ContentName + "," + FieldName;
-                                                                Stream.Add(GetDiagError(DiagProblem, DiagActions));
-                                                            }
-                                                        }
-                                                        break;
-                                                    case _fieldTypeIdLookup:
-                                                        //
-                                                        // ----- lookup type, read value and check lookup contentid
-                                                        //
-                                                        ErrorCount = core.doc.errorCount;
-                                                        bitBucket = csXfer.csGetValue(CSTestRecord, FieldName);
-                                                        if (ErrorCount != core.doc.errorCount) {
-                                                            DiagProblem = "PROBLEM: An error occurred reading the value of Content Field [" + ContentName + "].[" + FieldName + "]";
-                                                            DiagActions = new DiagActionType[2];
-                                                            DiagActions[0].Name = "Ignore, or handle this issue manually";
-                                                            DiagActions[0].Command = "";
-                                                            Stream.Add(GetDiagError(DiagProblem, DiagActions));
-                                                        } else {
-                                                            bitBucket = "";
-                                                            LookupList = csXfer.csGetText(CSFields, "Lookuplist");
-                                                            LookupContentID = csXfer.csGetInteger(CSFields, "LookupContentID");
-                                                            if (LookupContentID != 0) {
-                                                                ErrorCount = core.doc.errorCount;
-                                                                bitBucket = Local_GetContentNameByID(LookupContentID);
-                                                            }
-                                                            if ((string.IsNullOrEmpty(LookupList)) && ((LookupContentID == 0) || (string.IsNullOrEmpty(bitBucket)) || (ErrorCount != core.doc.errorCount))) {
-                                                                DiagProblem = "Content Field [" + ContentName + "].[" + FieldName + "] is a Lookup type, but LookupList is blank and LookupContentID [" + LookupContentID + "] is not valid.";
-                                                                DiagActions = new DiagActionType[3];
-                                                                DiagActions[0].Name = "Ignore, or handle this issue manually";
-                                                                DiagActions[0].Command = "";
-                                                                DiagActions[1].Name = "Convert the field to an Integer so no lookup is provided.";
-                                                                DiagActions[1].Command = DiagActionSetFieldType.ToString() + "," + ContentName + "," + FieldName + "," + encodeText(fieldTypeIdInteger);
-                                                                Stream.Add(GetDiagError(DiagProblem, DiagActions));
-                                                            }
-                                                        }
-                                                        break;
-                                                    default:
-                                                        //
-                                                        // ----- check for value in database
-                                                        //
-                                                        ErrorCount = core.doc.errorCount;
-                                                        bitBucket = csXfer.csGetValue(CSTestRecord, FieldName);
-                                                        if (ErrorCount != core.doc.errorCount) {
-                                                            DiagProblem = "PROBLEM: An error occurred reading the value of Content Field [" + ContentName + "].[" + FieldName + "]";
-                                                            DiagActions = new DiagActionType[4];
-                                                            DiagActions[0].Name = "Ignore, or handle this issue manually";
-                                                            DiagActions[0].Command = "";
-                                                            DiagActions[1].Name = "Add this field into the Content Definitions Content (and Authoring) Table.";
-                                                            DiagActions[1].Command = "x";
-                                                            Stream.Add(GetDiagError(DiagProblem, DiagActions));
-                                                        }
-                                                        break;
-                                                }
-                                                csXfer.csGoNext(CSFields);
-                                            }
-                                        }
-                                        csXfer.csClose(ref CSFields);
-                                        csXfer.csClose(ref CSTestRecord);
-                                        core.db.deleteContentRecord(ContentName, TestRecordID);
-                                    }
-                                    csXfer.csGoNext(CSContent);
-                                }
-                            }
-                            csXfer.csClose(ref CSContent);
-                        }
-                        //
-                        // ----- Check Navigator Entries
-                        //
-                        if (DiagActionCount < DiagActionCountMax) {
-                            Stream.Add(GetDiagHeader("Checking Navigator Entries...<br>"));
-                            CSPointer = csXfer.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName);
-                            if (!csXfer.csOk(CSPointer)) {
-                                DiagProblem = "PROBLEM: Could not open the [Navigator Entries] content.";
-                                DiagActions = new DiagActionType[4];
-                                DiagActions[0].Name = "Ignore, or handle this issue manually";
-                                DiagActions[0].Command = "";
-                                Stream.Add(GetDiagError(DiagProblem, DiagActions));
-                            } else {
-                                while (csXfer.csOk(CSPointer) && (DiagActionCount < DiagActionCountMax)) {
-                                    ContentID = csXfer.csGetInteger(CSPointer, "ContentID");
-                                    if (ContentID != 0) {
-                                        CSContent = csXfer.csOpen("Content", "ID=" + ContentID);
-                                        if (!csXfer.csOk(CSContent)) {
-                                            DiagProblem = "PROBLEM: Menu Entry [" + csXfer.csGetText(CSPointer, "name") + "] points to an invalid Content Definition.";
-                                            DiagActions = new DiagActionType[4];
-                                            DiagActions[0].Name = "Ignore, or handle this issue manually";
-                                            DiagActions[0].Command = "";
-                                            DiagActions[1].Name = "Remove this menu entry";
-                                            DiagActions[1].Command = DiagActionDeleteRecord.ToString() + ",Navigator Entries," + csXfer.csGetInteger(CSPointer, "ID");
-                                            Stream.Add(GetDiagError(DiagProblem, DiagActions));
-                                        }
-                                        csXfer.csClose(ref CSContent);
-                                    }
-                                    csXfer.csGoNext(CSPointer);
-                                }
-                            }
-                            csXfer.csClose(ref CSPointer);
-                        }
-                        if (DiagActionCount >= DiagActionCountMax) {
-                            DiagProblem = "Diagnostic Problem Limit (" + DiagActionCountMax + ") has been reached. Resolve the above issues to see more.";
-                            DiagActions = new DiagActionType[2];
-                            DiagActions[0].Name = "";
-                            DiagActions[0].Command = "";
-                            Stream.Add(GetDiagError(DiagProblem, DiagActions));
-                        }
-                        //
-                        // ----- Done with diagnostics
-                        //
-                        Stream.Add(HtmlController.inputHidden("DiagActionCount", DiagActionCount));
-                    }
-                }
-                //
-                // start diagnostic button
-                //
-                Stream.Add("</SPAN>");
-                if (DiagActionCount > 0) {
-                    ButtonList = ButtonList + "," + ButtonFix;
-                    ButtonList = ButtonList + "," + ButtonFixAndRun;
-                }
-                result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
-                //result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-            }
-            return result;
-        }
+        ////
+        ////=============================================================================
+        //// checks Content against Database tables
+        ////=============================================================================
+        ////
+        //private string GetForm_ContentDiagnostic() {
+        //    string result = "";
+        //    try {
+        //        //
+        //        string SQL = null;
+        //        string DataSourceName = null;
+        //        string TableName = null;
+        //        string ContentName = null;
+        //        int RecordID = 0;
+        //        int ErrorCount = 0;
+        //        string FieldName = null;
+        //        string bitBucket = null;
+        //        int ContentID = 0;
+        //        int TestRecordID = 0;
+        //        int fieldType = 0;
+        //        int RedirectContentID = 0;
+        //        int LookupContentID = 0;
+        //        string LookupList = null;
+        //        string DiagProblem = null;
+        //        int iDiagActionCount = 0;
+        //        int DiagActionPointer = 0;
+        //        string DiagAction = null;
+        //        DiagActionType[] DiagActions = null;
+        //        string Button = null;
+        //        bool FieldRequired = false;
+        //        bool FieldAuthorable = false;
+        //        StringBuilderLegacyController Stream = new StringBuilderLegacyController();
+        //        string ButtonList = null;
+        //        //
+        //        const string ButtonFix = "Make Corrections";
+        //        const string ButtonFixAndRun = "Make Corrections and Run Diagnostic";
+        //        const string ButtonRun = "Run Diagnostic";
+        //        //
+        //        ButtonList = ButtonRun;
+        //        //
+        //        Stream.Add(AdminUIController.getToolFormTitle("Content Diagnostic", "This tool finds Content and Table problems. To run successfully, the Site Property 'TrapErrors' must be set to true."));
+        //        Stream.Add(SpanClassAdminNormal + "<br>");
+        //        //
+        //        iDiagActionCount = core.docProperties.getInteger("DiagActionCount");
+        //        Button = core.docProperties.getText("Button");
+        //        if ((iDiagActionCount != 0) && ((Button == ButtonFix) || (Button == ButtonFixAndRun))) {
+        //            //
+        //            //-----------------------------------------------------------------------------------------------
+        //            // ----- Perform actions from previous Diagnostic
+        //            //-----------------------------------------------------------------------------------------------
+        //            //
+        //            Stream.Add("<br>");
+        //            for (DiagActionPointer = 0; DiagActionPointer <= iDiagActionCount; DiagActionPointer++) {
+        //                DiagAction = core.docProperties.getText("DiagAction" + DiagActionPointer);
+        //                Stream.Add("Perform Action " + DiagActionPointer + " - " + DiagAction + "<br>");
+        //                switch (GenericController.encodeInteger(DiagArgument(DiagAction, 0))) {
+        //                    case DiagActionSetFieldType:
+        //                        //
+        //                        // ----- Set Field Type
+        //                        //
+        //                        ContentID = Local_GetContentID(DiagArgument(DiagAction, 1));
+        //                        using (var csXfer = new CsModel(core)) {
+        //                            if (csXfer.csOpen("Content Fields", "(ContentID=" + ContentID + ")and(Name=" + DbController.encodeSQLText(DiagArgument(DiagAction, 2)) + ")")) {
+        //                                csXfer.csSet("Type", DiagArgument(DiagAction, 3));
+        //                            }
+        //                        }
+        //                        //end case
+        //                        break;
+        //                    case DiagActionSetFieldInactive:
+        //                        //
+        //                        // ----- Set Field Inactive
+        //                        //
+        //                        ContentID = Local_GetContentID(DiagArgument(DiagAction, 1));
+        //                        using (var csXfer = new CsModel(core)) {
+        //                            if (csXfer.csOpen("Content Fields", "(ContentID=" + ContentID + ")and(Name=" + DbController.encodeSQLText(DiagArgument(DiagAction, 2)) + ")")) {
+        //                                csXfer.csSet("active", 0);
+        //                            }
+        //                        }
+        //                        //end case
+        //                        break;
+        //                    case DiagActionDeleteRecord:
+        //                        //
+        //                        // ----- Delete Record
+        //                        //
+        //                        ContentName = DiagArgument(DiagAction, 1);
+        //                        RecordID = GenericController.encodeInteger(DiagArgument(DiagAction, 2));
+        //                        MetaController.deleteContentRecord(core, ContentName, RecordID);
+        //                        //end case
+        //                        break;
+        //                    case DiagActionContentDeDupe:
+        //                        ContentName = DiagArgument(DiagAction, 1);
+        //                        using (var csXfer = new CsModel(core)) {
+        //                            csXfer.csOpen("Content", "name=" + DbController.encodeSQLText(ContentName), "ID");
+        //                            if (csXfer.csOk()) {
+        //                                csXfer.csGoNext(CS);
+        //                                while (csXfer.csOk()) {
+        //                                    csXfer.csSet("active", 0);
+        //                                    csXfer.csGoNext(CS);
+        //                                }
+        //                            }
+        //                        }
+        //                        //end case
+        //                        break;
+        //                    case DiagActionSetRecordInactive:
+        //                        //
+        //                        // ----- Set Field Inactive
+        //                        //
+        //                        ContentName = DiagArgument(DiagAction, 1);
+        //                        RecordID = GenericController.encodeInteger(DiagArgument(DiagAction, 2));
+        //                        csXfer.csOpen(ContentName, "(ID=" + RecordID + ")");
+        //                        if (csXfer.csOk()) {
+        //                            csXfer.csSet(CS, "active", 0);
+        //                        }
+        //                        csXfer.csClose();
+        //                        //end case
+        //                        break;
+        //                    case DiagActionSetFieldNotRequired:
+        //                        //
+        //                        // ----- Set Field not-required
+        //                        //
+        //                        ContentName = DiagArgument(DiagAction, 1);
+        //                        RecordID = GenericController.encodeInteger(DiagArgument(DiagAction, 2));
+        //                        csXfer.csOpen(ContentName, "(ID=" + RecordID + ")");
+        //                        if (csXfer.csOk()) {
+        //                            csXfer.csSet(CS, "required", 0);
+        //                        }
+        //                        csXfer.csClose();
+        //                        //end case
+        //                        break;
+        //                }
+        //            }
+        //        }
+        //        if ((Button == ButtonRun) || (Button == ButtonFixAndRun)) {
+        //            //
+        //            // Process input
+        //            //
+        //            if (!core.siteProperties.trapErrors) {
+        //                //
+        //                // TrapErrors must be true to run this tools
+        //                //
+        //                Stream.Add("Site Property 'TrapErrors' is currently set false. This property must be true to run Content Diagnostics successfully.<br>");
+        //            } else {
+        //                core.html.enableOutputBuffer(false);
+        //                //
+        //                // ----- check Content Sources for duplicates
+        //                //
+        //                if (DiagActionCount < DiagActionCountMax) {
+        //                    Stream.Add(GetDiagHeader("Checking Content Definition Duplicates...<br>"));
+        //                    //
+        //                    SQL = "SELECT Count(ccContent.ID) AS RecordCount, ccContent.Name AS Name, ccContent.Active"
+        //                            + " From ccContent"
+        //                            + " GROUP BY ccContent.Name, ccContent.Active"
+        //                            + " Having (((Count(ccContent.ID)) > 1) And ((ccContent.active) <> 0))"
+        //                            + " ORDER BY Count(ccContent.ID) DESC;";
+        //                    CSPointer = csXfer.csOpenSql(SQL,"Default");
+        //                    if (csXfer.csOk()) {
+        //                        while (csXfer.csOk()) {
+        //                            DiagProblem = "PROBLEM: There are " + csXfer.csGetText(CSPointer, "RecordCount") + " records in the Content table with the name [" + csXfer.csGetText(CSPointer, "Name") + "]";
+        //                            DiagActions = new  DiagActionType[3];
+        //                            DiagActions[0].Name = "Ignore, or handle this issue manually";
+        //                            DiagActions[0].Command = "";
+        //                            DiagActions[1].Name = "Mark all duplicate definitions inactive";
+        //                            DiagActions[1].Command = DiagActionContentDeDupe.ToString() + "," + csXfer.csGetValue(CSPointer, "name");
+        //                            Stream.Add(GetDiagError(DiagProblem, DiagActions));
+        //                            csXfer.csGoNext();
+        //                        }
+        //                    }
+        //                    csXfer.csClose();
+        //                }
+        //                //
+        //                // ----- Content Fields
+        //                //
+        //                if (DiagActionCount < DiagActionCountMax) {
+        //                    Stream.Add(GetDiagHeader("Checking Content Fields...<br>"));
+        //                    //
+        //                    SQL = "SELECT ccFields.required AS FieldRequired, ccFields.Authorable AS FieldAuthorable, ccFields.Type AS FieldType, ccFields.Name AS FieldName, ccContent.ID AS ContentID, ccContent.Name AS ContentName, ccTables.Name AS TableName, ccDataSources.Name AS DataSourceName"
+        //                            + " FROM (ccFields LEFT JOIN ccContent ON ccFields.ContentID = ccContent.ID) LEFT JOIN (ccTables LEFT JOIN ccDataSources ON ccTables.DataSourceID = ccDataSources.ID) ON ccContent.ContentTableID = ccTables.ID"
+        //                            + " WHERE (((ccFields.Active)<>0) AND ((ccContent.Active)<>0) AND ((ccTables.Active)<>0)) OR (((ccFields.Active)<>0) AND ((ccContent.Active)<>0) AND ((ccTables.Active)<>0));";
+        //                    csXfer.csOpenSql(SQL,"Default");
+        //                    if (!csXfer.csOk()) {
+        //                        DiagProblem = "PROBLEM: No Content entries were found in the content table.";
+        //                        DiagActions = new DiagActionType[2];
+        //                        DiagActions[0].Name = "Ignore, or handle this issue manually";
+        //                        DiagActions[0].Command = "";
+        //                        Stream.Add(GetDiagError(DiagProblem, DiagActions));
+        //                    } else {
+        //                        while (csXfer.csOk() && (DiagActionCount < DiagActionCountMax)) {
+        //                            FieldName = csXfer.csGetText(CS, "FieldName");
+        //                            fieldType = csXfer.csGetInteger(CS, "FieldType");
+        //                            FieldRequired = csXfer.csGetBoolean(CS, "FieldRequired");
+        //                            FieldAuthorable = csXfer.csGetBoolean(CS, "FieldAuthorable");
+        //                            ContentName = csXfer.csGetText(CS, "ContentName");
+        //                            TableName = csXfer.csGetText(CS, "TableName");
+        //                            DataSourceName = csXfer.csGetText(CS, "DataSourceName");
+        //                            if (string.IsNullOrEmpty(DataSourceName)) {
+        //                                DataSourceName = "Default";
+        //                            }
+        //                            if (FieldRequired && (!FieldAuthorable)) {
+        //                                DiagProblem = "PROBLEM: Field [" + FieldName + "] in Content Definition [" + ContentName + "] is required, but is not referenced on the Admin Editing page. This will prevent content definition records from being saved.";
+        //                                DiagActions = new DiagActionType[2];
+        //                                DiagActions[0].Name = "Ignore, or handle this issue manually";
+        //                                DiagActions[0].Command = "";
+        //                                DiagActions[1].Name = "Set this Field inactive";
+        //                                DiagActions[1].Command = DiagActionSetFieldInactive.ToString() + "," + ContentName + "," + FieldName;
+        //                                DiagActions[1].Name = "Set this Field not required";
+        //                                DiagActions[1].Command = DiagActionSetFieldNotRequired.ToString() + "," + ContentName + "," + FieldName;
+        //                                Stream.Add(GetDiagError(DiagProblem, DiagActions));
+        //                            }
+        //                            if ((!string.IsNullOrEmpty(FieldName)) && (fieldType != fieldTypeIdRedirect) && (fieldType != fieldTypeIdManyToMany)) {
+        //                                SQL = "SELECT " + FieldName + " FROM " + TableName + " WHERE ID=0;";
+        //                                CSTest = csXfer.csOpenSql( SQL, DataSourceName);
+        //                                if (CSTest == -1) {
+        //                                    DiagProblem = "PROBLEM: Field [" + FieldName + "] in Content Definition [" + ContentName + "] could not be read from database table [" + TableName + "] on datasource [" + DataSourceName + "].";
+        //                                    DiagActions = new DiagActionType[2];
+        //                                    DiagActions[0].Name = "Ignore, or handle this issue manually";
+        //                                    DiagActions[0].Command = "";
+        //                                    DiagActions[1].Name = "Set this Content Definition Field inactive";
+        //                                    DiagActions[1].Command = DiagActionSetFieldInactive.ToString() + "," + ContentName + "," + FieldName;
+        //                                    Stream.Add(GetDiagError(DiagProblem, DiagActions));
+        //                                }
+        //                            }
+        //                            csXfer.csClose(ref CSTest);
+        //                            csXfer.csGoNext(CS);
+        //                        }
+        //                    }
+        //                    csXfer.csClose();
+        //                }
+        //                //
+        //                // ----- Insert Content Testing
+        //                //
+        //                if (DiagActionCount < DiagActionCountMax) {
+        //                    Stream.Add(GetDiagHeader("Checking Content Insertion...<br>"));
+        //                    //
+        //                    CSContent = csXfer.csOpen("Content");
+        //                    if (!csXfer.csOk(CSContent)) {
+        //                        DiagProblem = "PROBLEM: No Content entries were found in the content table.";
+        //                        DiagActions = new DiagActionType[2];
+        //                        DiagActions[0].Name = "Ignore, or handle this issue manually";
+        //                        DiagActions[0].Command = "";
+        //                        Stream.Add(GetDiagError(DiagProblem, DiagActions));
+        //                    } else {
+        //                        while (csXfer.csOk(CSContent) && (DiagActionCount < DiagActionCountMax)) {
+        //                            ContentID = csXfer.csGetInteger(CSContent, "ID");
+        //                            ContentName = csXfer.csGetText(CSContent, "name");
+        //                            CSTestRecord = csXfer.csInsert(ContentName);
+        //                            if (!csXfer.csOk(CSTestRecord)) {
+        //                                DiagProblem = "PROBLEM: Could not insert a record using Content Definition [" + ContentName + "]";
+        //                                DiagActions = new DiagActionType[2];
+        //                                DiagActions[0].Name = "Ignore, or handle this issue manually";
+        //                                DiagActions[0].Command = "";
+        //                                Stream.Add(GetDiagError(DiagProblem, DiagActions));
+        //                            } else {
+        //                                TestRecordID = csXfer.csGetInteger(CSTestRecord, "id");
+        //                                if (TestRecordID == 0) {
+        //                                    DiagProblem = "PROBLEM: Content Definition [" + ContentName + "] does not support the required field [ID]\"";
+        //                                    DiagActions = new DiagActionType[2];
+        //                                    DiagActions[0].Name = "Ignore, or handle this issue manually";
+        //                                    DiagActions[0].Command = "";
+        //                                    DiagActions[1].Name = "Set this Content Definition inactive";
+        //                                    DiagActions[1].Command = DiagActionSetRecordInactive.ToString() + ",Content," + ContentID;
+        //                                    Stream.Add(GetDiagError(DiagProblem, DiagActions));
+        //                                } else {
+        //                                    CSFields = csXfer.csOpen("Content Fields", "ContentID=" + ContentID);
+        //                                    while (csXfer.csOk(CSFields)) {
+        //                                        //
+        //                                        // ----- read the value of the field to test its presents
+        //                                        //
+        //                                        FieldName = csXfer.csGetText(CSFields, "name");
+        //                                        fieldType = csXfer.csGetInteger(CSFields, "Type");
+        //                                        switch (fieldType) {
+        //                                            case _fieldTypeIdManyToMany:
+        //                                                //
+        //                                                //   skip it
+        //                                                //
+        //                                                break;
+        //                                            case _fieldTypeIdRedirect:
+        //                                                //
+        //                                                // ----- redirect type, check redirect contentid
+        //                                                //
+        //                                                RedirectContentID = csXfer.csGetInteger(CSFields, "RedirectContentID");
+        //                                                ErrorCount = core.doc.errorCount;
+        //                                                bitBucket = Local_GetContentNameByID(RedirectContentID);
+        //                                                if (IsNull(bitBucket) || (ErrorCount != core.doc.errorCount)) {
+        //                                                    DiagProblem = "PROBLEM: Content Field [" + ContentName + "].[" + FieldName + "] is a Redirection type, but the ContentID [" + RedirectContentID + "] is not valid.";
+        //                                                    if (string.IsNullOrEmpty(FieldName)) {
+        //                                                        DiagProblem = DiagProblem + " Also, the field has no name attribute so these diagnostics can not automatically mark the field inactive.";
+        //                                                        DiagActions = new DiagActionType[2];
+        //                                                        DiagActions[0].Name = "Ignore, or handle this issue manually";
+        //                                                        DiagActions[0].Command = "";
+        //                                                        Stream.Add(GetDiagError(DiagProblem, DiagActions));
+        //                                                    } else {
+        //                                                        DiagActions = new DiagActionType[3];
+        //                                                        DiagActions[0].Name = "Ignore, or handle this issue manually";
+        //                                                        DiagActions[0].Command = "";
+        //                                                        DiagActions[1].Name = "Set this Content Definition Field inactive";
+        //                                                        DiagActions[1].Command = DiagActionSetFieldInactive.ToString() + "," + ContentName + "," + FieldName;
+        //                                                        Stream.Add(GetDiagError(DiagProblem, DiagActions));
+        //                                                    }
+        //                                                }
+        //                                                break;
+        //                                            case _fieldTypeIdLookup:
+        //                                                //
+        //                                                // ----- lookup type, read value and check lookup contentid
+        //                                                //
+        //                                                ErrorCount = core.doc.errorCount;
+        //                                                bitBucket = csXfer.csGetValue(CSTestRecord, FieldName);
+        //                                                if (ErrorCount != core.doc.errorCount) {
+        //                                                    DiagProblem = "PROBLEM: An error occurred reading the value of Content Field [" + ContentName + "].[" + FieldName + "]";
+        //                                                    DiagActions = new DiagActionType[2];
+        //                                                    DiagActions[0].Name = "Ignore, or handle this issue manually";
+        //                                                    DiagActions[0].Command = "";
+        //                                                    Stream.Add(GetDiagError(DiagProblem, DiagActions));
+        //                                                } else {
+        //                                                    bitBucket = "";
+        //                                                    LookupList = csXfer.csGetText(CSFields, "Lookuplist");
+        //                                                    LookupContentID = csXfer.csGetInteger(CSFields, "LookupContentID");
+        //                                                    if (LookupContentID != 0) {
+        //                                                        ErrorCount = core.doc.errorCount;
+        //                                                        bitBucket = Local_GetContentNameByID(LookupContentID);
+        //                                                    }
+        //                                                    if ((string.IsNullOrEmpty(LookupList)) && ((LookupContentID == 0) || (string.IsNullOrEmpty(bitBucket)) || (ErrorCount != core.doc.errorCount))) {
+        //                                                        DiagProblem = "Content Field [" + ContentName + "].[" + FieldName + "] is a Lookup type, but LookupList is blank and LookupContentID [" + LookupContentID + "] is not valid.";
+        //                                                        DiagActions = new DiagActionType[3];
+        //                                                        DiagActions[0].Name = "Ignore, or handle this issue manually";
+        //                                                        DiagActions[0].Command = "";
+        //                                                        DiagActions[1].Name = "Convert the field to an Integer so no lookup is provided.";
+        //                                                        DiagActions[1].Command = DiagActionSetFieldType.ToString() + "," + ContentName + "," + FieldName + "," + encodeText(fieldTypeIdInteger);
+        //                                                        Stream.Add(GetDiagError(DiagProblem, DiagActions));
+        //                                                    }
+        //                                                }
+        //                                                break;
+        //                                            default:
+        //                                                //
+        //                                                // ----- check for value in database
+        //                                                //
+        //                                                ErrorCount = core.doc.errorCount;
+        //                                                bitBucket = csXfer.csGetValue(CSTestRecord, FieldName);
+        //                                                if (ErrorCount != core.doc.errorCount) {
+        //                                                    DiagProblem = "PROBLEM: An error occurred reading the value of Content Field [" + ContentName + "].[" + FieldName + "]";
+        //                                                    DiagActions = new DiagActionType[4];
+        //                                                    DiagActions[0].Name = "Ignore, or handle this issue manually";
+        //                                                    DiagActions[0].Command = "";
+        //                                                    DiagActions[1].Name = "Add this field into the Content Definitions Content (and Authoring) Table.";
+        //                                                    DiagActions[1].Command = "x";
+        //                                                    Stream.Add(GetDiagError(DiagProblem, DiagActions));
+        //                                                }
+        //                                                break;
+        //                                        }
+        //                                        csXfer.csGoNext(CSFields);
+        //                                    }
+        //                                }
+        //                                csXfer.csClose(ref CSFields);
+        //                                csXfer.csClose(ref CSTestRecord);
+        //                                core.db.deleteContentRecord(ContentName, TestRecordID);
+        //                            }
+        //                            csXfer.csGoNext(CSContent);
+        //                        }
+        //                    }
+        //                    csXfer.csClose(ref CSContent);
+        //                }
+        //                //
+        //                // ----- Check Navigator Entries
+        //                //
+        //                if (DiagActionCount < DiagActionCountMax) {
+        //                    Stream.Add(GetDiagHeader("Checking Navigator Entries...<br>"));
+        //                    CSPointer = csXfer.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName);
+        //                    if (!csXfer.csOk()) {
+        //                        DiagProblem = "PROBLEM: Could not open the [Navigator Entries] content.";
+        //                        DiagActions = new DiagActionType[4];
+        //                        DiagActions[0].Name = "Ignore, or handle this issue manually";
+        //                        DiagActions[0].Command = "";
+        //                        Stream.Add(GetDiagError(DiagProblem, DiagActions));
+        //                    } else {
+        //                        while (csXfer.csOk() && (DiagActionCount < DiagActionCountMax)) {
+        //                            ContentID = csXfer.csGetInteger( "ContentID");
+        //                            if (ContentID != 0) {
+        //                                CSContent = csXfer.csOpen("Content", "ID=" + ContentID);
+        //                                if (!csXfer.csOk(CSContent)) {
+        //                                    DiagProblem = "PROBLEM: Menu Entry [" + csXfer.csGetText(CSPointer, "name") + "] points to an invalid Content Definition.";
+        //                                    DiagActions = new DiagActionType[4];
+        //                                    DiagActions[0].Name = "Ignore, or handle this issue manually";
+        //                                    DiagActions[0].Command = "";
+        //                                    DiagActions[1].Name = "Remove this menu entry";
+        //                                    DiagActions[1].Command = DiagActionDeleteRecord.ToString() + ",Navigator Entries," + csXfer.csGetInteger( "ID");
+        //                                    Stream.Add(GetDiagError(DiagProblem, DiagActions));
+        //                                }
+        //                                csXfer.csClose(ref CSContent);
+        //                            }
+        //                            csXfer.csGoNext();
+        //                        }
+        //                    }
+        //                    csXfer.csClose();
+        //                }
+        //                if (DiagActionCount >= DiagActionCountMax) {
+        //                    DiagProblem = "Diagnostic Problem Limit (" + DiagActionCountMax + ") has been reached. Resolve the above issues to see more.";
+        //                    DiagActions = new DiagActionType[2];
+        //                    DiagActions[0].Name = "";
+        //                    DiagActions[0].Command = "";
+        //                    Stream.Add(GetDiagError(DiagProblem, DiagActions));
+        //                }
+        //                //
+        //                // ----- Done with diagnostics
+        //                //
+        //                Stream.Add(HtmlController.inputHidden("DiagActionCount", DiagActionCount));
+        //            }
+        //        }
+        //        //
+        //        // start diagnostic button
+        //        //
+        //        Stream.Add("</SPAN>");
+        //        if (DiagActionCount > 0) {
+        //            ButtonList = ButtonList + "," + ButtonFix;
+        //            ButtonList = ButtonList + "," + ButtonFixAndRun;
+        //        }
+        //        result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
+        //        //result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
+        //    } catch (Exception ex) {
+        //        LogController.handleError( core,ex);
+        //    }
+        //    return result;
+        //}
         //
         //=============================================================================
         // Normalize the Index page Columns, setting proper values for IndexColumn, etc.
@@ -1511,16 +1346,16 @@ namespace Contensive.Addons.Tools {
                 //Call LoadContentDefinitions
                 //
                 CSPointer = csXfer.csOpen("Content Fields", "(ContentID=" + ContentID + ")", "IndexColumn");
-                if (!csXfer.csOk(CSPointer)) {
+                if (!csXfer.csOk()) {
                     throw (new GenericException("Unexpected exception")); // Call handleLegacyClassErrors2("NormalizeIndexColumns", "Could not read Content Field Definitions")
                 } else {
                     //
                     // Adjust IndexSortOrder to be 0 based, count by 1
                     //
                     ColumnCounter = 0;
-                    while (csXfer.csOk(CSPointer)) {
-                        IndexColumn = csXfer.csGetInteger(CSPointer, "IndexColumn");
-                        ColumnWidth = csXfer.csGetInteger(CSPointer, "IndexWidth");
+                    while (csXfer.csOk()) {
+                        IndexColumn = csXfer.csGetInteger( "IndexColumn");
+                        ColumnWidth = csXfer.csGetInteger( "IndexWidth");
                         if ((IndexColumn == 0) || (ColumnWidth == 0)) {
                             csXfer.csSet(CSPointer, "IndexColumn", 0);
                             csXfer.csSet(CSPointer, "IndexWidth", 0);
@@ -1533,14 +1368,14 @@ namespace Contensive.Addons.Tools {
                             ColumnCounter = ColumnCounter + 1;
                             ColumnWidthTotal = ColumnWidthTotal + ColumnWidth;
                         }
-                        csXfer.csGoNext(CSPointer);
+                        csXfer.csGoNext();
                     }
                     if (ColumnCounter == 0) {
                         //
                         // No columns found, set name as Column 0, active as column 1
                         //
                         csXfer.csGoFirst(CSPointer);
-                        while (csXfer.csOk(CSPointer)) {
+                        while (csXfer.csOk()) {
                             switch (GenericController.vbUCase(csXfer.csGetText(CSPointer, "name"))) {
                                 case "ACTIVE":
                                     csXfer.csSet(CSPointer, "IndexColumn", 0);
@@ -1553,7 +1388,7 @@ namespace Contensive.Addons.Tools {
                                     ColumnWidthTotal = ColumnWidthTotal + 80;
                                     break;
                             }
-                            csXfer.csGoNext(CSPointer);
+                            csXfer.csGoNext();
                         }
                     }
                     //
@@ -1561,20 +1396,20 @@ namespace Contensive.Addons.Tools {
                     //
                     if (ColumnWidthTotal > 0) {
                         csXfer.csGoFirst(CSPointer);
-                        while (csXfer.csOk(CSPointer)) {
-                            ColumnWidth = csXfer.csGetInteger(CSPointer, "IndexWidth");
+                        while (csXfer.csOk()) {
+                            ColumnWidth = csXfer.csGetInteger( "IndexWidth");
                             ColumnWidth = encodeInteger((ColumnWidth * 100) / (double)ColumnWidthTotal);
                             csXfer.csSet(CSPointer, "IndexWidth", ColumnWidth);
-                            csXfer.csGoNext(CSPointer);
+                            csXfer.csGoNext();
                         }
                     }
                 }
-                csXfer.csClose(ref CSPointer);
+                csXfer.csClose();
                 //
                 // ----- now fixup Sort Priority so only visible fields are sorted.
                 //
                 CSPointer = csXfer.csOpen("Content Fields", "(ContentID=" + ContentID + ")", "IndexSortPriority, IndexColumn");
-                if (!csXfer.csOk(CSPointer)) {
+                if (!csXfer.csOk()) {
                     throw (new GenericException("Unexpected exception")); // Call handleLegacyClassErrors2("NormalizeIndexColumns", "Error reading Content Field Definitions")
                 } else {
                     //
@@ -1583,13 +1418,13 @@ namespace Contensive.Addons.Tools {
                     int SortValue = 0;
                     int SortDirection = 0;
                     SortValue = 0;
-                    while (csXfer.csOk(CSPointer)) {
+                    while (csXfer.csOk()) {
                         SortDirection = 0;
-                        if (csXfer.csGetInteger(CSPointer, "IndexColumn") == 0) {
+                        if (csXfer.csGetInteger( "IndexColumn") == 0) {
                             csXfer.csSet(CSPointer, "IndexSortPriority", 0);
                         } else {
                             csXfer.csSet(CSPointer, "IndexSortPriority", SortValue);
-                            SortDirection = csXfer.csGetInteger(CSPointer, "IndexSortDirection");
+                            SortDirection = csXfer.csGetInteger( "IndexSortDirection");
                             if (SortDirection == 0) {
                                 SortDirection = 1;
                             } else {
@@ -1602,7 +1437,7 @@ namespace Contensive.Addons.Tools {
                             SortValue = SortValue + 1;
                         }
                         csXfer.csSet(CSPointer, "IndexSortDirection", SortDirection);
-                        csXfer.csGoNext(CSPointer);
+                        csXfer.csGoNext();
                     }
                 }
                 //
@@ -1981,7 +1816,7 @@ namespace Contensive.Addons.Tools {
                             //
                             RecordCount = RecordCount + 1;
                         }
-                        csXfer.csClose(ref CS);
+                        csXfer.csClose();
                         ReadTicks = ReadTicks + core.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                     }
                     Stream.Add(DateTime.Now + " Finished<br>");
@@ -2017,7 +1852,7 @@ namespace Contensive.Addons.Tools {
                             //
                             RecordCount = RecordCount + 1;
                         }
-                        csXfer.csClose(ref CS);
+                        csXfer.csClose();
                         ReadTicks = ReadTicks + core.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                     }
                     Stream.Add(DateTime.Now + " Finished<br>");
@@ -2397,7 +2232,7 @@ namespace Contensive.Addons.Tools {
                     TableName = csXfer.csGetText(CS, "name");
                     DataSource = csXfer.csGetLookup(CS, "DataSourceID");
                 }
-                csXfer.csClose(ref CS);
+                csXfer.csClose();
                 //
                 if ((TableID != 0) && (TableID == core.docProperties.getInteger("previoustableid")) && (!string.IsNullOrEmpty(Button))) {
                     //
@@ -3316,7 +3151,7 @@ namespace Contensive.Addons.Tools {
                     csXfer.csGoNext(CS);
                     RowPtr = RowPtr + 1;
                 }
-                csXfer.csClose(ref CS);
+                csXfer.csClose();
                 Stream.Add(TopHalf + BottomHalf + HtmlController.inputHidden("CDefRowCnt", RowPtr));
                 //
                 result = AdminUIController.getToolForm(core, Stream.Text, ButtonCancel + "," + ButtonFindAndReplace);

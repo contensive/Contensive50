@@ -202,12 +202,12 @@ namespace Contensive.Processor.Controllers {
                 string Criteria = getAuthoringControlCriteria(core, ContentName, RecordID) + "And(ControlType=" + authoringControl + ")";
                 switch (authoringControl) {
                     case AuthoringControls.Editing:
-                        core.db.deleteContentRecords("Authoring Controls", Criteria + "And(CreatedBy=" + DbController.encodeSQLNumber(MemberID) + ")", MemberID);
+                        MetaController.deleteContentRecords(core, "Authoring Controls", Criteria + "And(CreatedBy=" + DbController.encodeSQLNumber(MemberID) + ")", MemberID);
                         break;
                     case AuthoringControls.Submitted:
                     case AuthoringControls.Approved:
                     case AuthoringControls.Modified:
-                        core.db.deleteContentRecords("Authoring Controls", Criteria, MemberID);
+                        MetaController.deleteContentRecords(core, "Authoring Controls", Criteria, MemberID);
                         break;
                 }
             } catch (Exception ex) {

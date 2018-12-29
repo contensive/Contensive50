@@ -102,7 +102,7 @@ namespace Contensive.Addons.AdminSite {
                                 groupRuleEditor.rowList.Add(row);
                                 GroupCount += 1;
                             }
-                            csXfer.csGoNext(CS2);
+                            csXfer.csGoNext();
                         }
                     }
                 }

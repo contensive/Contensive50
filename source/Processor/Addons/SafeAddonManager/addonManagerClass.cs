@@ -187,7 +187,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                         //
                                         // Delete any addons from this collection
                                         //
-                                        core.db.deleteContentRecords(Processor.Models.Db.AddonModel.contentName, "collectionid=" + TargetCollectionID);
+                                        MetaController.deleteContentRecords(core, Processor.Models.Db.AddonModel.contentName, "collectionid=" + TargetCollectionID);
 
                                         //                            '
                                         //                            ' Load all collections into local collection storage
@@ -435,7 +435,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                             //
                                             // Delete Navigator Entries set as installed by the collection (this may be all that is needed)
                                             //
-                                            core.db.deleteContentRecords(Processor.Models.Db.NavigatorEntryModel.contentName, "installedbycollectionid=" + TargetCollectionID);
+                                            MetaController.deleteContentRecords(core, Processor.Models.Db.NavigatorEntryModel.contentName, "installedbycollectionid=" + TargetCollectionID);
                                         }
                                     }
                                 }
@@ -535,7 +535,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                         if (csXfer.csOk()) {
                                             InstalledCollectionIDList.Add(csXfer.csGetInteger(CS, "ID"));
                                         }
-                                        csXfer.csClose(ref CS);
+                                        csXfer.csClose();
                                     }
                                 }
                             }
@@ -718,7 +718,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                                             IsOnServer = GenericController.encodeBoolean(OnServerGuidList.IndexOf(CollectionGuid, System.StringComparison.OrdinalIgnoreCase) + 1);
                                                             csXfer.csOpen("Add-on Collections", GuidFieldName + "=" + DbController.encodeSQLText(CollectionGuid));
                                                             IsOnSite = csXfer.csOk();
-                                                            csXfer.csClose(ref CS);
+                                                            csXfer.csClose();
                                                             if (IsOnSite) {
                                                                 //
                                                                 // Already installed
@@ -834,7 +834,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                     csXfer.csGoNext(CS);
                                     RowPtr = RowPtr + 1;
                                 }
-                                csXfer.csClose(ref CS);
+                                csXfer.csClose();
                                 BodyHTML = "<div style=\"width:100%\">" + AdminUIController.getReport2(core, RowPtr, ColCaption, ColAlign, ColWidth, Cells, RowPtr, 1, "", PostTableCopy, RowPtr, "ccAdmin", ColSortable, 0) + "</div>";
                                 BodyHTML = AdminUIController.getEditPanel(core,true, "Add-on Collections", "Use this form to review and delete current add-on collections.", BodyHTML);
                                 BodyHTML = BodyHTML + HtmlController.inputHidden("accnt", RowPtr);
@@ -916,7 +916,7 @@ namespace Contensive.Addons.SafeAddonManager {
                 if (csXfer.csOk()) {
                     EntryID = csXfer.csGetInteger(CS, "ID");
                 }
-                csXfer.csClose(ref CS);
+                csXfer.csClose();
                 //
                 if (EntryID != 0) {
                     csXfer.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, "(parentID=" + DbController.encodeSQLNumber(EntryID) + ")");
@@ -924,7 +924,7 @@ namespace Contensive.Addons.SafeAddonManager {
                         GetForm_SafeModeAddonManager_DeleteNavigatorBranch(csXfer.csGetText(CS, "name"), EntryID);
                         csXfer.csGoNext(CS);
                     }
-                    csXfer.csClose(ref CS);
+                    csXfer.csClose();
                     core.db.deleteContentRecord(Processor.Models.Db.NavigatorEntryModel.contentName, EntryID);
                 }
             } catch (Exception ex) {
@@ -1016,14 +1016,14 @@ namespace Contensive.Addons.SafeAddonManager {
                         if (csXfer.csOk()) {
                             tempGetParentIDFromNameSpace = csXfer.csGetInteger(CS, "ID");
                         }
-                        csXfer.csClose(ref CS);
+                        csXfer.csClose();
                     } else {
                         ParentID = getParentIDFromNameSpace(ContentName, ParentNameSpace);
                         csXfer.csOpen(ContentName, "(name=" + DbController.encodeSQLText(ParentName) + ")and(parentid=" + ParentID + ")", "ID", false, 0, false, false, "ID");
                         if (csXfer.csOk()) {
                             tempGetParentIDFromNameSpace = csXfer.csGetInteger(CS, "ID");
                         }
-                        csXfer.csClose(ref CS);
+                        csXfer.csClose();
                     }
                 }
                 //

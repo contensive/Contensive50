@@ -883,7 +883,7 @@ namespace Contensive.Processor.Controllers {
 
                                                                 csXfer.csOpen("Copy Content", "name=" + DbController.encodeSQLText(FieldName), "ID");
                                                                 if (!csXfer.csOk()) {
-                                                                    csXfer.csClose(ref CS);
+                                                                    csXfer.csClose();
                                                                     csXfer.csInsert("Copy Content", core.session.user.id);
                                                                 }
                                                                 if (csXfer.csOk()) {
@@ -901,7 +901,7 @@ namespace Contensive.Processor.Controllers {
                                                                         csXfer.csGoNext(CS);
                                                                     }
                                                                 }
-                                                                csXfer.csClose(ref CS);
+                                                                csXfer.csClose();
                                                             }
 
                                                             break;
@@ -1168,7 +1168,7 @@ namespace Contensive.Processor.Controllers {
                                                             //
                                                             csXfer.csOpen("Copy Content", "Name=" + DbController.encodeSQLText(FieldName), "ID", false, 0, false, false, "id,name,Copy");
                                                             if (!csXfer.csOk()) {
-                                                                csXfer.csClose(ref CS);
+                                                                csXfer.csClose();
                                                                 csXfer.csInsert("Copy Content", core.session.user.id);
                                                                 if (csXfer.csOk()) {
                                                                     int RecordID = csXfer.csGetInteger(CS, "ID");
@@ -2569,7 +2569,7 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                 }
-                csXfer.csClose(ref CS);
+                csXfer.csClose();
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
             }

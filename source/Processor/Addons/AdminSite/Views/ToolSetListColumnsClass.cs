@@ -64,8 +64,6 @@ namespace Contensive.Addons.AdminSite {
                         AllowContentAutoLoad = (core.siteProperties.getBoolean("AllowContentAutoLoad", true));
                         core.siteProperties.setProperty("AllowContentAutoLoad", false);
                         bool reloadMetadata = false;
-                        int CSSource = 0;
-                        int CSTarget = 0;
                         int SourceContentID = 0;
                         string SourceName = null;
                         //
@@ -75,21 +73,22 @@ namespace Contensive.Addons.AdminSite {
                             foreach (KeyValuePair<string, CDefFieldModel> keyValuePair in adminContent.fields) {
                                 CDefFieldModel field = keyValuePair.Value;
                                 if (field.id == FieldIDToAdd) {
-                                    //If CDef.fields(FieldPtr).Name = FieldNameToAdd Then
                                     if (field.inherited) {
                                         SourceContentID = field.contentId;
                                         SourceName = field.nameLc;
-                                        CSSource = csXfer.csOpen("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + DbController.encodeSQLText(SourceName) + ")");
-                                        if (csXfer.csOk(CSSource)) {
-                                            CSTarget = csXfer.csInsert("Content Fields");
-                                            if (csXfer.csOk(CSTarget)) {
-                                                csXfer.csCopyRecord(CSSource, CSTarget);
-                                                csXfer.csSet(CSTarget, "ContentID", adminContent.id);
-                                                reloadMetadata = true;
+                                        //
+                                        // -- copy the field
+                                        using (var CSSource = new CsModel(core)) {
+                                            if (CSSource.csOpen("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + DbController.encodeSQLText(SourceName) + ")")) {
+                                                using (var CSTarget = new CsModel(core)) {
+                                                    if (CSTarget.csInsert("Content Fields")) {
+                                                        CSSource.csCopyRecord(CSTarget);
+                                                        CSTarget.csSet("ContentID", adminContent.id);
+                                                        reloadMetadata = true;
+                                                    }
+                                                }
                                             }
-                                            csXfer.csClose(ref CSTarget);
                                         }
-                                        csXfer.csClose(ref CSSource);
                                     }
                                     break;
                                 }
@@ -103,17 +102,17 @@ namespace Contensive.Addons.AdminSite {
                             if (field.inherited) {
                                 SourceContentID = field.contentId;
                                 SourceName = field.nameLc;
-                                CSSource = csXfer.csOpen("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + DbController.encodeSQLText(SourceName) + ")");
-                                if (csXfer.csOk(CSSource)) {
-                                    CSTarget = csXfer.csInsert("Content Fields");
-                                    if (csXfer.csOk(CSTarget)) {
-                                        csXfer.csCopyRecord(CSSource, CSTarget);
-                                        csXfer.csSet(CSTarget, "ContentID", adminContent.id);
-                                        reloadMetadata = true;
+                                using (var CSSource = new CsModel(core)) {
+                                    if (CSSource.csOpen("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + DbController.encodeSQLText(SourceName) + ")")) {
+                                        using (var CSTarget = new CsModel(core)) {
+                                            if (CSTarget.csInsert("Content Fields")) {
+                                                CSSource.csCopyRecord(CSTarget);
+                                                CSTarget.csSet("ContentID", adminContent.id);
+                                                reloadMetadata = true;
+                                            }
+                                        }
                                     }
-                                    csXfer.csClose(ref CSTarget);
                                 }
-                                csXfer.csClose(ref CSSource);
                             }
                         }
                         //
@@ -137,12 +136,12 @@ namespace Contensive.Addons.AdminSite {
                                         }
                                         {
                                             column = new IndexConfigClass.IndexConfigColumnClass();
-                                            csXfer.csOpenRecord("Content Fields", FieldIDToAdd, false, false);
-                                            if (csXfer.csOk()) {
-                                                column.Name = csXfer.csGet( "name");
-                                                column.Width = 20;
+                                            using (var csXfer = new CsModel(core)) {
+                                                if (csXfer.csOpenRecord("Content Fields", FieldIDToAdd)) {
+                                                    column.Name = csXfer.csGet("name");
+                                                    column.Width = 20;
+                                                }
                                             }
-                                            csXfer.csClose();
                                             IndexConfig.columns.Add(column);
                                             normalizeSaveLoad = true;
                                         }

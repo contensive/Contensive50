@@ -482,7 +482,7 @@ namespace Contensive.Addons.AdminSite {
                                 adminContent = MetaModel.create(core, recordContentId);
                             }
                         }
-                        csXfer.csClose(ref CS);
+                        csXfer.csClose();
                     }
                 }
                 //
@@ -1553,7 +1553,7 @@ namespace Contensive.Addons.AdminSite {
                                         } else {
                                             ParentID = csXfer.csGetInteger(CS, "ParentID");
                                         }
-                                        csXfer.csClose(ref CS);
+                                        csXfer.csClose();
                                         LoopPtr = LoopPtr + 1;
                                     }
                                     if (LoopPtr == LoopPtrMax) {

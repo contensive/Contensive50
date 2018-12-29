@@ -11,6 +11,7 @@ using static Contensive.Addons.AdminSite.Controllers.AdminUIController;
 using Contensive.Processor.Exceptions;
 using Contensive.Addons.AdminSite.Controllers;
 using Contensive.BaseClasses;
+using Contensive.Processor;
 
 namespace Contensive.Addons.AdminSite {
     public static class FormEdit {
@@ -840,31 +841,30 @@ namespace Contensive.Addons.AdminSite {
                             } else {
                                 //
                                 // -- editor failed, determine if it is missing (or inactive). If missing, remove it from the members preferences
-                                string SQL = "select id from ccaggregatefunctions where id=" + editorAddonID;
-                                csXfer.csOpenSql(SQL);
-                                if (!csXfer.csOk()) {
-                                    //
-                                    // -- missing, not just inactive
-                                    EditorString = "";
-                                    //
-                                    // load user's editor preferences to fieldEditorPreferences() - this is the editor this user has picked when there are >1
-                                    //   fieldId:addonId,fieldId:addonId,etc
-                                    //   with custom FancyBox form in edit window with button "set editor preference"
-                                    //   this button causes a 'refresh' action, reloads fields with stream without save
-                                    //
-                                    string tmpList = core.userProperty.getText("editorPreferencesForContent:" + adminData.adminContent.id, "");
-                                    int PosStart = GenericController.vbInstr(1, "," + tmpList, "," + fieldId + ":");
-                                    if (PosStart > 0) {
-                                        int PosEnd = GenericController.vbInstr(PosStart + 1, "," + tmpList, ",");
-                                        if (PosEnd == 0) {
-                                            tmpList = tmpList.Left(PosStart - 1);
-                                        } else {
-                                            tmpList = tmpList.Left(PosStart - 1) + tmpList.Substring(PosEnd - 1);
+                                using (var csXfer = new CsModel(core)) {
+                                    if (!csXfer.csOpenSql("select id from ccaggregatefunctions where id=" + editorAddonID)) {
+                                        //
+                                        // -- missing, not just inactive
+                                        EditorString = "";
+                                        //
+                                        // load user's editor preferences to fieldEditorPreferences() - this is the editor this user has picked when there are >1
+                                        //   fieldId:addonId,fieldId:addonId,etc
+                                        //   with custom FancyBox form in edit window with button "set editor preference"
+                                        //   this button causes a 'refresh' action, reloads fields with stream without save
+                                        //
+                                        string tmpList = core.userProperty.getText("editorPreferencesForContent:" + adminData.adminContent.id, "");
+                                        int PosStart = GenericController.vbInstr(1, "," + tmpList, "," + fieldId + ":");
+                                        if (PosStart > 0) {
+                                            int PosEnd = GenericController.vbInstr(PosStart + 1, "," + tmpList, ",");
+                                            if (PosEnd == 0) {
+                                                tmpList = tmpList.Left(PosStart - 1);
+                                            } else {
+                                                tmpList = tmpList.Left(PosStart - 1) + tmpList.Substring(PosEnd - 1);
+                                            }
+                                            core.userProperty.setProperty("editorPreferencesForContent:" + adminData.adminContent.id, tmpList);
                                         }
-                                        core.userProperty.setProperty("editorPreferencesForContent:" + adminData.adminContent.id, tmpList);
                                     }
                                 }
-                                csXfer.csClose(ref CS);
                             }
                         }
                         if (!useEditorAddon) {
@@ -893,7 +893,6 @@ namespace Contensive.Addons.AdminSite {
                                     EditorString += (">");
                                     EditorString += ("Open in New Window</A>");
                                 }
-                                //s.Add( "<td class=""ccAdminEditField""><nobr>" & SpanClassAdminNormal & EditorString & "&nbsp;</span></nobr></td>")
                             } else if (editorReadOnly) {
                                 //
                                 //--------------------------------------------------------------------------------------------
@@ -1749,41 +1748,18 @@ namespace Contensive.Addons.AdminSite {
         public static string getForm_Edit_GroupRules(CoreController core, AdminDataModel adminData) {
             string tempGetForm_Edit_GroupRules = null;
             try {
-                // todo
-                AdminUIController.EditRecordClass editRecord = adminData.editRecord;
-                //
-                //
-                string SQL = null;
-                int CS = 0;
-                int GroupRulesCount = 0;
-                int GroupRulesSize = 0;
-                int GroupRulesPointer = 0;
-                string SectionName = null;
-                string GroupName = null;
-                int GroupCount = 0;
-                bool GroupFound = false;
-                AdminDataModel.GroupRuleType[] GroupRules = { };
-                StringBuilderLegacyController FastString = null;
-                //adminUIController Adminui = new adminUIController(core);
-                //
-                // ----- Open the panel
-                //
-                FastString = new StringBuilderLegacyController();
-                //
-                //Call core.main_PrintPanelTop("ccPanel", "ccPanelShadow", "ccPanelHilite", "100%", 5)
-                //Call call FastString.Add(adminUIController.EditTableOpen)
+                StringBuilderLegacyController FastString = new StringBuilderLegacyController();
                 //
                 // ----- Gather all the groups which have authoring rights to the content
-                //
-                GroupRulesCount = 0;
-                GroupRulesSize = 0;
-                if (editRecord.id != 0) {
-                    SQL = "SELECT ccGroups.ID AS ID, ccGroupRules.AllowAdd as allowadd, ccGroupRules.AllowDelete as allowdelete"
-                        + " FROM ccGroups LEFT JOIN ccGroupRules ON ccGroups.ID = ccGroupRules.GroupID"
-                        + " WHERE (((ccGroupRules.ContentID)=" + editRecord.id + ") AND ((ccGroupRules.Active)<>0) AND ((ccGroups.Active)<>0))";
-                    csXfer.csOpenSql(SQL, "Default");
-                    if (csXfer.csOk()) {
-                        if (true) {
+                int GroupRulesCount = 0;
+                int GroupRulesSize = 0;
+                AdminDataModel.GroupRuleType[] GroupRules = { };
+                if (adminData.editRecord.id != 0) {
+                    using (var csXfer = new CsModel(core)) {
+                        string SQL = "SELECT ccGroups.ID AS ID, ccGroupRules.AllowAdd as allowadd, ccGroupRules.AllowDelete as allowdelete"
+                            + " FROM ccGroups LEFT JOIN ccGroupRules ON ccGroups.ID = ccGroupRules.GroupID"
+                            + " WHERE (((ccGroupRules.ContentID)=" + adminData.editRecord.id + ") AND ((ccGroupRules.Active)<>0) AND ((ccGroups.Active)<>0))";
+                        if (csXfer.csOpenSql(SQL)) {
                             GroupRulesSize = 100;
                             GroupRules = new AdminDataModel.GroupRuleType[GroupRulesSize + 1];
                             while (csXfer.csOk()) {
@@ -1791,84 +1767,78 @@ namespace Contensive.Addons.AdminSite {
                                     GroupRulesSize = GroupRulesSize + 100;
                                     Array.Resize(ref GroupRules, GroupRulesSize + 1);
                                 }
-                                GroupRules[GroupRulesCount].GroupID = csXfer.csGetInteger(CS, "ID");
-                                GroupRules[GroupRulesCount].AllowAdd = csXfer.csGetBoolean(CS, "AllowAdd");
-                                GroupRules[GroupRulesCount].AllowDelete = csXfer.csGetBoolean(CS, "AllowDelete");
-                                GroupRulesCount = GroupRulesCount + 1;
-                                csXfer.csGoNext(CS);
+                                GroupRules[GroupRulesCount].GroupID = csXfer.csGetInteger("ID");
+                                GroupRules[GroupRulesCount].AllowAdd = csXfer.csGetBoolean("AllowAdd");
+                                GroupRules[GroupRulesCount].AllowDelete = csXfer.csGetBoolean("AllowDelete");
+                                GroupRulesCount += 1;
+                                csXfer.csGoNext();
                             }
                         }
                     }
                 }
-                csXfer.csClose(ref CS);
                 //
                 // ----- Gather all the groups, sorted by ContentName
-                //
-                SQL = "SELECT ccGroups.ID AS ID, ccContent.Name AS SectionName, ccGroups.Name AS GroupName, ccGroups.Caption AS GroupCaption, ccGroups.SortOrder"
-                    + " FROM ccGroups LEFT JOIN ccContent ON ccGroups.ContentControlID = ccContent.ID"
-                    + " Where (((ccGroups.Active) <> " + SQLFalse + ") And ((ccContent.Active) <> " + SQLFalse + "))"
-                    + " GROUP BY ccGroups.ID, ccContent.Name, ccGroups.Name, ccGroups.Caption, ccGroups.SortOrder"
-                    + " ORDER BY ccContent.Name, ccGroups.Caption, ccGroups.SortOrder";
-                csXfer.csOpenSql(SQL, "Default");
-                if (!csXfer.csOk()) {
-                    FastString.Add("\r\n<tr><td colspan=\"3\">" + SpanClassAdminSmall + "There are no active groups</span></td></tr>");
-                } else {
-                    if (true) {
-                        //Call FastString.Add(vbCrLf & "<tr><td colspan=""3"" class=""ccAdminEditSubHeader"">Groups with authoring access</td></tr>")
-                        SectionName = "";
-                        GroupCount = 0;
-                        while (csXfer.csOk()) {
-                            GroupName = csXfer.csGet(CS, "GroupCaption");
-                            if (string.IsNullOrEmpty(GroupName)) {
-                                GroupName = csXfer.csGet(CS, "GroupName");
-                            }
-                            FastString.Add("<tr>");
-                            if (SectionName != csXfer.csGet(CS, "SectionName")) {
-                                //
-                                // ----- create the next section
-                                //
-                                SectionName = csXfer.csGet(CS, "SectionName");
-                                FastString.Add("<td valign=\"top\" align=\"right\">" + SpanClassAdminSmall + SectionName + "</td>");
-                            } else {
-                                FastString.Add("<td valign=\"top\" align=\"right\">&nbsp;</td>");
-                            }
-                            FastString.Add("<td class=\"ccAdminEditField\" align=\"left\" colspan=\"2\">" + SpanClassAdminSmall);
-                            GroupFound = false;
-                            if (GroupRulesCount != 0) {
-                                for (GroupRulesPointer = 0; GroupRulesPointer < GroupRulesCount; GroupRulesPointer++) {
-                                    if (GroupRules[GroupRulesPointer].GroupID == csXfer.csGetInteger(CS, "ID")) {
-                                        GroupFound = true;
-                                        break;
+                using (var csXfer = new CsModel(core)) {
+                    string SQL = "SELECT ccGroups.ID AS ID, ccContent.Name AS SectionName, ccGroups.Name AS GroupName, ccGroups.Caption AS GroupCaption, ccGroups.SortOrder"
+                        + " FROM ccGroups LEFT JOIN ccContent ON ccGroups.ContentControlID = ccContent.ID"
+                        + " Where (((ccGroups.Active) <> " + SQLFalse + ") And ((ccContent.Active) <> " + SQLFalse + "))"
+                        + " GROUP BY ccGroups.ID, ccContent.Name, ccGroups.Name, ccGroups.Caption, ccGroups.SortOrder"
+                        + " ORDER BY ccContent.Name, ccGroups.Caption, ccGroups.SortOrder";
+                    if (!csXfer.csOpenSql(SQL)) {
+                        FastString.Add("\r\n<tr><td colspan=\"3\">" + SpanClassAdminSmall + "There are no active groups</span></td></tr>");
+                    } else {
+                        {
+                            string SectionName = "";
+                            int GroupCount = 0;
+                            while (csXfer.csOk()) {
+                                string GroupName = csXfer.csGet("GroupCaption");
+                                if (string.IsNullOrEmpty(GroupName)) {
+                                    GroupName = csXfer.csGet("GroupName");
+                                }
+                                FastString.Add("<tr>");
+                                if (SectionName != csXfer.csGet("SectionName")) {
+                                    //
+                                    // ----- create the next section
+                                    //
+                                    SectionName = csXfer.csGet("SectionName");
+                                    FastString.Add("<td valign=\"top\" align=\"right\">" + SpanClassAdminSmall + SectionName + "</td>");
+                                } else {
+                                    FastString.Add("<td valign=\"top\" align=\"right\">&nbsp;</td>");
+                                }
+                                FastString.Add("<td class=\"ccAdminEditField\" align=\"left\" colspan=\"2\">" + SpanClassAdminSmall);
+                                bool GroupFound = false;
+                                int GroupRulesPointer = 0;
+                                if (GroupRulesCount != 0) {
+                                    for (GroupRulesPointer = 0; GroupRulesPointer < GroupRulesCount; GroupRulesPointer++) {
+                                        if (GroupRules[GroupRulesPointer].GroupID == csXfer.csGetInteger(CS, "ID")) {
+                                            GroupFound = true;
+                                            break;
+                                        }
                                     }
                                 }
+                                FastString.Add("<input type=\"hidden\" name=\"GroupID" + GroupCount + "\" value=\"" + csXfer.csGet("ID") + "\">");
+                                FastString.Add("<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"400\"><tr>");
+                                if (GroupFound) {
+                                    FastString.Add("<td width=\"200\">" + SpanClassAdminSmall + HtmlController.checkbox("Group" + GroupCount, true) + GroupName + "</span></td>");
+                                    FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + HtmlController.checkbox("GroupRuleAllowAdd" + GroupCount, GroupRules[GroupRulesPointer].AllowAdd) + " Allow Add</span></td>");
+                                    FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + HtmlController.checkbox("GroupRuleAllowDelete" + GroupCount, GroupRules[GroupRulesPointer].AllowDelete) + " Allow Delete</span></td>");
+                                } else {
+                                    FastString.Add("<td width=\"200\">" + SpanClassAdminSmall + HtmlController.checkbox("Group" + GroupCount, false) + GroupName + "</span></td>");
+                                    FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + HtmlController.checkbox("GroupRuleAllowAdd" + GroupCount, false) + " Allow Add</span></td>");
+                                    FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + HtmlController.checkbox("GroupRuleAllowDelete" + GroupCount, false) + " Allow Delete</span></td>");
+                                }
+                                FastString.Add("</tr></table>");
+                                FastString.Add("</span></td>");
+                                FastString.Add("</tr>");
+                                GroupCount = GroupCount + 1;
+                                csXfer.csGoNext();
                             }
-                            FastString.Add("<input type=\"hidden\" name=\"GroupID" + GroupCount + "\" value=\"" + csXfer.csGet(CS, "ID") + "\">");
-                            FastString.Add("<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"400\"><tr>");
-                            if (GroupFound) {
-                                FastString.Add("<td width=\"200\">" + SpanClassAdminSmall + HtmlController.checkbox("Group" + GroupCount, true) + GroupName + "</span></td>");
-                                FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + HtmlController.checkbox("GroupRuleAllowAdd" + GroupCount, GroupRules[GroupRulesPointer].AllowAdd) + " Allow Add</span></td>");
-                                FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + HtmlController.checkbox("GroupRuleAllowDelete" + GroupCount, GroupRules[GroupRulesPointer].AllowDelete) + " Allow Delete</span></td>");
-                            } else {
-                                FastString.Add("<td width=\"200\">" + SpanClassAdminSmall + HtmlController.checkbox("Group" + GroupCount, false) + GroupName + "</span></td>");
-                                FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + HtmlController.checkbox("GroupRuleAllowAdd" + GroupCount, false) + " Allow Add</span></td>");
-                                FastString.Add("<td width=\"100\">" + SpanClassAdminSmall + HtmlController.checkbox("GroupRuleAllowDelete" + GroupCount, false) + " Allow Delete</span></td>");
-                            }
-                            FastString.Add("</tr></table>");
-                            FastString.Add("</span></td>");
-                            FastString.Add("</tr>");
-                            GroupCount = GroupCount + 1;
-                            csXfer.csGoNext(CS);
+                            FastString.Add("\r\n<input type=\"hidden\" name=\"GroupCount\" value=\"" + GroupCount + "\">");
                         }
-                        FastString.Add("\r\n<input type=\"hidden\" name=\"GroupCount\" value=\"" + GroupCount + "\">");
                     }
                 }
-                csXfer.csClose(ref CS);
                 //
                 // ----- close the panel
-                //
-                //Call FastString.Add(adminUIController.EditTableClose)
-                //Call core.main_PrintPanelBottom("ccPanel", "ccPanelShadow", "ccPanelHilite", "100%", 5)
-                //
                 tempGetForm_Edit_GroupRules = AdminUIController.getEditPanel(core, (!adminData.allowAdminTabs), "Authoring Permissions", "The following groups can edit this content.", AdminUIController.editTable( FastString.Text ));
                 adminData.EditSectionPanelCount = adminData.EditSectionPanelCount + 1;
                 FastString = null;

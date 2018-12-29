@@ -162,13 +162,13 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     int CurrentLinkAliasID = 0;
                                     bool resaveLinkAlias = false;
-                                    int LinkAliasPageID = csXfer.csGetInteger(csXfer, "pageID");
-                                    if ((csXfer.csGetText(csXfer, "QueryStringSuffix").ToLowerInvariant() == QueryStringSuffix.ToLowerInvariant()) && (PageID == LinkAliasPageID)) {
+                                    int LinkAliasPageID = csXfer.csGetInteger("pageID");
+                                    if ((csXfer.csGetText("QueryStringSuffix").ToLowerInvariant() == QueryStringSuffix.ToLowerInvariant()) && (PageID == LinkAliasPageID)) {
                                         //
                                         // it maches a current entry for this link alias, if the current entry is not the highest number id,
                                         //   remove it and add this one
                                         //
-                                        CurrentLinkAliasID = csXfer.csGetInteger(csXfer, "id");
+                                        CurrentLinkAliasID = csXfer.csGetInteger("id");
 
 
 
@@ -183,9 +183,9 @@ namespace Contensive.Processor.Controllers {
                                                 CS2.csClose();
                                                 CS2.csInsert("Link Aliases", 0);
                                                 if (CS2.csOk()) {
-                                                    CS2.csSet(csXfer, "Name", WorkingLinkAlias);
-                                                    CS2.csSet(csXfer, "Pageid", PageID);
-                                                    CS2.csSet(csXfer, "QueryStringSuffix", QueryStringSuffix);
+                                                    CS2.csSet("Name", WorkingLinkAlias);
+                                                    CS2.csSet("Pageid", PageID);
+                                                    CS2.csSet("QueryStringSuffix", QueryStringSuffix);
                                                 }
                                             }
                                         }

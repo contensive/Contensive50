@@ -252,17 +252,14 @@ namespace Contensive.Addons.Housekeeping {
                         //
                         {
                             DateTime datePtr = default(DateTime);
-                            SQL = core.db.getSQLSelect("default", "ccviewingsummary", "DateNumber", "TimeDuration=24 and DateNumber>=" + OldestVisitSummaryWeCareAbout.Date.ToOADate(), "DateNumber Desc", "", 1);
-                            csXfer.csOpenSql(SQL, "Default");
-                            if (!csXfer.csOk()) {
-                                datePtr = OldestVisitSummaryWeCareAbout;
-                            } else {
-                                datePtr = DateTime.MinValue.AddDays(csXfer.csGetInteger(CS, "DateNumber"));
+                            using (var csXfer = new CsModel(core)) {
+                                if (!csXfer.csOpenSql(core.db.getSQLSelect("default", "ccviewingsummary", "DateNumber", "TimeDuration=24 and DateNumber>=" + OldestVisitSummaryWeCareAbout.Date.ToOADate(), "DateNumber Desc", "", 1))) {
+                                    datePtr = OldestVisitSummaryWeCareAbout;
+                                } else {
+                                    datePtr = DateTime.MinValue.AddDays(csXfer.csGetInteger(CS, "DateNumber"));
+                                }
                             }
-                            csXfer.csClose();
-                            if (datePtr < OldestVisitSummaryWeCareAbout) {
-                                datePtr = OldestVisitSummaryWeCareAbout;
-                            }
+                            if (datePtr < OldestVisitSummaryWeCareAbout) { datePtr = OldestVisitSummaryWeCareAbout; }
                             houseKeep_PageViewSummary(core, datePtr, Yesterday, 24, core.siteProperties.dataBuildVersion, OldestVisitSummaryWeCareAbout);
                         }
                         //
@@ -280,15 +277,14 @@ namespace Contensive.Addons.Housekeeping {
                         // Set NextSummaryStartDate based on the last time we ran hourly summarization
                         //
                         DateTime LastTimeSummaryWasRun = VisitArchiveDate;
-                        SQL = core.db.getSQLSelect("default", "ccVisitSummary", "DateAdded", "(timeduration=1)and(Dateadded>" + DbController.encodeSQLDate(VisitArchiveDate) + ")", "id Desc", "", 1);
-                        csXfer.csOpenSql(SQL, "Default");
-                        if (csXfer.csOk()) {
-                            LastTimeSummaryWasRun = csXfer.csGetDate(CS, "DateAdded");
-                            logHousekeeping(core, "Update hourly visit summary, last time summary was run was [" + LastTimeSummaryWasRun + "]");
-                        } else {
-                            logHousekeeping(core, "Update hourly visit summary, no hourly summaries were found, set start to [" + LastTimeSummaryWasRun + "]");
+                        using (var csXfer = new CsModel(core)) {
+                            if (csXfer.csOpenSql(core.db.getSQLSelect("default", "ccVisitSummary", "DateAdded", "(timeduration=1)and(Dateadded>" + DbController.encodeSQLDate(VisitArchiveDate) + ")", "id Desc", "", 1))) {
+                                LastTimeSummaryWasRun = csXfer.csGetDate("DateAdded");
+                                logHousekeeping(core, "Update hourly visit summary, last time summary was run was [" + LastTimeSummaryWasRun + "]");
+                            } else {
+                                logHousekeeping(core, "Update hourly visit summary, no hourly summaries were found, set start to [" + LastTimeSummaryWasRun + "]");
+                            }
                         }
-                        csXfer.csClose();
                         DateTime NextSummaryStartDate = LastTimeSummaryWasRun;
                         //
                         // Each hourly entry includes visits that started during that hour, but we do not know when they finished (maybe during last hour)
@@ -299,17 +295,15 @@ namespace Contensive.Addons.Housekeeping {
                         //
                         DateTime StartOfHour = (new DateTime(LastTimeSummaryWasRun.Year, LastTimeSummaryWasRun.Month, LastTimeSummaryWasRun.Day, LastTimeSummaryWasRun.Hour, 1, 1)).AddHours(-1); // (Int(24 * LastTimeSummaryWasRun) / 24) - PeriodStep
                         DateTime OldestDateAdded = StartOfHour;
-                        SQL = core.db.getSQLSelect("default", "ccVisits", "DateAdded", "LastVisitTime>" + DbController.encodeSQLDate(StartOfHour), "dateadded", "", 1);
-                        //SQL = "select top 1 Dateadded from ccvisits where LastVisitTime>" & encodeSQLDate(StartOfHour) & " order by DateAdded"
-                        csXfer.csOpenSql(SQL, "Default");
-                        if (csXfer.csOk()) {
-                            OldestDateAdded = csXfer.csGetDate(CS, "DateAdded");
-                            if (OldestDateAdded < NextSummaryStartDate) {
-                                NextSummaryStartDate = OldestDateAdded;
-                                logHousekeeping(core, "Update hourly visit summary, found a visit with the last viewing during the past hour. It started [" + OldestDateAdded + "], before the last summary was run.");
+                        using (var csXfer = new CsModel(core)) {
+                            if (csXfer.csOpenSql(core.db.getSQLSelect("default", "ccVisits", "DateAdded", "LastVisitTime>" + DbController.encodeSQLDate(StartOfHour), "dateadded", "", 1))) {
+                                OldestDateAdded = csXfer.csGetDate("DateAdded");
+                                if (OldestDateAdded < NextSummaryStartDate) {
+                                    NextSummaryStartDate = OldestDateAdded;
+                                    logHousekeeping(core, "Update hourly visit summary, found a visit with the last viewing during the past hour. It started [" + OldestDateAdded + "], before the last summary was run.");
+                                }
                             }
                         }
-                        csXfer.csClose();
                         //
                         // Verify there are 24 hour records for every day back the past 90 days
                         //
@@ -319,13 +313,11 @@ namespace Contensive.Addons.Housekeeping {
                         double PeriodStep = 1;
                         int HoursPerDay = 0;
                         for (double PeriodDatePtr = PeriodStartDate.ToOADate(); PeriodDatePtr <= OldestDateAdded.ToOADate(); PeriodDatePtr += PeriodStep) {
-                            SQL = "select count(id) as HoursPerDay from ccVisitSummary where TimeDuration=1 and DateNumber=" + encodeInteger(PeriodDatePtr) + " group by DateNumber";
-                            //SQL = "select count(id) as HoursPerDay from ccVisitSummary group by DateNumber having DateNumber=" & CLng(PeriodDatePtr)
-                            csXfer.csOpenSql(SQL, "Default");
-                            if (csXfer.csOk()) {
-                                HoursPerDay = csXfer.csGetInteger(CS, "HoursPerDay");
-                            }
-                            csXfer.csClose();
+                            using (var csXfer = new CsModel(core)) {
+                                if (csXfer.csOpenSql("select count(id) as HoursPerDay from ccVisitSummary where TimeDuration=1 and DateNumber=" + encodeInteger(PeriodDatePtr) + " group by DateNumber")) {
+                                    HoursPerDay = csXfer.csGetInteger("HoursPerDay");
+                                }
+                                csXfer.csClose();
                             if (HoursPerDay < 24) {
                                 DateofMissingSummary = DateTime.FromOADate(PeriodDatePtr);
                                 break;
@@ -391,52 +383,21 @@ namespace Contensive.Addons.Housekeeping {
         //
         private void HouseKeep_App_Daily(CoreController core, int VisitArchiveAgeDays, int GuestArchiveAgeDays, int EmailDropArchiveAgeDays, string DefaultMemberName, string BuildVersion) {
             try {
-                //
-                DateTime ArchiveEmailDropDate = default(DateTime);
-                string VirtualFileName = null;
-                string VirtualLink = null;
-                List<CPFileSystemBaseClass.FileDetail> FileList = null;
-                long FileSize = 0;
-                int DaystoRemove = 0;
-                int fieldType = 0;
-                int FieldContentID = 0;
-                string FieldCaption = null;
-                string FieldLast = null;
-                string FieldNew = null;
-                int FieldRecordID = 0;
-                DateTime OldestVisitDate = default(DateTime);
-                DateTime ArchiveDate = default(DateTime);
-                DateTime thirtyDaysAgo = default(DateTime);
-                DateTime SingleDate = default(DateTime);
-                int DataSourceType = 0;
-                string SQL = null;
-                string PathName = null;
-                string TableName = null;
-                string FieldName = null;
-                int CS = 0;
-                int CSTest = 0;
-                string Filename = null;
-                string appName = null;
-                bool ArchiveDeleteNoCookie = false;
-                DateTime MidnightTwoDaysAgo = default(DateTime);
-                string SQLDateMidnightTwoDaysAgo = null;
-                int TimeoutSave = 0;
-                DateTime Yesterday = default(DateTime);
                 DateTime rightNow = DateTime.Now;
                 //
-                Yesterday = rightNow.AddDays(-1).Date;
-                MidnightTwoDaysAgo = rightNow.AddDays(-2).Date;
-                thirtyDaysAgo = rightNow.AddDays(-30).Date;
-                appName = core.appConfig.name;
-                ArchiveDeleteNoCookie = GenericController.encodeBoolean(core.siteProperties.getText("ArchiveDeleteNoCookie", "1"));
-                DataSourceType = core.db.getDataSourceType("default");
-                TimeoutSave = core.db.sqlCommandTimeout;
+                DateTime Yesterday = rightNow.AddDays(-1).Date;
+                DateTime MidnightTwoDaysAgo = rightNow.AddDays(-2).Date;
+                DateTime thirtyDaysAgo = rightNow.AddDays(-30).Date;
+                string appName = core.appConfig.name;
+                bool ArchiveDeleteNoCookie = GenericController.encodeBoolean(core.siteProperties.getText("ArchiveDeleteNoCookie", "1"));
+                int DataSourceType = core.db.getDataSourceType("default");
+                int TimeoutSave = core.db.sqlCommandTimeout;
                 core.db.sqlCommandTimeout = 1800;
-                //
-                SQLDateMidnightTwoDaysAgo = DbController.encodeSQLDate(MidnightTwoDaysAgo);
+                string SQLDateMidnightTwoDaysAgo = DbController.encodeSQLDate(MidnightTwoDaysAgo);
                 //
                 // Any member records that were created outside contensive need to have CreatedByVisit=0 (past v4.1.152)
                 core.db.executeQuery("update ccmembers set CreatedByVisit=0 where createdbyvisit is null");
+                string sql = null;
                 //
                 // delete nocookie visits
                 // This must happen after the housekeep summarizing, and no sooner then 48 hours ago so all hits have been summarized before deleting
@@ -449,7 +410,7 @@ namespace Contensive.Addons.Housekeeping {
                     logHousekeeping(core, "Deleting members from visits with no cookie support older than Midnight, Two Days Ago");
                     switch (DataSourceType) {
                         case DataSourceTypeODBCAccess:
-                            SQL = "delete m.*"
+                            sql = "delete m.*"
                                 + " from ccmembers m,ccvisits v"
                                 + " where v.memberid=m.id"
                                 + " and(m.Visits=1)"
@@ -459,7 +420,7 @@ namespace Contensive.Addons.Housekeeping {
                                 + " and(v.CookieSupport=0)and(v.LastVisitTime<" + SQLDateMidnightTwoDaysAgo + ")";
                             break;
                         case DataSourceTypeODBCMySQL:
-                            SQL = "delete m"
+                            sql = "delete m"
                                 + " from ccmembers m,ccvisits v"
                                 + " where v.memberid=m.id"
                                 + " and(m.Visits=1)"
@@ -469,7 +430,7 @@ namespace Contensive.Addons.Housekeeping {
                                 + " and(v.CookieSupport=0)and(v.LastVisitTime<" + SQLDateMidnightTwoDaysAgo + ")";
                             break;
                         default:
-                            SQL = "delete from ccmembers from ccmembers m,ccvisits v"
+                            sql = "delete from ccmembers from ccmembers m,ccvisits v"
                                 + " where v.memberid=m.id"
                                 + " and(m.Visits=1)"
                                 + " and(m.createdbyvisit=1)"
@@ -509,7 +470,7 @@ namespace Contensive.Addons.Housekeeping {
                     //                    & " and(v.CookieSupport=0)and(v.LastVisitTime<" & SQLDateMidnightTwoDaysAgo & ")"
                     //        End Select
                     try {
-                        core.db.executeQuery(SQL);
+                        core.db.executeQuery(sql);
                     } catch (Exception) {
                     }
 
@@ -519,19 +480,19 @@ namespace Contensive.Addons.Housekeeping {
                     logHousekeeping(core, "Deleting viewings from visits with no cookie support older than Midnight, Two Days Ago");
                     switch (DataSourceType) {
                         case DataSourceTypeODBCAccess:
-                            SQL = "delete h.*"
+                            sql = "delete h.*"
                                 + " from ccviewings h,ccvisits v"
                                 + " where h.visitid=v.id"
                                 + " and(v.CookieSupport=0)and(v.LastVisitTime<" + SQLDateMidnightTwoDaysAgo + ")";
                             break;
                         case DataSourceTypeODBCMySQL:
-                            SQL = "delete h"
+                            sql = "delete h"
                                 + " from ccviewings h,ccvisits v"
                                 + " where h.visitid=v.id"
                                 + " and(v.CookieSupport=0)and(v.LastVisitTime<" + SQLDateMidnightTwoDaysAgo + ")";
                             break;
                         default:
-                            SQL = "delete from ccviewings"
+                            sql = "delete from ccviewings"
                                 + " from ccviewings h,ccvisits v"
                                 + " where h.visitid=v.id"
                                 + " and(v.CookieSupport=0)and(v.LastVisitTime<" + SQLDateMidnightTwoDaysAgo + ")";
@@ -539,7 +500,7 @@ namespace Contensive.Addons.Housekeeping {
                     }
                     // if this fails, continue with the rest of the work
                     try {
-                        core.db.executeQuery(SQL);
+                        core.db.executeQuery(sql);
                     } catch (Exception) {
                     }
                     //
@@ -548,26 +509,26 @@ namespace Contensive.Addons.Housekeeping {
                     logHousekeeping(core, "Deleting visitors from visits with no cookie support older than Midnight, Two Days Ago");
                     switch (DataSourceType) {
                         case DataSourceTypeODBCAccess:
-                            SQL = "delete r.*"
+                            sql = "delete r.*"
                                 + " from ccvisitors r,ccvisits v"
                                 + " where r.id=v.visitorid"
                                 + " and(v.CookieSupport=0)and(v.LastVisitTime<" + SQLDateMidnightTwoDaysAgo + ")";
                             break;
                         case DataSourceTypeODBCMySQL:
-                            SQL = "delete r"
+                            sql = "delete r"
                                 + " from ccvisitors r,ccvisits v"
                                 + " where r.id=v.visitorid"
                                 + " and(v.CookieSupport=0)and(v.LastVisitTime<" + SQLDateMidnightTwoDaysAgo + ")";
                             break;
                         default:
-                            SQL = "delete from ccvisitors"
+                            sql = "delete from ccvisitors"
                                 + " from ccvisitors r,ccvisits v"
                                 + " where r.id=v.visitorid"
                                 + " and(v.CookieSupport=0)and(v.LastVisitTime<" + SQLDateMidnightTwoDaysAgo + ")";
                             break;
                     }
                     try {
-                        core.db.executeQuery(SQL);
+                        core.db.executeQuery(sql);
                     } catch (Exception) {
                     }
                     //
@@ -591,16 +552,15 @@ namespace Contensive.Addons.Housekeeping {
                 //
                 logHousekeeping(core, "Deleting viewings with null or invalid VisitID");
                 core.db.deleteTableRecordChunks("default", "ccviewings", "(visitid=0 or visitid is null)", 1000, 10000);
+                DateTime OldestVisitDate = default(DateTime);
                 //
                 // Get Oldest Visit
-                //
-                //SQL = "select top 1 DateAdded from ccVisits where dateadded>0 order by DateAdded"
-                SQL = core.db.getSQLSelect("default", "ccVisits", "DateAdded", "", "dateadded", "", 1);
-                csXfer.csOpenSql(SQL, "Default");
-                if (csXfer.csOk()) {
-                    OldestVisitDate = csXfer.csGetDate(CS, "DateAdded").Date;
+                using (var csXfer = new CsModel(core)) {
+                    if (csXfer.csOpenSql(core.db.getSQLSelect("default", "ccVisits", "DateAdded", "", "dateadded", "", 1))) {
+                        OldestVisitDate = csXfer.csGetDate("DateAdded").Date;
+                    }
                 }
-                csXfer.csClose();
+                DateTime ArchiveDate = default(DateTime);
                 //
                 // Remove old visit records
                 //   if > 30 days in visit table, limit one pass to just 30 days
@@ -612,7 +572,7 @@ namespace Contensive.Addons.Housekeeping {
                     logHousekeeping(core, "No records were removed because Housekeep ArchiveRecordAgeDays is 0.");
                 } else {
                     ArchiveDate = rightNow.AddDays(-VisitArchiveAgeDays).Date;
-                    DaystoRemove = encodeInteger(ArchiveDate.Subtract(OldestVisitDate).TotalDays);
+                    int DaystoRemove = encodeInteger(ArchiveDate.Subtract(OldestVisitDate).TotalDays);
                     if (DaystoRemove > 30) {
                         ArchiveDate = OldestVisitDate.AddDays(30);
                     }
@@ -620,6 +580,7 @@ namespace Contensive.Addons.Housekeeping {
                         logHousekeeping(core, "No records were removed because Oldest Visit Date [" + OldestVisitDate + "] >= ArchiveDate [" + ArchiveDate + "].");
                     } else {
                         logHousekeeping(core, "Removing records from [" + OldestVisitDate + "] to [" + ArchiveDate + "].");
+                        DateTime SingleDate = default(DateTime);
                         SingleDate = OldestVisitDate;
                         do {
                             HouseKeep_App_Daily_RemoveVisitRecords(core, SingleDate, DataSourceType);
@@ -638,7 +599,7 @@ namespace Contensive.Addons.Housekeeping {
                 logHousekeeping(core, "Deleting 'guest' members with no visits (name is default name, visits=1, username null, email null,dateadded=lastvisit)");
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
-                        SQL = "delete m.*"
+                        sql = "delete m.*"
                             + " from ccmembers m,ccvisits v"
                             + " where v.memberid=m.id"
                             + " and(m.createdbyvisit=1)"
@@ -649,7 +610,7 @@ namespace Contensive.Addons.Housekeeping {
                             + " and(v.id is null)";
                         break;
                     case DataSourceTypeODBCMySQL:
-                        SQL = "delete m"
+                        sql = "delete m"
                             + " from ccmembers m,ccvisits v"
                             + " where v.memberid=m.id"
                             + " and(m.createdbyvisit=1)"
@@ -660,7 +621,7 @@ namespace Contensive.Addons.Housekeeping {
                             + " and(v.id is null)";
                         break;
                     default:
-                        SQL = "delete from ccmembers from ccmembers m,ccvisits v"
+                        sql = "delete from ccmembers from ccmembers m,ccvisits v"
                             + " where v.memberid=m.id"
                             + " and(m.createdbyvisit=1)"
                             + " and(m.Visits=1)"
@@ -670,14 +631,14 @@ namespace Contensive.Addons.Housekeeping {
                             + " and(v.id is null)";
                         break;
                 }
-                core.db.executeQuery(SQL);
+                core.db.executeNonQuery(sql);
                 //
                 // delete 'guests' Members created before ArchivePeopleAgeDays
                 //
                 logHousekeeping(core, "Deleting 'guest' members with no visits (name is default name, visits=1, username null, email null,dateadded=lastvisit)");
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
-                        SQL = "delete m.*"
+                        sql = "delete m.*"
                             + " from ccmembers m left join ccvisits v on v.memberid=m.id"
                             + " where(m.createdbyvisit=1)"
                             + " and(m.Visits=1)"
@@ -687,7 +648,7 @@ namespace Contensive.Addons.Housekeeping {
                             + " and(v.id is null)";
                         break;
                     case DataSourceTypeODBCMySQL:
-                        SQL = "delete m"
+                        sql = "delete m"
                             + " from ccmembers m left join ccvisits v on v.memberid=m.id"
                             + " where(m.createdbyvisit=1)"
                             + " and(m.Visits=1)"
@@ -697,7 +658,7 @@ namespace Contensive.Addons.Housekeeping {
                             + " and(v.id is null)";
                         break;
                     default:
-                        SQL = "delete from ccmembers from ccmembers m left join ccvisits v on v.memberid=m.id"
+                        sql = "delete from ccmembers from ccmembers m left join ccvisits v on v.memberid=m.id"
                             + " where(m.createdbyvisit=1)"
                             + " and(m.Visits=1)"
                             + " and(m.Username is null)"
@@ -706,79 +667,85 @@ namespace Contensive.Addons.Housekeeping {
                             + " and(v.id is null)";
                         break;
                 }
-                core.db.executeQuery(SQL);
+                core.db.executeNonQuery(sql);
                 //
                 // delete email drops older than archive.
                 //
                 logHousekeeping(core, "Deleting email drops older then " + EmailDropArchiveAgeDays + " days");
+                //
+                DateTime ArchiveEmailDropDate = default(DateTime);
                 ArchiveEmailDropDate = rightNow.AddDays(-EmailDropArchiveAgeDays).Date;
-                core.db.deleteContentRecords("Email drops", "(DateAdded is null)or(DateAdded<=" + DbController.encodeSQLDate(ArchiveEmailDropDate) + ")");
+                MetaController.deleteContentRecords(core, "Email drops", "(DateAdded is null)or(DateAdded<=" + DbController.encodeSQLDate(ArchiveEmailDropDate) + ")");
                 //
                 // delete email log entries not realted to a drop, older than archive.
                 //
                 logHousekeeping(core, "Deleting non-drop email logs older then " + EmailDropArchiveAgeDays + " days");
                 ArchiveEmailDropDate = rightNow.AddDays(-EmailDropArchiveAgeDays).Date;
-                core.db.deleteContentRecords("Email Log", "(emailDropId is null)and((DateAdded is null)or(DateAdded<=" + DbController.encodeSQLDate(ArchiveEmailDropDate) + "))");
+                MetaController.deleteContentRecords(core, "Email Log", "(emailDropId is null)and((DateAdded is null)or(DateAdded<=" + DbController.encodeSQLDate(ArchiveEmailDropDate) + "))");
                 //
                 // block duplicate redirect fields (match contentid+fieldtype+caption)
                 //
                 logHousekeeping(core, "Inactivate duplicate redirect fields");
-                csXfer.csOpenSql("Select ID, ContentID, Type, Caption from ccFields where (active<>0)and(Type=" + fieldTypeIdRedirect + ") Order By ContentID, Caption, ID");
-                FieldLast = "";
-                while (csXfer.csOk()) {
-                    //FieldType = core.app.csv_cs_getInteger(CS, "Type")
-                    FieldContentID = csXfer.csGetInteger(CS, "Contentid");
-                    FieldCaption = csXfer.csGetText(CS, "Caption");
-                    FieldNew = FieldContentID + FieldCaption;
-                    if (FieldNew == FieldLast) {
-                        FieldRecordID = csXfer.csGetInteger(CS, "ID");
-                        core.db.executeQuery("Update ccFields set active=0 where ID=" + FieldRecordID + ";");
+                int FieldContentID = 0;
+                string FieldLast = null;
+                string FieldNew = null;
+                int FieldRecordID = 0;
+                using (var csXfer = new CsModel(core)) {
+                    csXfer.csOpenSql("Select ID, ContentID, Type, Caption from ccFields where (active<>0)and(Type=" + fieldTypeIdRedirect + ") Order By ContentID, Caption, ID");
+                    FieldLast = "";
+                    while (csXfer.csOk()) {
+                        FieldContentID = csXfer.csGetInteger("Contentid");
+                        string FieldCaption = csXfer.csGetText("Caption");
+                        FieldNew = FieldContentID + FieldCaption;
+                        if (FieldNew == FieldLast) {
+                            FieldRecordID = csXfer.csGetInteger("ID");
+                            core.db.executeNonQuery("Update ccFields set active=0 where ID=" + FieldRecordID + ";");
+                        }
+                        FieldLast = FieldNew;
+                        csXfer.csGoNext();
                     }
-                    FieldLast = FieldNew;
-                    csXfer.csGoNext(CS);
                 }
-                csXfer.csClose();
                 //
                 // block duplicate non-redirect fields (match contentid+fieldtype+name)
-                //
                 logHousekeeping(core, "Inactivate duplicate non-redirect fields");
-                csXfer.csOpenSql("Select ID, Name, ContentID, Type from ccFields where (active<>0)and(Type<>" + fieldTypeIdRedirect + ") Order By ContentID, Name, Type, ID");
-                FieldLast = "";
-                while (csXfer.csOk()) {
-                    fieldType = csXfer.csGetInteger(CS, "Type");
-                    FieldContentID = csXfer.csGetInteger(CS, "Contentid");
-                    FieldName = csXfer.csGetText(CS, "Name");
-                    FieldRecordID = csXfer.csGetInteger(CS, "ID");
-                    FieldNew = FieldContentID + FieldName + fieldType;
-                    if (FieldNew == FieldLast) {
-                        core.db.executeQuery("Update ccFields set active=0 where ID=" + FieldRecordID + ";");
+                using (var csXfer = new CsModel(core)) {
+                    FieldLast = "";
+                    string FieldName = null;
+                    while (csXfer.csOpenSql("Select ID, Name, ContentID, Type from ccFields where (active<>0)and(Type<>" + fieldTypeIdRedirect + ") Order By ContentID, Name, Type, ID")) {
+                        int fieldType = csXfer.csGetInteger("Type");
+                        FieldContentID = csXfer.csGetInteger("Contentid");
+                        FieldName = csXfer.csGetText("Name");
+                        FieldRecordID = csXfer.csGetInteger("ID");
+                        FieldNew = FieldContentID + FieldName + fieldType;
+                        if (FieldNew == FieldLast) {
+                            core.db.executeQuery("Update ccFields set active=0 where ID=" + FieldRecordID + ";");
+                        }
+                        FieldLast = FieldNew;
+                        csXfer.csGoNext();
                     }
-                    FieldLast = FieldNew;
-                    csXfer.csGoNext(CS);
                 }
-                csXfer.csClose();
                 //
                 // Activities with no Member
                 //
                 logHousekeeping(core, "Deleting activities with no member record.");
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
-                        SQL = "delete ccactivitylog.*"
+                        sql = "delete ccactivitylog.*"
                             + " From ccactivitylog LEFT JOIN ccmembers on ccmembers.ID=ccactivitylog.memberid"
                             + " WHERE (ccmembers.ID is null)";
-                        core.db.executeQuery(SQL);
+                        core.db.executeQuery(sql);
                         break;
                     case DataSourceTypeODBCSQLServer:
-                        SQL = "delete from ccactivitylog"
+                        sql = "delete from ccactivitylog"
                             + " From ccactivitylog LEFT JOIN ccmembers on ccmembers.ID=ccactivitylog.memberid"
                             + " WHERE (ccmembers.ID is null)";
-                        core.db.executeQuery(SQL);
+                        core.db.executeQuery(sql);
                         break;
                     default:
-                        SQL = "delete ccactivitylog"
+                        sql = "delete ccactivitylog"
                             + " From ccactivitylog LEFT JOIN ccmembers on ccmembers.ID=ccactivitylog.memberid"
                             + " WHERE (ccmembers.ID is null)";
-                        core.db.executeQuery(SQL);
+                        core.db.executeQuery(sql);
                         break;
                 }
                 //
@@ -787,25 +754,25 @@ namespace Contensive.Addons.Housekeeping {
                 logHousekeeping(core, "Deleting member properties with no member record.");
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
-                        SQL = "delete ccProperties.*"
+                        sql = "delete ccProperties.*"
                             + " From ccProperties LEFT JOIN ccmembers on ccmembers.ID=ccProperties.KeyID"
                             + " WHERE (ccProperties.TypeID=0)"
                             + " AND (ccmembers.ID is null)";
-                        core.db.executeQuery(SQL);
+                        core.db.executeQuery(sql);
                         break;
                     case DataSourceTypeODBCSQLServer:
-                        SQL = "delete From ccProperties"
+                        sql = "delete From ccProperties"
                             + " From ccProperties LEFT JOIN ccmembers on ccmembers.ID=ccProperties.KeyID"
                             + " WHERE (ccProperties.TypeID=0)"
                             + " AND (ccmembers.ID is null)";
-                        core.db.executeQuery(SQL);
+                        core.db.executeQuery(sql);
                         break;
                     default:
-                        SQL = "delete ccProperties"
+                        sql = "delete ccProperties"
                             + " From ccProperties LEFT JOIN ccmembers on ccmembers.ID=ccProperties.KeyID"
                             + " WHERE (ccProperties.TypeID=0)"
                             + " AND (ccmembers.ID is null)";
-                        core.db.executeQuery(SQL);
+                        core.db.executeQuery(sql);
                         break;
                 }
                 //
@@ -814,25 +781,25 @@ namespace Contensive.Addons.Housekeeping {
                 logHousekeeping(core, "Deleting visit properties with no visit record.");
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
-                        SQL = "delete ccProperties.*"
+                        sql = "delete ccProperties.*"
                             + " from ccProperties LEFT JOIN ccVisits on ccVisits.ID=ccProperties.KeyID"
                             + " WHERE (ccProperties.TypeID=1)"
                             + " AND (ccVisits.ID is null)";
-                        core.db.executeQuery(SQL);
+                        core.db.executeQuery(sql);
                         break;
                     case DataSourceTypeODBCSQLServer:
-                        SQL = "delete From ccProperties"
+                        sql = "delete From ccProperties"
                             + " from ccProperties LEFT JOIN ccVisits on ccVisits.ID=ccProperties.KeyID"
                             + " WHERE (ccProperties.TypeID=1)"
                             + " AND (ccVisits.ID is null)";
-                        core.db.executeQuery(SQL);
+                        core.db.executeQuery(sql);
                         break;
                     default:
-                        SQL = "delete ccProperties"
+                        sql = "delete ccProperties"
                             + " from ccProperties LEFT JOIN ccVisits on ccVisits.ID=ccProperties.KeyID"
                             + " WHERE (ccProperties.TypeID=1)"
                             + " AND (ccVisits.ID is null)";
-                        core.db.executeQuery(SQL);
+                        core.db.executeQuery(sql);
                         break;
                 }
                 //
@@ -841,25 +808,25 @@ namespace Contensive.Addons.Housekeeping {
                 logHousekeeping(core, "Deleting visitor properties with no visitor record.");
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
-                        SQL = "delete ccProperties.*"
+                        sql = "delete ccProperties.*"
                             + " from ccProperties LEFT JOIN ccvisitors on ccvisitors.ID=ccProperties.KeyID"
                             + " where ccproperties.typeid=2"
                             + " and ccvisitors.id is null";
-                        core.db.executeQuery(SQL);
+                        core.db.executeQuery(sql);
                         break;
                     case DataSourceTypeODBCSQLServer:
-                        SQL = "delete From ccProperties"
+                        sql = "delete From ccProperties"
                             + " from ccProperties LEFT JOIN ccvisitors on ccvisitors.ID=ccProperties.KeyID"
                             + " where ccproperties.typeid=2"
                             + " and ccvisitors.id is null";
-                        core.db.executeQuery(SQL);
+                        core.db.executeQuery(sql);
                         break;
                     default:
-                        SQL = "delete ccProperties"
+                        sql = "delete ccProperties"
                             + " from ccProperties LEFT JOIN ccvisitors on ccvisitors.ID=ccProperties.KeyID"
                             + " where ccproperties.typeid=2"
                             + " and ccvisitors.id is null";
-                        core.db.executeQuery(SQL);
+                        core.db.executeQuery(sql);
                         break;
                 }
                 //
@@ -868,25 +835,25 @@ namespace Contensive.Addons.Housekeeping {
                 logHousekeeping(core, "Deleting Member Rules with bad MemberID.");
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
-                        SQL = "delete ccmemberrules.*"
+                        sql = "delete ccmemberrules.*"
                             + " From ccmemberrules"
                             + " LEFT JOIN ccmembers on ccmembers.ID=ccmemberrules.MemberID"
                             + " WHERE (ccmembers.ID is null)";
-                        core.db.executeQuery(SQL);
+                        core.db.executeQuery(sql);
                         break;
                     case DataSourceTypeODBCSQLServer:
-                        SQL = "delete From ccmemberrules"
+                        sql = "delete From ccmemberrules"
                             + " From ccmemberrules"
                             + " LEFT JOIN ccmembers on ccmembers.ID=ccmemberrules.MemberID"
                             + " WHERE (ccmembers.ID is null)";
-                        core.db.executeQuery(SQL);
+                        core.db.executeQuery(sql);
                         break;
                     default:
-                        SQL = "delete ccmemberrules"
+                        sql = "delete ccmemberrules"
                             + " From ccmemberrules"
                             + " LEFT JOIN ccmembers on ccmembers.ID=ccmemberrules.MemberID"
                             + " WHERE (ccmembers.ID is null)";
-                        core.db.executeQuery(SQL);
+                        core.db.executeQuery(sql);
                         break;
                 }
                 //
@@ -895,25 +862,25 @@ namespace Contensive.Addons.Housekeeping {
                 logHousekeeping(core, "Deleting Member Rules with bad GroupID.");
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
-                        SQL = "delete ccmemberrules.*"
+                        sql = "delete ccmemberrules.*"
                             + " From ccmemberrules"
                             + " LEFT JOIN ccgroups on ccgroups.ID=ccmemberrules.GroupID"
                             + " WHERE (ccgroups.ID is null)";
-                        core.db.executeQuery(SQL);
+                        core.db.executeQuery(sql);
                         break;
                     case DataSourceTypeODBCSQLServer:
-                        SQL = "delete From ccmemberrules"
+                        sql = "delete From ccmemberrules"
                             + " From ccmemberrules"
                             + " LEFT JOIN ccgroups on ccgroups.ID=ccmemberrules.GroupID"
                             + " WHERE (ccgroups.ID is null)";
-                        core.db.executeQuery(SQL);
+                        core.db.executeQuery(sql);
                         break;
                     default:
-                        SQL = "delete ccmemberrules"
+                        sql = "delete ccmemberrules"
                             + " From ccmemberrules"
                             + " LEFT JOIN ccgroups on ccgroups.ID=ccmemberrules.GroupID"
                             + " WHERE (ccgroups.ID is null)";
-                        core.db.executeQuery(SQL);
+                        core.db.executeQuery(sql);
                         break;
                 }
                 //
@@ -921,119 +888,83 @@ namespace Contensive.Addons.Housekeeping {
                 //   Handled record by record removed to prevent CDEF reload
                 //
                 logHousekeeping(core, "Deleting Group Rules with bad ContentID.");
-                SQL = "Select ccGroupRules.ID"
+                sql = "Select ccGroupRules.ID"
                     + " From ccGroupRules LEFT JOIN ccContent on ccContent.ID=ccGroupRules.ContentID"
                     + " WHERE (ccContent.ID is null)";
-                csXfer.csOpenSql(SQL, "Default");
-                while (csXfer.csOk()) {
-                    core.db.deleteContentRecord("Group Rules", csXfer.csGetInteger(CS, "ID"));
-                    csXfer.csGoNext(CS);
+                using (var csXfer = new CsModel(core)) {
+                    csXfer.csOpenSql(sql);
+                    while (csXfer.csOk()) {
+                        MetaController.deleteContentRecord(core, "Group Rules", csXfer.csGetInteger("ID"));
+                        csXfer.csGoNext();
+                    }
                 }
-                csXfer.csClose();
                 //
                 // GroupRules with bad GroupID
                 //
                 logHousekeeping(core, "Deleting Group Rules with bad GroupID.");
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
-                        SQL = "delete ccGroupRules.*"
+                        sql = "delete ccGroupRules.*"
                             + " From ccGroupRules"
                             + " LEFT JOIN ccgroups on ccgroups.ID=ccGroupRules.GroupID"
                             + " WHERE (ccgroups.ID is null)";
-                        core.db.executeQuery(SQL);
+                        core.db.executeQuery(sql);
                         break;
                     case DataSourceTypeODBCSQLServer:
-                        SQL = "delete from ccGroupRules"
+                        sql = "delete from ccGroupRules"
                             + " From ccGroupRules"
                             + " LEFT JOIN ccgroups on ccgroups.ID=ccGroupRules.GroupID"
                             + " WHERE (ccgroups.ID is null)";
-                        core.db.executeQuery(SQL);
+                        core.db.executeQuery(sql);
                         break;
                     default:
-                        SQL = "delete ccGroupRules"
+                        sql = "delete ccGroupRules"
                             + " From ccGroupRules"
                             + " LEFT JOIN ccgroups on ccgroups.ID=ccGroupRules.GroupID"
                             + " WHERE (ccgroups.ID is null)";
-                        core.db.executeQuery(SQL);
+                        core.db.executeQuery(sql);
                         break;
                 }
-                //
-                // TopicRules with bad ContentID
-                // delete manually to prevent cdef reload
-                //
-                //Call AppendClassLog(AppName, "HouseKeep_App_Daily(" & AppName & ")", "Deleting Topic Rules with bad ContentID.")
-                //SQL = "Select ccTopicRules.ID" _
-                //    & " From ccTopicRules LEFT JOIN ccContent on ccContent.ID=ccTopicRules.ContentID" _
-                //    & " WHERE (ccContent.ID is null)"
-                //CS = core.app.csv_OpenCSSQL("default", SQL)
-                //Do While core.app.csv_IsCSOK(CS)
-                //    Call core.csv_DeleteContentRecord("Topic Rules", core.app.csv_cs_getInteger(CS, "ID"))
-                //    Call core.app.csv_NextCSRecord(CS)
-                //    Loop
-                //Call core.app.csv_CloseCS(CS)
-                //
-                // TopicRules with bad TopicID
-                //
-                //Call AppendClassLog(AppName, "HouseKeep_App_Daily(" & AppName & ")", "Deleting Topic Rules with bad TopicID.")
-                //Select Case DataSourceType
-                //    Case DataSourceTypeODBCAccess
-                //        SQL = "delete ccTopicRules.*" _
-                //            & " From ccTopicRules" _
-                //            & " LEFT JOIN ccTopics on ccTopics.ID=ccTopicRules.topicID" _
-                //            & " WHERE (ccTopics.ID is null)"
-                //        Call core.app.executeSql(sql)
-                //    Case DataSourceTypeODBCSQLServer
-                //        SQL = "delete from ccTopicRules" _
-                //            & " From ccTopicRules" _
-                //            & " LEFT JOIN ccTopics on ccTopics.ID=ccTopicRules.topicID" _
-                //            & " WHERE (ccTopics.ID is null)"
-                //        Call core.app.executeSql(sql)
-                //    Case Else
-                //        SQL = "delete ccTopicRules" _
-                //            & " From ccTopicRules" _
-                //            & " LEFT JOIN ccTopics on ccTopics.ID=ccTopicRules.topicID" _
-                //            & " WHERE (ccTopics.ID is null)"
-                //        Call core.app.executeSql(sql)
-                //End Select
                 //
                 // ContentWatch with bad CContentID
                 //     must be deleted manually
                 //
                 logHousekeeping(core, "Deleting Content Watch with bad ContentID.");
-                SQL = "Select ccContentWatch.ID"
-                    + " From ccContentWatch LEFT JOIN ccContent on ccContent.ID=ccContentWatch.ContentID"
-                    + " WHERE (ccContent.ID is null)or(ccContent.Active=0)or(ccContent.Active is null)";
-                csXfer.csOpenSql(SQL, "Default");
-                while (csXfer.csOk()) {
-                    core.db.deleteContentRecord("Content Watch", csXfer.csGetInteger(CS, "ID"));
-                    csXfer.csGoNext(CS);
+                using (var csXfer = new CsModel(core)) {
+                    sql = "Select ccContentWatch.ID"
+                        + " From ccContentWatch LEFT JOIN ccContent on ccContent.ID=ccContentWatch.ContentID"
+                        + " WHERE (ccContent.ID is null)or(ccContent.Active=0)or(ccContent.Active is null)";
+                    csXfer.csOpenSql(sql);
+                    while (csXfer.csOk()) {
+                        MetaController.deleteContentRecord(core, "Content Watch", csXfer.csGetInteger("ID"));
+                        csXfer.csGoNext();
+                    }
                 }
-                csXfer.csClose();
                 //
                 // ContentWatchListRules with bad ContentWatchID
                 //
                 logHousekeeping(core, "Deleting ContentWatchList Rules with bad ContentWatchID.");
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
-                        SQL = "delete ccContentWatchListRules.*"
+                        sql = "delete ccContentWatchListRules.*"
                             + " From ccContentWatchListRules"
                             + " LEFT JOIN ccContentWatch on ccContentWatch.ID=ccContentWatchListRules.ContentWatchID"
                             + " WHERE (ccContentWatch.ID is null)";
-                        core.db.executeQuery(SQL);
+                        core.db.executeQuery(sql);
                         break;
                     case DataSourceTypeODBCSQLServer:
-                        SQL = "delete from ccContentWatchListRules"
+                        sql = "delete from ccContentWatchListRules"
                             + " From ccContentWatchListRules"
                             + " LEFT JOIN ccContentWatch on ccContentWatch.ID=ccContentWatchListRules.ContentWatchID"
                             + " WHERE (ccContentWatch.ID is null)";
-                        core.db.executeQuery(SQL);
+                        core.db.executeQuery(sql);
                         break;
                     default:
-                        SQL = "delete ccContentWatchListRules"
+                        sql = "delete ccContentWatchListRules"
                             + " From ccContentWatchListRules"
                             + " LEFT JOIN ccContentWatch on ccContentWatch.ID=ccContentWatchListRules.ContentWatchID"
                             + " WHERE (ccContentWatch.ID is null)";
-                        core.db.executeQuery(SQL);
+                        core.db.executeQuery(sql);
                         break;
                 }
                 //
@@ -1042,62 +973,62 @@ namespace Contensive.Addons.Housekeeping {
                 logHousekeeping(core, "Deleting ContentWatchList Rules with bad ContentWatchListID.");
                 switch (DataSourceType) {
                     case DataSourceTypeODBCAccess:
-                        SQL = "delete ccContentWatchListRules.*"
+                        sql = "delete ccContentWatchListRules.*"
                             + " From ccContentWatchListRules"
                             + " LEFT JOIN ccContentWatchLists on ccContentWatchLists.ID=ccContentWatchListRules.ContentWatchListID"
                             + " WHERE (ccContentWatchLists.ID is null)";
-                        core.db.executeQuery(SQL);
+                        core.db.executeQuery(sql);
                         break;
                     case DataSourceTypeODBCSQLServer:
-                        SQL = "delete from ccContentWatchListRules"
+                        sql = "delete from ccContentWatchListRules"
                             + " From ccContentWatchListRules"
                             + " LEFT JOIN ccContentWatchLists on ccContentWatchLists.ID=ccContentWatchListRules.ContentWatchListID"
                             + " WHERE (ccContentWatchLists.ID is null)";
-                        core.db.executeQuery(SQL);
+                        core.db.executeQuery(sql);
                         break;
                     default:
-                        SQL = "delete ccContentWatchListRules"
+                        sql = "delete ccContentWatchListRules"
                             + " From ccContentWatchListRules"
                             + " LEFT JOIN ccContentWatchLists on ccContentWatchLists.ID=ccContentWatchListRules.ContentWatchListID"
                             + " WHERE (ccContentWatchLists.ID is null)";
-                        core.db.executeQuery(SQL);
+                        core.db.executeQuery(sql);
                         break;
                 }
                 //
                 // Field help with no field
                 //
                 logHousekeeping(core, "Deleting field help with no field.");
-                SQL = ""
+                sql = ""
                     + "delete from ccfieldhelp where id in ("
                     + " select h.id"
                     + " from ccfieldhelp h"
                     + " left join ccfields f on f.id=h.fieldid where f.id is null"
                     + ")";
-                core.db.executeQuery(SQL);
+                core.db.executeQuery(sql);
                 //
                 // Field help duplicates - messy, but I am not sure where they are coming from, and this patchs the edit page performance problem
                 //
                 logHousekeeping(core, "Deleting duplicate field help records.");
-                SQL = ""
+                sql = ""
                     + "delete from ccfieldhelp where id in ("
                     + " select b.id"
                     + " from ccfieldhelp a"
                     + " left join ccfieldhelp b on a.fieldid=b.fieldid where a.id< b.id"
                     + ")";
-                core.db.executeQuery(SQL);
+                core.db.executeQuery(sql);
                 //
                 //addon editor rules with no addon
                 //
-                SQL = "delete from ccAddonContentFieldTypeRules where id in ("
+                sql = "delete from ccAddonContentFieldTypeRules where id in ("
                     + "select r.id from ccAddonContentFieldTypeRules r left join ccaggregatefunctions a on a.id=r.addonid where a.Id Is Null"
                     + ")";
-                core.db.executeQuery(SQL);
+                core.db.executeQuery(sql);
                 //
                 // convert FieldTypeLongText + htmlContent to FieldTypeHTML
                 //
                 logHousekeeping(core, "convert FieldTypeLongText + htmlContent to FieldTypeHTML.");
-                SQL = "update ccfields set type=" + fieldTypeIdHTML + " where type=" + fieldTypeIdLongText + " and ( htmlcontent<>0 )";
-                core.db.executeQuery(SQL);
+                sql = "update ccfields set type=" + fieldTypeIdHTML + " where type=" + fieldTypeIdLongText + " and ( htmlcontent<>0 )";
+                core.db.executeQuery(sql);
                 //
                 // convert FieldTypeTextFile + htmlContent to FieldTypeHTMLFile
                 //
@@ -1120,142 +1051,55 @@ namespace Contensive.Addons.Housekeeping {
                     //
                     int DSType = core.db.getDataSourceType("");
                     logHousekeeping(core, "Content TextFile types with no controlling record.");
-                    SQL = "SELECT DISTINCT ccTables.Name as TableName, ccFields.Name as FieldName"
-                        + " FROM (ccFields LEFT JOIN ccContent ON ccFields.ContentID = ccContent.ID) LEFT JOIN ccTables ON ccContent.ContentTableID = ccTables.ID"
-                        + " Where (((ccFields.Type) = 10))"
-                        + " ORDER BY ccTables.Name";
-                    csXfer.csOpenSql(SQL, "Default");
-                    while (csXfer.csOk()) {
-                        //
-                        // Get all the files in this path, and check that the record exists with this in its field
-                        //
-                        FieldName = csXfer.csGetText(CS, "FieldName");
-                        TableName = csXfer.csGetText(CS, "TableName");
-                        PathName = TableName + "\\" + FieldName;
-                        FileList = core.cdnFiles.getFileList(PathName);
-                        if (FileList.Count > 0) {
-                            core.db.executeQuery("CREATE INDEX temp" + FieldName + " ON " + TableName + " (" + FieldName + ")");
-                            foreach (CPFileSystemBaseClass.FileDetail file in FileList) {
-                                Filename = file.Name;
-                                VirtualFileName = PathName + "\\" + Filename;
-                                VirtualLink = GenericController.vbReplace(VirtualFileName, "\\", "/");
-                                FileSize = file.Size;
-                                if (FileSize == 0) {
-                                    SQL = "update " + TableName + " set " + FieldName + "=null where (" + FieldName + "=" + DbController.encodeSQLText(VirtualFileName) + ")or(" + FieldName + "=" + DbController.encodeSQLText(VirtualLink) + ")";
-                                    core.db.executeQuery(SQL);
-                                    core.cdnFiles.deleteFile(VirtualFileName);
-                                } else {
-                                    SQL = "SELECT ID FROM " + TableName + " WHERE (" + FieldName + "=" + DbController.encodeSQLText(VirtualFileName) + ")or(" + FieldName + "=" + DbController.encodeSQLText(VirtualLink) + ")";
-                                    CSTest = csXfer.csOpenSql(SQL, "Default");
-                                    if (!csXfer.csOk(CSTest)) {
+                    using (var csXfer = new CsModel(core)) {
+                        sql = "SELECT DISTINCT ccTables.Name as TableName, ccFields.Name as FieldName"
+                            + " FROM (ccFields LEFT JOIN ccContent ON ccFields.ContentID = ccContent.ID) LEFT JOIN ccTables ON ccContent.ContentTableID = ccTables.ID"
+                            + " Where (((ccFields.Type) = 10))"
+                            + " ORDER BY ccTables.Name";
+                        csXfer.csOpenSql(sql);
+                        while (csXfer.csOk()) {
+                            //
+                            // Get all the files in this path, and check that the record exists with this in its field
+                            //
+                            string FieldName = csXfer.csGetText("FieldName");
+                            string TableName = csXfer.csGetText("TableName");
+                            string PathName = TableName + "\\" + FieldName;
+                            List<CPFileSystemBaseClass.FileDetail> FileList = core.cdnFiles.getFileList(PathName);
+                            if (FileList.Count > 0) {
+                                core.db.executeQuery("CREATE INDEX temp" + FieldName + " ON " + TableName + " (" + FieldName + ")");
+                                foreach (CPFileSystemBaseClass.FileDetail file in FileList) {
+                                    string Filename = file.Name;
+                                    string VirtualFileName = PathName + "\\" + Filename;
+                                    string VirtualLink = GenericController.vbReplace(VirtualFileName, "\\", "/");
+                                    long FileSize = file.Size;
+                                    if (FileSize == 0) {
+                                        sql = "update " + TableName + " set " + FieldName + "=null where (" + FieldName + "=" + DbController.encodeSQLText(VirtualFileName) + ")or(" + FieldName + "=" + DbController.encodeSQLText(VirtualLink) + ")";
+                                        core.db.executeQuery(sql);
                                         core.cdnFiles.deleteFile(VirtualFileName);
+                                    } else {
+                                        using (var csTest = new CsModel(core)) {
+                                            sql = "SELECT ID FROM " + TableName + " WHERE (" + FieldName + "=" + DbController.encodeSQLText(VirtualFileName) + ")or(" + FieldName + "=" + DbController.encodeSQLText(VirtualLink) + ")";
+                                            if (!csTest.csOpenSql(sql)) {
+                                                core.cdnFiles.deleteFile(VirtualFileName);
+                                            }
+                                        }
                                     }
-                                    csXfer.csClose(ref CSTest);
                                 }
+                                if (DSType == 1) {
+                                    // access
+                                    sql = "Drop INDEX temp" + FieldName + " ON " + TableName;
+                                } else if (DSType == 2) {
+                                    // sql server
+                                    sql = "DROP INDEX " + TableName + ".temp" + FieldName;
+                                } else {
+                                    // mysql
+                                    sql = "ALTER TABLE " + TableName + " DROP INDEX temp" + FieldName;
+                                }
+                                core.db.executeQuery(sql);
                             }
-                            if (DSType == 1) {
-                                // access
-                                SQL = "Drop INDEX temp" + FieldName + " ON " + TableName;
-                            } else if (DSType == 2) {
-                                // sql server
-                                SQL = "DROP INDEX " + TableName + ".temp" + FieldName;
-                            } else {
-                                // mysql
-                                SQL = "ALTER TABLE " + TableName + " DROP INDEX temp" + FieldName;
-                            }
-                            core.db.executeQuery(SQL);
+                            csXfer.csGoNext();
                         }
-                        csXfer.csGoNext(CS);
                     }
-                    csXfer.csClose();
-                    //
-                    // problem here is 1) images may have resized images in the folder
-                    // 2) files may be in the wrong recordID if workflow.
-                    //
-                    //        '
-                    //        ' Content File types with no controlling record
-                    //        '
-                    //        SQL = "SELECT DISTINCT ccTables.Name as TableName, ccFields.Name as FieldName" _
-                    //            & " FROM (ccFields LEFT JOIN ccContent ON ccFields.ContentID = ccContent.ID) LEFT JOIN ccTables ON ccContent.ContentTableID = ccTables.ID" _
-                    //            & " Where ((ccFields.Type=6)OR(ccFields.Type=11)OR(ccFields.Type=16)OR(ccFields.Type=17)OR(ccFields.Type=18))" _
-                    //            & " ORDER BY ccTables.Name"
-                    //        CS = core.app.csv_OpenCSSQL("Default", SQL)
-                    //        Do While core.app.csv_IsCSOK(CS)
-                    //            '
-                    //            ' Get all the files in this path, and check that the record exists with this in its field
-                    //            '
-                    //            FieldName = core.app.csv_cs_getText(CS, "FieldName")
-                    //            TableName = core.app.csv_cs_getText(CS, "TableName")
-                    //            If core.csv_IsSQLTableField("Default", TableName, FieldName) Then
-                    //                PathName = TableName & "\" & FieldName
-                    //                PathNameRev = TableName & "/" & FieldName
-                    //                FolderList = core.contentFiles.getFolderList(PathName)
-                    //                If FolderList <> "" Then
-                    //                    FolderArray = Split(FolderList, vbCrLf)
-                    //                    FolderArrayCount = UBound(FolderArray) + 1
-                    //                    For FolderArrayPointer = 0 To FolderArrayCount - 1
-                    //                        If FolderArray(FolderArrayPointer) <> "" Then
-                    //                            FolderSplit = Split(FolderArray(FolderArrayPointer), ",")
-                    //                            FolderName = FolderSplit(0)
-                    //                            '
-                    //                            ' just verify the record exists -- all files in the folder are valid
-                    //                            '
-                    //                            SQL = "select id from " & TableName & " where id=" & encodeSQLNumber(FolderName)
-                    //                            CSTest = core.app.csv_OpenCSSQL("default", SQL)
-                    //                            If Not core.app.csv_IsCSOK(CSTest) Then
-                    //                            '    Call core.csv_DeleteVirtualFolder(PathNameRev & "\" & FolderName)
-                    //                            End If
-                    //                            Call core.app.csv_CloseCS(CSTest)
-                    //
-                    //                            FileList = core.csv_GetVirtualFileList(PathName & "\" & FolderName)
-                    //                            If FileList <> "" Then
-                    //                                FileArray = Split(FileList, vbCrLf)
-                    //                                FileArrayCount = UBound(FileArray) + 1
-                    //                                For FileArrayPointer = 0 To FileArrayCount - 1
-                    //                                    If FileArray(FileArrayPointer) <> "" Then
-                    //                                        FileSplit = Split(FileArray(FileArrayPointer), ",")
-                    //                                        FilenameOriginal = FileSplit(0)
-                    //                                        Filename = FilenameOriginal
-                    //                                        FilenameAltSize = ""
-                    //                                        Pos = InStrRev(Filename, ".")
-                    //
-                    //                                        If Pos > 0 Then
-                    //                                            FilenameExt = Mid(Filename, Pos + 1)
-                    //                                            FilenameNoExt = Mid(Filename, 1, Pos - 1)
-                    //                                            Pos = InStrRev(FilenameNoExt, "-")
-                    //                                            If Pos > 0 Then
-                    //                                                FilenameAltSize = Mid(FilenameNoExt, Pos + 1)
-                    //                                                If FilenameAltSize <> "" Then
-                    //                                                FilenameDim = Split(FilenameAltSize, "x")
-                    //                                                If UBound(FilenameDim) = 1 Then
-                    //                                                    If genericController.vbIsNumeric(FilenameDim(0)) And genericController.vbIsNumeric(FilenameDim(1)) Then
-                    //                                                        FilenameNoExt = Mid(FilenameNoExt, 1, Pos - 1)
-                    //                                                    End If
-                    //                                                End If
-                    //                                                End If
-                    //                                            End If
-                    //                                            Filename = FilenameNoExt & "." & FilenameExt
-                    //                                        End If
-                    //                                        If FilenameAltSize <> "" Then
-                    //                                            SQL = "SELECT ID FROM " & TableName & " WHERE (" & FieldName & "=" & encodeSQLText(PathNameRev & "/" & FolderName & "/" & FilenameOriginal) & ")or(" & FieldName & "=" & encodeSQLText(PathNameRev & "/" & FolderName & "/" & Filename) & ")"
-                    //                                        Else
-                    //                                            SQL = "SELECT ID FROM " & TableName & " WHERE " & FieldName & "=" & encodeSQLText(PathNameRev & "/" & FolderName & "/" & FilenameOriginal)
-                    //                                        End If
-                    //                                        CSTest = core.app.csv_OpenCSSQL("default", SQL)
-                    //                                        If Not core.app.csv_IsCSOK(CSTest) Then
-                    //                                            Call core.virtualFiles.DeleteFile(PathNameRev & "/" & FolderName & "/" & FilenameOriginal)
-                    //                                        End If
-                    //                                        Call core.app.csv_CloseCS(CSTest)
-                    //                                    End If
-                    //                                Next
-                    //                            End If
-                    //                        End If
-                    //                    Next
-                    //                End If
-                    //            End If
-                    //            Call core.app.csv_NextCSRecord(CS)
-                    //        Loop
-                    //        Call core.app.csv_CloseCS(CS)
                 }
                 core.db.sqlCommandTimeout = TimeoutSave;
                 return;
@@ -1710,55 +1554,38 @@ namespace Contensive.Addons.Housekeeping {
             int hint = 0;
             string hinttxt = "";
             try {
-                //
-                //
-                string baseCriteria = null;
-                //DateTime StartDate = default(DateTime);
-                DateTime PeriodStart = default(DateTime);
-                double PeriodStep = 0;
-                DateTime PeriodDatePtr = default(DateTime);
-                int DateNumber = 0;
-                int TimeNumber = 0;
-                DateTime DateStart = default(DateTime);
-                DateTime DateEnd = default(DateTime);
-                int CS = 0;
                 XmlDocument LibraryCollections = new XmlDocument();
                 XmlDocument LocalCollections = new XmlDocument();
                 XmlDocument Doc = new XmlDocument();
-                int CSPages = 0;
-                int PageID = 0;
-                string PageTitle = null;
-                int NoCookiePageViews = 0;
-                int PageViews = 0;
-                int AuthenticatedPageViews = 0;
-                int MobilePageViews = 0;
-                int BotPageViews = 0;
-                string SQL = null;
                 if (string.CompareOrdinal(BuildVersion, core.codeVersion()) < 0) {
                     LogController.handleError(core, new GenericException("Can not summarize analytics until this site's data needs been upgraded."));
                 } else {
                     hint = 1;
+                    DateTime PeriodStart = default(DateTime);
                     PeriodStart = StartTimeDate;
                     if (PeriodStart < OldestVisitSummaryWeCareAbout) {
                         PeriodStart = OldestVisitSummaryWeCareAbout;
                     }
+                    DateTime PeriodDatePtr = default(DateTime);
                     PeriodDatePtr = PeriodStart.Date;
-                    PeriodStep = (double)HourDuration / 24.0F;
+                    double PeriodStep = (double)HourDuration / 24.0F;
                     while (PeriodDatePtr < EndTimeDate) {
                         hint = 2;
                         //
                         hinttxt = ", HourDuration [" + HourDuration + "], PeriodDatePtr [" + PeriodDatePtr + "], PeriodDatePtr.AddHours(HourDuration / 2.0) [" + PeriodDatePtr.AddHours(HourDuration / 2.0) + "]";
-                        DateNumber = encodeInteger(PeriodDatePtr.AddHours(HourDuration / 2.0).ToOADate());
-                        TimeNumber = encodeInteger(PeriodDatePtr.TimeOfDay.TotalHours);
+                        int DateNumber = encodeInteger(PeriodDatePtr.AddHours(HourDuration / 2.0).ToOADate());
+                        int TimeNumber = encodeInteger(PeriodDatePtr.TimeOfDay.TotalHours);
+                        DateTime DateStart = default(DateTime);
                         DateStart = PeriodDatePtr.Date;
+                        DateTime DateEnd = default(DateTime);
                         DateEnd = PeriodDatePtr.AddHours(HourDuration).Date;
-                        PageTitle = "";
-                        PageID = 0;
-                        PageViews = 0;
-                        AuthenticatedPageViews = 0;
-                        MobilePageViews = 0;
-                        BotPageViews = 0;
-                        NoCookiePageViews = 0;
+                        string PageTitle = "";
+                        int PageID = 0;
+                        int PageViews = 0;
+                        int AuthenticatedPageViews = 0;
+                        int MobilePageViews = 0;
+                        int BotPageViews = 0;
+                        int NoCookiePageViews = 0;
                         //
                         // Loop through all the pages hit during this period
                         //
@@ -1768,170 +1595,163 @@ namespace Contensive.Addons.Housekeeping {
                         // then use the title to distinguish a page. The problem with this is the current system puts the
                         // visit number and page number in the name. if we select on district name, they will all be.
                         //
-                        SQL = "select distinct recordid,pagetitle from ccviewings h"
-                            + " where (h.recordid<>0)"
-                            + " and(h.dateadded>=" + DbController.encodeSQLDate(DateStart) + ")"
-                            + " and (h.dateadded<" + DbController.encodeSQLDate(DateEnd) + ")"
-                            + " and((h.ExcludeFromAnalytics is null)or(h.ExcludeFromAnalytics=0))"
-                            + "order by recordid";
-                        hint = 3;
-                        CSPages = csXfer.csOpenSql(SQL, "Default");
-                        if (!csXfer.csOk(CSPages)) {
-                            //
-                            // no hits found - add or update a single record for this day so we know it has been calculated
-                            //
-                            csXfer.csOpen("Page View Summary", "(timeduration=" + HourDuration + ")and(DateNumber=" + DateNumber + ")and(TimeNumber=" + TimeNumber + ")and(pageid=" + PageID + ")and(pagetitle=" + DbController.encodeSQLText(PageTitle) + ")");
-                            if (!csXfer.csOk()) {
-                                csXfer.csClose();
-                                csXfer.csInsert("Page View Summary");
-                            }
-                            //
-                            if (csXfer.csOk()) {
-                                csXfer.csSet(CS, "name", HourDuration + " hr summary for " + DateTime.FromOADate((double)DateNumber) + " " + TimeNumber + ":00, " + PageTitle);
-                                csXfer.csSet(CS, "DateNumber", DateNumber);
-                                csXfer.csSet(CS, "TimeNumber", TimeNumber);
-                                csXfer.csSet(CS, "TimeDuration", HourDuration);
-                                csXfer.csSet(CS, "PageViews", PageViews);
-                                csXfer.csSet(CS, "PageID", PageID);
-                                csXfer.csSet(CS, "PageTitle", PageTitle);
-                                csXfer.csSet(CS, "AuthenticatedPageViews", AuthenticatedPageViews);
-                                csXfer.csSet(CS, "NoCookiePageViews", NoCookiePageViews);
-                                if (true) {
-                                    csXfer.csSet(CS, "MobilePageViews", MobilePageViews);
-                                    csXfer.csSet(CS, "BotPageViews", BotPageViews);
+                        using (var csPages = new CsModel(core)) {
+                            string sql = "select distinct recordid,pagetitle from ccviewings h"
+                                + " where (h.recordid<>0)"
+                                + " and(h.dateadded>=" + DbController.encodeSQLDate(DateStart) + ")"
+                                + " and (h.dateadded<" + DbController.encodeSQLDate(DateEnd) + ")"
+                                + " and((h.ExcludeFromAnalytics is null)or(h.ExcludeFromAnalytics=0))"
+                                + "order by recordid";
+                            hint = 3;
+                            if (!csPages.csOpenSql(sql)) {
+                                //
+                                // no hits found - add or update a single record for this day so we know it has been calculated
+                                csPages.csOpen("Page View Summary", "(timeduration=" + HourDuration + ")and(DateNumber=" + DateNumber + ")and(TimeNumber=" + TimeNumber + ")and(pageid=" + PageID + ")and(pagetitle=" + DbController.encodeSQLText(PageTitle) + ")");
+                                if (!csPages.csOk()) {
+                                    csPages.csClose();
+                                    csPages.csInsert("Page View Summary");
                                 }
-                            }
-                            csXfer.csClose();
-                            hint = 4;
-                        } else {
-                            hint = 5;
-                            //
-                            // add an entry for each page hit on this day
-                            //
-                            while (csXfer.csOk(CSPages)) {
-                                PageID = csXfer.csGetInteger(CSPages, "recordid");
-                                PageTitle = csXfer.csGetText(CSPages, "pagetitle");
-                                baseCriteria = ""
-                                    + " (h.recordid=" + PageID + ")"
-                                    + " "
-                                    + " and(h.dateadded>=" + DbController.encodeSQLDate(DateStart) + ")"
-                                    + " and(h.dateadded<" + DbController.encodeSQLDate(DateEnd) + ")"
-                                    + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
-                                    + " and((h.ExcludeFromAnalytics is null)or(h.ExcludeFromAnalytics=0))"
-                                    + "";
-                                if (!string.IsNullOrEmpty(PageTitle)) {
-                                    baseCriteria = baseCriteria + "and(h.pagetitle=" + DbController.encodeSQLText(PageTitle) + ")";
+                                //
+                                if (csPages.csOk()) {
+                                    csPages.csSet("name", HourDuration + " hr summary for " + DateTime.FromOADate((double)DateNumber) + " " + TimeNumber + ":00, " + PageTitle);
+                                    csPages.csSet("DateNumber", DateNumber);
+                                    csPages.csSet("TimeNumber", TimeNumber);
+                                    csPages.csSet("TimeDuration", HourDuration);
+                                    csPages.csSet("PageViews", PageViews);
+                                    csPages.csSet("PageID", PageID);
+                                    csPages.csSet("PageTitle", PageTitle);
+                                    csPages.csSet("AuthenticatedPageViews", AuthenticatedPageViews);
+                                    csPages.csSet("NoCookiePageViews", NoCookiePageViews);
+                                    if (true) {
+                                        csPages.csSet("MobilePageViews", MobilePageViews);
+                                        csPages.csSet("BotPageViews", BotPageViews);
+                                    }
                                 }
-                                hint = 6;
+                                csPages.csClose();
+                                hint = 4;
+                            } else {
+                                hint = 5;
                                 //
-                                // Total Page Views
+                                // add an entry for each page hit on this day
                                 //
-                                SQL = "select count(h.id) as cnt"
-                                    + " from ccviewings h left join ccvisits v on h.visitid=v.id"
-                                    + " where " + baseCriteria + " and (v.CookieSupport<>0)"
-                                    + "";
-                                csXfer.csOpenSql(SQL, "Default");
-                                if (csXfer.csOk()) {
-                                    PageViews = csXfer.csGetInteger(CS, "cnt");
-                                }
-                                csXfer.csClose();
-                                hint = 7;
-                                //
-                                // Authenticated Visits
-                                //
-                                SQL = "select count(h.id) as cnt"
-                                    + " from ccviewings h left join ccvisits v on h.visitid=v.id"
-                                    + " where " + baseCriteria + " and(v.CookieSupport<>0)"
-                                    + " and(v.visitAuthenticated<>0)"
-                                    + "";
-                                csXfer.csOpenSql(SQL, "Default");
-                                if (csXfer.csOk()) {
-                                    AuthenticatedPageViews = csXfer.csGetInteger(CS, "cnt");
-                                }
-                                csXfer.csClose();
-                                hint = 8;
-                                //
-                                // No Cookie Page Views
-                                //
-                                SQL = "select count(h.id) as NoCookiePageViews"
-                                    + " from ccviewings h left join ccvisits v on h.visitid=v.id"
-                                    + " where " + baseCriteria + " and((v.CookieSupport=0)or(v.CookieSupport is null))"
-                                    + "";
-                                csXfer.csOpenSql(SQL, "Default");
-                                if (csXfer.csOk()) {
-                                    NoCookiePageViews = csXfer.csGetInteger(CS, "NoCookiePageViews");
-                                }
-                                csXfer.csClose();
-                                hint = 9;
-                                //
-                                if (true) {
+                                while (csPages.csOk()) {
+                                    PageID = csPages.csGetInteger("recordid");
+                                    PageTitle = csPages.csGetText("pagetitle");
+                                    string baseCriteria = ""
+                                        + " (h.recordid=" + PageID + ")"
+                                        + " "
+                                        + " and(h.dateadded>=" + DbController.encodeSQLDate(DateStart) + ")"
+                                        + " and(h.dateadded<" + DbController.encodeSQLDate(DateEnd) + ")"
+                                        + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
+                                        + " and((h.ExcludeFromAnalytics is null)or(h.ExcludeFromAnalytics=0))"
+                                        + "";
+                                    if (!string.IsNullOrEmpty(PageTitle)) {
+                                        baseCriteria = baseCriteria + "and(h.pagetitle=" + DbController.encodeSQLText(PageTitle) + ")";
+                                    }
+                                    hint = 6;
+                                    //
+                                    // Total Page Views
+                                    using (var csPageViews = new CsModel(core)) {
+                                        sql = "select count(h.id) as cnt"
+                                            + " from ccviewings h left join ccvisits v on h.visitid=v.id"
+                                            + " where " + baseCriteria + " and (v.CookieSupport<>0)"
+                                            + "";
+                                        csPageViews.csOpenSql(sql);
+                                        if (csPageViews.csOk()) {
+                                            PageViews = csPageViews.csGetInteger("cnt");
+                                        }
+                                    }
+                                    //
+                                    // Authenticated Visits
+                                    //
+                                    using (var csAuthPages = new CsModel(core)) {
+                                        sql = "select count(h.id) as cnt"
+                                            + " from ccviewings h left join ccvisits v on h.visitid=v.id"
+                                            + " where " + baseCriteria + " and(v.CookieSupport<>0)"
+                                            + " and(v.visitAuthenticated<>0)"
+                                            + "";
+                                        csAuthPages.csOpenSql(sql, "Default");
+                                        if (csAuthPages.csOk()) {
+                                            AuthenticatedPageViews = csAuthPages.csGetInteger("cnt");
+                                        }
+                                    }
+                                    //
+                                    // No Cookie Page Views
+                                    //
+                                    using (var csNoCookie = new CsModel(core)) {
+                                        sql = "select count(h.id) as NoCookiePageViews"
+                                            + " from ccviewings h left join ccvisits v on h.visitid=v.id"
+                                            + " where " + baseCriteria + " and((v.CookieSupport=0)or(v.CookieSupport is null))"
+                                            + "";
+                                        csNoCookie.csOpenSql(sql, "Default");
+                                        if (csNoCookie.csOk()) {
+                                            NoCookiePageViews = csNoCookie.csGetInteger("NoCookiePageViews");
+                                        }
+                                    }
+                                    //
                                     //
                                     // Mobile Visits
-                                    //
-                                    SQL = "select count(h.id) as cnt"
-                                        + " from ccviewings h left join ccvisits v on h.visitid=v.id"
-                                        + " where " + baseCriteria + " and(v.CookieSupport<>0)"
-                                        + " and(v.mobile<>0)"
-                                        + "";
-                                    csXfer.csOpenSql(SQL, "Default");
-                                    if (csXfer.csOk()) {
-                                        MobilePageViews = csXfer.csGetInteger(CS, "cnt");
+                                    using (var csMobileVisits = new CsModel(core)) {
+                                        sql = "select count(h.id) as cnt"
+                                            + " from ccviewings h left join ccvisits v on h.visitid=v.id"
+                                            + " where " + baseCriteria + " and(v.CookieSupport<>0)"
+                                            + " and(v.mobile<>0)"
+                                            + "";
+                                        csMobileVisits.csOpenSql(sql);
+                                        if (csMobileVisits.csOk()) {
+                                            MobilePageViews = csMobileVisits.csGetInteger("cnt");
+                                        }
                                     }
-                                    csXfer.csClose();
                                     //
                                     // Bot Visits
+                                    using (var csBotVisits = new CsModel(core)) {
+                                        sql = "select count(h.id) as cnt"
+                                            + " from ccviewings h left join ccvisits v on h.visitid=v.id"
+                                            + " where " + baseCriteria + " and(v.CookieSupport<>0)"
+                                            + " and(v.bot<>0)"
+                                            + "";
+                                        csBotVisits.csOpenSql(sql);
+                                        if (csBotVisits.csOk()) {
+                                            BotPageViews = csBotVisits.csGetInteger(CS, "cnt");
+                                        }
+                                    }
                                     //
-                                    SQL = "select count(h.id) as cnt"
-                                        + " from ccviewings h left join ccvisits v on h.visitid=v.id"
-                                        + " where " + baseCriteria + " and(v.CookieSupport<>0)"
-                                        + " and(v.bot<>0)"
-                                        + "";
-                                    csXfer.csOpenSql(SQL, "Default");
-                                    if (csXfer.csOk()) {
-                                        BotPageViews = csXfer.csGetInteger(CS, "cnt");
+                                    // Add or update the Visit Summary Record
+                                    //
+                                    using (var csPVS = new CsModel(core)) {
+                                        if (!csPVS.csOpen("Page View Summary", "(timeduration=" + HourDuration + ")and(DateNumber=" + DateNumber + ")and(TimeNumber=" + TimeNumber + ")and(pageid=" + PageID + ")and(pagetitle=" + DbController.encodeSQLText(PageTitle) + ")")) {
+                                            csPVS.csInsert("Page View Summary");
+                                        }
+                                        //
+                                        if (csPVS.csOk()) {
+                                            hint = 11;
+                                            string PageName = "";
+                                            if (string.IsNullOrEmpty(PageTitle)) {
+                                                PageName = MetaController.getRecordName(core, "page content", PageID);
+                                                csPVS.csSet("name", HourDuration + " hr summary for " + DateTime.FromOADate((double)DateNumber) + " " + TimeNumber + ":00, " + PageName);
+                                                csPVS.csSet("PageTitle", PageName);
+                                            } else {
+                                                csPVS.csSet("name", HourDuration + " hr summary for " + DateTime.FromOADate((double)DateNumber) + " " + TimeNumber + ":00, " + PageTitle);
+                                                csPVS.csSet("PageTitle", PageTitle);
+                                            }
+                                            csPVS.csSet("DateNumber", DateNumber);
+                                            csPVS.csSet("TimeNumber", TimeNumber);
+                                            csPVS.csSet("TimeDuration", HourDuration);
+                                            csPVS.csSet("PageViews", PageViews);
+                                            csPVS.csSet("PageID", PageID);
+                                            csPVS.csSet("AuthenticatedPageViews", AuthenticatedPageViews);
+                                            csPVS.csSet("NoCookiePageViews", NoCookiePageViews);
+                                            hint = 12;
+                                            if (true) {
+                                                csPVS.csSet("MobilePageViews", MobilePageViews);
+                                                csPVS.csSet("BotPageViews", BotPageViews);
+                                            }
+                                        }
                                     }
-                                    csXfer.csClose();
+                                    csPages.csGoNext();
                                 }
-                                hint = 10;
-                                //
-                                // Add or update the Visit Summary Record
-                                //
-                                csXfer.csOpen("Page View Summary", "(timeduration=" + HourDuration + ")and(DateNumber=" + DateNumber + ")and(TimeNumber=" + TimeNumber + ")and(pageid=" + PageID + ")and(pagetitle=" + DbController.encodeSQLText(PageTitle) + ")");
-                                if (!csXfer.csOk()) {
-                                    csXfer.csClose();
-                                    csXfer.csInsert("Page View Summary");
-                                }
-                                //
-                                if (csXfer.csOk()) {
-                                    hint = 11;
-                                    string PageName = null;
-
-                                    if (string.IsNullOrEmpty(PageTitle)) {
-                                        PageName = MetaController.getRecordName(core, "page content", PageID);
-                                        csXfer.csSet(CS, "name", HourDuration + " hr summary for " + DateTime.FromOADate((double)DateNumber) + " " + TimeNumber + ":00, " + PageName);
-                                        csXfer.csSet(CS, "PageTitle", PageName);
-                                    } else {
-                                        csXfer.csSet(CS, "name", HourDuration + " hr summary for " + DateTime.FromOADate((double)DateNumber) + " " + TimeNumber + ":00, " + PageTitle);
-                                        csXfer.csSet(CS, "PageTitle", PageTitle);
-                                    }
-                                    csXfer.csSet(CS, "DateNumber", DateNumber);
-                                    csXfer.csSet(CS, "TimeNumber", TimeNumber);
-                                    csXfer.csSet(CS, "TimeDuration", HourDuration);
-                                    csXfer.csSet(CS, "PageViews", PageViews);
-                                    csXfer.csSet(CS, "PageID", PageID);
-                                    csXfer.csSet(CS, "AuthenticatedPageViews", AuthenticatedPageViews);
-                                    csXfer.csSet(CS, "NoCookiePageViews", NoCookiePageViews);
-                                    hint = 12;
-                                    if (true) {
-                                        csXfer.csSet(CS, "MobilePageViews", MobilePageViews);
-                                        csXfer.csSet(CS, "BotPageViews", BotPageViews);
-                                    }
-                                }
-                                csXfer.csClose();
-                                csXfer.csGoNext(CSPages);
                             }
                         }
-                        csXfer.csClose(ref CSPages);
                         PeriodDatePtr = PeriodDatePtr.AddHours(HourDuration);
                     }
                 }

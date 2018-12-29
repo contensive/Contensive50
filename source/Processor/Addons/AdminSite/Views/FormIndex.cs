@@ -108,11 +108,11 @@ namespace Contensive.Addons.AdminSite {
                                 SQL += " where " + sqlWhere;
                             }
                             int recordCnt = 0;
-                            int csXfer.csOpenSql(SQL, datasource.name);
-                            if (csXfer.csOk()) {
-                                recordCnt = csXfer.csGetInteger(CS, "cnt");
+                            using (var csXfer = new CsModel(core)) {
+                                if (csXfer.csOpenSql(SQL, datasource.name)) {
+                                    recordCnt = csXfer.csGetInteger("cnt");
+                                }
                             }
-                            csXfer.csClose(ref CS);
                             //
                             // Assumble the SQL
                             //
@@ -305,73 +305,71 @@ namespace Contensive.Addons.AdminSite {
                             string RowColor = "";
                             int RecordPointer = 0;
                             int RecordLast = 0;
-                            csXfer.csOpenSql(SQL, datasource.name, IndexConfig.recordsPerPage, IndexConfig.pageNumber);
-                            if (csXfer.csOk()) {
-                                RecordPointer = IndexConfig.recordTop;
-                                RecordLast = IndexConfig.recordTop + IndexConfig.recordsPerPage;
-                                //
-                                // --- Print out the records
-                                while ((csXfer.csOk()) && (RecordPointer < RecordLast)) {
-                                    int RecordID = csXfer.csGetInteger(CS, "ID");
-                                    //RecordName = csXfer.csGetText(CS, "name");
-                                    //IsLandingPage = IsPageContent And (RecordID = LandingPageID)
-                                    if (RowColor == "class=\"ccAdminListRowOdd\"") {
-                                        RowColor = "class=\"ccAdminListRowEven\"";
-                                    } else {
-                                        RowColor = "class=\"ccAdminListRowOdd\"";
-                                    }
-                                    DataTable_DataRows += "\r\n<tr>";
+                            using (var csXfer = new CsModel(core)) {
+                                if (csXfer.csOpenSql(SQL, datasource.name, IndexConfig.recordsPerPage, IndexConfig.pageNumber)) {
+                                    RecordPointer = IndexConfig.recordTop;
+                                    RecordLast = IndexConfig.recordTop + IndexConfig.recordsPerPage;
                                     //
-                                    // --- Edit button column
-                                    DataTable_DataRows += "<td align=center " + RowColor + ">";
-                                    string URI = "\\" + core.appConfig.adminRoute + "?" + rnAdminAction + "=" + Constants.AdminActionNop + "&cid=" + adminData.adminContent.id + "&id=" + RecordID + "&" + RequestNameTitleExtension + "=" + GenericController.encodeRequestVariable(adminData.TitleExtension) + "&ad=" + adminData.ignore_legacyMenuDepth + "&" + rnAdminSourceForm + "=" + adminData.AdminForm + "&" + rnAdminForm + "=" + AdminFormEdit;
-                                    if (adminData.WherePairCount > 0) {
-                                        for (int WhereCount = 0; WhereCount < adminData.WherePairCount; WhereCount++) {
-                                            URI = URI + "&wl" + WhereCount + "=" + GenericController.encodeRequestVariable(adminData.WherePair[0, WhereCount]) + "&wr" + WhereCount + "=" + GenericController.encodeRequestVariable(adminData.WherePair[1, WhereCount]);
+                                    // --- Print out the records
+                                    while ((csXfer.csOk()) && (RecordPointer < RecordLast)) {
+                                        int RecordID = csXfer.csGetInteger("ID");
+                                        if (RowColor == "class=\"ccAdminListRowOdd\"") {
+                                            RowColor = "class=\"ccAdminListRowEven\"";
+                                        } else {
+                                            RowColor = "class=\"ccAdminListRowOdd\"";
                                         }
-                                    }
-                                    DataTable_DataRows += AdminUIController.getIconEditLink(URI);
-                                    DataTable_DataRows += ("</td>");
-                                    //
-                                    // --- Record Number column
-                                    //DataTable_DataRows += "<td align=right " + RowColor + ">" + SpanClassAdminSmall + "[" + (RecordPointer + 1) + "]</span></td>";
-                                    //
-                                    // --- Delete Checkbox Columns
-                                    if (AllowDelete) {
-                                        DataTable_DataRows += "<td align=center " + RowColor + "><input TYPE=CheckBox NAME=row" + RecordPointer + " VALUE=1 ID=\"DelCheck\"><input type=hidden name=rowid" + RecordPointer + " VALUE=" + RecordID + "></span></td>";
-                                    } else {
-                                        DataTable_DataRows += "<td align=center " + RowColor + "><input TYPE=CheckBox disabled=\"disabled\" NAME=row" + RecordPointer + " VALUE=1><input type=hidden name=rowid" + RecordPointer + " VALUE=" + RecordID + "></span></td>";
-                                    }
-                                    //
-                                    // --- field columns
-                                    foreach (var column in IndexConfig.columns) {
-                                        string columnNameLc = column.Name.ToLowerInvariant();
-                                        if (FieldUsedInColumns.ContainsKey(columnNameLc)) {
-                                            if (FieldUsedInColumns[columnNameLc]) {
-                                                DataTable_DataRows += ("\r\n<td valign=\"middle\" " + RowColor + " align=\"left\">" + SpanClassAdminNormal);
-                                                DataTable_DataRows += getForm_Index_GetCell(core, adminData, column.Name, CS, IsLookupFieldValid[columnNameLc], GenericController.vbLCase(adminData.adminContent.tableName) == "ccemail");
-                                                DataTable_DataRows += ("&nbsp;</span></td>");
+                                        DataTable_DataRows += "\r\n<tr>";
+                                        //
+                                        // --- Edit button column
+                                        DataTable_DataRows += "<td align=center " + RowColor + ">";
+                                        string URI = "\\" + core.appConfig.adminRoute + "?" + rnAdminAction + "=" + Constants.AdminActionNop + "&cid=" + adminData.adminContent.id + "&id=" + RecordID + "&" + RequestNameTitleExtension + "=" + GenericController.encodeRequestVariable(adminData.TitleExtension) + "&ad=" + adminData.ignore_legacyMenuDepth + "&" + rnAdminSourceForm + "=" + adminData.AdminForm + "&" + rnAdminForm + "=" + AdminFormEdit;
+                                        if (adminData.WherePairCount > 0) {
+                                            for (int WhereCount = 0; WhereCount < adminData.WherePairCount; WhereCount++) {
+                                                URI = URI + "&wl" + WhereCount + "=" + GenericController.encodeRequestVariable(adminData.WherePair[0, WhereCount]) + "&wr" + WhereCount + "=" + GenericController.encodeRequestVariable(adminData.WherePair[1, WhereCount]);
                                             }
                                         }
+                                        DataTable_DataRows += AdminUIController.getIconEditLink(URI);
+                                        DataTable_DataRows += ("</td>");
+                                        //
+                                        // --- Record Number column
+                                        //DataTable_DataRows += "<td align=right " + RowColor + ">" + SpanClassAdminSmall + "[" + (RecordPointer + 1) + "]</span></td>";
+                                        //
+                                        // --- Delete Checkbox Columns
+                                        if (AllowDelete) {
+                                            DataTable_DataRows += "<td align=center " + RowColor + "><input TYPE=CheckBox NAME=row" + RecordPointer + " VALUE=1 ID=\"DelCheck\"><input type=hidden name=rowid" + RecordPointer + " VALUE=" + RecordID + "></span></td>";
+                                        } else {
+                                            DataTable_DataRows += "<td align=center " + RowColor + "><input TYPE=CheckBox disabled=\"disabled\" NAME=row" + RecordPointer + " VALUE=1><input type=hidden name=rowid" + RecordPointer + " VALUE=" + RecordID + "></span></td>";
+                                        }
+                                        //
+                                        // --- field columns
+                                        foreach (var column in IndexConfig.columns) {
+                                            string columnNameLc = column.Name.ToLowerInvariant();
+                                            if (FieldUsedInColumns.ContainsKey(columnNameLc)) {
+                                                if (FieldUsedInColumns[columnNameLc]) {
+                                                    DataTable_DataRows += ("\r\n<td valign=\"middle\" " + RowColor + " align=\"left\">" + SpanClassAdminNormal);
+                                                    DataTable_DataRows += getForm_Index_GetCell(core, adminData, column.Name, CS, IsLookupFieldValid[columnNameLc], GenericController.vbLCase(adminData.adminContent.tableName) == "ccemail");
+                                                    DataTable_DataRows += ("&nbsp;</span></td>");
+                                                }
+                                            }
+                                        }
+                                        DataTable_DataRows += ("\n    </tr>");
+                                        csXfer.csGoNext(CS);
+                                        RecordPointer = RecordPointer + 1;
                                     }
-                                    DataTable_DataRows += ("\n    </tr>");
-                                    csXfer.csGoNext(CS);
-                                    RecordPointer = RecordPointer + 1;
-                                }
-                                DataTable_DataRows += "<input type=hidden name=rowcnt value=" + RecordPointer + ">";
-                                //
-                                // --- print out the stuff at the bottom
-                                //
-                                int RecordTop_NextPage = IndexConfig.recordTop;
-                                if (csXfer.csOk()) {
-                                    RecordTop_NextPage = RecordPointer;
-                                }
-                                int RecordTop_PreviousPage = IndexConfig.recordTop - IndexConfig.recordsPerPage;
-                                if (RecordTop_PreviousPage < 0) {
-                                    RecordTop_PreviousPage = 0;
+                                    DataTable_DataRows += "<input type=hidden name=rowcnt value=" + RecordPointer + ">";
+                                    //
+                                    // --- print out the stuff at the bottom
+                                    //
+                                    int RecordTop_NextPage = IndexConfig.recordTop;
+                                    if (csXfer.csOk()) {
+                                        RecordTop_NextPage = RecordPointer;
+                                    }
+                                    int RecordTop_PreviousPage = IndexConfig.recordTop - IndexConfig.recordsPerPage;
+                                    if (RecordTop_PreviousPage < 0) {
+                                        RecordTop_PreviousPage = 0;
+                                    }
                                 }
                             }
-                            csXfer.csClose(ref CS);
                             //
                             // Header at bottom
                             //
@@ -1490,27 +1488,13 @@ namespace Contensive.Addons.AdminSite {
         public static string getForm_IndexFilterContent( CoreController core, AdminDataModel adminData) {
             string returnContent = "";
             try {
-                string TableName = null;
-                string FieldCaption = null;
-                string ContentName = null;
-                int CS = 0;
-                string SQL = null;
-                string Caption = null;
-                string Link = null;
-                string RQS = null;
-                string QS = null;
+                var IndexConfig = IndexConfigClass.get(core, adminData);
+                string ContentName = MetaController.getContentNameByID(core, adminData.adminContent.id);
+                string RQS = "cid=" + adminData.adminContent.id + "&af=1";
+                string Link = string.Empty;
+                string QS = string.Empty;
                 int Ptr = 0;
-                string SubFilterList = null;
-                IndexConfigClass IndexConfig = null;
-                //string list = null;
-                //string[] ListSplit = null;
-                //int Cnt = 0;
-                //int Pos = 0;
-                //
-                IndexConfig = IndexConfigClass.get(core, adminData);
-                //
-                ContentName = MetaController.getContentNameByID(core, adminData.adminContent.id);
-                RQS = "cid=" + adminData.adminContent.id + "&af=1";
+                string SubFilterList = string.Empty;
                 //
                 //-------------------------------------------------------------------------------------
                 // Remove filters
@@ -1607,34 +1591,34 @@ namespace Contensive.Addons.AdminSite {
                     //
                     foreach (var findWordKvp in IndexConfig.findWords) {
                         IndexConfigClass.IndexConfigFindWordClass findWord = findWordKvp.Value;
-                        FieldCaption = GenericController.encodeText(MetaController.getContentFieldProperty(core, ContentName, findWord.Name, "caption"));
+                        string fieldCaption = (!adminData.adminContent.fields.ContainsKey(findWord.Name.ToLower())) ? findWord.Name : adminData.adminContent.fields[findWord.Name.ToLower()].caption;
                         QS = RQS;
                         QS = GenericController.modifyQueryString(QS, "IndexFilterRemoveFind", findWord.Name);
                         Link = "/" + core.appConfig.adminRoute + "?" + QS;
                         switch (findWord.MatchOption) {
                             case FindWordMatchEnum.matchincludes:
-                                returnContent += HtmlController.div(getIconDeleteLink(Link) + "&nbsp;" + FieldCaption + "&nbsp;includes&nbsp;'" + findWord.Value + "'", "ccFilterIndent");
+                                returnContent += HtmlController.div(getIconDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;includes&nbsp;'" + findWord.Value + "'", "ccFilterIndent");
                                 break;
                             case FindWordMatchEnum.MatchEmpty:
-                                returnContent += HtmlController.div(getIconDeleteLink(Link) + "&nbsp;" + FieldCaption + "&nbsp;is&nbsp;empty", "ccFilterIndent");
+                                returnContent += HtmlController.div(getIconDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;is&nbsp;empty", "ccFilterIndent");
                                 break;
                             case FindWordMatchEnum.MatchEquals:
-                                returnContent += HtmlController.div(getIconDeleteLink(Link) + "&nbsp;" + FieldCaption + "&nbsp;=&nbsp;'" + findWord.Value + "'", "ccFilterIndent");
+                                returnContent += HtmlController.div(getIconDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;=&nbsp;'" + findWord.Value + "'", "ccFilterIndent");
                                 break;
                             case FindWordMatchEnum.MatchFalse:
-                                returnContent += HtmlController.div(getIconDeleteLink(Link) + "&nbsp;" + FieldCaption + "&nbsp;is&nbsp;false", "ccFilterIndent");
+                                returnContent += HtmlController.div(getIconDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;is&nbsp;false", "ccFilterIndent");
                                 break;
                             case FindWordMatchEnum.MatchGreaterThan:
-                                returnContent += HtmlController.div(getIconDeleteLink(Link) + "&nbsp;" + FieldCaption + "&nbsp;&gt;&nbsp;'" + findWord.Value + "'", "ccFilterIndent");
+                                returnContent += HtmlController.div(getIconDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;&gt;&nbsp;'" + findWord.Value + "'", "ccFilterIndent");
                                 break;
                             case FindWordMatchEnum.MatchLessThan:
-                                returnContent += HtmlController.div(getIconDeleteLink(Link) + "&nbsp;" + FieldCaption + "&nbsp;&lt;&nbsp;'" + findWord.Value + "'", "ccFilterIndent");
+                                returnContent += HtmlController.div(getIconDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;&lt;&nbsp;'" + findWord.Value + "'", "ccFilterIndent");
                                 break;
                             case FindWordMatchEnum.MatchNotEmpty:
-                                returnContent += HtmlController.div(getIconDeleteLink(Link) + "&nbsp;" + FieldCaption + "&nbsp;is&nbsp;not&nbsp;empty", "ccFilterIndent");
+                                returnContent += HtmlController.div(getIconDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;is&nbsp;not&nbsp;empty", "ccFilterIndent");
                                 break;
                             case FindWordMatchEnum.MatchTrue:
-                                returnContent += HtmlController.div(getIconDeleteLink(Link) + "&nbsp;" + FieldCaption + "&nbsp;is&nbsp;true", "ccFilterIndent");
+                                returnContent += HtmlController.div(getIconDeleteLink(Link) + "&nbsp;" + fieldCaption + "&nbsp;is&nbsp;true", "ccFilterIndent");
                                 break;
                         }
                     }
@@ -1683,8 +1667,9 @@ namespace Contensive.Addons.AdminSite {
                 //
                 SubFilterList = "";
                 var contentList = ContentModel.createList(core, "(contenttableid in (select id from cctables where name=" + DbController.encodeSQLText(adminData.adminContent.tableName) + "))");
-                if (contentList.Count>1) {
-                    foreach ( var subContent in contentList ) {
+                string Caption = null;
+                if (contentList.Count > 1) {
+                    foreach (var subContent in contentList) {
                         Caption = "<span style=\"white-space:nowrap;\">" + subContent.name + "</span>";
                         QS = RQS;
                         QS = GenericController.modifyQueryString(QS, "IndexFilterAddCDef", subContent.id.ToString(), true);
@@ -1696,44 +1681,45 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // people filters
                 //
-                TableName = MetaController.getContentTablename(core, ContentName);
+                string TableName = MetaController.getContentTablename(core, ContentName);
                 SubFilterList = "";
                 if (GenericController.vbLCase(TableName) == GenericController.vbLCase("ccMembers")) {
-                    SQL = core.db.getSQLSelect("default", "ccGroups", "ID,Caption,Name", "(active<>0)", "Caption,Name");
-                    csXfer.csOpenSql(SQL, "Default");
-                    while (csXfer.csOk()) {
-                        string Name = csXfer.csGetText(CS, "Name");
-                        Ptr = 0;
-                        if (IndexConfig.groupListCnt > 0) {
-                            for (Ptr = 0; Ptr < IndexConfig.groupListCnt; Ptr++) {
-                                if (Name == IndexConfig.groupList[Ptr]) {
-                                    break;
+                    using (var csXfer = new CsModel(core)) {
+                        csXfer.csOpenSql(core.db.getSQLSelect("default", "ccGroups", "ID,Caption,Name", "(active<>0)", "Caption,Name"));
+                        while (csXfer.csOk()) {
+                            string Name = csXfer.csGetText(CS, "Name");
+                            Ptr = 0;
+                            if (IndexConfig.groupListCnt > 0) {
+                                for (Ptr = 0; Ptr < IndexConfig.groupListCnt; Ptr++) {
+                                    if (Name == IndexConfig.groupList[Ptr]) {
+                                        break;
+                                    }
                                 }
                             }
-                        }
-                        if (Ptr == IndexConfig.groupListCnt) {
-                            int RecordID = csXfer.csGetInteger(CS, "ID");
-                            Caption = csXfer.csGetText(CS, "Caption");
-                            if (string.IsNullOrEmpty(Caption)) {
-                                Caption = Name;
+                            if (Ptr == IndexConfig.groupListCnt) {
+                                int RecordID = csXfer.csGetInteger(CS, "ID");
+                                Caption = csXfer.csGetText(CS, "Caption");
                                 if (string.IsNullOrEmpty(Caption)) {
-                                    Caption = "Group " + RecordID;
+                                    Caption = Name;
+                                    if (string.IsNullOrEmpty(Caption)) {
+                                        Caption = "Group " + RecordID;
+                                    }
                                 }
+                                if (Caption.Length > 30) {
+                                    Caption = Caption.Left(15) + "..." + Caption.Substring(Caption.Length - 15);
+                                }
+                                Caption = "<span style=\"white-space:nowrap;\">" + Caption + "</span>";
+                                QS = RQS;
+                                if (!string.IsNullOrEmpty(Name.Trim(' '))) {
+                                    QS = GenericController.modifyQueryString(QS, "IndexFilterAddGroup", Name, true);
+                                } else {
+                                    QS = GenericController.modifyQueryString(QS, "IndexFilterAddGroup", RecordID.ToString(), true);
+                                }
+                                Link = "/" + core.appConfig.adminRoute + "?" + QS;
+                                SubFilterList = SubFilterList + "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\">" + Caption + "</a></div>";
                             }
-                            if (Caption.Length > 30) {
-                                Caption = Caption.Left(15) + "..." + Caption.Substring(Caption.Length - 15);
-                            }
-                            Caption = "<span style=\"white-space:nowrap;\">" + Caption + "</span>";
-                            QS = RQS;
-                            if (!string.IsNullOrEmpty(Name.Trim(' '))) {
-                                QS = GenericController.modifyQueryString(QS, "IndexFilterAddGroup", Name, true);
-                            } else {
-                                QS = GenericController.modifyQueryString(QS, "IndexFilterAddGroup", RecordID.ToString(), true);
-                            }
-                            Link = "/" + core.appConfig.adminRoute + "?" + QS;
-                            SubFilterList = SubFilterList + "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\">" + Caption + "</a></div>";
+                            csXfer.csGoNext(CS);
                         }
-                        csXfer.csGoNext(CS);
                     }
                 }
                 if (!string.IsNullOrEmpty(SubFilterList)) {
@@ -1810,26 +1796,18 @@ namespace Contensive.Addons.AdminSite {
         /// <param name="IsLookupFieldValid"></param>
         /// <param name="IsEmailContent"></param>
         /// <returns></returns>
-        public static string getForm_Index_GetCell( CoreController core, AdminDataModel adminData, string fieldName, int CS, bool IsLookupFieldValid, bool IsEmailContent) {
-            string return_formIndexCell = "";
+        public static string getForm_Index_GetCell( CoreController core, AdminDataModel adminData, string fieldName, CsModel csXfer, bool IsLookupFieldValid, bool IsEmailContent) {
             try {
+                var field = adminData.adminContent.fields[fieldName.ToLowerInvariant()];
+                int lookupTableCnt = field.id;
                 string FieldText = null;
                 string Filename = null;
-                string Copy = null;
-                StringBuilderLegacyController Stream = new StringBuilderLegacyController();
-                string[] lookups = null;
-                int LookupPtr = 0;
+                var Stream = new StringBuilderLegacyController();
                 int Pos = 0;
-                int lookupTableCnt = 0;
-                //
-                var tempVar = adminData.adminContent.fields[fieldName.ToLowerInvariant()];
-                lookupTableCnt = tempVar.id; // workaround for universally creating the left join tablename for each field
-                switch (tempVar.fieldTypeId) {
-                    //Case FieldTypeImage
-                    //    Stream.Add( Mid(core.app.cs_get(CS, .Name), 7 + Len(.Name) + Len(adminContext.content.ContentTableName)))
+                switch (field.fieldTypeId) {
                     case _fieldTypeIdFile:
                     case _fieldTypeIdFileImage:
-                        Filename = csXfer.csGet(CS, tempVar.nameLc);
+                        Filename = csXfer.csGet(field.nameLc);
                         Filename = GenericController.vbReplace(Filename, "\\", "/");
                         Pos = Filename.LastIndexOf("/") + 1;
                         if (Pos != 0) {
@@ -1839,47 +1817,43 @@ namespace Contensive.Addons.AdminSite {
                         break;
                     case _fieldTypeIdLookup:
                         if (IsLookupFieldValid) {
-                            Stream.Add(csXfer.csGet(CS, "LookupTable" + lookupTableCnt + "Name"));
+                            Stream.Add(csXfer.csGet("LookupTable" + lookupTableCnt + "Name"));
                             lookupTableCnt += 1;
-                        } else if (tempVar.lookupList != "") {
-                            lookups = tempVar.lookupList.Split(',');
-                            LookupPtr = csXfer.csGetInteger(CS, tempVar.nameLc) - 1;
+                        } else if (field.lookupList != "") {
+                            string[] lookups = field.lookupList.Split(',');
+                            int LookupPtr = csXfer.csGetInteger(field.nameLc) - 1;
                             if (LookupPtr <= lookups.GetUpperBound(0)) {
                                 if (LookupPtr < 0) {
                                     //Stream.Add( "-1")
                                 } else {
                                     Stream.Add(lookups[LookupPtr]);
                                 }
-                            } else {
-                                //Stream.Add( "-2")
                             }
-
                         } else {
-                            //Stream.Add( "-3")
                             Stream.Add(" ");
                         }
                         break;
                     case _fieldTypeIdMemberSelect:
                         if (IsLookupFieldValid) {
-                            Stream.Add(csXfer.csGet(CS, "LookupTable" + lookupTableCnt + "Name"));
+                            Stream.Add(csXfer.csGet("LookupTable" + lookupTableCnt + "Name"));
                             lookupTableCnt += 1;
                         } else {
-                            Stream.Add(csXfer.csGet(CS, tempVar.nameLc));
+                            Stream.Add(csXfer.csGet(field.nameLc));
                         }
                         break;
                     case _fieldTypeIdBoolean:
-                        if (csXfer.csGetBoolean(CS, tempVar.nameLc)) {
+                        if (csXfer.csGetBoolean(field.nameLc)) {
                             Stream.Add("yes");
                         } else {
                             Stream.Add("no");
                         }
                         break;
                     case _fieldTypeIdCurrency:
-                        Stream.Add(string.Format("{0:C}", csXfer.csGetNumber(CS, tempVar.nameLc)));
+                        Stream.Add(string.Format("{0:C}", csXfer.csGetNumber(field.nameLc)));
                         break;
                     case _fieldTypeIdLongText:
                     case _fieldTypeIdHTML:
-                        FieldText = csXfer.csGet(CS, tempVar.nameLc);
+                        FieldText = csXfer.csGet(field.nameLc);
                         if (FieldText.Length > 50) {
                             FieldText = FieldText.Left(50) + "[more]";
                         }
@@ -1891,11 +1865,9 @@ namespace Contensive.Addons.AdminSite {
                     case _fieldTypeIdFileJavascript:
                     case _fieldTypeIdFileHTML:
                         // rw( "n/a" )
-                        Filename = csXfer.csGet(CS, tempVar.nameLc);
+                        Filename = csXfer.csGet(field.nameLc);
                         if (!string.IsNullOrEmpty(Filename)) {
-                            Copy = core.cdnFiles.readFileText(Filename);
-                            // 20171103 - dont see why this is being converted, not html
-                            //Copy = core.html.convertActiveContent_internal(Copy, core.doc.authContext.user.id, "", 0, 0, True, False, False, False, True, False, "", "", IsEmailContent, 0, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin, core.doc.authContext.isAuthenticated, Nothing, core.doc.authContext.isEditingAnything())
+                            string Copy = core.cdnFiles.readFileText(Filename);
                             Stream.Add(Copy);
                         }
                         break;
@@ -1904,21 +1876,18 @@ namespace Contensive.Addons.AdminSite {
                         Stream.Add("n/a");
                         break;
                     default:
-                        if (tempVar.password) {
+                        if (field.password) {
                             Stream.Add("****");
                         } else {
-                            Stream.Add(csXfer.csGet(CS, tempVar.nameLc));
+                            Stream.Add(csXfer.csGet(field.nameLc));
                         }
                         break;
                 }
-                //
-                return_formIndexCell = HtmlController.encodeHtml(Stream.Text);
+                return HtmlController.encodeHtml(Stream.Text);
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
                 throw;
             }
-            return return_formIndexCell;
         }
-        //
     }
 }

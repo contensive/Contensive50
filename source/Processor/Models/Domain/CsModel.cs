@@ -711,23 +711,20 @@ namespace Contensive.Processor {
         /// <summary>
         /// get the first fieldname in the CS, Returns null if there are no more
         /// </summary>
-        /// <param name="CSPointer"></param>
+        /// <param name="ignore"></param>
         /// <returns></returns>
-        public string csGetFirstFieldName(int CSPointer) {
-            string returnFieldName = "";
+        public string csGetFirstFieldName() {
             try {
-                if (!csOk(CSPointer)) {
-                    throw new GenericException("data set is not valid");
-                } else {
-                    this.fieldPointer = 0;
-                    returnFieldName = csGetNextFieldName(CSPointer);
-                }
+                if (!csOk()) { throw new GenericException("data set is not valid"); }
+                this.fieldPointer = 0;
+                return csGetNextFieldName();
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
                 throw;
             }
-            return returnFieldName;
         }
+        //
+        public string csGetFirstFieldName(int ignore) => csGetFirstFieldName();
         //
         //========================================================================
         /// <summary>
@@ -735,23 +732,21 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="CSPointer"></param>
         /// <returns></returns>
-        public string csGetNextFieldName(int CSPointer) {
-            string returnFieldName = "";
+        public string csGetNextFieldName() {
             try {
-                if (!csOk(CSPointer)) {
-                    throw new GenericException("data set is not valid");
-                } else {
-                    while ((string.IsNullOrEmpty(returnFieldName)) && (this.fieldPointer < this.resultColumnCount)) {
-                        returnFieldName = this.fieldNames[this.fieldPointer];
-                        this.fieldPointer = this.fieldPointer + 1;
-                    }
+                if (!csOk()) { throw new GenericException("data set is not valid"); }
+                while (this.fieldPointer < this.resultColumnCount) {
+                    if(!string.IsNullOrWhiteSpace(this.fieldNames[this.fieldPointer])) { return this.fieldNames[this.fieldPointer]; }
+                    this.fieldPointer += 1;
                 }
+                return "";
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
                 throw;
             }
-            return returnFieldName;
         }
+        //
+        public string csGetNextFieldName(int CSPointer) => csGetNextFieldName();
         //
         //========================================================================
         /// <summary>
@@ -810,18 +805,17 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="CSPointer"></param>
         /// <returns></returns>
-        public string csGetSelectFieldList(int CSPointer) {
-            string returnResult = "";
+        public string csGetSelectFieldList() {
             try {
-                if (csOk(CSPointer)) {
-                    returnResult = string.Join(",", this.fieldNames);
-                }
+                if (csOk()) { return string.Join(",", this.fieldNames); }
+                return string.Empty;
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
                 throw;
             }
-            return returnResult;
         }
+        //
+        public string csGetSelectFieldList(int CSPointer) => csGetSelectFieldList();
         //
         //========================================================================
         /// <summary>
@@ -830,23 +824,18 @@ namespace Contensive.Processor {
         /// <param name="CSPointer"></param>
         /// <param name="FieldName"></param>
         /// <returns></returns>
-        public bool csIsFieldSupported(int CSPointer, string FieldName) {
-            bool returnResult = false;
+        public bool csIsFieldSupported(string FieldName) {
             try {
-                if (string.IsNullOrEmpty(FieldName)) {
-                    throw new ArgumentException("Field name cannot be blank");
-                } else if (!csOk(CSPointer)) {
-                    throw new ArgumentException("dataset is not valid");
-                } else {
-                    string CSSelectFieldList = csGetSelectFieldList(CSPointer);
-                    returnResult = GenericController.isInDelimitedString(CSSelectFieldList, FieldName, ",");
-                }
+                if (string.IsNullOrEmpty(FieldName)) { throw new ArgumentException("Field name cannot be blank"); }
+                if (!csOk()) { throw new ArgumentException("dataset is not valid"); }
+                return GenericController.isInDelimitedString(csGetSelectFieldList(), FieldName, ",");
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
                 throw;
             }
-            return returnResult;
         }
+        //
+        public bool csIsFieldSupported(int CSPointer, string FieldName) => csIsFieldSupported(FieldName);
         //
         //========================================================================
         /// <summary>
@@ -1924,7 +1913,7 @@ namespace Contensive.Processor {
         // try declaring the return as object() - an array holder for variants
         // try setting up each call to return a variant, not an array of variants
         //
-        public string[,] csGetRows(int CSPointer) {
+        public string[,] csGetRows() {
             string[,] returnResult = { { } };
             try {
                 returnResult = this.readCache;
@@ -1934,6 +1923,8 @@ namespace Contensive.Processor {
             }
             return returnResult;
         }
+        //
+        public string[,] csGetRows(int ignore) => csGetRows();
         //
         //========================================================================
         /// <summary>
@@ -1979,17 +1970,21 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         //
-        public string csGetRecordEditLink(int ignore, bool AllowCut = false) {
+        public string csGetRecordEditLink(bool AllowCut) {
             try {
                 if (!csOk(0)) { throw (new GenericException("Cannot create edit link because data set is not valid.")); }
                 string ContentName = MetaController.getContentNameByID(core, csGetInteger(0, "contentcontrolid"));
-                if (!string.IsNullOrEmpty(ContentName)) { return Addons.AdminSite.Controllers.AdminUIController.getRecordEditLink(core, ContentName, csGetInteger(0, "ID"), GenericController.encodeBoolean(AllowCut), csGetText(0, "Name"), core.session.isEditing(ContentName)); }
+                if (!string.IsNullOrEmpty(ContentName)) { return Addons.AdminSite.Controllers.AdminUIController.getRecordEditLink(core, ContentName, csGetInteger(0, "ID"), GenericController.encodeBoolean(allowCut), csGetText(0, "Name"), core.session.isEditing(ContentName)); }
                 return string.Empty;
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
                 throw;
             }
         }
+        //
+        public string csGetRecordEditLink(int ignore, bool allowCut) => csGetRecordEditLink(allowCut);
+        //
+        public string csGetRecordEditLink() => csGetRecordEditLink(false);
         //
         // ====================================================================================================
         //
@@ -2435,13 +2430,6 @@ namespace Contensive.Processor {
         //
         private void sample() {
             using (var csXfer = new CsModel(core)) {
-                if (csXfer.openSQL("")) {
-
-                }
-            }
-
-            using (var csXfer = new CsModel(core)) {
-
             }
         }
         //

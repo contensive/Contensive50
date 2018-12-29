@@ -122,7 +122,6 @@ namespace Contensive.Processor.Controllers {
                 Models.Domain.MetaModel CDef = null;
                 string ContentControlCriteria = null;
                 string LcaseCriteria = null;
-                int CSPointer = 0;
                 bool SelectedFound = false;
                 int RecordID = 0;
                 string Copy = null;
@@ -218,7 +217,7 @@ namespace Contensive.Processor.Controllers {
                         } else {
                             using ( var csXfer = new CsModel( core )) {
                                 if (csXfer.csOpenRecord(ContentName, CurrentValue)) {
-                                    result = csXfer.csGetText(CSPointer, "name") + "&nbsp;";
+                                    result = csXfer.csGetText("name") + "&nbsp;";
                                 }
                             }
                         }
@@ -228,7 +227,6 @@ namespace Contensive.Processor.Controllers {
                         // ----- Generate Drop Down Field Names
                         //
                         DropDownFieldList = CDef.dropDownFieldList;
-                        //DropDownFieldList = main_GetContentProperty(ContentName, "DropDownFieldList")
                         if (string.IsNullOrEmpty(DropDownFieldList)) {
                             DropDownFieldList = "NAME";
                         }
@@ -306,81 +304,51 @@ namespace Contensive.Processor.Controllers {
                             FastString.Add("<option value=\"\">" + NoneCaptionFPO + "</option>");
                             //
                             // ----- select values
-                            //
-                            CSPointer = csXfer.csOpen(ContentName, Criteria, SortFieldList, false, 0, false, false, SelectFields);
-                            if (csXfer.csOk()) {
-                                RowsArray = csXfer.csGetRows(CSPointer);
-                                RowFieldArray = csXfer.csGetSelectFieldList(CSPointer).Split(',');
-                                ColumnMax = RowsArray.GetUpperBound(0);
-                                RowMax = RowsArray.GetUpperBound(1);
-                                //
-                                // -- setup IDFieldPointer
-                                UcaseFieldName = "ID";
-                                for (ColumnPointer = 0; ColumnPointer <= ColumnMax; ColumnPointer++) {
-                                    if (UcaseFieldName == GenericController.vbUCase(RowFieldArray[ColumnPointer])) {
-                                        IDFieldPointer = ColumnPointer;
-                                        break;
-                                    }
-                                }
-                                //
-                                // setup DropDownFieldPointer()
-                                //
-                                for (var FieldPointer = 0; FieldPointer < DropDownFieldCount; FieldPointer++) {
-                                    UcaseFieldName = GenericController.vbUCase(DropDownFieldName[FieldPointer]);
+                            using (var csXfer = new CsModel(core)) {
+                                if (csXfer.csOpen(ContentName, Criteria, SortFieldList, false, 0, SelectFields)) {
+                                    RowsArray = csXfer.csGetRows();
+                                    RowFieldArray = csXfer.csGetSelectFieldList().Split(',');
+                                    ColumnMax = RowsArray.GetUpperBound(0);
+                                    RowMax = RowsArray.GetUpperBound(1);
+                                    //
+                                    // -- setup IDFieldPointer
+                                    UcaseFieldName = "ID";
                                     for (ColumnPointer = 0; ColumnPointer <= ColumnMax; ColumnPointer++) {
                                         if (UcaseFieldName == GenericController.vbUCase(RowFieldArray[ColumnPointer])) {
-                                            DropDownFieldPointer[FieldPointer] = ColumnPointer;
+                                            IDFieldPointer = ColumnPointer;
                                             break;
                                         }
                                     }
-                                }
-                                //
-                                // output select
-                                //
-                                SelectedFound = false;
-                                for (RowPointer = 0; RowPointer <= RowMax; RowPointer++) {
-                                    RecordID = GenericController.encodeInteger(RowsArray[IDFieldPointer, RowPointer]);
-                                    Copy = DropDownPreField;
+                                    //
+                                    // setup DropDownFieldPointer()
+                                    //
                                     for (var FieldPointer = 0; FieldPointer < DropDownFieldCount; FieldPointer++) {
-                                        Copy += RowsArray[DropDownFieldPointer[FieldPointer], RowPointer] + DropDownDelimiter[FieldPointer];
-                                    }
-                                    if (string.IsNullOrEmpty(Copy)) {
-                                        Copy = "no name";
-                                    }
-                                    FastString.Add("\r\n<option value=\"" + RecordID + "\" ");
-                                    if (RecordID == CurrentValue) {
-                                        FastString.Add("selected");
-                                        SelectedFound = true;
-                                    }
-                                    if (core.siteProperties.selectFieldWidthLimit != 0) {
-                                        if (Copy.Length > core.siteProperties.selectFieldWidthLimit) {
-                                            Copy = Copy.Left(core.siteProperties.selectFieldWidthLimit) + "...+";
+                                        UcaseFieldName = GenericController.vbUCase(DropDownFieldName[FieldPointer]);
+                                        for (ColumnPointer = 0; ColumnPointer <= ColumnMax; ColumnPointer++) {
+                                            if (UcaseFieldName == GenericController.vbUCase(RowFieldArray[ColumnPointer])) {
+                                                DropDownFieldPointer[FieldPointer] = ColumnPointer;
+                                                break;
+                                            }
                                         }
                                     }
-                                    FastString.Add(">" + HtmlController.encodeHtml(Copy) + "</option>");
-                                }
-                                if (!SelectedFound && (CurrentValue != 0)) {
-                                    csXfer.csClose();
-                                    if (!string.IsNullOrEmpty(Criteria)) {
-                                        Criteria = Criteria + "and";
-                                    }
-                                    Criteria = Criteria + "(id=" + GenericController.encodeInteger(CurrentValue) + ")";
-                                    CSPointer = csXfer.csOpen(ContentName, Criteria, SortFieldList, false, 0, false, false, SelectFields);
-                                    if (csXfer.csOk()) {
-                                        RowsArray = csXfer.csGetRows(CSPointer);
-                                        RowFieldArray = csXfer.csGetSelectFieldList(CSPointer).Split(',');
-                                        RowMax = RowsArray.GetUpperBound(1);
-                                        ColumnMax = RowsArray.GetUpperBound(0);
-                                        RecordID = GenericController.encodeInteger(RowsArray[IDFieldPointer, 0]);
+                                    //
+                                    // output select
+                                    //
+                                    SelectedFound = false;
+                                    for (RowPointer = 0; RowPointer <= RowMax; RowPointer++) {
+                                        RecordID = GenericController.encodeInteger(RowsArray[IDFieldPointer, RowPointer]);
                                         Copy = DropDownPreField;
                                         for (var FieldPointer = 0; FieldPointer < DropDownFieldCount; FieldPointer++) {
-                                            Copy += RowsArray[DropDownFieldPointer[FieldPointer], 0] + DropDownDelimiter[FieldPointer];
+                                            Copy += RowsArray[DropDownFieldPointer[FieldPointer], RowPointer] + DropDownDelimiter[FieldPointer];
                                         }
                                         if (string.IsNullOrEmpty(Copy)) {
                                             Copy = "no name";
                                         }
-                                        FastString.Add("\r\n<option value=\"" + RecordID + "\" selected");
-                                        SelectedFound = true;
+                                        FastString.Add("\r\n<option value=\"" + RecordID + "\" ");
+                                        if (RecordID == CurrentValue) {
+                                            FastString.Add("selected");
+                                            SelectedFound = true;
+                                        }
                                         if (core.siteProperties.selectFieldWidthLimit != 0) {
                                             if (Copy.Length > core.siteProperties.selectFieldWidthLimit) {
                                                 Copy = Copy.Left(core.siteProperties.selectFieldWidthLimit) + "...+";
@@ -388,10 +356,38 @@ namespace Contensive.Processor.Controllers {
                                         }
                                         FastString.Add(">" + HtmlController.encodeHtml(Copy) + "</option>");
                                     }
+                                    if (!SelectedFound && (CurrentValue != 0)) {
+                                        csXfer.csClose();
+                                        if (!string.IsNullOrEmpty(Criteria)) {
+                                            Criteria = Criteria + "and";
+                                        }
+                                        Criteria = Criteria + "(id=" + GenericController.encodeInteger(CurrentValue) + ")";
+                                        if (csXfer.csOpen(ContentName, Criteria, SortFieldList, false, 0, SelectFields)) {
+                                            RowsArray = csXfer.csGetRows();
+                                            RowFieldArray = csXfer.csGetSelectFieldList().Split(',');
+                                            RowMax = RowsArray.GetUpperBound(1);
+                                            ColumnMax = RowsArray.GetUpperBound(0);
+                                            RecordID = GenericController.encodeInteger(RowsArray[IDFieldPointer, 0]);
+                                            Copy = DropDownPreField;
+                                            for (var FieldPointer = 0; FieldPointer < DropDownFieldCount; FieldPointer++) {
+                                                Copy += RowsArray[DropDownFieldPointer[FieldPointer], 0] + DropDownDelimiter[FieldPointer];
+                                            }
+                                            if (string.IsNullOrEmpty(Copy)) {
+                                                Copy = "no name";
+                                            }
+                                            FastString.Add("\r\n<option value=\"" + RecordID + "\" selected");
+                                            SelectedFound = true;
+                                            if (core.siteProperties.selectFieldWidthLimit != 0) {
+                                                if (Copy.Length > core.siteProperties.selectFieldWidthLimit) {
+                                                    Copy = Copy.Left(core.siteProperties.selectFieldWidthLimit) + "...+";
+                                                }
+                                            }
+                                            FastString.Add(">" + HtmlController.encodeHtml(Copy) + "</option>");
+                                        }
+                                    }
                                 }
                             }
                             FastString.Add("</select>");
-                            csXfer.csClose();
                             SelectRaw = FastString.Text;
                         }
                     }
@@ -456,11 +452,12 @@ namespace Contensive.Processor.Controllers {
                         + " inner join ccMembers P on R.MemberID=P.ID"
                         + " where (P.active<>0)"
                         + " and (R.GroupID=" + GroupID + ")";
-                    csXfer.csOpenSql(SQL);
-                    if (csXfer.csOk()) {
-                        RowMax = RowMax + csXfer.csGetInteger( "cnt");
+                    using (var csXfer = new CsModel(core)) {
+                        csXfer.csOpenSql(SQL);
+                        if (csXfer.csOk()) {
+                            RowMax = RowMax + csXfer.csGetInteger("cnt");
+                        }
                     }
-                    csXfer.csClose();
                     if (RowMax > core.siteProperties.selectFieldLimit) {
                         //
                         // Selection is too big
@@ -468,11 +465,11 @@ namespace Contensive.Processor.Controllers {
                         LogController.handleError( core,new Exception("While building a group members list for group [" + GroupController.getGroupName(core, GroupID) + "], too many rows were selected. [" + RowMax + "] records exceeds [" + core.siteProperties.selectFieldLimit + "], the current Site Property app.SiteProperty_SelectFieldLimit."));
                         result += inputHidden(MenuNameFPO, currentValue);
                         if (currentValue != 0) {
-                            CSPointer = csXfer.csOpenRecord("people", currentValue);
-                            if (csXfer.csOk()) {
-                                result = csXfer.csGetText(CSPointer, "name") + "&nbsp;";
+                            using (var csXfer = new CsModel(core)) {
+                                if (csXfer.csOpenRecord("people", currentValue)) {
+                                    result = csXfer.csGetText("name") + "&nbsp;";
+                                }
                             }
-                            csXfer.csClose();
                         }
                         result += "(Selection is too large to display)";
                     } else {
@@ -570,71 +567,71 @@ namespace Contensive.Processor.Controllers {
                             if (string.IsNullOrEmpty(SortFieldList)) {
                                 SortFieldList = "name";
                             }
-                            SQL = "select " + SelectFields + " from ccMemberRules R"
-                                + " inner join ccMembers P on R.MemberID=P.ID"
-                                + " where (R.GroupID=" + GroupID + ")"
-                                + " and((R.DateExpires is null)or(R.DateExpires>" + DbController.encodeSQLDate(DateTime.Now) + "))"
-                                + " and(P.active<>0)"
-                                + " order by P." + SortFieldList;
-                            CSPointer = csXfer.csOpenSql(SQL);
-                            if (csXfer.csOk()) {
-                                string[,] RowsArray = csXfer.csGetRows(CSPointer);
-                                string[] RowFieldArray = csXfer.csGetSelectFieldList(CSPointer).Split(',');
-                                RowMax = RowsArray.GetUpperBound(1);
-                                int ColumnMax = RowsArray.GetUpperBound(0);
-                                //
-                                // setup IDFieldPointer
-                                //
-                                string UcaseFieldName = "ID";
-                                int IDFieldPointer = 0;
-                                for (int ColumnPointer = 0; ColumnPointer <= ColumnMax; ColumnPointer++) {
-                                    if (UcaseFieldName == GenericController.vbUCase(RowFieldArray[ColumnPointer])) {
-                                        IDFieldPointer = ColumnPointer;
-                                        break;
-                                    }
-                                }
-                                //
-                                // setup DropDownFieldPointer()
-                                //
-                                for (var FieldPointer = 0; FieldPointer < DropDownFieldCount; FieldPointer++) {
-                                    UcaseFieldName = GenericController.vbUCase(DropDownFieldName[FieldPointer]);
+                            using (var csXfer = new CsModel(core)) {
+                                SQL = "select " + SelectFields + " from ccMemberRules R"
+                                    + " inner join ccMembers P on R.MemberID=P.ID"
+                                    + " where (R.GroupID=" + GroupID + ")"
+                                    + " and((R.DateExpires is null)or(R.DateExpires>" + DbController.encodeSQLDate(DateTime.Now) + "))"
+                                    + " and(P.active<>0)"
+                                    + " order by P." + SortFieldList;
+                                if (csXfer.csOpenSql(SQL)) {
+                                    string[,] RowsArray = csXfer.csGetRows();
+                                    string[] RowFieldArray = csXfer.csGetSelectFieldList().Split(',');
+                                    RowMax = RowsArray.GetUpperBound(1);
+                                    int ColumnMax = RowsArray.GetUpperBound(0);
+                                    //
+                                    // setup IDFieldPointer
+                                    //
+                                    string UcaseFieldName = "ID";
+                                    int IDFieldPointer = 0;
                                     for (int ColumnPointer = 0; ColumnPointer <= ColumnMax; ColumnPointer++) {
                                         if (UcaseFieldName == GenericController.vbUCase(RowFieldArray[ColumnPointer])) {
-                                            DropDownFieldPointer[FieldPointer] = ColumnPointer;
+                                            IDFieldPointer = ColumnPointer;
                                             break;
                                         }
                                     }
-                                }
-                                //
-                                // output select
-                                //
-                                int LastRecordID = -1;
-                                for (int RowPointer = 0; RowPointer <= RowMax; RowPointer++) {
-                                    int RecordID = GenericController.encodeInteger(RowsArray[IDFieldPointer, RowPointer]);
-                                    if (RecordID != LastRecordID) {
-                                        string Copy = DropDownPreField;
-                                        for (var FieldPointer = 0; FieldPointer < DropDownFieldCount; FieldPointer++) {
-                                            Copy += RowsArray[DropDownFieldPointer[FieldPointer], RowPointer] + DropDownDelimiter[FieldPointer];
-                                        }
-                                        if (string.IsNullOrEmpty(Copy)) {
-                                            Copy = "no name";
-                                        }
-                                        FastString.Add("\r\n<option value=\"" + RecordID + "\" ");
-                                        if (RecordID == currentValue) {
-                                            FastString.Add("selected");
-                                        }
-                                        if (core.siteProperties.selectFieldWidthLimit != 0) {
-                                            if (Copy.Length > core.siteProperties.selectFieldWidthLimit) {
-                                                Copy = Copy.Left(core.siteProperties.selectFieldWidthLimit) + "...+";
+                                    //
+                                    // setup DropDownFieldPointer()
+                                    //
+                                    for (var FieldPointer = 0; FieldPointer < DropDownFieldCount; FieldPointer++) {
+                                        UcaseFieldName = GenericController.vbUCase(DropDownFieldName[FieldPointer]);
+                                        for (int ColumnPointer = 0; ColumnPointer <= ColumnMax; ColumnPointer++) {
+                                            if (UcaseFieldName == GenericController.vbUCase(RowFieldArray[ColumnPointer])) {
+                                                DropDownFieldPointer[FieldPointer] = ColumnPointer;
+                                                break;
                                             }
                                         }
-                                        FastString.Add(">" + Copy + "</option>");
-                                        LastRecordID = RecordID;
+                                    }
+                                    //
+                                    // output select
+                                    //
+                                    int LastRecordID = -1;
+                                    for (int RowPointer = 0; RowPointer <= RowMax; RowPointer++) {
+                                        int RecordID = GenericController.encodeInteger(RowsArray[IDFieldPointer, RowPointer]);
+                                        if (RecordID != LastRecordID) {
+                                            string Copy = DropDownPreField;
+                                            for (var FieldPointer = 0; FieldPointer < DropDownFieldCount; FieldPointer++) {
+                                                Copy += RowsArray[DropDownFieldPointer[FieldPointer], RowPointer] + DropDownDelimiter[FieldPointer];
+                                            }
+                                            if (string.IsNullOrEmpty(Copy)) {
+                                                Copy = "no name";
+                                            }
+                                            FastString.Add("\r\n<option value=\"" + RecordID + "\" ");
+                                            if (RecordID == currentValue) {
+                                                FastString.Add("selected");
+                                            }
+                                            if (core.siteProperties.selectFieldWidthLimit != 0) {
+                                                if (Copy.Length > core.siteProperties.selectFieldWidthLimit) {
+                                                    Copy = Copy.Left(core.siteProperties.selectFieldWidthLimit) + "...+";
+                                                }
+                                            }
+                                            FastString.Add(">" + Copy + "</option>");
+                                            LastRecordID = RecordID;
+                                        }
                                     }
                                 }
                             }
                             FastString.Add("</select>");
-                            csXfer.csClose();
                             SelectRaw = FastString.Text;
                         }
                     }
@@ -1486,29 +1483,28 @@ namespace Contensive.Processor.Controllers {
                         //
                         // Watch Lists
                         //
-                        int CSLists = csXfer.csOpen("Content Watch Lists", "", "Name,ID", false, 0, false, false, "Name,ID", 20, 1);
-                        if (csXfer.csOk(CSLists)) {
-                            while (csXfer.csOk(CSLists)) {
-                                string FieldName = encodeText(csXfer.csGetText(CSLists, "name")).Trim(' ');
-                                if (!string.IsNullOrEmpty(FieldName)) {
-                                    string FieldCaption = "Watch List [" + FieldName + "]";
-                                    IconIDControlString = "AC,WATCHLIST,0," + FieldName + ",ListName=" + FieldName + "&SortField=[DateAdded|Link|LinkLabel|Clicks|WhatsNewDateExpires]&SortDirection=Z-A[A-Z|Z-A]";
-                                    IconImg = AddonController.getAddonIconImg("/" + core.appConfig.adminRoute, 0, 0, 0, true, IconIDControlString, "", core.appConfig.cdnFileUrl, FieldCaption, "Rendered as the " + FieldCaption, "", 0);
-                                    IconImg = GenericController.EncodeJavascriptStringSingleQuote(IconImg);
-                                    FieldCaption = GenericController.EncodeJavascriptStringSingleQuote(FieldCaption);
-                                    Items[ItemsCnt] = "['" + FieldCaption + "','" + IconImg + "']";
-                                    //Items(ItemsCnt) = "['" & FieldCaption & "','<img onDblClick=""window.parent.OpenAddonPropertyWindow(this);"" alt=""Add-on"" title=""Rendered as the " & FieldCaption & """ id=""AC,WATCHLIST,0," & FieldName & ",ListName=" & FieldName & "&SortField=[DateAdded|Link|LinkLabel|Clicks|WhatsNewDateExpires]&SortDirection=Z-A[A-Z|Z-A]"" src=""/ContensiveBase/images/ACWatchList.GIF"">']"
-                                    Index.setPtr(FieldCaption, ItemsCnt);
-                                    ItemsCnt += 1;
-                                    if (ItemsCnt >= ItemsSize) {
-                                        ItemsSize = ItemsSize + 100;
-                                        Array.Resize(ref Items, ItemsSize + 1);
+                        using (var csXfer = new CsModel(core)) {
+                            if (csXfer.csOpen("Content Watch Lists", "", "Name,ID", false, 0, "Name,ID", 20, 1)) {
+                                while (csXfer.csOk()) {
+                                    string FieldName = encodeText(csXfer.csGetText("name")).Trim(' ');
+                                    if (!string.IsNullOrEmpty(FieldName)) {
+                                        string FieldCaption = "Watch List [" + FieldName + "]";
+                                        IconIDControlString = "AC,WATCHLIST,0," + FieldName + ",ListName=" + FieldName + "&SortField=[DateAdded|Link|LinkLabel|Clicks|WhatsNewDateExpires]&SortDirection=Z-A[A-Z|Z-A]";
+                                        IconImg = AddonController.getAddonIconImg("/" + core.appConfig.adminRoute, 0, 0, 0, true, IconIDControlString, "", core.appConfig.cdnFileUrl, FieldCaption, "Rendered as the " + FieldCaption, "", 0);
+                                        IconImg = GenericController.EncodeJavascriptStringSingleQuote(IconImg);
+                                        FieldCaption = GenericController.EncodeJavascriptStringSingleQuote(FieldCaption);
+                                        Items[ItemsCnt] = "['" + FieldCaption + "','" + IconImg + "']";
+                                        Index.setPtr(FieldCaption, ItemsCnt);
+                                        ItemsCnt += 1;
+                                        if (ItemsCnt >= ItemsSize) {
+                                            ItemsSize = ItemsSize + 100;
+                                            Array.Resize(ref Items, ItemsSize + 1);
+                                        }
                                     }
+                                    csXfer.csGoNext();
                                 }
-                                csXfer.csGoNext(CSLists);
                             }
                         }
-                        csXfer.csClose(ref CSLists);
                     }
                     //
                     // -- addons
@@ -1531,68 +1527,55 @@ namespace Contensive.Processor.Controllers {
                     }
                     string AddonContentName = Models.Db.AddonModel.contentName;
                     string SelectList = "Name,Link,ID,ArgumentList,ObjectProgramID,IconFilename,IconWidth,IconHeight,IconSprites,IsInline,ccguid";
-                    int CSAddons = csXfer.csOpen(AddonContentName, Criteria, "Name,ID", false, 0, false, false, SelectList);
-                    if (csXfer.csOk(CSAddons)) {
-                        string LastAddonName = "";
-                        while (csXfer.csOk(CSAddons)) {
-                            string addonGuid = csXfer.csGetText(CSAddons, "ccguid");
-                            string ObjectProgramID2 = csXfer.csGetText(CSAddons, "ObjectProgramID");
-                            if ((contentType == CPHtmlBaseClass.EditorContentType.contentTypeEmail) && (!string.IsNullOrEmpty(ObjectProgramID2))) {
-                                //
-                                // Block activex addons from email
-                                //
-                                //ObjectProgramID2 = ObjectProgramID2;
-                            } else {
-                                string addonName = encodeText(csXfer.csGet(CSAddons, "name")).Trim(' ');
-                                if (!string.IsNullOrEmpty(addonName) && (addonName != LastAddonName)) {
+                    using (var csXfer = new CsModel(core)) {
+                        if (csXfer.csOpen(AddonContentName, Criteria, "Name,ID", false, 0, SelectList)) {
+                            string LastAddonName = "";
+                            while (csXfer.csOk()) {
+                                string addonGuid = csXfer.csGetText("ccguid");
+                                string ObjectProgramID2 = csXfer.csGetText("ObjectProgramID");
+                                if ((contentType == CPHtmlBaseClass.EditorContentType.contentTypeEmail) && (!string.IsNullOrEmpty(ObjectProgramID2))) {
                                     //
-                                    // Icon (fieldtyperesourcelink)
+                                    // Block activex addons from email
                                     //
-                                    bool IsInline = csXfer.csGetBoolean(CSAddons, "IsInline");
-                                    string IconFilename = csXfer.csGet(CSAddons, "Iconfilename");
-                                    int IconWidth = 0;
-                                    int IconHeight = 0;
-                                    int IconSprites = 0;
-                                    if (!string.IsNullOrEmpty(IconFilename)) {
-                                        IconWidth = csXfer.csGetInteger(CSAddons, "IconWidth");
-                                        IconHeight = csXfer.csGetInteger(CSAddons, "IconHeight");
-                                        IconSprites = csXfer.csGetInteger(CSAddons, "IconSprites");
-                                    }
-                                    //
-                                    // Calculate DefaultAddonOption_String
-                                    //
-                                    string ArgumentList = csXfer.csGet(CSAddons, "ArgumentList").Trim(' ');
-                                    string defaultAddonOptions = AddonController.getDefaultAddonOptions(core, ArgumentList, addonGuid, IsInline);
-                                    defaultAddonOptions = encodeHtml(defaultAddonOptions);
-                                    //UseAjaxDefaultAddonOptions = false;
-                                    //if (UseAjaxDefaultAddonOptions) {
-                                    //    DefaultAddonOption_String = "";
-                                    //} else {
-                                    //    ArgumentList = encodeText(csXfer.csGet(CSAddons, "ArgumentList")).Trim(' ');
-                                    //    DefaultAddonOption_String = addonController.getDefaultAddonOption(core, ArgumentList, AddonGuid, IsInline);
-                                    //    DefaultAddonOption_String = encodeHTML(DefaultAddonOption_String);
-                                    //}
-                                    //
-                                    // Changes necessary to support commas in AddonName and OptionString
-                                    //   Remove commas in Field Name
-                                    //   Then in Javascript, when spliting on comma, anything past position 4, put back onto 4
-                                    //
-                                    LastAddonName = addonName;
-                                    IconIDControlString = "AC,AGGREGATEFUNCTION,0," + addonName + "," + defaultAddonOptions + "," + addonGuid;
-                                    IconImg = AddonController.getAddonIconImg("/" + core.appConfig.adminRoute, IconWidth, IconHeight, IconSprites, IsInline, IconIDControlString, IconFilename, core.appConfig.cdnFileUrl, addonName, "Rendered as the Add-on [" + addonName + "]", "", 0);
-                                    Items[ItemsCnt] = "['" + GenericController.EncodeJavascriptStringSingleQuote(addonName) + "','" + GenericController.EncodeJavascriptStringSingleQuote(IconImg) + "']";
-                                    Index.setPtr(addonName, ItemsCnt);
-                                    ItemsCnt += 1;
-                                    if (ItemsCnt >= ItemsSize) {
-                                        ItemsSize = ItemsSize + 100;
-                                        Array.Resize(ref Items, ItemsSize + 1);
+                                    //ObjectProgramID2 = ObjectProgramID2;
+                                } else {
+                                    string addonName = encodeText(csXfer.csGet("name")).Trim(' ');
+                                    if (!string.IsNullOrEmpty(addonName) && (addonName != LastAddonName)) {
+                                        //
+                                        // Icon (fieldtyperesourcelink)
+                                        //
+                                        bool IsInline = csXfer.csGetBoolean("IsInline");
+                                        string IconFilename = csXfer.csGet("Iconfilename");
+                                        int IconWidth = 0;
+                                        int IconHeight = 0;
+                                        int IconSprites = 0;
+                                        if (!string.IsNullOrEmpty(IconFilename)) {
+                                            IconWidth = csXfer.csGetInteger("IconWidth");
+                                            IconHeight = csXfer.csGetInteger("IconHeight");
+                                            IconSprites = csXfer.csGetInteger("IconSprites");
+                                        }
+                                        //
+                                        // Calculate DefaultAddonOption_String
+                                        //
+                                        string ArgumentList = csXfer.csGet("ArgumentList").Trim(' ');
+                                        string defaultAddonOptions = AddonController.getDefaultAddonOptions(core, ArgumentList, addonGuid, IsInline);
+                                        defaultAddonOptions = encodeHtml(defaultAddonOptions);
+                                        LastAddonName = addonName;
+                                        IconIDControlString = "AC,AGGREGATEFUNCTION,0," + addonName + "," + defaultAddonOptions + "," + addonGuid;
+                                        IconImg = AddonController.getAddonIconImg("/" + core.appConfig.adminRoute, IconWidth, IconHeight, IconSprites, IsInline, IconIDControlString, IconFilename, core.appConfig.cdnFileUrl, addonName, "Rendered as the Add-on [" + addonName + "]", "", 0);
+                                        Items[ItemsCnt] = "['" + GenericController.EncodeJavascriptStringSingleQuote(addonName) + "','" + GenericController.EncodeJavascriptStringSingleQuote(IconImg) + "']";
+                                        Index.setPtr(addonName, ItemsCnt);
+                                        ItemsCnt += 1;
+                                        if (ItemsCnt >= ItemsSize) {
+                                            ItemsSize = ItemsSize + 100;
+                                            Array.Resize(ref Items, ItemsSize + 1);
+                                        }
                                     }
                                 }
+                                csXfer.csGoNext();
                             }
-                            csXfer.csGoNext(CSAddons);
                         }
                     }
-                    csXfer.csClose(ref CSAddons);
                     //
                     // Build output sting in alphabetical order by name
                     //
@@ -1778,41 +1761,41 @@ namespace Contensive.Processor.Controllers {
                                     }
                                 }
                             }
-                            int CS = -1;
-                            if (IsContentList) {
-                                //
-                                // ContentList - Open the Content and build the options from the names
-                                csXfer.csOpen(ContentName, ContentCriteria, "name", true, 0, false, false, "ID,Name");
-                            } else if (IsListField) {
-                                //
-                                //
-                                // ListField
-                                int CID = Models.Domain.MetaModel.getContentId(core, ContentName);
-                                csXfer.csOpen("Content Fields", "Contentid=" + CID, "name", true, 0, false, false, "ID,Name");
-                            }
-
-                            if (csXfer.csOk()) {
-                                object[,] Cell = csXfer.csGetRows(CS);
-                                int RowCnt = Cell.GetUpperBound(1) + 1;
-                                int RowPtr = 0;
-                                for (RowPtr = 0; RowPtr < RowCnt; RowPtr++) {
+                            using (var csXfer = new CsModel(core)) {
+                                if (IsContentList) {
                                     //
-                                    string RecordName = GenericController.encodeText(Cell[1, RowPtr]);
-                                    RecordName = GenericController.vbReplace(RecordName, "\r\n", " ");
-                                    int RecordID = GenericController.encodeInteger(Cell[0, RowPtr]);
-                                    if (string.IsNullOrEmpty(RecordName)) {
-                                        RecordName = "record " + RecordID;
-                                    } else if (RecordName.Length > 50) {
-                                        RecordName = RecordName.Left(50) + "...";
-                                    }
-                                    RecordName = GenericController.encodeNvaArgument(RecordName);
-                                    list = list + "|" + RecordName;
-                                    if (IncludeID) {
-                                        list = list + ":" + RecordID;
+                                    // ContentList - Open the Content and build the options from the names
+                                    csXfer.csOpen(ContentName, ContentCriteria, "name", true, 0, "ID,Name");
+                                } else if (IsListField) {
+                                    //
+                                    //
+                                    // ListField
+                                    int CID = Models.Domain.MetaModel.getContentId(core, ContentName);
+                                    csXfer.csOpen("Content Fields", "Contentid=" + CID, "name", true, 0, "ID,Name");
+                                }
+
+                                if (csXfer.csOk()) {
+                                    object[,] Cell = csXfer.csGetRows();
+                                    int RowCnt = Cell.GetUpperBound(1) + 1;
+                                    int RowPtr = 0;
+                                    for (RowPtr = 0; RowPtr < RowCnt; RowPtr++) {
+                                        //
+                                        string RecordName = GenericController.encodeText(Cell[1, RowPtr]);
+                                        RecordName = GenericController.vbReplace(RecordName, "\r\n", " ");
+                                        int RecordID = GenericController.encodeInteger(Cell[0, RowPtr]);
+                                        if (string.IsNullOrEmpty(RecordName)) {
+                                            RecordName = "record " + RecordID;
+                                        } else if (RecordName.Length > 50) {
+                                            RecordName = RecordName.Left(50) + "...";
+                                        }
+                                        RecordName = GenericController.encodeNvaArgument(RecordName);
+                                        list = list + "|" + RecordName;
+                                        if (IncludeID) {
+                                            list = list + ":" + RecordID;
+                                        }
                                     }
                                 }
                             }
-                            csXfer.csClose();
                         } else {
                             //
                             // choice is not a function, just add the choice back to the list
@@ -1966,7 +1949,6 @@ namespace Contensive.Processor.Controllers {
             int PosNameStart = 0;
             int PosNameEnd = 0;
             string AddonName = null;
-            //Dim CSAddon As Integer
             int OptionPtr = 0;
             string ArgValueAddonEncoded = null;
             int OptionCnt = 0;
@@ -1984,7 +1966,6 @@ namespace Contensive.Processor.Controllers {
             string FieldName = null;
             string ACInstanceID = null;
             string ContentName = null;
-            int CS = 0;
             int PosACInstanceID = 0;
             int PosStart = 0;
             int PosIDStart = 0;
@@ -2138,157 +2119,157 @@ namespace Contensive.Processor.Controllers {
                 //
                 // ----- Normal Content Edit - find instance in the content
                 //
-                csXfer.csOpenRecord(ContentName, RecordID);
-                if (!csXfer.csOk()) {
-                    LogController.handleError( core,new Exception("No record found with content [" + ContentName + "] and RecordID [" + RecordID + "]"));
-                } else {
-                    if (!string.IsNullOrEmpty(FieldName)) {
-                        //
-                        // Field is given, find the position
-                        //
-                        Copy = csXfer.csGet(CS, FieldName);
-                        PosACInstanceID = GenericController.vbInstr(1, Copy, "=\"" + ACInstanceID + "\" ", 1);
+                using (var csXfer = new CsModel(core)) {
+                    if (!csXfer.csOpenRecord(ContentName, RecordID)) {
+                        LogController.handleError(core, new Exception("No record found with content [" + ContentName + "] and RecordID [" + RecordID + "]"));
                     } else {
-                        //
-                        // Find the field, then find the position
-                        //
-                        FieldName = csXfer.csGetFirstFieldName(CS);
-                        while (!string.IsNullOrEmpty(FieldName)) {
-                            fieldType = csXfer.csGetFieldTypeId(CS, FieldName);
-                            switch (fieldType) {
-                                case _fieldTypeIdLongText:
-                                case _fieldTypeIdText:
-                                case _fieldTypeIdFileText:
-                                case _fieldTypeIdFileCSS:
-                                case _fieldTypeIdFileXML:
-                                case _fieldTypeIdFileJavascript:
-                                case _fieldTypeIdHTML:
-                                case _fieldTypeIdFileHTML:
-                                    Copy = csXfer.csGet(CS, FieldName);
-                                    PosACInstanceID = GenericController.vbInstr(1, Copy, "ACInstanceID=\"" + ACInstanceID + "\"", 1);
-                                    if (PosACInstanceID != 0) {
-                                        //
-                                        // found the instance
-                                        //
-                                        PosACInstanceID = PosACInstanceID + 13;
-                                        //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
-                                        //ORIGINAL LINE: Exit Do
-                                        goto ExitLabel1;
-                                    }
-                                    break;
+                        if (!string.IsNullOrEmpty(FieldName)) {
+                            //
+                            // Field is given, find the position
+                            //
+                            Copy = csXfer.csGet(FieldName);
+                            PosACInstanceID = GenericController.vbInstr(1, Copy, "=\"" + ACInstanceID + "\" ", 1);
+                        } else {
+                            //
+                            // Find the field, then find the position
+                            //
+                            FieldName = csXfer.csGetFirstFieldName();
+                            while (!string.IsNullOrEmpty(FieldName)) {
+                                fieldType = csXfer.csGetFieldTypeId(CS, FieldName);
+                                switch (fieldType) {
+                                    case _fieldTypeIdLongText:
+                                    case _fieldTypeIdText:
+                                    case _fieldTypeIdFileText:
+                                    case _fieldTypeIdFileCSS:
+                                    case _fieldTypeIdFileXML:
+                                    case _fieldTypeIdFileJavascript:
+                                    case _fieldTypeIdHTML:
+                                    case _fieldTypeIdFileHTML:
+                                        Copy = csXfer.csGet(CS, FieldName);
+                                        PosACInstanceID = GenericController.vbInstr(1, Copy, "ACInstanceID=\"" + ACInstanceID + "\"", 1);
+                                        if (PosACInstanceID != 0) {
+                                            //
+                                            // found the instance
+                                            //
+                                            PosACInstanceID = PosACInstanceID + 13;
+                                            //todo  WARNING: Exit statements not matching the immediately enclosing block are converted using a 'goto' statement:
+                                            //ORIGINAL LINE: Exit Do
+                                            goto ExitLabel1;
+                                        }
+                                        break;
+                                }
+                                FieldName = csXfer.csGetNextFieldName(CS);
                             }
-                            FieldName = csXfer.csGetNextFieldName(CS);
+                            ExitLabel1:;
                         }
-                        ExitLabel1:;
-                    }
-                    //
-                    // Parse out the Addon Name
-                    //
-                    if (PosACInstanceID == 0) {
-                        LogController.handleError( core,new Exception("AC Instance [" + ACInstanceID + "] not found in record with content [" + ContentName + "] and RecordID [" + RecordID + "]"));
-                    } else {
-                        Copy = ActiveContentController.optimizeLibraryFileImagesInHtmlContent(core, Copy);
-                        ParseOK = false;
-                        PosStart = Copy.LastIndexOf("<ac ", PosACInstanceID - 1, System.StringComparison.OrdinalIgnoreCase) + 1;
-                        if (PosStart != 0) {
-                            //
-                            // main_Get Addon Name to lookup Addon and main_Get most recent Argument List
-                            //
-                            PosNameStart = GenericController.vbInstr(PosStart, Copy, " name=", 1);
-                            if (PosNameStart != 0) {
-                                PosNameStart = PosNameStart + 7;
-                                PosNameEnd = GenericController.vbInstr(PosNameStart, Copy, "\"");
-                                if (PosNameEnd != 0) {
-                                    AddonName = Copy.Substring(PosNameStart - 1, PosNameEnd - PosNameStart);
-                                    //????? test this
-                                    FoundAddon = false;
-                                    AddonModel embeddedAddon = core.addonCache.getAddonByName(AddonName);
-                                    if (embeddedAddon != null) {
-                                        FoundAddon = true;
-                                        AddonOptionConstructor = GenericController.encodeText(embeddedAddon.argumentList);
-                                        AddonOptionConstructor = GenericController.vbReplace(AddonOptionConstructor, "\r\n", "\r");
-                                        AddonOptionConstructor = GenericController.vbReplace(AddonOptionConstructor, "\n", "\r");
-                                        AddonOptionConstructor = GenericController.vbReplace(AddonOptionConstructor, "\r", "\r\n");
-                                        if (!string.IsNullOrEmpty(AddonOptionConstructor)) {
-                                            AddonOptionConstructor = AddonOptionConstructor + "\r\n";
-                                        }
-                                        if (GenericController.encodeBoolean(embeddedAddon.isInline)) {
-                                            AddonOptionConstructor = AddonOptionConstructor + AddonOptionConstructor_Inline;
+                        //
+                        // Parse out the Addon Name
+                        //
+                        if (PosACInstanceID == 0) {
+                            LogController.handleError(core, new Exception("AC Instance [" + ACInstanceID + "] not found in record with content [" + ContentName + "] and RecordID [" + RecordID + "]"));
+                        } else {
+                            Copy = ActiveContentController.optimizeLibraryFileImagesInHtmlContent(core, Copy);
+                            ParseOK = false;
+                            PosStart = Copy.LastIndexOf("<ac ", PosACInstanceID - 1, System.StringComparison.OrdinalIgnoreCase) + 1;
+                            if (PosStart != 0) {
+                                //
+                                // main_Get Addon Name to lookup Addon and main_Get most recent Argument List
+                                //
+                                PosNameStart = GenericController.vbInstr(PosStart, Copy, " name=", 1);
+                                if (PosNameStart != 0) {
+                                    PosNameStart = PosNameStart + 7;
+                                    PosNameEnd = GenericController.vbInstr(PosNameStart, Copy, "\"");
+                                    if (PosNameEnd != 0) {
+                                        AddonName = Copy.Substring(PosNameStart - 1, PosNameEnd - PosNameStart);
+                                        //????? test this
+                                        FoundAddon = false;
+                                        AddonModel embeddedAddon = core.addonCache.getAddonByName(AddonName);
+                                        if (embeddedAddon != null) {
+                                            FoundAddon = true;
+                                            AddonOptionConstructor = GenericController.encodeText(embeddedAddon.argumentList);
+                                            AddonOptionConstructor = GenericController.vbReplace(AddonOptionConstructor, "\r\n", "\r");
+                                            AddonOptionConstructor = GenericController.vbReplace(AddonOptionConstructor, "\n", "\r");
+                                            AddonOptionConstructor = GenericController.vbReplace(AddonOptionConstructor, "\r", "\r\n");
+                                            if (!string.IsNullOrEmpty(AddonOptionConstructor)) {
+                                                AddonOptionConstructor = AddonOptionConstructor + "\r\n";
+                                            }
+                                            if (GenericController.encodeBoolean(embeddedAddon.isInline)) {
+                                                AddonOptionConstructor = AddonOptionConstructor + AddonOptionConstructor_Inline;
+                                            } else {
+                                                AddonOptionConstructor = AddonOptionConstructor + AddonOptionConstructor_Block;
+                                            }
                                         } else {
-                                            AddonOptionConstructor = AddonOptionConstructor + AddonOptionConstructor_Block;
-                                        }
-                                    } else {
-                                        //
-                                        // -- Hardcoded Addons
-                                        switch (GenericController.vbLCase(AddonName)) {
-                                            case "block text":
-                                                FoundAddon = true;
-                                                AddonOptionConstructor = AddonOptionConstructor_ForBlockText;
-                                                break;
-                                            case "":
-                                                break;
-                                        }
-                                    }
-                                    if (FoundAddon) {
-                                        ConstructorSplit = GenericController.stringSplit(AddonOptionConstructor, "\r\n");
-                                        addonOption_String = "";
-                                        //
-                                        // main_Get all responses from current Argument List
-                                        //
-                                        for (Ptr = 0; Ptr <= ConstructorSplit.GetUpperBound(0); Ptr++) {
-                                            constructor = ConstructorSplit[Ptr];
-                                            if (!string.IsNullOrEmpty(constructor)) {
-                                                Arg = constructor.Split('=');
-                                                ArgName = Arg[0];
-                                                OptionCnt = core.docProperties.getInteger(ArgName + "CheckBoxCnt");
-                                                if (OptionCnt > 0) {
-                                                    ArgValueAddonEncoded = "";
-                                                    for (OptionPtr = 0; OptionPtr < OptionCnt; OptionPtr++) {
-                                                        ArgValue = core.docProperties.getText(ArgName + OptionPtr);
-                                                        if (!string.IsNullOrEmpty(ArgValue)) {
-                                                            ArgValueAddonEncoded = ArgValueAddonEncoded + "," + GenericController.encodeNvaArgument(ArgValue);
-                                                        }
-                                                    }
-                                                    if (!string.IsNullOrEmpty(ArgValueAddonEncoded)) {
-                                                        ArgValueAddonEncoded = ArgValueAddonEncoded.Substring(1);
-                                                    }
-                                                } else {
-                                                    ArgValue = core.docProperties.getText(ArgName);
-                                                    ArgValueAddonEncoded = GenericController.encodeNvaArgument(ArgValue);
-                                                }
-
-                                                addonOption_String = addonOption_String + "&" + GenericController.encodeNvaArgument(ArgName) + "=" + ArgValueAddonEncoded;
+                                            //
+                                            // -- Hardcoded Addons
+                                            switch (GenericController.vbLCase(AddonName)) {
+                                                case "block text":
+                                                    FoundAddon = true;
+                                                    AddonOptionConstructor = AddonOptionConstructor_ForBlockText;
+                                                    break;
+                                                case "":
+                                                    break;
                                             }
                                         }
-                                        if (!string.IsNullOrEmpty(addonOption_String)) {
-                                            addonOption_String = addonOption_String.Substring(1);
+                                        if (FoundAddon) {
+                                            ConstructorSplit = GenericController.stringSplit(AddonOptionConstructor, "\r\n");
+                                            addonOption_String = "";
+                                            //
+                                            // main_Get all responses from current Argument List
+                                            //
+                                            for (Ptr = 0; Ptr <= ConstructorSplit.GetUpperBound(0); Ptr++) {
+                                                constructor = ConstructorSplit[Ptr];
+                                                if (!string.IsNullOrEmpty(constructor)) {
+                                                    Arg = constructor.Split('=');
+                                                    ArgName = Arg[0];
+                                                    OptionCnt = core.docProperties.getInteger(ArgName + "CheckBoxCnt");
+                                                    if (OptionCnt > 0) {
+                                                        ArgValueAddonEncoded = "";
+                                                        for (OptionPtr = 0; OptionPtr < OptionCnt; OptionPtr++) {
+                                                            ArgValue = core.docProperties.getText(ArgName + OptionPtr);
+                                                            if (!string.IsNullOrEmpty(ArgValue)) {
+                                                                ArgValueAddonEncoded = ArgValueAddonEncoded + "," + GenericController.encodeNvaArgument(ArgValue);
+                                                            }
+                                                        }
+                                                        if (!string.IsNullOrEmpty(ArgValueAddonEncoded)) {
+                                                            ArgValueAddonEncoded = ArgValueAddonEncoded.Substring(1);
+                                                        }
+                                                    } else {
+                                                        ArgValue = core.docProperties.getText(ArgName);
+                                                        ArgValueAddonEncoded = GenericController.encodeNvaArgument(ArgValue);
+                                                    }
+
+                                                    addonOption_String = addonOption_String + "&" + GenericController.encodeNvaArgument(ArgName) + "=" + ArgValueAddonEncoded;
+                                                }
+                                            }
+                                            if (!string.IsNullOrEmpty(addonOption_String)) {
+                                                addonOption_String = addonOption_String.Substring(1);
+                                            }
+                                        }
+                                    }
+                                }
+                                //
+                                // Replace the new querystring into the AC tag in the content
+                                //
+                                PosIDStart = GenericController.vbInstr(PosStart, Copy, " querystring=", 1);
+                                if (PosIDStart != 0) {
+                                    PosIDStart = PosIDStart + 14;
+                                    if (PosIDStart != 0) {
+                                        PosIDEnd = GenericController.vbInstr(PosIDStart, Copy, "\"");
+                                        if (PosIDEnd != 0) {
+                                            ParseOK = true;
+                                            Copy = Copy.Left(PosIDStart - 1) + HtmlController.encodeHtml(addonOption_String) + Copy.Substring(PosIDEnd - 1);
+                                            csXfer.csSet(CS, FieldName, Copy);
+                                            needToClearCache = true;
                                         }
                                     }
                                 }
                             }
-                            //
-                            // Replace the new querystring into the AC tag in the content
-                            //
-                            PosIDStart = GenericController.vbInstr(PosStart, Copy, " querystring=", 1);
-                            if (PosIDStart != 0) {
-                                PosIDStart = PosIDStart + 14;
-                                if (PosIDStart != 0) {
-                                    PosIDEnd = GenericController.vbInstr(PosIDStart, Copy, "\"");
-                                    if (PosIDEnd != 0) {
-                                        ParseOK = true;
-                                        Copy = Copy.Left(PosIDStart - 1) + HtmlController.encodeHtml(addonOption_String) + Copy.Substring(PosIDEnd - 1);
-                                        csXfer.csSet(CS, FieldName, Copy);
-                                        needToClearCache = true;
-                                    }
-                                }
+                            if (!ParseOK) {
+                                LogController.handleError(core, new Exception("There was a problem parsing AC Instance [" + ACInstanceID + "] record with content [" + ContentName + "] and RecordID [" + RecordID + "]"));
                             }
-                        }
-                        if (!ParseOK) {
-                            LogController.handleError( core,new Exception("There was a problem parsing AC Instance [" + ACInstanceID + "] record with content [" + ContentName + "] and RecordID [" + RecordID + "]"));
                         }
                     }
                 }
-                csXfer.csClose();
             }
             if (needToClearCache) {
                 //
@@ -2420,7 +2401,6 @@ namespace Contensive.Processor.Controllers {
                         string javaScriptRequired = "";
                         javaScriptRequired += "var " + OldFolderVar + ";";
                         string SQL = null;
-                        int CS = 0;
                         int[] main_MemberShip = { };
                         string[] main_MemberShipRuleCopy = { };
                         if (PrimaryRecordID == 0) {
@@ -2450,42 +2430,38 @@ namespace Contensive.Processor.Controllers {
                             // ----- Determine main_MemberShip (which secondary records are associated by a rule)
                             // ----- (exclude new record issue ID=0)
                             //
-                            SQL = "SELECT " + SecondaryTablename + ".ID AS ID,'' as RuleCopy";
-                            //if (IsRuleCopySupported) {
-                            //    SQL = "SELECT " + SecondaryTablename + ".ID AS ID," + rulesTablename + ".RuleCopy";
-                            //} else {
-                            //    SQL = "SELECT " + SecondaryTablename + ".ID AS ID,'' as RuleCopy";
-                            //}
-                            SQL += ""
-                            + " FROM " + SecondaryTablename + " LEFT JOIN"
-                            + " " + rulesTablename + " ON " + SecondaryTablename + ".ID = " + rulesTablename + "." + RulesSecondaryFieldName + " WHERE "
-                            + " (" + rulesTablename + "." + RulesPrimaryFieldname + "=" + PrimaryRecordID + ")"
-                            + " AND (" + rulesTablename + ".Active<>0)"
-                            + " AND (" + SecondaryTablename + ".Active<>0)"
-                            + " And (" + SecondaryTablename + ".ContentControlID IN (" + string.Join(",", ContentIDList) + "))";
-                            if (!string.IsNullOrEmpty(SecondaryContentSelectCriteria)) {
-                                SQL += "AND(" + SecondaryContentSelectCriteria + ")";
-                            }
-                            csXfer.csOpenSql(SQL);
-                            if (csXfer.csOk()) {
-                                if (true) {
-                                    main_MemberShipSize = 10;
-                                    main_MemberShip = new int[main_MemberShipSize + 1];
-                                    main_MemberShipRuleCopy = new string[main_MemberShipSize + 1];
-                                    while (csXfer.csOk()) {
-                                        if (main_MemberShipCount >= main_MemberShipSize) {
-                                            main_MemberShipSize = main_MemberShipSize + 10;
-                                            Array.Resize(ref main_MemberShip, main_MemberShipSize + 1);
-                                            Array.Resize(ref main_MemberShipRuleCopy, main_MemberShipSize + 1);
+                            using (var csXfer = new CsModel(core)) {
+                                SQL = "SELECT " + SecondaryTablename + ".ID AS ID,'' as RuleCopy";
+                                SQL += ""
+                                    + " FROM " + SecondaryTablename + " LEFT JOIN"
+                                    + " " + rulesTablename + " ON " + SecondaryTablename + ".ID = " + rulesTablename + "." + RulesSecondaryFieldName + " WHERE "
+                                    + " (" + rulesTablename + "." + RulesPrimaryFieldname + "=" + PrimaryRecordID + ")"
+                                    + " AND (" + rulesTablename + ".Active<>0)"
+                                    + " AND (" + SecondaryTablename + ".Active<>0)"
+                                    + " And (" + SecondaryTablename + ".ContentControlID IN (" + string.Join(",", ContentIDList) + "))";
+                                if (!string.IsNullOrEmpty(SecondaryContentSelectCriteria)) {
+                                    SQL += "AND(" + SecondaryContentSelectCriteria + ")";
+                                }
+                                csXfer.csOpenSql(SQL);
+                                if (csXfer.csOk()) {
+                                    {
+                                        main_MemberShipSize = 10;
+                                        main_MemberShip = new int[main_MemberShipSize + 1];
+                                        main_MemberShipRuleCopy = new string[main_MemberShipSize + 1];
+                                        while (csXfer.csOk()) {
+                                            if (main_MemberShipCount >= main_MemberShipSize) {
+                                                main_MemberShipSize = main_MemberShipSize + 10;
+                                                Array.Resize(ref main_MemberShip, main_MemberShipSize + 1);
+                                                Array.Resize(ref main_MemberShipRuleCopy, main_MemberShipSize + 1);
+                                            }
+                                            main_MemberShip[main_MemberShipCount] = csXfer.csGetInteger("ID");
+                                            main_MemberShipRuleCopy[main_MemberShipCount] = csXfer.csGetText("RuleCopy");
+                                            main_MemberShipCount = main_MemberShipCount + 1;
+                                            csXfer.csGoNext();
                                         }
-                                        main_MemberShip[main_MemberShipCount] = csXfer.csGetInteger(CS, "ID");
-                                        main_MemberShipRuleCopy[main_MemberShipCount] = csXfer.csGetText(CS, "RuleCopy");
-                                        main_MemberShipCount = main_MemberShipCount + 1;
-                                        csXfer.csGoNext(CS);
                                     }
                                 }
                             }
-                            csXfer.csClose();
                         }
                         //
                         // ----- Gather all the Secondary Records, sorted by ContentName
@@ -2507,86 +2483,86 @@ namespace Contensive.Processor.Controllers {
                         //}
                         SQL += " ORDER BY ";
                         SQL += SecondaryTablename + "." + CaptionFieldName;
-                        csXfer.csOpenSql(SQL);
-                        if (!csXfer.csOk()) {
-                            returnHtml = "(No choices are available.)";
-                        } else {
-                            if (true) {
-                                string EndDiv = "";
-                                int CheckBoxCnt = 0;
-                                int DivCheckBoxCnt = 0;
-                                CanSeeHiddenFields = core.session.isAuthenticatedDeveloper(core);
-                                string DivName = htmlNamePrefix + ".All";
-                                while (csXfer.csOk()) {
-                                    string OptionName = csXfer.csGetText(CS, "OptionName");
-                                    if ((OptionName.Left(1) != "_") || CanSeeHiddenFields) {
-                                        //
-                                        // Current checkbox is visible
-                                        //
-                                        RecordID = csXfer.csGetInteger(CS, "ID");
-                                        AllowRuleCopy = csXfer.csGetBoolean(CS, "AllowRuleCopy");
-                                        string RuleCopyCaption = csXfer.csGetText(CS, "RuleCopyCaption");
-                                        string OptionCaption = csXfer.csGetText(CS, "OptionCaption");
-                                        if (string.IsNullOrEmpty(OptionCaption)) {
-                                            OptionCaption = OptionName;
-                                        }
-                                        string optionCaptionHtmlEncoded = null;
-                                        if (string.IsNullOrEmpty(OptionCaption)) {
-                                            optionCaptionHtmlEncoded = SingularPrefixHtmlEncoded + RecordID;
-                                        } else {
-                                            optionCaptionHtmlEncoded = HtmlController.encodeHtml(OptionCaption);
-                                        }
-                                        if (DivCheckBoxCnt != 0) {
-                                            // leave this between checkboxes - it is searched in the admin page
-                                            //returnHtml += "<br>\r\n";
-                                        }
-                                        string RuleCopy = "";
-                                        Found = false;
-                                        if (main_MemberShipCount != 0) {
-                                            int main_MemberShipPointer = 0;
-                                            for (main_MemberShipPointer = 0; main_MemberShipPointer < main_MemberShipCount; main_MemberShipPointer++) {
-                                                if (main_MemberShip[main_MemberShipPointer] == (RecordID)) {
-                                                    //s = s & main_GetFormInputHidden(TagName & "." & CheckBoxCnt, True)
-                                                    RuleCopy = main_MemberShipRuleCopy[main_MemberShipPointer];
-                                                    Found = true;
-                                                    break;
+                        using (var csXfer = new CsModel(core)) {
+                            if (!csXfer.csOpenSql(SQL)) {
+                                returnHtml = "(No choices are available.)";
+                            } else {
+                                {
+                                    string EndDiv = "";
+                                    int CheckBoxCnt = 0;
+                                    int DivCheckBoxCnt = 0;
+                                    CanSeeHiddenFields = core.session.isAuthenticatedDeveloper(core);
+                                    string DivName = htmlNamePrefix + ".All";
+                                    while (csXfer.csOk()) {
+                                        string OptionName = csXfer.csGetText("OptionName");
+                                        if ((OptionName.Left(1) != "_") || CanSeeHiddenFields) {
+                                            //
+                                            // Current checkbox is visible
+                                            //
+                                            RecordID = csXfer.csGetInteger("ID");
+                                            AllowRuleCopy = csXfer.csGetBoolean("AllowRuleCopy");
+                                            string RuleCopyCaption = csXfer.csGetText("RuleCopyCaption");
+                                            string OptionCaption = csXfer.csGetText("OptionCaption");
+                                            if (string.IsNullOrEmpty(OptionCaption)) {
+                                                OptionCaption = OptionName;
+                                            }
+                                            string optionCaptionHtmlEncoded = null;
+                                            if (string.IsNullOrEmpty(OptionCaption)) {
+                                                optionCaptionHtmlEncoded = SingularPrefixHtmlEncoded + RecordID;
+                                            } else {
+                                                optionCaptionHtmlEncoded = HtmlController.encodeHtml(OptionCaption);
+                                            }
+                                            if (DivCheckBoxCnt != 0) {
+                                                // leave this between checkboxes - it is searched in the admin page
+                                                //returnHtml += "<br>\r\n";
+                                            }
+                                            string RuleCopy = "";
+                                            Found = false;
+                                            if (main_MemberShipCount != 0) {
+                                                int main_MemberShipPointer = 0;
+                                                for (main_MemberShipPointer = 0; main_MemberShipPointer < main_MemberShipCount; main_MemberShipPointer++) {
+                                                    if (main_MemberShip[main_MemberShipPointer] == (RecordID)) {
+                                                        //s = s & main_GetFormInputHidden(TagName & "." & CheckBoxCnt, True)
+                                                        RuleCopy = main_MemberShipRuleCopy[main_MemberShipPointer];
+                                                        Found = true;
+                                                        break;
+                                                    }
                                                 }
                                             }
+                                            // must leave the first hidden with the value in this form - it is searched in the admin pge
+                                            //returnHtml += "\r\n";
+                                            //returnHtml += "<table><tr><td style=\"vertical-align:top;margin-top:0;width:20px;\">";
+                                            returnHtml += "<input type=hidden name=\"" + htmlNamePrefix + "." + CheckBoxCnt + ".id\" value=" + RecordID + ">";
+                                            if (readOnlyfield && !Found) {
+                                                returnHtml += "<div class=\"checkbox\"><label><input type=checkbox disabled>&nbsp;" + optionCaptionHtmlEncoded + "</label></div>";
+                                                //returnHtml += "<input type=checkbox disabled>";
+                                            } else if (readOnlyfield) {
+                                                returnHtml += "<div class=\"checkbox\"><label><input type=checkbox disabled checked>&nbsp;" + optionCaptionHtmlEncoded + "</label></div>";
+                                                //returnHtml += "<input type=checkbox disabled checked>";
+                                                returnHtml += "<input type=\"hidden\" name=\"" + htmlNamePrefix + "." + CheckBoxCnt + ".ID\" value=" + RecordID + ">";
+                                            } else if (Found) {
+                                                returnHtml += "<div class=\"checkbox\"><label><input type=checkbox name=\"" + htmlNamePrefix + "." + CheckBoxCnt + "\" value=\"1\" checked>&nbsp;" + optionCaptionHtmlEncoded + "</label></div>";
+                                                //returnHtml += "<input type=checkbox name=\"" + htmlNamePrefix + "." + CheckBoxCnt + "\" checked>";
+                                            } else {
+                                                returnHtml += "<div class=\"checkbox\"><label><input type=\"checkbox\" name=\"" + htmlNamePrefix + "." + CheckBoxCnt + "\" value=\"1\">&nbsp;" + optionCaptionHtmlEncoded + "</label></div>";
+                                                //returnHtml += "<input type=checkbox name=\"" + htmlNamePrefix + "." + CheckBoxCnt + "\">";
+                                            }
+                                            //returnHtml += "</td><td style=\"vertical-align:top;padding-top:4px;\">";
+                                            //returnHtml += SpanClassAdminNormal + optionCaptionHtmlEncoded;
+                                            //if (AllowRuleCopy) {
+                                            //    returnHtml += ", " + RuleCopyCaption + "&nbsp;" + inputText(core, htmlNamePrefix + "." + CheckBoxCnt + ".RuleCopy", RuleCopy, 1, 20);
+                                            //}
+                                            //returnHtml += "</td></tr></table>";
+                                            CheckBoxCnt = CheckBoxCnt + 1;
+                                            DivCheckBoxCnt = DivCheckBoxCnt + 1;
                                         }
-                                        // must leave the first hidden with the value in this form - it is searched in the admin pge
-                                        //returnHtml += "\r\n";
-                                        //returnHtml += "<table><tr><td style=\"vertical-align:top;margin-top:0;width:20px;\">";
-                                        returnHtml += "<input type=hidden name=\"" + htmlNamePrefix + "." + CheckBoxCnt + ".id\" value=" + RecordID + ">";
-                                        if (readOnlyfield && !Found) {
-                                            returnHtml += "<div class=\"checkbox\"><label><input type=checkbox disabled>&nbsp;" + optionCaptionHtmlEncoded + "</label></div>";
-                                            //returnHtml += "<input type=checkbox disabled>";
-                                        } else if (readOnlyfield) {
-                                            returnHtml += "<div class=\"checkbox\"><label><input type=checkbox disabled checked>&nbsp;" + optionCaptionHtmlEncoded + "</label></div>";
-                                            //returnHtml += "<input type=checkbox disabled checked>";
-                                            returnHtml += "<input type=\"hidden\" name=\"" + htmlNamePrefix + "." + CheckBoxCnt + ".ID\" value=" + RecordID + ">";
-                                        } else if (Found) {
-                                            returnHtml += "<div class=\"checkbox\"><label><input type=checkbox name=\"" + htmlNamePrefix + "." + CheckBoxCnt + "\" value=\"1\" checked>&nbsp;" + optionCaptionHtmlEncoded + "</label></div>";
-                                            //returnHtml += "<input type=checkbox name=\"" + htmlNamePrefix + "." + CheckBoxCnt + "\" checked>";
-                                        } else {
-                                            returnHtml += "<div class=\"checkbox\"><label><input type=\"checkbox\" name=\"" + htmlNamePrefix + "." + CheckBoxCnt + "\" value=\"1\">&nbsp;" + optionCaptionHtmlEncoded + "</label></div>";
-                                            //returnHtml += "<input type=checkbox name=\"" + htmlNamePrefix + "." + CheckBoxCnt + "\">";
-                                        }
-                                        //returnHtml += "</td><td style=\"vertical-align:top;padding-top:4px;\">";
-                                        //returnHtml += SpanClassAdminNormal + optionCaptionHtmlEncoded;
-                                        //if (AllowRuleCopy) {
-                                        //    returnHtml += ", " + RuleCopyCaption + "&nbsp;" + inputText(core, htmlNamePrefix + "." + CheckBoxCnt + ".RuleCopy", RuleCopy, 1, 20);
-                                        //}
-                                        //returnHtml += "</td></tr></table>";
-                                        CheckBoxCnt = CheckBoxCnt + 1;
-                                        DivCheckBoxCnt = DivCheckBoxCnt + 1;
+                                        csXfer.csGoNext();
                                     }
-                                    csXfer.csGoNext(CS);
+                                    returnHtml += EndDiv;
+                                    returnHtml += inputHidden(htmlNamePrefix + ".RowCount", CheckBoxCnt);
                                 }
-                                returnHtml += EndDiv;
-                                returnHtml += inputHidden( htmlNamePrefix + ".RowCount", CheckBoxCnt );
                             }
                         }
-                        csXfer.csClose();
                         addScriptCode(javaScriptRequired, "CheckList Categories");
                     }
                     //End If
@@ -3383,42 +3359,39 @@ namespace Contensive.Processor.Controllers {
         public string getContentCopy(string CopyName, string DefaultContent, int personalizationPeopleId, bool AllowEditWrapper, bool personalizationIsAuthenticated) {
             string returnCopy = "";
             try {
-                //
-                int CS = 0;
                 int RecordID = 0;
                 int contactPeopleId = 0;
                 //
                 // honestly, not sure what to do with 'return_ErrorMessage'
-                //
-                csXfer.csOpen("copy content", "Name=" + DbController.encodeSQLText(CopyName), "ID", true, 0, false, false, "Name,ID,Copy,modifiedBy");
-                if (!csXfer.csOk()) {
-                    csXfer.csClose();
-                    csXfer.csInsert("copy content", 0);
-                    if (csXfer.csOk()) {
-                        RecordID = csXfer.csGetInteger(CS, "ID");
-                        csXfer.csSet(CS, "name", CopyName);
-                        csXfer.csSet(CS, "copy", GenericController.encodeText(DefaultContent));
-                        csXfer.csSave(CS);
-                        //   Call WorkflowController.publishEdit("copy content", RecordID)
+                using (var csXfer = new CsModel(core)) {
+                    if (!csXfer.csOpen("copy content", "Name=" + DbController.encodeSQLText(CopyName), "ID", true, 0, "Name,ID,Copy,modifiedBy")) {
+                        csXfer.csClose();
+                        csXfer.csInsert("copy content", 0);
+                        if (csXfer.csOk()) {
+                            RecordID = csXfer.csGetInteger("ID");
+                            csXfer.csSet("name", CopyName);
+                            csXfer.csSet("copy", GenericController.encodeText(DefaultContent));
+                            csXfer.csSave();
+                            //   Call WorkflowController.publishEdit("copy content", RecordID)
+                        }
                     }
-                }
-                if (csXfer.csOk()) {
-                    RecordID = csXfer.csGetInteger(CS, "ID");
-                    contactPeopleId = csXfer.csGetInteger(CS, "modifiedBy");
-                    returnCopy = csXfer.csGet(CS, "Copy");
-                    //returnCopy = contentCmdController.executeContentCommands(core, returnCopy, CPUtilsBaseClass.addonContext.ContextPage, personalizationPeopleId, personalizationIsAuthenticated, ref Return_ErrorMessage);
-                    returnCopy = ActiveContentController.renderHtmlForWeb(core, returnCopy, "copy content", RecordID, personalizationPeopleId, "", 0, CPUtilsBaseClass.addonContext.ContextPage);
-                    //
-                    if (true) {
-                        if (core.session.isEditingAnything()) {
-                            returnCopy = csXfer.csGetRecordEditLink(CS, false) + returnCopy;
-                            if (AllowEditWrapper) {
-                                returnCopy = AdminUIController.getEditWrapper(core,"copy content", returnCopy);
+                    if (csXfer.csOk()) {
+                        RecordID = csXfer.csGetInteger("ID");
+                        contactPeopleId = csXfer.csGetInteger("modifiedBy");
+                        returnCopy = csXfer.csGet("Copy");
+                        //returnCopy = contentCmdController.executeContentCommands(core, returnCopy, CPUtilsBaseClass.addonContext.ContextPage, personalizationPeopleId, personalizationIsAuthenticated, ref Return_ErrorMessage);
+                        returnCopy = ActiveContentController.renderHtmlForWeb(core, returnCopy, "copy content", RecordID, personalizationPeopleId, "", 0, CPUtilsBaseClass.addonContext.ContextPage);
+                        //
+                        if (true) {
+                            if (core.session.isEditingAnything()) {
+                                returnCopy = csXfer.csGetRecordEditLink(false) + returnCopy;
+                                if (AllowEditWrapper) {
+                                    returnCopy = AdminUIController.getEditWrapper(core, "copy content", returnCopy);
+                                }
                             }
                         }
                     }
                 }
-                csXfer.csClose();
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
@@ -3543,17 +3516,18 @@ namespace Contensive.Processor.Controllers {
                         core.db.executeQuery(SQL);
                     } else if (RuleNeeded && (!RuleFound)) {
                         //
-                        // No record exists, and one is needed                        //
-                        int CSRule = csXfer.csInsert(rulesContentName);
-                        if (csXfer.csOk(CSRule)) {
-                            csXfer.csSet(CSRule, "Active", RuleNeeded);
-                            csXfer.csSet(CSRule, rulesPrimaryFieldname, primaryRecordID);
-                            csXfer.csSet(CSRule, rulesSecondaryFieldName, SecondaryRecordID);
-                            if (SupportRuleCopy) {
-                                csXfer.csSet(CSRule, "RuleCopy", RuleCopy);
+                        // No record exists, and one is needed                        
+                        using (var csXfer = new CsModel(core)) {
+                            csXfer.csInsert(rulesContentName);
+                            if (csXfer.csOk()) {
+                                csXfer.csSet("Active", RuleNeeded);
+                                csXfer.csSet(rulesPrimaryFieldname, primaryRecordID);
+                                csXfer.csSet(rulesSecondaryFieldName, SecondaryRecordID);
+                                if (SupportRuleCopy) {
+                                    csXfer.csSet("RuleCopy", RuleCopy);
+                                }
                             }
                         }
-                        csXfer.csClose(ref CSRule);
                         RuleContentChanged = true;
                     } else if ((!RuleNeeded) && RuleFound) {
                         //

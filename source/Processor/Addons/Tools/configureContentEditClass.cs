@@ -39,14 +39,14 @@ namespace Contensive.Addons.Tools {
                 int ContentID = cp.Doc.GetInteger("" + RequestNameToolContentID + "");
                 string dataSourceName = "default";
                 string ContentName = "";
-                Processor.Models.Domain.MetaModel CDef = null;
+                MetaModel CDef = null;
                 string TableName = "";
                 if (ContentID > 0) {
                     ContentName = cp.Content.GetRecordName("content", ContentID);
                     if (!string.IsNullOrEmpty(ContentName)) {
                         TableName = cp.Content.GetTable(ContentName);
                         dataSourceName = cp.Content.GetDataSource(ContentName);
-                        CDef = Processor.Models.Domain.MetaModel.create(core, ContentID, true, true);
+                        CDef = MetaModel.create(core, ContentID, true, true);
                     }
                 }
                 int RecordCount = 0;
@@ -93,7 +93,6 @@ namespace Contensive.Addons.Tools {
                                                     if (CSTarget.csInsert("Content Fields")) {
                                                         using (var CSSource = new CsModel(core)) {
                                                             if (CSSource.csOpenContentRecord("Content Fields", formFieldId)) { CSSource.csCopyRecord(CSTarget); }
-                                                            CSSource.csClose();
                                                         }
                                                         formFieldId = CSTarget.csGetInteger( "ID");
                                                         CSTarget.csSet( "ContentID", ContentID);
@@ -180,19 +179,25 @@ namespace Contensive.Addons.Tools {
                         if (ToolButton == ButtonAdd) {
                             //
                             // ----- Insert a blank Field
+                            var fieldMeta = MetaModel.createByUniqueName(core, ContentFieldModel.contentName);
+                            var field = ContentFieldModel.addDefault(core, fieldMeta);
+                            field.name = "unnamedField" + field.id.ToString();
+                            field.contentID = ContentID;
+                            field.editSortPriority = 0;
+                            field.save(core);
+                            ReloadCDef = true;
                             //
-                            CSPointer = csXfer.csInsert("Content Fields");
-                            if (csXfer.csOk()) {
-                                csXfer.csSet(CSPointer, "name", "unnamedField" + csXfer.csGetInteger("id").ToString());
-                                csXfer.csSet(CSPointer, "ContentID", ContentID);
-                                csXfer.csSet(CSPointer, "EditSortPriority", 0);
-                                ReloadCDef = true;
-                            }
-                            csXfer.csClose();
+                            //using (var csXfer = new CsModel(core)) {
+                            //    if (csXfer.csInsert("Content Fields")) {
+                            //        csXfer.csSet("name", "unnamedField" + csXfer.csGetInteger("id").ToString());
+                            //        csXfer.csSet("ContentID", ContentID);
+                            //        csXfer.csSet("EditSortPriority", 0);
+                            //        ReloadCDef = true;
+                            //    }
+                            //}
                         }
                         //
                         // ----- Button Reload CDef
-                        //
                         if (ToolButton == ButtonSaveandInvalidateCache) {
                             core.cache.invalidateAll();
                             core.clearMetaData();

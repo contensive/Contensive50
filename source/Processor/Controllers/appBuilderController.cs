@@ -809,7 +809,7 @@ namespace Contensive.Processor.Controllers {
                 using (var csXfer = new CsModel(core)) {
                     csXfer.csOpen("Countries", "name=" + DbController.encodeSQLText(name));
                     if (!csXfer.csOk()) {
-                        csXfer.csClose(ref CS);
+                        csXfer.csClose();
                         csXfer.csInsert("Countries", SystemMemberID);
                         if (csXfer.csOk()) {
                             csXfer.csSet(CS, "ACTIVE", true);
@@ -822,7 +822,7 @@ namespace Contensive.Processor.Controllers {
                             csXfer.csSet(CS, "DomesticShipping", "1");
                         }
                     }
-                    csXfer.csClose(ref CS);
+                    csXfer.csClose();
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -1086,7 +1086,7 @@ namespace Contensive.Processor.Controllers {
                             if (csXfer.csOk()) {
                                 RecordID = (csXfer.csGetInteger(CS, "ID"));
                             }
-                            csXfer.csClose(ref CS);
+                            csXfer.csClose();
                             if (RecordID == 0) {
                                 csXfer.csInsert(Processor.Models.Db.NavigatorEntryModel.contentName, SystemMemberID);
                                 if (csXfer.csOk()) {
@@ -1094,7 +1094,7 @@ namespace Contensive.Processor.Controllers {
                                     csXfer.csSet(CS, "name", recordName);
                                     csXfer.csSet(CS, "parentID", parentRecordId);
                                 }
-                                csXfer.csClose(ref CS);
+                                csXfer.csClose();
                             }
                             parentRecordId = RecordID;
                         }

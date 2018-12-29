@@ -1167,8 +1167,8 @@ namespace Contensive.Processor.Controllers {
                                                         }
                                                         collection.helpLink = CollectionHelpLink;
                                                         //
-                                                        core.db.deleteContentRecords("Add-on Collection CDef Rules", "CollectionID=" + collection.id);
-                                                        core.db.deleteContentRecords("Add-on Collection Parent Rules", "ParentID=" + collection.id);
+                                                        MetaController.deleteContentRecords(core, "Add-on Collection CDef Rules", "CollectionID=" + collection.id);
+                                                        MetaController.deleteContentRecords(core, "Add-on Collection Parent Rules", "ParentID=" + collection.id);
                                                         //
                                                         // Store all resource found, new way and compatibility way
                                                         //
@@ -1179,7 +1179,7 @@ namespace Contensive.Processor.Controllers {
                                                         // ----- remove any current navigator nodes installed by the collection previously
                                                         //
                                                         if (collection.id != 0) {
-                                                            core.db.deleteContentRecords(Processor.Models.Db.NavigatorEntryModel.contentName, "installedbycollectionid=" + collection.id);
+                                                            MetaController.deleteContentRecords(core, Processor.Models.Db.NavigatorEntryModel.contentName, "installedbycollectionid=" + collection.id);
                                                         }
                                                     }
                                                     //
@@ -1251,7 +1251,7 @@ namespace Contensive.Processor.Controllers {
                                                                                     csXfer.csSet(CS, "Contentid", ContentID);
                                                                                     csXfer.csSet(CS, "CollectionID", collection.id);
                                                                                 }
-                                                                                csXfer.csClose(ref CS);
+                                                                                csXfer.csClose();
                                                                             }
                                                                             break;
                                                                     }
@@ -1306,7 +1306,7 @@ namespace Contensive.Processor.Controllers {
                                                                                             // Insert the new record
                                                                                             //
                                                                                             recordfound = false;
-                                                                                            csXfer.csClose(ref cs);
+                                                                                            csXfer.csClose();
                                                                                             csXfer.csInsert(ContentName, 0);
                                                                                         }
                                                                                         if (csXfer.csOk()) {
@@ -1333,7 +1333,7 @@ namespace Contensive.Processor.Controllers {
                                                                                                 DataRecordList = DataRecordList + "\r\n" + ContentName + "," + ContentRecordGuid;
                                                                                             }
                                                                                         }
-                                                                                        csXfer.csClose(ref cs);
+                                                                                        csXfer.csClose();
                                                                                     }
                                                                                 }
                                                                             }
@@ -1375,14 +1375,14 @@ namespace Contensive.Processor.Controllers {
                                                                     if (csXfer.csOk()) {
                                                                         ChildCollectionID = csXfer.csGetInteger(cs, "id");
                                                                     }
-                                                                    csXfer.csClose(ref cs);
+                                                                    csXfer.csClose();
                                                                     if (ChildCollectionID != 0) {
                                                                         csXfer.csInsert("Add-on Collection Parent Rules", 0);
                                                                         if (csXfer.csOk()) {
                                                                             csXfer.csSet(cs, "ParentID", collection.id);
                                                                             csXfer.csSet(cs, "ChildID", ChildCollectionID);
                                                                         }
-                                                                        csXfer.csClose(ref cs);
+                                                                        csXfer.csClose();
                                                                     }
                                                                 }
                                                                 break;
@@ -1683,7 +1683,7 @@ namespace Contensive.Processor.Controllers {
                                                                                         }
                                                                                     }
                                                                                 }
-                                                                                csXfer.csClose(ref cs);
+                                                                                csXfer.csClose();
                                                                             }
                                                                         }
                                                                     }
@@ -1999,7 +1999,7 @@ namespace Contensive.Processor.Controllers {
                 if (csXfer.csOk()) {
                     navId = csXfer.csGetInteger(CS, "id");
                 }
-                csXfer.csClose(ref CS);
+                csXfer.csClose();
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
@@ -2141,7 +2141,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // not found by GUID - search name against name to update legacy Add-ons
                         //
-                        csXfer.csClose(ref CS);
+                        csXfer.csClose();
                         Criteria = "(name=" + DbController.encodeSQLText(addonName) + ")and(" + AddonGuidFieldName + " is null)";
                         csXfer.csOpen(Models.Db.AddonModel.contentName, Criteria,"", false);
                         if (csXfer.csOk()) {
@@ -2152,7 +2152,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // not found by GUID or by name, Insert a new addon
                         //
-                        csXfer.csClose(ref CS);
+                        csXfer.csClose();
                         csXfer.csInsert(Models.Db.AddonModel.contentName, 0);
                         if (csXfer.csOk()) {
                             LogController.logInfo(core, "UpgradeAppFromLocalCollection, Creating new Add-on [" + addonName + "], Guid [" + addonGuid + "]");
@@ -2169,10 +2169,10 @@ namespace Contensive.Processor.Controllers {
                         // Initialize the add-on
                         // Delete any existing related records - so if this is an update with removed relationships, those are removed
                         //
-                        //Call core.db.deleteContentRecords("Shared Styles Add-on Rules", "addonid=" & addonId)
-                        //Call core.db.deleteContentRecords("Add-on Scripting Module Rules", "addonid=" & addonId)
-                        core.db.deleteContentRecords("Add-on Include Rules", "addonid=" + addonId);
-                        core.db.deleteContentRecords("Add-on Content Trigger Rules", "addonid=" + addonId);
+                        //Call MetaController.deleteContentRecords(core, "Shared Styles Add-on Rules", "addonid=" & addonId)
+                        //Call MetaController.deleteContentRecords(core, "Add-on Scripting Module Rules", "addonid=" & addonId)
+                        MetaController.deleteContentRecords(core, "Add-on Include Rules", "addonid=" + addonId);
+                        MetaController.deleteContentRecords(core, "Add-on Content Trigger Rules", "addonid=" + addonId);
                         //
                         csXfer.csSet(CS, "collectionid", CollectionID);
                         csXfer.csSet(CS, AddonGuidFieldName, addonGuid);
@@ -2496,7 +2496,7 @@ namespace Contensive.Processor.Controllers {
                         //                AddonNavID = GetNonRootNavigatorID(asv, AOName, GetNavIDByGuid(asv, "{5FDDC758-4A15-4F98-8333-9CE8B8BFABC4}"), addonid, 0, NavIconTypeSetting, AOName & " Add-on", NavDeveloperOnly, 0, "", 0, 0, CollectionID, navAdminOnly)
                         //            End If
                     }
-                    csXfer.csClose(ref CS);
+                    csXfer.csClose();
                     //
                     // -- if this is needed, the installation xml files are available in the addon install folder. - I do not believe this is important
                     //       as if a collection is missing a dependancy, there is an error and you would expect to have to reinstall.
@@ -2645,7 +2645,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // not found by GUID - search name against name to update legacy Add-ons
                         //
-                        csXfer.csClose(ref CS);
+                        csXfer.csClose();
                         Criteria = "(name=" + DbController.encodeSQLText(AOName) + ")and(" + AddonGuidFieldName + " is null)";
                         csXfer.csOpen(Models.Db.AddonModel.contentName, Criteria,"", false);
                     }
@@ -2712,7 +2712,7 @@ namespace Contensive.Processor.Controllers {
                             }
                         }
                     }
-                    csXfer.csClose(ref CS);
+                    csXfer.csClose();
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);

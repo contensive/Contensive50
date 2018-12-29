@@ -157,14 +157,14 @@ namespace Contensive.Addons.AdminSite {
                             int ParentID = 0;
                             bool ContentSupportsParentID = false;
                             if (editRecord.id > 0) {
-                                int csXfer.csOpenRecord(RecordContentName, editRecord.id);
-                                if (csXfer.csOk()) {
-                                    ContentSupportsParentID = csXfer.csIsFieldSupported(CS, "ParentID");
-                                    if (ContentSupportsParentID) {
-                                        ParentID = csXfer.csGetInteger(CS, "ParentID");
+                                using (var csXfer = new CsModel(core)) {
+                                    if (csXfer.csOpenRecord(RecordContentName, editRecord.id)) {
+                                        ContentSupportsParentID = csXfer.csIsFieldSupported("ParentID");
+                                        if (ContentSupportsParentID) {
+                                            ParentID = csXfer.csGetInteger("ParentID");
+                                        }
                                     }
                                 }
-                                csXfer.csClose(ref CS);
                             }
                             //
                             int LimitContentSelectToThisID = 0;
