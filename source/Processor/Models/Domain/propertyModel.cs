@@ -141,7 +141,7 @@ namespace Contensive.Processor.Models.Domain {
                     // insert a new property record, get the ID back and save it in cache
                     //
                     using (var csXfer = new CsModel(core)) {
-                        if (csXfer.csInsert("Properties", SystemMemberID)) {
+                        if (csXfer.insert("Properties")) {
                             propertyCache[2, Ptr] = csXfer.csGetText("ID");
                             csXfer.csSet("name", propertyName);
                             csXfer.csSet("FieldValue", propertyValue);

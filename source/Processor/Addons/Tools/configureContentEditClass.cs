@@ -187,7 +187,7 @@ namespace Contensive.Addons.Tools {
                             ReloadCDef = true;
                             //
                             //using (var csXfer = new CsModel(core)) {
-                            //    if (csXfer.csInsert("Content Fields")) {
+                            //    if (csXfer.insert("Content Fields")) {
                             //        csXfer.csSet("name", "unnamedField" + csXfer.csGetInteger("id").ToString());
                             //        csXfer.csSet("ContentID", ContentID);
                             //        csXfer.csSet("EditSortPriority", 0);

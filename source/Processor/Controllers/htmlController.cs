@@ -3365,7 +3365,7 @@ namespace Contensive.Processor.Controllers {
                 using (var csXfer = new CsModel(core)) {
                     if (!csXfer.csOpen("copy content", "Name=" + DbController.encodeSQLText(CopyName), "ID", true, 0, "Name,ID,Copy,modifiedBy")) {
                         csXfer.close();
-                        csXfer.csInsert("copy content", 0);
+                        csXfer.insert("copy content");
                         if (csXfer.csOk()) {
                             RecordID = csXfer.csGetInteger("ID");
                             csXfer.csSet("name", CopyName);

@@ -1450,7 +1450,7 @@ namespace Contensive.Addons.Housekeeping {
                             csXfer.csOpen("Visit Summary", "(timeduration=" + HourDuration + ")and(DateNumber=" + DateNumber + ")and(TimeNumber=" + TimeNumber + ")");
                             if (!csXfer.csOk()) {
                                 csXfer.close();
-                                csXfer.csInsert("Visit Summary", 0);
+                                csXfer.insert("Visit Summary");
                             }
                             //
                             if (csXfer.csOk()) {

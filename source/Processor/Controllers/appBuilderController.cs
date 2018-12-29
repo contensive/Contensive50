@@ -810,7 +810,7 @@ namespace Contensive.Processor.Controllers {
                     csXfer.csOpen("Countries", "name=" + DbController.encodeSQLText(name));
                     if (!csXfer.csOk()) {
                         csXfer.close();
-                        csXfer.csInsert("Countries", SystemMemberID);
+                        csXfer.insert("Countries");
                         if (csXfer.csOk()) {
                             csXfer.csSet("ACTIVE", true);
                         }
@@ -1089,7 +1089,7 @@ namespace Contensive.Processor.Controllers {
                                 }
                                 csXfer.close();
                                 if (RecordID == 0) {
-                                    csXfer.csInsert(NavigatorEntryModel.contentName, SystemMemberID);
+                                    csXfer.insert(NavigatorEntryModel.contentName);
                                     if (csXfer.csOk()) {
                                         RecordID = csXfer.csGetInteger("ID");
                                         csXfer.csSet("name", recordName);

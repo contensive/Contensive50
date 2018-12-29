@@ -81,7 +81,7 @@ namespace Contensive.Addons.Email {
                             // Create Drop Record
                             int EmailDropID = 0;
                             using (var csDrop = new CsModel(core)) {
-                                csDrop.csInsert("Email Drops", EmailMemberID);
+                                csDrop.insert("Email Drops");
                                 if (csDrop.csOk()) {
                                     EmailDropID = csDrop.csGetInteger("ID");
                                     DateTime ScheduleDate = csDrop.csGetDate("ScheduleDate");
@@ -379,7 +379,7 @@ namespace Contensive.Addons.Email {
                 EmailBodyEncoded = EmailBody;
                 EmailSubjectEncoded = EmailSubject;
                 using (var CSLog = new CsModel(core)) {
-                    CSLog.csInsert("Email Log", 0);
+                    CSLog.insert("Email Log");
                     if (CSLog.csOk()) {
                         CSLog.csSet("Name", "Sent " + encodeText(DateTime.Now));
                         CSLog.csSet("EmailDropID", emailDropID);

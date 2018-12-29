@@ -287,7 +287,7 @@ namespace Contensive.Processor.Controllers {
                 if (Message.Length > 255) Message = Message.Substring(0, 255);
                 if (Link.Length > 255) Message = Link.Substring(0, 255);
                 using (var csXfer = new CsModel(core)) {
-                    if (csXfer.csInsert("Activity Log", ByMemberID)) {
+                    if (csXfer.insert("Activity Log")) {
                         csXfer.csSet("MemberID", SubjectMemberID);
                         csXfer.csSet("OrganizationID", SubjectOrganizationID);
                         csXfer.csSet("Message", Message);

@@ -825,7 +825,7 @@ namespace Contensive.Processor.Controllers {
                     //if (core.docProperties.getInteger("ContensiveUserForm") == 1) {
                     //    string FromAddress = core.siteProperties.getText("EmailFromAddress", "info@" + core.webServer.requestDomain);
                     //    EmailController.queueFormEmail(core, core.siteProperties.emailAdmin, FromAddress, "Form Submitted on " + core.webServer.requestReferer);
-                    //    csXfer.csInsert("User Form Response");
+                    //    csXfer.insert("User Form Response");
                     //    if (csXfer.csOk()) {
                     //        csXfer.csSet("name", "Form " + core.webServer.requestReferrer);
                     //        string Copy = "";

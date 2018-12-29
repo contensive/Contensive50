@@ -526,7 +526,7 @@ namespace Contensive.Processor.Controllers {
         public int createPageGetID(string PageName, string ContentName, int CreatedBy, string pageGuid) {
             int Id = 0;
             using (var csXfer = new CsModel(core)) {
-                if (csXfer.csInsert(ContentName, CreatedBy)) {
+                if (csXfer.insert(ContentName)) {
                     Id = csXfer.csGetInteger("ID");
                     csXfer.csSet("name", PageName);
                     csXfer.csSet("active", "1");

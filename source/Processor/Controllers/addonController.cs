@@ -883,7 +883,7 @@ namespace Contensive.Processor.Controllers {
                                                                     csXfer.csOpen("Copy Content", "name=" + DbController.encodeSQLText(FieldName), "ID");
                                                                     if (!csXfer.csOk()) {
                                                                         csXfer.close();
-                                                                        csXfer.csInsert("Copy Content", core.session.user.id);
+                                                                        csXfer.insert("Copy Content");
                                                                     }
                                                                     if (csXfer.csOk()) {
                                                                         csXfer.csSet("name", FieldName);
@@ -1169,7 +1169,7 @@ namespace Contensive.Processor.Controllers {
                                                                 csXfer.csOpen("Copy Content", "Name=" + DbController.encodeSQLText(FieldName), "ID", false, 0, "id,name,Copy");
                                                                 if (!csXfer.csOk()) {
                                                                     csXfer.close();
-                                                                    csXfer.csInsert("Copy Content", core.session.user.id);
+                                                                    csXfer.insert("Copy Content");
                                                                     if (csXfer.csOk()) {
                                                                         int RecordID = csXfer.csGetInteger("ID");
                                                                         csXfer.csSet("name", FieldName);

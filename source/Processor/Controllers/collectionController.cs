@@ -1247,7 +1247,7 @@ namespace Contensive.Processor.Controllers {
                                                                             int ContentID = MetaModel.getContentId(core, ContentName);
                                                                             if (ContentID > 0) {
                                                                                 using (var csXfer = new CsModel(core)) {
-                                                                                    csXfer.csInsert("Add-on Collection CDef Rules", 0);
+                                                                                    csXfer.insert("Add-on Collection CDef Rules");
                                                                                     if (csXfer.csOk()) {
                                                                                         csXfer.csSet("Contentid", ContentID);
                                                                                         csXfer.csSet("CollectionID", collection.id);
@@ -1308,7 +1308,7 @@ namespace Contensive.Processor.Controllers {
                                                                                                 //
                                                                                                 recordfound = false;
                                                                                                 csXfer.close();
-                                                                                                csXfer.csInsert(ContentName, 0);
+                                                                                                csXfer.insert(ContentName);
                                                                                             }
                                                                                             if (csXfer.csOk()) {
                                                                                                 //
@@ -1378,7 +1378,7 @@ namespace Contensive.Processor.Controllers {
                                                                         }
                                                                         csXfer.close();
                                                                         if (ChildCollectionID != 0) {
-                                                                            csXfer.csInsert("Add-on Collection Parent Rules", 0);
+                                                                            csXfer.insert("Add-on Collection Parent Rules");
                                                                             if (csXfer.csOk()) {
                                                                                 csXfer.csSet("ParentID", collection.id);
                                                                                 csXfer.csSet("ChildID", ChildCollectionID);
@@ -2154,7 +2154,7 @@ namespace Contensive.Processor.Controllers {
                             // not found by GUID or by name, Insert a new addon
                             //
                             cs.close();
-                            cs.csInsert(Models.Db.AddonModel.contentName, 0);
+                            cs.insert(Models.Db.AddonModel.contentName);
                             if (cs.csOk()) {
                                 LogController.logInfo(core, "UpgradeAppFromLocalCollection, Creating new Add-on [" + addonName + "], Guid [" + addonGuid + "]");
                             }
@@ -2219,7 +2219,7 @@ namespace Contensive.Processor.Controllers {
                                                                     Criteria = "(addonid=" + addonId + ")and(contentfieldTypeID=" + fieldTypeID + ")";
                                                                     CS2.csOpen("Add-on Content Field Type Rules", Criteria);
                                                                     if (!CS2.csOk()) {
-                                                                        CS2.csInsert("Add-on Content Field Type Rules", 0);
+                                                                        CS2.insert("Add-on Content Field Type Rules");
                                                                     }
                                                                     if (CS2.csOk()) {
                                                                         CS2.csSet("addonid", addonId);
@@ -2264,7 +2264,7 @@ namespace Contensive.Processor.Controllers {
                                                                     Criteria = "(addonid=" + addonId + ")and(contentid=" + TriggerContentID + ")";
                                                                     CS2.csOpen("Add-on Content Trigger Rules", Criteria);
                                                                     if (!CS2.csOk()) {
-                                                                        CS2.csInsert("Add-on Content Trigger Rules", 0);
+                                                                        CS2.insert("Add-on Content Trigger Rules");
                                                                         if (CS2.csOk()) {
                                                                             CS2.csSet("addonid", addonId);
                                                                             CS2.csSet("contentid", TriggerContentID);
@@ -2698,7 +2698,7 @@ namespace Contensive.Processor.Controllers {
                                                     }
                                                     if (AddRule) {
                                                         using (var cs3 = new CsModel(core)) {
-                                                            cs3.csInsert("Add-on Include Rules", 0);
+                                                            cs3.insert("Add-on Include Rules");
                                                             if (cs3.csOk()) {
                                                                 cs3.csSet("Addonid", addonId);
                                                                 cs3.csSet("IncludedAddonID", IncludeAddonID);

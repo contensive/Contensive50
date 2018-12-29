@@ -1149,7 +1149,7 @@ namespace Contensive.Addons.Tools {
         //                        while (csXfer.csOk(CSContent) && (DiagActionCount < DiagActionCountMax)) {
         //                            ContentID = csXfer.csGetInteger(CSContent, "ID");
         //                            ContentName = csXfer.csGetText(CSContent, "name");
-        //                            CSTestRecord = csXfer.csInsert(ContentName);
+        //                            CSTestRecord = csXfer.insert(ContentName);
         //                            if (!csXfer.csOk(CSTestRecord)) {
         //                                DiagProblem = "PROBLEM: Could not insert a record using Content Definition [" + ContentName + "]";
         //                                DiagActions = new DiagActionType[2];

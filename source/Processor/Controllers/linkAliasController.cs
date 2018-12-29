@@ -150,7 +150,7 @@ namespace Contensive.Processor.Controllers {
                                     // Alias not found, create a Link Aliases
                                     //
                                     csXfer.close();
-                                    csXfer.csInsert("Link Aliases", 0);
+                                    csXfer.insert("Link Aliases");
                                     if (csXfer.csOk()) {
                                         csXfer.csSet("Name", WorkingLinkAlias);
                                         csXfer.csSet("Pageid", PageID);
@@ -181,7 +181,7 @@ namespace Contensive.Processor.Controllers {
                                             if (resaveLinkAlias) {
                                                 core.db.executeQuery("delete from ccLinkAliases where id=" + CurrentLinkAliasID);
                                                 CS2.close();
-                                                CS2.csInsert("Link Aliases", 0);
+                                                CS2.insert("Link Aliases");
                                                 if (CS2.csOk()) {
                                                     CS2.csSet("Name", WorkingLinkAlias);
                                                     CS2.csSet("Pageid", PageID);

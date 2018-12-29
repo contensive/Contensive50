@@ -2516,7 +2516,7 @@ namespace Contensive.Addons.AdminSite {
                                 //                        ParentName = cp.core.app.csv_cs_getText(CS, "name")
                                 //                        AdminOnly = csXfer.cs_getBoolean(CS, "AdminOnly")
                                 //                        DeveloperOnly = csXfer.cs_getBoolean(CS, "DeveloperOnly")
-                                //                        CSEntry = cp.core.app.csv_InsertCSRecord(MenuContentName, SystemMemberID)
+                                //                        CSEntry = cp.core.app.csv_InsertCSRecord(MenuContentName)
                                 //                        If cp.core.app.csv_IsCSOK(CSEntry) Then
                                 //                            If ParentID = 0 Then
                                 //                                Call cp.core.app.csv_SetCS(CSEntry, "ParentID", Null)
