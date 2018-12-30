@@ -50,9 +50,9 @@ namespace Contensive.Processor.Controllers {
                     ContentName = MetaController.getContentNameByID(core, ContentID);
                     if (!string.IsNullOrEmpty(ContentName)) {
                         using (var csXfer = new CsModel(core)) {
-                            csXfer.csOpen(ContentName, "ID=" + DbController.encodeSQLNumber(RecordID), "", false);
-                            if (csXfer.csOk()) {
-                                csXfer.csSet(FieldName, ContentCopy);
+                            csXfer.open(ContentName, "ID=" + DbController.encodeSQLNumber(RecordID), "", false);
+                            if (csXfer.ok()) {
+                                csXfer.set(FieldName, ContentCopy);
                             }
                             csXfer.close();
                         }
@@ -88,12 +88,12 @@ namespace Contensive.Processor.Controllers {
                 intContentName = MetaController.getContentNameByID(core, ContentID);
                 if (!string.IsNullOrEmpty(intContentName)) {
                     using (var csXfer = new CsModel(core)) {
-                        csXfer.csOpen(intContentName, "ID=" + intRecordId);
-                        if (!csXfer.csOk()) {
+                        csXfer.open(intContentName, "ID=" + intRecordId);
+                        if (!csXfer.ok()) {
                             PanelCopy = SpanClassAdminNormal + "The information you have selected can not be accessed.</span>";
                             EditorPanel = EditorPanel + core.html.getPanel(PanelCopy);
                         } else {
-                            Copy = csXfer.csGet(strFieldName);
+                            Copy = csXfer.getText(strFieldName);
                             EditorPanel = EditorPanel + HtmlController.inputHidden("Type", FormTypeActiveEditor);
                             EditorPanel = EditorPanel + HtmlController.inputHidden("cid", ContentID);
                             EditorPanel = EditorPanel + HtmlController.inputHidden("ID", intRecordId);

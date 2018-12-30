@@ -35,7 +35,7 @@ namespace Contensive.Addons.Primitives {
                 using (var csXfer = new CsModel(core)) {
                     if (csXfer.insert("Trap Log")) {
                         InsertTestOK = true;
-                        TrapID = csXfer.csGetInteger("ID");
+                        TrapID = csXfer.getInteger("ID");
                     }
                 }
                 if (InsertTestOK) {

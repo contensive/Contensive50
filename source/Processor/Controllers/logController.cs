@@ -288,12 +288,12 @@ namespace Contensive.Processor.Controllers {
                 if (Link.Length > 255) Message = Link.Substring(0, 255);
                 using (var csXfer = new CsModel(core)) {
                     if (csXfer.insert("Activity Log")) {
-                        csXfer.csSet("MemberID", SubjectMemberID);
-                        csXfer.csSet("OrganizationID", SubjectOrganizationID);
-                        csXfer.csSet("Message", Message);
-                        csXfer.csSet("Link", Link);
-                        csXfer.csSet("VisitorID", VisitorID);
-                        csXfer.csSet("VisitID", VisitID);
+                        csXfer.set("MemberID", SubjectMemberID);
+                        csXfer.set("OrganizationID", SubjectOrganizationID);
+                        csXfer.set("Message", Message);
+                        csXfer.set("Link", Link);
+                        csXfer.set("VisitorID", VisitorID);
+                        csXfer.set("VisitID", VisitID);
                     }
                 }
                 //
@@ -377,15 +377,15 @@ namespace Contensive.Processor.Controllers {
                 //
                 using (var csXfer = new CsModel(core)) {
                     if (csXfer.insert("Site Warnings")) {
-                        csXfer.csSet("name", Name);
-                        csXfer.csSet("description", Description);
-                        csXfer.csSet("generalKey", generalKey);
-                        csXfer.csSet("specificKey", specificKey);
-                        csXfer.csSet("count", 1);
-                        csXfer.csSet("DateLastReported", DateTime.Now);
-                        csXfer.csSet("shortDescription", shortDescription);
-                        csXfer.csSet("location", location);
-                        csXfer.csSet("pageId", PageID);
+                        csXfer.set("name", Name);
+                        csXfer.set("description", Description);
+                        csXfer.set("generalKey", generalKey);
+                        csXfer.set("specificKey", specificKey);
+                        csXfer.set("count", 1);
+                        csXfer.set("DateLastReported", DateTime.Now);
+                        csXfer.set("shortDescription", shortDescription);
+                        csXfer.set("location", location);
+                        csXfer.set("pageId", PageID);
                     }
                 }
             }

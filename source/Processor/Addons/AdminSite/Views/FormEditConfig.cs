@@ -77,10 +77,10 @@ namespace Contensive.Addons.AdminSite {
                             core.privateFiles.deleteFile(EditorStyleRulesFilename);
                             //
                             using (var csXfer = new CsModel(core)) {
-                                while (csXfer.csOpenSql("select id from cctemplates")) {
-                                    EditorStyleRulesFilename = GenericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", csXfer.csGet("ID"), 1, 99, 1);
+                                while (csXfer.openSql("select id from cctemplates")) {
+                                    EditorStyleRulesFilename = GenericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", csXfer.getText("ID"), 1, 99, 1);
                                     core.privateFiles.deleteFile(EditorStyleRulesFilename);
-                                    csXfer.csGoNext();
+                                    csXfer.goNext();
                                 }
                             }
                         }

@@ -1248,9 +1248,9 @@ namespace Contensive.Processor.Controllers {
                                                                             if (ContentID > 0) {
                                                                                 using (var csXfer = new CsModel(core)) {
                                                                                     csXfer.insert("Add-on Collection CDef Rules");
-                                                                                    if (csXfer.csOk()) {
-                                                                                        csXfer.csSet("Contentid", ContentID);
-                                                                                        csXfer.csSet("CollectionID", collection.id);
+                                                                                    if (csXfer.ok()) {
+                                                                                        csXfer.set("Contentid", ContentID);
+                                                                                        csXfer.set("CollectionID", collection.id);
                                                                                     }
                                                                                 }
                                                                             }
@@ -1297,12 +1297,12 @@ namespace Contensive.Processor.Controllers {
                                                                                         MetaModel CDef = Models.Domain.MetaModel.createByUniqueName(core, ContentName);
                                                                                         using (var csXfer = new CsModel(core)) {
                                                                                             if (!string.IsNullOrEmpty(ContentRecordGuid)) {
-                                                                                                csXfer.csOpen(ContentName, "ccguid=" + DbController.encodeSQLText(ContentRecordGuid));
+                                                                                                csXfer.open(ContentName, "ccguid=" + DbController.encodeSQLText(ContentRecordGuid));
                                                                                             } else {
-                                                                                                csXfer.csOpen(ContentName, "name=" + DbController.encodeSQLText(ContentRecordName));
+                                                                                                csXfer.open(ContentName, "name=" + DbController.encodeSQLText(ContentRecordName));
                                                                                             }
                                                                                             bool recordfound = true;
-                                                                                            if (!csXfer.csOk()) {
+                                                                                            if (!csXfer.ok()) {
                                                                                                 //
                                                                                                 // Insert the new record
                                                                                                 //
@@ -1310,7 +1310,7 @@ namespace Contensive.Processor.Controllers {
                                                                                                 csXfer.close();
                                                                                                 csXfer.insert(ContentName);
                                                                                             }
-                                                                                            if (csXfer.csOk()) {
+                                                                                            if (csXfer.ok()) {
                                                                                                 //
                                                                                                 // Update the record
                                                                                                 //
@@ -1318,7 +1318,7 @@ namespace Contensive.Processor.Controllers {
                                                                                                     //
                                                                                                     // found by guid, use guid in list and save name
                                                                                                     //
-                                                                                                    csXfer.csSet("name", ContentRecordName);
+                                                                                                    csXfer.set("name", ContentRecordName);
                                                                                                     DataRecordList = DataRecordList + "\r\n" + ContentName + "," + ContentRecordGuid;
                                                                                                 } else if (recordfound) {
                                                                                                     //
@@ -1329,8 +1329,8 @@ namespace Contensive.Processor.Controllers {
                                                                                                     //
                                                                                                     // record was created
                                                                                                     //
-                                                                                                    csXfer.csSet("ccguid", ContentRecordGuid);
-                                                                                                    csXfer.csSet("name", ContentRecordName);
+                                                                                                    csXfer.set("ccguid", ContentRecordGuid);
+                                                                                                    csXfer.set("name", ContentRecordName);
                                                                                                     DataRecordList = DataRecordList + "\r\n" + ContentName + "," + ContentRecordGuid;
                                                                                                 }
                                                                                             }
@@ -1372,16 +1372,16 @@ namespace Contensive.Processor.Controllers {
                                                                 if (!string.IsNullOrEmpty(ChildCollectionGUID)) {
                                                                     int ChildCollectionID = 0;
                                                                     using (var csXfer = new CsModel(core)) {
-                                                                        csXfer.csOpen("Add-on Collections", "ccguid=" + DbController.encodeSQLText(ChildCollectionGUID));
-                                                                        if (csXfer.csOk()) {
-                                                                            ChildCollectionID = csXfer.csGetInteger("id");
+                                                                        csXfer.open("Add-on Collections", "ccguid=" + DbController.encodeSQLText(ChildCollectionGUID));
+                                                                        if (csXfer.ok()) {
+                                                                            ChildCollectionID = csXfer.getInteger("id");
                                                                         }
                                                                         csXfer.close();
                                                                         if (ChildCollectionID != 0) {
                                                                             csXfer.insert("Add-on Collection Parent Rules");
-                                                                            if (csXfer.csOk()) {
-                                                                                csXfer.csSet("ParentID", collection.id);
-                                                                                csXfer.csSet("ChildID", ChildCollectionID);
+                                                                            if (csXfer.ok()) {
+                                                                                csXfer.set("ParentID", collection.id);
+                                                                                csXfer.set("ChildID", ChildCollectionID);
                                                                             }
                                                                             csXfer.close();
                                                                         }
@@ -1610,11 +1610,11 @@ namespace Contensive.Processor.Controllers {
                                                                                 MetaModel CDef = Models.Domain.MetaModel.createByUniqueName(core, ContentName);
                                                                                 using (var csXfer = new CsModel(core)) {
                                                                                     if (!string.IsNullOrEmpty(ContentRecordGuid)) {
-                                                                                        csXfer.csOpen(ContentName, "ccguid=" + DbController.encodeSQLText(ContentRecordGuid));
+                                                                                        csXfer.open(ContentName, "ccguid=" + DbController.encodeSQLText(ContentRecordGuid));
                                                                                     } else {
-                                                                                        csXfer.csOpen(ContentName, "name=" + DbController.encodeSQLText(ContentRecordName));
+                                                                                        csXfer.open(ContentName, "name=" + DbController.encodeSQLText(ContentRecordName));
                                                                                     }
-                                                                                    if (csXfer.csOk()) {
+                                                                                    if (csXfer.ok()) {
                                                                                         //
                                                                                         // Update the record
                                                                                         foreach (XmlNode FieldNode in ContentNode.ChildNodes) {
@@ -1654,7 +1654,7 @@ namespace Contensive.Processor.Controllers {
                                                                                                                             if (fieldLookupId <= 0) {
                                                                                                                                 return_ErrorMessage = return_ErrorMessage + "<P>Warning: There was a problem translating field [" + FieldName + "] in record [" + ContentName + "] because the record it refers to was not found in this site.</P>";
                                                                                                                             } else {
-                                                                                                                                csXfer.csSet(FieldName, fieldLookupId);
+                                                                                                                                csXfer.set(FieldName, fieldLookupId);
                                                                                                                             }
                                                                                                                         } else {
                                                                                                                             //
@@ -1664,7 +1664,7 @@ namespace Contensive.Processor.Controllers {
                                                                                                                                 if (fieldLookupId <= 0) {
                                                                                                                                     return_ErrorMessage = return_ErrorMessage + "<P>Warning: There was a problem translating field [" + FieldName + "] in record [" + ContentName + "] because the record it refers to was not found in this site.</P>";
                                                                                                                                 } else {
-                                                                                                                                    csXfer.csSet(FieldName, fieldLookupId);
+                                                                                                                                    csXfer.set(FieldName, fieldLookupId);
                                                                                                                                 }
                                                                                                                             }
                                                                                                                         }
@@ -1672,12 +1672,12 @@ namespace Contensive.Processor.Controllers {
                                                                                                                 } else if (FieldValue.IsNumeric()) {
                                                                                                                     //
                                                                                                                     // must be lookup list
-                                                                                                                    csXfer.csSet(FieldName, FieldValue);
+                                                                                                                    csXfer.set(FieldName, FieldValue);
                                                                                                                 }
                                                                                                                 break;
                                                                                                             }
                                                                                                         default: {
-                                                                                                                csXfer.csSet(FieldName, FieldValue);
+                                                                                                                csXfer.set(FieldName, FieldValue);
                                                                                                                 break;
                                                                                                             }
                                                                                                     }
@@ -1996,8 +1996,8 @@ namespace Contensive.Processor.Controllers {
             int navId = 0;
             try {
                 using (var csXfer = new CsModel(core)) {
-                    if (csXfer.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, "ccguid=" + DbController.encodeSQLText(ccGuid), "ID", true, 0, "ID")) {
-                        navId = csXfer.csGetInteger("id");
+                    if (csXfer.open(Processor.Models.Db.NavigatorEntryModel.contentName, "ccguid=" + DbController.encodeSQLText(ccGuid), "ID", true, 0, "ID")) {
+                        navId = csXfer.getInteger("id");
                     }
                 }
             } catch (Exception ex) {
@@ -2132,8 +2132,8 @@ namespace Contensive.Processor.Controllers {
                     }
                     using (var cs = new CsModel(core)) {
                         string Criteria = "(" + AddonGuidFieldName + "=" + DbController.encodeSQLText(addonGuid) + ")";
-                        cs.csOpen(Models.Db.AddonModel.contentName, Criteria, "", false);
-                        if (cs.csOk()) {
+                        cs.open(Models.Db.AddonModel.contentName, Criteria, "", false);
+                        if (cs.ok()) {
                             //
                             // Update the Addon
                             //
@@ -2144,28 +2144,28 @@ namespace Contensive.Processor.Controllers {
                             //
                             cs.close();
                             Criteria = "(name=" + DbController.encodeSQLText(addonName) + ")and(" + AddonGuidFieldName + " is null)";
-                            cs.csOpen(Models.Db.AddonModel.contentName, Criteria, "", false);
-                            if (cs.csOk()) {
+                            cs.open(Models.Db.AddonModel.contentName, Criteria, "", false);
+                            if (cs.ok()) {
                                 LogController.logInfo(core, "UpgradeAppFromLocalCollection, Add-on name matched an existing Add-on that has no GUID, Updating legacy Aggregate Function to Add-on [" + addonName + "], Guid [" + addonGuid + "]");
                             }
                         }
-                        if (!cs.csOk()) {
+                        if (!cs.ok()) {
                             //
                             // not found by GUID or by name, Insert a new addon
                             //
                             cs.close();
                             cs.insert(Models.Db.AddonModel.contentName);
-                            if (cs.csOk()) {
+                            if (cs.ok()) {
                                 LogController.logInfo(core, "UpgradeAppFromLocalCollection, Creating new Add-on [" + addonName + "], Guid [" + addonGuid + "]");
                             }
                         }
-                        if (!cs.csOk()) {
+                        if (!cs.ok()) {
                             //
                             // Could not create new Add-on
                             //
                             LogController.logInfo(core, "UpgradeAppFromLocalCollection, Add-on could not be created, skipping Add-on [" + addonName + "], Guid [" + addonGuid + "]");
                         } else {
-                            int addonId = cs.csGetInteger("ID");
+                            int addonId = cs.getInteger("ID");
                             //
                             // Initialize the add-on
                             // Delete any existing related records - so if this is an update with removed relationships, those are removed
@@ -2175,10 +2175,10 @@ namespace Contensive.Processor.Controllers {
                             MetaController.deleteContentRecords(core, "Add-on Include Rules", "addonid=" + addonId);
                             MetaController.deleteContentRecords(core, "Add-on Content Trigger Rules", "addonid=" + addonId);
                             //
-                            cs.csSet("collectionid", CollectionID);
-                            cs.csSet(AddonGuidFieldName, addonGuid);
-                            cs.csSet("name", addonName);
-                            cs.csSet("navTypeId", navTypeId);
+                            cs.set("collectionid", CollectionID);
+                            cs.set(AddonGuidFieldName, addonGuid);
+                            cs.set("name", addonName);
+                            cs.set("navTypeId", navTypeId);
                             string ArgumentList = "";
                             string StyleSheet = "";
                             if (AddonNode.ChildNodes.Count > 0) {
@@ -2217,13 +2217,13 @@ namespace Contensive.Processor.Controllers {
                                                             if (fieldTypeID > 0) {
                                                                 using (var CS2 = new CsModel(core)) {
                                                                     Criteria = "(addonid=" + addonId + ")and(contentfieldTypeID=" + fieldTypeID + ")";
-                                                                    CS2.csOpen("Add-on Content Field Type Rules", Criteria);
-                                                                    if (!CS2.csOk()) {
+                                                                    CS2.open("Add-on Content Field Type Rules", Criteria);
+                                                                    if (!CS2.ok()) {
                                                                         CS2.insert("Add-on Content Field Type Rules");
                                                                     }
-                                                                    if (CS2.csOk()) {
-                                                                        CS2.csSet("addonid", addonId);
-                                                                        CS2.csSet("contentfieldTypeID", fieldTypeID);
+                                                                    if (CS2.ok()) {
+                                                                        CS2.set("addonid", addonId);
+                                                                        CS2.set("contentfieldTypeID", fieldTypeID);
                                                                     }
                                                                 }
                                                             }
@@ -2250,24 +2250,24 @@ namespace Contensive.Processor.Controllers {
                                                             }
                                                             using (var CS2 = new CsModel(core)) {
                                                                 Criteria = "(ccguid=" + DbController.encodeSQLText(ContentNameorGuid) + ")";
-                                                                CS2.csOpen("Content", Criteria);
-                                                                if (!CS2.csOk()) {
+                                                                CS2.open("Content", Criteria);
+                                                                if (!CS2.ok()) {
                                                                     Criteria = "(ccguid is null)and(name=" + DbController.encodeSQLText(ContentNameorGuid) + ")";
-                                                                    CS2.csOpen("content", Criteria);
+                                                                    CS2.open("content", Criteria);
                                                                 }
-                                                                if (CS2.csOk()) {
-                                                                    TriggerContentID = CS2.csGetInteger("ID");
+                                                                if (CS2.ok()) {
+                                                                    TriggerContentID = CS2.getInteger("ID");
                                                                 }
                                                             }
                                                             if (TriggerContentID != 0) {
                                                                 using (var CS2 = new CsModel(core)) {
                                                                     Criteria = "(addonid=" + addonId + ")and(contentid=" + TriggerContentID + ")";
-                                                                    CS2.csOpen("Add-on Content Trigger Rules", Criteria);
-                                                                    if (!CS2.csOk()) {
+                                                                    CS2.open("Add-on Content Trigger Rules", Criteria);
+                                                                    if (!CS2.ok()) {
                                                                         CS2.insert("Add-on Content Trigger Rules");
-                                                                        if (CS2.csOk()) {
-                                                                            CS2.csSet("addonid", addonId);
-                                                                            CS2.csSet("contentid", TriggerContentID);
+                                                                        if (CS2.ok()) {
+                                                                            CS2.set("addonid", addonId);
+                                                                            CS2.set("contentid", TriggerContentID);
                                                                         }
                                                                     }
                                                                     CS2.close();
@@ -2288,11 +2288,11 @@ namespace Contensive.Processor.Controllers {
                                                 } else {
                                                     scriptinglanguageid = (int)AddonController.ScriptLanguages.VBScript;
                                                 }
-                                                cs.csSet("scriptinglanguageid", scriptinglanguageid);
+                                                cs.set("scriptinglanguageid", scriptinglanguageid);
                                                 ScriptingEntryPoint = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "entrypoint", "");
-                                                cs.csSet("ScriptingEntryPoint", ScriptingEntryPoint);
+                                                cs.set("ScriptingEntryPoint", ScriptingEntryPoint);
                                                 ScriptingTimeout = GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "timeout", "5000"));
-                                                cs.csSet("ScriptingTimeout", ScriptingTimeout);
+                                                cs.set("ScriptingTimeout", ScriptingTimeout);
                                                 ScriptingCode = "";
                                                 foreach (XmlNode ScriptingNode in PageInterfaceWithinLoop.ChildNodes) {
                                                     switch (GenericController.vbLCase(ScriptingNode.Name)) {
@@ -2301,20 +2301,20 @@ namespace Contensive.Processor.Controllers {
                                                             break;
                                                     }
                                                 }
-                                                cs.csSet("ScriptingCode", ScriptingCode);
+                                                cs.set("ScriptingCode", ScriptingCode);
                                                 break;
                                             case "activexprogramid":
                                                 //
                                                 // save program id
                                                 //
                                                 FieldValue = PageInterfaceWithinLoop.InnerText;
-                                                cs.csSet("ObjectProgramID", FieldValue);
+                                                cs.set("ObjectProgramID", FieldValue);
                                                 break;
                                             case "navigator":
                                                 //
                                                 // create a navigator entry with a parent set to this
                                                 //
-                                                cs.csSave();
+                                                cs.save();
                                                 menuNameSpace = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "NameSpace", "");
                                                 if (!string.IsNullOrEmpty(menuNameSpace)) {
                                                     string NavIconTypeString = XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "type", "");
@@ -2375,12 +2375,12 @@ namespace Contensive.Processor.Controllers {
                                                 //
                                                 FieldName = PageInterfaceWithinLoop.Name;
                                                 FieldValue = PageInterfaceWithinLoop.InnerText;
-                                                if (!cs.csIsFieldSupported(FieldName)) {
+                                                if (!cs.isFieldSupported(FieldName)) {
                                                     //
                                                     // Bad field name - need to report it somehow
                                                     //
                                                 } else {
-                                                    cs.csSet(FieldName, FieldValue);
+                                                    cs.set(FieldName, FieldValue);
                                                     if (GenericController.encodeBoolean(PageInterfaceWithinLoop.InnerText)) {
                                                         //
                                                         // if template, admin or content - let non-developers have navigator entry
@@ -2416,11 +2416,11 @@ namespace Contensive.Processor.Controllers {
                                                             FieldValue = FieldValue.Substring(17);
                                                         }
                                                     }
-                                                    cs.csSet("IconFilename", FieldValue);
+                                                    cs.set("IconFilename", FieldValue);
                                                     if (true) {
-                                                        cs.csSet("IconWidth", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "width", "0")));
-                                                        cs.csSet("IconHeight", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "height", "0")));
-                                                        cs.csSet("IconSprites", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "sprites", "0")));
+                                                        cs.set("IconWidth", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "width", "0")));
+                                                        cs.set("IconHeight", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "height", "0")));
+                                                        cs.set("IconSprites", GenericController.encodeInteger(XmlController.GetXMLAttribute(core, IsFound, PageInterfaceWithinLoop, "sprites", "0")));
                                                     }
                                                 }
                                                 break;
@@ -2440,7 +2440,7 @@ namespace Contensive.Processor.Controllers {
                                                 //   this removes the ccsettingpages and settingcollectionrules, etc.
                                                 //
                                                 if (true) {
-                                                    cs.csSet("formxml", PageInterfaceWithinLoop.InnerXml);
+                                                    cs.set("formxml", PageInterfaceWithinLoop.InnerXml);
                                                 }
                                                 break;
                                             case "javascript":
@@ -2449,7 +2449,7 @@ namespace Contensive.Processor.Controllers {
                                                 // these all translate to JSFilename
                                                 //
                                                 FieldName = "jsfilename";
-                                                cs.csSet(FieldName, PageInterfaceWithinLoop.InnerText);
+                                                cs.set(FieldName, PageInterfaceWithinLoop.InnerText);
 
                                                 break;
                                             case "iniframe":
@@ -2457,7 +2457,7 @@ namespace Contensive.Processor.Controllers {
                                                 // typo - field is inframe
                                                 //
                                                 FieldName = "inframe";
-                                                cs.csSet(FieldName, PageInterfaceWithinLoop.InnerText);
+                                                cs.set(FieldName, PageInterfaceWithinLoop.InnerText);
                                                 break;
                                             default:
                                                 //
@@ -2465,21 +2465,21 @@ namespace Contensive.Processor.Controllers {
                                                 //
                                                 FieldName = PageInterfaceWithinLoop.Name;
                                                 FieldValue = PageInterfaceWithinLoop.InnerText;
-                                                if (!cs.csIsFieldSupported(FieldName)) {
+                                                if (!cs.isFieldSupported(FieldName)) {
                                                     //
                                                     // Bad field name - need to report it somehow
                                                     //
                                                     LogController.handleError(core, new ApplicationException("bad field found [" + FieldName + "], in addon node [" + addonName + "], of collection [" + MetaController.getRecordName(core, "add-on collections", CollectionID) + "]"));
                                                 } else {
-                                                    cs.csSet(FieldName, FieldValue);
+                                                    cs.set(FieldName, FieldValue);
                                                 }
                                                 break;
                                         }
                                     }
                                 }
                             }
-                            cs.csSet("ArgumentList", ArgumentList);
-                            cs.csSet("StylesFilename", StyleSheet);
+                            cs.set("ArgumentList", ArgumentList);
+                            cs.set("StylesFilename", StyleSheet);
                             // these are dynamic now
                             //            '
                             //            ' Setup special setting/tool/report Navigator Entry
@@ -2633,8 +2633,8 @@ namespace Contensive.Processor.Controllers {
                     AddOnType =XmlController.GetXMLAttribute(core, IsFound, AddonNode, "type", "");
                     Criteria = "(" + AddonGuidFieldName + "=" + DbController.encodeSQLText(AOGuid) + ")";
                     using (var csXfer = new CsModel(core)) {
-                        csXfer.csOpen(Models.Db.AddonModel.contentName, Criteria, "", false);
-                        if (csXfer.csOk()) {
+                        csXfer.open(Models.Db.AddonModel.contentName, Criteria, "", false);
+                        if (csXfer.ok()) {
                             //
                             // Update the Addon
                             //
@@ -2645,15 +2645,15 @@ namespace Contensive.Processor.Controllers {
                             //
                             csXfer.close();
                             Criteria = "(name=" + DbController.encodeSQLText(AOName) + ")and(" + AddonGuidFieldName + " is null)";
-                            csXfer.csOpen(Models.Db.AddonModel.contentName, Criteria, "", false);
+                            csXfer.open(Models.Db.AddonModel.contentName, Criteria, "", false);
                         }
-                        if (!csXfer.csOk()) {
+                        if (!csXfer.ok()) {
                             //
                             // Could not find add-on
                             //
                             LogController.logInfo(core, "UpgradeAppFromLocalCollection, Add-on could not be created, skipping Add-on [" + AOName + "], Guid [" + AOGuid + "]");
                         } else {
-                            addonId = csXfer.csGetInteger("ID");
+                            addonId = csXfer.getInteger("ID");
                             if (AddonNode.ChildNodes.Count > 0) {
                                 foreach (XmlNode PageInterface in AddonNode.ChildNodes) {
                                     switch (GenericController.vbLCase(PageInterface.Name)) {
@@ -2680,9 +2680,9 @@ namespace Contensive.Processor.Controllers {
                                                 }
                                                 if (!string.IsNullOrEmpty(Criteria)) {
                                                     using (var CS2 = new CsModel(core)) {
-                                                        CS2.csOpen(Models.Db.AddonModel.contentName, Criteria);
-                                                        if (CS2.csOk()) {
-                                                            IncludeAddonID = CS2.csGetInteger("ID");
+                                                        CS2.open(Models.Db.AddonModel.contentName, Criteria);
+                                                        if (CS2.ok()) {
+                                                            IncludeAddonID = CS2.getInteger("ID");
                                                         }
                                                     }
                                                     AddRule = false;
@@ -2693,15 +2693,15 @@ namespace Contensive.Processor.Controllers {
                                                         ReturnErrorMessage = ReturnErrorMessage + "<P>The collection was not installed because the add-on [" + AOName + "] requires an included add-on [" + IncludeAddonName + "] which could not be found. If it is in the collection being installed, it must appear before any add-ons that include it.</P>";
                                                     } else {
                                                         using (var cs3 = new CsModel(core)) {
-                                                            AddRule = !cs3.csOpenSql("select ID from ccAddonIncludeRules where Addonid=" + addonId + " and IncludedAddonID=" + IncludeAddonID);
+                                                            AddRule = !cs3.openSql("select ID from ccAddonIncludeRules where Addonid=" + addonId + " and IncludedAddonID=" + IncludeAddonID);
                                                         }
                                                     }
                                                     if (AddRule) {
                                                         using (var cs3 = new CsModel(core)) {
                                                             cs3.insert("Add-on Include Rules");
-                                                            if (cs3.csOk()) {
-                                                                cs3.csSet("Addonid", addonId);
-                                                                cs3.csSet("IncludedAddonID", IncludeAddonID);
+                                                            if (cs3.ok()) {
+                                                                cs3.set("Addonid", addonId);
+                                                                cs3.set("IncludedAddonID", IncludeAddonID);
                                                             }
                                                         }
                                                     }

@@ -34,16 +34,16 @@ namespace Contensive.Processor.Controllers {
             }
             using (var csXfer = new CsModel(core)) {
                 csXfer.insert("Remote Queries");
-                if (csXfer.csOk()) {
+                if (csXfer.ok()) {
                     RemoteKey = GenericController.getGUIDString();
                     DataSourceID = MetaController.getRecordId(core, "Data Sources", dataSourceName);
-                    csXfer.csSet("remotekey", RemoteKey);
-                    csXfer.csSet("datasourceid", DataSourceID);
-                    csXfer.csSet("sqlquery", SQL);
-                    csXfer.csSet("maxRows", maxRows);
-                    csXfer.csSet("dateexpires", DbController.encodeSQLDate(core.doc.profileStartTime.AddDays(1)));
-                    csXfer.csSet("QueryTypeID", QueryTypeSQL);
-                    csXfer.csSet("VisitId", core.session.visit.id);
+                    csXfer.set("remotekey", RemoteKey);
+                    csXfer.set("datasourceid", DataSourceID);
+                    csXfer.set("sqlquery", SQL);
+                    csXfer.set("maxRows", maxRows);
+                    csXfer.set("dateexpires", DbController.encodeSQLDate(core.doc.profileStartTime.AddDays(1)));
+                    csXfer.set("QueryTypeID", QueryTypeSQL);
+                    csXfer.set("VisitId", core.session.visit.id);
                 }
                 csXfer.close();
             }

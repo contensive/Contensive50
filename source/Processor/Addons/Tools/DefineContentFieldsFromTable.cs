@@ -51,11 +51,11 @@ namespace Contensive.Addons.Tools {
                 Stream.Add("<TD><Select name=\"ContentName\">");
                 int ItemCount = 0;
                 using (var csXfer = new CsModel(core)) {
-                    csXfer.csOpen("Content", "", "name");
-                    while (csXfer.csOk()) {
-                        Stream.Add("<option value=\"" + csXfer.csGetText("name") + "\">" + csXfer.csGetText("name") + "</option>");
+                    csXfer.open("Content", "", "name");
+                    while (csXfer.ok()) {
+                        Stream.Add("<option value=\"" + csXfer.getText("name") + "\">" + csXfer.getText("name") + "</option>");
                         ItemCount = ItemCount + 1;
-                        csXfer.csGoNext();
+                        csXfer.goNext();
                     }
 
                 }

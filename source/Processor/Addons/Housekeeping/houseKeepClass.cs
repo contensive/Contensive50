@@ -102,9 +102,9 @@ namespace Contensive.Addons.Housekeeping {
                     int PeopleCID = MetaModel.getContentId(core, "people");
                     string SQL = "select defaultvalue from ccfields where name='name' and contentid=(" + PeopleCID + ")";
                     using (var csXfer = new CsModel(core)) {
-                        csXfer.csOpenSql(SQL, "Default");
-                        if (csXfer.csOk()) {
-                            DefaultMemberName = csXfer.csGetText("defaultvalue");
+                        csXfer.openSql(SQL, "Default");
+                        if (csXfer.ok()) {
+                            DefaultMemberName = csXfer.getText("defaultvalue");
                         }
                         csXfer.close();
                     }
@@ -150,10 +150,10 @@ namespace Contensive.Addons.Housekeeping {
                             logHousekeeping(core, "Archive update for pages on [" + core.appConfig.name + "]");
                             SQL = "select * from ccpagecontent where (( DateArchive is not null )and(DateArchive<" + SQLNow + "))and(active<>0)";
                             using (var csXfer = new CsModel(core)) {
-                                csXfer.csOpenSql(SQL, "Default");
-                                while (csXfer.csOk()) {
-                                    int RecordID = csXfer.csGetInteger("ID");
-                                    int ArchiveParentID = csXfer.csGetInteger("ArchiveParentID");
+                                csXfer.openSql(SQL, "Default");
+                                while (csXfer.ok()) {
+                                    int RecordID = csXfer.getInteger("ID");
+                                    int ArchiveParentID = csXfer.getInteger("ArchiveParentID");
                                     if (ArchiveParentID == 0) {
                                         SQL = "update ccpagecontent set DateArchive=null where (id=" + RecordID + ")";
                                         core.db.executeQuery(SQL);
@@ -162,7 +162,7 @@ namespace Contensive.Addons.Housekeeping {
                                         core.db.executeQuery(SQL);
                                         NeedToClearCache = true;
                                     }
-                                    csXfer.csGoNext();
+                                    csXfer.goNext();
                                 }
                                 csXfer.close();
                             }
@@ -193,17 +193,17 @@ namespace Contensive.Addons.Housekeeping {
                             //
                             SQL = core.db.getSQLSelect("default", "ccVisitSummary", "DateNumber", "TimeDuration=24 and DateNumber>=" + OldestVisitSummaryWeCareAbout.Date.ToOADate(), "DateNumber,TimeNumber");
                             using (var csXfer = new CsModel(core)) {
-                                csXfer.csOpenSql(SQL, "Default");
+                                csXfer.openSql(SQL, "Default");
                                 DateTime datePtr = OldestVisitSummaryWeCareAbout;
                                 while (datePtr <= Yesterday) {
-                                    if (!csXfer.csOk()) {
+                                    if (!csXfer.ok()) {
                                         //
                                         // Out of data, start with this DatePtr
                                         //
                                         houseKeep_VisitSummary(core, datePtr, datePtr, 24, core.siteProperties.dataBuildVersion, OldestVisitSummaryWeCareAbout);
                                         //Exit For
                                     } else {
-                                        DateTime workingDate = DateTime.MinValue.AddDays(csXfer.csGetInteger("DateNumber"));
+                                        DateTime workingDate = DateTime.MinValue.AddDays(csXfer.getInteger("DateNumber"));
                                         if (datePtr < workingDate) {
                                             //
                                             // There are missing dates, update them
@@ -211,11 +211,11 @@ namespace Contensive.Addons.Housekeeping {
                                             houseKeep_VisitSummary(core, datePtr, workingDate.AddDays(-1), 24, core.siteProperties.dataBuildVersion, OldestVisitSummaryWeCareAbout);
                                         }
                                     }
-                                    if (csXfer.csOk()) {
+                                    if (csXfer.ok()) {
                                         //
                                         // if there is more data, go to the next record
                                         //
-                                        csXfer.csGoNext();
+                                        csXfer.goNext();
                                     }
                                     datePtr = datePtr.AddDays(1).Date;
                                 }
@@ -253,10 +253,10 @@ namespace Contensive.Addons.Housekeeping {
                         {
                             DateTime datePtr = default(DateTime);
                             using (var csXfer = new CsModel(core)) {
-                                if (!csXfer.csOpenSql(core.db.getSQLSelect("default", "ccviewingsummary", "DateNumber", "TimeDuration=24 and DateNumber>=" + OldestVisitSummaryWeCareAbout.Date.ToOADate(), "DateNumber Desc", "", 1))) {
+                                if (!csXfer.openSql(core.db.getSQLSelect("default", "ccviewingsummary", "DateNumber", "TimeDuration=24 and DateNumber>=" + OldestVisitSummaryWeCareAbout.Date.ToOADate(), "DateNumber Desc", "", 1))) {
                                     datePtr = OldestVisitSummaryWeCareAbout;
                                 } else {
-                                    datePtr = DateTime.MinValue.AddDays(csXfer.csGetInteger("DateNumber"));
+                                    datePtr = DateTime.MinValue.AddDays(csXfer.getInteger("DateNumber"));
                                 }
                             }
                             if (datePtr < OldestVisitSummaryWeCareAbout) { datePtr = OldestVisitSummaryWeCareAbout; }
@@ -278,8 +278,8 @@ namespace Contensive.Addons.Housekeeping {
                         //
                         DateTime LastTimeSummaryWasRun = VisitArchiveDate;
                         using (var csXfer = new CsModel(core)) {
-                            if (csXfer.csOpenSql(core.db.getSQLSelect("default", "ccVisitSummary", "DateAdded", "(timeduration=1)and(Dateadded>" + DbController.encodeSQLDate(VisitArchiveDate) + ")", "id Desc", "", 1))) {
-                                LastTimeSummaryWasRun = csXfer.csGetDate("DateAdded");
+                            if (csXfer.openSql(core.db.getSQLSelect("default", "ccVisitSummary", "DateAdded", "(timeduration=1)and(Dateadded>" + DbController.encodeSQLDate(VisitArchiveDate) + ")", "id Desc", "", 1))) {
+                                LastTimeSummaryWasRun = csXfer.getDate("DateAdded");
                                 logHousekeeping(core, "Update hourly visit summary, last time summary was run was [" + LastTimeSummaryWasRun + "]");
                             } else {
                                 logHousekeeping(core, "Update hourly visit summary, no hourly summaries were found, set start to [" + LastTimeSummaryWasRun + "]");
@@ -296,8 +296,8 @@ namespace Contensive.Addons.Housekeeping {
                         DateTime StartOfHour = (new DateTime(LastTimeSummaryWasRun.Year, LastTimeSummaryWasRun.Month, LastTimeSummaryWasRun.Day, LastTimeSummaryWasRun.Hour, 1, 1)).AddHours(-1); // (Int(24 * LastTimeSummaryWasRun) / 24) - PeriodStep
                         DateTime OldestDateAdded = StartOfHour;
                         using (var csXfer = new CsModel(core)) {
-                            if (csXfer.csOpenSql(core.db.getSQLSelect("default", "ccVisits", "DateAdded", "LastVisitTime>" + DbController.encodeSQLDate(StartOfHour), "dateadded", "", 1))) {
-                                OldestDateAdded = csXfer.csGetDate("DateAdded");
+                            if (csXfer.openSql(core.db.getSQLSelect("default", "ccVisits", "DateAdded", "LastVisitTime>" + DbController.encodeSQLDate(StartOfHour), "dateadded", "", 1))) {
+                                OldestDateAdded = csXfer.getDate("DateAdded");
                                 if (OldestDateAdded < NextSummaryStartDate) {
                                     NextSummaryStartDate = OldestDateAdded;
                                     logHousekeeping(core, "Update hourly visit summary, found a visit with the last viewing during the past hour. It started [" + OldestDateAdded + "], before the last summary was run.");
@@ -314,8 +314,8 @@ namespace Contensive.Addons.Housekeeping {
                         int HoursPerDay = 0;
                         for (double PeriodDatePtr = PeriodStartDate.ToOADate(); PeriodDatePtr <= OldestDateAdded.ToOADate(); PeriodDatePtr += PeriodStep) {
                             using (var csXfer = new CsModel(core)) {
-                                if (csXfer.csOpenSql("select count(id) as HoursPerDay from ccVisitSummary where TimeDuration=1 and DateNumber=" + encodeInteger(PeriodDatePtr) + " group by DateNumber")) {
-                                    HoursPerDay = csXfer.csGetInteger("HoursPerDay");
+                                if (csXfer.openSql("select count(id) as HoursPerDay from ccVisitSummary where TimeDuration=1 and DateNumber=" + encodeInteger(PeriodDatePtr) + " group by DateNumber")) {
+                                    HoursPerDay = csXfer.getInteger("HoursPerDay");
                                 }
                                 csXfer.close();
                                 if (HoursPerDay < 24) {
@@ -557,8 +557,8 @@ namespace Contensive.Addons.Housekeeping {
                 //
                 // Get Oldest Visit
                 using (var csXfer = new CsModel(core)) {
-                    if (csXfer.csOpenSql(core.db.getSQLSelect("default", "ccVisits", "DateAdded", "", "dateadded", "", 1))) {
-                        OldestVisitDate = csXfer.csGetDate("DateAdded").Date;
+                    if (csXfer.openSql(core.db.getSQLSelect("default", "ccVisits", "DateAdded", "", "dateadded", "", 1))) {
+                        OldestVisitDate = csXfer.getDate("DateAdded").Date;
                     }
                 }
                 DateTime ArchiveDate = default(DateTime);
@@ -692,18 +692,18 @@ namespace Contensive.Addons.Housekeeping {
                 string FieldNew = null;
                 int FieldRecordID = 0;
                 using (var csXfer = new CsModel(core)) {
-                    csXfer.csOpenSql("Select ID, ContentID, Type, Caption from ccFields where (active<>0)and(Type=" + fieldTypeIdRedirect + ") Order By ContentID, Caption, ID");
+                    csXfer.openSql("Select ID, ContentID, Type, Caption from ccFields where (active<>0)and(Type=" + fieldTypeIdRedirect + ") Order By ContentID, Caption, ID");
                     FieldLast = "";
-                    while (csXfer.csOk()) {
-                        FieldContentID = csXfer.csGetInteger("Contentid");
-                        string FieldCaption = csXfer.csGetText("Caption");
+                    while (csXfer.ok()) {
+                        FieldContentID = csXfer.getInteger("Contentid");
+                        string FieldCaption = csXfer.getText("Caption");
                         FieldNew = FieldContentID + FieldCaption;
                         if (FieldNew == FieldLast) {
-                            FieldRecordID = csXfer.csGetInteger("ID");
+                            FieldRecordID = csXfer.getInteger("ID");
                             core.db.executeNonQuery("Update ccFields set active=0 where ID=" + FieldRecordID + ";");
                         }
                         FieldLast = FieldNew;
-                        csXfer.csGoNext();
+                        csXfer.goNext();
                     }
                 }
                 //
@@ -712,17 +712,17 @@ namespace Contensive.Addons.Housekeeping {
                 using (var csXfer = new CsModel(core)) {
                     FieldLast = "";
                     string FieldName = null;
-                    while (csXfer.csOpenSql("Select ID, Name, ContentID, Type from ccFields where (active<>0)and(Type<>" + fieldTypeIdRedirect + ") Order By ContentID, Name, Type, ID")) {
-                        int fieldType = csXfer.csGetInteger("Type");
-                        FieldContentID = csXfer.csGetInteger("Contentid");
-                        FieldName = csXfer.csGetText("Name");
-                        FieldRecordID = csXfer.csGetInteger("ID");
+                    while (csXfer.openSql("Select ID, Name, ContentID, Type from ccFields where (active<>0)and(Type<>" + fieldTypeIdRedirect + ") Order By ContentID, Name, Type, ID")) {
+                        int fieldType = csXfer.getInteger("Type");
+                        FieldContentID = csXfer.getInteger("Contentid");
+                        FieldName = csXfer.getText("Name");
+                        FieldRecordID = csXfer.getInteger("ID");
                         FieldNew = FieldContentID + FieldName + fieldType;
                         if (FieldNew == FieldLast) {
                             core.db.executeQuery("Update ccFields set active=0 where ID=" + FieldRecordID + ";");
                         }
                         FieldLast = FieldNew;
-                        csXfer.csGoNext();
+                        csXfer.goNext();
                     }
                 }
                 //
@@ -893,10 +893,10 @@ namespace Contensive.Addons.Housekeeping {
                     + " From ccGroupRules LEFT JOIN ccContent on ccContent.ID=ccGroupRules.ContentID"
                     + " WHERE (ccContent.ID is null)";
                 using (var csXfer = new CsModel(core)) {
-                    csXfer.csOpenSql(sql);
-                    while (csXfer.csOk()) {
-                        MetaController.deleteContentRecord(core, "Group Rules", csXfer.csGetInteger("ID"));
-                        csXfer.csGoNext();
+                    csXfer.openSql(sql);
+                    while (csXfer.ok()) {
+                        MetaController.deleteContentRecord(core, "Group Rules", csXfer.getInteger("ID"));
+                        csXfer.goNext();
                     }
                 }
                 //
@@ -935,10 +935,10 @@ namespace Contensive.Addons.Housekeeping {
                     sql = "Select ccContentWatch.ID"
                         + " From ccContentWatch LEFT JOIN ccContent on ccContent.ID=ccContentWatch.ContentID"
                         + " WHERE (ccContent.ID is null)or(ccContent.Active=0)or(ccContent.Active is null)";
-                    csXfer.csOpenSql(sql);
-                    while (csXfer.csOk()) {
-                        MetaController.deleteContentRecord(core, "Content Watch", csXfer.csGetInteger("ID"));
-                        csXfer.csGoNext();
+                    csXfer.openSql(sql);
+                    while (csXfer.ok()) {
+                        MetaController.deleteContentRecord(core, "Content Watch", csXfer.getInteger("ID"));
+                        csXfer.goNext();
                     }
                 }
                 //
@@ -1057,13 +1057,13 @@ namespace Contensive.Addons.Housekeeping {
                             + " FROM (ccFields LEFT JOIN ccContent ON ccFields.ContentID = ccContent.ID) LEFT JOIN ccTables ON ccContent.ContentTableID = ccTables.ID"
                             + " Where (((ccFields.Type) = 10))"
                             + " ORDER BY ccTables.Name";
-                        csXfer.csOpenSql(sql);
-                        while (csXfer.csOk()) {
+                        csXfer.openSql(sql);
+                        while (csXfer.ok()) {
                             //
                             // Get all the files in this path, and check that the record exists with this in its field
                             //
-                            string FieldName = csXfer.csGetText("FieldName");
-                            string TableName = csXfer.csGetText("TableName");
+                            string FieldName = csXfer.getText("FieldName");
+                            string TableName = csXfer.getText("TableName");
                             string PathName = TableName + "\\" + FieldName;
                             List<CPFileSystemBaseClass.FileDetail> FileList = core.cdnFiles.getFileList(PathName);
                             if (FileList.Count > 0) {
@@ -1080,7 +1080,7 @@ namespace Contensive.Addons.Housekeeping {
                                     } else {
                                         using (var csTest = new CsModel(core)) {
                                             sql = "SELECT ID FROM " + TableName + " WHERE (" + FieldName + "=" + DbController.encodeSQLText(VirtualFileName) + ")or(" + FieldName + "=" + DbController.encodeSQLText(VirtualLink) + ")";
-                                            if (!csTest.csOpenSql(sql)) {
+                                            if (!csTest.openSql(sql)) {
                                                 core.cdnFiles.deleteFile(VirtualFileName);
                                             }
                                         }
@@ -1098,7 +1098,7 @@ namespace Contensive.Addons.Housekeeping {
                                 }
                                 core.db.executeQuery(sql);
                             }
-                            csXfer.csGoNext();
+                            csXfer.goNext();
                         }
                     }
                 }
@@ -1307,9 +1307,9 @@ namespace Contensive.Addons.Housekeeping {
                             + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
                             + "";
                         using (var csXfer = new CsModel(core)) {
-                            csXfer.csOpenSql(SQL, "Default");
-                            if (csXfer.csOk()) {
-                                NoCookieVisits = csXfer.csGetInteger("NoCookieVisits");
+                            csXfer.openSql(SQL, "Default");
+                            if (csXfer.ok()) {
+                                NoCookieVisits = csXfer.getInteger("NoCookieVisits");
                             }
                         }
                         //
@@ -1323,11 +1323,11 @@ namespace Contensive.Addons.Housekeeping {
                             + " and((v.ExcludeFromAnalytics is null)or(v.ExcludeFromAnalytics=0))"
                             + "";
                         using (var csXfer = new CsModel(core)) {
-                            csXfer.csOpenSql(SQL, "Default");
-                            if (csXfer.csOk()) {
-                                VisitCnt = csXfer.csGetInteger("VisitCnt");
-                                HitCnt = csXfer.csGetInteger("HitCnt");
-                                TimeOnSite = csXfer.csGetNumber("TimeOnSite");
+                            csXfer.openSql(SQL, "Default");
+                            if (csXfer.ok()) {
+                                VisitCnt = csXfer.getInteger("VisitCnt");
+                                HitCnt = csXfer.getInteger("HitCnt");
+                                TimeOnSite = csXfer.getNumber("TimeOnSite");
                             }
                         }
                         //
@@ -1343,9 +1343,9 @@ namespace Contensive.Addons.Housekeeping {
                                 + " and(v.VisitorNew<>0)"
                                 + "";
                             using (var csXfer = new CsModel(core)) {
-                                csXfer.csOpenSql(SQL, "Default");
-                                if (csXfer.csOk()) {
-                                    NewVisitorVisits = csXfer.csGetInteger("NewVisitorVisits");
+                                csXfer.openSql(SQL, "Default");
+                                if (csXfer.ok()) {
+                                    NewVisitorVisits = csXfer.getInteger("NewVisitorVisits");
                                 }
                             }
                             //
@@ -1360,9 +1360,9 @@ namespace Contensive.Addons.Housekeeping {
                                 + " and(v.PageVisits=1)"
                                 + "";
                             using (var csXfer = new CsModel(core)) {
-                                csXfer.csOpenSql(SQL, "Default");
-                                if (csXfer.csOk()) {
-                                    SinglePageVisits = csXfer.csGetInteger("SinglePageVisits");
+                                csXfer.openSql(SQL, "Default");
+                                if (csXfer.ok()) {
+                                    SinglePageVisits = csXfer.getInteger("SinglePageVisits");
                                 }
                             }
                             //
@@ -1377,11 +1377,11 @@ namespace Contensive.Addons.Housekeeping {
                                 + " and(PageVisits>1)"
                                 + "";
                             using (var csXfer = new CsModel(core)) {
-                                csXfer.csOpenSql(SQL, "Default");
-                                if (csXfer.csOk()) {
-                                    MultiPageVisitCnt = csXfer.csGetInteger("VisitCnt");
-                                    MultiPageHitCnt = csXfer.csGetInteger("HitCnt");
-                                    MultiPageTimetoLastHitSum = csXfer.csGetNumber("TimetoLastHitSum");
+                                csXfer.openSql(SQL, "Default");
+                                if (csXfer.ok()) {
+                                    MultiPageVisitCnt = csXfer.getInteger("VisitCnt");
+                                    MultiPageHitCnt = csXfer.getInteger("HitCnt");
+                                    MultiPageTimetoLastHitSum = csXfer.getNumber("TimetoLastHitSum");
                                 }
                             }
                             //
@@ -1396,9 +1396,9 @@ namespace Contensive.Addons.Housekeeping {
                                 + " and(VisitAuthenticated<>0)"
                                 + "";
                             using (var csXfer = new CsModel(core)) {
-                                csXfer.csOpenSql(SQL, "Default");
-                                if (csXfer.csOk()) {
-                                    AuthenticatedVisits = csXfer.csGetInteger("AuthenticatedVisits");
+                                csXfer.openSql(SQL, "Default");
+                                if (csXfer.ok()) {
+                                    AuthenticatedVisits = csXfer.getInteger("AuthenticatedVisits");
                                 }
                             }
                             // 
@@ -1414,9 +1414,9 @@ namespace Contensive.Addons.Housekeeping {
                                 + " and(Mobile<>0)"
                                 + "";
                             using (var csXfer = new CsModel(core)) {
-                                csXfer.csOpenSql(SQL, "Default");
-                                if (csXfer.csOk()) {
-                                    MobileVisits = csXfer.csGetInteger("cnt");
+                                csXfer.openSql(SQL, "Default");
+                                if (csXfer.ok()) {
+                                    MobileVisits = csXfer.getInteger("cnt");
                                 }
                             }
                             //
@@ -1431,9 +1431,9 @@ namespace Contensive.Addons.Housekeeping {
                                 + " and(Bot<>0)"
                                 + "";
                             using (var csXfer = new CsModel(core)) {
-                                csXfer.csOpenSql(SQL, "Default");
-                                if (csXfer.csOk()) {
-                                    BotVisits = csXfer.csGetInteger("cnt");
+                                csXfer.openSql(SQL, "Default");
+                                if (csXfer.ok()) {
+                                    BotVisits = csXfer.getInteger("cnt");
                                 }
                             }
                             //
@@ -1447,27 +1447,27 @@ namespace Contensive.Addons.Housekeeping {
                         // Add or update the Visit Summary Record
                         //
                         using (var csXfer = new CsModel(core)) {
-                            csXfer.csOpen("Visit Summary", "(timeduration=" + HourDuration + ")and(DateNumber=" + DateNumber + ")and(TimeNumber=" + TimeNumber + ")");
-                            if (!csXfer.csOk()) {
+                            csXfer.open("Visit Summary", "(timeduration=" + HourDuration + ")and(DateNumber=" + DateNumber + ")and(TimeNumber=" + TimeNumber + ")");
+                            if (!csXfer.ok()) {
                                 csXfer.close();
                                 csXfer.insert("Visit Summary");
                             }
                             //
-                            if (csXfer.csOk()) {
-                                csXfer.csSet("name", HourDuration + " hr summary for " + DateTime.FromOADate(DateNumber).ToShortDateString() + " " + TimeNumber + ":00");
-                                csXfer.csSet("DateNumber", DateNumber);
-                                csXfer.csSet("TimeNumber", TimeNumber);
-                                csXfer.csSet("Visits", VisitCnt);
-                                csXfer.csSet("PagesViewed", HitCnt);
-                                csXfer.csSet("TimeDuration", HourDuration);
-                                csXfer.csSet("NewVisitorVisits", NewVisitorVisits);
-                                csXfer.csSet("SinglePageVisits", SinglePageVisits);
-                                csXfer.csSet("AuthenticatedVisits", AuthenticatedVisits);
-                                csXfer.csSet("NoCookieVisits", NoCookieVisits);
-                                csXfer.csSet("AveTimeOnSite", AveTimeOnSite);
+                            if (csXfer.ok()) {
+                                csXfer.set("name", HourDuration + " hr summary for " + DateTime.FromOADate(DateNumber).ToShortDateString() + " " + TimeNumber + ":00");
+                                csXfer.set("DateNumber", DateNumber);
+                                csXfer.set("TimeNumber", TimeNumber);
+                                csXfer.set("Visits", VisitCnt);
+                                csXfer.set("PagesViewed", HitCnt);
+                                csXfer.set("TimeDuration", HourDuration);
+                                csXfer.set("NewVisitorVisits", NewVisitorVisits);
+                                csXfer.set("SinglePageVisits", SinglePageVisits);
+                                csXfer.set("AuthenticatedVisits", AuthenticatedVisits);
+                                csXfer.set("NoCookieVisits", NoCookieVisits);
+                                csXfer.set("AveTimeOnSite", AveTimeOnSite);
                                 if (true) {
-                                    csXfer.csSet("MobileVisits", MobileVisits);
-                                    csXfer.csSet("BotVisits", BotVisits);
+                                    csXfer.set("MobileVisits", MobileVisits);
+                                    csXfer.set("BotVisits", BotVisits);
                                 }
                             }
                         }
@@ -1611,28 +1611,28 @@ namespace Contensive.Addons.Housekeeping {
                                 + " and((h.ExcludeFromAnalytics is null)or(h.ExcludeFromAnalytics=0))"
                                 + "order by recordid";
                             hint = 3;
-                            if (!csPages.csOpenSql(sql)) {
+                            if (!csPages.openSql(sql)) {
                                 //
                                 // no hits found - add or update a single record for this day so we know it has been calculated
-                                csPages.csOpen("Page View Summary", "(timeduration=" + HourDuration + ")and(DateNumber=" + DateNumber + ")and(TimeNumber=" + TimeNumber + ")and(pageid=" + PageID + ")and(pagetitle=" + DbController.encodeSQLText(PageTitle) + ")");
-                                if (!csPages.csOk()) {
+                                csPages.open("Page View Summary", "(timeduration=" + HourDuration + ")and(DateNumber=" + DateNumber + ")and(TimeNumber=" + TimeNumber + ")and(pageid=" + PageID + ")and(pagetitle=" + DbController.encodeSQLText(PageTitle) + ")");
+                                if (!csPages.ok()) {
                                     csPages.close();
                                     csPages.insert("Page View Summary");
                                 }
                                 //
-                                if (csPages.csOk()) {
-                                    csPages.csSet("name", HourDuration + " hr summary for " + DateTime.FromOADate((double)DateNumber) + " " + TimeNumber + ":00, " + PageTitle);
-                                    csPages.csSet("DateNumber", DateNumber);
-                                    csPages.csSet("TimeNumber", TimeNumber);
-                                    csPages.csSet("TimeDuration", HourDuration);
-                                    csPages.csSet("PageViews", PageViews);
-                                    csPages.csSet("PageID", PageID);
-                                    csPages.csSet("PageTitle", PageTitle);
-                                    csPages.csSet("AuthenticatedPageViews", AuthenticatedPageViews);
-                                    csPages.csSet("NoCookiePageViews", NoCookiePageViews);
+                                if (csPages.ok()) {
+                                    csPages.set("name", HourDuration + " hr summary for " + DateTime.FromOADate((double)DateNumber) + " " + TimeNumber + ":00, " + PageTitle);
+                                    csPages.set("DateNumber", DateNumber);
+                                    csPages.set("TimeNumber", TimeNumber);
+                                    csPages.set("TimeDuration", HourDuration);
+                                    csPages.set("PageViews", PageViews);
+                                    csPages.set("PageID", PageID);
+                                    csPages.set("PageTitle", PageTitle);
+                                    csPages.set("AuthenticatedPageViews", AuthenticatedPageViews);
+                                    csPages.set("NoCookiePageViews", NoCookiePageViews);
                                     if (true) {
-                                        csPages.csSet("MobilePageViews", MobilePageViews);
-                                        csPages.csSet("BotPageViews", BotPageViews);
+                                        csPages.set("MobilePageViews", MobilePageViews);
+                                        csPages.set("BotPageViews", BotPageViews);
                                     }
                                 }
                                 csPages.close();
@@ -1642,9 +1642,9 @@ namespace Contensive.Addons.Housekeeping {
                                 //
                                 // add an entry for each page hit on this day
                                 //
-                                while (csPages.csOk()) {
-                                    PageID = csPages.csGetInteger("recordid");
-                                    PageTitle = csPages.csGetText("pagetitle");
+                                while (csPages.ok()) {
+                                    PageID = csPages.getInteger("recordid");
+                                    PageTitle = csPages.getText("pagetitle");
                                     string baseCriteria = ""
                                         + " (h.recordid=" + PageID + ")"
                                         + " "
@@ -1664,9 +1664,9 @@ namespace Contensive.Addons.Housekeeping {
                                             + " from ccviewings h left join ccvisits v on h.visitid=v.id"
                                             + " where " + baseCriteria + " and (v.CookieSupport<>0)"
                                             + "";
-                                        csPageViews.csOpenSql(sql);
-                                        if (csPageViews.csOk()) {
-                                            PageViews = csPageViews.csGetInteger("cnt");
+                                        csPageViews.openSql(sql);
+                                        if (csPageViews.ok()) {
+                                            PageViews = csPageViews.getInteger("cnt");
                                         }
                                     }
                                     //
@@ -1678,9 +1678,9 @@ namespace Contensive.Addons.Housekeeping {
                                             + " where " + baseCriteria + " and(v.CookieSupport<>0)"
                                             + " and(v.visitAuthenticated<>0)"
                                             + "";
-                                        csAuthPages.csOpenSql(sql, "Default");
-                                        if (csAuthPages.csOk()) {
-                                            AuthenticatedPageViews = csAuthPages.csGetInteger("cnt");
+                                        csAuthPages.openSql(sql, "Default");
+                                        if (csAuthPages.ok()) {
+                                            AuthenticatedPageViews = csAuthPages.getInteger("cnt");
                                         }
                                     }
                                     //
@@ -1691,9 +1691,9 @@ namespace Contensive.Addons.Housekeeping {
                                             + " from ccviewings h left join ccvisits v on h.visitid=v.id"
                                             + " where " + baseCriteria + " and((v.CookieSupport=0)or(v.CookieSupport is null))"
                                             + "";
-                                        csNoCookie.csOpenSql(sql, "Default");
-                                        if (csNoCookie.csOk()) {
-                                            NoCookiePageViews = csNoCookie.csGetInteger("NoCookiePageViews");
+                                        csNoCookie.openSql(sql, "Default");
+                                        if (csNoCookie.ok()) {
+                                            NoCookiePageViews = csNoCookie.getInteger("NoCookiePageViews");
                                         }
                                     }
                                     //
@@ -1705,9 +1705,9 @@ namespace Contensive.Addons.Housekeeping {
                                             + " where " + baseCriteria + " and(v.CookieSupport<>0)"
                                             + " and(v.mobile<>0)"
                                             + "";
-                                        csMobileVisits.csOpenSql(sql);
-                                        if (csMobileVisits.csOk()) {
-                                            MobilePageViews = csMobileVisits.csGetInteger("cnt");
+                                        csMobileVisits.openSql(sql);
+                                        if (csMobileVisits.ok()) {
+                                            MobilePageViews = csMobileVisits.getInteger("cnt");
                                         }
                                     }
                                     //
@@ -1718,45 +1718,45 @@ namespace Contensive.Addons.Housekeeping {
                                             + " where " + baseCriteria + " and(v.CookieSupport<>0)"
                                             + " and(v.bot<>0)"
                                             + "";
-                                        csBotVisits.csOpenSql(sql);
-                                        if (csBotVisits.csOk()) {
-                                            BotPageViews = csBotVisits.csGetInteger("cnt");
+                                        csBotVisits.openSql(sql);
+                                        if (csBotVisits.ok()) {
+                                            BotPageViews = csBotVisits.getInteger("cnt");
                                         }
                                     }
                                     //
                                     // Add or update the Visit Summary Record
                                     //
                                     using (var csPVS = new CsModel(core)) {
-                                        if (!csPVS.csOpen("Page View Summary", "(timeduration=" + HourDuration + ")and(DateNumber=" + DateNumber + ")and(TimeNumber=" + TimeNumber + ")and(pageid=" + PageID + ")and(pagetitle=" + DbController.encodeSQLText(PageTitle) + ")")) {
+                                        if (!csPVS.open("Page View Summary", "(timeduration=" + HourDuration + ")and(DateNumber=" + DateNumber + ")and(TimeNumber=" + TimeNumber + ")and(pageid=" + PageID + ")and(pagetitle=" + DbController.encodeSQLText(PageTitle) + ")")) {
                                             csPVS.insert("Page View Summary");
                                         }
                                         //
-                                        if (csPVS.csOk()) {
+                                        if (csPVS.ok()) {
                                             hint = 11;
                                             string PageName = "";
                                             if (string.IsNullOrEmpty(PageTitle)) {
                                                 PageName = MetaController.getRecordName(core, "page content", PageID);
-                                                csPVS.csSet("name", HourDuration + " hr summary for " + DateTime.FromOADate((double)DateNumber) + " " + TimeNumber + ":00, " + PageName);
-                                                csPVS.csSet("PageTitle", PageName);
+                                                csPVS.set("name", HourDuration + " hr summary for " + DateTime.FromOADate((double)DateNumber) + " " + TimeNumber + ":00, " + PageName);
+                                                csPVS.set("PageTitle", PageName);
                                             } else {
-                                                csPVS.csSet("name", HourDuration + " hr summary for " + DateTime.FromOADate((double)DateNumber) + " " + TimeNumber + ":00, " + PageTitle);
-                                                csPVS.csSet("PageTitle", PageTitle);
+                                                csPVS.set("name", HourDuration + " hr summary for " + DateTime.FromOADate((double)DateNumber) + " " + TimeNumber + ":00, " + PageTitle);
+                                                csPVS.set("PageTitle", PageTitle);
                                             }
-                                            csPVS.csSet("DateNumber", DateNumber);
-                                            csPVS.csSet("TimeNumber", TimeNumber);
-                                            csPVS.csSet("TimeDuration", HourDuration);
-                                            csPVS.csSet("PageViews", PageViews);
-                                            csPVS.csSet("PageID", PageID);
-                                            csPVS.csSet("AuthenticatedPageViews", AuthenticatedPageViews);
-                                            csPVS.csSet("NoCookiePageViews", NoCookiePageViews);
+                                            csPVS.set("DateNumber", DateNumber);
+                                            csPVS.set("TimeNumber", TimeNumber);
+                                            csPVS.set("TimeDuration", HourDuration);
+                                            csPVS.set("PageViews", PageViews);
+                                            csPVS.set("PageID", PageID);
+                                            csPVS.set("AuthenticatedPageViews", AuthenticatedPageViews);
+                                            csPVS.set("NoCookiePageViews", NoCookiePageViews);
                                             hint = 12;
                                             if (true) {
-                                                csPVS.csSet("MobilePageViews", MobilePageViews);
-                                                csPVS.csSet("BotPageViews", BotPageViews);
+                                                csPVS.set("MobilePageViews", MobilePageViews);
+                                                csPVS.set("BotPageViews", BotPageViews);
                                             }
                                         }
                                     }
-                                    csPages.csGoNext();
+                                    csPages.goNext();
                                 }
                             }
                         }

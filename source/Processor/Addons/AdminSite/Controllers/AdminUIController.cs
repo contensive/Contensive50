@@ -906,9 +906,9 @@ namespace Contensive.Addons.AdminSite.Controllers {
                     string CreatedBy = "the system";
                     if ( editRecord.createdBy.id != 0) {
                         using (var csXfer = new CsModel(core)) {
-                            if (csXfer.csOpenSql("select Name,Active from ccMembers where id=" + editRecord.createdBy.id)) {
-                                string Name = csXfer.csGetText("name");
-                                bool Active = csXfer.csGetBoolean("active");
+                            if (csXfer.openSql("select Name,Active from ccMembers where id=" + editRecord.createdBy.id)) {
+                                string Name = csXfer.getText("name");
+                                bool Active = csXfer.getBoolean("active");
                                 if (!Active && (!string.IsNullOrEmpty(Name))) {
                                     CreatedBy = "Inactive user " + Name;
                                 } else if (!Active) {
@@ -937,9 +937,9 @@ namespace Contensive.Addons.AdminSite.Controllers {
                         CreatedBy = "the system";
                         if ( editRecord.modifiedBy.id != 0) {
                             using (var csXfer = new CsModel(core)) {
-                                if (csXfer.csOpenSql("select Name,Active from ccMembers where id=" + editRecord.modifiedBy.id)) {
-                                    string Name = csXfer.csGetText("name");
-                                    bool Active = csXfer.csGetBoolean("active");
+                                if (csXfer.openSql("select Name,Active from ccMembers where id=" + editRecord.modifiedBy.id)) {
+                                    string Name = csXfer.getText("name");
+                                    bool Active = csXfer.getBoolean("active");
                                     if (!Active && (!string.IsNullOrEmpty(Name))) {
                                         CreatedBy = "Inactive user " + Name;
                                     } else if (!Active) {
@@ -1081,12 +1081,12 @@ namespace Contensive.Addons.AdminSite.Controllers {
                 result += (HtmlController.inputHidden(fieldName, GenericController.encodeText(fieldValue)));
                 if (!string.IsNullOrEmpty(LookupContentName)) {
                     using (var csXfer = new CsModel(core)) {
-                        csXfer.csOpenRecord(LookupContentName, fieldValue, "Name,ContentControlID");
-                        if (csXfer.csOk()) {
-                            if (csXfer.csGet("Name") == "") {
+                        csXfer.openRecord(LookupContentName, fieldValue, "Name,ContentControlID");
+                        if (csXfer.ok()) {
+                            if (csXfer.getText("Name") == "") {
                                 result += ("No Name");
                             } else {
-                                result += (HtmlController.encodeHtml(csXfer.csGet("Name")));
+                                result += (HtmlController.encodeHtml(csXfer.getText("Name")));
                             }
                             result += ("&nbsp;[<a TabIndex=-1 href=\"?" + rnAdminForm + "=4&cid=" + lookupContentID + "&id=" + fieldValue.ToString() + "\" target=\"_blank\">View details in new window</a>]");
                         } else {
@@ -1103,7 +1103,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                 result += core.html.selectFromContent(fieldName, fieldValue, LookupContentName, sqlFilter, nonLabel, "", ref IsEmptyList, "select form-control");
                 if (fieldValue != 0) {
                     using (var csXfer = new CsModel(core)) {
-                        if (csXfer.csOpenRecord(LookupContentName, fieldValue, "ID")) {
+                        if (csXfer.openRecord(LookupContentName, fieldValue, "ID")) {
                             result += ("&nbsp;[<a TabIndex=-1 href=\"?" + rnAdminForm + "=4&cid=" + lookupContentID + "&id=" + fieldValue.ToString() + "\" target=\"_blank\">Details</a>]");
                         }
                         csXfer.close();
@@ -1713,15 +1713,15 @@ namespace Contensive.Addons.AdminSite.Controllers {
                                 + " AND(ccMembers.active<>0)"
                                 + " AND(ccMembers.ID=" + core.session.user.id + ")"
                                 + " );";
-                            csXfer.csOpenSql(sql);
-                            if (csXfer.csOk()) {
+                            csXfer.openSql(sql);
+                            if (csXfer.ok()) {
                                 //
                                 // ----- Entry was found, member has some kind of access
                                 //
                                 userHasAccess = true;
                                 contentAllowAdd = content.allowAdd;
-                                groupRulesAllowAdd = csXfer.csGetBoolean("GroupRulesAllowAdd");
-                                memberRulesDateExpires = csXfer.csGetDate("MemberRulesDateExpires");
+                                groupRulesAllowAdd = csXfer.getBoolean("GroupRulesAllowAdd");
+                                memberRulesDateExpires = csXfer.getDate("MemberRulesDateExpires");
                                 memberRulesAllow = false;
                                 if (memberRulesDateExpires == DateTime.MinValue) {
                                     memberRulesAllow = true;

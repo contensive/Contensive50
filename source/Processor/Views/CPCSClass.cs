@@ -60,7 +60,7 @@ namespace Contensive.Processor {
         /// <returns></returns>
         public override bool OpenRecord(string contentName, int recordId, string selectFieldList, bool activeOnly) {
             try {
-                if (!cs.csOpenRecord(contentName, recordId,selectFieldList)) { return false; }
+                if (!cs.openRecord(contentName, recordId,selectFieldList)) { return false; }
                 if ( !activeOnly || cs.getBoolean("active")) { return true; }
                 cs.close();
                 return false;
@@ -84,7 +84,7 @@ namespace Contensive.Processor {
         //
         public override bool Open(string contentName, string sqlCriteria, string sortFieldList, bool activeOnly, string selectFieldList, int pageSize, int pageNumber) {
             try {
-                return cs.csOpen(contentName, sqlCriteria, sortFieldList, activeOnly, 0, selectFieldList, pageSize, pageNumber);
+                return cs.open(contentName, sqlCriteria, sortFieldList, activeOnly, 0, selectFieldList, pageSize, pageNumber);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -126,7 +126,7 @@ namespace Contensive.Processor {
         //
         public override bool OpenGroupUsers(List<string> groupList, string sqlCriteria, string sortFieldList, bool activeOnly, int pageSize, int pageNumber) {
             try {
-                return cs.csOpenGroupUsers(groupList, sqlCriteria, sortFieldList, activeOnly, pageSize, pageNumber);
+                return cs.openGroupUsers(groupList, sqlCriteria, sortFieldList, activeOnly, pageSize, pageNumber);
             } catch (Exception ex) {
                 LogController.handleError( cp.core, ex );
                 throw;
@@ -196,9 +196,9 @@ namespace Contensive.Processor {
                     //
                     // -- arguments reversed from legacy api mistake, datasource has the query, sql has the datasource
                     LogController.logWarn(cp.core, "Call to cs with arguments reversed, datasource [" + dataSourcename + "], sql [" + sql + "]");
-                    return cs.csOpenSql(dataSourcename, sql, pageSize, pageNumber);
+                    return cs.openSql(dataSourcename, sql, pageSize, pageNumber);
                 }
-                return cs.csOpenSql(sql, dataSourcename, pageSize, pageNumber);
+                return cs.openSql(sql, dataSourcename, pageSize, pageNumber);
             } catch (Exception ex) {
                 LogController.handleError(cp.core, ex);
                 throw;
@@ -261,7 +261,7 @@ namespace Contensive.Processor {
         //
         public override bool FieldOK(string fieldName) {
             try {
-                return cs.csIsFieldSupported(fieldName);
+                return cs.isFieldSupported(fieldName);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -272,7 +272,7 @@ namespace Contensive.Processor {
         //
         public override void GoFirst() {
             try {
-                cs.csGoFirst(false);
+                cs.goFirst(false);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -283,7 +283,7 @@ namespace Contensive.Processor {
         //
         public override string GetAddLink(string presetNameValueList, bool allowPaste) {
             try {
-                return cs.csGetRecordAddLink(cp.core, 0, presetNameValueList, allowPaste);
+                return cs.getRecordAddLink(cp.core, presetNameValueList, allowPaste);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -300,7 +300,7 @@ namespace Contensive.Processor {
         //
         public override bool GetBoolean(string FieldName) {
             try {
-                return cs.csGetBoolean(FieldName);
+                return cs.getBoolean(FieldName);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -311,7 +311,7 @@ namespace Contensive.Processor {
         //
         public override DateTime GetDate(string FieldName) {
             try {
-                return cs.csGetDate(FieldName);
+                return cs.getDate(FieldName);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -322,7 +322,7 @@ namespace Contensive.Processor {
         //
         public override string GetEditLink(bool allowCut) {
             try {
-                return cs.csGetRecordEditLink(0, allowCut);
+                return cs.getRecordEditLink(allowCut);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -352,7 +352,7 @@ namespace Contensive.Processor {
         //
         public override int GetInteger(string FieldName) {
             try {
-                return cs.csGetInteger(FieldName);
+                return cs.getInteger(FieldName);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -363,7 +363,7 @@ namespace Contensive.Processor {
         //
         public override double GetNumber(string FieldName) {
             try {
-                return cs.csGetNumber(FieldName);
+                return cs.getNumber(FieldName);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -374,7 +374,7 @@ namespace Contensive.Processor {
         //
         public override int GetRowCount() {
             try {
-                return cs.csGetRowCount();
+                return cs.getRowCount();
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -385,7 +385,7 @@ namespace Contensive.Processor {
         //
         public override string GetSQL() {
             try {
-                return cs.csGetSql();
+                return cs.getSql();
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -396,7 +396,7 @@ namespace Contensive.Processor {
         //
         public override string GetText(string fieldName) {
             try {
-                return cs.csGet(0, fieldName);
+                return cs.getText(fieldName);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -407,7 +407,7 @@ namespace Contensive.Processor {
         //
         public override string GetHtml(string fieldName) {
             try {
-                return cs.csGet(0, fieldName);
+                return cs.getText(fieldName);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -418,7 +418,7 @@ namespace Contensive.Processor {
         //
         public override void GoNext() {
             try {
-                cs.csGoNext(0);
+                cs.goNext();
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -429,8 +429,8 @@ namespace Contensive.Processor {
         //
         public override bool NextOK() {
             try {
-                cs.csGoNext(0);
-                return cs.csOk();
+                cs.goNext();
+                return cs.ok();
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -441,7 +441,7 @@ namespace Contensive.Processor {
         //
         public override bool OK() {
             try {
-                return cs.csOk();
+                return cs.ok();
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -452,7 +452,7 @@ namespace Contensive.Processor {
         //
         public override void Save() {
             try {
-                cs.csSave();
+                cs.save();
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -464,25 +464,25 @@ namespace Contensive.Processor {
         public override void SetField(string fieldName, object fieldValue) {
             try {
                 if (fieldValue is string fieldString) {
-                    cs.csSet(fieldName, fieldString);
+                    cs.set(fieldName, fieldString);
                     return;
                 }
                 int? fieldInt = fieldValue as int?;
                 if (fieldInt != null) {
-                    cs.csSet(fieldName, fieldInt.GetValueOrDefault());
+                    cs.set(fieldName, fieldInt.GetValueOrDefault());
                     return;
                 }
                 bool? fieldBool = fieldValue as bool?;
                 if (fieldBool != null) {
-                    cs.csSet(fieldName, fieldBool.GetValueOrDefault());
+                    cs.set(fieldName, fieldBool.GetValueOrDefault());
                     return;
                 }
                 DateTime? fieldDate = fieldValue as DateTime?;
                 if (fieldDate != null) {
-                    cs.csSet(fieldName, fieldDate.GetValueOrDefault());
+                    cs.set(fieldName, fieldDate.GetValueOrDefault());
                     return;
                 }
-                cs.csSet(fieldName, fieldValue.ToString());
+                cs.set(fieldName, fieldValue.ToString());
             } catch (Exception ex) {
                 LogController.handleError(cp.core, ex);
                 throw;
@@ -490,26 +490,26 @@ namespace Contensive.Processor {
         }
         //
         public override void SetField(string FieldName, int FieldValue) {
-            cs.csSet(FieldName, FieldValue);
+            cs.set(FieldName, FieldValue);
         }
         //
         public override void SetField(string FieldName, bool FieldValue) {
-            cs.csSet(FieldName, FieldValue);
+            cs.set(FieldName, FieldValue);
         }
         //
         public override void SetField(string FieldName, DateTime FieldValue) {
-            cs.csSet(FieldName, FieldValue);
+            cs.set(FieldName, FieldValue);
         }
         //
         public override void SetField(string FieldName, String FieldValue) {
-            cs.csSet(FieldName, FieldValue);
+            cs.set(FieldName, FieldValue);
         }
         //
         //====================================================================================================
         //
         public override void SetFormInput(string fieldName, string requestName) {
             try {
-                cs.csSetFormInput(cp.core, 0, fieldName, requestName);
+                cs.setFormInput(cp.core, fieldName, requestName);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
@@ -525,7 +525,7 @@ namespace Contensive.Processor {
         /// <param name="fieldName"></param>
         /// <returns></returns>
         public override string GetValue(string fieldName) {
-            return cs.csGetValue(0, fieldName);
+            return cs.getRawData(fieldName);
         }
         //
         //====================================================================================================
@@ -553,7 +553,7 @@ namespace Contensive.Processor {
         [Obsolete("Use SetField for all field types that store data in files (textfile, cssfile, etc)")]
         public override void SetFile(string FieldName, string Copy, string ContentName) {
             try {
-                cs.csSetTextFile(0, FieldName, Copy, ContentName);
+                cs.setTextFile(FieldName, Copy, ContentName);
             } catch (Exception ex) {
                 LogController.handleError(cp.core, ex);
                 throw;
@@ -564,9 +564,9 @@ namespace Contensive.Processor {
         public override bool OpenSQL2(string sql, string DataSourcename = "default", int PageSize = 10, int PageNumber = 1) {
             try {
                 if (((string.IsNullOrEmpty(sql)) || (sql.ToLowerInvariant() == "default")) && (!string.IsNullOrEmpty(DataSourcename)) && (DataSourcename.ToLowerInvariant() != "default")) {
-                    return cs.csOpenSql(sql, DataSourcename, PageSize, PageNumber);
+                    return cs.openSql(sql, DataSourcename, PageSize, PageNumber);
                 } else {
-                    return cs.csOpenSql(sql, DataSourcename, PageSize, PageNumber);
+                    return cs.openSql(sql, DataSourcename, PageSize, PageNumber);
                 }
             } catch (Exception ex) {
                 LogController.handleError(cp.core, ex);
@@ -577,7 +577,7 @@ namespace Contensive.Processor {
         [Obsolete("Use getText for copy. getFilename for filename", true)]
         public override string GetTextFile(string FieldName) {
             try {
-                return cs.csGetText(FieldName);
+                return cs.getText(FieldName);
             } catch (Exception ex) {
                 LogController.handleError(cp.core, ex);
                 throw;

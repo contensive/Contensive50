@@ -80,8 +80,8 @@ namespace Contensive.Addons.Tools {
                                         if (dt.Rows.Count == 0) {
                                             using (var csXfer = new CsModel(core)) {
                                                 csXfer.insert("Meta Keywords");
-                                                if (csXfer.csOk()) {
-                                                    csXfer.csSet("name", Keyword);
+                                                if (csXfer.ok()) {
+                                                    csXfer.set("name", Keyword);
                                                 }
                                             }
                                         }

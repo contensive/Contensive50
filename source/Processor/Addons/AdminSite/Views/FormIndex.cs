@@ -109,8 +109,8 @@ namespace Contensive.Addons.AdminSite {
                             }
                             int recordCnt = 0;
                             using (var csXfer = new CsModel(core)) {
-                                if (csXfer.csOpenSql(SQL, datasource.name)) {
-                                    recordCnt = csXfer.csGetInteger("cnt");
+                                if (csXfer.openSql(SQL, datasource.name)) {
+                                    recordCnt = csXfer.getInteger("cnt");
                                 }
                             }
                             //
@@ -306,13 +306,13 @@ namespace Contensive.Addons.AdminSite {
                             int RecordPointer = 0;
                             int RecordLast = 0;
                             using (var csXfer = new CsModel(core)) {
-                                if (csXfer.csOpenSql(SQL, datasource.name, IndexConfig.recordsPerPage, IndexConfig.pageNumber)) {
+                                if (csXfer.openSql(SQL, datasource.name, IndexConfig.recordsPerPage, IndexConfig.pageNumber)) {
                                     RecordPointer = IndexConfig.recordTop;
                                     RecordLast = IndexConfig.recordTop + IndexConfig.recordsPerPage;
                                     //
                                     // --- Print out the records
-                                    while ((csXfer.csOk()) && (RecordPointer < RecordLast)) {
-                                        int RecordID = csXfer.csGetInteger("ID");
+                                    while ((csXfer.ok()) && (RecordPointer < RecordLast)) {
+                                        int RecordID = csXfer.getInteger("ID");
                                         if (RowColor == "class=\"ccAdminListRowOdd\"") {
                                             RowColor = "class=\"ccAdminListRowEven\"";
                                         } else {
@@ -353,7 +353,7 @@ namespace Contensive.Addons.AdminSite {
                                             }
                                         }
                                         DataTable_DataRows += ("\n    </tr>");
-                                        csXfer.csGoNext();
+                                        csXfer.goNext();
                                         RecordPointer = RecordPointer + 1;
                                     }
                                     DataTable_DataRows += "<input type=hidden name=rowcnt value=" + RecordPointer + ">";
@@ -361,7 +361,7 @@ namespace Contensive.Addons.AdminSite {
                                     // --- print out the stuff at the bottom
                                     //
                                     int RecordTop_NextPage = IndexConfig.recordTop;
-                                    if (csXfer.csOk()) {
+                                    if (csXfer.ok()) {
                                         RecordTop_NextPage = RecordPointer;
                                     }
                                     int RecordTop_PreviousPage = IndexConfig.recordTop - IndexConfig.recordsPerPage;
@@ -1686,9 +1686,9 @@ namespace Contensive.Addons.AdminSite {
                 SubFilterList = "";
                 if (GenericController.vbLCase(TableName) == GenericController.vbLCase("ccMembers")) {
                     using (var csXfer = new CsModel(core)) {
-                        csXfer.csOpenSql(core.db.getSQLSelect("default", "ccGroups", "ID,Caption,Name", "(active<>0)", "Caption,Name"));
-                        while (csXfer.csOk()) {
-                            string Name = csXfer.csGetText("Name");
+                        csXfer.openSql(core.db.getSQLSelect("default", "ccGroups", "ID,Caption,Name", "(active<>0)", "Caption,Name"));
+                        while (csXfer.ok()) {
+                            string Name = csXfer.getText("Name");
                             Ptr = 0;
                             if (IndexConfig.groupListCnt > 0) {
                                 for (Ptr = 0; Ptr < IndexConfig.groupListCnt; Ptr++) {
@@ -1698,8 +1698,8 @@ namespace Contensive.Addons.AdminSite {
                                 }
                             }
                             if (Ptr == IndexConfig.groupListCnt) {
-                                int RecordID = csXfer.csGetInteger("ID");
-                                Caption = csXfer.csGetText("Caption");
+                                int RecordID = csXfer.getInteger("ID");
+                                Caption = csXfer.getText("Caption");
                                 if (string.IsNullOrEmpty(Caption)) {
                                     Caption = Name;
                                     if (string.IsNullOrEmpty(Caption)) {
@@ -1719,7 +1719,7 @@ namespace Contensive.Addons.AdminSite {
                                 Link = "/" + core.appConfig.adminRoute + "?" + QS;
                                 SubFilterList = SubFilterList + "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\">" + Caption + "</a></div>";
                             }
-                            csXfer.csGoNext();
+                            csXfer.goNext();
                         }
                     }
                 }
@@ -1808,7 +1808,7 @@ namespace Contensive.Addons.AdminSite {
                 switch (field.fieldTypeId) {
                     case _fieldTypeIdFile:
                     case _fieldTypeIdFileImage:
-                        Filename = csXfer.csGet(field.nameLc);
+                        Filename = csXfer.getText(field.nameLc);
                         Filename = GenericController.vbReplace(Filename, "\\", "/");
                         Pos = Filename.LastIndexOf("/") + 1;
                         if (Pos != 0) {
@@ -1818,11 +1818,11 @@ namespace Contensive.Addons.AdminSite {
                         break;
                     case _fieldTypeIdLookup:
                         if (IsLookupFieldValid) {
-                            Stream.Add(csXfer.csGet("LookupTable" + lookupTableCnt + "Name"));
+                            Stream.Add(csXfer.getText("LookupTable" + lookupTableCnt + "Name"));
                             lookupTableCnt += 1;
                         } else if (field.lookupList != "") {
                             string[] lookups = field.lookupList.Split(',');
-                            int LookupPtr = csXfer.csGetInteger(field.nameLc) - 1;
+                            int LookupPtr = csXfer.getInteger(field.nameLc) - 1;
                             if (LookupPtr <= lookups.GetUpperBound(0)) {
                                 if (LookupPtr < 0) {
                                     //Stream.Add( "-1")
@@ -1836,25 +1836,25 @@ namespace Contensive.Addons.AdminSite {
                         break;
                     case _fieldTypeIdMemberSelect:
                         if (IsLookupFieldValid) {
-                            Stream.Add(csXfer.csGet("LookupTable" + lookupTableCnt + "Name"));
+                            Stream.Add(csXfer.getText("LookupTable" + lookupTableCnt + "Name"));
                             lookupTableCnt += 1;
                         } else {
-                            Stream.Add(csXfer.csGet(field.nameLc));
+                            Stream.Add(csXfer.getText(field.nameLc));
                         }
                         break;
                     case _fieldTypeIdBoolean:
-                        if (csXfer.csGetBoolean(field.nameLc)) {
+                        if (csXfer.getBoolean(field.nameLc)) {
                             Stream.Add("yes");
                         } else {
                             Stream.Add("no");
                         }
                         break;
                     case _fieldTypeIdCurrency:
-                        Stream.Add(string.Format("{0:C}", csXfer.csGetNumber(field.nameLc)));
+                        Stream.Add(string.Format("{0:C}", csXfer.getNumber(field.nameLc)));
                         break;
                     case _fieldTypeIdLongText:
                     case _fieldTypeIdHTML:
-                        FieldText = csXfer.csGet(field.nameLc);
+                        FieldText = csXfer.getText(field.nameLc);
                         if (FieldText.Length > 50) {
                             FieldText = FieldText.Left(50) + "[more]";
                         }
@@ -1866,7 +1866,7 @@ namespace Contensive.Addons.AdminSite {
                     case _fieldTypeIdFileJavascript:
                     case _fieldTypeIdFileHTML:
                         // rw( "n/a" )
-                        Filename = csXfer.csGet(field.nameLc);
+                        Filename = csXfer.getText(field.nameLc);
                         if (!string.IsNullOrEmpty(Filename)) {
                             string Copy = core.cdnFiles.readFileText(Filename);
                             Stream.Add(Copy);
@@ -1880,7 +1880,7 @@ namespace Contensive.Addons.AdminSite {
                         if (field.password) {
                             Stream.Add("****");
                         } else {
-                            Stream.Add(csXfer.csGet(field.nameLc));
+                            Stream.Add(csXfer.getText(field.nameLc));
                         }
                         break;
                 }

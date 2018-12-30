@@ -284,7 +284,7 @@ namespace Contensive.Processor.Models.Db {
                     + " order by u.Email,u.ID"
                     + " ";
             var cs = new CsModel(core);
-            if (cs.openSQL(sqlCriteria)) {
+            if (cs.openSql(sqlCriteria)) {
                 do {
                     result.Add(cs.getInteger("id"));
                     cs.goNext();

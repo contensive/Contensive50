@@ -142,11 +142,11 @@ namespace Contensive.Processor.Models.Domain {
                     //
                     using (var csXfer = new CsModel(core)) {
                         if (csXfer.insert("Properties")) {
-                            propertyCache[2, Ptr] = csXfer.csGetText("ID");
-                            csXfer.csSet("name", propertyName);
-                            csXfer.csSet("FieldValue", propertyValue);
-                            csXfer.csSet("TypeID", (int)propertyType);
-                            csXfer.csSet("KeyID", keyId.ToString());
+                            propertyCache[2, Ptr] = csXfer.getText("ID");
+                            csXfer.set("name", propertyName);
+                            csXfer.set("FieldValue", propertyValue);
+                            csXfer.set("TypeID", (int)propertyType);
+                            csXfer.set("KeyID", keyId.ToString());
                         }
                     }
                 } else if (propertyCache[1, Ptr] != propertyValue) {

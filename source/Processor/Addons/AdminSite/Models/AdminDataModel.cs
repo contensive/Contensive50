@@ -237,14 +237,14 @@ namespace Contensive.Addons.AdminSite {
                     //
                     ContentID = ((editRecord.contentControlId.Equals(0)) ? adminContent.id : editRecord.contentControlId);
                     using (var csXfer = new CsModel(core)) {
-                        csXfer.csOpen("Content Watch", "(ContentID=" + DbController.encodeSQLNumber(ContentID) + ")AND(RecordID=" + DbController.encodeSQLNumber(editRecord.id) + ")");
-                        if (csXfer.csOk()) {
+                        csXfer.open("Content Watch", "(ContentID=" + DbController.encodeSQLNumber(ContentID) + ")AND(RecordID=" + DbController.encodeSQLNumber(editRecord.id) + ")");
+                        if (csXfer.ok()) {
                             ContentWatchLoaded = true;
-                            ContentWatchRecordID = (csXfer.csGetInteger("ID"));
-                            ContentWatchLink = (csXfer.csGet("Link"));
-                            ContentWatchClicks = (csXfer.csGetInteger("Clicks"));
-                            ContentWatchLinkLabel = (csXfer.csGet("LinkLabel"));
-                            ContentWatchExpires = (csXfer.csGetDate("WhatsNewDateExpires"));
+                            ContentWatchRecordID = (csXfer.getInteger("ID"));
+                            ContentWatchLink = (csXfer.getText("Link"));
+                            ContentWatchClicks = (csXfer.getInteger("Clicks"));
+                            ContentWatchLinkLabel = (csXfer.getText("LinkLabel"));
+                            ContentWatchExpires = (csXfer.getDate("WhatsNewDateExpires"));
                             csXfer.close();
                         }
 
@@ -274,9 +274,9 @@ namespace Contensive.Addons.AdminSite {
                     // ----- Update ContentWatchListRules for all checked boxes
                     //
                     using (var csXfer = new CsModel(core)) {
-                        csXfer.csOpen("Content Watch Lists");
-                        while (csXfer.csOk()) {
-                            RecordID = (csXfer.csGetInteger("ID"));
+                        csXfer.open("Content Watch Lists");
+                        while (csXfer.ok()) {
+                            RecordID = (csXfer.getInteger("ID"));
                             if (core.docProperties.getBoolean("ContentWatchList." + RecordID)) {
                                 if (ContentWatchListIDCount >= ContentWatchListIDSize) {
                                     ContentWatchListIDSize = ContentWatchListIDSize + 50;
@@ -285,7 +285,7 @@ namespace Contensive.Addons.AdminSite {
                                 ContentWatchListID[ContentWatchListIDCount] = RecordID;
                                 ContentWatchListIDCount = ContentWatchListIDCount + 1;
                             }
-                            csXfer.csGoNext();
+                            csXfer.goNext();
                         }
                         csXfer.close();
                     }
@@ -465,10 +465,10 @@ namespace Contensive.Addons.AdminSite {
                     // set adminContext.content to the content definition of the requested record
                     //
                     using (var csXfer = new CsModel(core)) {
-                        csXfer.csOpenRecord(adminContent.name, requestedRecordId, "ContentControlID");
-                        if (csXfer.csOk()) {
+                        csXfer.openRecord(adminContent.name, requestedRecordId, "ContentControlID");
+                        if (csXfer.ok()) {
                             editRecord.id = requestedRecordId;
-                            int recordContentId = csXfer.csGetInteger("ContentControlID");
+                            int recordContentId = csXfer.getInteger("ContentControlID");
                             //adminContent.id = csXfer.csGetInteger("ContentControlID");
                             if ((recordContentId > 0) && (recordContentId != adminContent.id)) {
                                 adminContent = MetaModel.create(core, recordContentId);
@@ -993,12 +993,12 @@ namespace Contensive.Addons.AdminSite {
                     //   Open Content Sets with the data
                     //
                     using (var csXfer = new CsModel(core)) {
-                        csXfer.csOpenRecord(adminContent.name, editRecord.id);
+                        csXfer.openRecord(adminContent.name, editRecord.id);
                         //
                         //
                         // store fieldvalues in RecordValuesVariant
                         //
-                        if (!(csXfer.csOk())) {
+                        if (!(csXfer.ok())) {
                             //
                             //   Live or Edit records were not found
                             //
@@ -1042,10 +1042,10 @@ namespace Contensive.Addons.AdminSite {
                                     case _fieldTypeIdFileXML:
                                     case _fieldTypeIdFileJavascript:
                                     case _fieldTypeIdFileHTML:
-                                        DBValueVariant = csXfer.csGet(adminContentcontent.nameLc);
+                                        DBValueVariant = csXfer.getText(adminContentcontent.nameLc);
                                         break;
                                     default:
-                                        DBValueVariant = csXfer.csGetValue(adminContentcontent.nameLc);
+                                        DBValueVariant = csXfer.getRawData(adminContentcontent.nameLc);
                                         break;
                                 }
                                 //
@@ -1081,13 +1081,13 @@ namespace Contensive.Addons.AdminSite {
                                 //
                                 switch (GenericController.vbUCase(adminContentcontent.nameLc)) {
                                     case "DATEADDED":
-                                        editRecord.dateAdded = csXfer.csGetDate(adminContentcontent.nameLc);
+                                        editRecord.dateAdded = csXfer.getDate(adminContentcontent.nameLc);
                                         break;
                                     case "MODIFIEDDATE":
-                                        editRecord.modifiedDate = csXfer.csGetDate(adminContentcontent.nameLc);
+                                        editRecord.modifiedDate = csXfer.getDate(adminContentcontent.nameLc);
                                         break;
                                     case "CREATEDBY":
-                                        int createdByPersonId = csXfer.csGetInteger(adminContentcontent.nameLc);
+                                        int createdByPersonId = csXfer.getInteger(adminContentcontent.nameLc);
                                         if (createdByPersonId == 0) {
                                             editRecord.createdBy = new PersonModel() { name = "system" };
                                         } else {
@@ -1098,7 +1098,7 @@ namespace Contensive.Addons.AdminSite {
                                         }
                                         break;
                                     case "MODIFIEDBY":
-                                        int modifiedByPersonId = csXfer.csGetInteger(adminContentcontent.nameLc);
+                                        int modifiedByPersonId = csXfer.getInteger(adminContentcontent.nameLc);
                                         if (modifiedByPersonId == 0) {
                                             editRecord.modifiedBy = new PersonModel() { name = "system" };
                                         } else {
@@ -1109,26 +1109,26 @@ namespace Contensive.Addons.AdminSite {
                                         }
                                         break;
                                     case "ACTIVE":
-                                        editRecord.active = csXfer.csGetBoolean(adminContentcontent.nameLc);
+                                        editRecord.active = csXfer.getBoolean(adminContentcontent.nameLc);
                                         break;
                                     case "CONTENTCONTROLID":
-                                        editRecord.contentControlId = csXfer.csGetInteger(adminContentcontent.nameLc);
+                                        editRecord.contentControlId = csXfer.getInteger(adminContentcontent.nameLc);
                                         if (editRecord.contentControlId.Equals(0)) {
                                             editRecord.contentControlId = adminContent.id;
                                         }
                                         editRecord.contentControlId_Name = MetaController.getContentNameByID(core, editRecord.contentControlId);
                                         break;
                                     case "ID":
-                                        editRecord.id = csXfer.csGetInteger(adminContentcontent.nameLc);
+                                        editRecord.id = csXfer.getInteger(adminContentcontent.nameLc);
                                         break;
                                     case "MENUHEADLINE":
-                                        editRecord.menuHeadline = csXfer.csGetText(adminContentcontent.nameLc);
+                                        editRecord.menuHeadline = csXfer.getText(adminContentcontent.nameLc);
                                         break;
                                     case "NAME":
-                                        editRecord.nameLc = csXfer.csGetText(adminContentcontent.nameLc);
+                                        editRecord.nameLc = csXfer.getText(adminContentcontent.nameLc);
                                         break;
                                     case "PARENTID":
-                                        editRecord.parentID = csXfer.csGetInteger(adminContentcontent.nameLc);
+                                        editRecord.parentID = csXfer.getInteger(adminContentcontent.nameLc);
                                         //Case Else
                                         //    EditRecordValuesVariant(FieldPointer) = DBValueVariant
                                         break;
@@ -1528,11 +1528,11 @@ namespace Contensive.Addons.AdminSite {
                                     while ((LoopPtr < LoopPtrMax) && (ParentID != 0) && (("," + UsedIDs + ",").IndexOf("," + ParentID.ToString() + ",") == -1)) {
                                         UsedIDs = UsedIDs + "," + ParentID.ToString();
                                         using (var csXfer = new CsModel(core)) {
-                                            csXfer.csOpen(adminContent.name, "ID=" + ParentID, "", true, 0, "ParentID");
-                                            if (!csXfer.csOk()) {
+                                            csXfer.open(adminContent.name, "ID=" + ParentID, "", true, 0, "ParentID");
+                                            if (!csXfer.ok()) {
                                                 ParentID = 0;
                                             } else {
-                                                ParentID = csXfer.csGetInteger("ParentID");
+                                                ParentID = csXfer.getInteger("ParentID");
                                             }
                                         }
                                         LoopPtr = LoopPtr + 1;
@@ -1592,8 +1592,8 @@ namespace Contensive.Addons.AdminSite {
                                         SQLUnique = SQLUnique + "and(id<>" + editRecord.id + ")";
                                     }
                                     using (var csXfer = new CsModel(core)) {
-                                        csXfer.csOpenSql(SQLUnique, adminContent.dataSourceName);
-                                        if (csXfer.csOk()) {
+                                        csXfer.openSql(SQLUnique, adminContent.dataSourceName);
+                                        if (csXfer.ok()) {
                                             //
                                             // field is not unique, skip it and flag error
                                             //

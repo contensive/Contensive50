@@ -1056,11 +1056,11 @@ namespace Contensive.Processor.Controllers {
             tempmain_RedirectByRecord_ReturnStatus = false;
             BlockRedirect = false;
             using (var csXfer = new CsModel(core)) {
-                csXfer.csOpen(iContentName, "ID=" + iRecordID);
-                if (csXfer.csOk()) {
+                csXfer.open(iContentName, "ID=" + iRecordID);
+                if (csXfer.ok()) {
                     //
                     // Assume all Link fields are already encoded -- as this is how they would appear if the admin cut and pasted
-                    EncodedLink = encodeText(csXfer.csGetText(iFieldName)).Trim(' ');
+                    EncodedLink = encodeText(csXfer.getText(iFieldName)).Trim(' ');
                     if (string.IsNullOrEmpty(EncodedLink)) {
                         BlockRedirect = true;
                     } else {
@@ -1076,31 +1076,31 @@ namespace Contensive.Processor.Controllers {
                                 //       inactive or expired before redirecting
                                 //
                                 LinkPrefix = core.webServer.requestContentWatchPrefix;
-                                ContentID = (csXfer.csGetInteger("ContentID"));
+                                ContentID = (csXfer.getInteger("ContentID"));
                                 HostContentName = MetaController.getContentNameByID(core, ContentID);
                                 if (string.IsNullOrEmpty(HostContentName)) {
                                     //
                                     // ----- Content Watch with a bad ContentID, mark inactive
                                     //
                                     BlockRedirect = true;
-                                    csXfer.csSet("active", 0);
+                                    csXfer.set("active", 0);
                                 } else {
-                                    HostRecordID = (csXfer.csGetInteger("RecordID"));
+                                    HostRecordID = (csXfer.getInteger("RecordID"));
                                     if (HostRecordID == 0) {
                                         //
                                         // ----- Content Watch with a bad iRecordID, mark inactive
                                         //
                                         BlockRedirect = true;
-                                        csXfer.csSet("active", 0);
+                                        csXfer.set("active", 0);
                                     } else {
                                         using (var CSHost = new CsModel(core)) {
-                                            CSHost.csOpen(HostContentName, "ID=" + HostRecordID);
-                                            if (!CSHost.csOk()) {
+                                            CSHost.open(HostContentName, "ID=" + HostRecordID);
+                                            if (!CSHost.ok()) {
                                                 //
                                                 // ----- Content Watch host record not found, mark inactive
                                                 //
                                                 BlockRedirect = true;
-                                                csXfer.csSet("active", 0);
+                                                csXfer.set("active", 0);
                                             }
                                         }
                                     }
@@ -1119,8 +1119,8 @@ namespace Contensive.Processor.Controllers {
                         // If link incorrectly includes the LinkPrefix, take it off first, then add it back
                         //
                         NonEncodedLink = GenericController.removeUrlPrefix(NonEncodedLink, LinkPrefix);
-                        if (csXfer.csIsFieldSupported("Clicks")) {
-                            csXfer.csSet("Clicks", (csXfer.csGetNumber("Clicks")) + 1);
+                        if (csXfer.isFieldSupported("Clicks")) {
+                            csXfer.set("Clicks", (csXfer.getNumber("Clicks")) + 1);
                         }
                         core.webServer.redirect(LinkPrefix + NonEncodedLink, "Call to " + MethodName + ", no reason given.", false, false);
                         tempmain_RedirectByRecord_ReturnStatus = true;

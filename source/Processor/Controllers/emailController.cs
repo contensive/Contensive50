@@ -595,29 +595,29 @@ namespace Contensive.Processor.Controllers {
                 string EmailStatus = null;
                 //
                 using (var csXfer = new CsModel(core)) {
-                    csXfer.csOpenRecord("email", EmailID);
-                    if (!csXfer.csOk()) {
+                    csXfer.openRecord("email", EmailID);
+                    if (!csXfer.ok()) {
                         ErrorController.addUserError(core, "There was a problem sending the email confirmation. The email record could not be found.");
                     } else {
-                        EmailSubject = csXfer.csGet("Subject");
-                        EmailBody = csXfer.csGet("copyFilename");
+                        EmailSubject = csXfer.getText("Subject");
+                        EmailBody = csXfer.getText("copyFilename");
                         //
                         // merge in template
                         //
                         EmailTemplate = "";
-                        EMailTemplateID = csXfer.csGetInteger("EmailTemplateID");
+                        EMailTemplateID = csXfer.getInteger("EmailTemplateID");
                         if (EMailTemplateID != 0) {
                             using (var CSTemplate = new CsModel(core)) {
-                                CSTemplate.csOpenRecord("Email Templates", EMailTemplateID,  "BodyHTML");
-                                if (csXfer.csOk()) {
-                                    EmailTemplate = CSTemplate.csGet("BodyHTML");
+                                CSTemplate.openRecord("Email Templates", EMailTemplateID,  "BodyHTML");
+                                if (csXfer.ok()) {
+                                    EmailTemplate = CSTemplate.getText("BodyHTML");
                                 }
                             }
                         }
                         //
                         // spam footer
                         //
-                        if (csXfer.csGetBoolean("AllowSpamFooter")) {
+                        if (csXfer.getBoolean("AllowSpamFooter")) {
                             //
                             // This field is default true, and non-authorable
                             // It will be true in all cases, except a possible unforseen exception
@@ -713,7 +713,7 @@ namespace Contensive.Processor.Controllers {
                                 EmailBody = EmailBody + "<div style=\"clear:both;padding:10px;margin:10px;border:1px dashed #888;\">Administrator<br><br>" + ConfirmFooter + "</div>";
                                 string queryStringForLinkAppend = "";
                                 string sendStatus = "";
-                                if (!queuePersonEmail(core, person, csXfer.csGetText("FromAddress"), EmailSubject, EmailBody, "", "", true, true, EmailID, EmailTemplate, false, ref sendStatus, queryStringForLinkAppend)) {
+                                if (!queuePersonEmail(core, person, csXfer.getText("FromAddress"), EmailSubject, EmailBody, "", "", true, true, EmailID, EmailTemplate, false, ref sendStatus, queryStringForLinkAppend)) {
                                     ErrorController.addUserError(core, EmailStatus);
                                 }
                             }

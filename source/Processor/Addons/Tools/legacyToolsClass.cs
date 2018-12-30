@@ -426,21 +426,21 @@ namespace Contensive.Addons.Tools {
                         if (ParentNavID != 0) {
                             ParentNavID = 0;
                             using (var csSrc = new CsModel(core)) {
-                                if (csSrc.csOpen(NavigatorEntryModel.contentName, "(name=" + DbController.encodeSQLText("Advanced") + ")and(parentid=" + ParentNavID + ")")) {
-                                    ParentNavID = csSrc.csGetInteger("ID");
+                                if (csSrc.open(NavigatorEntryModel.contentName, "(name=" + DbController.encodeSQLText("Advanced") + ")and(parentid=" + ParentNavID + ")")) {
+                                    ParentNavID = csSrc.getInteger("ID");
                                 }
                             }
                             if (ParentNavID != 0) {
                                 using (var csDest = new CsModel(core)) {
-                                    csDest.csOpen(NavigatorEntryModel.contentName, "(name=" + DbController.encodeSQLText(ContentName) + ")and(parentid=" + NavID + ")");
-                                    if (!csDest.csOk()) {
+                                    csDest.open(NavigatorEntryModel.contentName, "(name=" + DbController.encodeSQLText(ContentName) + ")and(parentid=" + NavID + ")");
+                                    if (!csDest.ok()) {
                                         csDest.close();
                                         csDest.insert(NavigatorEntryModel.contentName);
                                     }
-                                    if (csDest.csOk()) {
-                                        csDest.csSet("name", ContentName);
-                                        csDest.csSet("parentid", ParentNavID);
-                                        csDest.csSet("contentid", ContentID);
+                                    if (csDest.ok()) {
+                                        csDest.set("name", ContentName);
+                                        csDest.set("parentid", ParentNavID);
+                                        csDest.set("contentid", ContentID);
                                     }
                                 }
                             }
@@ -524,13 +524,13 @@ namespace Contensive.Addons.Tools {
                                         SourceContentID = field.contentId;
                                         SourceName = field.nameLc;
                                         using (var CSSource = new CsModel(core)) {
-                                            CSSource.csOpen("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + DbController.encodeSQLText(SourceName) + ")");
-                                            if (CSSource.csOk()) {
+                                            CSSource.open("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + DbController.encodeSQLText(SourceName) + ")");
+                                            if (CSSource.ok()) {
                                                 using (var CSTarget = new CsModel(core)) {
                                                     CSTarget.insert("Content Fields");
-                                                    if (CSTarget.csOk()) {
+                                                    if (CSTarget.ok()) {
                                                         CSSource.copyRecord(CSTarget);
-                                                        CSTarget.csSet("ContentID", ContentID);
+                                                        CSTarget.set("ContentID", ContentID);
                                                         ReloadCDef = true;
                                                     }
                                                 }
@@ -552,11 +552,11 @@ namespace Contensive.Addons.Tools {
                                 SourceContentID = field.contentId;
                                 SourceName = field.nameLc;
                                 using (var CSSource = new CsModel(core)) {
-                                    if (CSSource.csOpen("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + DbController.encodeSQLText(SourceName) + ")")) {
+                                    if (CSSource.open("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + DbController.encodeSQLText(SourceName) + ")")) {
                                         using (var CSTarget = new CsModel(core)) {
                                             if (CSTarget.insert("Content Fields")) {
                                                 CSSource.copyRecord(CSTarget);
-                                                CSTarget.csSet("ContentID", ContentID);
+                                                CSTarget.set("ContentID", ContentID);
                                                 ReloadCDef = true;
                                             }
                                         }
@@ -586,19 +586,19 @@ namespace Contensive.Addons.Tools {
                                                 Processor.Models.Domain.MetaModel.MetaAdminColumnClass adminColumn = keyValuePair.Value;
                                                 Processor.Models.Domain.MetaFieldModel field = CDef.fields[adminColumn.Name];
                                                 using (var csXfer = new CsModel(core)) {
-                                                    csXfer.csOpenRecord("Content Fields", field.id);
-                                                    csXfer.csSet("IndexColumn", (columnPtr) * 10);
-                                                    csXfer.csSet("IndexWidth", Math.Floor((adminColumn.Width * 80) / (double)ColumnWidthTotal));
+                                                    csXfer.openRecord("Content Fields", field.id);
+                                                    csXfer.set("IndexColumn", (columnPtr) * 10);
+                                                    csXfer.set("IndexWidth", Math.Floor((adminColumn.Width * 80) / (double)ColumnWidthTotal));
                                                 }
                                                 columnPtr += 1;
                                             }
                                         }
                                         using (var csXfer = new CsModel(core)) {
-                                            if (csXfer.csOpenRecord("Content Fields", FieldIDToAdd)) {
-                                                csXfer.csSet("IndexColumn", columnPtr * 10);
-                                                csXfer.csSet("IndexWidth", 20);
-                                                csXfer.csSet("IndexSortPriority", 99);
-                                                csXfer.csSet("IndexSortDirection", 1);
+                                            if (csXfer.openRecord("Content Fields", FieldIDToAdd)) {
+                                                csXfer.set("IndexColumn", columnPtr * 10);
+                                                csXfer.set("IndexWidth", 20);
+                                                csXfer.set("IndexSortPriority", 99);
+                                                csXfer.set("IndexSortDirection", 1);
                                             }
                                         }
                                         ReloadCDef = true;
@@ -616,15 +616,15 @@ namespace Contensive.Addons.Tools {
                                             Processor.Models.Domain.MetaModel.MetaAdminColumnClass adminColumn = keyValuePair.Value;
                                             Processor.Models.Domain.MetaFieldModel field = CDef.fields[adminColumn.Name];
                                             using (var csXfer = new CsModel(core)) {
-                                                csXfer.csOpenRecord("Content Fields", field.id);
+                                                csXfer.openRecord("Content Fields", field.id);
                                                 if (fieldId == TargetFieldID) {
-                                                    csXfer.csSet("IndexColumn", 0);
-                                                    csXfer.csSet("IndexWidth", 0);
-                                                    csXfer.csSet("IndexSortPriority", 0);
-                                                    csXfer.csSet("IndexSortDirection", 0);
+                                                    csXfer.set("IndexColumn", 0);
+                                                    csXfer.set("IndexWidth", 0);
+                                                    csXfer.set("IndexSortPriority", 0);
+                                                    csXfer.set("IndexSortDirection", 0);
                                                 } else {
-                                                    csXfer.csSet("IndexColumn", (columnPtr) * 10);
-                                                    csXfer.csSet("IndexWidth", Math.Floor((adminColumn.Width * 100) / (double)ColumnWidthTotal));
+                                                    csXfer.set("IndexColumn", (columnPtr) * 10);
+                                                    csXfer.set("IndexWidth", Math.Floor((adminColumn.Width * 100) / (double)ColumnWidthTotal));
                                                 }
                                             }
                                             columnPtr += 1;
@@ -645,25 +645,25 @@ namespace Contensive.Addons.Tools {
                                             Processor.Models.Domain.MetaFieldModel field = CDef.fields[adminColumn.Name];
                                             FieldName = adminColumn.Name;
                                             using (var csXfer = new CsModel(core)) {
-                                                csXfer.csOpenRecord("Content Fields", field.id);
+                                                csXfer.openRecord("Content Fields", field.id);
                                                 if ((CDef.fields[FieldName.ToLowerInvariant()].id == TargetFieldID) && (columnPtr < CDef.adminColumns.Count)) {
-                                                    csXfer.csSet("IndexColumn", (columnPtr + 1) * 10);
+                                                    csXfer.set("IndexColumn", (columnPtr + 1) * 10);
                                                     //
                                                     MoveNextColumn = true;
                                                 } else if (MoveNextColumn) {
                                                     //
                                                     // This is one past target
                                                     //
-                                                    csXfer.csSet("IndexColumn", (columnPtr - 1) * 10);
+                                                    csXfer.set("IndexColumn", (columnPtr - 1) * 10);
                                                     MoveNextColumn = false;
                                                 } else {
                                                     //
                                                     // not target or one past target
                                                     //
-                                                    csXfer.csSet("IndexColumn", (columnPtr) * 10);
+                                                    csXfer.set("IndexColumn", (columnPtr) * 10);
                                                     MoveNextColumn = false;
                                                 }
-                                                csXfer.csSet("IndexWidth", Math.Floor((adminColumn.Width * 100) / (double)ColumnWidthTotal));
+                                                csXfer.set("IndexWidth", Math.Floor((adminColumn.Width * 100) / (double)ColumnWidthTotal));
                                             }
                                             columnPtr += 1;
                                         }
@@ -684,25 +684,25 @@ namespace Contensive.Addons.Tools {
                                             Processor.Models.Domain.MetaFieldModel field = CDef.fields[adminColumn.Name];
                                             FieldName = adminColumn.Name;
                                             using (var csXfer = new CsModel(core)) {
-                                                csXfer.csOpenRecord("Content Fields", field.id);
+                                                csXfer.openRecord("Content Fields", field.id);
                                                 if ((field.id == TargetFieldID) && (columnPtr < CDef.adminColumns.Count)) {
-                                                    csXfer.csSet("IndexColumn", (columnPtr - 1) * 10);
+                                                    csXfer.set("IndexColumn", (columnPtr - 1) * 10);
                                                     //
                                                     MoveNextColumn = true;
                                                 } else if (MoveNextColumn) {
                                                     //
                                                     // This is one past target
                                                     //
-                                                    csXfer.csSet("IndexColumn", (columnPtr + 1) * 10);
+                                                    csXfer.set("IndexColumn", (columnPtr + 1) * 10);
                                                     MoveNextColumn = false;
                                                 } else {
                                                     //
                                                     // not target or one past target
                                                     //
-                                                    csXfer.csSet("IndexColumn", (columnPtr) * 10);
+                                                    csXfer.set("IndexColumn", (columnPtr) * 10);
                                                     MoveNextColumn = false;
                                                 }
-                                                csXfer.csSet("IndexWidth", Math.Floor((adminColumn.Width * 100) / (double)ColumnWidthTotal));
+                                                csXfer.set("IndexWidth", Math.Floor((adminColumn.Width * 100) / (double)ColumnWidthTotal));
                                             }
                                             columnPtr += 1;
                                         }
@@ -1342,62 +1342,62 @@ namespace Contensive.Addons.Tools {
                 //Call LoadContentDefinitions
                 //
                 using (var csXfer = new CsModel(core)) {
-                    csXfer.csOpen("Content Fields", "(ContentID=" + ContentID + ")", "IndexColumn");
-                    if (!csXfer.csOk()) {
+                    csXfer.open("Content Fields", "(ContentID=" + ContentID + ")", "IndexColumn");
+                    if (!csXfer.ok()) {
                         throw (new GenericException("Unexpected exception")); // Call handleLegacyClassErrors2("NormalizeIndexColumns", "Could not read Content Field Definitions")
                     } else {
                         //
                         // Adjust IndexSortOrder to be 0 based, count by 1
                         //
                         ColumnCounter = 0;
-                        while (csXfer.csOk()) {
-                            IndexColumn = csXfer.csGetInteger("IndexColumn");
-                            ColumnWidth = csXfer.csGetInteger("IndexWidth");
+                        while (csXfer.ok()) {
+                            IndexColumn = csXfer.getInteger("IndexColumn");
+                            ColumnWidth = csXfer.getInteger("IndexWidth");
                             if ((IndexColumn == 0) || (ColumnWidth == 0)) {
-                                csXfer.csSet( "IndexColumn", 0);
-                                csXfer.csSet( "IndexWidth", 0);
-                                csXfer.csSet( "IndexSortPriority", 0);
+                                csXfer.set( "IndexColumn", 0);
+                                csXfer.set( "IndexWidth", 0);
+                                csXfer.set( "IndexSortPriority", 0);
                             } else {
                                 //
                                 // Column appears in Index, clean it up
                                 //
-                                csXfer.csSet( "IndexColumn", ColumnCounter);
+                                csXfer.set( "IndexColumn", ColumnCounter);
                                 ColumnCounter = ColumnCounter + 1;
                                 ColumnWidthTotal = ColumnWidthTotal + ColumnWidth;
                             }
-                            csXfer.csGoNext();
+                            csXfer.goNext();
                         }
                         if (ColumnCounter == 0) {
                             //
                             // No columns found, set name as Column 0, active as column 1
                             //
-                            csXfer.csGoFirst();
-                            while (csXfer.csOk()) {
-                                switch (GenericController.vbUCase(csXfer.csGetText( "name"))) {
+                            csXfer.goFirst();
+                            while (csXfer.ok()) {
+                                switch (GenericController.vbUCase(csXfer.getText( "name"))) {
                                     case "ACTIVE":
-                                        csXfer.csSet( "IndexColumn", 0);
-                                        csXfer.csSet( "IndexWidth", 20);
+                                        csXfer.set( "IndexColumn", 0);
+                                        csXfer.set( "IndexWidth", 20);
                                         ColumnWidthTotal = ColumnWidthTotal + 20;
                                         break;
                                     case "NAME":
-                                        csXfer.csSet( "IndexColumn", 1);
-                                        csXfer.csSet( "IndexWidth", 80);
+                                        csXfer.set( "IndexColumn", 1);
+                                        csXfer.set( "IndexWidth", 80);
                                         ColumnWidthTotal = ColumnWidthTotal + 80;
                                         break;
                                 }
-                                csXfer.csGoNext();
+                                csXfer.goNext();
                             }
                         }
                         //
                         // ----- Now go back and set a normalized Width value
                         //
                         if (ColumnWidthTotal > 0) {
-                            csXfer.csGoFirst();
-                            while (csXfer.csOk()) {
-                                ColumnWidth = csXfer.csGetInteger("IndexWidth");
+                            csXfer.goFirst();
+                            while (csXfer.ok()) {
+                                ColumnWidth = csXfer.getInteger("IndexWidth");
                                 ColumnWidth = encodeInteger((ColumnWidth * 100) / (double)ColumnWidthTotal);
-                                csXfer.csSet( "IndexWidth", ColumnWidth);
-                                csXfer.csGoNext();
+                                csXfer.set( "IndexWidth", ColumnWidth);
+                                csXfer.goNext();
                             }
                         }
                     }
@@ -1406,8 +1406,8 @@ namespace Contensive.Addons.Tools {
                 // ----- now fixup Sort Priority so only visible fields are sorted.
                 //
                 using (var csXfer = new CsModel(core)) {
-                    csXfer.csOpen("Content Fields", "(ContentID=" + ContentID + ")", "IndexSortPriority, IndexColumn");
-                    if (!csXfer.csOk()) {
+                    csXfer.open("Content Fields", "(ContentID=" + ContentID + ")", "IndexSortPriority, IndexColumn");
+                    if (!csXfer.ok()) {
                         throw (new GenericException("Unexpected exception")); // Call handleLegacyClassErrors2("NormalizeIndexColumns", "Error reading Content Field Definitions")
                     } else {
                         //
@@ -1416,13 +1416,13 @@ namespace Contensive.Addons.Tools {
                         int SortValue = 0;
                         int SortDirection = 0;
                         SortValue = 0;
-                        while (csXfer.csOk()) {
+                        while (csXfer.ok()) {
                             SortDirection = 0;
-                            if (csXfer.csGetInteger("IndexColumn") == 0) {
-                                csXfer.csSet("IndexSortPriority", 0);
+                            if (csXfer.getInteger("IndexColumn") == 0) {
+                                csXfer.set("IndexSortPriority", 0);
                             } else {
-                                csXfer.csSet("IndexSortPriority", SortValue);
-                                SortDirection = csXfer.csGetInteger("IndexSortDirection");
+                                csXfer.set("IndexSortPriority", SortValue);
+                                SortDirection = csXfer.getInteger("IndexSortDirection");
                                 if (SortDirection == 0) {
                                     SortDirection = 1;
                                 } else {
@@ -1434,8 +1434,8 @@ namespace Contensive.Addons.Tools {
                                 }
                                 SortValue = SortValue + 1;
                             }
-                            csXfer.csSet("IndexSortDirection", SortDirection);
-                            csXfer.csGoNext();
+                            csXfer.set("IndexSortDirection", SortDirection);
+                            csXfer.goNext();
                         }
                     }
                 }
@@ -1588,10 +1588,10 @@ namespace Contensive.Addons.Tools {
                     //
                     Stream.Add("Synchronizing Tables to Content Definitions<br>");
                     using (var csXfer = new CsModel(core)) {
-                        csXfer.csOpen("Content", "", "", false, 0, "id");
-                        if (csXfer.csOk()) {
+                        csXfer.open("Content", "", "", false, 0, "id");
+                        if (csXfer.ok()) {
                             do {
-                                CD = Processor.Models.Domain.MetaModel.create(core, csXfer.csGetInteger("id"));
+                                CD = Processor.Models.Domain.MetaModel.create(core, csXfer.getInteger("id"));
                                 TableName = CD.tableName;
                                 Stream.Add("Synchronizing Content " + CD.name + " to table " + TableName + "<br>");
                                 core.db.createSQLTable(CD.dataSourceName, TableName);
@@ -1602,9 +1602,9 @@ namespace Contensive.Addons.Tools {
                                         core.db.createSQLTableField(CD.dataSourceName, TableName, field.nameLc, field.fieldTypeId);
                                     }
                                 }
-                                csXfer.csGoNext();
-                            } while (csXfer.csOk());
-                            ContentNameArray = csXfer.csGetRows();
+                                csXfer.goNext();
+                            } while (csXfer.ok());
+                            ContentNameArray = csXfer.getRows();
                             ContentNameCount = ContentNameArray.GetUpperBound(1) + 1;
                         }
                     }
@@ -1791,18 +1791,18 @@ namespace Contensive.Addons.Tools {
                         //
                         TestTicks = core.doc.appStopWatch.ElapsedMilliseconds;
                         using (var csXfer = new CsModel(core)) {
-                            csXfer.csOpen("Site Properties", "", "", true, 0, "", PageSize, PageNumber);
+                            csXfer.open("Site Properties", "", "", true, 0, "", PageSize, PageNumber);
                             OpenTicks = OpenTicks + core.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                             //
                             RecordCount = 0;
-                            while (csXfer.csOk()) {
+                            while (csXfer.ok()) {
                                 //
                                 TestTicks = core.doc.appStopWatch.ElapsedMilliseconds;
-                                TestCopy = GenericController.encodeText(csXfer.csGetValue("Name"));
+                                TestCopy = GenericController.encodeText(csXfer.getRawData("Name"));
                                 ReadTicks = ReadTicks + core.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                                 //
                                 TestTicks = core.doc.appStopWatch.ElapsedMilliseconds;
-                                csXfer.csGoNext();
+                                csXfer.goNext();
                                 NextTicks = NextTicks + core.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                                 //
                                 RecordCount = RecordCount + 1;
@@ -1828,18 +1828,18 @@ namespace Contensive.Addons.Tools {
                         //
                         TestTicks = core.doc.appStopWatch.ElapsedMilliseconds;
                         using (var csXfer = new CsModel(core)) {
-                            csXfer.csOpen("Site Properties", "", "", true, 0, "name", PageSize, PageNumber);
+                            csXfer.open("Site Properties", "", "", true, 0, "name", PageSize, PageNumber);
                             OpenTicks = OpenTicks + core.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                             //
                             RecordCount = 0;
-                            while (csXfer.csOk()) {
+                            while (csXfer.ok()) {
                                 //
                                 TestTicks = core.doc.appStopWatch.ElapsedMilliseconds;
-                                TestCopy = GenericController.encodeText(csXfer.csGetValue("Name"));
+                                TestCopy = GenericController.encodeText(csXfer.getRawData("Name"));
                                 ReadTicks = ReadTicks + core.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                                 //
                                 TestTicks = core.doc.appStopWatch.ElapsedMilliseconds;
-                                csXfer.csGoNext();
+                                csXfer.goNext();
                                 NextTicks = NextTicks + core.doc.appStopWatch.ElapsedMilliseconds - TestTicks;
                                 //
                                 RecordCount = RecordCount + 1;
@@ -2219,10 +2219,10 @@ namespace Contensive.Addons.Tools {
                 // Get Tablename and DataSource
                 //
                 using (var csXfer = new CsModel(core)) {
-                    csXfer.csOpenRecord("Tables", TableID, "Name,DataSourceID");
-                    if (csXfer.csOk()) {
-                        TableName = csXfer.csGetText("name");
-                        DataSource = csXfer.csGetLookup("DataSourceID");
+                    csXfer.openRecord("Tables", TableID, "Name,DataSourceID");
+                    if (csXfer.ok()) {
+                        TableName = csXfer.getText("name");
+                        DataSource = csXfer.getText("DataSourceID");
                     }
                 }
                 //
@@ -2373,20 +2373,20 @@ namespace Contensive.Addons.Tools {
                         + " FROM ((ccContent LEFT JOIN ccTables ON ccContent.ContentTableID = ccTables.ID) LEFT JOIN ccFields ON ccContent.ID = ccFields.ContentID) LEFT JOIN ccFieldTypes ON ccFields.Type = ccFieldTypes.ID"
                         + " ORDER BY ccTables.Name, ccFields.Name;";
                 using (var csXfer = new CsModel(core)) {
-                    csXfer.csOpenSql(SQL, "Default");
+                    csXfer.openSql(SQL, "Default");
                     TableName = "";
-                    while (csXfer.csOk()) {
-                        if (TableName != csXfer.csGetText( "TableName")) {
-                            TableName = csXfer.csGetText( "TableName");
+                    while (csXfer.ok()) {
+                        if (TableName != csXfer.getText( "TableName")) {
+                            TableName = csXfer.getText( "TableName");
                             result += HtmlController.tableRow("<B>" + TableName + "</b>", TableColSpan, TableEvenRow);
                         }
                         result += HtmlController.tableRowStart();
                         result += HtmlController.td("&nbsp;", "", 0, TableEvenRow);
-                        result += HtmlController.td(csXfer.csGetText( "FieldName"), "", 0, TableEvenRow);
-                        result += HtmlController.td(csXfer.csGetText( "FieldType"), "", 0, TableEvenRow);
+                        result += HtmlController.td(csXfer.getText( "FieldName"), "", 0, TableEvenRow);
+                        result += HtmlController.td(csXfer.getText( "FieldType"), "", 0, TableEvenRow);
                         result += kmaEndTableRow;
                         TableEvenRow = !TableEvenRow;
-                        csXfer.csGoNext();
+                        csXfer.goNext();
                     }
                 }
                 //
@@ -3129,19 +3129,19 @@ namespace Contensive.Addons.Tools {
                 Stream.Add("<br><br>");
                 //
                 using (var csXfer = new CsModel(core)) {
-                    csXfer.csOpen("Content");
-                    while (csXfer.csOk()) {
-                        RecordName = csXfer.csGetText("Name");
+                    csXfer.open("Content");
+                    while (csXfer.ok()) {
+                        RecordName = csXfer.getText("Name");
                         lcName = GenericController.vbLCase(RecordName);
                         if (IsDeveloper || (lcName == "page content") || (lcName == "copy content") || (lcName == "page templates")) {
-                            RecordID = csXfer.csGetInteger("ID");
+                            RecordID = csXfer.getInteger("ID");
                             if (GenericController.vbInstr(1, "," + CDefList + ",", "," + RecordName + ",") != 0) {
-                                TopHalf = TopHalf + "<div>" + HtmlController.checkbox("Cdef" + RowPtr, true) + HtmlController.inputHidden("CDefName" + RowPtr, RecordName) + "&nbsp;" + csXfer.csGetText( "Name") + "</div>";
+                                TopHalf = TopHalf + "<div>" + HtmlController.checkbox("Cdef" + RowPtr, true) + HtmlController.inputHidden("CDefName" + RowPtr, RecordName) + "&nbsp;" + csXfer.getText( "Name") + "</div>";
                             } else {
-                                BottomHalf = BottomHalf + "<div>" + HtmlController.checkbox("Cdef" + RowPtr, false) + HtmlController.inputHidden("CDefName" + RowPtr, RecordName) + "&nbsp;" + csXfer.csGetText( "Name") + "</div>";
+                                BottomHalf = BottomHalf + "<div>" + HtmlController.checkbox("Cdef" + RowPtr, false) + HtmlController.inputHidden("CDefName" + RowPtr, RecordName) + "&nbsp;" + csXfer.getText( "Name") + "</div>";
                             }
                         }
-                        csXfer.csGoNext();
+                        csXfer.goNext();
                         RowPtr = RowPtr + 1;
                     }
                 }

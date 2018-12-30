@@ -64,11 +64,11 @@ namespace Contensive.Addons.AdminSite {
                     //
                     Link = core.doc.main_GetPageDynamicLink(editRecord.id, false);
                     using (var csXfer = new CsModel(core)) {
-                        csXfer.csOpen("Link Aliases", "pageid=" + editRecord.id, "ID Desc", true, 0, "name");
-                        while (csXfer.csOk()) {
-                            LinkList = LinkList + "<div style=\"margin-left:4px;margin-bottom:4px;\">" + HtmlController.encodeHtml(csXfer.csGetText("name")) + "</div>";
+                        csXfer.open("Link Aliases", "pageid=" + editRecord.id, "ID Desc", true, 0, "name");
+                        while (csXfer.ok()) {
+                            LinkList = LinkList + "<div style=\"margin-left:4px;margin-bottom:4px;\">" + HtmlController.encodeHtml(csXfer.getText("name")) + "</div>";
                             LinkCnt = LinkCnt + 1;
-                            csXfer.csGoNext();
+                            csXfer.goNext();
                         }
                     }
                     if (LinkCnt > 0) {

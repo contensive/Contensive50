@@ -35,8 +35,8 @@ namespace Contensive.Addons.AdminSite {
                         //        Call LoadAndSaveCalendarEvents
                     }
                     using (var CSLists = new CsModel(core)) {
-                        CSLists.csOpen("Content Watch Lists", "name<>" + DbController.encodeSQLText(""), "ID");
-                        if (CSLists.csOk()) {
+                        CSLists.open("Content Watch Lists", "name<>" + DbController.encodeSQLText(""), "ID");
+                        if (CSLists.ok()) {
                             //
                             // ----- Open the panel
                             //
@@ -52,28 +52,28 @@ namespace Contensive.Addons.AdminSite {
                             // ----- Content Watch Lists, checking the ones that have active rules
                             //
                             RecordCount = 0;
-                            while (CSLists.csOk()) {
-                                ContentWatchListID = CSLists.csGetInteger("id");
+                            while (CSLists.ok()) {
+                                ContentWatchListID = CSLists.getInteger("id");
                                 //
                                 if (adminData.ContentWatchRecordID != 0) {
                                     using (var CSRules = new CsModel(core)) {
-                                        CSRules.csOpen("Content Watch List Rules", "(ContentWatchID=" + adminData.ContentWatchRecordID + ")AND(ContentWatchListID=" + ContentWatchListID + ")");
+                                        CSRules.open("Content Watch List Rules", "(ContentWatchID=" + adminData.ContentWatchRecordID + ")AND(ContentWatchListID=" + ContentWatchListID + ")");
                                         if (editRecord.userReadOnly) {
-                                            HTMLFieldString = GenericController.encodeText(CSRules.csOk());
+                                            HTMLFieldString = GenericController.encodeText(CSRules.ok());
                                         } else {
-                                            HTMLFieldString = HtmlController.checkbox("ContentWatchList." + CSLists.csGet("ID"), CSRules.csOk());
+                                            HTMLFieldString = HtmlController.checkbox("ContentWatchList." + CSLists.getText("ID"), CSRules.ok());
                                         }
                                     }
                                 } else {
                                     if (editRecord.userReadOnly) {
                                         HTMLFieldString = GenericController.encodeText(false);
                                     } else {
-                                        HTMLFieldString = HtmlController.checkbox("ContentWatchList." + CSLists.csGet("ID"), false);
+                                        HTMLFieldString = HtmlController.checkbox("ContentWatchList." + CSLists.getText("ID"), false);
                                     }
                                 }
                                 //
-                                FastString.Add(AdminUIController.getEditRowLegacy(core, HTMLFieldString, "Include in " + CSLists.csGet("name"), "When true, this Content Record can be included in the '" + CSLists.csGet("name") + "' list", false, false, ""));
-                                CSLists.csGoNext();
+                                FastString.Add(AdminUIController.getEditRowLegacy(core, HTMLFieldString, "Include in " + CSLists.getText("name"), "When true, this Content Record can be included in the '" + CSLists.getText("name") + "' list", false, false, ""));
+                                CSLists.goNext();
                                 RecordCount = RecordCount + 1;
                             }
                             //

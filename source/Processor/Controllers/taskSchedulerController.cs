@@ -296,7 +296,7 @@ namespace Contensive.Processor.Controllers {
                     // -- Search for a duplicate
                     string sql = "select top 1 id from cctasks where ((cmdDetail=" + cmdDetailJson + ")and(datestarted is not null))";
                     using (var csXfer = new CsModel(core)) {
-                        resultTaskAdded = !csXfer.csOpenSql(sql);
+                        resultTaskAdded = !csXfer.openSql(sql);
                     }
                 }
                 //

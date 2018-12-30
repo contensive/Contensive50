@@ -880,24 +880,24 @@ namespace Contensive.Processor.Controllers {
                                                                     FieldValue = core.docProperties.getText(FieldName);
                                                                 }
                                                                 using (var csXfer = new CsModel(core)) {
-                                                                    csXfer.csOpen("Copy Content", "name=" + DbController.encodeSQLText(FieldName), "ID");
-                                                                    if (!csXfer.csOk()) {
+                                                                    csXfer.open("Copy Content", "name=" + DbController.encodeSQLText(FieldName), "ID");
+                                                                    if (!csXfer.ok()) {
                                                                         csXfer.close();
                                                                         csXfer.insert("Copy Content");
                                                                     }
-                                                                    if (csXfer.csOk()) {
-                                                                        csXfer.csSet("name", FieldName);
+                                                                    if (csXfer.ok()) {
+                                                                        csXfer.set("name", FieldName);
                                                                         //
                                                                         // Set copy
                                                                         //
-                                                                        csXfer.csSet("copy", FieldValue);
+                                                                        csXfer.set("copy", FieldValue);
                                                                         //
                                                                         // delete duplicates
                                                                         //
-                                                                        csXfer.csGoNext();
-                                                                        while (csXfer.csOk()) {
+                                                                        csXfer.goNext();
+                                                                        while (csXfer.ok()) {
                                                                             csXfer.deleteRecord();
-                                                                            csXfer.csGoNext();
+                                                                            csXfer.goNext();
                                                                         }
                                                                     }
                                                                 }
@@ -1166,19 +1166,19 @@ namespace Contensive.Processor.Controllers {
                                                             FieldHTML = GenericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", ""));
                                                             //
                                                             using (var csXfer = new CsModel(core)) {
-                                                                csXfer.csOpen("Copy Content", "Name=" + DbController.encodeSQLText(FieldName), "ID", false, 0, "id,name,Copy");
-                                                                if (!csXfer.csOk()) {
+                                                                csXfer.open("Copy Content", "Name=" + DbController.encodeSQLText(FieldName), "ID", false, 0, "id,name,Copy");
+                                                                if (!csXfer.ok()) {
                                                                     csXfer.close();
                                                                     csXfer.insert("Copy Content");
-                                                                    if (csXfer.csOk()) {
-                                                                        int RecordID = csXfer.csGetInteger("ID");
-                                                                        csXfer.csSet("name", FieldName);
-                                                                        csXfer.csSet("copy", GenericController.encodeText(TabNode.InnerText));
-                                                                        csXfer.csSave();
+                                                                    if (csXfer.ok()) {
+                                                                        int RecordID = csXfer.getInteger("ID");
+                                                                        csXfer.set("name", FieldName);
+                                                                        csXfer.set("copy", GenericController.encodeText(TabNode.InnerText));
+                                                                        csXfer.save();
                                                                     }
                                                                 }
-                                                                if (csXfer.csOk()) {
-                                                                    FieldValue = csXfer.csGetText("copy");
+                                                                if (csXfer.ok()) {
+                                                                    FieldValue = csXfer.getText("copy");
                                                                 }
                                                             }
                                                             if (FieldHTML) {
@@ -2529,26 +2529,26 @@ namespace Contensive.Processor.Controllers {
                 s = Content;
                 SelectFieldList = "name,copytext,javascriptonload,javascriptbodyend,stylesfilename,otherheadtags,JSFilename,targetString";
                 using (var csXfer = new CsModel(core)) {
-                    csXfer.csOpenRecord("Wrappers", WrapperID, SelectFieldList);
-                    if (csXfer.csOk()) {
-                        Wrapper = csXfer.csGetText("copytext");
-                        wrapperName = csXfer.csGetText("name");
-                        TargetString = csXfer.csGetText("targetString");
+                    csXfer.openRecord("Wrappers", WrapperID, SelectFieldList);
+                    if (csXfer.ok()) {
+                        Wrapper = csXfer.getText("copytext");
+                        wrapperName = csXfer.getText("name");
+                        TargetString = csXfer.getText("targetString");
                         //
                         SourceComment = "wrapper " + wrapperName;
                         if (!string.IsNullOrEmpty(WrapperSourceForComment)) {
                             SourceComment = SourceComment + " for " + WrapperSourceForComment;
                         }
-                        core.html.addScriptCode_onLoad(csXfer.csGetText("javascriptonload"), SourceComment);
-                        core.html.addScriptCode(csXfer.csGetText("javascriptbodyend"), SourceComment);
-                        core.html.addHeadTag(csXfer.csGetText("OtherHeadTags"), SourceComment);
+                        core.html.addScriptCode_onLoad(csXfer.getText("javascriptonload"), SourceComment);
+                        core.html.addScriptCode(csXfer.getText("javascriptbodyend"), SourceComment);
+                        core.html.addHeadTag(csXfer.getText("OtherHeadTags"), SourceComment);
                         //
-                        JSFilename = csXfer.csGetText("jsfilename");
+                        JSFilename = csXfer.getText("jsfilename");
                         if (!string.IsNullOrEmpty(JSFilename)) {
                             JSFilename = GenericController.getCdnFileLink(core, JSFilename);
                             core.html.addScriptLinkSrc(JSFilename, SourceComment);
                         }
-                        Copy = csXfer.csGetText("stylesfilename");
+                        Copy = csXfer.getText("stylesfilename");
                         if (!string.IsNullOrEmpty(Copy)) {
                             if (GenericController.vbInstr(1, Copy, "://") != 0) {
                             } else if (Copy.Left(1) == "/") {
@@ -2829,60 +2829,57 @@ namespace Contensive.Processor.Controllers {
         public string throwEvent(string eventNameIdOrGuid) {
             string returnString = "";
             try {
-                string sql = null;
-                var cs = new CsModel(core);
-                int addonid = 0;
-                //
-                sql = "select e.id,c.addonId"
-                    + " from (ccAddonEvents e"
-                    + " left join ccAddonEventCatchers c on c.eventId=e.id)"
-                    + " where ";
-                if (eventNameIdOrGuid.IsNumeric()) {
-                    sql += "e.id=" + DbController.encodeSQLNumber(double.Parse(eventNameIdOrGuid));
-                } else if (GenericController.isGuid(eventNameIdOrGuid)) {
-                    sql += "e.ccGuid=" + DbController.encodeSQLText(eventNameIdOrGuid);
-                } else {
-                    sql += "e.name=" + DbController.encodeSQLText(eventNameIdOrGuid);
-                }
-                if (!cs.openSQL(sql)) {
-                    //
-                    // event not found
-                    //
+                using (var cs = new CsModel(core)) {
+                    string sql = "select e.id,c.addonId"
+                        + " from (ccAddonEvents e"
+                        + " left join ccAddonEventCatchers c on c.eventId=e.id)"
+                        + " where ";
                     if (eventNameIdOrGuid.IsNumeric()) {
-                        //
-                        // can not create an id
-                        //
+                        sql += "e.id=" + DbController.encodeSQLNumber(double.Parse(eventNameIdOrGuid));
                     } else if (GenericController.isGuid(eventNameIdOrGuid)) {
-                        //
-                        // create event with Guid and id for name
-                        //
-                        cs.close();
-                        cs.insert("add-on Events");
-                        cs.setField("ccguid", eventNameIdOrGuid);
-                        cs.setField("name", "Event " + cs.getInteger("id").ToString());
-                    } else if (!string.IsNullOrEmpty(eventNameIdOrGuid)) {
-                        //
-                        // create event with name
-                        //
-                        cs.close();
-                        cs.insert("add-on Events");
-                        cs.setField("name", eventNameIdOrGuid);
+                        sql += "e.ccGuid=" + DbController.encodeSQLText(eventNameIdOrGuid);
+                    } else {
+                        sql += "e.name=" + DbController.encodeSQLText(eventNameIdOrGuid);
                     }
-                } else {
-                    while (cs.ok()) {
-                        addonid = cs.getInteger("addonid");
-                        if (addonid != 0) {
-                            var addon = AddonModel.create(core, addonid);
-                            returnString += core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext {
-                                addonType = CPUtilsBaseClass.addonContext.ContextSimple,
-                                errorContextMessage = "calling handler addon id [" + addonid + "] for event [" + eventNameIdOrGuid + "]"
-                            });
+                    if (!cs.openSql(sql)) {
+                        //
+                        // event not found
+                        //
+                        if (eventNameIdOrGuid.IsNumeric()) {
+                            //
+                            // can not create an id
+                            //
+                        } else if (GenericController.isGuid(eventNameIdOrGuid)) {
+                            //
+                            // create event with Guid and id for name
+                            //
+                            cs.close();
+                            cs.insert("add-on Events");
+                            cs.set("ccguid", eventNameIdOrGuid);
+                            cs.set("name", "Event " + cs.getInteger("id").ToString());
+                        } else if (!string.IsNullOrEmpty(eventNameIdOrGuid)) {
+                            //
+                            // create event with name
+                            //
+                            cs.close();
+                            cs.insert("add-on Events");
+                            cs.set("name", eventNameIdOrGuid);
                         }
-                        cs.goNext();
+                    } else {
+                        while (cs.ok()) {
+                            int addonid = cs.getInteger("addonid");
+                            if (addonid != 0) {
+                                var addon = AddonModel.create(core, addonid);
+                                returnString += core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext {
+                                    addonType = CPUtilsBaseClass.addonContext.ContextSimple,
+                                    errorContextMessage = "calling handler addon id [" + addonid + "] for event [" + eventNameIdOrGuid + "]"
+                                });
+                            }
+                            cs.goNext();
+                        }
                     }
+                    cs.close();
                 }
-                cs.close();
-                //
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
             }

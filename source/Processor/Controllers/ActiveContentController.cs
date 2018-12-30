@@ -292,14 +292,14 @@ namespace Contensive.Processor.Controllers {
                                                                 } else {
                                                                     Criteria = "name=" + DbController.encodeSQLText(ACName.ToUpper());
                                                                 }
-                                                                if (csXfer.csOpen(AddonContentName, Criteria, "Name,ID", false, 0, SelectList)) {
-                                                                    IconFilename = csXfer.csGet("IconFilename");
-                                                                    SrcOptionList = csXfer.csGet("ArgumentList");
-                                                                    IconWidth = csXfer.csGetInteger("IconWidth");
-                                                                    IconHeight = csXfer.csGetInteger("IconHeight");
-                                                                    IconSprites = csXfer.csGetInteger("IconSprites");
-                                                                    AddonIsInline = csXfer.csGetBoolean("IsInline");
-                                                                    ACGuid = csXfer.csGetText("ccGuid");
+                                                                if (csXfer.open(AddonContentName, Criteria, "Name,ID", false, 0, SelectList)) {
+                                                                    IconFilename = csXfer.getText("IconFilename");
+                                                                    SrcOptionList = csXfer.getText("ArgumentList");
+                                                                    IconWidth = csXfer.getInteger("IconWidth");
+                                                                    IconHeight = csXfer.getInteger("IconHeight");
+                                                                    IconSprites = csXfer.getInteger("IconSprites");
+                                                                    AddonIsInline = csXfer.getBoolean("IsInline");
+                                                                    ACGuid = csXfer.getText("ccGuid");
                                                                     IconAlt = ACName;
                                                                     IconTitle = "Rendered as the Add-on [" + ACName + "]";
                                                                 } else {

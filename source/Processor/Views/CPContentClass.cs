@@ -163,7 +163,7 @@ namespace Contensive.Processor {
             string result = "";
             try {
                 using (var cs = new CsModel(cp.core)) {
-                    cs.csOpen("layouts", "name=" + DbController.encodeSQLText(layoutName), "id", false, cp.core.session.user.id, "layout");
+                    cs.open("layouts", "name=" + DbController.encodeSQLText(layoutName), "id", false, cp.core.session.user.id, "layout");
                     if (cs.ok()) {
                         result = cs.getText("layout");
                     }
@@ -182,7 +182,7 @@ namespace Contensive.Processor {
             try {
                 CsModel cs = new CsModel(cp.core);
                 if (cs.insert(contentName)) {
-                    cs.setField("name", recordName);
+                    cs.set("name", recordName);
                     recordId = cs.getInteger("id");
                 }
                 cs.close();

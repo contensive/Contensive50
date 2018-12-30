@@ -315,8 +315,8 @@ namespace Contensive.Processor.Controllers {
                         using (var csXfer = new CsModel(core)) {
                             sqlCriteria = "(email=" + DbController.encodeSQLText(workingEmail) + ")";
                             sqlCriteria = sqlCriteria + "and((dateExpires is null)or(dateExpires>" + DbController.encodeSQLDate(DateTime.Now) + "))";
-                            csXfer.csOpen("People", sqlCriteria, "ID",true,core.session.user.id,"username,password", 1);
-                            if (!csXfer.csOk()) {
+                            csXfer.open("People", sqlCriteria, "ID",true,core.session.user.id,"username,password", 1);
+                            if (!csXfer.ok()) {
                                 //
                                 // valid login account for this email not found
                                 //
@@ -325,36 +325,36 @@ namespace Contensive.Processor.Controllers {
                                     // look for expired account to renew
                                     //
                                     csXfer.close();
-                                    csXfer.csOpen("People", "((email=" + DbController.encodeSQLText(workingEmail) + "))", "ID");
-                                    if (csXfer.csOk()) {
+                                    csXfer.open("People", "((email=" + DbController.encodeSQLText(workingEmail) + "))", "ID");
+                                    if (csXfer.ok()) {
                                         //
                                         // renew this old record
                                         //
                                         //hint = "150"
-                                        csXfer.csSet("developer", "1");
-                                        csXfer.csSet("admin", "1");
-                                        if ( csXfer.getDate( "dateExpires") > DateTime.MinValue ) { csXfer.csSet("dateExpires", DateTime.Now.AddDays(7).Date.ToString());  }
+                                        csXfer.set("developer", "1");
+                                        csXfer.set("admin", "1");
+                                        if ( csXfer.getDate( "dateExpires") > DateTime.MinValue ) { csXfer.set("dateExpires", DateTime.Now.AddDays(7).Date.ToString());  }
                                     } else {
                                         //
                                         // inject support record
                                         //
                                         csXfer.close();
                                         csXfer.insert("people");
-                                        csXfer.csSet("name", "Contensive Support");
-                                        csXfer.csSet("email", workingEmail);
-                                        csXfer.csSet("developer", "1");
-                                        csXfer.csSet("admin", "1");
-                                        csXfer.csSet("dateExpires", DateTime.Now.AddDays(7).Date.ToString());
+                                        csXfer.set("name", "Contensive Support");
+                                        csXfer.set("email", workingEmail);
+                                        csXfer.set("developer", "1");
+                                        csXfer.set("admin", "1");
+                                        csXfer.set("dateExpires", DateTime.Now.AddDays(7).Date.ToString());
                                     }
                                 } else {
                                     ErrorController.addUserError(core, "No current user was found matching this email address. Please try again. ");
                                 }
                             }
-                            if (csXfer.csOk()) {
+                            if (csXfer.ok()) {
                                 FromAddress = core.siteProperties.getText("EmailFromAddress", "info@" + core.webServer.requestDomain);
                                 subject = "Password Request at " + core.webServer.requestDomain;
                                 Message = "";
-                                while (csXfer.csOk()) {
+                                while (csXfer.ok()) {
                                     //hint = "170"
                                     updateUser = false;
                                     if (string.IsNullOrEmpty(Message)) {
@@ -371,7 +371,7 @@ namespace Contensive.Processor.Controllers {
                                     // username
                                     //
                                     //hint = "200"
-                                    Username = csXfer.csGetText("Username");
+                                    Username = csXfer.getText("Username");
                                     usernameOK = true;
                                     if (!allowEmailLogin) {
                                         //hint = "210"
@@ -405,7 +405,7 @@ namespace Contensive.Processor.Controllers {
                                         // password
                                         //
                                         //hint = "280"
-                                        Password = csXfer.csGetText("Password");
+                                        Password = csXfer.getText("Password");
                                         if (Password.Trim() != Password) {
                                             //hint = "290"
                                             Password = Password.Trim();
@@ -427,12 +427,12 @@ namespace Contensive.Processor.Controllers {
                                         result = true;
                                         if (updateUser) {
                                             //hint = "350"
-                                            csXfer.csSet("username", Username);
-                                            csXfer.csSet("password", Password);
+                                            csXfer.set("username", Username);
+                                            csXfer.set("password", Password);
                                         }
                                         recordCnt = recordCnt + 1;
                                     }
-                                    csXfer.csGoNext();
+                                    csXfer.goNext();
                                 }
                             }
                         }
@@ -475,11 +475,11 @@ namespace Contensive.Processor.Controllers {
                     } else {
                         if (!(core.doc.debug_iUserError != "")) {
                             using (var csXfer = new CsModel(core)) {
-                                csXfer.csOpen("people", "ID=" + DbController.encodeSQLNumber(core.session.user.id));
-                                if (!csXfer.csOk()) {
+                                csXfer.open("people", "ID=" + DbController.encodeSQLNumber(core.session.user.id));
+                                if (!csXfer.ok()) {
                                     LogController.handleError(core, new Exception("Could not open the current members account to set the username and password."));
                                 } else {
-                                    if ((csXfer.csGetText("username") != "") || (csXfer.csGetText("password") != "") || (csXfer.csGetBoolean("admin")) || (csXfer.csGetBoolean("developer"))) {
+                                    if ((csXfer.getText("username") != "") || (csXfer.getText("password") != "") || (csXfer.getBoolean("admin")) || (csXfer.getBoolean("developer"))) {
                                         //
                                         // if the current account can be logged into, you can not join 'into' it
                                         //
@@ -489,11 +489,11 @@ namespace Contensive.Processor.Controllers {
                                     LastName = core.docProperties.getText("lastname");
                                     FullName = FirstName + " " + LastName;
                                     Email = core.docProperties.getText("email");
-                                    csXfer.csSet("FirstName", FirstName);
-                                    csXfer.csSet("LastName", LastName);
-                                    csXfer.csSet("Name", FullName);
-                                    csXfer.csSet("username", loginForm_Username);
-                                    csXfer.csSet("password", loginForm_Password);
+                                    csXfer.set("FirstName", FirstName);
+                                    csXfer.set("LastName", LastName);
+                                    csXfer.set("Name", FullName);
+                                    csXfer.set("username", loginForm_Username);
+                                    csXfer.set("password", loginForm_Password);
                                     SessionController.authenticateById(core, core.session.user.id, core.session);
                                 }
                                 csXfer.close();

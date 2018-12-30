@@ -695,7 +695,7 @@ namespace Contensive.Processor.Controllers {
                                 + " AND(ccGroupRules.ContentID Is not Null)"
                                 + " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + DbController.encodeSQLDate(core.doc.profileStartTime) + "))"
                                 + ")";
-                        _isAuthenticatedContentManagerAnything = csXfer.csOpenSql(sql);
+                        _isAuthenticatedContentManagerAnything = csXfer.openSql(sql);
                     }
                     //
                     _isAuthenticatedContentManagerAnything_userId = user.id;
@@ -797,13 +797,13 @@ namespace Contensive.Processor.Controllers {
                     }
                     Criteria = Criteria + "and((dateExpires is null)or(dateExpires>" + DbController.encodeSQLDate(DateTime.Now) + "))";
                     using (var csXfer = new CsModel(core)) {
-                        csXfer.csOpen("People", Criteria, "id",true, user.id, "ID,password,admin,developer", PageSize: 2);
-                        if (!csXfer.csOk()) {
+                        csXfer.open("People", Criteria, "id",true, user.id, "ID,password,admin,developer", PageSize: 2);
+                        if (!csXfer.ok()) {
                             //
                             // ----- loginFieldValue not found, stop here
                             //
                             ErrorController.addUserError(core, badLoginUserError);
-                        } else if ((!GenericController.encodeBoolean(core.siteProperties.getBoolean("AllowDuplicateUsernames", false))) && (csXfer.csGetRowCount() > 1)) {
+                        } else if ((!GenericController.encodeBoolean(core.siteProperties.getBoolean("AllowDuplicateUsernames", false))) && (csXfer.getRowCount() > 1)) {
                             //
                             // ----- AllowDuplicates is false, and there are more then one record
                             //
@@ -812,7 +812,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // ----- search all found records for the correct password
                             //
-                            while (csXfer.csOk()) {
+                            while (csXfer.ok()) {
                                 returnUserId = 0;
                                 //
                                 // main_Get Id if password good
@@ -821,10 +821,10 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     // no-password-login -- allowNoPassword + no password given + account has no password + account not admin/dev/cm
                                     //
-                                    recordIsAdmin = csXfer.csGetBoolean("admin");
-                                    recordIsDeveloper = !csXfer.csGetBoolean("admin");
-                                    if (allowNoPasswordLogin && (csXfer.csGetText("password") == "") && (!recordIsAdmin) && (recordIsDeveloper)) {
-                                        returnUserId = csXfer.csGetInteger("ID");
+                                    recordIsAdmin = csXfer.getBoolean("admin");
+                                    recordIsDeveloper = !csXfer.getBoolean("admin");
+                                    if (allowNoPasswordLogin && (csXfer.getText("password") == "") && (!recordIsAdmin) && (recordIsDeveloper)) {
+                                        returnUserId = csXfer.getInteger("ID");
                                         //
                                         // verify they are in no content manager groups
                                         //
@@ -838,21 +838,21 @@ namespace Contensive.Processor.Controllers {
                                                 + " AND(ccGroupRules.ContentID Is not Null)"
                                                 + " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + DbController.encodeSQLDate(core.doc.profileStartTime) + "))"
                                                 + ");";
-                                            if (csRules.csOpenSql(SQL)) { returnUserId = 0; }
+                                            if (csRules.openSql(SQL)) { returnUserId = 0; }
                                         }
                                     }
                                 } else {
                                     //
                                     // password login
                                     //
-                                    if (GenericController.vbLCase(csXfer.csGetText("password")) == GenericController.vbLCase(iPassword)) {
-                                        returnUserId = csXfer.csGetInteger("ID");
+                                    if (GenericController.vbLCase(csXfer.getText("password")) == GenericController.vbLCase(iPassword)) {
+                                        returnUserId = csXfer.getInteger("ID");
                                     }
                                 }
                                 if (returnUserId != 0) {
                                     break;
                                 }
-                                csXfer.csGoNext();
+                                csXfer.goNext();
                             }
                             if (returnUserId == 0) {
                                 ErrorController.addUserError(core, badLoginUserError);
@@ -902,7 +902,7 @@ namespace Contensive.Processor.Controllers {
                     //        errorMessage = "You currently have cookie support disabled in your browser. Without cookies, your browser can not support the level of security required to login."
                 } else {
                     using (var csXfer = new CsModel(core)) {
-                        if (csXfer.csOpen("People", "username=" + DbController.encodeSQLText(Username), "id", false, 2, "ID")) {
+                        if (csXfer.open("People", "username=" + DbController.encodeSQLText(Username), "id", false, 2, "ID")) {
                             //
                             // ----- username was found, stop here
                             returnErrorCode = 3;

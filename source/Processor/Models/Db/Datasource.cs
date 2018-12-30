@@ -116,7 +116,7 @@ namespace Contensive.Processor.Models.Db {
             try {
                 CsModel cs = new CsModel(core);
                 List<string> ignoreCacheNames = new List<string>();
-                if ( cs.openSQL( "select id from ccdatasources where active>0")) {
+                if ( cs.openSql( "select id from ccdatasources where active>0")) {
                     do {
                         DataSourceModel instance = create(core, cs.getInteger("id"));
                         if (instance != null) {

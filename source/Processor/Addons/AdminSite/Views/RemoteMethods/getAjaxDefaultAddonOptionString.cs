@@ -20,10 +20,10 @@ namespace Contensive.Addons.AdminSite {
                 using (CoreController core = ((CPClass)cp).core) {
                     using (var csXfer = new CsModel(core)) {
                         string AddonGuid = core.docProperties.getText("guid");
-                        csXfer.csOpen(Processor.Models.Db.AddonModel.contentName, "ccguid=" + DbController.encodeSQLText(AddonGuid));
-                        if (csXfer.csOk()) {
-                            string addonArgumentList = csXfer.csGetText("argumentlist");
-                            bool addonIsInline = csXfer.csGetBoolean("IsInline");
+                        csXfer.open(Processor.Models.Db.AddonModel.contentName, "ccguid=" + DbController.encodeSQLText(AddonGuid));
+                        if (csXfer.ok()) {
+                            string addonArgumentList = csXfer.getText("argumentlist");
+                            bool addonIsInline = csXfer.getBoolean("IsInline");
                             returnHtml = AddonController.getDefaultAddonOptions(core, addonArgumentList, AddonGuid, addonIsInline);
                         }
                     }

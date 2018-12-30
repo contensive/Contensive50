@@ -79,11 +79,11 @@ namespace Contensive.Addons.AdminSite {
                                         //
                                         // -- copy the field
                                         using (var CSSource = new CsModel(core)) {
-                                            if (CSSource.csOpen("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + DbController.encodeSQLText(SourceName) + ")")) {
+                                            if (CSSource.open("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + DbController.encodeSQLText(SourceName) + ")")) {
                                                 using (var CSTarget = new CsModel(core)) {
                                                     if (CSTarget.insert("Content Fields")) {
                                                         CSSource.copyRecord(CSTarget);
-                                                        CSTarget.csSet("ContentID", adminContent.id);
+                                                        CSTarget.set("ContentID", adminContent.id);
                                                         reloadMetadata = true;
                                                     }
                                                 }
@@ -103,11 +103,11 @@ namespace Contensive.Addons.AdminSite {
                                 SourceContentID = field.contentId;
                                 SourceName = field.nameLc;
                                 using (var CSSource = new CsModel(core)) {
-                                    if (CSSource.csOpen("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + DbController.encodeSQLText(SourceName) + ")")) {
+                                    if (CSSource.open("Content Fields", "(ContentID=" + SourceContentID + ")and(Name=" + DbController.encodeSQLText(SourceName) + ")")) {
                                         using (var CSTarget = new CsModel(core)) {
                                             if (CSTarget.insert("Content Fields")) {
                                                 CSSource.copyRecord(CSTarget);
-                                                CSTarget.csSet("ContentID", adminContent.id);
+                                                CSTarget.set("ContentID", adminContent.id);
                                                 reloadMetadata = true;
                                             }
                                         }
@@ -137,8 +137,8 @@ namespace Contensive.Addons.AdminSite {
                                         {
                                             column = new IndexConfigClass.IndexConfigColumnClass();
                                             using (var csXfer = new CsModel(core)) {
-                                                if (csXfer.csOpenRecord("Content Fields", FieldIDToAdd)) {
-                                                    column.Name = csXfer.csGet("name");
+                                                if (csXfer.openRecord("Content Fields", FieldIDToAdd)) {
+                                                    column.Name = csXfer.getText("name");
                                                     column.Width = 20;
                                                 }
                                             }

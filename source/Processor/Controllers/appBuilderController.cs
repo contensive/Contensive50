@@ -807,19 +807,19 @@ namespace Contensive.Processor.Controllers {
         private static void verifyCountry(CoreController core, string name, string abbreviation) {
             try {
                 using (var csXfer = new CsModel(core)) {
-                    csXfer.csOpen("Countries", "name=" + DbController.encodeSQLText(name));
-                    if (!csXfer.csOk()) {
+                    csXfer.open("Countries", "name=" + DbController.encodeSQLText(name));
+                    if (!csXfer.ok()) {
                         csXfer.close();
                         csXfer.insert("Countries");
-                        if (csXfer.csOk()) {
-                            csXfer.csSet("ACTIVE", true);
+                        if (csXfer.ok()) {
+                            csXfer.set("ACTIVE", true);
                         }
                     }
-                    if (csXfer.csOk()) {
-                        csXfer.csSet("NAME", name);
-                        csXfer.csSet("Abbreviation", abbreviation);
+                    if (csXfer.ok()) {
+                        csXfer.set("NAME", name);
+                        csXfer.set("Abbreviation", abbreviation);
                         if (GenericController.vbLCase(name) == "united states") {
-                            csXfer.csSet("DomesticShipping", "1");
+                            csXfer.set("DomesticShipping", "1");
                         }
                     }
                     csXfer.close();
@@ -1083,17 +1083,17 @@ namespace Contensive.Processor.Controllers {
                             }
                             int RecordID = 0;
                             using (var csXfer = new CsModel(core)) {
-                                csXfer.csOpen(NavigatorEntryModel.contentName, Criteria, "ID", true, 0,  "ID", 1);
-                                if (csXfer.csOk()) {
-                                    RecordID = (csXfer.csGetInteger("ID"));
+                                csXfer.open(NavigatorEntryModel.contentName, Criteria, "ID", true, 0,  "ID", 1);
+                                if (csXfer.ok()) {
+                                    RecordID = (csXfer.getInteger("ID"));
                                 }
                                 csXfer.close();
                                 if (RecordID == 0) {
                                     csXfer.insert(NavigatorEntryModel.contentName);
-                                    if (csXfer.csOk()) {
-                                        RecordID = csXfer.csGetInteger("ID");
-                                        csXfer.csSet("name", recordName);
-                                        csXfer.csSet("parentID", parentRecordId);
+                                    if (csXfer.ok()) {
+                                        RecordID = csXfer.getInteger("ID");
+                                        csXfer.set("name", recordName);
+                                        csXfer.set("parentID", parentRecordId);
                                     }
                                 }
                             }

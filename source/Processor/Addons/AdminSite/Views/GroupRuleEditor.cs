@@ -64,12 +64,12 @@ namespace Contensive.Addons.AdminSite {
                         // Output all the groups, with the active and dateexpires from those joined
                         //body.Add(adminUIController.EditTableOpen);
                         bool CanSeeHiddenGroups = core.session.isAuthenticatedDeveloper(core);
-                        csXfer.csOpenSql(SQL2, "Default");
-                        while (csXfer.csOk()) {
-                            string GroupName = csXfer.csGet("GroupName");
+                        csXfer.openSql(SQL2, "Default");
+                        while (csXfer.ok()) {
+                            string GroupName = csXfer.getText("GroupName");
                             if ((GroupName.Left(1) != "_") || CanSeeHiddenGroups) {
-                                string GroupCaption = csXfer.csGet("GroupCaption");
-                                int GroupID = csXfer.csGetInteger("ID");
+                                string GroupCaption = csXfer.getText("GroupCaption");
+                                int GroupID = csXfer.getInteger("ID");
                                 if (string.IsNullOrEmpty(GroupCaption)) {
                                     GroupCaption = GroupName;
                                     if (string.IsNullOrEmpty(GroupCaption)) {
@@ -103,7 +103,7 @@ namespace Contensive.Addons.AdminSite {
                                 groupRuleEditor.rowList.Add(row);
                                 GroupCount += 1;
                             }
-                            csXfer.csGoNext();
+                            csXfer.goNext();
                         }
                     }
                 }

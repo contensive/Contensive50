@@ -216,8 +216,8 @@ namespace Contensive.Processor.Controllers {
                             result = inputText(core, MenuName, "0");
                         } else {
                             using ( var csXfer = new CsModel( core )) {
-                                if (csXfer.csOpenRecord(ContentName, CurrentValue)) {
-                                    result = csXfer.csGetText("name") + "&nbsp;";
+                                if (csXfer.openRecord(ContentName, CurrentValue)) {
+                                    result = csXfer.getText("name") + "&nbsp;";
                                 }
                             }
                         }
@@ -305,9 +305,9 @@ namespace Contensive.Processor.Controllers {
                             //
                             // ----- select values
                             using (var csXfer = new CsModel(core)) {
-                                if (csXfer.csOpen(ContentName, Criteria, SortFieldList, false, 0, SelectFields)) {
-                                    RowsArray = csXfer.csGetRows();
-                                    RowFieldArray = csXfer.csGetSelectFieldList().Split(',');
+                                if (csXfer.open(ContentName, Criteria, SortFieldList, false, 0, SelectFields)) {
+                                    RowsArray = csXfer.getRows();
+                                    RowFieldArray = csXfer.getSelectFieldList().Split(',');
                                     ColumnMax = RowsArray.GetUpperBound(0);
                                     RowMax = RowsArray.GetUpperBound(1);
                                     //
@@ -362,9 +362,9 @@ namespace Contensive.Processor.Controllers {
                                             Criteria = Criteria + "and";
                                         }
                                         Criteria = Criteria + "(id=" + GenericController.encodeInteger(CurrentValue) + ")";
-                                        if (csXfer.csOpen(ContentName, Criteria, SortFieldList, false, 0, SelectFields)) {
-                                            RowsArray = csXfer.csGetRows();
-                                            RowFieldArray = csXfer.csGetSelectFieldList().Split(',');
+                                        if (csXfer.open(ContentName, Criteria, SortFieldList, false, 0, SelectFields)) {
+                                            RowsArray = csXfer.getRows();
+                                            RowFieldArray = csXfer.getSelectFieldList().Split(',');
                                             RowMax = RowsArray.GetUpperBound(1);
                                             ColumnMax = RowsArray.GetUpperBound(0);
                                             RecordID = GenericController.encodeInteger(RowsArray[IDFieldPointer, 0]);
@@ -453,9 +453,9 @@ namespace Contensive.Processor.Controllers {
                         + " where (P.active<>0)"
                         + " and (R.GroupID=" + GroupID + ")";
                     using (var csXfer = new CsModel(core)) {
-                        csXfer.csOpenSql(SQL);
-                        if (csXfer.csOk()) {
-                            RowMax = RowMax + csXfer.csGetInteger("cnt");
+                        csXfer.openSql(SQL);
+                        if (csXfer.ok()) {
+                            RowMax = RowMax + csXfer.getInteger("cnt");
                         }
                     }
                     if (RowMax > core.siteProperties.selectFieldLimit) {
@@ -466,8 +466,8 @@ namespace Contensive.Processor.Controllers {
                         result += inputHidden(MenuNameFPO, currentValue);
                         if (currentValue != 0) {
                             using (var csXfer = new CsModel(core)) {
-                                if (csXfer.csOpenRecord("people", currentValue)) {
-                                    result = csXfer.csGetText("name") + "&nbsp;";
+                                if (csXfer.openRecord("people", currentValue)) {
+                                    result = csXfer.getText("name") + "&nbsp;";
                                 }
                             }
                         }
@@ -574,9 +574,9 @@ namespace Contensive.Processor.Controllers {
                                     + " and((R.DateExpires is null)or(R.DateExpires>" + DbController.encodeSQLDate(DateTime.Now) + "))"
                                     + " and(P.active<>0)"
                                     + " order by P." + SortFieldList;
-                                if (csXfer.csOpenSql(SQL)) {
-                                    string[,] RowsArray = csXfer.csGetRows();
-                                    string[] RowFieldArray = csXfer.csGetSelectFieldList().Split(',');
+                                if (csXfer.openSql(SQL)) {
+                                    string[,] RowsArray = csXfer.getRows();
+                                    string[] RowFieldArray = csXfer.getSelectFieldList().Split(',');
                                     RowMax = RowsArray.GetUpperBound(1);
                                     int ColumnMax = RowsArray.GetUpperBound(0);
                                     //
@@ -1161,7 +1161,7 @@ namespace Contensive.Processor.Controllers {
                         // main_Get the current value if the record was found
                         //
                         if (cs.ok()) {
-                            FieldValueVariant = cs.csGetValue(fieldName);
+                            FieldValueVariant = cs.getRawData(fieldName);
                         }
                         //
                         if (FieldPassword) {
@@ -1296,7 +1296,7 @@ namespace Contensive.Processor.Controllers {
                                         //
                                         if (FieldReadOnly) {
                                             using (CsModel csLookup = new CsModel(core)) {
-                                                if (cs.csOpenRecord(FieldLookupContentName, FieldValueInteger)) {
+                                                if (cs.openRecord(FieldLookupContentName, FieldValueInteger)) {
                                                     returnResult = csLookup.getTextEncoded("name");
                                                 }
                                             }
@@ -1483,9 +1483,9 @@ namespace Contensive.Processor.Controllers {
                         // Watch Lists
                         //
                         using (var csXfer = new CsModel(core)) {
-                            if (csXfer.csOpen("Content Watch Lists", "", "Name,ID", false, 0, "Name,ID", 20, 1)) {
-                                while (csXfer.csOk()) {
-                                    string FieldName = encodeText(csXfer.csGetText("name")).Trim(' ');
+                            if (csXfer.open("Content Watch Lists", "", "Name,ID", false, 0, "Name,ID", 20, 1)) {
+                                while (csXfer.ok()) {
+                                    string FieldName = encodeText(csXfer.getText("name")).Trim(' ');
                                     if (!string.IsNullOrEmpty(FieldName)) {
                                         string FieldCaption = "Watch List [" + FieldName + "]";
                                         IconIDControlString = "AC,WATCHLIST,0," + FieldName + ",ListName=" + FieldName + "&SortField=[DateAdded|Link|LinkLabel|Clicks|WhatsNewDateExpires]&SortDirection=Z-A[A-Z|Z-A]";
@@ -1500,7 +1500,7 @@ namespace Contensive.Processor.Controllers {
                                             Array.Resize(ref Items, ItemsSize + 1);
                                         }
                                     }
-                                    csXfer.csGoNext();
+                                    csXfer.goNext();
                                 }
                             }
                         }
@@ -1527,36 +1527,36 @@ namespace Contensive.Processor.Controllers {
                     string AddonContentName = Models.Db.AddonModel.contentName;
                     string SelectList = "Name,Link,ID,ArgumentList,ObjectProgramID,IconFilename,IconWidth,IconHeight,IconSprites,IsInline,ccguid";
                     using (var csXfer = new CsModel(core)) {
-                        if (csXfer.csOpen(AddonContentName, Criteria, "Name,ID", false, 0, SelectList)) {
+                        if (csXfer.open(AddonContentName, Criteria, "Name,ID", false, 0, SelectList)) {
                             string LastAddonName = "";
-                            while (csXfer.csOk()) {
-                                string addonGuid = csXfer.csGetText("ccguid");
-                                string ObjectProgramID2 = csXfer.csGetText("ObjectProgramID");
+                            while (csXfer.ok()) {
+                                string addonGuid = csXfer.getText("ccguid");
+                                string ObjectProgramID2 = csXfer.getText("ObjectProgramID");
                                 if ((contentType == CPHtmlBaseClass.EditorContentType.contentTypeEmail) && (!string.IsNullOrEmpty(ObjectProgramID2))) {
                                     //
                                     // Block activex addons from email
                                     //
                                     //ObjectProgramID2 = ObjectProgramID2;
                                 } else {
-                                    string addonName = encodeText(csXfer.csGet("name")).Trim(' ');
+                                    string addonName = encodeText(csXfer.getText("name")).Trim(' ');
                                     if (!string.IsNullOrEmpty(addonName) && (addonName != LastAddonName)) {
                                         //
                                         // Icon (fieldtyperesourcelink)
                                         //
-                                        bool IsInline = csXfer.csGetBoolean("IsInline");
-                                        string IconFilename = csXfer.csGet("Iconfilename");
+                                        bool IsInline = csXfer.getBoolean("IsInline");
+                                        string IconFilename = csXfer.getText("Iconfilename");
                                         int IconWidth = 0;
                                         int IconHeight = 0;
                                         int IconSprites = 0;
                                         if (!string.IsNullOrEmpty(IconFilename)) {
-                                            IconWidth = csXfer.csGetInteger("IconWidth");
-                                            IconHeight = csXfer.csGetInteger("IconHeight");
-                                            IconSprites = csXfer.csGetInteger("IconSprites");
+                                            IconWidth = csXfer.getInteger("IconWidth");
+                                            IconHeight = csXfer.getInteger("IconHeight");
+                                            IconSprites = csXfer.getInteger("IconSprites");
                                         }
                                         //
                                         // Calculate DefaultAddonOption_String
                                         //
-                                        string ArgumentList = csXfer.csGet("ArgumentList").Trim(' ');
+                                        string ArgumentList = csXfer.getText("ArgumentList").Trim(' ');
                                         string defaultAddonOptions = AddonController.getDefaultAddonOptions(core, ArgumentList, addonGuid, IsInline);
                                         defaultAddonOptions = encodeHtml(defaultAddonOptions);
                                         LastAddonName = addonName;
@@ -1571,7 +1571,7 @@ namespace Contensive.Processor.Controllers {
                                         }
                                     }
                                 }
-                                csXfer.csGoNext();
+                                csXfer.goNext();
                             }
                         }
                     }
@@ -1764,17 +1764,17 @@ namespace Contensive.Processor.Controllers {
                                 if (IsContentList) {
                                     //
                                     // ContentList - Open the Content and build the options from the names
-                                    csXfer.csOpen(ContentName, ContentCriteria, "name", true, 0, "ID,Name");
+                                    csXfer.open(ContentName, ContentCriteria, "name", true, 0, "ID,Name");
                                 } else if (IsListField) {
                                     //
                                     //
                                     // ListField
                                     int CID = Models.Domain.MetaModel.getContentId(core, ContentName);
-                                    csXfer.csOpen("Content Fields", "Contentid=" + CID, "name", true, 0, "ID,Name");
+                                    csXfer.open("Content Fields", "Contentid=" + CID, "name", true, 0, "ID,Name");
                                 }
 
-                                if (csXfer.csOk()) {
-                                    object[,] Cell = csXfer.csGetRows();
+                                if (csXfer.ok()) {
+                                    object[,] Cell = csXfer.getRows();
                                     int RowCnt = Cell.GetUpperBound(1) + 1;
                                     int RowPtr = 0;
                                     for (RowPtr = 0; RowPtr < RowCnt; RowPtr++) {
@@ -2119,22 +2119,22 @@ namespace Contensive.Processor.Controllers {
                 // ----- Normal Content Edit - find instance in the content
                 //
                 using (var csXfer = new CsModel(core)) {
-                    if (!csXfer.csOpenRecord(ContentName, RecordID)) {
+                    if (!csXfer.openRecord(ContentName, RecordID)) {
                         LogController.handleError(core, new Exception("No record found with content [" + ContentName + "] and RecordID [" + RecordID + "]"));
                     } else {
                         if (!string.IsNullOrEmpty(FieldName)) {
                             //
                             // Field is given, find the position
                             //
-                            Copy = csXfer.csGet(FieldName);
+                            Copy = csXfer.getText(FieldName);
                             PosACInstanceID = GenericController.vbInstr(1, Copy, "=\"" + ACInstanceID + "\" ", 1);
                         } else {
                             //
                             // Find the field, then find the position
                             //
-                            FieldName = csXfer.csGetFirstFieldName();
+                            FieldName = csXfer.getFirstFieldName();
                             while (!string.IsNullOrEmpty(FieldName)) {
-                                fieldType = csXfer.csGetFieldTypeId(FieldName);
+                                fieldType = csXfer.getFieldTypeId(FieldName);
                                 switch (fieldType) {
                                     case _fieldTypeIdLongText:
                                     case _fieldTypeIdText:
@@ -2144,7 +2144,7 @@ namespace Contensive.Processor.Controllers {
                                     case _fieldTypeIdFileJavascript:
                                     case _fieldTypeIdHTML:
                                     case _fieldTypeIdFileHTML:
-                                        Copy = csXfer.csGet(FieldName);
+                                        Copy = csXfer.getText(FieldName);
                                         PosACInstanceID = GenericController.vbInstr(1, Copy, "ACInstanceID=\"" + ACInstanceID + "\"", 1);
                                         if (PosACInstanceID != 0) {
                                             //
@@ -2157,7 +2157,7 @@ namespace Contensive.Processor.Controllers {
                                         }
                                         break;
                                 }
-                                FieldName = csXfer.csGetNextFieldName();
+                                FieldName = csXfer.getNextFieldName();
                             }
                             ExitLabel1:;
                         }
@@ -2257,7 +2257,7 @@ namespace Contensive.Processor.Controllers {
                                         if (PosIDEnd != 0) {
                                             ParseOK = true;
                                             Copy = Copy.Left(PosIDStart - 1) + HtmlController.encodeHtml(addonOption_String) + Copy.Substring(PosIDEnd - 1);
-                                            csXfer.csSet(FieldName, Copy);
+                                            csXfer.set(FieldName, Copy);
                                             needToClearCache = true;
                                         }
                                     }
@@ -2441,22 +2441,22 @@ namespace Contensive.Processor.Controllers {
                                 if (!string.IsNullOrEmpty(SecondaryContentSelectCriteria)) {
                                     SQL += "AND(" + SecondaryContentSelectCriteria + ")";
                                 }
-                                csXfer.csOpenSql(SQL);
-                                if (csXfer.csOk()) {
+                                csXfer.openSql(SQL);
+                                if (csXfer.ok()) {
                                     {
                                         main_MemberShipSize = 10;
                                         main_MemberShip = new int[main_MemberShipSize + 1];
                                         main_MemberShipRuleCopy = new string[main_MemberShipSize + 1];
-                                        while (csXfer.csOk()) {
+                                        while (csXfer.ok()) {
                                             if (main_MemberShipCount >= main_MemberShipSize) {
                                                 main_MemberShipSize = main_MemberShipSize + 10;
                                                 Array.Resize(ref main_MemberShip, main_MemberShipSize + 1);
                                                 Array.Resize(ref main_MemberShipRuleCopy, main_MemberShipSize + 1);
                                             }
-                                            main_MemberShip[main_MemberShipCount] = csXfer.csGetInteger("ID");
-                                            main_MemberShipRuleCopy[main_MemberShipCount] = csXfer.csGetText("RuleCopy");
+                                            main_MemberShip[main_MemberShipCount] = csXfer.getInteger("ID");
+                                            main_MemberShipRuleCopy[main_MemberShipCount] = csXfer.getText("RuleCopy");
                                             main_MemberShipCount = main_MemberShipCount + 1;
-                                            csXfer.csGoNext();
+                                            csXfer.goNext();
                                         }
                                     }
                                 }
@@ -2483,7 +2483,7 @@ namespace Contensive.Processor.Controllers {
                         SQL += " ORDER BY ";
                         SQL += SecondaryTablename + "." + CaptionFieldName;
                         using (var csXfer = new CsModel(core)) {
-                            if (!csXfer.csOpenSql(SQL)) {
+                            if (!csXfer.openSql(SQL)) {
                                 returnHtml = "(No choices are available.)";
                             } else {
                                 {
@@ -2492,16 +2492,16 @@ namespace Contensive.Processor.Controllers {
                                     int DivCheckBoxCnt = 0;
                                     CanSeeHiddenFields = core.session.isAuthenticatedDeveloper(core);
                                     string DivName = htmlNamePrefix + ".All";
-                                    while (csXfer.csOk()) {
-                                        string OptionName = csXfer.csGetText("OptionName");
+                                    while (csXfer.ok()) {
+                                        string OptionName = csXfer.getText("OptionName");
                                         if ((OptionName.Left(1) != "_") || CanSeeHiddenFields) {
                                             //
                                             // Current checkbox is visible
                                             //
-                                            RecordID = csXfer.csGetInteger("ID");
-                                            AllowRuleCopy = csXfer.csGetBoolean("AllowRuleCopy");
-                                            string RuleCopyCaption = csXfer.csGetText("RuleCopyCaption");
-                                            string OptionCaption = csXfer.csGetText("OptionCaption");
+                                            RecordID = csXfer.getInteger("ID");
+                                            AllowRuleCopy = csXfer.getBoolean("AllowRuleCopy");
+                                            string RuleCopyCaption = csXfer.getText("RuleCopyCaption");
+                                            string OptionCaption = csXfer.getText("OptionCaption");
                                             if (string.IsNullOrEmpty(OptionCaption)) {
                                                 OptionCaption = OptionName;
                                             }
@@ -2555,7 +2555,7 @@ namespace Contensive.Processor.Controllers {
                                             CheckBoxCnt = CheckBoxCnt + 1;
                                             DivCheckBoxCnt = DivCheckBoxCnt + 1;
                                         }
-                                        csXfer.csGoNext();
+                                        csXfer.goNext();
                                     }
                                     returnHtml += EndDiv;
                                     returnHtml += inputHidden(htmlNamePrefix + ".RowCount", CheckBoxCnt);
@@ -3363,27 +3363,27 @@ namespace Contensive.Processor.Controllers {
                 //
                 // honestly, not sure what to do with 'return_ErrorMessage'
                 using (var csXfer = new CsModel(core)) {
-                    if (!csXfer.csOpen("copy content", "Name=" + DbController.encodeSQLText(CopyName), "ID", true, 0, "Name,ID,Copy,modifiedBy")) {
+                    if (!csXfer.open("copy content", "Name=" + DbController.encodeSQLText(CopyName), "ID", true, 0, "Name,ID,Copy,modifiedBy")) {
                         csXfer.close();
                         csXfer.insert("copy content");
-                        if (csXfer.csOk()) {
-                            RecordID = csXfer.csGetInteger("ID");
-                            csXfer.csSet("name", CopyName);
-                            csXfer.csSet("copy", GenericController.encodeText(DefaultContent));
-                            csXfer.csSave();
+                        if (csXfer.ok()) {
+                            RecordID = csXfer.getInteger("ID");
+                            csXfer.set("name", CopyName);
+                            csXfer.set("copy", GenericController.encodeText(DefaultContent));
+                            csXfer.save();
                             //   Call WorkflowController.publishEdit("copy content", RecordID)
                         }
                     }
-                    if (csXfer.csOk()) {
-                        RecordID = csXfer.csGetInteger("ID");
-                        contactPeopleId = csXfer.csGetInteger("modifiedBy");
-                        returnCopy = csXfer.csGet("Copy");
+                    if (csXfer.ok()) {
+                        RecordID = csXfer.getInteger("ID");
+                        contactPeopleId = csXfer.getInteger("modifiedBy");
+                        returnCopy = csXfer.getText("Copy");
                         //returnCopy = contentCmdController.executeContentCommands(core, returnCopy, CPUtilsBaseClass.addonContext.ContextPage, personalizationPeopleId, personalizationIsAuthenticated, ref Return_ErrorMessage);
                         returnCopy = ActiveContentController.renderHtmlForWeb(core, returnCopy, "copy content", RecordID, personalizationPeopleId, "", 0, CPUtilsBaseClass.addonContext.ContextPage);
                         //
                         if (true) {
                             if (core.session.isEditingAnything()) {
-                                returnCopy = csXfer.csGetRecordEditLink(false) + returnCopy;
+                                returnCopy = csXfer.getRecordEditLink(false) + returnCopy;
                                 if (AllowEditWrapper) {
                                     returnCopy = AdminUIController.getEditWrapper(core, "copy content", returnCopy);
                                 }
@@ -3402,12 +3402,12 @@ namespace Contensive.Processor.Controllers {
         //
         public void setContentCopy(string copyName, string content) {
             using (var csXfer = new CsModel(core)) {
-                csXfer.csOpen("Copy Content", "name=" + DbController.encodeSQLText(copyName));
-                if (!csXfer.csOk()) {
+                csXfer.open("Copy Content", "name=" + DbController.encodeSQLText(copyName));
+                if (!csXfer.ok()) {
                     csXfer.insert("Copy Content");
                 }
-                csXfer.csSet("name", copyName);
-                csXfer.csSet("Copy", content);
+                csXfer.set("name", copyName);
+                csXfer.set("Copy", content);
             }
         }
         //
@@ -3500,12 +3500,12 @@ namespace Contensive.Processor.Controllers {
                         // No record exists, and one is needed                        
                         using (var csXfer = new CsModel(core)) {
                             csXfer.insert(rulesContentName);
-                            if (csXfer.csOk()) {
-                                csXfer.csSet("Active", RuleNeeded);
-                                csXfer.csSet(rulesPrimaryFieldname, primaryRecordID);
-                                csXfer.csSet(rulesSecondaryFieldName, SecondaryRecordID);
+                            if (csXfer.ok()) {
+                                csXfer.set("Active", RuleNeeded);
+                                csXfer.set(rulesPrimaryFieldname, primaryRecordID);
+                                csXfer.set(rulesSecondaryFieldName, SecondaryRecordID);
                                 if (SupportRuleCopy) {
-                                    csXfer.csSet("RuleCopy", RuleCopy);
+                                    csXfer.set("RuleCopy", RuleCopy);
                                 }
                             }
                         }

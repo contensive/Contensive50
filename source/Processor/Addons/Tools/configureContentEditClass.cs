@@ -91,10 +91,10 @@ namespace Contensive.Addons.Tools {
                                                 using (var CSTarget = new CsModel(core)) {
                                                     if (CSTarget.insert("Content Fields")) {
                                                         using (var CSSource = new CsModel(core)) {
-                                                            if (CSSource.csOpenContentRecord("Content Fields", formFieldId)) { CSSource.copyRecord(CSTarget); }
+                                                            if (CSSource.openRecord("Content Fields", formFieldId)) { CSSource.copyRecord(CSTarget); }
                                                         }
-                                                        formFieldId = CSTarget.csGetInteger( "ID");
-                                                        CSTarget.csSet( "ContentID", ContentID);
+                                                        formFieldId = CSTarget.getInteger( "ID");
+                                                        CSTarget.set( "ContentID", ContentID);
                                                     }
                                                     CSTarget.close();
                                                 }
@@ -428,11 +428,11 @@ namespace Contensive.Addons.Tools {
                             streamRow.Add("<td class=\"ccPanelInput\" align=\"left\"><nobr>");
                             if (fieldsort.field.inherited) {
                                 using (var csXfer = new CsModel(core)) {
-                                    csXfer.csOpenRecord("Content Field Types", fieldsort.field.fieldTypeId);
-                                    if (!csXfer.csOk()) {
+                                    csXfer.openRecord("Content Field Types", fieldsort.field.fieldTypeId);
+                                    if (!csXfer.ok()) {
                                         streamRow.Add(SpanClassAdminSmall + "Unknown[" + fieldsort.field.fieldTypeId + "]</SPAN>");
                                     } else {
-                                        streamRow.Add(SpanClassAdminSmall + csXfer.csGetText("Name") + "</SPAN>");
+                                        streamRow.Add(SpanClassAdminSmall + csXfer.getText("Name") + "</SPAN>");
                                     }
                                 }
                             } else if (FieldLocked) {

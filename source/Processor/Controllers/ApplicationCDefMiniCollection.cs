@@ -432,10 +432,10 @@ namespace Contensive.Processor.Controllers {
                     + " from cctables T left join ccDataSources d on D.ID=T.DataSourceID"
                     + " where t.active<>0";
                 using (var csXfer = new CsModel(core)) {
-                    csXfer.csOpenSql(SQL);
-                    while (csXfer.csOk()) {
-                        string DataSourceName = csXfer.csGetText("DataSourceName");
-                        string TableName = csXfer.csGetText("TableName");
+                    csXfer.openSql(SQL);
+                    while (csXfer.ok()) {
+                        string DataSourceName = csXfer.getText("DataSourceName");
+                        string TableName = csXfer.getText("TableName");
                         string IndexList = core.db.getSQLIndexList(DataSourceName, TableName);
                         //
                         if (!string.IsNullOrEmpty(IndexList)) {
@@ -490,7 +490,7 @@ namespace Contensive.Processor.Controllers {
                                 }
                             }
                         }
-                        csXfer.csGoNext();
+                        csXfer.goNext();
                     }
                 }
                 result = sb.ToString();

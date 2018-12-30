@@ -1237,9 +1237,9 @@ namespace Contensive.Processor.Controllers {
                     case PersonModel.contentTableName:
                         //
                         using (var csXfer = new CsModel(this)) {
-                            csXfer.csOpenRecord("people", RecordID, "Name,OrganizationID");
-                            if (csXfer.csOk()) {
-                                ActivityLogOrganizationID = csXfer.csGetInteger("OrganizationID");
+                            csXfer.openRecord("people", RecordID, "Name,OrganizationID");
+                            if (csXfer.ok()) {
+                                ActivityLogOrganizationID = csXfer.getInteger("OrganizationID");
                             }
                         }
                         if (IsDelete) {
@@ -1313,15 +1313,15 @@ namespace Contensive.Processor.Controllers {
                         //hint = hint & ",180"
                         if (siteProperties.getBoolean("ImageAllowSFResize", true) && (!IsDelete)) {
                             using (var csXfer = new CsModel(this)) {
-                                if (csXfer.csOpenRecord("library files", RecordID)) {
-                                    string Filename = csXfer.csGet("filename");
+                                if (csXfer.openRecord("library files", RecordID)) {
+                                    string Filename = csXfer.getText("filename");
                                     int Pos = Filename.LastIndexOf("/") + 1;
                                     string FilePath = "";
                                     if (Pos > 0) {
                                         FilePath = Filename.Left(Pos);
                                         Filename = Filename.Substring(Pos);
                                     }
-                                    csXfer.csSet("filesize", appRootFiles.getFileSize(FilePath + Filename));
+                                    csXfer.set("filesize", appRootFiles.getFileSize(FilePath + Filename));
                                     Pos = Filename.LastIndexOf(".") + 1;
                                     if (Pos > 0) {
                                         string FilenameExt = Filename.Substring(Pos);
@@ -1332,9 +1332,9 @@ namespace Contensive.Processor.Controllers {
                                                 //
                                                 //
                                                 //
-                                                csXfer.csSet("height", sf.height);
-                                                csXfer.csSet("width", sf.width);
-                                                string AltSizeList = csXfer.csGetText("AltSizeList");
+                                                csXfer.set("height", sf.height);
+                                                csXfer.set("width", sf.width);
+                                                string AltSizeList = csXfer.getText("AltSizeList");
                                                 bool RebuildSizes = (string.IsNullOrEmpty(AltSizeList));
                                                 if (RebuildSizes) {
                                                     AltSizeList = "";
@@ -1375,7 +1375,7 @@ namespace Contensive.Processor.Controllers {
                                                         sf.save(FilePath + FilenameNoExt + "-180x" + sf.height + "." + FilenameExt, appRootFiles);
                                                         AltSizeList = AltSizeList + "\r\n80x" + sf.height;
                                                     }
-                                                    csXfer.csSet("AltSizeList", AltSizeList);
+                                                    csXfer.set("AltSizeList", AltSizeList);
                                                 }
                                                 sf.Dispose();
                                                 sf = null;
@@ -1395,7 +1395,7 @@ namespace Contensive.Processor.Controllers {
                 Dictionary<string, string> instanceArguments;
                 bool onChangeAddonsAsync = siteProperties.getBoolean("execute oncontentchange addons async", false);
                 using (var csXfer = new CsModel(this)) {
-                    csXfer.csOpen("Add-on Content Trigger Rules", "ContentID=" + ContentID, "", false, 0, "addonid");
+                    csXfer.open("Add-on Content Trigger Rules", "ContentID=" + ContentID, "", false, 0, "addonid");
                     string Option_String = null;
                     if (IsDelete) {
                         instanceArguments = new Dictionary<string, string>() {
@@ -1418,8 +1418,8 @@ namespace Contensive.Processor.Controllers {
                             + "\r\ncontentid=" + ContentID
                             + "\r\nrecordid=" + RecordID + "";
                     }
-                    while (csXfer.csOk()) {
-                        int addonId = csXfer.csGetInteger("Addonid");
+                    while (csXfer.ok()) {
+                        int addonId = csXfer.getInteger("Addonid");
                         if (onChangeAddonsAsync) {
                             //
                             // -- execute addon async
@@ -1435,7 +1435,7 @@ namespace Contensive.Processor.Controllers {
                                 personalizationPeopleId = session.user.id
                             });
                         }
-                        csXfer.csGoNext();
+                        csXfer.goNext();
                     }
                 }
             } catch (Exception ex) {

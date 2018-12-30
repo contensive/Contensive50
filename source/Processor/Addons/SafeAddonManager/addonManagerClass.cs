@@ -420,9 +420,9 @@ namespace Contensive.Addons.SafeAddonManager {
                                         if (TargetCollectionID > 0) {
                                             AddonNavigatorID = 0;
                                             using (var csXfer = new CsModel(core)) {
-                                                csXfer.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, "name='Manage Add-ons' and ((parentid=0)or(parentid is null))");
-                                                if (csXfer.csOk()) {
-                                                    AddonNavigatorID = csXfer.csGetInteger("ID");
+                                                csXfer.open(Processor.Models.Db.NavigatorEntryModel.contentName, "name='Manage Add-ons' and ((parentid=0)or(parentid is null))");
+                                                if (csXfer.ok()) {
+                                                    AddonNavigatorID = csXfer.getInteger("ID");
                                                 }
                                             }
                                             if (AddonNavigatorID > 0) {
@@ -532,9 +532,9 @@ namespace Contensive.Addons.SafeAddonManager {
                                 } else {
                                     foreach (string installedCollectionGuid in InstalledCollectionGuidList) {
                                         using (var csXfer = new CsModel(core)) {
-                                            csXfer.csOpen("Add-on Collections", GuidFieldName + "=" + DbController.encodeSQLText(installedCollectionGuid));
-                                            if (csXfer.csOk()) {
-                                                InstalledCollectionIDList.Add(csXfer.csGetInteger("ID"));
+                                            csXfer.open("Add-on Collections", GuidFieldName + "=" + DbController.encodeSQLText(installedCollectionGuid));
+                                            if (csXfer.ok()) {
+                                                InstalledCollectionIDList.Add(csXfer.getInteger("ID"));
                                             }
                                         }
                                     }
@@ -718,7 +718,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                                         } else {
                                                             IsOnServer = GenericController.encodeBoolean(OnServerGuidList.IndexOf(CollectionGuid, System.StringComparison.OrdinalIgnoreCase) + 1);
                                                             using (var csXfer = new CsModel(core)) {
-                                                                IsOnSite = csXfer.csOpen("Add-on Collections", GuidFieldName + "=" + DbController.encodeSQLText(CollectionGuid));
+                                                                IsOnSite = csXfer.open("Add-on Collections", GuidFieldName + "=" + DbController.encodeSQLText(CollectionGuid));
                                                             }
                                                             if (IsOnSite) {
                                                                 //
@@ -806,15 +806,15 @@ namespace Contensive.Addons.SafeAddonManager {
                                         //
                                         // non-developers
                                         //
-                                        csXfer.csOpen("Add-on Collections", "((system is null)or(system=0))", "Name");
+                                        csXfer.open("Add-on Collections", "((system is null)or(system=0))", "Name");
                                     } else {
                                         //
                                         // developers
                                         //
                                         DisplaySystem = true;
-                                        csXfer.csOpen("Add-on Collections", "", "Name");
+                                        csXfer.open("Add-on Collections", "", "Name");
                                     }
-                                    string[,] tempVar3 = new string[csXfer.csGetRowCount() + 1, ColumnCnt + 1];
+                                    string[,] tempVar3 = new string[csXfer.getRowCount() + 1, ColumnCnt + 1];
                                     if (Cells != null) {
                                         for (int Dimension0 = 0; Dimension0 < Cells.GetLength(0); Dimension0++) {
                                             int CopyLength = Math.Min(Cells.GetLength(1), tempVar3.GetLength(1));
@@ -825,15 +825,15 @@ namespace Contensive.Addons.SafeAddonManager {
                                     }
                                     Cells = tempVar3;
                                     RowPtr = 0;
-                                    while (csXfer.csOk()) {
-                                        Cells[RowPtr, 0] = HtmlController.checkbox("AC" + RowPtr) + HtmlController.inputHidden("ACID" + RowPtr, csXfer.csGetInteger("ID"));
-                                        Cells[RowPtr, 1] = csXfer.csGetText("name");
+                                    while (csXfer.ok()) {
+                                        Cells[RowPtr, 0] = HtmlController.checkbox("AC" + RowPtr) + HtmlController.inputHidden("ACID" + RowPtr, csXfer.getInteger("ID"));
+                                        Cells[RowPtr, 1] = csXfer.getText("name");
                                         if (DisplaySystem) {
-                                            if (csXfer.csGetBoolean("system")) {
+                                            if (csXfer.getBoolean("system")) {
                                                 Cells[RowPtr, 1] = Cells[RowPtr, 1] + " (system)";
                                             }
                                         }
-                                        csXfer.csGoNext();
+                                        csXfer.goNext();
                                         RowPtr = RowPtr + 1;
                                     }
                                     csXfer.close();
@@ -911,22 +911,22 @@ namespace Contensive.Addons.SafeAddonManager {
                 int EntryID = 0;
                 using (var csXfer = new CsModel(core)) {
                     if (EntryParentID == 0) {
-                        csXfer.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, "(name=" + DbController.encodeSQLText(EntryName) + ")and((parentID is null)or(parentid=0))");
+                        csXfer.open(Processor.Models.Db.NavigatorEntryModel.contentName, "(name=" + DbController.encodeSQLText(EntryName) + ")and((parentID is null)or(parentid=0))");
                     } else {
-                        csXfer.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, "(name=" + DbController.encodeSQLText(EntryName) + ")and(parentID=" + DbController.encodeSQLNumber(EntryParentID) + ")");
+                        csXfer.open(Processor.Models.Db.NavigatorEntryModel.contentName, "(name=" + DbController.encodeSQLText(EntryName) + ")and(parentID=" + DbController.encodeSQLNumber(EntryParentID) + ")");
                     }
-                    if (csXfer.csOk()) {
-                        EntryID = csXfer.csGetInteger("ID");
+                    if (csXfer.ok()) {
+                        EntryID = csXfer.getInteger("ID");
                     }
                     csXfer.close();
                 }
                 //
                 if (EntryID != 0) {
                     using (var csXfer = new CsModel(core)) {
-                        csXfer.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName, "(parentID=" + DbController.encodeSQLNumber(EntryID) + ")");
-                        while (csXfer.csOk()) {
-                            GetForm_SafeModeAddonManager_DeleteNavigatorBranch(csXfer.csGetText("name"), EntryID);
-                            csXfer.csGoNext();
+                        csXfer.open(Processor.Models.Db.NavigatorEntryModel.contentName, "(parentID=" + DbController.encodeSQLNumber(EntryID) + ")");
+                        while (csXfer.ok()) {
+                            GetForm_SafeModeAddonManager_DeleteNavigatorBranch(csXfer.getText("name"), EntryID);
+                            csXfer.goNext();
                         }
                         csXfer.close();
                     }
@@ -1017,18 +1017,18 @@ namespace Contensive.Addons.SafeAddonManager {
                     }
                     if (string.IsNullOrEmpty(ParentNameSpace)) {
                         using (var csXfer = new CsModel(core)) {
-                            csXfer.csOpen(ContentName, "(name=" + DbController.encodeSQLText(ParentName) + ")and((parentid is null)or(parentid=0))", "ID", false, 0,"ID");
-                            if (csXfer.csOk()) {
-                                tempGetParentIDFromNameSpace = csXfer.csGetInteger("ID");
+                            csXfer.open(ContentName, "(name=" + DbController.encodeSQLText(ParentName) + ")and((parentid is null)or(parentid=0))", "ID", false, 0,"ID");
+                            if (csXfer.ok()) {
+                                tempGetParentIDFromNameSpace = csXfer.getInteger("ID");
                             }
                             csXfer.close();
                         }
                     } else {
                         ParentID = getParentIDFromNameSpace(ContentName, ParentNameSpace);
                         using (var csXfer = new CsModel(core)) {
-                            csXfer.csOpen(ContentName, "(name=" + DbController.encodeSQLText(ParentName) + ")and(parentid=" + ParentID + ")", "ID", false, 0, "ID");
-                            if (csXfer.csOk()) {
-                                tempGetParentIDFromNameSpace = csXfer.csGetInteger("ID");
+                            csXfer.open(ContentName, "(name=" + DbController.encodeSQLText(ParentName) + ")and(parentid=" + ParentID + ")", "ID", false, 0, "ID");
+                            if (csXfer.ok()) {
+                                tempGetParentIDFromNameSpace = csXfer.getInteger("ID");
                             }
                         }
                     }

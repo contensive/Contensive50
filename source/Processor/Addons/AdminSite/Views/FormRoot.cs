@@ -25,9 +25,9 @@ namespace Contensive.Addons.AdminSite {
                 if (core.session.visit.id == core.docProperties.getInteger(RequestNameDashboardReset)) {
                     //$$$$$ cache this
                     using (var csXfer = new CsModel(core)) {
-                        csXfer.csOpen(Processor.Models.Db.AddonModel.contentName, "ccguid=" + DbController.encodeSQLText(addonGuidDashboard));
-                        if (csXfer.csOk()) {
-                            addonId = csXfer.csGetInteger("id");
+                        csXfer.open(Processor.Models.Db.AddonModel.contentName, "ccguid=" + DbController.encodeSQLText(addonGuidDashboard));
+                        if (csXfer.ok()) {
+                            addonId = csXfer.getInteger("id");
                             core.siteProperties.setProperty("AdminRootAddonID", GenericController.encodeText(addonId));
                         }
                     }

@@ -158,10 +158,10 @@ namespace Contensive.Addons.AdminSite {
                             bool ContentSupportsParentID = false;
                             if (editRecord.id > 0) {
                                 using (var csXfer = new CsModel(core)) {
-                                    if (csXfer.csOpenRecord(RecordContentName, editRecord.id)) {
-                                        ContentSupportsParentID = csXfer.csIsFieldSupported("ParentID");
+                                    if (csXfer.openRecord(RecordContentName, editRecord.id)) {
+                                        ContentSupportsParentID = csXfer.isFieldSupported("ParentID");
                                         if (ContentSupportsParentID) {
-                                            ParentID = csXfer.csGetInteger("ParentID");
+                                            ParentID = csXfer.getInteger("ParentID");
                                         }
                                     }
                                 }
@@ -175,9 +175,9 @@ namespace Contensive.Addons.AdminSite {
                                     //
                                     // This record has a parent, set LimitContentSelectToThisID to the parent's CID
                                     using (var csXfer = new CsModel(core)) {
-                                        csXfer.csOpenRecord(RecordContentName, ParentID, "ContentControlID");
-                                        if (csXfer.csOk()) {
-                                            LimitContentSelectToThisID = csXfer.csGetInteger("ContentControlID");
+                                        csXfer.openRecord(RecordContentName, ParentID, "ContentControlID");
+                                        if (csXfer.ok()) {
+                                            LimitContentSelectToThisID = csXfer.getInteger("ContentControlID");
                                         }
                                         csXfer.close();
                                     }
@@ -200,15 +200,15 @@ namespace Contensive.Addons.AdminSite {
                                 TableID = MetaController.getRecordId(core, "Tables", TableName2);
                                 string CIDList = "";
                                 using (var csXfer = new CsModel(core)) {
-                                    csXfer.csOpen("Content", "ContentTableID=" + TableID, "", true, 0, "ContentControlID");
-                                    while (csXfer.csOk()) {
-                                        int ChildCID = csXfer.csGetInteger("ID");
+                                    csXfer.open("Content", "ContentTableID=" + TableID, "", true, 0, "ContentControlID");
+                                    while (csXfer.ok()) {
+                                        int ChildCID = csXfer.getInteger("ID");
                                         if (MetaController.isWithinContent(core, ChildCID, LimitContentSelectToThisID)) {
                                             if ((core.session.isAuthenticatedAdmin(core)) || (core.session.isAuthenticatedContentManager(core, MetaController.getContentNameByID(core, ChildCID)))) {
                                                 CIDList = CIDList + "," + ChildCID;
                                             }
                                         }
-                                        csXfer.csGoNext();
+                                        csXfer.goNext();
                                     }
                                     csXfer.close();
                                 }
@@ -241,12 +241,12 @@ namespace Contensive.Addons.AdminSite {
                             fieldValue = "(not set)";
                         } else {
                             using (var csXfer = new CsModel(core)) {
-                                csXfer.csOpen("people", "(id=" + FieldValueInteger + ")", "name,active", false);
-                                if (!csXfer.csOk()) {
+                                csXfer.open("people", "(id=" + FieldValueInteger + ")", "name,active", false);
+                                if (!csXfer.ok()) {
                                     fieldValue = "#" + FieldValueInteger + ", (deleted)";
                                 } else {
-                                    fieldValue = "#" + FieldValueInteger + ", " + csXfer.csGet("name");
-                                    if (!csXfer.csGetBoolean("active")) {
+                                    fieldValue = "#" + FieldValueInteger + ", " + csXfer.getText("name");
+                                    if (!csXfer.getBoolean("active")) {
                                         fieldValue += " (inactive)";
                                     }
                                 }
@@ -288,12 +288,12 @@ namespace Contensive.Addons.AdminSite {
                             fieldValue = "(not set)";
                         } else {
                             using (var csXfer = new CsModel(core)) {
-                                csXfer.csOpen("people", "(id=" + FieldValueInteger + ")", "name,active", false);
-                                if (!csXfer.csOk()) {
+                                csXfer.open("people", "(id=" + FieldValueInteger + ")", "name,active", false);
+                                if (!csXfer.ok()) {
                                     fieldValue = "#" + FieldValueInteger + ", (deleted)";
                                 } else {
-                                    fieldValue = "#" + FieldValueInteger + ", " + csXfer.csGet("name");
-                                    if (!csXfer.csGetBoolean("active")) {
+                                    fieldValue = "#" + FieldValueInteger + ", " + csXfer.getText("name");
+                                    if (!csXfer.getBoolean("active")) {
                                         fieldValue += " (inactive)";
                                     }
                                 }

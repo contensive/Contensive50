@@ -108,9 +108,9 @@ namespace Contensive.Addons.AdminSite {
                             //
                             SQL = "select count(" + adminData.adminContent.tableName + ".ID) as cnt from " + SQLFrom + " where " + SQLWhere;
                             using (var csXfer = new CsModel(core)) {
-                                csXfer.csOpenSql(SQL, datasource.name);
-                                if (csXfer.csOk()) {
-                                    recordCnt = csXfer.csGetInteger("cnt");
+                                csXfer.openSql(SQL, datasource.name);
+                                if (csXfer.ok()) {
+                                    recordCnt = csXfer.getInteger("cnt");
                                 }
                             }
                             //

@@ -102,17 +102,17 @@ namespace Contensive.Addons.AdminSite {
                                     for (RowPtr = 0; RowPtr < RowCnt; RowPtr++) {
                                         if (core.docProperties.getBoolean("Row" + RowPtr)) {
                                             using (var CSSrc = new CsModel(core)) {
-                                                if (CSSrc.csOpenRecord("Tasks", core.docProperties.getInteger("RowID" + RowPtr))) {
+                                                if (CSSrc.openRecord("Tasks", core.docProperties.getInteger("RowID" + RowPtr))) {
                                                     using (var CSDst = new CsModel(core)) {
                                                         if (CSDst.insert("Tasks")) {
-                                                            CSDst.csSet("Name", CSSrc.csGetText("name"));
-                                                            CSDst.csSet(SQLFieldName, CSSrc.csGetText(SQLFieldName));
-                                                            if (GenericController.vbLCase(CSSrc.csGetText("command")) == "xml") {
-                                                                CSDst.csSet("Filename", "DupDownload_" + encodeText(GenericController.dateToSeconds(core.doc.profileStartTime)) + encodeText(GenericController.GetRandomInteger(core)) + ".xml");
-                                                                CSDst.csSet("Command", "BUILDXML");
+                                                            CSDst.set("Name", CSSrc.getText("name"));
+                                                            CSDst.set(SQLFieldName, CSSrc.getText(SQLFieldName));
+                                                            if (GenericController.vbLCase(CSSrc.getText("command")) == "xml") {
+                                                                CSDst.set("Filename", "DupDownload_" + encodeText(GenericController.dateToSeconds(core.doc.profileStartTime)) + encodeText(GenericController.GetRandomInteger(core)) + ".xml");
+                                                                CSDst.set("Command", "BUILDXML");
                                                             } else {
-                                                                CSDst.csSet("Filename", "DupDownload_" + encodeText(GenericController.dateToSeconds(core.doc.profileStartTime)) + encodeText(GenericController.GetRandomInteger(core)) + ".csv");
-                                                                CSDst.csSet("Command", "BUILDCSV");
+                                                                CSDst.set("Filename", "DupDownload_" + encodeText(GenericController.dateToSeconds(core.doc.profileStartTime)) + encodeText(GenericController.GetRandomInteger(core)) + ".csv");
+                                                                CSDst.set("Command", "BUILDCSV");
                                                             }
                                                         }
                                                         CSDst.close();
@@ -132,16 +132,16 @@ namespace Contensive.Addons.AdminSite {
                                 } else if (Format == "CSV") {
                                     using (var csXfer = new CsModel(core)) {
                                         csXfer.insert("Tasks");
-                                        if (csXfer.csOk()) {
+                                        if (csXfer.ok()) {
                                             ContentName = MetaController.getContentNameByID(core, ContentID);
                                             TableName = MetaController.getContentTablename(core, ContentName);
                                             Criteria = MetaController.getContentControlCriteria(core, ContentName);
                                             Name = "CSV Download, " + ContentName;
                                             Filename = GenericController.vbReplace(ContentName, " ", "") + "_" + encodeText(GenericController.dateToSeconds(core.doc.profileStartTime)) + encodeText(GenericController.GetRandomInteger(core)) + ".csv";
-                                            csXfer.csSet("Name", Name);
-                                            csXfer.csSet("Filename", Filename);
-                                            csXfer.csSet("Command", "BUILDCSV");
-                                            csXfer.csSet(SQLFieldName, "SELECT * from " + TableName + " where " + Criteria);
+                                            csXfer.set("Name", Name);
+                                            csXfer.set("Filename", Filename);
+                                            csXfer.set("Command", "BUILDCSV");
+                                            csXfer.set(SQLFieldName, "SELECT * from " + TableName + " where " + Criteria);
                                             Description = Description + "<p>Your CSV Download has been requested.</p>";
                                         }
                                         csXfer.close();
@@ -151,16 +151,16 @@ namespace Contensive.Addons.AdminSite {
                                 } else if (Format == "XML") {
                                     using (var csXfer = new CsModel(core)) {
                                         csXfer.insert("Tasks");
-                                        if (csXfer.csOk()) {
+                                        if (csXfer.ok()) {
                                             ContentName = MetaController.getContentNameByID(core, ContentID);
                                             TableName = MetaController.getContentTablename(core, ContentName);
                                             Criteria = MetaController.getContentControlCriteria(core, ContentName);
                                             Name = "XML Download, " + ContentName;
                                             Filename = GenericController.vbReplace(ContentName, " ", "") + "_" + encodeText(GenericController.dateToSeconds(core.doc.profileStartTime)) + encodeText(GenericController.GetRandomInteger(core)) + ".xml";
-                                            csXfer.csSet("Name", Name);
-                                            csXfer.csSet("Filename", Filename);
-                                            csXfer.csSet("Command", "BUILDXML");
-                                            csXfer.csSet(SQLFieldName, "SELECT * from " + TableName + " where " + Criteria);
+                                            csXfer.set("Name", Name);
+                                            csXfer.set("Filename", Filename);
+                                            csXfer.set("Command", "BUILDXML");
+                                            csXfer.set(SQLFieldName, "SELECT * from " + TableName + " where " + Criteria);
                                             Description = Description + "<p>Your XML Download has been requested.</p>";
                                         }
                                     }
@@ -223,23 +223,23 @@ namespace Contensive.Addons.AdminSite {
                     //
                     using (var csXfer = new CsModel(core)) {
                         SQL = "select M.Name as CreatedByName, T.* from ccTasks T left join ccMembers M on M.ID=T.CreatedBy where (T.Command='BuildCSV')or(T.Command='BuildXML') order by T.DateAdded Desc";
-                        csXfer.csOpenSql(SQL, "Default", PageSize, PageNumber);
+                        csXfer.openSql(SQL, "Default", PageSize, PageNumber);
                         RowPointer = 0;
-                        if (!csXfer.csOk()) {
+                        if (!csXfer.ok()) {
                             Cells[0, 1] = "There are no download requests";
                             RowPointer = 1;
                         } else {
-                            DataRowCount = csXfer.csGetRowCount();
+                            DataRowCount = csXfer.getRowCount();
                             LinkPrefix = "<a href=\"" + core.appConfig.cdnFileUrl;
                             LinkSuffix = "\" target=_blank>Available</a>";
-                            while (csXfer.csOk() && (RowPointer < PageSize)) {
-                                RecordID = csXfer.csGetInteger("ID");
-                                DateCompleted = csXfer.csGetDate("DateCompleted");
-                                ResultMessage = csXfer.csGetText("ResultMessage");
+                            while (csXfer.ok() && (RowPointer < PageSize)) {
+                                RecordID = csXfer.getInteger("ID");
+                                DateCompleted = csXfer.getDate("DateCompleted");
+                                ResultMessage = csXfer.getText("ResultMessage");
                                 Cells[RowPointer, 0] = HtmlController.checkbox("Row" + RowPointer) + HtmlController.inputHidden("RowID" + RowPointer, RecordID);
-                                Cells[RowPointer, 1] = csXfer.csGetText("name");
-                                Cells[RowPointer, 2] = csXfer.csGetText("CreatedByName");
-                                Cells[RowPointer, 3] = csXfer.csGetDate("DateAdded").ToShortDateString();
+                                Cells[RowPointer, 1] = csXfer.getText("name");
+                                Cells[RowPointer, 2] = csXfer.getText("CreatedByName");
+                                Cells[RowPointer, 3] = csXfer.getDate("DateAdded").ToShortDateString();
                                 if (DateCompleted == DateTime.MinValue) {
                                     RemoteKey = RemoteQueryController.main_GetRemoteQueryKey(core, "select DateCompleted,filename,resultMessage from cctasks where id=" + RecordID, "default", 1);
                                     Cell = "";
@@ -271,12 +271,12 @@ namespace Contensive.Addons.AdminSite {
                                     //
                                     Cells[RowPointer, 4] = Cell;
                                 } else if (ResultMessage == "ok") {
-                                    Cells[RowPointer, 4] = "<div id=\"pending" + RowPointer + "\">" + LinkPrefix + csXfer.csGetText("filename") + LinkSuffix + "</div>";
+                                    Cells[RowPointer, 4] = "<div id=\"pending" + RowPointer + "\">" + LinkPrefix + csXfer.getText("filename") + LinkSuffix + "</div>";
                                 } else {
                                     Cells[RowPointer, 4] = "<div id=\"pending" + RowPointer + "\"><a href=\"javascript:alert('" + GenericController.EncodeJavascriptStringSingleQuote(ResultMessage) + ";return false');\">error</a></div>";
                                 }
                                 RowPointer = RowPointer + 1;
-                                csXfer.csGoNext();
+                                csXfer.goNext();
                             }
                         }
                         csXfer.close();

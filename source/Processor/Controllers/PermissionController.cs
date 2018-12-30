@@ -183,12 +183,12 @@ namespace Contensive.Processor.Controllers {
                         + " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + DbController.encodeSQLDate(core.doc.profileStartTime) + "))"
                         + ");";
                     using (var csXfer = new CsModel(core)) {
-                        csXfer.csOpenSql(SQL);
-                        if (csXfer.csOk()) {
+                        csXfer.openSql(SQL);
+                        if (csXfer.ok()) {
                             result.allowEdit = true;
                             result.allowSave = true;
-                            result.allowAdd = csXfer.csGetBoolean("allowAdd");
-                            result.allowDelete = csXfer.csGetBoolean("allowDelete");
+                            result.allowAdd = csXfer.getBoolean("allowAdd");
+                            result.allowDelete = csXfer.getBoolean("allowDelete");
                         }
                     }
                     //

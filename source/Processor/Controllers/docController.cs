@@ -303,9 +303,9 @@ namespace Contensive.Processor.Controllers {
             string result = "";
             try {
                 using (var csXfer = new CsModel(core)) {
-                    if (csXfer.csOpen("Content Watch", "ContentRecordKey=" + DbController.encodeSQLText(ContentRecordKey), "", false, 0, "Link,Clicks")) {
-                        result = csXfer.csGetText("Link");
-                        if (GenericController.encodeBoolean(IncrementClicks)) { csXfer.csSet("Clicks", csXfer.csGetInteger("clicks") + 1); }
+                    if (csXfer.open("Content Watch", "ContentRecordKey=" + DbController.encodeSQLText(ContentRecordKey), "", false, 0, "Link,Clicks")) {
+                        result = csXfer.getText("Link");
+                        if (GenericController.encodeBoolean(IncrementClicks)) { csXfer.set("Clicks", csXfer.getInteger("clicks") + 1); }
                     } else {
                         result = GenericController.encodeText(DefaultLink);
                     }
@@ -361,9 +361,9 @@ namespace Contensive.Processor.Controllers {
                 int ParentID = 0;
                 int templateId = 0;
                 using (var csXfer = new CsModel(core)) {
-                    if (csXfer.csOpenRecord("Page Content", PageID, "TemplateID,ParentID")) {
-                        templateId = csXfer.csGetInteger("TemplateID");
-                        ParentID = csXfer.csGetInteger("ParentID");
+                    if (csXfer.openRecord("Page Content", PageID, "TemplateID,ParentID")) {
+                        templateId = csXfer.getInteger("TemplateID");
+                        ParentID = csXfer.getInteger("ParentID");
                     }
                 }
                 //
@@ -488,19 +488,19 @@ namespace Contensive.Processor.Controllers {
             try {
                 MetaController.deleteContentRecords(core, "Form Pages", "name=" + DbController.encodeSQLText("Registration Form"));
                 using (var csXfer = new CsModel(core)) {
-                    if (!csXfer.csOpen("Form Pages", "name=" + DbController.encodeSQLText("Registration Form"))) {
+                    if (!csXfer.open("Form Pages", "name=" + DbController.encodeSQLText("Registration Form"))) {
                         //
                         // create Version 1 template - just to main_Get it started
                         //
                         if (csXfer.insert("Form Pages")) {
-                            csXfer.csSet("name", "Registration Form");
+                            csXfer.set("name", "Registration Form");
                             string Copy = ""
                                 + "\r\n<table border=\"0\" cellpadding=\"2\" cellspacing=\"0\" width=\"100%\">"
                                 + "\r\n{{REPEATSTART}}<tr><td align=right style=\"height:22px;\">{{CAPTION}}&nbsp;</td><td align=left>{{FIELD}}</td></tr>{{REPEATEND}}"
                                 + "\r\n<tr><td align=right><img alt=\"space\" src=\"/ContensiveBase/images/spacer.gif\" width=135 height=1></td><td width=\"100%\">&nbsp;</td></tr>"
                                 + "\r\n<tr><td colspan=2>&nbsp;<br>" + core.html.getPanelButtons(ButtonRegister, "Button") + "</td></tr>"
                                 + "\r\n</table>";
-                            csXfer.csSet("Body", Copy);
+                            csXfer.set("Body", Copy);
                             Copy = ""
                                 + "1"
                                 + "\r\nRegistered\r\ntrue"
@@ -510,7 +510,7 @@ namespace Contensive.Processor.Controllers {
                                 + "\r\n1,Phone,true,Phone"
                                 + "\r\n2,Please keep me informed of news and events,false,Subscribers"
                                 + "";
-                            csXfer.csSet("Instructions", Copy);
+                            csXfer.set("Instructions", Copy);
                         }
                     }
                 }
@@ -527,13 +527,13 @@ namespace Contensive.Processor.Controllers {
             int Id = 0;
             using (var csXfer = new CsModel(core)) {
                 if (csXfer.insert(ContentName)) {
-                    Id = csXfer.csGetInteger("ID");
-                    csXfer.csSet("name", PageName);
-                    csXfer.csSet("active", "1");
+                    Id = csXfer.getInteger("ID");
+                    csXfer.set("name", PageName);
+                    csXfer.set("active", "1");
                     if (true) {
-                        csXfer.csSet("ccGuid", pageGuid);
+                        csXfer.set("ccGuid", pageGuid);
                     }
-                    csXfer.csSave();
+                    csXfer.save();
                 }
             }
             return Id;
@@ -573,12 +573,12 @@ namespace Contensive.Processor.Controllers {
                 string keywordList = "";
                 int MetaContentID = 0;
                 using (var csXfer = new CsModel(core)) {
-                    if (csXfer.csOpen("Meta Content", Criteria, "", false, 0, FieldList)) {
-                        MetaContentID = csXfer.csGetInteger("ID");
-                        core.html.addTitle(HtmlController.encodeHtml(csXfer.csGetText("Name")), "page content");
-                        core.html.addMetaDescription(HtmlController.encodeHtml(csXfer.csGetText("MetaDescription")), "page content");
-                        core.html.addHeadTag(csXfer.csGetText("OtherHeadTags"), "page content");
-                        keywordList = csXfer.csGetText("MetaKeywordList").Replace("\r\n", ",");
+                    if (csXfer.open("Meta Content", Criteria, "", false, 0, FieldList)) {
+                        MetaContentID = csXfer.getInteger("ID");
+                        core.html.addTitle(HtmlController.encodeHtml(csXfer.getText("Name")), "page content");
+                        core.html.addMetaDescription(HtmlController.encodeHtml(csXfer.getText("MetaDescription")), "page content");
+                        core.html.addHeadTag(csXfer.getText("OtherHeadTags"), "page content");
+                        keywordList = csXfer.getText("MetaKeywordList").Replace("\r\n", ",");
                     }
                     csXfer.close();
                 }
@@ -589,10 +589,10 @@ namespace Contensive.Processor.Controllers {
                         + " From ccMetaKeywords"
                         + " LEFT JOIN ccMetaKeywordRules on ccMetaKeywordRules.MetaKeywordID=ccMetaKeywords.ID"
                         + " Where ccMetaKeywordRules.MetaContentID=" + MetaContentID;
-                    csXfer.csOpenSql(SQL);
-                    while (csXfer.csOk()) {
-                        keywordList = keywordList + "," + csXfer.csGetText("Name");
-                        csXfer.csGoNext();
+                    csXfer.openSql(SQL);
+                    while (csXfer.ok()) {
+                        keywordList = keywordList + "," + csXfer.getText("Name");
+                        csXfer.goNext();
                     }
                     if (!string.IsNullOrEmpty(keywordList)) {
                         if (keywordList.Left(1) == ",") {

@@ -327,7 +327,7 @@ namespace Contensive.Processor.Controllers {
                                 + " )"
                                 + " ";
                             using (var csXfer = new CsModel(core)) {
-                                returnREsult = csXfer.csOpenSql(sql);
+                                returnREsult = csXfer.openSql(sql);
                             }
                         }
                     } else {
@@ -357,8 +357,8 @@ namespace Contensive.Processor.Controllers {
                             + " left join ccMemberRules r on r.Memberid=m.id"
                             + " where" + Criteria;
                         using (var csXfer = new CsModel(core)) {
-                            csXfer.csOpenSql(sql, "Default");
-                            returnREsult = csXfer.csOk();
+                            csXfer.openSql(sql, "Default");
+                            returnREsult = csXfer.ok();
                         }
                     }
                 }
