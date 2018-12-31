@@ -905,10 +905,10 @@ namespace Contensive.Addons.AdminSite.Controllers {
                     //
                     string CreatedBy = "the system";
                     if ( editRecord.createdBy.id != 0) {
-                        using (var csXfer = new CsModel(core)) {
-                            if (csXfer.openSql("select Name,Active from ccMembers where id=" + editRecord.createdBy.id)) {
-                                string Name = csXfer.getText("name");
-                                bool Active = csXfer.getBoolean("active");
+                        using (var csData = new CsModel(core)) {
+                            if (csData.openSql("select Name,Active from ccMembers where id=" + editRecord.createdBy.id)) {
+                                string Name = csData.getText("name");
+                                bool Active = csData.getBoolean("active");
                                 if (!Active && (!string.IsNullOrEmpty(Name))) {
                                     CreatedBy = "Inactive user " + Name;
                                 } else if (!Active) {
@@ -936,10 +936,10 @@ namespace Contensive.Addons.AdminSite.Controllers {
                         ModifiedCopy = ModifiedCopy + " " + editRecord.modifiedDate;
                         CreatedBy = "the system";
                         if ( editRecord.modifiedBy.id != 0) {
-                            using (var csXfer = new CsModel(core)) {
-                                if (csXfer.openSql("select Name,Active from ccMembers where id=" + editRecord.modifiedBy.id)) {
-                                    string Name = csXfer.getText("name");
-                                    bool Active = csXfer.getBoolean("active");
+                            using (var csData = new CsModel(core)) {
+                                if (csData.openSql("select Name,Active from ccMembers where id=" + editRecord.modifiedBy.id)) {
+                                    string Name = csData.getText("name");
+                                    bool Active = csData.getBoolean("active");
                                     if (!Active && (!string.IsNullOrEmpty(Name))) {
                                         CreatedBy = "Inactive user " + Name;
                                     } else if (!Active) {
@@ -1080,13 +1080,13 @@ namespace Contensive.Addons.AdminSite.Controllers {
                 // ----- Lookup ReadOnly
                 result += (HtmlController.inputHidden(fieldName, GenericController.encodeText(fieldValue)));
                 if (!string.IsNullOrEmpty(LookupContentName)) {
-                    using (var csXfer = new CsModel(core)) {
-                        csXfer.openRecord(LookupContentName, fieldValue, "Name,ContentControlID");
-                        if (csXfer.ok()) {
-                            if (csXfer.getText("Name") == "") {
+                    using (var csData = new CsModel(core)) {
+                        csData.openRecord(LookupContentName, fieldValue, "Name,ContentControlID");
+                        if (csData.ok()) {
+                            if (csData.getText("Name") == "") {
                                 result += ("No Name");
                             } else {
-                                result += (HtmlController.encodeHtml(csXfer.getText("Name")));
+                                result += (HtmlController.encodeHtml(csData.getText("Name")));
                             }
                             result += ("&nbsp;[<a TabIndex=-1 href=\"?" + rnAdminForm + "=4&cid=" + lookupContentID + "&id=" + fieldValue.ToString() + "\" target=\"_blank\">View details in new window</a>]");
                         } else {
@@ -1102,11 +1102,11 @@ namespace Contensive.Addons.AdminSite.Controllers {
                 string nonLabel = (fieldRequired) ? "" : "None";
                 result += core.html.selectFromContent(fieldName, fieldValue, LookupContentName, sqlFilter, nonLabel, "", ref IsEmptyList, "select form-control");
                 if (fieldValue != 0) {
-                    using (var csXfer = new CsModel(core)) {
-                        if (csXfer.openRecord(LookupContentName, fieldValue, "ID")) {
+                    using (var csData = new CsModel(core)) {
+                        if (csData.openRecord(LookupContentName, fieldValue, "ID")) {
                             result += ("&nbsp;[<a TabIndex=-1 href=\"?" + rnAdminForm + "=4&cid=" + lookupContentID + "&id=" + fieldValue.ToString() + "\" target=\"_blank\">Details</a>]");
                         }
-                        csXfer.close();
+                        csData.close();
                     }
                 }
                 result += ("&nbsp;[<a TabIndex=-1 href=\"?cid=" + lookupContentID + "\" target=\"_blank\">See all " + LookupContentName + "</a>]");
@@ -1696,7 +1696,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                         //
                         // non-admin member, first check if they have access and main_Get true markers
                         //
-                        using (var csXfer = new CsModel(core)) {
+                        using (var csData = new CsModel(core)) {
                             string sql = "SELECT ccContent.ID as ContentID, ccContent.AllowAdd as ContentAllowAdd, ccGroupRules.AllowAdd as GroupRulesAllowAdd, ccMemberRules.DateExpires as MemberRulesDateExpires"
                                 + " FROM (((ccContent"
                                     + " LEFT JOIN ccGroupRules ON ccGroupRules.ContentID=ccContent.ID)"
@@ -1713,15 +1713,15 @@ namespace Contensive.Addons.AdminSite.Controllers {
                                 + " AND(ccMembers.active<>0)"
                                 + " AND(ccMembers.ID=" + core.session.user.id + ")"
                                 + " );";
-                            csXfer.openSql(sql);
-                            if (csXfer.ok()) {
+                            csData.openSql(sql);
+                            if (csData.ok()) {
                                 //
                                 // ----- Entry was found, member has some kind of access
                                 //
                                 userHasAccess = true;
                                 contentAllowAdd = content.allowAdd;
-                                groupRulesAllowAdd = csXfer.getBoolean("GroupRulesAllowAdd");
-                                memberRulesDateExpires = csXfer.getDate("MemberRulesDateExpires");
+                                groupRulesAllowAdd = csData.getBoolean("GroupRulesAllowAdd");
+                                memberRulesDateExpires = csData.getDate("MemberRulesDateExpires");
                                 memberRulesAllow = false;
                                 if (memberRulesDateExpires == DateTime.MinValue) {
                                     memberRulesAllow = true;

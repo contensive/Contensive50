@@ -32,10 +32,10 @@ namespace Contensive.Addons.Primitives {
                 //
                 bool InsertTestOK = false;
                 int TrapID = 0;
-                using (var csXfer = new CsModel(core)) {
-                    if (csXfer.insert("Trap Log")) {
+                using (var csData = new CsModel(core)) {
+                    if (csData.insert("Trap Log")) {
                         InsertTestOK = true;
-                        TrapID = csXfer.getInteger("ID");
+                        TrapID = csData.getInteger("ID");
                     }
                 }
                 if (InsertTestOK) {

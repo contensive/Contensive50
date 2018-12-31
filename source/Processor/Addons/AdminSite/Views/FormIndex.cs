@@ -108,9 +108,9 @@ namespace Contensive.Addons.AdminSite {
                                 SQL += " where " + sqlWhere;
                             }
                             int recordCnt = 0;
-                            using (var csXfer = new CsModel(core)) {
-                                if (csXfer.openSql(SQL, datasource.name)) {
-                                    recordCnt = csXfer.getInteger("cnt");
+                            using (var csData = new CsModel(core)) {
+                                if (csData.openSql(SQL, datasource.name)) {
+                                    recordCnt = csData.getInteger("cnt");
                                 }
                             }
                             //
@@ -305,14 +305,14 @@ namespace Contensive.Addons.AdminSite {
                             string RowColor = "";
                             int RecordPointer = 0;
                             int RecordLast = 0;
-                            using (var csXfer = new CsModel(core)) {
-                                if (csXfer.openSql(SQL, datasource.name, IndexConfig.recordsPerPage, IndexConfig.pageNumber)) {
+                            using (var csData = new CsModel(core)) {
+                                if (csData.openSql(SQL, datasource.name, IndexConfig.recordsPerPage, IndexConfig.pageNumber)) {
                                     RecordPointer = IndexConfig.recordTop;
                                     RecordLast = IndexConfig.recordTop + IndexConfig.recordsPerPage;
                                     //
                                     // --- Print out the records
-                                    while ((csXfer.ok()) && (RecordPointer < RecordLast)) {
-                                        int RecordID = csXfer.getInteger("ID");
+                                    while ((csData.ok()) && (RecordPointer < RecordLast)) {
+                                        int RecordID = csData.getInteger("ID");
                                         if (RowColor == "class=\"ccAdminListRowOdd\"") {
                                             RowColor = "class=\"ccAdminListRowEven\"";
                                         } else {
@@ -347,13 +347,13 @@ namespace Contensive.Addons.AdminSite {
                                             if (FieldUsedInColumns.ContainsKey(columnNameLc)) {
                                                 if (FieldUsedInColumns[columnNameLc]) {
                                                     DataTable_DataRows += ("\r\n<td valign=\"middle\" " + RowColor + " align=\"left\">" + SpanClassAdminNormal);
-                                                    DataTable_DataRows += getForm_Index_GetCell(core, adminData, column.Name, csXfer, IsLookupFieldValid[columnNameLc], GenericController.vbLCase(adminData.adminContent.tableName) == "ccemail");
+                                                    DataTable_DataRows += getForm_Index_GetCell(core, adminData, column.Name, csData, IsLookupFieldValid[columnNameLc], GenericController.vbLCase(adminData.adminContent.tableName) == "ccemail");
                                                     DataTable_DataRows += ("&nbsp;</span></td>");
                                                 }
                                             }
                                         }
                                         DataTable_DataRows += ("\n    </tr>");
-                                        csXfer.goNext();
+                                        csData.goNext();
                                         RecordPointer = RecordPointer + 1;
                                     }
                                     DataTable_DataRows += "<input type=hidden name=rowcnt value=" + RecordPointer + ">";
@@ -361,7 +361,7 @@ namespace Contensive.Addons.AdminSite {
                                     // --- print out the stuff at the bottom
                                     //
                                     int RecordTop_NextPage = IndexConfig.recordTop;
-                                    if (csXfer.ok()) {
+                                    if (csData.ok()) {
                                         RecordTop_NextPage = RecordPointer;
                                     }
                                     int RecordTop_PreviousPage = IndexConfig.recordTop - IndexConfig.recordsPerPage;
@@ -1094,7 +1094,7 @@ namespace Contensive.Addons.AdminSite {
                         for (Ptr = 0; Ptr < IndexConfig.groupListCnt; Ptr++) {
                             GroupName = IndexConfig.groupList[Ptr];
                             if (!string.IsNullOrEmpty(GroupName)) {
-                                GroupID = MetaController.getRecordId( core,"Groups", GroupName);
+                                GroupID = MetaController.getRecordIdByUniqueName( core,"Groups", GroupName);
                                 if (GroupID == 0 && GroupName.IsNumeric()) {
                                     GroupID = GenericController.encodeInteger(GroupName);
                                 }
@@ -1685,10 +1685,10 @@ namespace Contensive.Addons.AdminSite {
                 string TableName = MetaController.getContentTablename(core, ContentName);
                 SubFilterList = "";
                 if (GenericController.vbLCase(TableName) == GenericController.vbLCase("ccMembers")) {
-                    using (var csXfer = new CsModel(core)) {
-                        csXfer.openSql(core.db.getSQLSelect("default", "ccGroups", "ID,Caption,Name", "(active<>0)", "Caption,Name"));
-                        while (csXfer.ok()) {
-                            string Name = csXfer.getText("Name");
+                    using (var csData = new CsModel(core)) {
+                        csData.openSql(core.db.getSQLSelect("default", "ccGroups", "ID,Caption,Name", "(active<>0)", "Caption,Name"));
+                        while (csData.ok()) {
+                            string Name = csData.getText("Name");
                             Ptr = 0;
                             if (IndexConfig.groupListCnt > 0) {
                                 for (Ptr = 0; Ptr < IndexConfig.groupListCnt; Ptr++) {
@@ -1698,8 +1698,8 @@ namespace Contensive.Addons.AdminSite {
                                 }
                             }
                             if (Ptr == IndexConfig.groupListCnt) {
-                                int RecordID = csXfer.getInteger("ID");
-                                Caption = csXfer.getText("Caption");
+                                int RecordID = csData.getInteger("ID");
+                                Caption = csData.getText("Caption");
                                 if (string.IsNullOrEmpty(Caption)) {
                                     Caption = Name;
                                     if (string.IsNullOrEmpty(Caption)) {
@@ -1719,7 +1719,7 @@ namespace Contensive.Addons.AdminSite {
                                 Link = "/" + core.appConfig.adminRoute + "?" + QS;
                                 SubFilterList = SubFilterList + "<div class=\"ccFilterIndent\"><a class=\"ccFilterLink\" href=\"" + Link + "\">" + Caption + "</a></div>";
                             }
-                            csXfer.goNext();
+                            csData.goNext();
                         }
                     }
                 }
@@ -1797,7 +1797,7 @@ namespace Contensive.Addons.AdminSite {
         /// <param name="IsLookupFieldValid"></param>
         /// <param name="IsEmailContent"></param>
         /// <returns></returns>
-        public static string getForm_Index_GetCell( CoreController core, AdminDataModel adminData, string fieldName, CsModel csXfer, bool IsLookupFieldValid, bool IsEmailContent) {
+        public static string getForm_Index_GetCell( CoreController core, AdminDataModel adminData, string fieldName, CsModel csData, bool IsLookupFieldValid, bool IsEmailContent) {
             try {
                 var field = adminData.adminContent.fields[fieldName.ToLowerInvariant()];
                 int lookupTableCnt = field.id;
@@ -1808,7 +1808,7 @@ namespace Contensive.Addons.AdminSite {
                 switch (field.fieldTypeId) {
                     case _fieldTypeIdFile:
                     case _fieldTypeIdFileImage:
-                        Filename = csXfer.getText(field.nameLc);
+                        Filename = csData.getText(field.nameLc);
                         Filename = GenericController.vbReplace(Filename, "\\", "/");
                         Pos = Filename.LastIndexOf("/") + 1;
                         if (Pos != 0) {
@@ -1818,11 +1818,11 @@ namespace Contensive.Addons.AdminSite {
                         break;
                     case _fieldTypeIdLookup:
                         if (IsLookupFieldValid) {
-                            Stream.Add(csXfer.getText("LookupTable" + lookupTableCnt + "Name"));
+                            Stream.Add(csData.getText("LookupTable" + lookupTableCnt + "Name"));
                             lookupTableCnt += 1;
                         } else if (field.lookupList != "") {
                             string[] lookups = field.lookupList.Split(',');
-                            int LookupPtr = csXfer.getInteger(field.nameLc) - 1;
+                            int LookupPtr = csData.getInteger(field.nameLc) - 1;
                             if (LookupPtr <= lookups.GetUpperBound(0)) {
                                 if (LookupPtr < 0) {
                                     //Stream.Add( "-1")
@@ -1836,25 +1836,25 @@ namespace Contensive.Addons.AdminSite {
                         break;
                     case _fieldTypeIdMemberSelect:
                         if (IsLookupFieldValid) {
-                            Stream.Add(csXfer.getText("LookupTable" + lookupTableCnt + "Name"));
+                            Stream.Add(csData.getText("LookupTable" + lookupTableCnt + "Name"));
                             lookupTableCnt += 1;
                         } else {
-                            Stream.Add(csXfer.getText(field.nameLc));
+                            Stream.Add(csData.getText(field.nameLc));
                         }
                         break;
                     case _fieldTypeIdBoolean:
-                        if (csXfer.getBoolean(field.nameLc)) {
+                        if (csData.getBoolean(field.nameLc)) {
                             Stream.Add("yes");
                         } else {
                             Stream.Add("no");
                         }
                         break;
                     case _fieldTypeIdCurrency:
-                        Stream.Add(string.Format("{0:C}", csXfer.getNumber(field.nameLc)));
+                        Stream.Add(string.Format("{0:C}", csData.getNumber(field.nameLc)));
                         break;
                     case _fieldTypeIdLongText:
                     case _fieldTypeIdHTML:
-                        FieldText = csXfer.getText(field.nameLc);
+                        FieldText = csData.getText(field.nameLc);
                         if (FieldText.Length > 50) {
                             FieldText = FieldText.Left(50) + "[more]";
                         }
@@ -1866,7 +1866,7 @@ namespace Contensive.Addons.AdminSite {
                     case _fieldTypeIdFileJavascript:
                     case _fieldTypeIdFileHTML:
                         // rw( "n/a" )
-                        Filename = csXfer.getText(field.nameLc);
+                        Filename = csData.getText(field.nameLc);
                         if (!string.IsNullOrEmpty(Filename)) {
                             string Copy = core.cdnFiles.readFileText(Filename);
                             Stream.Add(Copy);
@@ -1880,7 +1880,7 @@ namespace Contensive.Addons.AdminSite {
                         if (field.password) {
                             Stream.Add("****");
                         } else {
-                            Stream.Add(csXfer.getText(field.nameLc));
+                            Stream.Add(csData.getText(field.nameLc));
                         }
                         break;
                 }

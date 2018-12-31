@@ -78,10 +78,10 @@ namespace Contensive.Addons.Tools {
                                     if (!string.IsNullOrEmpty(Keyword)) {
                                         DataTable dt = core.db.executeQuery("select top 1 ID from ccMetaKeywords where name=" + DbController.encodeSQLText(Keyword));
                                         if (dt.Rows.Count == 0) {
-                                            using (var csXfer = new CsModel(core)) {
-                                                csXfer.insert("Meta Keywords");
-                                                if (csXfer.ok()) {
-                                                    csXfer.set("name", Keyword);
+                                            using (var csData = new CsModel(core)) {
+                                                csData.insert("Meta Keywords");
+                                                if (csData.ok()) {
+                                                    csData.set("name", Keyword);
                                                 }
                                             }
                                         }

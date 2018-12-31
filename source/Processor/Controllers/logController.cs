@@ -286,14 +286,14 @@ namespace Contensive.Processor.Controllers {
                 //
                 if (Message.Length > 255) Message = Message.Substring(0, 255);
                 if (Link.Length > 255) Message = Link.Substring(0, 255);
-                using (var csXfer = new CsModel(core)) {
-                    if (csXfer.insert("Activity Log")) {
-                        csXfer.set("MemberID", SubjectMemberID);
-                        csXfer.set("OrganizationID", SubjectOrganizationID);
-                        csXfer.set("Message", Message);
-                        csXfer.set("Link", Link);
-                        csXfer.set("VisitorID", VisitorID);
-                        csXfer.set("VisitID", VisitID);
+                using (var csData = new CsModel(core)) {
+                    if (csData.insert("Activity Log")) {
+                        csData.set("MemberID", SubjectMemberID);
+                        csData.set("OrganizationID", SubjectOrganizationID);
+                        csData.set("Message", Message);
+                        csData.set("Link", Link);
+                        csData.set("VisitorID", VisitorID);
+                        csData.set("VisitID", VisitID);
                     }
                 }
                 //
@@ -375,17 +375,17 @@ namespace Contensive.Processor.Controllers {
                 //
                 // insert new record
                 //
-                using (var csXfer = new CsModel(core)) {
-                    if (csXfer.insert("Site Warnings")) {
-                        csXfer.set("name", Name);
-                        csXfer.set("description", Description);
-                        csXfer.set("generalKey", generalKey);
-                        csXfer.set("specificKey", specificKey);
-                        csXfer.set("count", 1);
-                        csXfer.set("DateLastReported", DateTime.Now);
-                        csXfer.set("shortDescription", shortDescription);
-                        csXfer.set("location", location);
-                        csXfer.set("pageId", PageID);
+                using (var csData = new CsModel(core)) {
+                    if (csData.insert("Site Warnings")) {
+                        csData.set("name", Name);
+                        csData.set("description", Description);
+                        csData.set("generalKey", generalKey);
+                        csData.set("specificKey", specificKey);
+                        csData.set("count", 1);
+                        csData.set("DateLastReported", DateTime.Now);
+                        csData.set("shortDescription", shortDescription);
+                        csData.set("location", location);
+                        csData.set("pageId", PageID);
                     }
                 }
             }

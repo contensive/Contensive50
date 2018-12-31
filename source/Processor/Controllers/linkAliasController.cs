@@ -143,18 +143,18 @@ namespace Contensive.Processor.Controllers {
                             // Make sure there is one here for this
                             //
                             int linkAliasId = 0;
-                            using (var csXfer = new CsModel(core)) {
-                                csXfer.open("Link Aliases", "name=" + DbController.encodeSQLText(WorkingLinkAlias), "", false, 0, "Name,PageID,QueryStringSuffix");
-                                if (!csXfer.ok()) {
+                            using (var csData = new CsModel(core)) {
+                                csData.open("Link Aliases", "name=" + DbController.encodeSQLText(WorkingLinkAlias), "", false, 0, "Name,PageID,QueryStringSuffix");
+                                if (!csData.ok()) {
                                     //
                                     // Alias not found, create a Link Aliases
                                     //
-                                    csXfer.close();
-                                    csXfer.insert("Link Aliases");
-                                    if (csXfer.ok()) {
-                                        csXfer.set("Name", WorkingLinkAlias);
-                                        csXfer.set("Pageid", PageID);
-                                        csXfer.set("QueryStringSuffix", QueryStringSuffix);
+                                    csData.close();
+                                    csData.insert("Link Aliases");
+                                    if (csData.ok()) {
+                                        csData.set("Name", WorkingLinkAlias);
+                                        csData.set("Pageid", PageID);
+                                        csData.set("QueryStringSuffix", QueryStringSuffix);
                                     }
                                 } else {
                                     //
@@ -162,13 +162,13 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     int CurrentLinkAliasID = 0;
                                     bool resaveLinkAlias = false;
-                                    int LinkAliasPageID = csXfer.getInteger("pageID");
-                                    if ((csXfer.getText("QueryStringSuffix").ToLowerInvariant() == QueryStringSuffix.ToLowerInvariant()) && (PageID == LinkAliasPageID)) {
+                                    int LinkAliasPageID = csData.getInteger("pageID");
+                                    if ((csData.getText("QueryStringSuffix").ToLowerInvariant() == QueryStringSuffix.ToLowerInvariant()) && (PageID == LinkAliasPageID)) {
                                         //
                                         // it maches a current entry for this link alias, if the current entry is not the highest number id,
                                         //   remove it and add this one
                                         //
-                                        CurrentLinkAliasID = csXfer.getInteger("id");
+                                        CurrentLinkAliasID = csData.getInteger("id");
 
 
 
@@ -197,8 +197,8 @@ namespace Contensive.Processor.Controllers {
                                         if (OverRideDuplicate) {
                                             //
                                             // change the Link Alias to the new link
-                                            csXfer.set("Pageid", PageID);
-                                            csXfer.set("QueryStringSuffix", QueryStringSuffix);
+                                            csData.set("Pageid", PageID);
+                                            csData.set("QueryStringSuffix", QueryStringSuffix);
                                         } else if (AllowLinkAlias) {
                                             //
                                             // This alias points to a different link, and link aliasing is in use, call it an error (but save record anyway)
@@ -219,8 +219,8 @@ namespace Contensive.Processor.Controllers {
                                         }
                                     }
                                 }
-                                linkAliasId = csXfer.getInteger("id");
-                                csXfer.close();
+                                linkAliasId = csData.getInteger("id");
+                                csData.close();
                             }
                             core.cache.invalidateDbRecord(linkAliasId, LinkAliasModel.contentTableName);
                             //

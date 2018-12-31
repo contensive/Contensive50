@@ -33,13 +33,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static AddonCollectionModel addDefault(CoreController core, Domain.MetaModel cdef) {
-            return addDefault<AddonCollectionModel>(core, cdef);
+        public static AddonCollectionModel addDefault(CoreController core, Domain.MetaModel metaData) {
+            return addDefault<AddonCollectionModel>(core, metaData);
         }
         //
         //====================================================================================================
-        public static AddonCollectionModel addDefault(CoreController core, Domain.MetaModel cdef, ref List<string> callersCacheNameList) {
-            return addDefault<AddonCollectionModel>(core, cdef, ref callersCacheNameList);
+        public static AddonCollectionModel addDefault(CoreController core, Domain.MetaModel metaData, ref List<string> callersCacheNameList) {
+            return addDefault<AddonCollectionModel>(core, metaData, ref callersCacheNameList);
         }
         //
         //====================================================================================================

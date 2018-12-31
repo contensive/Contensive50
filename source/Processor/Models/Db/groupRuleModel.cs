@@ -25,13 +25,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static GroupRuleModel addDefault(CoreController core, Domain.MetaModel cdef) {
-            return addDefault<GroupRuleModel>(core, cdef);
+        public static GroupRuleModel addDefault(CoreController core, Domain.MetaModel metaData) {
+            return addDefault<GroupRuleModel>(core, metaData);
         }
         //
         //====================================================================================================
-        public static GroupRuleModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.MetaModel cdef) {
-            return addDefault<GroupRuleModel>(core, cdef, ref callersCacheNameList);
+        public static GroupRuleModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.MetaModel metaData) {
+            return addDefault<GroupRuleModel>(core, metaData, ref callersCacheNameList);
         }
         //
         //====================================================================================================

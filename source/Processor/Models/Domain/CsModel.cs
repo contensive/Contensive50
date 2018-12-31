@@ -43,10 +43,10 @@ namespace Contensive.Processor {
         /// <summary>
         /// true if it was created here
         /// </summary>
-        private bool newRecord;
-        /// <summary>
-        /// ***** should be removed. This should be the same as metaData.name
-        /// </summary>
+        //private bool newRecord;
+        ///// <summary>
+        ///// ***** should be removed. This should be the same as metaData.name
+        ///// </summary>
         private string contentName;
         /// <summary>
         /// If opened with a content name, this is that content's metadata
@@ -59,10 +59,10 @@ namespace Contensive.Processor {
         /// <summary>
         /// Set when CS is opened and if a save happens
         /// </summary>
-        private bool isModified;
-        /// <summary>
-        /// The read object, null when empty otherwise it needs to be disposed
-        /// </summary>
+        //private bool isModified;
+        ///// <summary>
+        ///// The read object, null when empty otherwise it needs to be disposed
+        ///// </summary>
         private DataTable dt = null;
         /// <summary>
         /// Holds the SQL that created the result set
@@ -92,10 +92,10 @@ namespace Contensive.Processor {
         /// number of columns in the fieldNames and readCache
         /// </summary>
         private int resultColumnCount;
-        /// <summary>
-        /// readCache is at the last record
-        /// </summary>
-        private bool resultEOF;
+        ///// <summary>
+        ///// readCache is at the last record
+        ///// </summary>
+        // private bool resultEOF;
         /// <summary>
         /// 2-D array of the result rows/columns
         /// </summary>
@@ -139,7 +139,7 @@ namespace Contensive.Processor {
                     resultColumnCount = 0;
                     readCacheRowCnt = 0;
                     readCacheRowPtr = -1;
-                    resultEOF = true;
+                    //resultEOF = true;
                     isOpen = false;
                     if (dt != null) {
                         dt.Dispose();
@@ -449,14 +449,14 @@ namespace Contensive.Processor {
         /// <returns></returns>
         private void init() {
             isOpen = true;
-            newRecord = true;
+            //newRecord = true;
             contentName = "";
             contentMeta = null;
             dataSourceName = "";
             dt = null;
             fieldNames = null;
             fieldPointer = 0;
-            isModified = false;
+            //isModified = false;
             lastUsed = DateTime.Now;
             userId = core.session.user.id;
             pageNumber = 0;
@@ -465,7 +465,7 @@ namespace Contensive.Processor {
             readCacheRowCnt = 0;
             readCacheRowPtr = 0;
             resultColumnCount = 0;
-            resultEOF = true;
+            //resultEOF = true;
             sqlSelectFieldList = "";
             sqlSource = "";
             createdByQuery = false;
@@ -775,7 +775,7 @@ namespace Contensive.Processor {
                                 }
                             } else if (this.createdByQuery) {
                                 //
-                                // -- get from cdef
+                                // -- get from metadata
                                 fieldTypeId = this.contentMeta.fields[fieldName.ToLowerInvariant()].fieldTypeId;
                             } else {
                                 //
@@ -947,7 +947,7 @@ namespace Contensive.Processor {
                 // -- redirect field, special case, no data
                 if (field.fieldTypeId == fieldTypeIdRedirect) { return string.Empty; }
                 string rawData = getRawData(fieldName);
-                if (!IsNull(rawData)) { return string.Empty; }
+                if (IsNull(rawData)) { return string.Empty; }
                 switch (field.fieldTypeId) {
                     case Constants._fieldTypeIdBoolean:
                         //
@@ -1055,7 +1055,7 @@ namespace Contensive.Processor {
                 if (string.IsNullOrEmpty(fieldName.Trim())) { throw new ArgumentException("fieldName cannnot be blank"); }
                 if (!this.createdByQuery) { throw new GenericException("Cannot update a contentset created from a sql query."); }
                 if (this.contentMeta == null) { throw new GenericException("Cannot update a contentset created with meta data."); }
-                if (!string.IsNullOrEmpty(this.contentMeta.name)) { throw new GenericException("Cannot update a contentset created with invalid meta data."); }
+                if (string.IsNullOrEmpty(this.contentMeta.name)) { throw new GenericException("Cannot update a contentset created with invalid meta data."); }
                 string FieldNameLc = fieldName.Trim(' ').ToLowerInvariant();
                 if (!this.contentMeta.fields.ContainsKey(FieldNameLc)) { throw new ArgumentException("The field [" + fieldName + "] could Not be found In content [" + this.contentMeta.name + "]"); }
                 MetaFieldModel field = this.contentMeta.fields[FieldNameLc];
@@ -1108,7 +1108,7 @@ namespace Contensive.Processor {
                         int FilenameRev = 0;
                         string path = null;
                         int Pos = 0;
-                        string pathFilenameOriginal = getText(field.nameLc);
+                        string pathFilenameOriginal = getRawData(field.nameLc);
                         PathFilename = pathFilenameOriginal;
                         string BlankTest = null;
                         BlankTest = rawValueForDb;
@@ -1478,7 +1478,7 @@ namespace Contensive.Processor {
                 this.resultColumnCount = 0;
                 this.readCacheRowCnt = 0;
                 this.readCacheRowPtr = -1;
-                this.resultEOF = true;
+                //this.resultEOF = true;
                 this.writeCache = new Dictionary<string, string>();
                 this.fieldNames = new String[] { };
                 if (this.dt != null) {
@@ -1756,18 +1756,15 @@ namespace Contensive.Processor {
         /// Open a contentwatch data set
         /// </summary>
         /// <param name="core"></param>
-        /// <param name="ListName"></param>
-        /// <param name="SortFieldList"></param>
-        /// <param name="ActiveOnly"></param>
+        /// <param name="listName"></param>
+        /// <param name="sortFieldList"></param>
+        /// <param name="sctiveOnly"></param>
         /// <param name="PageSize"></param>
-        /// <param name="PageNumber"></param>
+        /// <param name="pageNumber"></param>
         /// <returns></returns>
-        public bool openContentWatchList(CoreController core, string ListName, string SortFieldList = "", bool ActiveOnly = true, int PageSize = 1000, int PageNumber = 1) {
+        public bool openContentWatchList(CoreController core, string listName, string sortFieldList, bool sctiveOnly, int PageSize, int pageNumber) {
             try {
-                string sortFieldList = encodeText(encodeEmpty(SortFieldList, "")).Trim(' ');
-                if (string.IsNullOrEmpty(sortFieldList)) {
-                    sortFieldList = "DateAdded";
-                }
+                sortFieldList = encodeEmpty(sortFieldList, "dateadded").Trim(' ');
                 //
                 // ----- Add tablename to the front of SortFieldList fieldnames
                 sortFieldList = " " + GenericController.vbReplace(sortFieldList, ",", " , ") + " ";
@@ -1795,7 +1792,7 @@ namespace Contensive.Processor {
                     + " FROM (ccContentWatchLists"
                     + " LEFT JOIN ccContentWatchListRules ON ccContentWatchLists.ID = ccContentWatchListRules.ContentWatchListID)"
                     + " LEFT JOIN ccContentWatch ON ccContentWatchListRules.ContentWatchID = ccContentWatch.ID"
-                    + " WHERE (((ccContentWatchLists.Name)=" + DbController.encodeSQLText(ListName) + ")"
+                    + " WHERE (((ccContentWatchLists.Name)=" + DbController.encodeSQLText(listName) + ")"
                     + "AND ((ccContentWatchLists.Active)<>0)"
                     + "AND ((ccContentWatchListRules.Active)<>0)"
                     + "AND ((ccContentWatch.Active)<>0)"
@@ -1804,14 +1801,14 @@ namespace Contensive.Processor {
                     + "AND ((ccContentWatch.WhatsNewDateExpires is null)or(ccContentWatch.WhatsNewDateExpires>" + DbController.encodeSQLDate(core.doc.profileStartTime) + "))"
                     + ")"
                     + " ORDER BY " + sortFieldList + ";";
-                if (!openSql(SQL, "", PageSize, PageNumber)) {
+                if (!openSql(SQL, "", PageSize, pageNumber)) {
                     //
                     // Check if listname exists
                     //
-                    if (!this.open("Content Watch Lists", "name=" + DbController.encodeSQLText(ListName), "ID", false, 0, "ID")) {
+                    if (!this.open("Content Watch Lists", "name=" + DbController.encodeSQLText(listName), "ID", false, 0, "ID")) {
                         this.close();
                         if (this.insert("Content Watch Lists")) {
-                            this.set("name", ListName);
+                            this.set("name", listName);
                         }
                     }
                     this.close();
@@ -1823,6 +1820,18 @@ namespace Contensive.Processor {
                 throw;
             }
         }
+        //
+        public bool openContentWatchList(CoreController core, string listName, string sortFieldList, bool activeOnly, int pageSize)
+            => openContentWatchList(core, listName, sortFieldList, activeOnly, pageSize, 1);
+        //
+        public bool openContentWatchList(CoreController core, string listName, string sortFieldList, bool activeOnly)
+            => openContentWatchList(core, listName, sortFieldList, activeOnly, 1000, 1);
+        //
+        public bool openContentWatchList(CoreController core, string listName, string sortFieldList)
+            => openContentWatchList(core, listName, sortFieldList, true, 1000, 1);
+        //
+        public bool openContentWatchList(CoreController core, string listName)
+            => openContentWatchList(core, listName, "", true, 1000, 1);
         //
         //========================================================================
         //
@@ -1850,104 +1859,81 @@ namespace Contensive.Processor {
         /// <param name="PageNumber"></param>
         /// <returns></returns>
         public bool open(string contentName, string sqlCriteria, string sqlOrderBy, bool activeOnly, int memberId, string sqlSelectFieldList, int PageSize, int PageNumber) {
-            bool returnCs = false;
+            bool result = false;
             try {
+                //
+                // -- if a previous dataset is open, close it now
+                if (isOpen) { close(); }
+                //
+                // -- verify arguments
                 if (string.IsNullOrEmpty(contentName)) { throw new ArgumentException("ContentName cannot be blank"); }
-                {
-                    var CDef = Models.Domain.MetaModel.createByUniqueName(core, contentName);
-                    if (CDef == null) { throw (new GenericException("No content found For [" + contentName + "]")); }
-                    if (CDef.id <= 0) { throw (new GenericException("No content found For [" + contentName + "]")); }
-                    {
-                        sqlOrderBy = GenericController.encodeEmpty(sqlOrderBy, CDef.defaultSortMethod);
-                        sqlSelectFieldList = GenericController.encodeEmpty(sqlSelectFieldList, CDef.selectCommaList);
-                        //
-                        // verify the sortfields are in this table
-                        if (!string.IsNullOrEmpty(sqlOrderBy)) {
-                            string[] SortFields = sqlOrderBy.Split(',');
-                            for (int ptr = 0; ptr < SortFields.GetUpperBound(0) + 1; ptr++) {
-                                string SortField = SortFields[ptr].ToLowerInvariant();
-                                SortField = GenericController.vbReplace(SortField, "asc", "", 1, 99, 1);
-                                SortField = GenericController.vbReplace(SortField, "desc", "", 1, 99, 1);
-                                SortField = SortField.Trim(' ');
-                                if (!CDef.selectList.Contains(SortField)) { throw (new GenericException("The field [" + SortField + "] was used in sqlOrderBy for content [" + contentName + "], but the content does not include this field.")); }
-                            }
-                        }
-                        //
-                        // ----- fixup the criteria to include the ContentControlID(s) / EditSourceID
-                        string sqlContentCriteria = CDef.legacyContentControlCriteria;
-                        if (string.IsNullOrEmpty(sqlContentCriteria)) {
-                            sqlContentCriteria = "(1=1)";
-                        } else {
-                            //
-                            // remove tablename from contentcontrolcriteria - if in workflow mode, and authoringtable is different, this would be wrong, also makes sql smaller, and is not necessary
-                            sqlContentCriteria = GenericController.vbReplace(sqlContentCriteria, CDef.tableName + ".", "");
-                        }
-                        if (!string.IsNullOrEmpty(sqlCriteria)) {
-                            sqlContentCriteria = sqlContentCriteria + "and(" + sqlCriteria + ")";
-                        }
-                        //
-                        // ----- Active Only records
-                        if (activeOnly) {
-                            sqlContentCriteria = sqlContentCriteria + "and(active<>0)";
-                        }
-                        //
-                        // ----- Process Select Fields, make sure ContentControlID,ID,Name,Active are included
-                        sqlSelectFieldList = GenericController.vbReplace(sqlSelectFieldList, "\t", " ");
-                        while (GenericController.vbInstr(1, sqlSelectFieldList, " ,") != 0) {
-                            sqlSelectFieldList = GenericController.vbReplace(sqlSelectFieldList, " ,", ",");
-                        }
-                        while (GenericController.vbInstr(1, sqlSelectFieldList, ", ") != 0) {
-                            sqlSelectFieldList = GenericController.vbReplace(sqlSelectFieldList, ", ", ",");
-                        }
-                        if ((!string.IsNullOrEmpty(sqlSelectFieldList)) && (sqlSelectFieldList.IndexOf("*", System.StringComparison.OrdinalIgnoreCase) == -1)) {
-                            string TestUcaseFieldList = GenericController.vbUCase("," + sqlSelectFieldList + ",");
-                            if (GenericController.vbInstr(1, TestUcaseFieldList, ",CONTENTCONTROLID,", 1) == 0) {
-                                sqlSelectFieldList = sqlSelectFieldList + ",ContentControlID";
-                            }
-                            if (GenericController.vbInstr(1, TestUcaseFieldList, ",NAME,", 1) == 0) {
-                                sqlSelectFieldList = sqlSelectFieldList + ",Name";
-                            }
-                            if (GenericController.vbInstr(1, TestUcaseFieldList, ",ID,", 1) == 0) {
-                                sqlSelectFieldList = sqlSelectFieldList + ",ID";
-                            }
-                            if (GenericController.vbInstr(1, TestUcaseFieldList, ",ACTIVE,", 1) == 0) {
-                                sqlSelectFieldList = sqlSelectFieldList + ",ACTIVE";
-                            }
-                        }
-                        //
-                        // ----- Check for blank Tablename or DataSource
-                        if (string.IsNullOrEmpty(CDef.tableName)) {
-                            throw (new Exception("Content metadata [" + contentName + "] does not reference a valid table"));
-                        } else if (string.IsNullOrEmpty(CDef.dataSourceName)) {
-                            throw (new Exception("Table metadata [" + CDef.tableName + "] does not reference a valid datasource"));
-                        }
-                        //
-                        // ----- If no select list, use *
-                        if (string.IsNullOrEmpty(sqlSelectFieldList)) {
-                            sqlSelectFieldList = "*";
-                        }
-                        string sql = "select " + sqlSelectFieldList + " from " + CDef.tableName + " where (" + sqlContentCriteria + ")" + (string.IsNullOrWhiteSpace(sqlOrderBy) ? "" : " order by " + sqlOrderBy);
-                        //
-                        // -- now open the sql
-                        if (openSql(sql, CDef.dataSourceName, PageSize, PageNumber)) {
-                            //
-                            // -- correct the status
-                            this.readable = true;
-                            this.createdByQuery = true;
-                            this.contentName = contentName;
-                            this.dataSourceName = CDef.dataSourceName;
-                            this.contentMeta = CDef;
-                            this.sqlSelectFieldList = sqlSelectFieldList;
-                            this.sqlSource = sql;
-                            return true;
-                        }
+                var contentMetaData = MetaModel.createByUniqueName(core, contentName);
+                if (contentMetaData == null) { throw (new GenericException("No content found For [" + contentName + "]")); }
+                if (contentMetaData.id <= 0) { throw (new GenericException("No content found For [" + contentName + "]")); }
+                if (string.IsNullOrWhiteSpace(contentMetaData.tableName)) { throw (new GenericException("Content metadata [" + contentName + "] does not reference a valid table")); }
+                sqlOrderBy = GenericController.encodeEmpty(sqlOrderBy, contentMetaData.defaultSortMethod);
+                sqlSelectFieldList = GenericController.encodeEmpty(sqlSelectFieldList, contentMetaData.selectCommaList);
+                //
+                // -- verify the sortfields are in this table
+                if (!string.IsNullOrEmpty(sqlOrderBy)) {
+                    string[] SortFields = sqlOrderBy.Split(',');
+                    for (int ptr = 0; ptr < SortFields.GetUpperBound(0) + 1; ptr++) {
+                        string SortField = SortFields[ptr].ToLowerInvariant();
+                        SortField = GenericController.vbReplace(SortField, "asc", "", 1, 99, 1);
+                        SortField = GenericController.vbReplace(SortField, "desc", "", 1, 99, 1);
+                        SortField = SortField.Trim(' ');
+                        if (!contentMetaData.selectList.Contains(SortField)) { throw (new GenericException("The field [" + SortField + "] was used in sqlOrderBy for content [" + contentName + "], but the content does not include this field.")); }
                     }
+                }
+                //
+                // -- fixup the criteria to include the ContentControlID(s) / EditSourceID
+                string sqlContentCriteria = contentMetaData.legacyContentControlCriteria;
+                if (string.IsNullOrEmpty(sqlContentCriteria)) {
+                    sqlContentCriteria = "(1=1)";
+                } else {
+                    //
+                    // -- remove tablename from contentcontrolcriteria - if in workflow mode, and authoringtable is different, this would be wrong, also makes sql smaller, and is not necessary
+                    sqlContentCriteria = GenericController.vbReplace(sqlContentCriteria, contentMetaData.tableName + ".", "");
+                }
+                if (!string.IsNullOrEmpty(sqlCriteria)) { sqlContentCriteria += "and(" + sqlCriteria + ")"; }
+                if (activeOnly) { sqlContentCriteria += "and(active<>0)"; }
+                //
+                // -- Process Select Fields, make sure ContentControlID,ID,Name,Active are included
+                sqlSelectFieldList = GenericController.vbReplace(sqlSelectFieldList, "\t", " ");
+                while (GenericController.vbInstr(1, sqlSelectFieldList, " ,") != 0) { sqlSelectFieldList = GenericController.vbReplace(sqlSelectFieldList, " ,", ","); }
+                while (GenericController.vbInstr(1, sqlSelectFieldList, ", ") != 0) { sqlSelectFieldList = GenericController.vbReplace(sqlSelectFieldList, ", ", ","); }
+                //
+                // -- add required fields into select list
+                if ((!string.IsNullOrEmpty(sqlSelectFieldList)) && (sqlSelectFieldList.IndexOf("*", System.StringComparison.OrdinalIgnoreCase) == -1)) {
+                    string testList = ("," + sqlSelectFieldList + ",").ToLower();
+                    if (!testList.Contains(",contentcontrolid,")) { sqlSelectFieldList += ",contentcontrolid"; }
+                    if (!testList.Contains(",name,")) { sqlSelectFieldList += ",name"; }
+                    if (!testList.Contains(",id,")) { sqlSelectFieldList += ",id"; }
+                    if (!testList.Contains(",active,")) { sqlSelectFieldList += ",active"; }
+                }
+                //
+                // ----- If no select list, use *
+                if (string.IsNullOrEmpty(sqlSelectFieldList)) { sqlSelectFieldList = "*"; }
+                string sql = "select " + sqlSelectFieldList + " from " + contentMetaData.tableName + " where (" + sqlContentCriteria + ")" + (string.IsNullOrWhiteSpace(sqlOrderBy) ? "" : " order by " + sqlOrderBy);
+                //
+                // -- now open the sql
+                if (openSql(sql, contentMetaData.dataSourceName, PageSize, PageNumber)) {
+                    //
+                    // -- correct the status
+                    this.readable = true;
+                    this.createdByQuery = true;
+                    this.contentName = contentName;
+                    this.dataSourceName = contentMetaData.dataSourceName;
+                    this.contentMeta = contentMetaData;
+                    this.sqlSelectFieldList = sqlSelectFieldList;
+                    this.sqlSource = sql;
+                    return true;
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
                 throw;
             }
-            return returnCs;
+            return result;
         }
         //
         public bool open(string contentName, string sqlCriteria, string sqlOrderBy, bool activeOnly, int memberId)
@@ -1983,6 +1969,7 @@ namespace Contensive.Processor {
         public bool openSql(string sql, string dataSourceName, int pageSize, int pageNumber) {
             try {
                 init();
+                //this.newRecord = false;
                 this.readable = true;
                 this.createdByQuery = false;
                 this.contentName = "";
@@ -2021,6 +2008,7 @@ namespace Contensive.Processor {
                 if (disposing) {
                     //
                     // -- call .dispose for managed objects
+                    close();
                     if (dt != null) {
                         dt.Dispose();
                         dt = null;

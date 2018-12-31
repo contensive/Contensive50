@@ -2,6 +2,7 @@
 using System;
 using System.Data;
 using Contensive.Processor.Controllers;
+using Contensive.Processor.Models.Db;
 
 namespace Contensive.Processor.Models.Domain {
     //
@@ -341,17 +342,13 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         public int lookupContentID { get; set; }
         public string get_lookupContentName(CoreController core) {
-            if ((_lookupContentName == null)&(lookupContentID>0)) {
-                _lookupContentName = MetaController.getContentNameByID(core, lookupContentID);
-                //if (lookupContentID > 0) {
-                //    _lookupContentName = "";
-                //    var content = ContentModel.create(core, lookupContentID);
-                //    if (content != null) _lookupContentName = content.name;
-                //    //DataTable dt = core.db.executeQuery("select name from cccontent where id=" + lookupContentID.ToString());
-                //    //if (dt.Rows.Count > 0) {
-                //    //    _lookupContentName = GenericController.encodeText(dt.Rows[0][0]);
-                //    //}
-                //}
+            if ((_lookupContentName == null)&&(lookupContentID>0)) {
+                if (lookupContentID > 0) {
+                    _lookupContentName = "";
+                    var content = ContentModel.create(core, lookupContentID);
+                    if (content != null) _lookupContentName = content.name;
+                }
+                //_lookupContentName = MetaController.getContentNameByID(core, lookupContentID);
             }
             return _lookupContentName;
         }
@@ -396,7 +393,9 @@ namespace Contensive.Processor.Models.Domain {
         public int memberSelectGroupId_get(CoreController core) {
             if (_memberSelectGroupId == null) {
                 if (_memberSelectGroupName != null) {
-                    _memberSelectGroupId = MetaController.getRecordId( core,"groups", GenericController.encodeText(_memberSelectGroupName));
+                    var group = GroupModel.createByUniqueName(core, _memberSelectGroupName);
+                    _memberSelectGroupId = (group == null) ? 0 : group.id;
+                    //_memberSelectGroupId = MetaController.getRecordId( core,"groups", GenericController.encodeText(_memberSelectGroupName));
                 };
             }
             return (GenericController.encodeInteger(_memberSelectGroupId));

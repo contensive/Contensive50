@@ -533,11 +533,11 @@ namespace Contensive.Addons.Email {
             //string tempGetEmailTemplate = "";
             //try {
             //    if (EmailTemplateID != 0) {
-            //        csXfer.csOpenContentRecord("Email Templates", EmailTemplateID, 0, false, false, "BodyHTML");
-            //        if (csXfer.csOk()) {
-            //            tempGetEmailTemplate = csXfer.csGet("BodyHTML");
+            //        csData.csOpenContentRecord("Email Templates", EmailTemplateID, 0, false, false, "BodyHTML");
+            //        if (csData.csOk()) {
+            //            tempGetEmailTemplate = csData.csGet("BodyHTML");
             //        }
-            //        csXfer.csClose();
+            //        csData.csClose();
             //    }
             //} catch (Exception ex) {
             //    logController.handleException( core,ex);

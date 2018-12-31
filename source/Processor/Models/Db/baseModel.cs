@@ -251,9 +251,9 @@ namespace Contensive.Processor.Models.Db {
         /// <typeparam name="T"></typeparam>
         /// <param name="core"></param>
         /// <returns></returns>
-        public static T addDefault<T>(CoreController core, Domain.MetaModel cdef) where T : BaseModel {
+        public static T addDefault<T>(CoreController core, Domain.MetaModel metaData) where T : BaseModel {
             var callersCacheNameList = new List<string>();
-            return addDefault<T>(core, cdef, ref callersCacheNameList);
+            return addDefault<T>(core, metaData, ref callersCacheNameList);
         }
         //
         //====================================================================================================
@@ -263,7 +263,7 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="core"></param>
         /// <param name="callersCacheNameList"></param>
         /// <returns></returns>
-        public static T addDefault<T>(CoreController core, Domain.MetaModel cdef, ref List<string> callersCacheNameList) where T : BaseModel {
+        public static T addDefault<T>(CoreController core, Domain.MetaModel metaData, ref List<string> callersCacheNameList) where T : BaseModel {
             T result = default(T);
             try {
                 result = addEmpty<T>(core);
@@ -271,8 +271,8 @@ namespace Contensive.Processor.Models.Db {
                     foreach (PropertyInfo modelProperty in result.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
                         string propertyName = modelProperty.Name;
                         string propertyValue = "";
-                        if (cdef.fields.ContainsKey(propertyName.ToLowerInvariant())) {
-                            propertyValue = cdef.fields[propertyName.ToLowerInvariant()].defaultValue;
+                        if (metaData.fields.ContainsKey(propertyName.ToLowerInvariant())) {
+                            propertyValue = metaData.fields[propertyName.ToLowerInvariant()].defaultValue;
                             switch (propertyName.ToLowerInvariant()) {
                                 case "specialcasefield":
                                     break;
@@ -855,17 +855,9 @@ namespace Contensive.Processor.Models.Db {
                         }
                     }
                     if (sqlPairs.count>0) {
-                        if (id == 0) {
-                            //
-                            // -- insert
-                            core.db.insertTableRecord(datasourceName, tableName, sqlPairs, asyncSave);
-                        } else {
-                            //
-                            // -- update
-                            core.db.updateTableRecord(datasourceName, tableName, "(id=" + id.ToString() + ")", sqlPairs, asyncSave);
-                        }
+                        if (id == 0) { id = core.db.insertTableRecordGetId(datasourceName, tableName); }
+                        core.db.updateTableRecord(datasourceName, tableName, "(id=" + id.ToString() + ")", sqlPairs, asyncSave);
                     }
-                    //cs.close(asyncSave);
                     //
                     // -- object is here, but the cache was invalidated, setting
                     string cacheKey = CacheController.createCacheKey_forDbRecord(id, tableName, datasourceName);

@@ -84,7 +84,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override int GetId(string GroupNameIdOrGuid) => MetaController.getRecordId( core,"groups", GroupNameIdOrGuid);
+        public override int GetId(string GroupNameOrGuid) => MetaController.getRecordId_Legacy( core,"groups", GroupNameOrGuid);
         //
         //====================================================================================================
         //

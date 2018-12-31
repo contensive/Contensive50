@@ -76,11 +76,12 @@ namespace Contensive.Addons.AdminSite {
                             string EditorStyleRulesFilename = GenericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", "0", 1, 99, 1);
                             core.privateFiles.deleteFile(EditorStyleRulesFilename);
                             //
-                            using (var csXfer = new CsModel(core)) {
-                                while (csXfer.openSql("select id from cctemplates")) {
-                                    EditorStyleRulesFilename = GenericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", csXfer.getText("ID"), 1, 99, 1);
+                            using (var csData = new CsModel(core)) {
+                                csData.openSql("select id from cctemplates");
+                                while (csData.ok()) {
+                                    EditorStyleRulesFilename = GenericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", csData.getText("ID"), 1, 99, 1);
                                     core.privateFiles.deleteFile(EditorStyleRulesFilename);
-                                    csXfer.goNext();
+                                    csData.goNext();
                                 }
                             }
                         }

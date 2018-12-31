@@ -76,7 +76,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Dictionary of cdef, index by name
         /// </summary>
-        internal Dictionary<string, Models.Domain.MetaModel> cdefDictionary { get; set; }
+        internal Dictionary<string, Models.Domain.MetaModel> metaDataDictionary { get; set; }
         //
         /// <summary>
         /// Dictionary of tableschema, index by name
@@ -436,7 +436,7 @@ namespace Contensive.Processor.Controllers {
             cp_forAddonExecutionOnly = cp;
             LogController.forceNLog( "CoreController constructor-0, enter", LogController.logLevel.Trace);
             //
-            cdefDictionary = new Dictionary<string, Models.Domain.MetaModel>();
+            metaDataDictionary = new Dictionary<string, Models.Domain.MetaModel>();
             tableSchemaDictionary = null;
             //
             // -- create default auth objects for non-user methods, or until auth is available
@@ -459,7 +459,7 @@ namespace Contensive.Processor.Controllers {
             this.cp_forAddonExecutionOnly = cp;
             LogController.forceNLog( "CoreController constructor-1, enter", LogController.logLevel.Trace);
             //
-            cdefDictionary = new Dictionary<string, Models.Domain.MetaModel>();
+            metaDataDictionary = new Dictionary<string, Models.Domain.MetaModel>();
             tableSchemaDictionary = null;
             //
             // -- create default auth objects for non-user methods, or until auth is available
@@ -509,7 +509,7 @@ namespace Contensive.Processor.Controllers {
             cp_forAddonExecutionOnly = cp;
             LogController.forceNLog( "CoreController constructor-2, enter", LogController.logLevel.Trace);
             //
-            cdefDictionary = new Dictionary<string, Models.Domain.MetaModel>();
+            metaDataDictionary = new Dictionary<string, Models.Domain.MetaModel>();
             tableSchemaDictionary = null;
             //
             // -- create default auth objects for non-user methods, or until auth is available
@@ -553,7 +553,7 @@ namespace Contensive.Processor.Controllers {
             this.cp_forAddonExecutionOnly = cp;
             LogController.forceNLog( "CoreController constructor-4, enter", LogController.logLevel.Trace);
             //
-            cdefDictionary = new Dictionary<string, Models.Domain.MetaModel>();
+            metaDataDictionary = new Dictionary<string, Models.Domain.MetaModel>();
             tableSchemaDictionary = null;
             //
             // -- create default auth objects for non-user methods, or until auth is available
@@ -1181,8 +1181,8 @@ namespace Contensive.Processor.Controllers {
         /// Clear all data from the metaData current instance. Next request will load from cache.
         /// </summary>
         public void clearMetaData() {
-            if (cdefDictionary != null) {
-                cdefDictionary.Clear();
+            if (metaDataDictionary != null) {
+                metaDataDictionary.Clear();
             }
             if (tableSchemaDictionary != null) {
                 tableSchemaDictionary.Clear();
@@ -1236,10 +1236,10 @@ namespace Contensive.Processor.Controllers {
                         break;
                     case PersonModel.contentTableName:
                         //
-                        using (var csXfer = new CsModel(this)) {
-                            csXfer.openRecord("people", RecordID, "Name,OrganizationID");
-                            if (csXfer.ok()) {
-                                ActivityLogOrganizationID = csXfer.getInteger("OrganizationID");
+                        using (var csData = new CsModel(this)) {
+                            csData.openRecord("people", RecordID, "Name,OrganizationID");
+                            if (csData.ok()) {
+                                ActivityLogOrganizationID = csData.getInteger("OrganizationID");
                             }
                         }
                         if (IsDelete) {
@@ -1312,16 +1312,16 @@ namespace Contensive.Processor.Controllers {
                         //
                         //hint = hint & ",180"
                         if (siteProperties.getBoolean("ImageAllowSFResize", true) && (!IsDelete)) {
-                            using (var csXfer = new CsModel(this)) {
-                                if (csXfer.openRecord("library files", RecordID)) {
-                                    string Filename = csXfer.getText("filename");
+                            using (var csData = new CsModel(this)) {
+                                if (csData.openRecord("library files", RecordID)) {
+                                    string Filename = csData.getText("filename");
                                     int Pos = Filename.LastIndexOf("/") + 1;
                                     string FilePath = "";
                                     if (Pos > 0) {
                                         FilePath = Filename.Left(Pos);
                                         Filename = Filename.Substring(Pos);
                                     }
-                                    csXfer.set("filesize", appRootFiles.getFileSize(FilePath + Filename));
+                                    csData.set("filesize", appRootFiles.getFileSize(FilePath + Filename));
                                     Pos = Filename.LastIndexOf(".") + 1;
                                     if (Pos > 0) {
                                         string FilenameExt = Filename.Substring(Pos);
@@ -1332,9 +1332,9 @@ namespace Contensive.Processor.Controllers {
                                                 //
                                                 //
                                                 //
-                                                csXfer.set("height", sf.height);
-                                                csXfer.set("width", sf.width);
-                                                string AltSizeList = csXfer.getText("AltSizeList");
+                                                csData.set("height", sf.height);
+                                                csData.set("width", sf.width);
+                                                string AltSizeList = csData.getText("AltSizeList");
                                                 bool RebuildSizes = (string.IsNullOrEmpty(AltSizeList));
                                                 if (RebuildSizes) {
                                                     AltSizeList = "";
@@ -1375,7 +1375,7 @@ namespace Contensive.Processor.Controllers {
                                                         sf.save(FilePath + FilenameNoExt + "-180x" + sf.height + "." + FilenameExt, appRootFiles);
                                                         AltSizeList = AltSizeList + "\r\n80x" + sf.height;
                                                     }
-                                                    csXfer.set("AltSizeList", AltSizeList);
+                                                    csData.set("AltSizeList", AltSizeList);
                                                 }
                                                 sf.Dispose();
                                                 sf = null;
@@ -1394,8 +1394,8 @@ namespace Contensive.Processor.Controllers {
                 //
                 Dictionary<string, string> instanceArguments;
                 bool onChangeAddonsAsync = siteProperties.getBoolean("execute oncontentchange addons async", false);
-                using (var csXfer = new CsModel(this)) {
-                    csXfer.open("Add-on Content Trigger Rules", "ContentID=" + ContentID, "", false, 0, "addonid");
+                using (var csData = new CsModel(this)) {
+                    csData.open("Add-on Content Trigger Rules", "ContentID=" + ContentID, "", false, 0, "addonid");
                     string Option_String = null;
                     if (IsDelete) {
                         instanceArguments = new Dictionary<string, string>() {
@@ -1418,8 +1418,8 @@ namespace Contensive.Processor.Controllers {
                             + "\r\ncontentid=" + ContentID
                             + "\r\nrecordid=" + RecordID + "";
                     }
-                    while (csXfer.ok()) {
-                        int addonId = csXfer.getInteger("Addonid");
+                    while (csData.ok()) {
+                        int addonId = csData.getInteger("Addonid");
                         if (onChangeAddonsAsync) {
                             //
                             // -- execute addon async
@@ -1435,7 +1435,7 @@ namespace Contensive.Processor.Controllers {
                                 personalizationPeopleId = session.user.id
                             });
                         }
-                        csXfer.goNext();
+                        csData.goNext();
                     }
                 }
             } catch (Exception ex) {

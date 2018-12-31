@@ -35,13 +35,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static RemoteQueryModel addDefault(CoreController core, Domain.MetaModel cdef) {
-            return addDefault<RemoteQueryModel>(core, cdef);
+        public static RemoteQueryModel addDefault(CoreController core, Domain.MetaModel metaData) {
+            return addDefault<RemoteQueryModel>(core, metaData);
         }
         //
         //====================================================================================================
-        public static RemoteQueryModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.MetaModel cdef) {
-            return addDefault<RemoteQueryModel>(core, cdef, ref callersCacheNameList);
+        public static RemoteQueryModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.MetaModel metaData) {
+            return addDefault<RemoteQueryModel>(core, metaData, ref callersCacheNameList);
         }
         //
         //====================================================================================================

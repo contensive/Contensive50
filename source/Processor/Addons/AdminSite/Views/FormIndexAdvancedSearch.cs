@@ -188,9 +188,9 @@ namespace Contensive.Addons.AdminSite {
                 //                ReDim Preserve FieldLookupContentName(FieldSize)
                 //                ReDim Preserve FieldLookupList(FieldSize)
                 //            End If
-                //            FieldName = genericController.vbLCase(csXfer.cs_getText(CS, "name"))
+                //            FieldName = genericController.vbLCase(csData.cs_getText(CS, "name"))
                 //            FieldNames(FieldPtr) = FieldName
-                //            FieldCaption(FieldPtr) = csXfer.cs_getText(CS, "Caption")
+                //            FieldCaption(FieldPtr) = csData.cs_getText(CS, "Caption")
                 //            FieldID(FieldPtr) = core.app.cs_getInteger(CS, "ID")
                 //            FieldType(FieldPtr) = core.app.cs_getInteger(CS, "Type")
                 //            If FieldType(FieldPtr) = 7 Then
@@ -198,7 +198,7 @@ namespace Contensive.Addons.AdminSite {
                 //                If ContentID > 0 Then
                 //                    FieldLookupContentName(FieldPtr) = CdefController.getContentNameByID(core,ContentID)
                 //                End If
-                //                FieldLookupList(FieldPtr) = csXfer.cs_getText(CS, "LookupList")
+                //                FieldLookupList(FieldPtr) = csData.cs_getText(CS, "LookupList")
                 //            End If
                 //            '
                 //            ' set prepoplate value from indexconfig

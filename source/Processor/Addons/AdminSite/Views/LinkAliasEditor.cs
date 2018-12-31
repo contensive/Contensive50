@@ -63,12 +63,12 @@ namespace Contensive.Addons.AdminSite {
                     // Table of old Link Aliases
                     //
                     Link = core.doc.main_GetPageDynamicLink(editRecord.id, false);
-                    using (var csXfer = new CsModel(core)) {
-                        csXfer.open("Link Aliases", "pageid=" + editRecord.id, "ID Desc", true, 0, "name");
-                        while (csXfer.ok()) {
-                            LinkList = LinkList + "<div style=\"margin-left:4px;margin-bottom:4px;\">" + HtmlController.encodeHtml(csXfer.getText("name")) + "</div>";
+                    using (var csData = new CsModel(core)) {
+                        csData.open("Link Aliases", "pageid=" + editRecord.id, "ID Desc", true, 0, "name");
+                        while (csData.ok()) {
+                            LinkList = LinkList + "<div style=\"margin-left:4px;margin-bottom:4px;\">" + HtmlController.encodeHtml(csData.getText("name")) + "</div>";
                             LinkCnt = LinkCnt + 1;
-                            csXfer.goNext();
+                            csData.goNext();
                         }
                     }
                     if (LinkCnt > 0) {

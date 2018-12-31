@@ -685,7 +685,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // Is a CM for any content def
                 if ((!_isAuthenticatedContentManagerAnything_loaded) || (_isAuthenticatedContentManagerAnything_userId != user.id)) {
-                    using (var csXfer = new CsModel(core)) {
+                    using (var csData = new CsModel(core)) {
                         string sql = "SELECT ccGroupRules.ContentID"
                             + " FROM ccGroupRules RIGHT JOIN ccMemberRules ON ccGroupRules.GroupID = ccMemberRules.GroupID"
                             + " WHERE ("
@@ -695,7 +695,7 @@ namespace Contensive.Processor.Controllers {
                                 + " AND(ccGroupRules.ContentID Is not Null)"
                                 + " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + DbController.encodeSQLDate(core.doc.profileStartTime) + "))"
                                 + ")";
-                        _isAuthenticatedContentManagerAnything = csXfer.openSql(sql);
+                        _isAuthenticatedContentManagerAnything = csData.openSql(sql);
                     }
                     //
                     _isAuthenticatedContentManagerAnything_userId = user.id;
@@ -796,14 +796,14 @@ namespace Contensive.Processor.Controllers {
                         Criteria = "(username=" + DbController.encodeSQLText(iLoginFieldValue) + ")";
                     }
                     Criteria = Criteria + "and((dateExpires is null)or(dateExpires>" + DbController.encodeSQLDate(DateTime.Now) + "))";
-                    using (var csXfer = new CsModel(core)) {
-                        csXfer.open("People", Criteria, "id",true, user.id, "ID,password,admin,developer", PageSize: 2);
-                        if (!csXfer.ok()) {
+                    using (var csData = new CsModel(core)) {
+                        csData.open("People", Criteria, "id",true, user.id, "ID,password,admin,developer", PageSize: 2);
+                        if (!csData.ok()) {
                             //
                             // ----- loginFieldValue not found, stop here
                             //
                             ErrorController.addUserError(core, badLoginUserError);
-                        } else if ((!GenericController.encodeBoolean(core.siteProperties.getBoolean("AllowDuplicateUsernames", false))) && (csXfer.getRowCount() > 1)) {
+                        } else if ((!GenericController.encodeBoolean(core.siteProperties.getBoolean("AllowDuplicateUsernames", false))) && (csData.getRowCount() > 1)) {
                             //
                             // ----- AllowDuplicates is false, and there are more then one record
                             //
@@ -812,7 +812,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // ----- search all found records for the correct password
                             //
-                            while (csXfer.ok()) {
+                            while (csData.ok()) {
                                 returnUserId = 0;
                                 //
                                 // main_Get Id if password good
@@ -821,10 +821,10 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     // no-password-login -- allowNoPassword + no password given + account has no password + account not admin/dev/cm
                                     //
-                                    recordIsAdmin = csXfer.getBoolean("admin");
-                                    recordIsDeveloper = !csXfer.getBoolean("admin");
-                                    if (allowNoPasswordLogin && (csXfer.getText("password") == "") && (!recordIsAdmin) && (recordIsDeveloper)) {
-                                        returnUserId = csXfer.getInteger("ID");
+                                    recordIsAdmin = csData.getBoolean("admin");
+                                    recordIsDeveloper = !csData.getBoolean("admin");
+                                    if (allowNoPasswordLogin && (csData.getText("password") == "") && (!recordIsAdmin) && (recordIsDeveloper)) {
+                                        returnUserId = csData.getInteger("ID");
                                         //
                                         // verify they are in no content manager groups
                                         //
@@ -845,20 +845,20 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     // password login
                                     //
-                                    if (GenericController.vbLCase(csXfer.getText("password")) == GenericController.vbLCase(iPassword)) {
-                                        returnUserId = csXfer.getInteger("ID");
+                                    if (GenericController.vbLCase(csData.getText("password")) == GenericController.vbLCase(iPassword)) {
+                                        returnUserId = csData.getInteger("ID");
                                     }
                                 }
                                 if (returnUserId != 0) {
                                     break;
                                 }
-                                csXfer.goNext();
+                                csData.goNext();
                             }
                             if (returnUserId == 0) {
                                 ErrorController.addUserError(core, badLoginUserError);
                             }
                         }
-                        csXfer.close();
+                        csData.close();
                     }
                 }
             } catch (Exception ex) {
@@ -901,8 +901,8 @@ namespace Contensive.Processor.Controllers {
                     //        errorCode = 2
                     //        errorMessage = "You currently have cookie support disabled in your browser. Without cookies, your browser can not support the level of security required to login."
                 } else {
-                    using (var csXfer = new CsModel(core)) {
-                        if (csXfer.open("People", "username=" + DbController.encodeSQLText(Username), "id", false, 2, "ID")) {
+                    using (var csData = new CsModel(core)) {
+                        if (csData.open("People", "username=" + DbController.encodeSQLText(Username), "id", false, 2, "ID")) {
                             //
                             // ----- username was found, stop here
                             returnErrorCode = 3;

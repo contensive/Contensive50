@@ -98,13 +98,13 @@ namespace Contensive.Processor.Controllers {
                         } else {
                             //
                             int CollectionFileCnt = 0;
-                            foreach (XmlNode CDefSection in Doc.DocumentElement.ChildNodes) {
+                            foreach (XmlNode metaDataSection in Doc.DocumentElement.ChildNodes) {
                                 string ResourceFilename = null;
                                 string ResourceLink = null;
                                 string CollectionVersion = null;
                                 string CollectionFileLink = null;
                                 string Collectionname = null;
-                                switch (GenericController.vbLCase(CDefSection.Name)) {
+                                switch (GenericController.vbLCase(metaDataSection.Name)) {
                                     case "collection":
                                         //
                                         // Read in the interfaces and save to Add-ons
@@ -114,29 +114,29 @@ namespace Contensive.Processor.Controllers {
                                         CollectionGuid = "";
                                         CollectionVersion = "";
                                         CollectionFileLink = "";
-                                        foreach (XmlNode CDefInterfaces in CDefSection.ChildNodes) {
+                                        foreach (XmlNode metaDataInterfaces in metaDataSection.ChildNodes) {
                                             int Pos = 0;
                                             string UserError = null;
-                                            switch (GenericController.vbLCase(CDefInterfaces.Name)) {
+                                            switch (GenericController.vbLCase(metaDataInterfaces.Name)) {
                                                 case "name":
-                                                    Collectionname = CDefInterfaces.InnerText;
+                                                    Collectionname = metaDataInterfaces.InnerText;
                                                     break;
                                                 case "help":
-                                                    if (!string.IsNullOrWhiteSpace(CDefInterfaces.InnerText)) {
-                                                        core.privateFiles.saveFile(workingPath + "Collection.hlp", CDefInterfaces.InnerText);
+                                                    if (!string.IsNullOrWhiteSpace(metaDataInterfaces.InnerText)) {
+                                                        core.privateFiles.saveFile(workingPath + "Collection.hlp", metaDataInterfaces.InnerText);
                                                     }
                                                     break;
                                                 case "guid":
-                                                    CollectionGuid = CDefInterfaces.InnerText;
+                                                    CollectionGuid = metaDataInterfaces.InnerText;
                                                     break;
                                                 case "lastchangedate":
-                                                    return_CollectionLastChangeDate = GenericController.encodeDate(CDefInterfaces.InnerText);
+                                                    return_CollectionLastChangeDate = GenericController.encodeDate(metaDataInterfaces.InnerText);
                                                     break;
                                                 case "version":
-                                                    CollectionVersion = CDefInterfaces.InnerText;
+                                                    CollectionVersion = metaDataInterfaces.InnerText;
                                                     break;
                                                 case "collectionfilelink":
-                                                    CollectionFileLink = CDefInterfaces.InnerText;
+                                                    CollectionFileLink = metaDataInterfaces.InnerText;
                                                     CollectionFileCnt = CollectionFileCnt + 1;
                                                     if (!string.IsNullOrEmpty(CollectionFileLink)) {
                                                         Pos = CollectionFileLink.LastIndexOf("/") + 1;
@@ -156,7 +156,7 @@ namespace Contensive.Processor.Controllers {
                                                     // save the filenames and download them only if OKtoinstall
                                                     ResourceFilename = "";
                                                     ResourceLink = "";
-                                                    foreach (XmlNode ActiveXNode in CDefInterfaces.ChildNodes) {
+                                                    foreach (XmlNode ActiveXNode in metaDataInterfaces.ChildNodes) {
                                                         switch (GenericController.vbLCase(ActiveXNode.Name)) {
                                                             case "filename":
                                                                 ResourceFilename = ActiveXNode.InnerText;
@@ -662,18 +662,18 @@ namespace Contensive.Processor.Controllers {
                                             // Install activeX and search for importcollections
                                             //
                                             //hint = hint & ",500"
-                                            foreach (XmlNode CDefSection in CollectionFile.DocumentElement.ChildNodes) {
+                                            foreach (XmlNode metaDataSection in CollectionFile.DocumentElement.ChildNodes) {
                                                 string ChildCollectionGUID = null;
                                                 string ChildCollectionName = null;
                                                 bool Found = false;
-                                                switch (GenericController.vbLCase(CDefSection.Name)) {
+                                                switch (GenericController.vbLCase(metaDataSection.Name)) {
                                                     case "resource":
                                                         //
                                                         // resource node, if executable node, save to RegisterList
                                                         //
                                                         //hint = hint & ",510"
-                                                        //ResourceType = genericController.vbLCase(xmlController.GetXMLAttribute(core, IsFound, CDefSection, "type", ""))
-                                                        //Dim resourceFilename As String = Trim(xmlController.GetXMLAttribute(core, IsFound, CDefSection, "name", ""))
+                                                        //ResourceType = genericController.vbLCase(xmlController.GetXMLAttribute(core, IsFound, metadataSection, "type", ""))
+                                                        //Dim resourceFilename As String = Trim(xmlController.GetXMLAttribute(core, IsFound, metadataSection, "name", ""))
                                                         //Dim resourcePathFilename As String = CollectionVersionPath & resourceFilename
                                                         //If resourceFilename = "" Then
                                                         //    '
@@ -711,30 +711,14 @@ namespace Contensive.Processor.Controllers {
                                                         //    End Select
                                                         //End If
                                                         break;
-                                                    case "interfaces":
-                                                        //
-                                                        // Compatibility only - this is deprecated - Install ActiveX found in Add-ons
-                                                        //
-                                                        //hint = hint & ",530"
-                                                        //For Each CDefInterfaces In CDefSection.ChildNodes
-                                                        //    AOName =xmlController.GetXMLAttribute(core, IsFound, CDefInterfaces, "name", "No Name")
-                                                        //    If AOName = "" Then
-                                                        //        AOName = "No Name"
-                                                        //    End If
-                                                        //    AOGuid =xmlController.GetXMLAttribute(core, IsFound, CDefInterfaces, "guid", AOName)
-                                                        //    If AOGuid = "" Then
-                                                        //        AOGuid = AOName
-                                                        //    End If
-                                                        //Next
-                                                        break;
                                                     case "getcollection":
                                                     case "importcollection":
                                                         //
                                                         // -- Download Collection file into install folder
-                                                        ChildCollectionName = XmlController.GetXMLAttribute(core, Found, CDefSection, "name", "");
-                                                        ChildCollectionGUID = XmlController.GetXMLAttribute(core, Found, CDefSection, "guid", CDefSection.InnerText);
+                                                        ChildCollectionName = XmlController.GetXMLAttribute(core, Found, metaDataSection, "name", "");
+                                                        ChildCollectionGUID = XmlController.GetXMLAttribute(core, Found, metaDataSection, "guid", metaDataSection.InnerText);
                                                         if (string.IsNullOrEmpty(ChildCollectionGUID)) {
-                                                            ChildCollectionGUID = CDefSection.InnerText;
+                                                            ChildCollectionGUID = metaDataSection.InnerText;
                                                         }
                                                         string statusMsg = "Installing collection [" + ChildCollectionName + ", " + ChildCollectionGUID + "] referenced from collection [" + Collectionname + "]";
                                                         LogController.logInfo(core, "BuildLocalCollectionFolder, getCollection or importcollection, childCollectionName [" + ChildCollectionName + "], childCollectionGuid [" + ChildCollectionGUID + "]");
@@ -864,7 +848,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Upgrade Application from a local collection
         /// </summary>
-        public static bool installCollectionFromLocalRepo(CoreController core, string CollectionGuid, string ignore_BuildVersion, ref string return_ErrorMessage, string ImportFromCollectionsGuidList, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> blockCollectionList, bool includeBaseCDefInstall) {
+        public static bool installCollectionFromLocalRepo(CoreController core, string CollectionGuid, string ignore_BuildVersion, ref string return_ErrorMessage, string ImportFromCollectionsGuidList, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> blockCollectionList, bool includeBaseMetaDataInstall) {
             bool result = false;
             try {
                 //
@@ -973,15 +957,15 @@ namespace Contensive.Processor.Controllers {
                                                 string wwwFileList = "";
                                                 string ContentFileList = "";
                                                 string ExecFileList = "";
-                                                foreach (XmlNode CDefSection in Doc.DocumentElement.ChildNodes) {
-                                                    switch (CDefSection.Name.ToLowerInvariant()) {
+                                                foreach (XmlNode MetaDataSection in Doc.DocumentElement.ChildNodes) {
+                                                    switch (MetaDataSection.Name.ToLowerInvariant()) {
                                                         case "resource": {
                                                                 //
                                                                 // set wwwfilelist, contentfilelist, execfilelist
                                                                 //
-                                                                string resourceType = XmlController.GetXMLAttribute(core, IsFound, CDefSection, "type", "");
-                                                                string resourcePath = XmlController.GetXMLAttribute(core, IsFound, CDefSection, "path", "");
-                                                                string filename = XmlController.GetXMLAttribute(core, IsFound, CDefSection, "name", "");
+                                                                string resourceType = XmlController.GetXMLAttribute(core, IsFound, MetaDataSection, "type", "");
+                                                                string resourcePath = XmlController.GetXMLAttribute(core, IsFound, MetaDataSection, "path", "");
+                                                                string filename = XmlController.GetXMLAttribute(core, IsFound, MetaDataSection, "name", "");
                                                                 //
                                                                 LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], resource found, name [" + filename + "], type [" + resourceType + "], path [" + resourcePath + "]");
                                                                 //
@@ -1048,10 +1032,10 @@ namespace Contensive.Processor.Controllers {
                                                                 // Get path to this collection and call into it
                                                                 //
                                                                 bool Found = false;
-                                                                string ChildCollectionName = XmlController.GetXMLAttribute(core, Found, CDefSection, "name", "");
-                                                                string ChildCollectionGUID = XmlController.GetXMLAttribute(core, Found, CDefSection, "guid", CDefSection.InnerText);
+                                                                string ChildCollectionName = XmlController.GetXMLAttribute(core, Found, MetaDataSection, "name", "");
+                                                                string ChildCollectionGUID = XmlController.GetXMLAttribute(core, Found, MetaDataSection, "guid", MetaDataSection.InnerText);
                                                                 if (string.IsNullOrEmpty(ChildCollectionGUID)) {
-                                                                    ChildCollectionGUID = CDefSection.InnerText;
+                                                                    ChildCollectionGUID = MetaDataSection.InnerText;
                                                                 }
                                                                 if ((ImportFromCollectionsGuidList + "," + CollectionGuid).IndexOf(ChildCollectionGUID, System.StringComparison.OrdinalIgnoreCase) != -1) {
                                                                     //
@@ -1142,11 +1126,11 @@ namespace Contensive.Processor.Controllers {
                                                     //
                                                     {
                                                         string CollectionHelpLink = "";
-                                                        foreach (XmlNode CDefSection in Doc.DocumentElement.ChildNodes) {
-                                                            if (CDefSection.Name.ToLowerInvariant() == "helplink") {
+                                                        foreach (XmlNode metaDataSection in Doc.DocumentElement.ChildNodes) {
+                                                            if (metaDataSection.Name.ToLowerInvariant() == "helplink") {
                                                                 //
                                                                 // only save the first
-                                                                CollectionHelpLink = CDefSection.InnerText;
+                                                                CollectionHelpLink = metaDataSection.InnerText;
                                                                 break;
                                                             }
                                                         }
@@ -1184,20 +1168,20 @@ namespace Contensive.Processor.Controllers {
                                                     }
                                                     //
                                                     //-------------------------------------------------------------------------------
-                                                    LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], stage-4, isolate and process schema-relatednodes (cdef,index,etc)");
+                                                    LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], stage-4, isolate and process schema-relatednodes (metadata,index,etc)");
                                                     //-------------------------------------------------------------------------------
                                                     //
                                                     bool isBaseCollection = (baseCollectionGuid.ToLowerInvariant() == CollectionGuid.ToLowerInvariant());
-                                                    if (!isBaseCollection || includeBaseCDefInstall) {
-                                                        string CDefMiniCollection = "";
-                                                        foreach (XmlNode CDefSection in Doc.DocumentElement.ChildNodes) {
-                                                            switch (GenericController.vbLCase(CDefSection.Name)) {
+                                                    if (!isBaseCollection || includeBaseMetaDataInstall) {
+                                                        string metaDataMiniCollection = "";
+                                                        foreach (XmlNode metaDataSection in Doc.DocumentElement.ChildNodes) {
+                                                            switch (GenericController.vbLCase(metaDataSection.Name)) {
                                                                 case "contensivecdef":
                                                                     //
-                                                                    // old cdef xection -- take the inner
+                                                                    // old metadata section -- take the inner
                                                                     //
-                                                                    foreach (XmlNode ChildNode in CDefSection.ChildNodes) {
-                                                                        CDefMiniCollection += "\r\n" + ChildNode.OuterXml;
+                                                                    foreach (XmlNode ChildNode in metaDataSection.ChildNodes) {
+                                                                        metaDataMiniCollection += "\r\n" + ChildNode.OuterXml;
                                                                     }
                                                                     break;
                                                                 case "cdef":
@@ -1210,47 +1194,47 @@ namespace Contensive.Processor.Controllers {
                                                                 case "navigatorentry":
                                                                     //
                                                                     // handled by Upgrade class
-                                                                    CDefMiniCollection += CDefSection.OuterXml;
+                                                                    metaDataMiniCollection += metaDataSection.OuterXml;
                                                                     break;
                                                             }
                                                         }
                                                         //
-                                                        // -- install CdefMiniCollection
-                                                        if (!string.IsNullOrEmpty(CDefMiniCollection)) {
+                                                        // -- install metadataMiniCollection
+                                                        if (!string.IsNullOrEmpty(metaDataMiniCollection)) {
                                                             //
                                                             // -- Use the upgrade code to import this part
-                                                            CDefMiniCollection = "<" + CollectionFileRootNode + ">" + CDefMiniCollection + "</" + CollectionFileRootNode + ">";
-                                                            CDefMiniCollectionModel.installCDefMiniCollectionFromXml(false, core, CDefMiniCollection, IsNewBuild, repair, isBaseCollection, ref nonCriticalErrorList, logPrefix, ref blockCollectionList);
+                                                            metaDataMiniCollection = "<" + CollectionFileRootNode + ">" + metaDataMiniCollection + "</" + CollectionFileRootNode + ">";
+                                                            MetaDataMiniCollectionModel.installMetaDataMiniCollectionFromXml(false, core, metaDataMiniCollection, IsNewBuild, repair, isBaseCollection, ref nonCriticalErrorList, logPrefix, ref blockCollectionList);
                                                             //
                                                             // -- Process nodes to save Collection data
                                                             XmlDocument NavDoc = new XmlDocument();
                                                             loadOK = true;
                                                             try {
-                                                                NavDoc.LoadXml(CDefMiniCollection);
+                                                                NavDoc.LoadXml(metaDataMiniCollection);
                                                             } catch (Exception) {
                                                                 //
                                                                 // error - Need a way to reach the user that submitted the file
                                                                 //
-                                                                LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], creating navigator entries, there was an error parsing the portion of the collection that contains cdef. Navigator entry creation was aborted. [There was an error reading the Meta data file.]");
+                                                                LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], creating navigator entries, there was an error parsing the portion of the collection that contains metadata. Navigator entry creation was aborted. [There was an error reading the Meta data file.]");
                                                                 result = false;
                                                                 return_ErrorMessage = return_ErrorMessage + "<P>The collection was not installed because the xml collection file has an error.</P>";
                                                                 loadOK = false;
                                                             }
                                                             if (loadOK) {
-                                                                foreach (XmlNode CDefNode in NavDoc.DocumentElement.ChildNodes) {
-                                                                    switch (GenericController.vbLCase(CDefNode.Name)) {
+                                                                foreach (XmlNode metaDataNode in NavDoc.DocumentElement.ChildNodes) {
+                                                                    switch (GenericController.vbLCase(metaDataNode.Name)) {
                                                                         case "cdef":
-                                                                            string ContentName = XmlController.GetXMLAttribute(core, IsFound, CDefNode, "name", "");
+                                                                            string ContentName = XmlController.GetXMLAttribute(core, IsFound, metaDataNode, "name", "");
                                                                             //
-                                                                            // setup cdef rule
+                                                                            // setup metadata rule
                                                                             //
                                                                             int ContentID = MetaModel.getContentId(core, ContentName);
                                                                             if (ContentID > 0) {
-                                                                                using (var csXfer = new CsModel(core)) {
-                                                                                    csXfer.insert("Add-on Collection CDef Rules");
-                                                                                    if (csXfer.ok()) {
-                                                                                        csXfer.set("Contentid", ContentID);
-                                                                                        csXfer.set("CollectionID", collection.id);
+                                                                                using (var csData = new CsModel(core)) {
+                                                                                    csData.insert("Add-on Collection CDef Rules");
+                                                                                    if (csData.ok()) {
+                                                                                        csData.set("Contentid", ContentID);
+                                                                                        csData.set("CollectionID", collection.id);
                                                                                     }
                                                                                 }
                                                                             }
@@ -1266,14 +1250,14 @@ namespace Contensive.Processor.Controllers {
                                                     //-------------------------------------------------------------------------------
                                                     //
                                                     {
-                                                        foreach (XmlNode CDefSection in Doc.DocumentElement.ChildNodes) {
-                                                            switch (GenericController.vbLCase(CDefSection.Name)) {
+                                                        foreach (XmlNode metaDataSection in Doc.DocumentElement.ChildNodes) {
+                                                            switch (GenericController.vbLCase(metaDataSection.Name)) {
                                                                 case "data": {
                                                                         //
                                                                         // import content
                                                                         //   This can only be done with matching guid
                                                                         //
-                                                                        foreach (XmlNode ContentNode in CDefSection.ChildNodes) {
+                                                                        foreach (XmlNode ContentNode in metaDataSection.ChildNodes) {
                                                                             if (GenericController.vbLCase(ContentNode.Name) == "record") {
                                                                                 //
                                                                                 // Data.Record node
@@ -1294,23 +1278,23 @@ namespace Contensive.Processor.Controllers {
                                                                                         //
                                                                                         // create or update the record
                                                                                         //
-                                                                                        MetaModel CDef = Models.Domain.MetaModel.createByUniqueName(core, ContentName);
-                                                                                        using (var csXfer = new CsModel(core)) {
+                                                                                        MetaModel metaData = Models.Domain.MetaModel.createByUniqueName(core, ContentName);
+                                                                                        using (var csData = new CsModel(core)) {
                                                                                             if (!string.IsNullOrEmpty(ContentRecordGuid)) {
-                                                                                                csXfer.open(ContentName, "ccguid=" + DbController.encodeSQLText(ContentRecordGuid));
+                                                                                                csData.open(ContentName, "ccguid=" + DbController.encodeSQLText(ContentRecordGuid));
                                                                                             } else {
-                                                                                                csXfer.open(ContentName, "name=" + DbController.encodeSQLText(ContentRecordName));
+                                                                                                csData.open(ContentName, "name=" + DbController.encodeSQLText(ContentRecordName));
                                                                                             }
                                                                                             bool recordfound = true;
-                                                                                            if (!csXfer.ok()) {
+                                                                                            if (!csData.ok()) {
                                                                                                 //
                                                                                                 // Insert the new record
                                                                                                 //
                                                                                                 recordfound = false;
-                                                                                                csXfer.close();
-                                                                                                csXfer.insert(ContentName);
+                                                                                                csData.close();
+                                                                                                csData.insert(ContentName);
                                                                                             }
-                                                                                            if (csXfer.ok()) {
+                                                                                            if (csData.ok()) {
                                                                                                 //
                                                                                                 // Update the record
                                                                                                 //
@@ -1318,7 +1302,7 @@ namespace Contensive.Processor.Controllers {
                                                                                                     //
                                                                                                     // found by guid, use guid in list and save name
                                                                                                     //
-                                                                                                    csXfer.set("name", ContentRecordName);
+                                                                                                    csData.set("name", ContentRecordName);
                                                                                                     DataRecordList = DataRecordList + "\r\n" + ContentName + "," + ContentRecordGuid;
                                                                                                 } else if (recordfound) {
                                                                                                     //
@@ -1329,8 +1313,8 @@ namespace Contensive.Processor.Controllers {
                                                                                                     //
                                                                                                     // record was created
                                                                                                     //
-                                                                                                    csXfer.set("ccguid", ContentRecordGuid);
-                                                                                                    csXfer.set("name", ContentRecordName);
+                                                                                                    csData.set("ccguid", ContentRecordGuid);
+                                                                                                    csData.set("name", ContentRecordName);
                                                                                                     DataRecordList = DataRecordList + "\r\n" + ContentName + "," + ContentRecordGuid;
                                                                                                 }
                                                                                             }
@@ -1349,8 +1333,8 @@ namespace Contensive.Processor.Controllers {
                                                     LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], stage-6, install addon nodes, set importcollection relationships");
                                                     //-------------------------------------------------------------------------------
                                                     //
-                                                    foreach (XmlNode CDefSection in Doc.DocumentElement.ChildNodes) {
-                                                        switch (GenericController.vbLCase(CDefSection.Name)) {
+                                                    foreach (XmlNode metaDataSection in Doc.DocumentElement.ChildNodes) {
+                                                        switch (GenericController.vbLCase(metaDataSection.Name)) {
                                                             case "cdef":
                                                             case "data":
                                                             case "help":
@@ -1364,26 +1348,26 @@ namespace Contensive.Processor.Controllers {
                                                                 //
                                                                 // processed, but add rule for collection record
                                                                 bool Found = false;
-                                                                string ChildCollectionName =XmlController.GetXMLAttribute(core, Found, CDefSection, "name", "");
-                                                                string ChildCollectionGUID =XmlController.GetXMLAttribute(core, Found, CDefSection, "guid", CDefSection.InnerText);
+                                                                string ChildCollectionName =XmlController.GetXMLAttribute(core, Found, metaDataSection, "name", "");
+                                                                string ChildCollectionGUID =XmlController.GetXMLAttribute(core, Found, metaDataSection, "guid", metaDataSection.InnerText);
                                                                 if (string.IsNullOrEmpty(ChildCollectionGUID)) {
-                                                                    ChildCollectionGUID = CDefSection.InnerText;
+                                                                    ChildCollectionGUID = metaDataSection.InnerText;
                                                                 }
                                                                 if (!string.IsNullOrEmpty(ChildCollectionGUID)) {
                                                                     int ChildCollectionID = 0;
-                                                                    using (var csXfer = new CsModel(core)) {
-                                                                        csXfer.open("Add-on Collections", "ccguid=" + DbController.encodeSQLText(ChildCollectionGUID));
-                                                                        if (csXfer.ok()) {
-                                                                            ChildCollectionID = csXfer.getInteger("id");
+                                                                    using (var csData = new CsModel(core)) {
+                                                                        csData.open("Add-on Collections", "ccguid=" + DbController.encodeSQLText(ChildCollectionGUID));
+                                                                        if (csData.ok()) {
+                                                                            ChildCollectionID = csData.getInteger("id");
                                                                         }
-                                                                        csXfer.close();
+                                                                        csData.close();
                                                                         if (ChildCollectionID != 0) {
-                                                                            csXfer.insert("Add-on Collection Parent Rules");
-                                                                            if (csXfer.ok()) {
-                                                                                csXfer.set("ParentID", collection.id);
-                                                                                csXfer.set("ChildID", ChildCollectionID);
+                                                                            csData.insert("Add-on Collection Parent Rules");
+                                                                            if (csData.ok()) {
+                                                                                csData.set("ParentID", collection.id);
+                                                                                csData.set("ChildID", ChildCollectionID);
                                                                             }
-                                                                            csXfer.close();
+                                                                            csData.close();
                                                                         }
                                                                     }
                                                                 }
@@ -1396,18 +1380,18 @@ namespace Contensive.Processor.Controllers {
                                                                 //    ' Scripting modules
                                                                 //    '
                                                                 //    ScriptingModuleID = 0
-                                                                //    ScriptingName =xmlController.GetXMLAttribute(core,IsFound, CDefSection, "name", "No Name")
+                                                                //    ScriptingName =xmlController.GetXMLAttribute(core,IsFound, metadataSection, "name", "No Name")
                                                                 //    If ScriptingName = "" Then
                                                                 //        ScriptingName = "No Name"
                                                                 //    End If
-                                                                //    ScriptingGuid =xmlController.GetXMLAttribute(core,IsFound, CDefSection, "guid", AOName)
+                                                                //    ScriptingGuid =xmlController.GetXMLAttribute(core,IsFound, metadataSection, "guid", AOName)
                                                                 //    If ScriptingGuid = "" Then
                                                                 //        ScriptingGuid = ScriptingName
                                                                 //    End If
                                                                 //    Criteria = "(ccguid=" & DbController.encodeSQLText(ScriptingGuid) & ")"
                                                                 //    ScriptingModuleID = 0
-                                                                //    csXfer.cs_open("Scripting Modules", Criteria)
-                                                                //    If csXfer.cs_ok(CS) Then
+                                                                //    csData.cs_open("Scripting Modules", Criteria)
+                                                                //    If csData.cs_ok(CS) Then
                                                                 //        '
                                                                 //        ' Update the Addon
                                                                 //        '
@@ -1416,45 +1400,45 @@ namespace Contensive.Processor.Controllers {
                                                                 //        '
                                                                 //        ' not found by GUID - search name against name to update legacy Add-ons
                                                                 //        '
-                                                                //        Call csXfer.cs_Close(CS)
+                                                                //        Call csData.cs_Close(CS)
                                                                 //        Criteria = "(name=" & DbController.encodeSQLText(ScriptingName) & ")and(ccguid is null)"
-                                                                //        csXfer.cs_open("Scripting Modules", Criteria)
-                                                                //        If csXfer.cs_ok(CS) Then
+                                                                //        csData.cs_open("Scripting Modules", Criteria)
+                                                                //        If csData.cs_ok(CS) Then
                                                                 //            Call logcontroller.appendInstallLog(core, "UpgradeAppFromLocalCollection, Scripting Module matched an existing Module that has no GUID, Updating to [" & ScriptingName & "], Guid [" & ScriptingGuid & "]")
                                                                 //        End If
                                                                 //    End If
-                                                                //    If Not csXfer.cs_ok(CS) Then
+                                                                //    If Not csData.cs_ok(CS) Then
                                                                 //        '
                                                                 //        ' not found by GUID or by name, Insert a new
                                                                 //        '
-                                                                //        Call csXfer.cs_Close(CS)
-                                                                //        csXfer.cs_insertRecord("Scripting Modules", 0)
-                                                                //        If csXfer.cs_ok(CS) Then
+                                                                //        Call csData.cs_Close(CS)
+                                                                //        csData.cs_insertRecord("Scripting Modules", 0)
+                                                                //        If csData.cs_ok(CS) Then
                                                                 //            Call logcontroller.appendInstallLog(core, "UpgradeAppFromLocalCollection, Creating new Scripting Module [" & ScriptingName & "], Guid [" & ScriptingGuid & "]")
                                                                 //        End If
                                                                 //    End If
-                                                                //    If Not csXfer.cs_ok(CS) Then
+                                                                //    If Not csData.cs_ok(CS) Then
                                                                 //        '
                                                                 //        ' Could not create new
                                                                 //        '
                                                                 //        Call logcontroller.appendInstallLog(core, "UpgradeAppFromLocalCollection, Scripting Module could not be created, skipping Scripting Module [" & ScriptingName & "], Guid [" & ScriptingGuid & "]")
                                                                 //    Else
-                                                                //        ScriptingModuleID = csXfer.cs_getInteger("ID")
-                                                                //        Call csXfer.cs_set("code", CDefSection.InnerText)
-                                                                //        Call csXfer.cs_set("name", ScriptingName)
-                                                                //        Call csXfer.cs_set("ccguid", ScriptingGuid)
+                                                                //        ScriptingModuleID = csData.cs_getInteger("ID")
+                                                                //        Call csData.cs_set("code", metadataSection.InnerText)
+                                                                //        Call csData.cs_set("name", ScriptingName)
+                                                                //        Call csData.cs_set("ccguid", ScriptingGuid)
                                                                 //    End If
-                                                                //    Call csXfer.cs_Close(CS)
+                                                                //    Call csData.cs_Close(CS)
                                                                 //    If ScriptingModuleID <> 0 Then
                                                                 //        '
                                                                 //        ' Add Add-on Collection Module Rule
                                                                 //        '
-                                                                //        csXfer.cs_insertRecord("Add-on Collection Module Rules", 0)
-                                                                //        If csXfer.cs_ok(CS) Then
-                                                                //            Call csXfer.cs_set("Collectionid", CollectionID)
-                                                                //            Call csXfer.cs_set("ScriptingModuleID", ScriptingModuleID)
+                                                                //        csData.cs_insertRecord("Add-on Collection Module Rules", 0)
+                                                                //        If csData.cs_ok(CS) Then
+                                                                //            Call csData.cs_set("Collectionid", CollectionID)
+                                                                //            Call csData.cs_set("ScriptingModuleID", ScriptingModuleID)
                                                                 //        End If
-                                                                //        Call csXfer.cs_Close(CS)
+                                                                //        Call csData.cs_Close(CS)
                                                                 //    End If
                                                                 break;
                                                             case "sharedstyle":
@@ -1466,18 +1450,18 @@ namespace Contensive.Processor.Controllers {
                                                                 //    ' Shared Style
                                                                 //    '
                                                                 //    sharedStyleId = 0
-                                                                //    NodeName =xmlController.GetXMLAttribute(core,IsFound, CDefSection, "name", "No Name")
+                                                                //    NodeName =xmlController.GetXMLAttribute(core,IsFound, metadataSection, "name", "No Name")
                                                                 //    If NodeName = "" Then
                                                                 //        NodeName = "No Name"
                                                                 //    End If
-                                                                //    nodeGuid =xmlController.GetXMLAttribute(core,IsFound, CDefSection, "guid", AOName)
+                                                                //    nodeGuid =xmlController.GetXMLAttribute(core,IsFound, metadataSection, "guid", AOName)
                                                                 //    If nodeGuid = "" Then
                                                                 //        nodeGuid = NodeName
                                                                 //    End If
                                                                 //    Criteria = "(ccguid=" & DbController.encodeSQLText(nodeGuid) & ")"
                                                                 //    ScriptingModuleID = 0
-                                                                //    csXfer.cs_open("Shared Styles", Criteria)
-                                                                //    If csXfer.cs_ok(CS) Then
+                                                                //    csData.cs_open("Shared Styles", Criteria)
+                                                                //    If csData.cs_ok(CS) Then
                                                                 //        '
                                                                 //        ' Update the Addon
                                                                 //        '
@@ -1486,40 +1470,40 @@ namespace Contensive.Processor.Controllers {
                                                                 //        '
                                                                 //        ' not found by GUID - search name against name to update legacy Add-ons
                                                                 //        '
-                                                                //        Call csXfer.cs_Close(CS)
+                                                                //        Call csData.cs_Close(CS)
                                                                 //        Criteria = "(name=" & DbController.encodeSQLText(NodeName) & ")and(ccguid is null)"
-                                                                //        csXfer.cs_open("shared styles", Criteria)
-                                                                //        If csXfer.cs_ok(CS) Then
+                                                                //        csData.cs_open("shared styles", Criteria)
+                                                                //        If csData.cs_ok(CS) Then
                                                                 //            Call logcontroller.appendInstallLog(core, "UpgradeAppFromLocalCollection, shared style matched an existing Module that has no GUID, Updating to [" & NodeName & "], Guid [" & nodeGuid & "]")
                                                                 //        End If
                                                                 //    End If
-                                                                //    If Not csXfer.cs_ok(CS) Then
+                                                                //    If Not csData.cs_ok(CS) Then
                                                                 //        '
                                                                 //        ' not found by GUID or by name, Insert a new
                                                                 //        '
-                                                                //        Call csXfer.cs_Close(CS)
-                                                                //        csXfer.cs_insertRecord("shared styles", 0)
-                                                                //        If csXfer.cs_ok(CS) Then
+                                                                //        Call csData.cs_Close(CS)
+                                                                //        csData.cs_insertRecord("shared styles", 0)
+                                                                //        If csData.cs_ok(CS) Then
                                                                 //            Call logcontroller.appendInstallLog(core, "UpgradeAppFromLocalCollection, Creating new shared style [" & NodeName & "], Guid [" & nodeGuid & "]")
                                                                 //        End If
                                                                 //    End If
-                                                                //    If Not csXfer.cs_ok(CS) Then
+                                                                //    If Not csData.cs_ok(CS) Then
                                                                 //        '
                                                                 //        ' Could not create new
                                                                 //        '
                                                                 //        Call logcontroller.appendInstallLog(core, "UpgradeAppFromLocalCollection, shared style could not be created, skipping shared style [" & NodeName & "], Guid [" & nodeGuid & "]")
                                                                 //    Else
-                                                                //        sharedStyleId = csXfer.cs_getInteger("ID")
-                                                                //        Call csXfer.cs_set("StyleFilename", CDefSection.InnerText)
-                                                                //        Call csXfer.cs_set("name", NodeName)
-                                                                //        Call csXfer.cs_set("ccguid", nodeGuid)
-                                                                //        Call csXfer.cs_set("alwaysInclude",xmlController.GetXMLAttribute(core,IsFound, CDefSection, "alwaysinclude", "0"))
-                                                                //        Call csXfer.cs_set("prefix",xmlController.GetXMLAttribute(core,IsFound, CDefSection, "prefix", ""))
-                                                                //        Call csXfer.cs_set("suffix",xmlController.GetXMLAttribute(core,IsFound, CDefSection, "suffix", ""))
-                                                                //        Call csXfer.cs_set("suffix",xmlController.GetXMLAttribute(core,IsFound, CDefSection, "suffix", ""))
-                                                                //        Call csXfer.cs_set("sortOrder",xmlController.GetXMLAttribute(core,IsFound, CDefSection, "sortOrder", ""))
+                                                                //        sharedStyleId = csData.cs_getInteger("ID")
+                                                                //        Call csData.cs_set("StyleFilename", metadataSection.InnerText)
+                                                                //        Call csData.cs_set("name", NodeName)
+                                                                //        Call csData.cs_set("ccguid", nodeGuid)
+                                                                //        Call csData.cs_set("alwaysInclude",xmlController.GetXMLAttribute(core,IsFound, metadataSection, "alwaysinclude", "0"))
+                                                                //        Call csData.cs_set("prefix",xmlController.GetXMLAttribute(core,IsFound, metadataSection, "prefix", ""))
+                                                                //        Call csData.cs_set("suffix",xmlController.GetXMLAttribute(core,IsFound, metadataSection, "suffix", ""))
+                                                                //        Call csData.cs_set("suffix",xmlController.GetXMLAttribute(core,IsFound, metadataSection, "suffix", ""))
+                                                                //        Call csData.cs_set("sortOrder",xmlController.GetXMLAttribute(core,IsFound, metadataSection, "sortOrder", ""))
                                                                 //    End If
-                                                                //    Call csXfer.cs_Close(CS)
+                                                                //    Call csData.cs_Close(CS)
                                                                 break;
                                                             case "addon":
                                                             case "add-on":
@@ -1527,7 +1511,7 @@ namespace Contensive.Processor.Controllers {
                                                                 // Add-on Node, do part 1 of 2
                                                                 //   (include add-on node must be done after all add-ons are installed)
                                                                 //
-                                                                InstallCollectionFromLocalRepo_addonNode_installAddon(core, CDefSection, "ccguid", core.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage);
+                                                                InstallCollectionFromLocalRepo_addonNode_installAddon(core, metaDataSection, "ccguid", core.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage);
                                                                 if (!result) {
                                                                     //result = result;
                                                                 }
@@ -1536,8 +1520,8 @@ namespace Contensive.Processor.Controllers {
                                                                 //
                                                                 // Legacy Interface Node
                                                                 //
-                                                                foreach (XmlNode CDefInterfaces in CDefSection.ChildNodes) {
-                                                                    InstallCollectionFromLocalRepo_addonNode_installAddon(core, CDefInterfaces, "ccguid", core.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage);
+                                                                foreach (XmlNode metaDataInterfaces in metaDataSection.ChildNodes) {
+                                                                    InstallCollectionFromLocalRepo_addonNode_installAddon(core, metaDataInterfaces, "ccguid", core.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage);
                                                                     if (!result) {
                                                                         //result = result;
                                                                     }
@@ -1546,15 +1530,15 @@ namespace Contensive.Processor.Controllers {
                                                                 //    '
                                                                 //    ' otherxml
                                                                 //    '
-                                                                //    If genericController.vbLCase(CDefSection.OuterXml) <> "<otherxml></otherxml>" Then
-                                                                //        OtherXML = OtherXML & vbCrLf & CDefSection.OuterXml
+                                                                //    If genericController.vbLCase(metadataSection.OuterXml) <> "<otherxml></otherxml>" Then
+                                                                //        OtherXML = OtherXML & vbCrLf & metadataSection.OuterXml
                                                                 //    End If
                                                                 //    'Case Else
                                                                 //    '    '
                                                                 //    '    ' Unknown node in collection file
                                                                 //    '    '
-                                                                //    '    OtherXML = OtherXML & vbCrLf & CDefSection.OuterXml
-                                                                //    '    Call logcontroller.appendInstallLog(core, "Addon Collection for [" & Collectionname & "] contained an unknown node [" & CDefSection.Name & "]. This node will be ignored.")
+                                                                //    '    OtherXML = OtherXML & vbCrLf & metadataSection.OuterXml
+                                                                //    '    Call logcontroller.appendInstallLog(core, "Addon Collection for [" & Collectionname & "] contained an unknown node [" & metadataSection.Name & "]. This node will be ignored.")
                                                                 break;
                                                         }
                                                     }
@@ -1579,8 +1563,8 @@ namespace Contensive.Processor.Controllers {
                                                                 //
                                                                 // Legacy Interface Node
                                                                 //
-                                                                foreach (XmlNode CDefInterfaces in collectionNode.ChildNodes) {
-                                                                    installCollectionFromLocalRepo_addonNode_setAddonDependencies(core, CDefInterfaces, "ccguid", core.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage);
+                                                                foreach (XmlNode metaDataInterfaces in collectionNode.ChildNodes) {
+                                                                    installCollectionFromLocalRepo_addonNode_setAddonDependencies(core, metaDataInterfaces, "ccguid", core.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage);
                                                                     if (!result) {
                                                                         //result = result;
                                                                     }
@@ -1593,10 +1577,10 @@ namespace Contensive.Processor.Controllers {
                                                     LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], stage-8, process data nodes, set record fields");
                                                     //-------------------------------------------------------------------------------
                                                     //
-                                                    foreach (XmlNode CDefSection in Doc.DocumentElement.ChildNodes) {
-                                                        switch (GenericController.vbLCase(CDefSection.Name)) {
+                                                    foreach (XmlNode metaDataSection in Doc.DocumentElement.ChildNodes) {
+                                                        switch (GenericController.vbLCase(metaDataSection.Name)) {
                                                             case "data":
-                                                                foreach (XmlNode ContentNode in CDefSection.ChildNodes) {
+                                                                foreach (XmlNode ContentNode in metaDataSection.ChildNodes) {
                                                                     if (ContentNode.Name.ToLowerInvariant() == "record") {
                                                                         string ContentName =XmlController.GetXMLAttribute(core, IsFound, ContentNode, "content", "");
                                                                         if (string.IsNullOrEmpty(ContentName)) {
@@ -1607,14 +1591,14 @@ namespace Contensive.Processor.Controllers {
                                                                             string ContentRecordGuid =XmlController.GetXMLAttribute(core, IsFound, ContentNode, "guid", "");
                                                                             string ContentRecordName =XmlController.GetXMLAttribute(core, IsFound, ContentNode, "name", "");
                                                                             if ((!string.IsNullOrEmpty(ContentRecordGuid)) || (!string.IsNullOrEmpty(ContentRecordName))) {
-                                                                                MetaModel CDef = Models.Domain.MetaModel.createByUniqueName(core, ContentName);
-                                                                                using (var csXfer = new CsModel(core)) {
+                                                                                MetaModel metaData = Models.Domain.MetaModel.createByUniqueName(core, ContentName);
+                                                                                using (var csData = new CsModel(core)) {
                                                                                     if (!string.IsNullOrEmpty(ContentRecordGuid)) {
-                                                                                        csXfer.open(ContentName, "ccguid=" + DbController.encodeSQLText(ContentRecordGuid));
+                                                                                        csData.open(ContentName, "ccguid=" + DbController.encodeSQLText(ContentRecordGuid));
                                                                                     } else {
-                                                                                        csXfer.open(ContentName, "name=" + DbController.encodeSQLText(ContentRecordName));
+                                                                                        csData.open(ContentName, "name=" + DbController.encodeSQLText(ContentRecordName));
                                                                                     }
-                                                                                    if (csXfer.ok()) {
+                                                                                    if (csData.ok()) {
                                                                                         //
                                                                                         // Update the record
                                                                                         foreach (XmlNode FieldNode in ContentNode.ChildNodes) {
@@ -1623,7 +1607,7 @@ namespace Contensive.Processor.Controllers {
                                                                                                 string FieldName = XmlController.GetXMLAttribute(core, IsFound, FieldNode, "name", "").ToLowerInvariant();
                                                                                                 int fieldTypeId = -1;
                                                                                                 int FieldLookupContentID = -1;
-                                                                                                foreach (var keyValuePair in CDef.fields) {
+                                                                                                foreach (var keyValuePair in metaData.fields) {
                                                                                                     Models.Domain.MetaFieldModel field = keyValuePair.Value;
                                                                                                     if (GenericController.vbLCase(field.nameLc) == FieldName) {
                                                                                                         fieldTypeId = field.fieldTypeId;
@@ -1647,24 +1631,24 @@ namespace Contensive.Processor.Controllers {
                                                                                                                 if (FieldLookupContentID != 0) {
                                                                                                                     string FieldLookupContentName = MetaController.getContentNameByID(core, FieldLookupContentID);
                                                                                                                     if (!string.IsNullOrEmpty(FieldLookupContentName)) {
-                                                                                                                        if ((FieldValue.Left(1) == "{") && (FieldValue.Substring(FieldValue.Length - 1) == "}") && MetaController.isContentFieldSupported(core, FieldLookupContentName, "ccguid")) {
+                                                                                                                        if (isGuid(FieldValue) && MetaController.isContentFieldSupported(core, FieldLookupContentName, "ccguid")) {
                                                                                                                             //
                                                                                                                             // Lookup by guid
                                                                                                                             int fieldLookupId = GenericController.encodeInteger(MetaController.getRecordId(core, FieldLookupContentName, FieldValue));
                                                                                                                             if (fieldLookupId <= 0) {
                                                                                                                                 return_ErrorMessage = return_ErrorMessage + "<P>Warning: There was a problem translating field [" + FieldName + "] in record [" + ContentName + "] because the record it refers to was not found in this site.</P>";
                                                                                                                             } else {
-                                                                                                                                csXfer.set(FieldName, fieldLookupId);
+                                                                                                                                csData.set(FieldName, fieldLookupId);
                                                                                                                             }
                                                                                                                         } else {
                                                                                                                             //
                                                                                                                             // lookup by name
                                                                                                                             if (!string.IsNullOrEmpty(FieldValue)) {
-                                                                                                                                int fieldLookupId = MetaController.getRecordId(core, FieldLookupContentName, FieldValue);
+                                                                                                                                int fieldLookupId = MetaController.getRecordIdByUniqueName(core, FieldLookupContentName, FieldValue);
                                                                                                                                 if (fieldLookupId <= 0) {
                                                                                                                                     return_ErrorMessage = return_ErrorMessage + "<P>Warning: There was a problem translating field [" + FieldName + "] in record [" + ContentName + "] because the record it refers to was not found in this site.</P>";
                                                                                                                                 } else {
-                                                                                                                                    csXfer.set(FieldName, fieldLookupId);
+                                                                                                                                    csData.set(FieldName, fieldLookupId);
                                                                                                                                 }
                                                                                                                             }
                                                                                                                         }
@@ -1672,12 +1656,12 @@ namespace Contensive.Processor.Controllers {
                                                                                                                 } else if (FieldValue.IsNumeric()) {
                                                                                                                     //
                                                                                                                     // must be lookup list
-                                                                                                                    csXfer.set(FieldName, FieldValue);
+                                                                                                                    csData.set(FieldName, FieldValue);
                                                                                                                 }
                                                                                                                 break;
                                                                                                             }
                                                                                                         default: {
-                                                                                                                csXfer.set(FieldName, FieldValue);
+                                                                                                                csData.set(FieldName, FieldValue);
                                                                                                                 break;
                                                                                                             }
                                                                                                     }
@@ -1923,7 +1907,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Installs Addons in a source folder
         /// </summary>
-        public static bool installCollectionsFromPrivateFolder(CoreController core, string installPrivatePath, ref string return_ErrorMessage, ref List<string> return_CollectionGUIDList, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> blockCollectionList, bool includeBaseCDefInstall) {
+        public static bool installCollectionsFromPrivateFolder(CoreController core, string installPrivatePath, ref string return_ErrorMessage, ref List<string> return_CollectionGUIDList, bool IsNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> blockCollectionList, bool includeBaseMetaDataInstall) {
             bool returnSuccess = false;
             try {
                 DateTime CollectionLastChangeDate;
@@ -1937,7 +1921,7 @@ namespace Contensive.Processor.Controllers {
                     LogController.logInfo(core, "BuildLocalCollectionFolder returned false with Error Message [" + return_ErrorMessage + "], exiting without calling UpgradeAllAppsFromLocalCollection");
                 } else {
                     foreach (string collectionGuid in return_CollectionGUIDList) {
-                        if (!installCollectionFromLocalRepo(core, collectionGuid, core.siteProperties.dataBuildVersion, ref return_ErrorMessage, "", IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref blockCollectionList, includeBaseCDefInstall)) {
+                        if (!installCollectionFromLocalRepo(core, collectionGuid, core.siteProperties.dataBuildVersion, ref return_ErrorMessage, "", IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, ref blockCollectionList, includeBaseMetaDataInstall)) {
                             LogController.logInfo(core, "UpgradeAllAppsFromLocalCollection returned false with Error Message [" + return_ErrorMessage + "].");
                             break;
                         }
@@ -1995,9 +1979,9 @@ namespace Contensive.Processor.Controllers {
         private static int getNavIDByGuid(CoreController core, string ccGuid) {
             int navId = 0;
             try {
-                using (var csXfer = new CsModel(core)) {
-                    if (csXfer.open(Processor.Models.Db.NavigatorEntryModel.contentName, "ccguid=" + DbController.encodeSQLText(ccGuid), "ID", true, 0, "ID")) {
-                        navId = csXfer.getInteger("id");
+                using (var csData = new CsModel(core)) {
+                    if (csData.open(Processor.Models.Db.NavigatorEntryModel.contentName, "ccguid=" + DbController.encodeSQLText(ccGuid), "ID", true, 0, "ID")) {
+                        navId = csData.getInteger("id");
                     }
                 }
             } catch (Exception ex) {
@@ -2213,7 +2197,7 @@ namespace Contensive.Processor.Controllers {
                                                     switch (GenericController.vbLCase(TriggerNode.Name)) {
                                                         case "type":
                                                             fieldType = TriggerNode.InnerText;
-                                                            fieldTypeID = MetaController.getRecordId(core, "Content Field Types", fieldType);
+                                                            fieldTypeID = MetaController.getRecordIdByUniqueName(core, "Content Field Types", fieldType);
                                                             if (fieldTypeID > 0) {
                                                                 using (var CS2 = new CsModel(core)) {
                                                                     Criteria = "(addonid=" + addonId + ")and(contentfieldTypeID=" + fieldTypeID + ")";
@@ -2607,53 +2591,31 @@ namespace Contensive.Processor.Controllers {
         private static string installCollectionFromLocalRepo_addonNode_setAddonDependencies(CoreController core, XmlNode AddonNode, string AddonGuidFieldName, string ignore_BuildVersion, int CollectionID, ref bool ReturnUpgradeOK, ref string ReturnErrorMessage) {
             string result = "";
             try {
-                bool AddRule = false;
-                string IncludeAddonName = null;
-                string IncludeAddonGuid = null;
-                int IncludeAddonID = 0;
-                string UserError = null;
-                string Criteria = null;
-                bool IsFound = false;
-                string AOName = null;
-                string AOGuid = null;
-                string AddOnType = null;
-                int addonId = 0;
-                string Basename;
-                //
-                Basename = GenericController.vbLCase(AddonNode.Name);
+                string Basename = GenericController.vbLCase(AddonNode.Name);
                 if ((Basename == "page") || (Basename == "process") || (Basename == "addon") || (Basename == "add-on")) {
-                    AOName =XmlController.GetXMLAttribute(core, IsFound, AddonNode, "name", "No Name");
-                    if (string.IsNullOrEmpty(AOName)) {
-                        AOName = "No Name";
-                    }
-                    AOGuid =XmlController.GetXMLAttribute(core, IsFound, AddonNode, "guid", AOName);
-                    if (string.IsNullOrEmpty(AOGuid)) {
-                        AOGuid = AOName;
-                    }
-                    AddOnType =XmlController.GetXMLAttribute(core, IsFound, AddonNode, "type", "");
-                    Criteria = "(" + AddonGuidFieldName + "=" + DbController.encodeSQLText(AOGuid) + ")";
-                    using (var csXfer = new CsModel(core)) {
-                        csXfer.open(Models.Db.AddonModel.contentName, Criteria, "", false);
-                        if (csXfer.ok()) {
+                    bool IsFound = false;
+                    string AOName = XmlController.GetXMLAttribute(core, IsFound, AddonNode, "name", "No Name");
+                    if (string.IsNullOrEmpty(AOName)) { AOName = "No Name"; }
+                    string AOGuid = XmlController.GetXMLAttribute(core, IsFound, AddonNode, "guid", AOName);
+                    if (string.IsNullOrEmpty(AOGuid)) { AOGuid = AOName; }
+                    string AddOnType = XmlController.GetXMLAttribute(core, IsFound, AddonNode, "type", "");
+                    string Criteria = "(" + AddonGuidFieldName + "=" + DbController.encodeSQLText(AOGuid) + ")";
+                    using (var csData = new CsModel(core)) {
+                        if (csData.open(Models.Db.AddonModel.contentName, Criteria, "", false)) {
                             //
                             // Update the Addon
-                            //
                             LogController.logInfo(core, "UpgradeAppFromLocalCollection, GUID match with existing Add-on, Updating Add-on [" + AOName + "], Guid [" + AOGuid + "]");
                         } else {
                             //
                             // not found by GUID - search name against name to update legacy Add-ons
-                            //
-                            csXfer.close();
                             Criteria = "(name=" + DbController.encodeSQLText(AOName) + ")and(" + AddonGuidFieldName + " is null)";
-                            csXfer.open(Models.Db.AddonModel.contentName, Criteria, "", false);
+                            csData.open(Models.Db.AddonModel.contentName, Criteria, "", false);
                         }
-                        if (!csXfer.ok()) {
+                        if (!csData.ok()) {
                             //
                             // Could not find add-on
-                            //
                             LogController.logInfo(core, "UpgradeAppFromLocalCollection, Add-on could not be created, skipping Add-on [" + AOName + "], Guid [" + AOGuid + "]");
                         } else {
-                            addonId = csXfer.getInteger("ID");
                             if (AddonNode.ChildNodes.Count > 0) {
                                 foreach (XmlNode PageInterface in AddonNode.ChildNodes) {
                                     switch (GenericController.vbLCase(PageInterface.Name)) {
@@ -2666,9 +2628,9 @@ namespace Contensive.Processor.Controllers {
                                             // when importing a collectin that will be used for an include
                                             //
                                             if (true) {
-                                                IncludeAddonName = XmlController.GetXMLAttribute(core, IsFound, PageInterface, "name", "");
-                                                IncludeAddonGuid = XmlController.GetXMLAttribute(core, IsFound, PageInterface, "guid", IncludeAddonName);
-                                                IncludeAddonID = 0;
+                                                string IncludeAddonName = XmlController.GetXMLAttribute(core, IsFound, PageInterface, "name", "");
+                                                string IncludeAddonGuid = XmlController.GetXMLAttribute(core, IsFound, PageInterface, "guid", IncludeAddonName);
+                                                int IncludeAddonID = 0;
                                                 Criteria = "";
                                                 if (!string.IsNullOrEmpty(IncludeAddonGuid)) {
                                                     Criteria = AddonGuidFieldName + "=" + DbController.encodeSQLText(IncludeAddonGuid);
@@ -2685,22 +2647,22 @@ namespace Contensive.Processor.Controllers {
                                                             IncludeAddonID = CS2.getInteger("ID");
                                                         }
                                                     }
-                                                    AddRule = false;
+                                                    bool AddRule = false;
                                                     if (IncludeAddonID == 0) {
-                                                        UserError = "The include add-on [" + IncludeAddonName + "] could not be added because it was not found. If it is in the collection being installed, it must appear before any add-ons that include it.";
+                                                        string UserError = "The include add-on [" + IncludeAddonName + "] could not be added because it was not found. If it is in the collection being installed, it must appear before any add-ons that include it.";
                                                         LogController.logInfo(core, "UpgradeAddFromLocalCollection_InstallAddonNode, UserError [" + UserError + "]");
                                                         ReturnUpgradeOK = false;
                                                         ReturnErrorMessage = ReturnErrorMessage + "<P>The collection was not installed because the add-on [" + AOName + "] requires an included add-on [" + IncludeAddonName + "] which could not be found. If it is in the collection being installed, it must appear before any add-ons that include it.</P>";
                                                     } else {
                                                         using (var cs3 = new CsModel(core)) {
-                                                            AddRule = !cs3.openSql("select ID from ccAddonIncludeRules where Addonid=" + addonId + " and IncludedAddonID=" + IncludeAddonID);
+                                                            AddRule = !cs3.openSql("select ID from ccAddonIncludeRules where Addonid=" + csData.getInteger("id") + " and IncludedAddonID=" + IncludeAddonID);
                                                         }
                                                     }
                                                     if (AddRule) {
                                                         using (var cs3 = new CsModel(core)) {
                                                             cs3.insert("Add-on Include Rules");
                                                             if (cs3.ok()) {
-                                                                cs3.set("Addonid", addonId);
+                                                                cs3.set("Addonid", csData.getInteger("id"));
                                                                 cs3.set("IncludedAddonID", IncludeAddonID);
                                                             }
                                                         }
@@ -2724,7 +2686,7 @@ namespace Contensive.Processor.Controllers {
         //
         //======================================================================================================
         /// <summary>
-        /// Import CDef on top of current configuration and the base configuration
+        /// Import metadata on top of current configuration and the base configuration
         /// </summary>
         public static void installBaseCollection(CoreController core, bool isNewBuild, bool isRepairMode, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> blockCollectionList) {
             try {
@@ -2740,9 +2702,9 @@ namespace Contensive.Processor.Controllers {
                 } else {
                     {
                         //
-                        // -- Special Case - must install base collection cdef first because it builds the system that the system needs to do everything else
-                        LogController.logInfo(core, "installBaseCollection, install CDef first to verify system requirements");
-                        CDefMiniCollectionModel.installCDefMiniCollectionFromXml(true, core, baseCollectionXml, isNewBuild, true, isRepairMode, ref nonCriticalErrorList, logPrefix, ref blockCollectionList);
+                        // -- Special Case - must install base collection metadata first because it builds the system that the system needs to do everything else
+                        LogController.logInfo(core, "installBaseCollection, install metadata first to verify system requirements");
+                        MetaDataMiniCollectionModel.installMetaDataMiniCollectionFromXml(true, core, baseCollectionXml, isNewBuild, true, isRepairMode, ref nonCriticalErrorList, logPrefix, ref blockCollectionList);
                     }
                     //
                     // now treat as a regular collection and install - to pickup everything else 
@@ -2905,15 +2867,15 @@ namespace Contensive.Processor.Controllers {
                         LogController.logInfo(core, UserError);
                         ErrorController.addUserError(core, UserError);
                     } else {
-                        foreach (XmlNode CDef_Node in LibCollections.DocumentElement.ChildNodes) {
+                        foreach (XmlNode metaData_Node in LibCollections.DocumentElement.ChildNodes) {
                             var collection = new CollectionStoreClass();
                             remoteCollectionStoreList.Add(collection);
-                            switch (GenericController.vbLCase(CDef_Node.Name)) {
+                            switch (GenericController.vbLCase(metaData_Node.Name)) {
                                 case "collection":
                                     //
                                     // Read the collection
                                     //
-                                    foreach (XmlNode CollectionNode in CDef_Node.ChildNodes) {
+                                    foreach (XmlNode CollectionNode in metaData_Node.ChildNodes) {
                                         switch (GenericController.vbLCase(CollectionNode.Name)) {
                                             case "name":
                                                 collection.name = CollectionNode.InnerText;

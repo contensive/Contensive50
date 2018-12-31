@@ -22,13 +22,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static CopyContentModel addDefault(CoreController core, Domain.MetaModel cdef) {
-            return addDefault<CopyContentModel>(core, cdef);
+        public static CopyContentModel addDefault(CoreController core, Domain.MetaModel metaData) {
+            return addDefault<CopyContentModel>(core, metaData);
         }
         //
         //====================================================================================================
-        public static CopyContentModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.MetaModel cdef) {
-            return addDefault<CopyContentModel>(core, cdef, ref callersCacheNameList);
+        public static CopyContentModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.MetaModel metaData) {
+            return addDefault<CopyContentModel>(core, metaData, ref callersCacheNameList);
         }
         //
         //====================================================================================================

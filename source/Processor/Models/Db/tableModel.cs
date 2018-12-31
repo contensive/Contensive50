@@ -34,13 +34,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static TableModel addDefault(CoreController core, Domain.MetaModel cdef) {
-            return addDefault<TableModel>(core, cdef);
+        public static TableModel addDefault(CoreController core, Domain.MetaModel metaData) {
+            return addDefault<TableModel>(core, metaData);
         }
         //
         //====================================================================================================
-        public static TableModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.MetaModel cdef) {
-            return addDefault<TableModel>(core, cdef, ref callersCacheNameList);
+        public static TableModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.MetaModel metaData) {
+            return addDefault<TableModel>(core, metaData, ref callersCacheNameList);
         }
         //
         //====================================================================================================

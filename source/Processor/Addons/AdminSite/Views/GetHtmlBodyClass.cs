@@ -414,26 +414,26 @@ namespace Contensive.Addons.AdminSite {
                 bool FoundAddon = false;
                 //
                 if (GenericController.vbInstr(1, "," + UsedIDString + ",", "," + HelpAddonID.ToString() + ",") == 0) {
-                    using (var csXfer = new CsModel(cp.core)) {
-                        csXfer.openRecord(Processor.Models.Db.AddonModel.contentName, HelpAddonID);
-                        if (csXfer.ok()) {
+                    using (var csData = new CsModel(cp.core)) {
+                        csData.openRecord(Processor.Models.Db.AddonModel.contentName, HelpAddonID);
+                        if (csData.ok()) {
                             FoundAddon = true;
-                            AddonName = csXfer.getText("Name");
-                            AddonHelpCopy = csXfer.getText("help");
-                            AddonDateAdded = csXfer.getDate("dateadded");
+                            AddonName = csData.getText("Name");
+                            AddonHelpCopy = csData.getText("help");
+                            AddonDateAdded = csData.getDate("dateadded");
                             if (MetaController.isContentFieldSupported(cp.core, Processor.Models.Db.AddonModel.contentName, "lastupdated")) {
-                                AddonLastUpdated = csXfer.getDate("lastupdated");
+                                AddonLastUpdated = csData.getDate("lastupdated");
                             }
                             if (AddonLastUpdated == DateTime.MinValue) {
                                 AddonLastUpdated = AddonDateAdded;
                             }
-                            IconFilename = csXfer.getText("Iconfilename");
-                            IconWidth = csXfer.getInteger("IconWidth");
-                            IconHeight = csXfer.getInteger("IconHeight");
-                            IconSprites = csXfer.getInteger("IconSprites");
-                            IconIsInline = csXfer.getBoolean("IsInline");
+                            IconFilename = csData.getText("Iconfilename");
+                            IconWidth = csData.getInteger("IconWidth");
+                            IconHeight = csData.getInteger("IconHeight");
+                            IconSprites = csData.getInteger("IconSprites");
+                            IconIsInline = csData.getBoolean("IsInline");
                             IconImg = AddonController.getAddonIconImg("/" + cp.core.appConfig.adminRoute, IconWidth, IconHeight, IconSprites, IconIsInline, "", IconFilename, cp.core.appConfig.cdnFileUrl, AddonName, AddonName, "", 0);
-                            helpLink = csXfer.getText("helpLink");
+                            helpLink = csData.getText("helpLink");
                         }
                     }
                     //
@@ -445,13 +445,13 @@ namespace Contensive.Addons.AdminSite {
                             IncludeHelp += GetAddonHelp(cp, addonon.id, HelpAddonID + "," + addonon.id.ToString());
                         }
                         //SQL = "select IncludedAddonID from ccAddonIncludeRules where AddonID=" + HelpAddonID;
-                        //CS = csXfer.csOpenSql(SQL, "Default");
-                        //while (csXfer.csOk()) {
-                        //    IncludeID = csXfer.csGetInteger("IncludedAddonID");
+                        //CS = csData.csOpenSql(SQL, "Default");
+                        //while (csData.csOk()) {
+                        //    IncludeID = csData.csGetInteger("IncludedAddonID");
                         //    IncludeHelp = IncludeHelp + GetAddonHelp(cp, IncludeID, HelpAddonID + "," + IncludeID.ToString());
-                        //    csXfer.csGoNext();
+                        //    csData.csGoNext();
                         //}
-                        //csXfer.csClose();
+                        //csData.csClose();
                         //
                         if (!string.IsNullOrEmpty(helpLink)) {
                             if (!string.IsNullOrEmpty(AddonHelpCopy)) {
@@ -495,17 +495,17 @@ namespace Contensive.Addons.AdminSite {
                 string IncludeHelp = "";
                 //
                 if (GenericController.vbInstr(1, "," + UsedIDString + ",", "," + HelpCollectionID.ToString() + ",") == 0) {
-                    using (var csXfer = new CsModel(cp.core)) {
-                        csXfer.openRecord("Add-on Collections", HelpCollectionID);
-                        if (csXfer.ok()) {
-                            Collectionname = csXfer.getText("Name");
-                            CollectionHelpCopy = csXfer.getText("help");
-                            CollectionDateAdded = csXfer.getDate("dateadded");
+                    using (var csData = new CsModel(cp.core)) {
+                        csData.openRecord("Add-on Collections", HelpCollectionID);
+                        if (csData.ok()) {
+                            Collectionname = csData.getText("Name");
+                            CollectionHelpCopy = csData.getText("help");
+                            CollectionDateAdded = csData.getDate("dateadded");
                             if (MetaController.isContentFieldSupported(cp.core, "Add-on Collections", "lastupdated")) {
-                                CollectionLastUpdated = csXfer.getDate("lastupdated");
+                                CollectionLastUpdated = csData.getDate("lastupdated");
                             }
                             if (MetaController.isContentFieldSupported(cp.core, "Add-on Collections", "helplink")) {
-                                CollectionHelpLink = csXfer.getText("helplink");
+                                CollectionHelpLink = csData.getText("helplink");
                             }
                             if (CollectionLastUpdated == DateTime.MinValue) {
                                 CollectionLastUpdated = CollectionDateAdded;
@@ -515,11 +515,11 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // Add-ons
                     //
-                    using (var csXfer = new CsModel(cp.core)) {
-                        csXfer.open(Processor.Models.Db.AddonModel.contentName, "CollectionID=" + HelpCollectionID, "name");
-                        while (csXfer.ok()) {
-                            IncludeHelp = IncludeHelp + "<div style=\"clear:both;\">" + GetAddonHelp(cp, csXfer.getInteger("ID"), "") + "</div>";
-                            csXfer.goNext();
+                    using (var csData = new CsModel(cp.core)) {
+                        csData.open(Processor.Models.Db.AddonModel.contentName, "CollectionID=" + HelpCollectionID, "name");
+                        while (csData.ok()) {
+                            IncludeHelp = IncludeHelp + "<div style=\"clear:both;\">" + GetAddonHelp(cp, csData.getInteger("ID"), "") + "</div>";
+                            csData.goNext();
                         }
                     }
                     //
@@ -567,23 +567,23 @@ namespace Contensive.Addons.AdminSite {
                 int ParentID = 0;
                 //
                 Found = false;
-                using (var csXfer = new CsModel(cp.core)) {
+                using (var csData = new CsModel(cp.core)) {
                     SQL = "select h.HelpDefault,h.HelpCustom from ccfieldhelp h left join ccfields f on f.id=h.fieldid where f.contentid=" + ContentID + " and f.name=" + DbController.encodeSQLText(FieldName);
-                    csXfer.openSql(SQL);
-                    if (csXfer.ok()) {
+                    csData.openSql(SQL);
+                    if (csData.ok()) {
                         Found = true;
-                        return_Default = csXfer.getText("helpDefault");
-                        return_Custom = csXfer.getText("helpCustom");
+                        return_Default = csData.getText("helpDefault");
+                        return_Custom = csData.getText("helpCustom");
                     }
                 }
                 //
                 if (!Found) {
                     ParentID = 0;
-                    using (var csXfer = new CsModel(cp.core)) {
+                    using (var csData = new CsModel(cp.core)) {
                         SQL = "select parentid from cccontent where id=" + ContentID;
-                        csXfer.openSql(SQL);
-                        if (csXfer.ok()) {
-                            ParentID = csXfer.getInteger("parentid");
+                        csData.openSql(SQL);
+                        if (csData.ok()) {
+                            ParentID = csData.getInteger("parentid");
                         }
                     }
                     if (ParentID != 0) {
@@ -716,19 +716,19 @@ namespace Contensive.Addons.AdminSite {
                                         if (!MetaController.isWithinContent(cp.core, adminData.editRecord.contentControlId, MetaModel.getContentId(cp.core, "Group Email"))) {
                                             Processor.Controllers.ErrorController.addUserError(cp.core, "The send action only supports Group Email.");
                                         } else {
-                                            using (var csXfer = new CsModel(cp.core)) {
-                                                csXfer.openRecord("Group Email", adminData.editRecord.id);
-                                                if (!csXfer.ok()) {
+                                            using (var csData = new CsModel(cp.core)) {
+                                                csData.openRecord("Group Email", adminData.editRecord.id);
+                                                if (!csData.ok()) {
                                                     //throw new GenericException("Unexpected exception"); // //throw new GenericException("Unexpected exception")' cp.core.handleLegacyError23("Email ID [" &  adminContext.editRecord.id & "] could not be found in Group Email.")
-                                                } else if (csXfer.getText("FromAddress") == "") {
+                                                } else if (csData.getText("FromAddress") == "") {
                                                     Processor.Controllers.ErrorController.addUserError(cp.core, "A 'From Address' is required before sending an email.");
-                                                } else if (csXfer.getText("Subject") == "") {
+                                                } else if (csData.getText("Subject") == "") {
                                                     Processor.Controllers.ErrorController.addUserError(cp.core, "A 'Subject' is required before sending an email.");
                                                 } else {
-                                                    csXfer.set("submitted", true);
-                                                    csXfer.set("ConditionID", 0);
-                                                    if (csXfer.getDate("ScheduleDate") == DateTime.MinValue) {
-                                                        csXfer.set("ScheduleDate", cp.core.doc.profileStartTime);
+                                                    csData.set("submitted", true);
+                                                    csData.set("ConditionID", 0);
+                                                    if (csData.getDate("ScheduleDate") == DateTime.MinValue) {
+                                                        csData.set("ScheduleDate", cp.core.doc.profileStartTime);
                                                     }
                                                 }
                                             }
@@ -751,14 +751,14 @@ namespace Contensive.Addons.AdminSite {
                                         if (!MetaController.isWithinContent(cp.core, adminData.editRecord.contentControlId, MetaModel.getContentId(cp.core, "Conditional Email"))) {
                                             Processor.Controllers.ErrorController.addUserError(cp.core, "The deactivate action only supports Conditional Email.");
                                         } else {
-                                            using (var csXfer = new CsModel(cp.core)) {
-                                                csXfer.openRecord("Conditional Email", adminData.editRecord.id);
-                                                if (!csXfer.ok()) {
+                                            using (var csData = new CsModel(cp.core)) {
+                                                csData.openRecord("Conditional Email", adminData.editRecord.id);
+                                                if (!csData.ok()) {
                                                     //throw new GenericException("Unexpected exception"); // //throw new GenericException("Unexpected exception")' cp.core.handleLegacyError23("Email ID [" & editRecord.id & "] could not be opened.")
                                                 } else {
-                                                    csXfer.set("submitted", false);
+                                                    csData.set("submitted", false);
                                                 }
-                                                csXfer.close();
+                                                csData.close();
                                             }
                                         }
                                     }
@@ -780,16 +780,16 @@ namespace Contensive.Addons.AdminSite {
                                         if (!MetaController.isWithinContent(cp.core, adminData.editRecord.contentControlId, MetaModel.getContentId(cp.core, "Conditional Email"))) {
                                             Processor.Controllers.ErrorController.addUserError(cp.core, "The activate action only supports Conditional Email.");
                                         } else {
-                                            using (var csXfer = new CsModel(cp.core)) {
-                                                csXfer.openRecord("Conditional Email", adminData.editRecord.id);
-                                                if (!csXfer.ok()) {
+                                            using (var csData = new CsModel(cp.core)) {
+                                                csData.openRecord("Conditional Email", adminData.editRecord.id);
+                                                if (!csData.ok()) {
                                                     //throw new GenericException("Unexpected exception"); // //throw new GenericException("Unexpected exception")' cp.core.handleLegacyError23("Email ID [" & editRecord.id & "] could not be opened.")
-                                                } else if (csXfer.getInteger("ConditionID") == 0) {
+                                                } else if (csData.getInteger("ConditionID") == 0) {
                                                     Processor.Controllers.ErrorController.addUserError(cp.core, "A condition must be set.");
                                                 } else {
-                                                    csXfer.set("submitted", true);
-                                                    if (csXfer.getDate("ScheduleDate") == DateTime.MinValue) {
-                                                        csXfer.set("ScheduleDate", cp.core.doc.profileStartTime);
+                                                    csData.set("submitted", true);
+                                                    if (csData.getDate("ScheduleDate") == DateTime.MinValue) {
+                                                        csData.set("ScheduleDate", cp.core.doc.profileStartTime);
                                                     }
                                                 }
                                             }
@@ -835,15 +835,15 @@ namespace Contensive.Addons.AdminSite {
                                 if (RowCnt > 0) {
                                     for (RowPtr = 0; RowPtr < RowCnt; RowPtr++) {
                                         if (cp.core.docProperties.getBoolean("row" + RowPtr)) {
-                                            using (var csXfer = new CsModel(cp.core)) {
-                                                csXfer.openRecord(adminData.adminContent.name, cp.core.docProperties.getInteger("rowid" + RowPtr));
-                                                if (csXfer.ok()) {
-                                                    RecordID = csXfer.getInteger("ID");
-                                                    csXfer.deleteRecord();
+                                            using (var csData = new CsModel(cp.core)) {
+                                                csData.openRecord(adminData.adminContent.name, cp.core.docProperties.getInteger("rowid" + RowPtr));
+                                                if (csData.ok()) {
+                                                    RecordID = csData.getInteger("ID");
+                                                    csData.deleteRecord();
                                                     //
                                                     // non-Workflow Delete
                                                     //
-                                                    ContentName = MetaController.getContentNameByID(cp.core, csXfer.getInteger("ContentControlID"));
+                                                    ContentName = MetaController.getContentNameByID(cp.core, csData.getInteger("ContentControlID"));
                                                     cp.core.cache.invalidateDbRecord(RecordID, adminData.adminContent.tableName);
                                                     cp.core.processAfterSave(true, ContentName, RecordID, "", 0, UseContentWatchLink);
                                                     //
@@ -931,8 +931,8 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // --- create GroupRule records for all selected
                 //
-                using (var csXfer = new CsModel(cp.core)) {
-                    csXfer.open("Group Rules", "GroupID=" + GroupID, "ContentID, ID", true);
+                using (var csData = new CsModel(cp.core)) {
+                    csData.open("Group Rules", "GroupID=" + GroupID, "ContentID, ID", true);
                     ContentCount = cp.core.docProperties.getInteger("ContentCount");
                     if (ContentCount > 0) {
                         for (ContentPointer = 0; ContentPointer < ContentCount; ContentPointer++) {
@@ -942,15 +942,15 @@ namespace Contensive.Addons.AdminSite {
                             AllowDelete = cp.core.docProperties.getBoolean("ContentGroupRuleAllowDelete" + ContentPointer);
                             //
                             RuleFound = false;
-                            csXfer.goFirst();
-                            if (csXfer.ok()) {
-                                while (csXfer.ok()) {
-                                    if (csXfer.getInteger("ContentID") == ContentID) {
-                                        RuleId = csXfer.getInteger("id");
+                            csData.goFirst();
+                            if (csData.ok()) {
+                                while (csData.ok()) {
+                                    if (csData.getInteger("ContentID") == ContentID) {
+                                        RuleId = csData.getInteger("id");
                                         RuleFound = true;
                                         break;
                                     }
-                                    csXfer.goNext();
+                                    csData.goNext();
                                 }
                             }
                             if (RuleNeeded && !RuleFound) {
@@ -969,12 +969,12 @@ namespace Contensive.Addons.AdminSite {
                                 //Call cp.core.main_DeleteCSRecord(CSPointer)
                                 RecordChanged = true;
                             } else if (RuleFound && RuleNeeded) {
-                                if (AllowAdd != csXfer.getBoolean("AllowAdd")) {
-                                    csXfer.set("AllowAdd", AllowAdd);
+                                if (AllowAdd != csData.getBoolean("AllowAdd")) {
+                                    csData.set("AllowAdd", AllowAdd);
                                     RecordChanged = true;
                                 }
-                                if (AllowDelete != csXfer.getBoolean("AllowDelete")) {
-                                    csXfer.set("AllowDelete", AllowDelete);
+                                if (AllowDelete != csData.getBoolean("AllowDelete")) {
+                                    csData.set("AllowDelete", AllowDelete);
                                     RecordChanged = true;
                                 }
                             }
@@ -1031,11 +1031,11 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // --- Create Group Rules for all child content
                     //
-                    using (var csXfer = new CsModel(cp.core)) {
-                        csXfer.open("Content", "ParentID=" + ContentID);
-                        while (csXfer.ok()) {
-                            LoadAndSaveGroupRules_ForContentAndChildren(cp, csXfer.getInteger("id"), MyParentIDString);
-                            csXfer.goNext();
+                    using (var csData = new CsModel(cp.core)) {
+                        csData.open("Content", "ParentID=" + ContentID);
+                        while (csData.ok()) {
+                            LoadAndSaveGroupRules_ForContentAndChildren(cp, csData.getInteger("id"), MyParentIDString);
+                            csData.goNext();
                         }
                     }
                 }
@@ -1073,8 +1073,8 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // --- create GroupRule records for all selected
                 //
-                using (var csXfer = new CsModel(cp.core)) {
-                    csXfer.open("Group Rules", "ContentID=" + ContentID, "GroupID,ID", true);
+                using (var csData = new CsModel(cp.core)) {
+                    csData.open("Group Rules", "ContentID=" + ContentID, "GroupID,ID", true);
                     GroupCount = cp.core.docProperties.getInteger("GroupCount");
                     if (GroupCount > 0) {
                         for (GroupPointer = 0; GroupPointer < GroupCount; GroupPointer++) {
@@ -1084,14 +1084,14 @@ namespace Contensive.Addons.AdminSite {
                             AllowDelete = cp.core.docProperties.getBoolean("GroupRuleAllowDelete" + GroupPointer);
                             //
                             RuleFound = false;
-                            csXfer.goFirst();
-                            if (csXfer.ok()) {
-                                while (csXfer.ok()) {
-                                    if (csXfer.getInteger("GroupID") == GroupID) {
+                            csData.goFirst();
+                            if (csData.ok()) {
+                                while (csData.ok()) {
+                                    if (csData.getInteger("GroupID") == GroupID) {
                                         RuleFound = true;
                                         break;
                                     }
-                                    csXfer.goNext();
+                                    csData.goNext();
                                 }
                             }
                             if (RuleNeeded && !RuleFound) {
@@ -1106,15 +1106,15 @@ namespace Contensive.Addons.AdminSite {
                                 }
                                 RecordChanged = true;
                             } else if (RuleFound && !RuleNeeded) {
-                                csXfer.deleteRecord();
+                                csData.deleteRecord();
                                 RecordChanged = true;
                             } else if (RuleFound && RuleNeeded) {
-                                if (AllowAdd != csXfer.getBoolean("AllowAdd")) {
-                                    csXfer.set("AllowAdd", AllowAdd);
+                                if (AllowAdd != csData.getBoolean("AllowAdd")) {
+                                    csData.set("AllowAdd", AllowAdd);
                                     RecordChanged = true;
                                 }
-                                if (AllowDelete != csXfer.getBoolean("AllowDelete")) {
-                                    csXfer.set("AllowDelete", AllowDelete);
+                                if (AllowDelete != csData.getBoolean("AllowDelete")) {
+                                    csData.set("AllowDelete", AllowDelete);
                                     RecordChanged = true;
                                 }
                             }
@@ -1160,22 +1160,22 @@ namespace Contensive.Addons.AdminSite {
                     // ----- update/create the content watch record for this content record
                     //
                     ContentID = (editRecord.contentControlId.Equals(0)) ? adminData.adminContent.id : editRecord.contentControlId;
-                    using (var csXfer = new CsModel(cp.core)) {
-                        csXfer.open("Content Watch", "(ContentID=" + DbController.encodeSQLNumber(ContentID) + ")And(RecordID=" + DbController.encodeSQLNumber(editRecord.id) + ")");
-                        if (!csXfer.ok()) {
-                            csXfer.insert("Content Watch");
-                            csXfer.set("contentid", ContentID);
-                            csXfer.set("recordid", editRecord.id);
-                            csXfer.set("ContentRecordKey", ContentID + "." + editRecord.id);
-                            csXfer.set("clicks", 0);
+                    using (var csData = new CsModel(cp.core)) {
+                        csData.open("Content Watch", "(ContentID=" + DbController.encodeSQLNumber(ContentID) + ")And(RecordID=" + DbController.encodeSQLNumber(editRecord.id) + ")");
+                        if (!csData.ok()) {
+                            csData.insert("Content Watch");
+                            csData.set("contentid", ContentID);
+                            csData.set("recordid", editRecord.id);
+                            csData.set("ContentRecordKey", ContentID + "." + editRecord.id);
+                            csData.set("clicks", 0);
                         }
-                        if (!csXfer.ok()) {
+                        if (!csData.ok()) {
                             LogController.handleError(cp.core, new GenericException("SaveContentTracking, can Not create New record"));
                         } else {
-                            ContentWatchID = csXfer.getInteger("ID");
-                            csXfer.set("LinkLabel", adminData.ContentWatchLinkLabel);
-                            csXfer.set("WhatsNewDateExpires", adminData.ContentWatchExpires);
-                            csXfer.set("Link", adminData.ContentWatchLink);
+                            ContentWatchID = csData.getInteger("ID");
+                            csData.set("LinkLabel", adminData.ContentWatchLinkLabel);
+                            csData.set("WhatsNewDateExpires", adminData.ContentWatchExpires);
+                            csData.set("Link", adminData.ContentWatchLink);
                             //
                             // ----- delete all rules for this ContentWatch record
                             //
@@ -1238,21 +1238,21 @@ namespace Contensive.Addons.AdminSite {
                         if (OverRideDuplicate) {
                             cp.core.db.executeQuery("update " + adminData.adminContent.tableName + " set linkalias=null where ( linkalias=" + DbController.encodeSQLText(linkAlias) + ") and (id<>" + editRecord.id + ")");
                         } else {
-                            using (var csXfer = new CsModel(cp.core)) {
-                                csXfer.open(adminData.adminContent.name, "( linkalias=" + DbController.encodeSQLText(linkAlias) + ")and(id<>" + editRecord.id + ")");
-                                if (csXfer.ok()) {
+                            using (var csData = new CsModel(cp.core)) {
+                                csData.open(adminData.adminContent.name, "( linkalias=" + DbController.encodeSQLText(linkAlias) + ")and(id<>" + editRecord.id + ")");
+                                if (csData.ok()) {
                                     isDupError = true;
                                     ErrorController.addUserError(cp.core, "The Link Alias you entered can not be used because another record uses this value [" + linkAlias + "]. Enter a different Link Alias, or check the Override Duplicates checkbox in the Link Alias tab.");
                                 }
-                                csXfer.close();
+                                csData.close();
                             }
                         }
                         if (!isDupError) {
                             DupCausesWarning = true;
-                            using (var csXfer = new CsModel(cp.core)) {
-                                csXfer.openRecord(adminData.adminContent.name, editRecord.id);
-                                if (csXfer.ok()) {
-                                    csXfer.set("linkalias", linkAlias);
+                            using (var csData = new CsModel(cp.core)) {
+                                csData.openRecord(adminData.adminContent.name, editRecord.id);
+                                if (csData.ok()) {
+                                    csData.set("linkalias", linkAlias);
                                 }
                             }
                             //
@@ -1291,16 +1291,16 @@ namespace Contensive.Addons.AdminSite {
                     // -- Record will be saved, create a new one if this is an add
                     bool NewRecord = false;
                     bool recordChanged = false;
-                    using (var csXfer = new CsModel(cp.core)) {
+                    using (var csData = new CsModel(cp.core)) {
                         if (editRecord.id == 0) {
                             NewRecord = true;
                             recordChanged = true;
-                            csXfer.insert(adminData.adminContent.name);
+                            csData.insert(adminData.adminContent.name);
                         } else {
                             NewRecord = false;
-                            csXfer.openRecord(adminData.adminContent.name, editRecord.id);
+                            csData.openRecord(adminData.adminContent.name, editRecord.id);
                         }
-                        if (!csXfer.ok()) {
+                        if (!csData.ok()) {
                             //
                             // ----- Error: new record could not be created
                             //
@@ -1319,7 +1319,7 @@ namespace Contensive.Addons.AdminSite {
                             //
                             // ----- Get the ID of the current record
                             //
-                            editRecord.id = csXfer.getInteger("ID");
+                            editRecord.id = csData.getInteger("ID");
                             //
                             // ----- Create the update sql
                             //
@@ -1347,10 +1347,10 @@ namespace Contensive.Addons.AdminSite {
                                             } else {
                                                 //
                                                 // save the value in the request
-                                                if (csXfer.getText(fieldName) != FieldValueText) {
+                                                if (csData.getText(fieldName) != FieldValueText) {
                                                     fieldChanged = true;
                                                     recordChanged = true;
-                                                    csXfer.set(fieldName, FieldValueText);
+                                                    csData.set(fieldName, FieldValueText);
                                                 }
                                             }
                                             break;
@@ -1370,10 +1370,10 @@ namespace Contensive.Addons.AdminSite {
                                         }
                                     case "ACTIVE": {
                                             bool saveValue = GenericController.encodeBoolean(fieldValueObject);
-                                            if (csXfer.getBoolean(fieldName) != saveValue) {
+                                            if (csData.getBoolean(fieldName) != saveValue) {
                                                 fieldChanged = true;
                                                 recordChanged = true;
-                                                csXfer.set(fieldName, saveValue);
+                                                csData.set(fieldName, saveValue);
                                             }
                                             break;
                                         }
@@ -1434,16 +1434,16 @@ namespace Contensive.Addons.AdminSite {
                                                 if (cp.core.docProperties.getBoolean(fieldName + ".DeleteFlag")) {
                                                     recordChanged = true;
                                                     fieldChanged = true;
-                                                    csXfer.set(fieldName, "");
+                                                    csData.set(fieldName, "");
                                                 }
                                                 string filename = GenericController.encodeText(fieldValueObject);
                                                 if (!string.IsNullOrWhiteSpace(filename)) {
                                                     filename = FileController.encodeDosFilename(filename);
-                                                    string unixPathFilename = csXfer.getFieldFilename(fieldName, filename);
+                                                    string unixPathFilename = csData.getFieldFilename(fieldName, filename);
                                                     string dosPathFilename = GenericController.convertToDosSlash(unixPathFilename);
                                                     string dosPath = GenericController.getPath(dosPathFilename);
                                                     cp.core.cdnFiles.upload(fieldName, dosPath, ref filename);
-                                                    csXfer.set(fieldName, unixPathFilename);
+                                                    csData.set(fieldName, unixPathFilename);
                                                     recordChanged = true;
                                                     fieldChanged = true;
                                                 }
@@ -1454,10 +1454,10 @@ namespace Contensive.Addons.AdminSite {
                                                 // boolean
                                                 //
                                                 bool saveValue = GenericController.encodeBoolean(fieldValueObject);
-                                                if (csXfer.getBoolean(fieldName) != saveValue) {
+                                                if (csData.getBoolean(fieldName) != saveValue) {
                                                     recordChanged = true;
                                                     fieldChanged = true;
-                                                    csXfer.set(fieldName, saveValue);
+                                                    csData.set(fieldName, saveValue);
                                                 }
                                                 break;
                                             }
@@ -1467,10 +1467,10 @@ namespace Contensive.Addons.AdminSite {
                                                 // Floating pointer numbers
                                                 //
                                                 double saveValue = GenericController.encodeNumber(fieldValueObject);
-                                                if (csXfer.getNumber(fieldName) != saveValue) {
+                                                if (csData.getNumber(fieldName) != saveValue) {
                                                     recordChanged = true;
                                                     fieldChanged = true;
-                                                    csXfer.set(fieldName, saveValue);
+                                                    csData.set(fieldName, saveValue);
                                                 }
                                                 break;
                                             }
@@ -1479,10 +1479,10 @@ namespace Contensive.Addons.AdminSite {
                                                 // Date
                                                 //
                                                 DateTime saveValue = GenericController.encodeDate(fieldValueObject);
-                                                if (csXfer.getDate(fieldName) != saveValue) {
+                                                if (csData.getDate(fieldName) != saveValue) {
                                                     fieldChanged = true;
                                                     recordChanged = true;
-                                                    csXfer.set(fieldName, saveValue);
+                                                    csData.set(fieldName, saveValue);
                                                 }
                                                 break;
                                             }
@@ -1492,10 +1492,10 @@ namespace Contensive.Addons.AdminSite {
                                                 // Integers
                                                 //
                                                 int saveValue = GenericController.encodeInteger(fieldValueObject);
-                                                if (saveValue != csXfer.getInteger(fieldName)) {
+                                                if (saveValue != csData.getInteger(fieldName)) {
                                                     fieldChanged = true;
                                                     recordChanged = true;
-                                                    csXfer.set(fieldName, saveValue);
+                                                    csData.set(fieldName, saveValue);
                                                 }
                                                 break;
                                             }
@@ -1511,10 +1511,10 @@ namespace Contensive.Addons.AdminSite {
                                                 // Text
                                                 //
                                                 string saveValue = GenericController.encodeText(fieldValueObject);
-                                                if (csXfer.getText(fieldName) != saveValue) {
+                                                if (csData.getText(fieldName) != saveValue) {
                                                     fieldChanged = true;
                                                     recordChanged = true;
-                                                    csXfer.set(fieldName, saveValue);
+                                                    csData.set(fieldName, saveValue);
                                                 }
                                                 break;
                                             }
@@ -1538,7 +1538,7 @@ namespace Contensive.Addons.AdminSite {
                                                 string saveValue = GenericController.encodeText(fieldValueObject);
                                                 fieldChanged = true;
                                                 recordChanged = true;
-                                                csXfer.set(UcaseFieldName, saveValue);
+                                                csData.set(UcaseFieldName, saveValue);
                                                 //sql &=  "," & .Name & "=" & cp.core.app.EncodeSQL(FieldValueVariant, .FieldType)
                                                 break;
                                             }
@@ -1554,7 +1554,7 @@ namespace Contensive.Addons.AdminSite {
                                         case "cclibraryfiles":
                                             //
                                             if (cp.core.docProperties.getText("filename") != "") {
-                                                csXfer.set("altsizelist", "");
+                                                csData.set("altsizelist", "");
                                             }
                                             break;
                                     }
@@ -1717,7 +1717,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     string CMCriteria = null;
 
-                    editableCdefIdList = MetaController.getEditableCdefIdList(cp.core);
+                    editableCdefIdList = MetaController.getEditableMetaDataIdList(cp.core);
                     if (editableCdefIdList.Count == 0) {
                         CMCriteria = "(1=0)";
                     } else if (editableCdefIdList.Count == 1) {
@@ -1989,14 +1989,14 @@ namespace Contensive.Addons.AdminSite {
                                     EditorStyleRulesFilename = GenericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", "0", 1, 99, 1);
                                     cp.core.cdnFiles.deleteFile(EditorStyleRulesFilename);
                                     //
-                                    using (var csXfer = new CsModel(cp.core)) {
-                                        csXfer.openSql("select id from cctemplates");
-                                        while (csXfer.ok()) {
-                                            EditorStyleRulesFilename = GenericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", csXfer.getText("ID"), 1, 99, 1);
+                                    using (var csData = new CsModel(cp.core)) {
+                                        csData.openSql("select id from cctemplates");
+                                        while (csData.ok()) {
+                                            EditorStyleRulesFilename = GenericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", csData.getText("ID"), 1, 99, 1);
                                             cp.core.cdnFiles.deleteFile(EditorStyleRulesFilename);
-                                            csXfer.goNext();
+                                            csData.goNext();
                                         }
-                                        csXfer.close();
+                                        csData.close();
                                     }
                                     break;
                             }
@@ -2174,13 +2174,13 @@ namespace Contensive.Addons.AdminSite {
                             //    EditorStyleRulesFilename = genericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", "0", 1, 99, vbTextCompare)
                             //    Call cp.core.cdnFiles.deleteFile(EditorStyleRulesFilename)
                             //    '
-                            //    CS = csXfer.cs_openCsSql_rev("default", "select id from cctemplates")
-                            //    Do While csXfer.cs_ok(CS)
-                            //        EditorStyleRulesFilename = genericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", csXfer.cs_get(CS, "ID"), 1, 99, vbTextCompare)
+                            //    CS = csData.cs_openCsSql_rev("default", "select id from cctemplates")
+                            //    Do While csData.cs_ok(CS)
+                            //        EditorStyleRulesFilename = genericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", csData.cs_get(CS, "ID"), 1, 99, vbTextCompare)
                             //        Call cp.core.cdnFiles.deleteFile(EditorStyleRulesFilename)
-                            //        Call csXfer.cs_goNext(CS)
+                            //        Call csData.cs_goNext(CS)
                             //    Loop
-                            //    Call csXfer.cs_Close(CS)
+                            //    Call csData.cs_Close(CS)
 
 
                         }
@@ -2349,9 +2349,9 @@ namespace Contensive.Addons.AdminSite {
                         //
                         // ----- Update Record
                         //
-                        using (var csXfer = new CsModel(cp.core)) {
-                            csXfer.open("Member Rules", "(MemberID=" + PeopleID + ")and(GroupID=" + GroupID + ")", "", false, 0, "Active,MemberID,GroupID,DateExpires");
-                            if (!csXfer.ok()) {
+                        using (var csData = new CsModel(cp.core)) {
+                            csData.open("Member Rules", "(MemberID=" + PeopleID + ")and(GroupID=" + GroupID + ")", "", false, 0, "Active,MemberID,GroupID,DateExpires");
+                            if (!csData.ok()) {
                                 //
                                 // No record exists
                                 //
@@ -2359,12 +2359,12 @@ namespace Contensive.Addons.AdminSite {
                                     //
                                     // No record, Rule needed, add it
                                     //
-                                    csXfer.insert("Member Rules");
-                                    if (csXfer.ok()) {
-                                        csXfer.set("Active", true);
-                                        csXfer.set("MemberID", PeopleID);
-                                        csXfer.set("GroupID", GroupID);
-                                        csXfer.set("DateExpires", DateExpires);
+                                    csData.insert("Member Rules");
+                                    if (csData.ok()) {
+                                        csData.set("Active", true);
+                                        csData.set("MemberID", PeopleID);
+                                        csData.set("GroupID", GroupID);
+                                        csData.set("DateExpires", DateExpires);
                                     }
                                 }
                             } else {
@@ -2375,17 +2375,17 @@ namespace Contensive.Addons.AdminSite {
                                     //
                                     // record exists, and it is needed, update the DateExpires if changed
                                     //
-                                    RuleActive = csXfer.getBoolean("active");
-                                    RuleDateExpires = csXfer.getDate("DateExpires");
+                                    RuleActive = csData.getBoolean("active");
+                                    RuleDateExpires = csData.getDate("DateExpires");
                                     if ((!RuleActive) || (RuleDateExpires != DateExpires)) {
-                                        csXfer.set("Active", true);
-                                        csXfer.set("DateExpires", DateExpires);
+                                        csData.set("Active", true);
+                                        csData.set("DateExpires", DateExpires);
                                     }
                                 } else {
                                     //
                                     // record exists and it is not needed, delete it
                                     //
-                                    MemberRuleID = csXfer.getInteger("ID");
+                                    MemberRuleID = csData.getInteger("ID");
                                     cp.core.db.deleteTableRecord(MemberRuleID, "ccMemberRules", "Default");
                                 }
                             }
@@ -2472,30 +2472,30 @@ namespace Contensive.Addons.AdminSite {
                             // Create Group and Rule
                             //
                             if (NewGroup && (!string.IsNullOrEmpty(NewGroupName))) {
-                                using (var csXfer = new CsModel(cp.core)) {
-                                    csXfer.open("Groups", "name=" + DbController.encodeSQLText(NewGroupName));
-                                    if (csXfer.ok()) {
+                                using (var csData = new CsModel(cp.core)) {
+                                    csData.open("Groups", "name=" + DbController.encodeSQLText(NewGroupName));
+                                    if (csData.ok()) {
                                         Description = Description + "<div>Group [" + NewGroupName + "] already exists, using existing group.</div>";
-                                        GroupID = csXfer.getInteger("ID");
+                                        GroupID = csData.getInteger("ID");
                                     } else {
                                         Description = Description + "<div>Creating new group [" + NewGroupName + "]</div>";
-                                        csXfer.close();
-                                        csXfer.insert("Groups");
-                                        if (csXfer.ok()) {
-                                            GroupID = csXfer.getInteger("ID");
-                                            csXfer.set("Name", NewGroupName);
-                                            csXfer.set("Caption", NewGroupName);
+                                        csData.close();
+                                        csData.insert("Groups");
+                                        if (csData.ok()) {
+                                            GroupID = csData.getInteger("ID");
+                                            csData.set("Name", NewGroupName);
+                                            csData.set("Caption", NewGroupName);
                                         }
                                     }
                                 }
                             }
                             if (GroupID != 0) {
-                                using (var csXfer = new CsModel(cp.core)) {
-                                    csXfer.insert("Group Rules");
-                                    if (csXfer.ok()) {
+                                using (var csData = new CsModel(cp.core)) {
+                                    csData.insert("Group Rules");
+                                    if (csData.ok()) {
                                         Description = Description + "<div>Assigning group [" + MetaController.getRecordName(cp.core, "Groups", GroupID) + "] to edit content [" + ChildContentName + "].</div>";
-                                        csXfer.set("GroupID", GroupID);
-                                        csXfer.set("ContentID", ChildContentID);
+                                        csData.set("GroupID", GroupID);
+                                        csData.set("ContentID", ChildContentID);
                                     }
                                 }
                             }
@@ -2514,8 +2514,8 @@ namespace Contensive.Addons.AdminSite {
                                 //                    Do While cp.core.app.csv_IsCSOK(CS)
                                 //                        ParentID = cp.core.app.csv_cs_getText(CS, "ID")
                                 //                        ParentName = cp.core.app.csv_cs_getText(CS, "name")
-                                //                        AdminOnly = csXfer.cs_getBoolean(CS, "AdminOnly")
-                                //                        DeveloperOnly = csXfer.cs_getBoolean(CS, "DeveloperOnly")
+                                //                        AdminOnly = csData.cs_getBoolean(CS, "AdminOnly")
+                                //                        DeveloperOnly = csData.cs_getBoolean(CS, "DeveloperOnly")
                                 //                        CSEntry = cp.core.app.csv_InsertCSRecord(MenuContentName)
                                 //                        If cp.core.app.csv_IsCSOK(CSEntry) Then
                                 //                            If ParentID = 0 Then
@@ -2553,20 +2553,20 @@ namespace Contensive.Addons.AdminSite {
                                 // Add Legacy Navigator Entries
                                 //
                                 // -- deprecated
-                                //CS = csXfer.cs_open(Processor.Models.Db.NavigatorEntryModel.contentName, "ContentID=" & ParentContentID)
-                                //Do While csXfer.cs_ok(CS)
-                                //    MenuName = csXfer.cs_get(CS, "name")
-                                //    AdminOnly = csXfer.cs_getBoolean(CS, "AdminOnly")
-                                //    DeveloperOnly = csXfer.cs_getBoolean(CS, "DeveloperOnly")
+                                //CS = csData.cs_open(Processor.Models.Db.NavigatorEntryModel.contentName, "ContentID=" & ParentContentID)
+                                //Do While csData.cs_ok(CS)
+                                //    MenuName = csData.cs_get(CS, "name")
+                                //    AdminOnly = csData.cs_getBoolean(CS, "AdminOnly")
+                                //    DeveloperOnly = csData.cs_getBoolean(CS, "DeveloperOnly")
                                 //    If MenuName = "" Then
                                 //        MenuName = "Site Content"
                                 //    End If
                                 //    Call Controllers.appBuilderController.admin_VerifyAdminMenu(cp.core, MenuName, ChildContentName, ChildContentName, "", ChildContentName, AdminOnly, DeveloperOnly, False)
                                 //    Description = Description _
                                 //        & "<div>Creating Legacy site menu for [" & ChildContentName & "] under entry [" & MenuName & "].</div>"
-                                //    csXfer.cs_goNext(CS)
+                                //    csData.cs_goNext(CS)
                                 //Loop
-                                //Call csXfer.cs_Close(CS)
+                                //Call csData.cs_Close(CS)
                             }
                             //
                             Description = Description + "<div>&nbsp;</div>"
@@ -2630,20 +2630,20 @@ namespace Contensive.Addons.AdminSite {
                 } else {
                     SQL = "select Name, ID from ccContent where ParentID=" + ParentID + " and (AllowContentChildTool<>0) and not (allowcontentchildtool is null);";
                 }
-                using (var csXfer = new CsModel(cp.core)) {
-                    csXfer.openSql(SQL, "Default");
-                    while (csXfer.ok()) {
-                        RecordName = csXfer.getText("Name");
-                        RecordID = csXfer.getInteger("ID");
+                using (var csData = new CsModel(cp.core)) {
+                    csData.openSql(SQL, "Default");
+                    while (csData.ok()) {
+                        RecordName = csData.getText("Name");
+                        RecordID = csData.getInteger("ID");
                         if (RecordID == DefaultValue) {
-                            returnOptions = returnOptions + "<option value=\"" + RecordID + "\" selected>" + csXfer.getText("name") + "</option>";
+                            returnOptions = returnOptions + "<option value=\"" + RecordID + "\" selected>" + csData.getText("name") + "</option>";
                         } else {
-                            returnOptions = returnOptions + "<option value=\"" + RecordID + "\" >" + csXfer.getText("name") + "</option>";
+                            returnOptions = returnOptions + "<option value=\"" + RecordID + "\" >" + csData.getText("name") + "</option>";
                         }
                         returnOptions = returnOptions + GetContentChildTool_Options(cp, RecordID, DefaultValue);
-                        csXfer.goNext();
+                        csData.goNext();
                     }
-                    csXfer.close();
+                    csData.close();
                 }
             } catch (Exception ex) {
                 LogController.handleError(cp.core, ex);
@@ -2728,10 +2728,10 @@ namespace Contensive.Addons.AdminSite {
                     //
                     PagesTotal = 0;
                     SQL = "SELECT Count(ID) as Result FROM ccVisits;";
-                    using (var csXfer = new CsModel(cp.core)) {
-                        csXfer.openSql(SQL, "Default");
-                        if (csXfer.ok()) {
-                            PagesTotal = csXfer.getInteger("Result");
+                    using (var csData = new CsModel(cp.core)) {
+                        csData.openSql(SQL, "Default");
+                        if (csData.ok()) {
+                            PagesTotal = csData.getInteger("Result");
                         }
                     }
                     tableBody += AdminUIController.getEditRowLegacy(cp.core, SpanClassAdminNormal + PagesTotal, "Visits Found", "", false, false, "");
@@ -2740,11 +2740,11 @@ namespace Contensive.Addons.AdminSite {
                     //
                     Copy = "unknown";
                     AgeInDays = "unknown";
-                    using (var csXfer = new CsModel(cp.core)) {
+                    using (var csData = new CsModel(cp.core)) {
                         SQL = cp.core.db.getSQLSelect("default", "ccVisits", "DateAdded", "", "ID", "", 1);
-                        csXfer.openSql(SQL, "Default");
-                        if (csXfer.ok()) {
-                            DateValue = csXfer.getDate("DateAdded");
+                        csData.openSql(SQL, "Default");
+                        if (csData.ok()) {
+                            DateValue = csData.getDate("DateAdded");
                             if (DateValue != DateTime.MinValue) {
                                 Copy = GenericController.encodeText(DateValue);
                                 AgeInDays = GenericController.encodeText(encodeInteger(Math.Floor(encodeNumber(cp.core.doc.profileStartTime - DateValue))));
@@ -2757,12 +2757,12 @@ namespace Contensive.Addons.AdminSite {
                     //
                     PagesTotal = 0;
                     SQL = "SELECT Count(ID) as result  FROM ccViewings;";
-                    using (var csXfer = new CsModel(cp.core)) {
-                        csXfer.openSql(SQL, "Default");
-                        if (csXfer.ok()) {
-                            PagesTotal = csXfer.getInteger("Result");
+                    using (var csData = new CsModel(cp.core)) {
+                        csData.openSql(SQL, "Default");
+                        if (csData.ok()) {
+                            PagesTotal = csData.getInteger("Result");
                         }
-                        csXfer.close();
+                        csData.close();
                     }
                     tableBody += (AdminUIController.getEditRowLegacy(cp.core, SpanClassAdminNormal + PagesTotal, "Viewings Found", "", false, false, ""));
                     //
@@ -2810,29 +2810,29 @@ namespace Contensive.Addons.AdminSite {
                 if (cp.core.doc.debug_iUserError != "") {
                     Processor.Controllers.ErrorController.addUserError(cp.core, "Existing pages could not be checked for Link Alias names because there was another error on this page. Correct this error, and turn Link Alias on again to rerun the verification.");
                 } else {
-                    using (var csXfer = new CsModel(cp.core)) {
-                        csXfer.open("Page Content");
-                        while (csXfer.ok()) {
+                    using (var csData = new CsModel(cp.core)) {
+                        csData.open("Page Content");
+                        while (csData.ok()) {
                             //
                             // Add the link alias
                             //
-                            linkAlias = csXfer.getText("LinkAlias");
+                            linkAlias = csData.getText("LinkAlias");
                             if (!string.IsNullOrEmpty(linkAlias)) {
                                 //
                                 // Add the link alias
                                 //
-                                LinkAliasController.addLinkAlias(cp.core, linkAlias, csXfer.getInteger("ID"), "", false, true);
+                                LinkAliasController.addLinkAlias(cp.core, linkAlias, csData.getInteger("ID"), "", false, true);
                             } else {
                                 //
                                 // Add the name
                                 //
-                                linkAlias = csXfer.getText("name");
+                                linkAlias = csData.getText("name");
                                 if (!string.IsNullOrEmpty(linkAlias)) {
-                                    LinkAliasController.addLinkAlias(cp.core, linkAlias, csXfer.getInteger("ID"), "", false, false);
+                                    LinkAliasController.addLinkAlias(cp.core, linkAlias, csData.getInteger("ID"), "", false, false);
                                 }
                             }
                             //
-                            csXfer.goNext();
+                            csData.goNext();
                         }
                     }
                     if (cp.core.doc.debug_iUserError != "") {

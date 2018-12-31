@@ -49,12 +49,12 @@ namespace Contensive.Processor.Controllers {
                     //
                     ContentName = MetaController.getContentNameByID(core, ContentID);
                     if (!string.IsNullOrEmpty(ContentName)) {
-                        using (var csXfer = new CsModel(core)) {
-                            csXfer.open(ContentName, "ID=" + DbController.encodeSQLNumber(RecordID), "", false);
-                            if (csXfer.ok()) {
-                                csXfer.set(FieldName, ContentCopy);
+                        using (var csData = new CsModel(core)) {
+                            csData.open(ContentName, "ID=" + DbController.encodeSQLNumber(RecordID), "", false);
+                            if (csData.ok()) {
+                                csData.set(FieldName, ContentCopy);
                             }
-                            csXfer.close();
+                            csData.close();
                         }
                     }
                     break;
@@ -87,13 +87,13 @@ namespace Contensive.Processor.Controllers {
             } else {
                 intContentName = MetaController.getContentNameByID(core, ContentID);
                 if (!string.IsNullOrEmpty(intContentName)) {
-                    using (var csXfer = new CsModel(core)) {
-                        csXfer.open(intContentName, "ID=" + intRecordId);
-                        if (!csXfer.ok()) {
+                    using (var csData = new CsModel(core)) {
+                        csData.open(intContentName, "ID=" + intRecordId);
+                        if (!csData.ok()) {
                             PanelCopy = SpanClassAdminNormal + "The information you have selected can not be accessed.</span>";
                             EditorPanel = EditorPanel + core.html.getPanel(PanelCopy);
                         } else {
-                            Copy = csXfer.getText(strFieldName);
+                            Copy = csData.getText(strFieldName);
                             EditorPanel = EditorPanel + HtmlController.inputHidden("Type", FormTypeActiveEditor);
                             EditorPanel = EditorPanel + HtmlController.inputHidden("cid", ContentID);
                             EditorPanel = EditorPanel + HtmlController.inputHidden("ID", intRecordId);
@@ -104,7 +104,7 @@ namespace Contensive.Processor.Controllers {
                             ButtonPanel = core.html.getPanelButtons(ButtonCancel + "," + ButtonSave, "button");
                             EditorPanel = EditorPanel + ButtonPanel;
                         }
-                        csXfer.close();
+                        csData.close();
                     }
                 }
             }

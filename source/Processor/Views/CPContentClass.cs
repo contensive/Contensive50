@@ -115,9 +115,14 @@ namespace Contensive.Processor {
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// get a record id from its unique name. If a duplicate exists, the first ordered by id is returned
+        /// </summary>
+        /// <param name="contentName"></param>
+        /// <param name="recordName"></param>
+        /// <returns></returns>
         public override int GetRecordID(string contentName, string recordName) {
-            return MetaController.getRecordId( cp.core,contentName, recordName);
+            return MetaController.getRecordIdByUniqueName( cp.core,contentName, recordName);
         }
         //
         //====================================================================================================

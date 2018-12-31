@@ -140,13 +140,13 @@ namespace Contensive.Processor.Models.Domain {
                     //
                     // insert a new property record, get the ID back and save it in cache
                     //
-                    using (var csXfer = new CsModel(core)) {
-                        if (csXfer.insert("Properties")) {
-                            propertyCache[2, Ptr] = csXfer.getText("ID");
-                            csXfer.set("name", propertyName);
-                            csXfer.set("FieldValue", propertyValue);
-                            csXfer.set("TypeID", (int)propertyType);
-                            csXfer.set("KeyID", keyId.ToString());
+                    using (var csData = new CsModel(core)) {
+                        if (csData.insert("Properties")) {
+                            propertyCache[2, Ptr] = csData.getText("ID");
+                            csData.set("name", propertyName);
+                            csData.set("FieldValue", propertyValue);
+                            csData.set("TypeID", (int)propertyType);
+                            csData.set("KeyID", keyId.ToString());
                         }
                     }
                 } else if (propertyCache[1, Ptr] != propertyValue) {

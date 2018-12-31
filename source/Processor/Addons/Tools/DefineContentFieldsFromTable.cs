@@ -50,12 +50,12 @@ namespace Contensive.Addons.Tools {
                 Stream.Add("<TD>" + SpanClassAdminNormal + "Content Name</SPAN></td>");
                 Stream.Add("<TD><Select name=\"ContentName\">");
                 int ItemCount = 0;
-                using (var csXfer = new CsModel(core)) {
-                    csXfer.open("Content", "", "name");
-                    while (csXfer.ok()) {
-                        Stream.Add("<option value=\"" + csXfer.getText("name") + "\">" + csXfer.getText("name") + "</option>");
+                using (var csData = new CsModel(core)) {
+                    csData.open("Content", "", "name");
+                    while (csData.ok()) {
+                        Stream.Add("<option value=\"" + csData.getText("name") + "\">" + csData.getText("name") + "</option>");
                         ItemCount = ItemCount + 1;
-                        csXfer.goNext();
+                        csData.goNext();
                     }
 
                 }

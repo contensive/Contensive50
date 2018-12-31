@@ -9,7 +9,7 @@ namespace Contensive.Processor.Controllers {
     /// <summary>
     /// Handle the nitty-gritty of reading and writing the xml file for collections and CDefMiniCollections
     /// </summary>
-    public static class ApplicationCDefMiniCollection {
+    public static class ApplicationMetaDataMiniCollection {
         //
         // ----- global scope variables
         //
@@ -431,11 +431,11 @@ namespace Contensive.Processor.Controllers {
                     + " select D.name as DataSourceName,T.name as TableName"
                     + " from cctables T left join ccDataSources d on D.ID=T.DataSourceID"
                     + " where t.active<>0";
-                using (var csXfer = new CsModel(core)) {
-                    csXfer.openSql(SQL);
-                    while (csXfer.ok()) {
-                        string DataSourceName = csXfer.getText("DataSourceName");
-                        string TableName = csXfer.getText("TableName");
+                using (var csData = new CsModel(core)) {
+                    csData.openSql(SQL);
+                    while (csData.ok()) {
+                        string DataSourceName = csData.getText("DataSourceName");
+                        string TableName = csData.getText("TableName");
                         string IndexList = core.db.getSQLIndexList(DataSourceName, TableName);
                         //
                         if (!string.IsNullOrEmpty(IndexList)) {
@@ -490,7 +490,7 @@ namespace Contensive.Processor.Controllers {
                                 }
                             }
                         }
-                        csXfer.goNext();
+                        csData.goNext();
                     }
                 }
                 result = sb.ToString();
@@ -543,7 +543,7 @@ namespace Contensive.Processor.Controllers {
                 // ****************************** if cdef not loaded, this fails
                 //
                 appName = core.appConfig.name;
-                MenuContentID = MetaController.getRecordId( core,"Content", Processor.Models.Db.NavigatorEntryModel.contentName);
+                MenuContentID = MetaController.getRecordIdByUniqueName( core,"Content", Processor.Models.Db.NavigatorEntryModel.contentName);
                 dt = core.db.executeQuery("select * from ccMenuEntries where (contentcontrolid=" + MenuContentID + ")and(name<>'')");
                 if (dt.Rows.Count > 0) {
                     NavIconType = 0;
@@ -592,7 +592,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 System.Text.StringBuilder sb = new System.Text.StringBuilder();
                 string appName = core.appConfig.name;
-                int MenuContentID = MetaController.getRecordId( core,"Content", Processor.Models.Db.NavigatorEntryModel.contentName);
+                int MenuContentID = MetaController.getRecordIdByUniqueName( core,"Content", Processor.Models.Db.NavigatorEntryModel.contentName);
                 DataTable rs = core.db.executeQuery("select * from ccMenuEntries where (contentcontrolid=" + MenuContentID + ")and(name<>'')");
                 if (DbController.isDataTableOk(rs)) {
                     if (true) {

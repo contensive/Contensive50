@@ -36,13 +36,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static GroupEmailModel addDefault(CoreController core, Domain.MetaModel cdef) {
-            return addDefault<GroupEmailModel>(core, cdef);
+        public static GroupEmailModel addDefault(CoreController core, Domain.MetaModel metaData) {
+            return addDefault<GroupEmailModel>(core, metaData);
         }
         //
         //====================================================================================================
-        public static GroupEmailModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.MetaModel cdef) {
-            return addDefault<GroupEmailModel>(core, cdef, ref callersCacheNameList);
+        public static GroupEmailModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.MetaModel metaData) {
+            return addDefault<GroupEmailModel>(core, metaData, ref callersCacheNameList);
         }
         //
         //====================================================================================================

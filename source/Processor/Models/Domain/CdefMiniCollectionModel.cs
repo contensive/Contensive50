@@ -19,9 +19,9 @@ namespace Contensive.Processor.Models.Domain {
     //
     //====================================================================================================
     /// <summary>
-    /// miniCollection - This is an old collection object used in part to load the cdef part xml files. REFACTOR this into CollectionWantList and werialization into jscon
+    /// miniCollection - This is an old collection object used in part to load the metadata part xml files. REFACTOR this into CollectionWantList and werialization into jscon
     /// </summary>
-    public class CDefMiniCollectionModel : ICloneable {
+    public class MetaDataMiniCollectionModel : ICloneable {
         //
         //====================================================================================================
         /// <summary>
@@ -40,7 +40,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// Name dictionary of content definitions in the collection
         /// </summary>
-        public Dictionary<string, Models.Domain.MetaModel> cdef = new Dictionary<string, Models.Domain.MetaModel>();
+        public Dictionary<string, Models.Domain.MetaModel> metaData = new Dictionary<string, Models.Domain.MetaModel>();
         //
         //====================================================================================================
         /// <summary>
@@ -183,31 +183,31 @@ namespace Contensive.Processor.Models.Domain {
             public string Style;
         }
         ////
-        //internal static void installCDefMiniCollectionFromXml_2(CoreController core, string srcXml, bool isNewBuild, bool isBaseCollection, bool isRepairMode, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> installedCollections) {
-        //    CDefMiniCollectionModel baseCollection = installCDefMiniCollection_LoadXml(core, srcXml, true, true, isNewBuild, new CDefMiniCollectionModel(), logPrefix, ref installedCollections);
-        //    installCDefMiniCollection_BuildDb(core, baseCollection, core.siteProperties.dataBuildVersion, isNewBuild, isRepairMode, ref nonCriticalErrorList, logPrefix, ref installedCollections);
+        //internal static void installmetadataMiniCollectionFromXml_2(CoreController core, string srcXml, bool isNewBuild, bool isBaseCollection, bool isRepairMode, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> installedCollections) {
+        //    metadataMiniCollectionModel baseCollection = installmetadataMiniCollection_LoadXml(core, srcXml, true, true, isNewBuild, new metadataMiniCollectionModel(), logPrefix, ref installedCollections);
+        //    installmetadataMiniCollection_BuildDb(core, baseCollection, core.siteProperties.dataBuildVersion, isNewBuild, isRepairMode, ref nonCriticalErrorList, logPrefix, ref installedCollections);
 
         //}
         //
         //======================================================================================================
         //
-        internal static void installCDefMiniCollectionFromXml(bool quick, CoreController core, string srcXml, bool isNewBuild, bool isRepairMode, bool isBaseCollection, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> installedCollections) {
+        internal static void installMetaDataMiniCollectionFromXml(bool quick, CoreController core, string srcXml, bool isNewBuild, bool isRepairMode, bool isBaseCollection, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> installedCollections) {
             try {
                 if (quick) {
                     //
-                    LogController.logInfo(core, "installCDefMiniCollectionFromXML");
+                    LogController.logInfo(core, "installmetadataMiniCollectionFromXML");
                     // 
                     // -- method 1, just install
-                    CDefMiniCollectionModel baseCollection = installCDefMiniCollection_LoadXml(core, srcXml, true, true, isNewBuild, new CDefMiniCollectionModel(), logPrefix, ref installedCollections);
-                    installCDefMiniCollection_BuildDb(core, baseCollection, core.siteProperties.dataBuildVersion, isNewBuild, isRepairMode, ref nonCriticalErrorList, logPrefix, ref installedCollections);
+                    MetaDataMiniCollectionModel baseCollection = installMetaDataMiniCollection_LoadXml(core, srcXml, true, true, isNewBuild, new MetaDataMiniCollectionModel(), logPrefix, ref installedCollections);
+                    installMetaDataMiniCollection_BuildDb(core, baseCollection, core.siteProperties.dataBuildVersion, isNewBuild, isRepairMode, ref nonCriticalErrorList, logPrefix, ref installedCollections);
                 } else {
                     //
                     // -- method 2, merge with application collection and install
                     //
-                    CDefMiniCollectionModel miniCollectionWorking = getApplicationCDefMiniCollection(core, isNewBuild, logPrefix, ref installedCollections);
-                    CDefMiniCollectionModel miniCollectionToAdd = installCDefMiniCollection_LoadXml(core, srcXml, isBaseCollection, false, isNewBuild, miniCollectionWorking, logPrefix, ref installedCollections);
+                    MetaDataMiniCollectionModel miniCollectionWorking = getApplicationMetaDataMiniCollection(core, isNewBuild, logPrefix, ref installedCollections);
+                    MetaDataMiniCollectionModel miniCollectionToAdd = installMetaDataMiniCollection_LoadXml(core, srcXml, isBaseCollection, false, isNewBuild, miniCollectionWorking, logPrefix, ref installedCollections);
                     addMiniCollectionSrcToDst(core, ref miniCollectionWorking, miniCollectionToAdd);
-                    installCDefMiniCollection_BuildDb(core, miniCollectionWorking, core.siteProperties.dataBuildVersion, isNewBuild, isRepairMode, ref nonCriticalErrorList, logPrefix, ref installedCollections);
+                    installMetaDataMiniCollection_BuildDb(core, miniCollectionWorking, core.siteProperties.dataBuildVersion, isNewBuild, isRepairMode, ref nonCriticalErrorList, logPrefix, ref installedCollections);
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
@@ -217,13 +217,13 @@ namespace Contensive.Processor.Models.Domain {
         //
         //======================================================================================================
         /// <summary>
-        /// create a collection class from a collection xml file, cdef are added to the cdefs in the application collection
+        /// create a collection class from a collection xml file, metadata are added to the metadatas in the application collection
         /// </summary>
-        private static CDefMiniCollectionModel installCDefMiniCollection_LoadXml(CoreController core, string srcCollecionXml, bool IsccBaseFile, bool setAllDataChanged, bool IsNewBuild, CDefMiniCollectionModel defaultCollection, string logPrefix, ref List<string> installedCollections) {
-            CDefMiniCollectionModel result = null;
+        private static MetaDataMiniCollectionModel installMetaDataMiniCollection_LoadXml(CoreController core, string srcCollecionXml, bool IsccBaseFile, bool setAllDataChanged, bool IsNewBuild, MetaDataMiniCollectionModel defaultCollection, string logPrefix, ref List<string> installedCollections) {
+            MetaDataMiniCollectionModel result = null;
             try {
-                Models.Domain.MetaModel DefaultCDef = null;
-                Models.Domain.MetaFieldModel DefaultCDefField = null;
+                MetaModel DefaultMetaData = null;
+                MetaFieldModel DefaultMetaDataField = null;
                 string contentNameLc = null;
                 string Collectionname = null;
                 string ContentTableName = null;
@@ -240,31 +240,31 @@ namespace Contensive.Processor.Models.Domain {
                 string menuNameSpace = null;
                 string MenuGuid = null;
 
-                XmlNode CDef_Node = null;
+                XmlNode metaData_Node = null;
                 string DataSourceName = null;
                 XmlDocument srcXmlDom = new XmlDocument();
                 string NodeName = null;
                 //
-                LogController.logInfo(core, "Application: " + core.appConfig.name + ", UpgradeCDef_LoadDataToCollection");
+                LogController.logInfo(core, "Application: " + core.appConfig.name + ", Upgrademetadata_LoadDataToCollection");
                 //
-                result = new CDefMiniCollectionModel();
+                result = new MetaDataMiniCollectionModel();
                 //
                 if (string.IsNullOrEmpty(srcCollecionXml)) {
                     //
                     // -- empty collection is an error
-                    throw (new GenericException("UpgradeCDef_LoadDataToCollection, srcCollectionXml is blank or null"));
+                    throw (new GenericException("Upgrademetadata_LoadDataToCollection, srcCollectionXml is blank or null"));
                 } else {
                     try {
                         srcXmlDom.LoadXml(srcCollecionXml);
                     } catch (Exception ex) {
                         //
                         // -- xml load error
-                        LogController.logError(core, "UpgradeCDef_LoadDataToCollection Error reading xml archive, ex=[" + ex.ToString() + "]");
-                        throw new Exception("Error in UpgradeCDef_LoadDataToCollection, during doc.loadXml()", ex);
+                        LogController.logError(core, "Upgrademetadata_LoadDataToCollection Error reading xml archive, ex=[" + ex.ToString() + "]");
+                        throw new Exception("Error in Upgrademetadata_LoadDataToCollection, during doc.loadXml()", ex);
                     }
                     if ((srcXmlDom.DocumentElement.Name.ToLowerInvariant() != CollectionFileRootNode) && (srcXmlDom.DocumentElement.Name.ToLowerInvariant() != "contensivecdef")) {
                         //
-                        // -- root node must be collection (or legacy contensivecdef)
+                        // -- root node must be collection (or legacy contensivemetadata)
                         LogController.handleError(core, new GenericException("the archive file has a syntax error. Application name must be the first node."));
                     } else {
                         result.isBaseCollection = IsccBaseFile;
@@ -274,9 +274,9 @@ namespace Contensive.Processor.Models.Domain {
                         //hint = "get collection name"
                         Collectionname = XmlController.GetXMLAttribute(core, Found, srcXmlDom.DocumentElement, "name", "");
                         if (string.IsNullOrEmpty(Collectionname)) {
-                            LogController.logInfo(core, "UpgradeCDef_LoadDataToCollection, Application: " + core.appConfig.name + ", Collection has no name");
+                            LogController.logInfo(core, "Upgrademetadata_LoadDataToCollection, Application: " + core.appConfig.name + ", Collection has no name");
                         } else {
-                            //Call AppendClassLogFile(core.app.config.name,"UpgradeCDef_LoadDataToCollection", "UpgradeCDef_LoadDataToCollection, Application: " & core.app.appEnvironment.name & ", Collection: " & Collectionname)
+                            //Call AppendClassLogFile(core.app.config.name,"Upgrademetadata_LoadDataToCollection", "Upgrademetadata_LoadDataToCollection, Application: " & core.app.appEnvironment.name & ", Collection: " & Collectionname)
                         }
                         result.name = Collectionname;
                         //
@@ -294,28 +294,26 @@ namespace Contensive.Processor.Models.Domain {
                         //End If
                         //SortMethodList = SortMethodList & vbTab
                         //
-                        foreach (XmlNode CDef_NodeWithinLoop in srcXmlDom.DocumentElement.ChildNodes) {
-                            CDef_Node = CDef_NodeWithinLoop;
-                            //isCdefTarget = False
-                            NodeName = GenericController.vbLCase(CDef_NodeWithinLoop.Name);
-                            //hint = "read node " & NodeName
+                        foreach (XmlNode metaData_NodeWithinLoop in srcXmlDom.DocumentElement.ChildNodes) {
+                            metaData_Node = metaData_NodeWithinLoop;
+                            NodeName = GenericController.vbLCase(metaData_NodeWithinLoop.Name);
                             switch (NodeName) {
                                 case "cdef":
                                     //
                                     // Content Definitions
                                     //
-                                    ContentName = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "name", "");
+                                    ContentName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "name", "");
                                     contentNameLc = GenericController.vbLCase(ContentName);
                                     if (string.IsNullOrEmpty(ContentName)) {
-                                        throw (new GenericException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "collection file contains a CDEF node with no name attribute. This is not allowed.", "dll", "builderClass", "UpgradeCDef_LoadDataToCollection", 0, "", "", False, True, "")
+                                        throw (new GenericException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "collection file contains a metadata node with no name attribute. This is not allowed.", "dll", "builderClass", "Upgrademetadata_LoadDataToCollection", 0, "", "", False, True, "")
                                     } else {
                                         //
-                                        // setup a cdef from the application collection to use as a default for missing attributes (for inherited cdef)
+                                        // setup a metadata from the application collection to use as a default for missing attributes (for inherited metadata)
                                         //
-                                        if (defaultCollection.cdef.ContainsKey(contentNameLc)) {
-                                            DefaultCDef = defaultCollection.cdef[contentNameLc];
+                                        if (defaultCollection.metaData.ContainsKey(contentNameLc)) {
+                                            DefaultMetaData = defaultCollection.metaData[contentNameLc];
                                         } else {
-                                            DefaultCDef = new Models.Domain.MetaModel() {
+                                            DefaultMetaData = new Models.Domain.MetaModel() {
                                                 active = true,
                                                 activeOnly = true,
                                                 aliasID = "id",
@@ -331,168 +329,167 @@ namespace Contensive.Processor.Models.Domain {
                                             };
                                         }
                                         //
-                                        ContentTableName = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "ContentTableName", DefaultCDef.tableName);
+                                        ContentTableName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "ContentTableName", DefaultMetaData.tableName);
                                         if (!string.IsNullOrEmpty(ContentTableName)) {
                                             //
                                             // These two fields are needed to import the row
                                             //
-                                            DataSourceName = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "dataSource", DefaultCDef.dataSourceName);
+                                            DataSourceName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "dataSource", DefaultMetaData.dataSourceName);
                                             if (string.IsNullOrEmpty(DataSourceName)) {
                                                 DataSourceName = "Default";
                                             }
                                             //
-                                            // ----- Add CDef if not already there
+                                            // ----- Add metadata if not already there
                                             //
-                                            if (!result.cdef.ContainsKey(ContentName.ToLowerInvariant())) {
-                                                result.cdef.Add(ContentName.ToLowerInvariant(), new Models.Domain.MetaModel());
+                                            if (!result.metaData.ContainsKey(ContentName.ToLowerInvariant())) {
+                                                result.metaData.Add(ContentName.ToLowerInvariant(), new Models.Domain.MetaModel());
                                             }
                                             //
-                                            // Get CDef attributes
+                                            // Get metadata attributes
                                             //
-                                            Models.Domain.MetaModel targetCdef = result.cdef[ContentName.ToLowerInvariant()];
+                                            Models.Domain.MetaModel targetMetaData = result.metaData[ContentName.ToLowerInvariant()];
                                             string activeDefaultText = "1";
-                                            if (!(DefaultCDef.active)) {
+                                            if (!(DefaultMetaData.active)) {
                                                 activeDefaultText = "0";
                                             }
-                                            ActiveText = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "Active", activeDefaultText);
+                                            ActiveText = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "Active", activeDefaultText);
                                             if (string.IsNullOrEmpty(ActiveText)) {
                                                 ActiveText = "1";
                                             }
-                                            targetCdef.active = GenericController.encodeBoolean(ActiveText);
-                                            targetCdef.activeOnly = true;
+                                            targetMetaData.active = GenericController.encodeBoolean(ActiveText);
+                                            targetMetaData.activeOnly = true;
                                             //.adminColumns = ?
-                                            targetCdef.adminOnly = XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "AdminOnly", DefaultCDef.adminOnly);
-                                            targetCdef.aliasID = "id";
-                                            targetCdef.aliasName = "name";
-                                            targetCdef.allowAdd = XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "AllowAdd", DefaultCDef.allowAdd);
-                                            targetCdef.allowCalendarEvents = XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "AllowCalendarEvents", DefaultCDef.allowCalendarEvents);
-                                            targetCdef.allowContentChildTool = XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "AllowContentChildTool", DefaultCDef.allowContentChildTool);
-                                            targetCdef.allowContentTracking = XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "AllowContentTracking", DefaultCDef.allowContentTracking);
-                                            targetCdef.allowDelete = XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "AllowDelete", DefaultCDef.allowDelete);
-                                            targetCdef.allowTopicRules = XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "AllowTopicRules", DefaultCDef.allowTopicRules);
-                                            targetCdef.guid = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "guid", DefaultCDef.guid);
-                                            targetCdef.dataChanged = setAllDataChanged;
-                                            targetCdef.legacyContentControlCriteria = "";
-                                            targetCdef.dataSourceName = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "ContentDataSourceName", DefaultCDef.dataSourceName);
-                                            targetCdef.tableName = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "ContentTableName", DefaultCDef.tableName);
-                                            targetCdef.dataSourceId = 0;
-                                            targetCdef.defaultSortMethod = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "DefaultSortMethod", DefaultCDef.defaultSortMethod);
-                                            if ((targetCdef.defaultSortMethod == "") || (targetCdef.defaultSortMethod.ToLowerInvariant() == "name")) {
-                                                targetCdef.defaultSortMethod = "By Name";
-                                            } else if (GenericController.vbLCase(targetCdef.defaultSortMethod) == "sortorder") {
-                                                targetCdef.defaultSortMethod = "By Alpha Sort Order Field";
-                                            } else if (GenericController.vbLCase(targetCdef.defaultSortMethod) == "date") {
-                                                targetCdef.defaultSortMethod = "By Date";
+                                            targetMetaData.adminOnly = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "AdminOnly", DefaultMetaData.adminOnly);
+                                            targetMetaData.aliasID = "id";
+                                            targetMetaData.aliasName = "name";
+                                            targetMetaData.allowAdd = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "AllowAdd", DefaultMetaData.allowAdd);
+                                            targetMetaData.allowCalendarEvents = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "AllowCalendarEvents", DefaultMetaData.allowCalendarEvents);
+                                            targetMetaData.allowContentChildTool = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "AllowContentChildTool", DefaultMetaData.allowContentChildTool);
+                                            targetMetaData.allowContentTracking = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "AllowContentTracking", DefaultMetaData.allowContentTracking);
+                                            targetMetaData.allowDelete = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "AllowDelete", DefaultMetaData.allowDelete);
+                                            targetMetaData.allowTopicRules = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "AllowTopicRules", DefaultMetaData.allowTopicRules);
+                                            targetMetaData.guid = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "guid", DefaultMetaData.guid);
+                                            targetMetaData.dataChanged = setAllDataChanged;
+                                            targetMetaData.legacyContentControlCriteria = "";
+                                            targetMetaData.dataSourceName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "ContentDataSourceName", DefaultMetaData.dataSourceName);
+                                            targetMetaData.tableName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "ContentTableName", DefaultMetaData.tableName);
+                                            targetMetaData.dataSourceId = 0;
+                                            targetMetaData.defaultSortMethod = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "DefaultSortMethod", DefaultMetaData.defaultSortMethod);
+                                            if ((targetMetaData.defaultSortMethod == "") || (targetMetaData.defaultSortMethod.ToLowerInvariant() == "name")) {
+                                                targetMetaData.defaultSortMethod = "By Name";
+                                            } else if (GenericController.vbLCase(targetMetaData.defaultSortMethod) == "sortorder") {
+                                                targetMetaData.defaultSortMethod = "By Alpha Sort Order Field";
+                                            } else if (GenericController.vbLCase(targetMetaData.defaultSortMethod) == "date") {
+                                                targetMetaData.defaultSortMethod = "By Date";
                                             }
-                                            targetCdef.developerOnly = XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "DeveloperOnly", DefaultCDef.developerOnly);
-                                            targetCdef.dropDownFieldList = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "DropDownFieldList", DefaultCDef.dropDownFieldList);
-                                            targetCdef.editorGroupName = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "EditorGroupName", DefaultCDef.editorGroupName);
-                                            targetCdef.fields = new Dictionary<string, Models.Domain.MetaFieldModel>();
-                                            targetCdef.iconLink = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "IconLink", DefaultCDef.iconLink);
-                                            targetCdef.iconHeight = XmlController.GetXMLAttributeInteger(core, Found, CDef_NodeWithinLoop, "IconHeight", DefaultCDef.iconHeight);
-                                            targetCdef.iconWidth = XmlController.GetXMLAttributeInteger(core, Found, CDef_NodeWithinLoop, "IconWidth", DefaultCDef.iconWidth);
-                                            targetCdef.iconSprites = XmlController.GetXMLAttributeInteger(core, Found, CDef_NodeWithinLoop, "IconSprites", DefaultCDef.iconSprites);
-                                            targetCdef.includesAFieldChange = false;
-                                            targetCdef.installedByCollectionGuid = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "installedByCollection", DefaultCDef.installedByCollectionGuid);
-                                            targetCdef.isBaseContent = IsccBaseFile || XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "IsBaseContent", false);
-                                            targetCdef.isModifiedSinceInstalled = XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "IsModified", DefaultCDef.isModifiedSinceInstalled);
-                                            targetCdef.name = ContentName;
-                                            targetCdef.parentName = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "Parent", DefaultCDef.parentName);
-                                            targetCdef.whereClause = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "WhereClause", DefaultCDef.whereClause);
+                                            targetMetaData.developerOnly = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "DeveloperOnly", DefaultMetaData.developerOnly);
+                                            targetMetaData.dropDownFieldList = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "DropDownFieldList", DefaultMetaData.dropDownFieldList);
+                                            targetMetaData.editorGroupName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "EditorGroupName", DefaultMetaData.editorGroupName);
+                                            targetMetaData.fields = new Dictionary<string, Models.Domain.MetaFieldModel>();
+                                            targetMetaData.iconLink = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "IconLink", DefaultMetaData.iconLink);
+                                            targetMetaData.iconHeight = XmlController.GetXMLAttributeInteger(core, Found, metaData_NodeWithinLoop, "IconHeight", DefaultMetaData.iconHeight);
+                                            targetMetaData.iconWidth = XmlController.GetXMLAttributeInteger(core, Found, metaData_NodeWithinLoop, "IconWidth", DefaultMetaData.iconWidth);
+                                            targetMetaData.iconSprites = XmlController.GetXMLAttributeInteger(core, Found, metaData_NodeWithinLoop, "IconSprites", DefaultMetaData.iconSprites);
+                                            targetMetaData.includesAFieldChange = false;
+                                            targetMetaData.installedByCollectionGuid = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "installedByCollection", DefaultMetaData.installedByCollectionGuid);
+                                            targetMetaData.isBaseContent = IsccBaseFile || XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "IsBaseContent", false);
+                                            targetMetaData.isModifiedSinceInstalled = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "IsModified", DefaultMetaData.isModifiedSinceInstalled);
+                                            targetMetaData.name = ContentName;
+                                            targetMetaData.parentName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "Parent", DefaultMetaData.parentName);
+                                            targetMetaData.whereClause = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "WhereClause", DefaultMetaData.whereClause);
                                             //
-                                            // Get CDef field nodes
+                                            // Get metadata field nodes
                                             //
-                                            foreach (XmlNode CDefChildNode in CDef_NodeWithinLoop.ChildNodes) {
+                                            foreach (XmlNode MetaDataChildNode in metaData_NodeWithinLoop.ChildNodes) {
                                                 //
-                                                // ----- process CDef Field
+                                                // ----- process metadata Field
                                                 //
-                                                if (textMatch(CDefChildNode.Name, "field")) {
-                                                    FieldName = XmlController.GetXMLAttribute(core, Found, CDefChildNode, "Name", "");
+                                                if (textMatch(MetaDataChildNode.Name, "field")) {
+                                                    FieldName = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "Name", "");
                                                     if (FieldName.ToLowerInvariant() == "middlename") {
                                                         //FieldName = FieldName;
                                                     }
                                                     //
-                                                    // try to find field in the defaultcdef
+                                                    // try to find field in the defaultmetadata
                                                     //
-                                                    if (DefaultCDef.fields.ContainsKey(FieldName)) {
-                                                        DefaultCDefField = DefaultCDef.fields[FieldName];
+                                                    if (DefaultMetaData.fields.ContainsKey(FieldName)) {
+                                                        DefaultMetaDataField = DefaultMetaData.fields[FieldName];
                                                     } else {
-                                                        DefaultCDefField = new Models.Domain.MetaFieldModel();
+                                                        DefaultMetaDataField = new Models.Domain.MetaFieldModel();
                                                     }
                                                     //
-                                                    if (!(result.cdef[ContentName.ToLowerInvariant()].fields.ContainsKey(FieldName.ToLowerInvariant()))) {
-                                                        result.cdef[ContentName.ToLowerInvariant()].fields.Add(FieldName.ToLowerInvariant(), new Models.Domain.MetaFieldModel());
+                                                    if (!(result.metaData[ContentName.ToLowerInvariant()].fields.ContainsKey(FieldName.ToLowerInvariant()))) {
+                                                        result.metaData[ContentName.ToLowerInvariant()].fields.Add(FieldName.ToLowerInvariant(), new Models.Domain.MetaFieldModel());
                                                     }
-                                                    var cdefField = result.cdef[ContentName.ToLowerInvariant()].fields[FieldName.ToLowerInvariant()];
-                                                    cdefField.nameLc = FieldName.ToLowerInvariant();
+                                                    var metaDataField = result.metaData[ContentName.ToLowerInvariant()].fields[FieldName.ToLowerInvariant()];
+                                                    metaDataField.nameLc = FieldName.ToLowerInvariant();
                                                     ActiveText = "0";
-                                                    if (DefaultCDefField.active) {
+                                                    if (DefaultMetaDataField.active) {
                                                         ActiveText = "1";
                                                     }
-                                                    ActiveText = XmlController.GetXMLAttribute(core, Found, CDefChildNode, "Active", ActiveText);
+                                                    ActiveText = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "Active", ActiveText);
                                                     if (string.IsNullOrEmpty(ActiveText)) {
                                                         ActiveText = "1";
                                                     }
-                                                    cdefField.active = GenericController.encodeBoolean(ActiveText);
+                                                    metaDataField.active = GenericController.encodeBoolean(ActiveText);
                                                     //
                                                     // Convert Field Descriptor (text) to field type (integer)
                                                     //
-                                                    string defaultFieldTypeName = MetaController.getFieldTypeNameFromFieldTypeId(core, DefaultCDefField.fieldTypeId);
-                                                    string fieldTypeName = XmlController.GetXMLAttribute(core, Found, CDefChildNode, "FieldType", defaultFieldTypeName);
-                                                    cdefField.fieldTypeId = core.db.getFieldTypeIdFromFieldTypeName(fieldTypeName);
-                                                    cdefField.editSortPriority = XmlController.GetXMLAttributeInteger(core, Found, CDefChildNode, "EditSortPriority", DefaultCDefField.editSortPriority);
-                                                    cdefField.authorable = XmlController.GetXMLAttributeBoolean(core, Found, CDefChildNode, "Authorable", DefaultCDefField.authorable);
-                                                    cdefField.caption = XmlController.GetXMLAttribute(core, Found, CDefChildNode, "Caption", DefaultCDefField.caption);
-                                                    cdefField.defaultValue = XmlController.GetXMLAttribute(core, Found, CDefChildNode, "DefaultValue", DefaultCDefField.defaultValue);
-                                                    cdefField.notEditable = XmlController.GetXMLAttributeBoolean(core, Found, CDefChildNode, "NotEditable", DefaultCDefField.notEditable);
-                                                    cdefField.indexColumn = XmlController.GetXMLAttributeInteger(core, Found, CDefChildNode, "IndexColumn", DefaultCDefField.indexColumn);
-                                                    cdefField.indexWidth = XmlController.GetXMLAttribute(core, Found, CDefChildNode, "IndexWidth", DefaultCDefField.indexWidth);
-                                                    cdefField.indexSortOrder = XmlController.GetXMLAttributeInteger(core, Found, CDefChildNode, "IndexSortOrder", DefaultCDefField.indexSortOrder);
-                                                    cdefField.redirectID = XmlController.GetXMLAttribute(core, Found, CDefChildNode, "RedirectID", DefaultCDefField.redirectID);
-                                                    cdefField.redirectPath = XmlController.GetXMLAttribute(core, Found, CDefChildNode, "RedirectPath", DefaultCDefField.redirectPath);
-                                                    cdefField.htmlContent = XmlController.GetXMLAttributeBoolean(core, Found, CDefChildNode, "HTMLContent", DefaultCDefField.htmlContent);
-                                                    cdefField.uniqueName = XmlController.GetXMLAttributeBoolean(core, Found, CDefChildNode, "UniqueName", DefaultCDefField.uniqueName);
-                                                    cdefField.password = XmlController.GetXMLAttributeBoolean(core, Found, CDefChildNode, "Password", DefaultCDefField.password);
-                                                    cdefField.adminOnly = XmlController.GetXMLAttributeBoolean(core, Found, CDefChildNode, "AdminOnly", DefaultCDefField.adminOnly);
-                                                    cdefField.developerOnly = XmlController.GetXMLAttributeBoolean(core, Found, CDefChildNode, "DeveloperOnly", DefaultCDefField.developerOnly);
-                                                    cdefField.readOnly = XmlController.GetXMLAttributeBoolean(core, Found, CDefChildNode, "ReadOnly", DefaultCDefField.readOnly);
-                                                    cdefField.required = XmlController.GetXMLAttributeBoolean(core, Found, CDefChildNode, "Required", DefaultCDefField.required);
-                                                    cdefField.RSSTitleField = XmlController.GetXMLAttributeBoolean(core, Found, CDefChildNode, "RSSTitle", DefaultCDefField.RSSTitleField);
-                                                    cdefField.RSSDescriptionField = XmlController.GetXMLAttributeBoolean(core, Found, CDefChildNode, "RSSDescriptionField", DefaultCDefField.RSSDescriptionField);
-                                                    cdefField.memberSelectGroupName_set(core, XmlController.GetXMLAttribute(core, Found, CDefChildNode, "MemberSelectGroup", ""));
-                                                    cdefField.editTabName = XmlController.GetXMLAttribute(core, Found, CDefChildNode, "EditTab", DefaultCDefField.editTabName);
-                                                    cdefField.Scramble = XmlController.GetXMLAttributeBoolean(core, Found, CDefChildNode, "Scramble", DefaultCDefField.Scramble);
-                                                    cdefField.lookupList = XmlController.GetXMLAttribute(core, Found, CDefChildNode, "LookupList", DefaultCDefField.lookupList);
-                                                    cdefField.ManyToManyRulePrimaryField = XmlController.GetXMLAttribute(core, Found, CDefChildNode, "ManyToManyRulePrimaryField", DefaultCDefField.ManyToManyRulePrimaryField);
-                                                    cdefField.ManyToManyRuleSecondaryField = XmlController.GetXMLAttribute(core, Found, CDefChildNode, "ManyToManyRuleSecondaryField", DefaultCDefField.ManyToManyRuleSecondaryField);
-                                                    cdefField.set_lookupContentName(core, XmlController.GetXMLAttribute(core, Found, CDefChildNode, "LookupContent", DefaultCDefField.get_lookupContentName(core)));
+                                                    string defaultFieldTypeName = MetaController.getFieldTypeNameFromFieldTypeId(core, DefaultMetaDataField.fieldTypeId);
+                                                    string fieldTypeName = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "FieldType", defaultFieldTypeName);
+                                                    metaDataField.fieldTypeId = core.db.getFieldTypeIdFromFieldTypeName(fieldTypeName);
+                                                    metaDataField.editSortPriority = XmlController.GetXMLAttributeInteger(core, Found, MetaDataChildNode, "EditSortPriority", DefaultMetaDataField.editSortPriority);
+                                                    metaDataField.authorable = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "Authorable", DefaultMetaDataField.authorable);
+                                                    metaDataField.caption = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "Caption", DefaultMetaDataField.caption);
+                                                    metaDataField.defaultValue = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "DefaultValue", DefaultMetaDataField.defaultValue);
+                                                    metaDataField.notEditable = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "NotEditable", DefaultMetaDataField.notEditable);
+                                                    metaDataField.indexColumn = XmlController.GetXMLAttributeInteger(core, Found, MetaDataChildNode, "IndexColumn", DefaultMetaDataField.indexColumn);
+                                                    metaDataField.indexWidth = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "IndexWidth", DefaultMetaDataField.indexWidth);
+                                                    metaDataField.indexSortOrder = XmlController.GetXMLAttributeInteger(core, Found, MetaDataChildNode, "IndexSortOrder", DefaultMetaDataField.indexSortOrder);
+                                                    metaDataField.redirectID = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "RedirectID", DefaultMetaDataField.redirectID);
+                                                    metaDataField.redirectPath = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "RedirectPath", DefaultMetaDataField.redirectPath);
+                                                    metaDataField.htmlContent = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "HTMLContent", DefaultMetaDataField.htmlContent);
+                                                    metaDataField.uniqueName = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "UniqueName", DefaultMetaDataField.uniqueName);
+                                                    metaDataField.password = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "Password", DefaultMetaDataField.password);
+                                                    metaDataField.adminOnly = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "AdminOnly", DefaultMetaDataField.adminOnly);
+                                                    metaDataField.developerOnly = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "DeveloperOnly", DefaultMetaDataField.developerOnly);
+                                                    metaDataField.readOnly = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "ReadOnly", DefaultMetaDataField.readOnly);
+                                                    metaDataField.required = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "Required", DefaultMetaDataField.required);
+                                                    metaDataField.RSSTitleField = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "RSSTitle", DefaultMetaDataField.RSSTitleField);
+                                                    metaDataField.RSSDescriptionField = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "RSSDescriptionField", DefaultMetaDataField.RSSDescriptionField);
+                                                    metaDataField.memberSelectGroupName_set(core, XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "MemberSelectGroup", ""));
+                                                    metaDataField.editTabName = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "EditTab", DefaultMetaDataField.editTabName);
+                                                    metaDataField.Scramble = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "Scramble", DefaultMetaDataField.Scramble);
+                                                    metaDataField.lookupList = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "LookupList", DefaultMetaDataField.lookupList);
+                                                    metaDataField.ManyToManyRulePrimaryField = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "ManyToManyRulePrimaryField", DefaultMetaDataField.ManyToManyRulePrimaryField);
+                                                    metaDataField.ManyToManyRuleSecondaryField = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "ManyToManyRuleSecondaryField", DefaultMetaDataField.ManyToManyRuleSecondaryField);
+                                                    metaDataField.set_lookupContentName(core, XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "LookupContent", DefaultMetaDataField.get_lookupContentName(core)));
                                                     // isbase should be set if the base file is loading, regardless of the state of any isBaseField attribute -- which will be removed later
                                                     // case 1 - when the application collection is loaded from the exported xml file, isbasefield must follow the export file although the data is not the base collection
                                                     // case 2 - when the base file is loaded, all fields must include the attribute
-                                                    //Return_Collection.CDefExt(CDefPtr).Fields(FieldPtr).IsBaseField = IsccBaseFile
-                                                    cdefField.isBaseField = XmlController.GetXMLAttributeBoolean(core, Found, CDefChildNode, "IsBaseField", false) || IsccBaseFile;
-                                                    cdefField.set_redirectContentName(core, XmlController.GetXMLAttribute(core, Found, CDefChildNode, "RedirectContent", DefaultCDefField.get_redirectContentName(core)));
-                                                    cdefField.set_manyToManyContentName(core, XmlController.GetXMLAttribute(core, Found, CDefChildNode, "ManyToManyContent", DefaultCDefField.get_manyToManyContentName(core)));
-                                                    cdefField.set_manyToManyRuleContentName(core, XmlController.GetXMLAttribute(core, Found, CDefChildNode, "ManyToManyRuleContent", DefaultCDefField.get_manyToManyRuleContentName(core)));
-                                                    cdefField.isModifiedSinceInstalled = XmlController.GetXMLAttributeBoolean(core, Found, CDefChildNode, "IsModified", DefaultCDefField.isModifiedSinceInstalled);
-                                                    cdefField.installedByCollectionGuid = XmlController.GetXMLAttribute(core, Found, CDefChildNode, "installedByCollectionId", DefaultCDefField.installedByCollectionGuid);
-                                                    cdefField.dataChanged = setAllDataChanged;
+                                                    metaDataField.isBaseField = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "IsBaseField", false) || IsccBaseFile;
+                                                    metaDataField.set_redirectContentName(core, XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "RedirectContent", DefaultMetaDataField.get_redirectContentName(core)));
+                                                    metaDataField.set_manyToManyContentName(core, XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "ManyToManyContent", DefaultMetaDataField.get_manyToManyContentName(core)));
+                                                    metaDataField.set_manyToManyRuleContentName(core, XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "ManyToManyRuleContent", DefaultMetaDataField.get_manyToManyRuleContentName(core)));
+                                                    metaDataField.isModifiedSinceInstalled = XmlController.GetXMLAttributeBoolean(core, Found, MetaDataChildNode, "IsModified", DefaultMetaDataField.isModifiedSinceInstalled);
+                                                    metaDataField.installedByCollectionGuid = XmlController.GetXMLAttribute(core, Found, MetaDataChildNode, "installedByCollectionId", DefaultMetaDataField.installedByCollectionGuid);
+                                                    metaDataField.dataChanged = setAllDataChanged;
                                                     //
                                                     // ----- handle child nodes (help node)
                                                     //
-                                                    cdefField.helpCustom = "";
-                                                    cdefField.helpDefault = "";
-                                                    foreach (XmlNode FieldChildNode in CDefChildNode.ChildNodes) {
+                                                    metaDataField.helpCustom = "";
+                                                    metaDataField.helpDefault = "";
+                                                    foreach (XmlNode FieldChildNode in MetaDataChildNode.ChildNodes) {
                                                         //
-                                                        // ----- process CDef Field
+                                                        // ----- process metadata Field
                                                         //
                                                         if (textMatch(FieldChildNode.Name, "HelpDefault")) {
-                                                            cdefField.helpDefault = FieldChildNode.InnerText;
+                                                            metaDataField.helpDefault = FieldChildNode.InnerText;
                                                         }
                                                         if (textMatch(FieldChildNode.Name, "HelpCustom")) {
-                                                            cdefField.helpCustom = FieldChildNode.InnerText;
+                                                            metaDataField.helpCustom = FieldChildNode.InnerText;
                                                         }
-                                                        cdefField.HelpChanged = setAllDataChanged;
+                                                        metaDataField.HelpChanged = setAllDataChanged;
                                                     }
                                                 }
                                             }
@@ -503,15 +500,15 @@ namespace Contensive.Processor.Models.Domain {
                                     //
                                     // SQL Indexes
                                     //
-                                    IndexName = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "indexname", "");
-                                    TableName = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "tableName", "");
-                                    DataSourceName = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "DataSourceName", "");
+                                    IndexName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "indexname", "");
+                                    TableName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "tableName", "");
+                                    DataSourceName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "DataSourceName", "");
                                     if (string.IsNullOrEmpty(DataSourceName)) {
                                         DataSourceName = "default";
                                     }
                                     bool removeDup = false;
-                                    CDefMiniCollectionModel.MiniCollectionSQLIndexModel dupToRemove = new CDefMiniCollectionModel.MiniCollectionSQLIndexModel();
-                                    foreach (CDefMiniCollectionModel.MiniCollectionSQLIndexModel index in result.sqlIndexes) {
+                                    MetaDataMiniCollectionModel.MiniCollectionSQLIndexModel dupToRemove = new MetaDataMiniCollectionModel.MiniCollectionSQLIndexModel();
+                                    foreach (MetaDataMiniCollectionModel.MiniCollectionSQLIndexModel index in result.sqlIndexes) {
                                         if (textMatch(index.IndexName, IndexName) & textMatch(index.TableName, TableName) & textMatch(index.DataSourceName, DataSourceName)) {
                                             dupToRemove = index;
                                             removeDup = true;
@@ -521,11 +518,11 @@ namespace Contensive.Processor.Models.Domain {
                                     if (removeDup) {
                                         result.sqlIndexes.Remove(dupToRemove);
                                     }
-                                    CDefMiniCollectionModel.MiniCollectionSQLIndexModel newIndex = new CDefMiniCollectionModel.MiniCollectionSQLIndexModel {
+                                    MetaDataMiniCollectionModel.MiniCollectionSQLIndexModel newIndex = new MetaDataMiniCollectionModel.MiniCollectionSQLIndexModel {
                                         IndexName = IndexName,
                                         TableName = TableName,
                                         DataSourceName = DataSourceName,
-                                        FieldNameList = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "FieldNameList", "")
+                                        FieldNameList = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "FieldNameList", "")
                                     };
                                     result.sqlIndexes.Add(newIndex);
                                     break;
@@ -534,9 +531,9 @@ namespace Contensive.Processor.Models.Domain {
                                 case "navigatorentry":
                                     //
                                     // Admin Menus / Navigator Entries
-                                    MenuName = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "Name", "");
-                                    menuNameSpace = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "NameSpace", "");
-                                    MenuGuid = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "guid", "");
+                                    MenuName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "Name", "");
+                                    menuNameSpace = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "NameSpace", "");
+                                    MenuGuid = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "guid", "");
                                     IsNavigator = (NodeName == "navigatorentry");
                                     string MenuKey = null;
                                     if (!IsNavigator) {
@@ -545,27 +542,27 @@ namespace Contensive.Processor.Models.Domain {
                                         MenuKey = MenuGuid;
                                     }
                                     if (!result.menus.ContainsKey(MenuKey)) {
-                                        ActiveText = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "Active", "1");
+                                        ActiveText = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "Active", "1");
                                         if (string.IsNullOrEmpty(ActiveText)) {
                                             ActiveText = "1";
                                         }
-                                        result.menus.Add(MenuKey, new CDefMiniCollectionModel.MiniCollectionMenuModel() {
+                                        result.menus.Add(MenuKey, new MetaDataMiniCollectionModel.MiniCollectionMenuModel() {
                                             dataChanged = setAllDataChanged,
                                             Name = MenuName,
                                             Guid = MenuGuid,
                                             Key = MenuKey,
                                             Active = GenericController.encodeBoolean(ActiveText),
-                                            menuNameSpace = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "NameSpace", ""),
-                                            ParentName = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "ParentName", ""),
-                                            ContentName = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "ContentName", ""),
-                                            LinkPage = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "LinkPage", ""),
-                                            SortOrder = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "SortOrder", ""),
-                                            AdminOnly = XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "AdminOnly", false),
-                                            DeveloperOnly = XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "DeveloperOnly", false),
-                                            NewWindow = XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "NewWindow", false),
-                                            AddonName = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "AddonName", ""),
-                                            NavIconType = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "NavIconType", ""),
-                                            NavIconTitle = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "NavIconTitle", ""),
+                                            menuNameSpace = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "NameSpace", ""),
+                                            ParentName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "ParentName", ""),
+                                            ContentName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "ContentName", ""),
+                                            LinkPage = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "LinkPage", ""),
+                                            SortOrder = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "SortOrder", ""),
+                                            AdminOnly = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "AdminOnly", false),
+                                            DeveloperOnly = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "DeveloperOnly", false),
+                                            NewWindow = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "NewWindow", false),
+                                            AddonName = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "AddonName", ""),
+                                            NavIconType = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "NavIconType", ""),
+                                            NavIconTitle = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "NavIconTitle", ""),
                                             IsNavigator = IsNavigator
                                         });
                                     }
@@ -575,7 +572,7 @@ namespace Contensive.Processor.Models.Domain {
                                     //
                                     // 20181026 - no longer needed -- Aggregate Objects (just make them -- there are not too many
                                     //
-                                    //Name =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "Name", "");
+                                    //Name =XmlController.GetXMLAttribute(core, Found, metadata_NodeWithinLoop, "Name", "");
                                     //MiniCollectionModel.miniCollectionAddOnModel addon;
                                     //if (result.legacyAddOns.ContainsKey(Name.ToLowerInvariant())) {
                                     //    addon = result.legacyAddOns[Name.ToLowerInvariant()];
@@ -584,17 +581,17 @@ namespace Contensive.Processor.Models.Domain {
                                     //    result.legacyAddOns.Add(Name.ToLowerInvariant(), addon);
                                     //}
                                     //addon.dataChanged = setAllDataChanged;
-                                    //addon.Link =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "Link", "");
-                                    //addon.ObjectProgramID =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "ObjectProgramID", "");
-                                    //addon.ArgumentList =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "ArgumentList", "");
-                                    //addon.SortOrder =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "SortOrder", "");
-                                    //addon.Copy =XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "copy", "");
+                                    //addon.Link =XmlController.GetXMLAttribute(core, Found, metadata_NodeWithinLoop, "Link", "");
+                                    //addon.ObjectProgramID =XmlController.GetXMLAttribute(core, Found, metadata_NodeWithinLoop, "ObjectProgramID", "");
+                                    //addon.ArgumentList =XmlController.GetXMLAttribute(core, Found, metadata_NodeWithinLoop, "ArgumentList", "");
+                                    //addon.SortOrder =XmlController.GetXMLAttribute(core, Found, metadata_NodeWithinLoop, "SortOrder", "");
+                                    //addon.Copy =XmlController.GetXMLAttribute(core, Found, metadata_NodeWithinLoop, "copy", "");
                                     break;
                                 case "style":
                                     //
                                     // style sheet entries
                                     //
-                                    Name = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "Name", "");
+                                    Name = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "Name", "");
                                     if (result.styleCnt > 0) {
                                         for (Ptr = 0; Ptr < result.styleCnt; Ptr++) {
                                             if (textMatch(result.styles[Ptr].Name, Name)) {
@@ -610,14 +607,14 @@ namespace Contensive.Processor.Models.Domain {
                                     }
                                     var tempVar5 = result.styles[Ptr];
                                     tempVar5.dataChanged = setAllDataChanged;
-                                    tempVar5.Overwrite = XmlController.GetXMLAttributeBoolean(core, Found, CDef_NodeWithinLoop, "Overwrite", false);
-                                    tempVar5.Copy = CDef_NodeWithinLoop.InnerText;
+                                    tempVar5.Overwrite = XmlController.GetXMLAttributeBoolean(core, Found, metaData_NodeWithinLoop, "Overwrite", false);
+                                    tempVar5.Copy = metaData_NodeWithinLoop.InnerText;
                                     break;
                                 case "stylesheet":
                                     //
                                     // style sheet in one entry
                                     //
-                                    result.styleSheet = CDef_NodeWithinLoop.InnerText;
+                                    result.styleSheet = metaData_NodeWithinLoop.InnerText;
                                     break;
                                 case "getcollection":
                                 case "importcollection":
@@ -626,16 +623,16 @@ namespace Contensive.Processor.Models.Domain {
                                     //    //
                                     //    // Import collections are blocked from the BuildDatabase upgrade b/c the resulting Db must be portable
                                     //    //
-                                    //    Collectionname = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "name", "");
-                                    //    CollectionGuid = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "guid", "");
+                                    //    Collectionname = XmlController.GetXMLAttribute(core, Found, metadata_NodeWithinLoop, "name", "");
+                                    //    CollectionGuid = XmlController.GetXMLAttribute(core, Found, metadata_NodeWithinLoop, "guid", "");
                                     //    if (string.IsNullOrEmpty(CollectionGuid)) {
-                                    //        CollectionGuid = CDef_NodeWithinLoop.InnerText;
+                                    //        CollectionGuid = metadata_NodeWithinLoop.InnerText;
                                     //    }
                                     //    if (string.IsNullOrEmpty(CollectionGuid)) {
                                     //        status = "The collection you selected [" + Collectionname + "] can not be downloaded because it does not include a valid GUID.";
-                                    //        //core.AppendLog("builderClass.UpgradeCDef_LoadDataToCollection, UserError [" & status & "], The error was [" & Doc.ParseError.reason & "]")
+                                    //        //core.AppendLog("builderClass.Upgrademetadata_LoadDataToCollection, UserError [" & status & "], The error was [" & Doc.ParseError.reason & "]")
                                     //    } else {
-                                    //        result.collectionImports.Add(new CDefMiniCollectionModel.ImportCollectionType() {
+                                    //        result.collectionImports.Add(new metadataMiniCollectionModel.ImportCollectionType() {
                                     //            Name = Collectionname,
                                     //            Guid = CollectionGuid
                                     //        });
@@ -648,7 +645,7 @@ namespace Contensive.Processor.Models.Domain {
                                     // Page Templates
                                     //-------------------------------------------------------------------------------------------------
                                     // *********************************************************************************
-                                    // Page Template - started, but Return_Collection and LoadDataToCDef are all that is done do far
+                                    // Page Template - started, but Return_Collection and LoadDataTometadata are all that is done do far
                                     //
                                     if (result.pageTemplateCnt > 0) {
                                         for (Ptr = 0; Ptr < result.pageTemplateCnt; Ptr++) {
@@ -664,9 +661,9 @@ namespace Contensive.Processor.Models.Domain {
                                         result.pageTemplates[Ptr].Name = Name;
                                     }
                                     var tempVar6 = result.pageTemplates[Ptr];
-                                    tempVar6.Copy = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "Copy", "");
-                                    tempVar6.Guid = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "guid", "");
-                                    tempVar6.Style = XmlController.GetXMLAttribute(core, Found, CDef_NodeWithinLoop, "style", "");
+                                    tempVar6.Copy = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "Copy", "");
+                                    tempVar6.Guid = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "guid", "");
+                                    tempVar6.Style = XmlController.GetXMLAttribute(core, Found, metaData_NodeWithinLoop, "style", "");
                                     break;
                                 case "pagecontent":
                                     //
@@ -689,7 +686,7 @@ namespace Contensive.Processor.Models.Domain {
                         // Convert Menus.ParentName to Menu.menuNameSpace
                         //
                         foreach (var kvp in result.menus) {
-                            CDefMiniCollectionModel.MiniCollectionMenuModel menu = kvp.Value;
+                            MetaDataMiniCollectionModel.MiniCollectionMenuModel menu = kvp.Value;
                             if (!string.IsNullOrEmpty(menu.ParentName)) {
                                 menu.menuNameSpace = GetMenuNameSpace(core, result.menus, menu, "");
                             }
@@ -705,43 +702,43 @@ namespace Contensive.Processor.Models.Domain {
         //
         //======================================================================================================
         /// <summary>
-        /// Verify ccContent and ccFields records from the cdef nodes of a a collection file. This is the last step of loading teh cdef nodes of a collection file. ParentId field is set based on ParentName node.
+        /// Verify ccContent and ccFields records from the metadata nodes of a a collection file. This is the last step of loading teh metadata nodes of a collection file. ParentId field is set based on ParentName node.
         /// </summary>
-        private static void installCDefMiniCollection_BuildDb(CoreController core, CDefMiniCollectionModel Collection, string BuildVersion, bool isNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> installedCollections) {
+        private static void installMetaDataMiniCollection_BuildDb(CoreController core, MetaDataMiniCollectionModel Collection, string BuildVersion, bool isNewBuild, bool repair, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> installedCollections) {
             try {
                 //
                 logPrefix += ", installCollection_BuildDbFromMiniCollection";
-                LogController.logInfo(core, "Application: " + core.appConfig.name + ", UpgradeCDef_BuildDbFromCollection");
+                LogController.logInfo(core, "Application: " + core.appConfig.name + ", Upgrademetadata_BuildDbFromCollection");
                 //
                 //----------------------------------------------------------------------------------------------------------------------
-                LogController.logInfo(core, "CDef Load, stage 1: verify core sql tables");
+                LogController.logInfo(core, "metadata Load, stage 1: verify core sql tables");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
                 AppBuilderController.verifyBasicTables(core, logPrefix);
                 //
                 //----------------------------------------------------------------------------------------------------------------------
-                LogController.logInfo(core, "CDef Load, stage 2: create SQL tables in default datasource");
+                LogController.logInfo(core, "metadata Load, stage 2: create SQL tables in default datasource");
                 string ContentName = null;
                 //----------------------------------------------------------------------------------------------------------------------
                 //
                 if (true) {
                     string UsedTables = "";
-                    foreach (var keypairvalue in Collection.cdef) {
-                        Models.Domain.MetaModel workingCdef = keypairvalue.Value;
-                        ContentName = workingCdef.name;
-                        if (workingCdef.dataChanged) {
-                            LogController.logInfo(core, "creating sql table [" + workingCdef.tableName + "], datasource [" + workingCdef.dataSourceName + "]");
-                            if (GenericController.vbLCase(workingCdef.dataSourceName) == "default" || workingCdef.dataSourceName == "") {
-                                string TableName = workingCdef.tableName;
+                    foreach (var keypairvalue in Collection.metaData) {
+                        Models.Domain.MetaModel workingMetaData = keypairvalue.Value;
+                        ContentName = workingMetaData.name;
+                        if (workingMetaData.dataChanged) {
+                            LogController.logInfo(core, "creating sql table [" + workingMetaData.tableName + "], datasource [" + workingMetaData.dataSourceName + "]");
+                            if (GenericController.vbLCase(workingMetaData.dataSourceName) == "default" || workingMetaData.dataSourceName == "") {
+                                string TableName = workingMetaData.tableName;
                                 if (GenericController.vbInstr(1, "," + UsedTables + ",", "," + TableName + ",", 1) != 0) {
                                     //TableName = TableName;
                                 } else {
                                     UsedTables = UsedTables + "," + TableName;
-                                    core.db.createSQLTable(workingCdef.dataSourceName, TableName);
+                                    core.db.createSQLTable(workingMetaData.dataSourceName, TableName);
                                 }
-                                foreach (var fieldNvp in workingCdef.fields) {
+                                foreach (var fieldNvp in workingMetaData.fields) {
                                     MetaFieldModel field = fieldNvp.Value;
-                                    core.db.createSQLTableField(workingCdef.dataSourceName, TableName, field.nameLc, field.fieldTypeId);
+                                    core.db.createSQLTableField(workingMetaData.dataSourceName, TableName, field.nameLc, field.fieldTypeId);
                                 }
                             }
                         }
@@ -751,23 +748,21 @@ namespace Contensive.Processor.Models.Domain {
                 }
                 //
                 //----------------------------------------------------------------------------------------------------------------------
-                LogController.logInfo(core, "CDef Load, stage 3: Verify all CDef names in ccContent so GetContentID calls will succeed");
+                LogController.logInfo(core, "metadata Load, stage 3: Verify all metadata names in ccContent so GetContentID calls will succeed");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
                 List<string> installedContentList = new List<string>();
-                DataTable rs = core.db.executeQuery("SELECT Name from ccContent where (active<>0)");
-                if (DbController.isDataTableOk(rs)) {
-                    installedContentList = new List<string>(convertDataTableColumntoItemList(rs));
+                using (DataTable rs = core.db.executeQuery("SELECT Name from ccContent where (active<>0)")) {
+                    if (DbController.isDataTableOk(rs)) {
+                        installedContentList = new List<string>(convertDataTableColumntoItemList(rs));
+                    }
                 }
-                rs.Dispose();
-                string SQL = null;
                 //
-                foreach (var keypairvalue in Collection.cdef) {
+                foreach (var keypairvalue in Collection.metaData) {
                     if (keypairvalue.Value.dataChanged) {
-                        LogController.logInfo(core, "adding cdef name [" + keypairvalue.Value.name + "]");
+                        LogController.logInfo(core, "adding metadata name [" + keypairvalue.Value.name + "]");
                         if (!installedContentList.Contains(keypairvalue.Value.name.ToLowerInvariant())) {
-                            SQL = "Insert into ccContent (name,ccguid,active,createkey)values(" + DbController.encodeSQLText(keypairvalue.Value.name) + "," + DbController.encodeSQLText(keypairvalue.Value.guid) + ",1,0);";
-                            core.db.executeQuery(SQL);
+                            core.db.executeQuery("Insert into ccContent (name,ccguid,active,createkey)values(" + DbController.encodeSQLText(keypairvalue.Value.name) + "," + DbController.encodeSQLText(keypairvalue.Value.guid) + ",1,0);");
                             installedContentList.Add(keypairvalue.Value.name.ToLowerInvariant());
                         }
                     }
@@ -776,7 +771,7 @@ namespace Contensive.Processor.Models.Domain {
                 core.cache.invalidateAll();
                 //
                 //----------------------------------------------------------------------------------------------------------------------
-                LogController.logInfo(core, "CDef Load, stage 4: Verify content records required for Content Server");
+                LogController.logInfo(core, "metadata Load, stage 4: Verify content records required for Content Server");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
                 AppBuilderController.verifySortMethods(core);
@@ -785,12 +780,12 @@ namespace Contensive.Processor.Models.Domain {
                 core.cache.invalidateAll();
                 //
                 //----------------------------------------------------------------------------------------------------------------------
-                LogController.logInfo(core, "CDef Load, stage 5: verify 'Content' content definition");
+                LogController.logInfo(core, "metadata Load, stage 5: verify 'Content' content definition");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
-                foreach (var keypairvalue in Collection.cdef) {
+                foreach (var keypairvalue in Collection.metaData) {
                     if (keypairvalue.Value.name.ToLowerInvariant() == "content") {
-                        installCDefMiniCollection_buildDb_saveCDefToDb(core, keypairvalue.Value, BuildVersion);
+                        installMetaDataMiniCollection_buildDb_saveMetaDataToDb(core, keypairvalue.Value, BuildVersion);
                         break;
                     }
                 }
@@ -798,69 +793,54 @@ namespace Contensive.Processor.Models.Domain {
                 core.cache.invalidateAll();
                 //
                 //----------------------------------------------------------------------------------------------------------------------
-                LogController.logInfo(core, "CDef Load, stage 6: Verify all definitions and fields");
+                LogController.logInfo(core, "metadata Load, stage 6: Verify all definitions and fields");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
-                foreach (var keypairvalue in Collection.cdef) {
-                    MetaModel cdef = keypairvalue.Value;
+                foreach (var keypairvalue in Collection.metaData) {
+                    MetaModel metaData = keypairvalue.Value;
                     bool fieldChanged = false;
-                    if (!cdef.dataChanged) {
-                        foreach (var field in cdef.fields) {
+                    if (!metaData.dataChanged) {
+                        foreach (var field in metaData.fields) {
                             fieldChanged = field.Value.dataChanged;
                             if (fieldChanged) break;
                         }
                     }
-                    if ((fieldChanged || cdef.dataChanged) && (cdef.name.ToLowerInvariant() != "content")) {
-                        installCDefMiniCollection_buildDb_saveCDefToDb(core, cdef, BuildVersion);
+                    if ((fieldChanged || metaData.dataChanged) && (metaData.name.ToLowerInvariant() != "content")) {
+                        installMetaDataMiniCollection_buildDb_saveMetaDataToDb(core, metaData, BuildVersion);
                     }
                 }
                 core.clearMetaData();
                 core.cache.invalidateAll();
                 //
                 //----------------------------------------------------------------------------------------------------------------------
-                LogController.logInfo(core, "CDef Load, stage 7: Verify all field help");
+                LogController.logInfo(core, "metadata Load, stage 7: Verify all field help");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
-                int FieldHelpCID = MetaController.getRecordId( core,"content", "Content Field Help");
-                foreach (var keypairvalue in Collection.cdef) {
-                    Models.Domain.MetaModel workingCdef = keypairvalue.Value;
-                    //ContentName = workingCdef.name;
-                    foreach (var fieldKeyValuePair in workingCdef.fields) {
-                        Models.Domain.MetaFieldModel workingField = fieldKeyValuePair.Value;
-                        //string FieldName = field.nameLc;
-                        //var field2 = Collection.cdef[ContentName.ToLowerInvariant()].fields[((string)null).ToLowerInvariant()];
+                int FieldHelpCID = MetaController.getRecordIdByUniqueName( core,"content", "Content Field Help");
+                foreach (var keypairvalue in Collection.metaData) {
+                    MetaModel workingMetaData = keypairvalue.Value;
+                    foreach (var fieldKeyValuePair in workingMetaData.fields) {
+                        MetaFieldModel workingField = fieldKeyValuePair.Value;
                         if (workingField.HelpChanged) {
                             int fieldId = 0;
-                            SQL = "select f.id from ccfields f left join cccontent c on c.id=f.contentid where (f.name=" + DbController.encodeSQLText(workingField.nameLc) + ")and(c.name=" + DbController.encodeSQLText(workingCdef.name) + ") order by f.id";
-                            rs = core.db.executeQuery(SQL);
-                            if (DbController.isDataTableOk(rs)) {
-                                fieldId = GenericController.encodeInteger(DbController.getDataRowFieldText(rs.Rows[0], "id"));
+                            using (var rs = core.db.executeQuery("select f.id from ccfields f left join cccontent c on c.id=f.contentid where (f.name=" + DbController.encodeSQLText(workingField.nameLc) + ")and(c.name=" + DbController.encodeSQLText(workingMetaData.name) + ") order by f.id")) {
+                                if (DbController.isDataTableOk(rs)) {
+                                    fieldId = GenericController.encodeInteger(DbController.getDataRowFieldText(rs.Rows[0], "id"));
+                                }
                             }
-                            rs.Dispose();
-                            if (fieldId == 0) {
-                                throw (new GenericException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "Can not update help field for content [" & ContentName & "], field [" & FieldName & "] because the field was not found in the Db.", "dll", "builderClass", "UpgradeCDef_BuildDbFromCollection", 0, "", "", False, True, "")
-                            } else {
-                                SQL = "select id from ccfieldhelp where fieldid=" + fieldId + " order by id";
-                                rs = core.db.executeQuery(SQL);
-                                //
-                                int FieldHelpID = 0;
+                            if (fieldId == 0) { throw (new GenericException("Unexpected exception")); }
+                            int FieldHelpID = 0;
+                            using (var rs = core.db.executeQuery("select id from ccfieldhelp where fieldid=" + fieldId + " order by id")) {
                                 if (DbController.isDataTableOk(rs)) {
                                     FieldHelpID = GenericController.encodeInteger(rs.Rows[0]["id"]);
                                 } else {
                                     FieldHelpID = core.db.insertTableRecordGetId("default", "ccfieldhelp", 0);
                                 }
-                                rs.Dispose();
-                                if (FieldHelpID != 0) {
-                                    string Copy = workingField.helpCustom;
-                                    if (string.IsNullOrEmpty(Copy)) {
-                                        Copy = workingField.helpDefault;
-                                        if (!string.IsNullOrEmpty(Copy)) {
-                                            //Copy = Copy;
-                                        }
-                                    }
-                                    SQL = "update ccfieldhelp set active=1,contentcontrolid=" + FieldHelpCID + ",fieldid=" + fieldId + ",helpdefault=" + DbController.encodeSQLText(Copy) + " where id=" + FieldHelpID;
-                                    core.db.executeQuery(SQL);
-                                }
+                            }
+                            if (FieldHelpID != 0) {
+                                string Copy = workingField.helpCustom;
+                                if (string.IsNullOrEmpty(Copy)) { Copy = workingField.helpDefault; }
+                                core.db.executeQuery("update ccfieldhelp set active=1,contentcontrolid=" + FieldHelpCID + ",fieldid=" + fieldId + ",helpdefault=" + DbController.encodeSQLText(Copy) + " where id=" + FieldHelpID);
                             }
                         }
                     }
@@ -869,10 +849,10 @@ namespace Contensive.Processor.Models.Domain {
                 core.cache.invalidateAll();
                 //
                 //----------------------------------------------------------------------------------------------------------------------
-                LogController.logInfo(core, "CDef Load, stage 8: create SQL indexes");
+                LogController.logInfo(core, "metadata Load, stage 8: create SQL indexes");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
-                foreach (CDefMiniCollectionModel.MiniCollectionSQLIndexModel index in Collection.sqlIndexes) {
+                foreach (MetaDataMiniCollectionModel.MiniCollectionSQLIndexModel index in Collection.sqlIndexes) {
                     if (index.dataChanged) {
                         LogController.logInfo(core, "creating index [" + index.IndexName + "], fields [" + index.FieldNameList + "], on table [" + index.TableName + "]");
                         core.db.createSQLIndex(index.DataSourceName, index.TableName, index.IndexName, index.FieldNameList);
@@ -882,7 +862,7 @@ namespace Contensive.Processor.Models.Domain {
                 core.cache.invalidateAll();
                 //
                 //----------------------------------------------------------------------------------------------------------------------
-                LogController.logInfo(core, "CDef Load, stage 9: Verify All Menu Names, then all Menus");
+                LogController.logInfo(core, "metadata Load, stage 9: Verify All Menu Names, then all Menus");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
                 foreach (var kvp in Collection.menus) {
@@ -894,11 +874,11 @@ namespace Contensive.Processor.Models.Domain {
                 }
                 //
                 //----------------------------------------------------------------------------------------------------------------------
-                LogController.logInfo(core, "CDef Load, Upgrade collections added during upgrade process");
+                LogController.logInfo(core, "metadata Load, Upgrade collections added during upgrade process");
                 //----------------------------------------------------------------------------------------------------------------------
                 //\//
                 // 
-                // 20181028 - cdef upgrades shuld not include addon upgrdes
+                // 20181028 - metadata upgrades shuld not include addon upgrdes
                 //LogController.logInfo(core, "Installing Add-on Collections gathered during upgrade");
                 //foreach (var import in Collection.collectionImports) {
                 //    string CollectionPath = "";
@@ -923,7 +903,7 @@ namespace Contensive.Processor.Models.Domain {
                 //}
                 //
                 //----------------------------------------------------------------------------------------------------------------------
-                LogController.logInfo(core, "CDef Load, stage 9: Verify Styles");
+                LogController.logInfo(core, "metadata Load, stage 9: Verify Styles");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
                 if (Collection.styleCnt > 0) {
@@ -1002,32 +982,32 @@ namespace Contensive.Processor.Models.Domain {
         //
         //====================================================================================================
         /// <summary>
-        /// Overlay a Src CDef on to the current one (Dst). Any Src CDEf entries found in Src are added to Dst.
-        /// if SrcIsUserCDef is true, then the Src is overlayed on the Dst if there are any changes -- and .CDefChanged flag set
+        /// Overlay a Src metadata on to the current one (Dst). Any Src metadata entries found in Src are added to Dst.
+        /// if SrcIsUsermetadata is true, then the Src is overlayed on the Dst if there are any changes -- and .metadataChanged flag set
         /// </summary>
-        private static bool addMiniCollectionSrcToDst(CoreController core, ref CDefMiniCollectionModel dstCollection, CDefMiniCollectionModel srcCollection) {
+        private static bool addMiniCollectionSrcToDst(CoreController core, ref MetaDataMiniCollectionModel dstCollection, MetaDataMiniCollectionModel srcCollection) {
             bool returnOk = true;
             try {
                 string SrcFieldName = null;
                 bool updateDst = false;
-                Models.Domain.MetaModel srcCdef = null;
+                MetaModel srcMetaData = null;
                 //
                 // If the Src is the BaseCollection, the Dst must be the Application Collectio
                 //   in this case, reset any BaseContent or BaseField attributes in the application that are not in the base
                 //
                 if (srcCollection.isBaseCollection) {
-                    foreach (var dstKeyValuePair in dstCollection.cdef) {
-                        Models.Domain.MetaModel dstWorkingCdef = dstKeyValuePair.Value;
-                        string contentName = dstWorkingCdef.name;
-                        if (dstCollection.cdef[contentName.ToLowerInvariant()].isBaseContent) {
+                    foreach (var dstKeyValuePair in dstCollection.metaData) {
+                        Models.Domain.MetaModel dstWorkingMetaData = dstKeyValuePair.Value;
+                        string contentName = dstWorkingMetaData.name;
+                        if (dstCollection.metaData[contentName.ToLowerInvariant()].isBaseContent) {
                             //
-                            // this application collection Cdef is marked base, verify it is in the base collection
+                            // this application collection metadata is marked base, verify it is in the base collection
                             //
-                            if (!srcCollection.cdef.ContainsKey(contentName.ToLowerInvariant())) {
+                            if (!srcCollection.metaData.ContainsKey(contentName.ToLowerInvariant())) {
                                 //
-                                // cdef in dst is marked base, but it is not in the src collection, reset the cdef.isBaseContent and all field.isbasefield
+                                // metadata in dst is marked base, but it is not in the src collection, reset the metadata.isBaseContent and all field.isbasefield
                                 //
-                                var tempVar = dstCollection.cdef[contentName.ToLowerInvariant()];
+                                var tempVar = dstCollection.metaData[contentName.ToLowerInvariant()];
                                 tempVar.isBaseContent = false;
                                 tempVar.dataChanged = true;
                                 foreach (var dstFieldKeyValuePair in tempVar.fields) {
@@ -1046,180 +1026,180 @@ namespace Contensive.Processor.Models.Domain {
                 // -------------------------------------------------------------------------------------------------
                 // Go through all CollectionSrc and find the CollectionDst match
                 //   if it is an exact match, do nothing
-                //   if the cdef does not match, set cdefext[Ptr].CDefChanged true
-                //   if any field does not match, set cdefext...field...CDefChanged
+                //   if the metadata does not match, set metadataext[Ptr].metadataChanged true
+                //   if any field does not match, set metadataext...field...metadataChanged
                 //   if the is no CollectionDst for the CollectionSrc, add it and set okToUpdateDstFromSrc
                 // -------------------------------------------------------------------------------------------------
                 //
-                LogController.logInfo(core, "Application: " + core.appConfig.name + ", UpgradeCDef_AddSrcToDst");
+                LogController.logInfo(core, "Application: " + core.appConfig.name + ", Upgrademetadata_AddSrcToDst");
                 string dstName = null;
                 //
-                foreach (var srcKeyValuePair in srcCollection.cdef) {
-                    srcCdef = srcKeyValuePair.Value;
-                    string srcName = srcCdef.name;
+                foreach (var srcKeyValuePair in srcCollection.metaData) {
+                    srcMetaData = srcKeyValuePair.Value;
+                    string srcName = srcMetaData.name;
                     //
-                    // Search for this cdef in the Dst
+                    // Search for this metadata in the Dst
                     //
                     updateDst = false;
-                    Models.Domain.MetaModel dstCdef = null;
-                    if (!dstCollection.cdef.ContainsKey(srcName.ToLowerInvariant())) {
+                    MetaModel dstMetaData = null;
+                    if (!dstCollection.metaData.ContainsKey(srcName.ToLowerInvariant())) {
                         //
                         // add src to dst
                         //
-                        dstCdef = new Models.Domain.MetaModel();
-                        dstCollection.cdef.Add(srcName.ToLowerInvariant(), dstCdef);
+                        dstMetaData = new Models.Domain.MetaModel();
+                        dstCollection.metaData.Add(srcName.ToLowerInvariant(), dstMetaData);
                         updateDst = true;
                     } else {
-                        dstCdef = dstCollection.cdef[srcName.ToLowerInvariant()];
+                        dstMetaData = dstCollection.metaData[srcName.ToLowerInvariant()];
                         dstName = srcName;
                         //
                         // found a match between Src and Dst
                         //
-                        if (dstCdef.isBaseContent == srcCdef.isBaseContent) {
+                        if (dstMetaData.isBaseContent == srcMetaData.isBaseContent) {
                             //
-                            // Allow changes to user cdef only from user cdef, changes to base only from base
-                            updateDst |= (dstCdef.activeOnly != srcCdef.activeOnly);
-                            updateDst |= (dstCdef.adminOnly != srcCdef.adminOnly);
-                            updateDst |= (dstCdef.developerOnly != srcCdef.developerOnly);
-                            updateDst |= (dstCdef.allowAdd != srcCdef.allowAdd);
-                            updateDst |= (dstCdef.allowCalendarEvents != srcCdef.allowCalendarEvents);
-                            updateDst |= (dstCdef.allowContentTracking != srcCdef.allowContentTracking);
-                            updateDst |= (dstCdef.allowDelete != srcCdef.allowDelete);
-                            updateDst |= (dstCdef.allowTopicRules != srcCdef.allowTopicRules);
-                            updateDst |= !textMatch(dstCdef.dataSourceName, srcCdef.dataSourceName);
-                            updateDst |= !textMatch(dstCdef.tableName, srcCdef.tableName);
-                            updateDst |= !textMatch(dstCdef.defaultSortMethod, srcCdef.defaultSortMethod);
-                            updateDst |= !textMatch(dstCdef.dropDownFieldList, srcCdef.dropDownFieldList);
-                            updateDst |= !textMatch(dstCdef.editorGroupName, srcCdef.editorGroupName);
-                            updateDst |= (dstCdef.active != srcCdef.active);
-                            updateDst |= (dstCdef.allowContentChildTool != srcCdef.allowContentChildTool);
-                            updateDst |= (dstCdef.parentID != srcCdef.parentID);
-                            updateDst |= !textMatch(dstCdef.iconLink, srcCdef.iconLink);
-                            updateDst |= (dstCdef.iconHeight != srcCdef.iconHeight);
-                            updateDst |= (dstCdef.iconWidth != srcCdef.iconWidth);
-                            updateDst |= (dstCdef.iconSprites != srcCdef.iconSprites);
-                            updateDst |= !textMatch(dstCdef.installedByCollectionGuid, srcCdef.installedByCollectionGuid);
-                            updateDst |= !textMatch(dstCdef.guid, srcCdef.guid);
-                            updateDst |= (dstCdef.isBaseContent != srcCdef.isBaseContent);
+                            // Allow changes to user metadata only from user metadata, changes to base only from base
+                            updateDst |= (dstMetaData.activeOnly != srcMetaData.activeOnly);
+                            updateDst |= (dstMetaData.adminOnly != srcMetaData.adminOnly);
+                            updateDst |= (dstMetaData.developerOnly != srcMetaData.developerOnly);
+                            updateDst |= (dstMetaData.allowAdd != srcMetaData.allowAdd);
+                            updateDst |= (dstMetaData.allowCalendarEvents != srcMetaData.allowCalendarEvents);
+                            updateDst |= (dstMetaData.allowContentTracking != srcMetaData.allowContentTracking);
+                            updateDst |= (dstMetaData.allowDelete != srcMetaData.allowDelete);
+                            updateDst |= (dstMetaData.allowTopicRules != srcMetaData.allowTopicRules);
+                            updateDst |= !textMatch(dstMetaData.dataSourceName, srcMetaData.dataSourceName);
+                            updateDst |= !textMatch(dstMetaData.tableName, srcMetaData.tableName);
+                            updateDst |= !textMatch(dstMetaData.defaultSortMethod, srcMetaData.defaultSortMethod);
+                            updateDst |= !textMatch(dstMetaData.dropDownFieldList, srcMetaData.dropDownFieldList);
+                            updateDst |= !textMatch(dstMetaData.editorGroupName, srcMetaData.editorGroupName);
+                            updateDst |= (dstMetaData.active != srcMetaData.active);
+                            updateDst |= (dstMetaData.allowContentChildTool != srcMetaData.allowContentChildTool);
+                            updateDst |= (dstMetaData.parentID != srcMetaData.parentID);
+                            updateDst |= !textMatch(dstMetaData.iconLink, srcMetaData.iconLink);
+                            updateDst |= (dstMetaData.iconHeight != srcMetaData.iconHeight);
+                            updateDst |= (dstMetaData.iconWidth != srcMetaData.iconWidth);
+                            updateDst |= (dstMetaData.iconSprites != srcMetaData.iconSprites);
+                            updateDst |= !textMatch(dstMetaData.installedByCollectionGuid, srcMetaData.installedByCollectionGuid);
+                            updateDst |= !textMatch(dstMetaData.guid, srcMetaData.guid);
+                            updateDst |= (dstMetaData.isBaseContent != srcMetaData.isBaseContent);
                         }
                     }
                     if (updateDst) {
                         //
                         // update the Dst with the Src
-                        dstCdef.active = srcCdef.active;
-                        dstCdef.activeOnly = srcCdef.activeOnly;
-                        dstCdef.adminOnly = srcCdef.adminOnly;
-                        dstCdef.aliasID = srcCdef.aliasID;
-                        dstCdef.aliasName = srcCdef.aliasName;
-                        dstCdef.allowAdd = srcCdef.allowAdd;
-                        dstCdef.allowCalendarEvents = srcCdef.allowCalendarEvents;
-                        dstCdef.allowContentChildTool = srcCdef.allowContentChildTool;
-                        dstCdef.allowContentTracking = srcCdef.allowContentTracking;
-                        dstCdef.allowDelete = srcCdef.allowDelete;
-                        dstCdef.allowTopicRules = srcCdef.allowTopicRules;
-                        dstCdef.guid = srcCdef.guid;
-                        dstCdef.legacyContentControlCriteria = srcCdef.legacyContentControlCriteria;
-                        dstCdef.dataSourceName = srcCdef.dataSourceName;
-                        dstCdef.tableName = srcCdef.tableName;
-                        dstCdef.dataSourceId = srcCdef.dataSourceId;
-                        dstCdef.defaultSortMethod = srcCdef.defaultSortMethod;
-                        dstCdef.developerOnly = srcCdef.developerOnly;
-                        dstCdef.dropDownFieldList = srcCdef.dropDownFieldList;
-                        dstCdef.editorGroupName = srcCdef.editorGroupName;
-                        dstCdef.iconHeight = srcCdef.iconHeight;
-                        dstCdef.iconLink = srcCdef.iconLink;
-                        dstCdef.iconSprites = srcCdef.iconSprites;
-                        dstCdef.iconWidth = srcCdef.iconWidth;
-                        dstCdef.installedByCollectionGuid = srcCdef.installedByCollectionGuid;
-                        dstCdef.isBaseContent = srcCdef.isBaseContent;
-                        dstCdef.isModifiedSinceInstalled = srcCdef.isModifiedSinceInstalled;
-                        dstCdef.name = srcCdef.name;
-                        dstCdef.parentID = srcCdef.parentID;
-                        dstCdef.parentName = srcCdef.parentName;
-                        dstCdef.selectCommaList = srcCdef.selectCommaList;
-                        dstCdef.whereClause = srcCdef.whereClause;
-                        dstCdef.includesAFieldChange = true;
-                        dstCdef.dataChanged = true;
+                        dstMetaData.active = srcMetaData.active;
+                        dstMetaData.activeOnly = srcMetaData.activeOnly;
+                        dstMetaData.adminOnly = srcMetaData.adminOnly;
+                        dstMetaData.aliasID = srcMetaData.aliasID;
+                        dstMetaData.aliasName = srcMetaData.aliasName;
+                        dstMetaData.allowAdd = srcMetaData.allowAdd;
+                        dstMetaData.allowCalendarEvents = srcMetaData.allowCalendarEvents;
+                        dstMetaData.allowContentChildTool = srcMetaData.allowContentChildTool;
+                        dstMetaData.allowContentTracking = srcMetaData.allowContentTracking;
+                        dstMetaData.allowDelete = srcMetaData.allowDelete;
+                        dstMetaData.allowTopicRules = srcMetaData.allowTopicRules;
+                        dstMetaData.guid = srcMetaData.guid;
+                        dstMetaData.legacyContentControlCriteria = srcMetaData.legacyContentControlCriteria;
+                        dstMetaData.dataSourceName = srcMetaData.dataSourceName;
+                        dstMetaData.tableName = srcMetaData.tableName;
+                        dstMetaData.dataSourceId = srcMetaData.dataSourceId;
+                        dstMetaData.defaultSortMethod = srcMetaData.defaultSortMethod;
+                        dstMetaData.developerOnly = srcMetaData.developerOnly;
+                        dstMetaData.dropDownFieldList = srcMetaData.dropDownFieldList;
+                        dstMetaData.editorGroupName = srcMetaData.editorGroupName;
+                        dstMetaData.iconHeight = srcMetaData.iconHeight;
+                        dstMetaData.iconLink = srcMetaData.iconLink;
+                        dstMetaData.iconSprites = srcMetaData.iconSprites;
+                        dstMetaData.iconWidth = srcMetaData.iconWidth;
+                        dstMetaData.installedByCollectionGuid = srcMetaData.installedByCollectionGuid;
+                        dstMetaData.isBaseContent = srcMetaData.isBaseContent;
+                        dstMetaData.isModifiedSinceInstalled = srcMetaData.isModifiedSinceInstalled;
+                        dstMetaData.name = srcMetaData.name;
+                        dstMetaData.parentID = srcMetaData.parentID;
+                        dstMetaData.parentName = srcMetaData.parentName;
+                        dstMetaData.selectCommaList = srcMetaData.selectCommaList;
+                        dstMetaData.whereClause = srcMetaData.whereClause;
+                        dstMetaData.includesAFieldChange = true;
+                        dstMetaData.dataChanged = true;
                     }
                     //
                     // Now check each of the field records for an addition, or a change
-                    // DstPtr is still set to the Dst CDef
+                    // DstPtr is still set to the Dst metadata
                     //
-                    //Call AppendClassLogFile(core.app.config.name,"UpgradeCDef_AddSrcToDst", "CollectionSrc.CDef[SrcPtr].fields.count=" & CollectionSrc.CDef[SrcPtr].fields.count)
-                    foreach (var srcFieldKeyValuePair in srcCdef.fields) {
-                        Models.Domain.MetaFieldModel srcCdefField = srcFieldKeyValuePair.Value;
-                        SrcFieldName = srcCdefField.nameLc;
+                    //Call AppendClassLogFile(core.app.config.name,"Upgrademetadata_AddSrcToDst", "CollectionSrc.metadata[SrcPtr].fields.count=" & CollectionSrc.metadata[SrcPtr].fields.count)
+                    foreach (var srcFieldKeyValuePair in srcMetaData.fields) {
+                        Models.Domain.MetaFieldModel srcMetaDataField = srcFieldKeyValuePair.Value;
+                        SrcFieldName = srcMetaDataField.nameLc;
                         updateDst = false;
-                        if (!dstCollection.cdef.ContainsKey(srcName.ToLowerInvariant())) {
+                        if (!dstCollection.metaData.ContainsKey(srcName.ToLowerInvariant())) {
                             //
                             // should have been the collection
                             //
                             throw (new GenericException("ERROR - cannot update destination content because it was not found after being added."));
                         } else {
-                            dstCdef = dstCollection.cdef[srcName.ToLowerInvariant()];
+                            dstMetaData = dstCollection.metaData[srcName.ToLowerInvariant()];
                             bool HelpChanged = false;
-                            Models.Domain.MetaFieldModel dstCdefField = null;
-                            if (dstCdef.fields.ContainsKey(SrcFieldName.ToLowerInvariant())) {
+                            Models.Domain.MetaFieldModel dstMetaDataField = null;
+                            if (dstMetaData.fields.ContainsKey(SrcFieldName.ToLowerInvariant())) {
                                 //
                                 // Src field was found in Dst fields
                                 //
 
-                                dstCdefField = dstCdef.fields[SrcFieldName.ToLowerInvariant()];
+                                dstMetaDataField = dstMetaData.fields[SrcFieldName.ToLowerInvariant()];
                                 updateDst = false;
-                                if (dstCdefField.isBaseField == srcCdefField.isBaseField) {
-                                    updateDst |= (srcCdefField.active != dstCdefField.active);
-                                    updateDst |= (srcCdefField.adminOnly != dstCdefField.adminOnly);
-                                    updateDst |= (srcCdefField.authorable != dstCdefField.authorable);
-                                    updateDst |= !textMatch(srcCdefField.caption, dstCdefField.caption);
-                                    updateDst |= (srcCdefField.contentId != dstCdefField.contentId);
-                                    updateDst |= (srcCdefField.developerOnly != dstCdefField.developerOnly);
-                                    updateDst |= (srcCdefField.editSortPriority != dstCdefField.editSortPriority);
-                                    updateDst |= !textMatch(srcCdefField.editTabName, dstCdefField.editTabName);
-                                    updateDst |= (srcCdefField.fieldTypeId != dstCdefField.fieldTypeId);
-                                    updateDst |= (srcCdefField.htmlContent != dstCdefField.htmlContent);
-                                    updateDst |= (srcCdefField.indexColumn != dstCdefField.indexColumn);
-                                    updateDst |= (srcCdefField.indexSortDirection != dstCdefField.indexSortDirection);
-                                    updateDst |= (encodeInteger(srcCdefField.indexSortOrder) != GenericController.encodeInteger(dstCdefField.indexSortOrder));
-                                    updateDst |= !textMatch(srcCdefField.indexWidth, dstCdefField.indexWidth);
-                                    updateDst |= (srcCdefField.lookupContentID != dstCdefField.lookupContentID);
-                                    updateDst |= !textMatch(srcCdefField.lookupList, dstCdefField.lookupList);
-                                    updateDst |= (srcCdefField.manyToManyContentID != dstCdefField.manyToManyContentID);
-                                    updateDst |= (srcCdefField.manyToManyRuleContentID != dstCdefField.manyToManyRuleContentID);
-                                    updateDst |= !textMatch(srcCdefField.ManyToManyRulePrimaryField, dstCdefField.ManyToManyRulePrimaryField);
-                                    updateDst |= !textMatch(srcCdefField.ManyToManyRuleSecondaryField, dstCdefField.ManyToManyRuleSecondaryField);
-                                    updateDst |= (srcCdefField.memberSelectGroupId_get(core) != dstCdefField.memberSelectGroupId_get(core));
-                                    updateDst |= (srcCdefField.notEditable != dstCdefField.notEditable);
-                                    updateDst |= (srcCdefField.password != dstCdefField.password);
-                                    updateDst |= (srcCdefField.readOnly != dstCdefField.readOnly);
-                                    updateDst |= (srcCdefField.redirectContentID != dstCdefField.redirectContentID);
-                                    updateDst |= !textMatch(srcCdefField.redirectID, dstCdefField.redirectID);
-                                    updateDst |= !textMatch(srcCdefField.redirectPath, dstCdefField.redirectPath);
-                                    updateDst |= (srcCdefField.required != dstCdefField.required);
-                                    updateDst |= (srcCdefField.RSSDescriptionField != dstCdefField.RSSDescriptionField);
-                                    updateDst |= (srcCdefField.RSSTitleField != dstCdefField.RSSTitleField);
-                                    updateDst |= (srcCdefField.Scramble != dstCdefField.Scramble);
-                                    updateDst |= (srcCdefField.textBuffered != dstCdefField.textBuffered);
-                                    updateDst |= (GenericController.encodeText(srcCdefField.defaultValue) != GenericController.encodeText(dstCdefField.defaultValue));
-                                    updateDst |= (srcCdefField.uniqueName != dstCdefField.uniqueName);
-                                    updateDst |= (srcCdefField.isBaseField != dstCdefField.isBaseField);
-                                    updateDst |= !textMatch(srcCdefField.get_lookupContentName(core), dstCdefField.get_lookupContentName(core));
-                                    updateDst |= !textMatch(srcCdefField.get_lookupContentName(core), dstCdefField.get_lookupContentName(core));
-                                    updateDst |= !textMatch(srcCdefField.get_manyToManyRuleContentName(core), dstCdefField.get_manyToManyRuleContentName(core));
-                                    updateDst |= !textMatch(srcCdefField.get_redirectContentName(core), dstCdefField.get_redirectContentName(core));
-                                    updateDst |= !textMatch(srcCdefField.installedByCollectionGuid, dstCdefField.installedByCollectionGuid);
+                                if (dstMetaDataField.isBaseField == srcMetaDataField.isBaseField) {
+                                    updateDst |= (srcMetaDataField.active != dstMetaDataField.active);
+                                    updateDst |= (srcMetaDataField.adminOnly != dstMetaDataField.adminOnly);
+                                    updateDst |= (srcMetaDataField.authorable != dstMetaDataField.authorable);
+                                    updateDst |= !textMatch(srcMetaDataField.caption, dstMetaDataField.caption);
+                                    updateDst |= (srcMetaDataField.contentId != dstMetaDataField.contentId);
+                                    updateDst |= (srcMetaDataField.developerOnly != dstMetaDataField.developerOnly);
+                                    updateDst |= (srcMetaDataField.editSortPriority != dstMetaDataField.editSortPriority);
+                                    updateDst |= !textMatch(srcMetaDataField.editTabName, dstMetaDataField.editTabName);
+                                    updateDst |= (srcMetaDataField.fieldTypeId != dstMetaDataField.fieldTypeId);
+                                    updateDst |= (srcMetaDataField.htmlContent != dstMetaDataField.htmlContent);
+                                    updateDst |= (srcMetaDataField.indexColumn != dstMetaDataField.indexColumn);
+                                    updateDst |= (srcMetaDataField.indexSortDirection != dstMetaDataField.indexSortDirection);
+                                    updateDst |= (encodeInteger(srcMetaDataField.indexSortOrder) != GenericController.encodeInteger(dstMetaDataField.indexSortOrder));
+                                    updateDst |= !textMatch(srcMetaDataField.indexWidth, dstMetaDataField.indexWidth);
+                                    updateDst |= (srcMetaDataField.lookupContentID != dstMetaDataField.lookupContentID);
+                                    updateDst |= !textMatch(srcMetaDataField.lookupList, dstMetaDataField.lookupList);
+                                    updateDst |= (srcMetaDataField.manyToManyContentID != dstMetaDataField.manyToManyContentID);
+                                    updateDst |= (srcMetaDataField.manyToManyRuleContentID != dstMetaDataField.manyToManyRuleContentID);
+                                    updateDst |= !textMatch(srcMetaDataField.ManyToManyRulePrimaryField, dstMetaDataField.ManyToManyRulePrimaryField);
+                                    updateDst |= !textMatch(srcMetaDataField.ManyToManyRuleSecondaryField, dstMetaDataField.ManyToManyRuleSecondaryField);
+                                    updateDst |= (srcMetaDataField.memberSelectGroupId_get(core) != dstMetaDataField.memberSelectGroupId_get(core));
+                                    updateDst |= (srcMetaDataField.notEditable != dstMetaDataField.notEditable);
+                                    updateDst |= (srcMetaDataField.password != dstMetaDataField.password);
+                                    updateDst |= (srcMetaDataField.readOnly != dstMetaDataField.readOnly);
+                                    updateDst |= (srcMetaDataField.redirectContentID != dstMetaDataField.redirectContentID);
+                                    updateDst |= !textMatch(srcMetaDataField.redirectID, dstMetaDataField.redirectID);
+                                    updateDst |= !textMatch(srcMetaDataField.redirectPath, dstMetaDataField.redirectPath);
+                                    updateDst |= (srcMetaDataField.required != dstMetaDataField.required);
+                                    updateDst |= (srcMetaDataField.RSSDescriptionField != dstMetaDataField.RSSDescriptionField);
+                                    updateDst |= (srcMetaDataField.RSSTitleField != dstMetaDataField.RSSTitleField);
+                                    updateDst |= (srcMetaDataField.Scramble != dstMetaDataField.Scramble);
+                                    updateDst |= (srcMetaDataField.textBuffered != dstMetaDataField.textBuffered);
+                                    updateDst |= (GenericController.encodeText(srcMetaDataField.defaultValue) != GenericController.encodeText(dstMetaDataField.defaultValue));
+                                    updateDst |= (srcMetaDataField.uniqueName != dstMetaDataField.uniqueName);
+                                    updateDst |= (srcMetaDataField.isBaseField != dstMetaDataField.isBaseField);
+                                    updateDst |= !textMatch(srcMetaDataField.get_lookupContentName(core), dstMetaDataField.get_lookupContentName(core));
+                                    updateDst |= !textMatch(srcMetaDataField.get_lookupContentName(core), dstMetaDataField.get_lookupContentName(core));
+                                    updateDst |= !textMatch(srcMetaDataField.get_manyToManyRuleContentName(core), dstMetaDataField.get_manyToManyRuleContentName(core));
+                                    updateDst |= !textMatch(srcMetaDataField.get_redirectContentName(core), dstMetaDataField.get_redirectContentName(core));
+                                    updateDst |= !textMatch(srcMetaDataField.installedByCollectionGuid, dstMetaDataField.installedByCollectionGuid);
                                 }
                                 //
-                                // Check Help fields, track changed independantly so frequent help changes will not force timely cdef loads
+                                // Check Help fields, track changed independantly so frequent help changes will not force timely metadata loads
                                 //
-                                bool HelpCustomChanged = !textMatch(srcCdefField.helpCustom, srcCdefField.helpCustom);
-                                bool HelpDefaultChanged = !textMatch(srcCdefField.helpDefault, srcCdefField.helpDefault);
+                                bool HelpCustomChanged = !textMatch(srcMetaDataField.helpCustom, srcMetaDataField.helpCustom);
+                                bool HelpDefaultChanged = !textMatch(srcMetaDataField.helpDefault, srcMetaDataField.helpDefault);
                                 HelpChanged = HelpDefaultChanged || HelpCustomChanged;
                             } else {
                                 //
                                 // field was not found in dst, add it and populate
                                 //
-                                dstCdef.fields.Add(SrcFieldName.ToLowerInvariant(), new Models.Domain.MetaFieldModel());
-                                dstCdefField = dstCdef.fields[SrcFieldName.ToLowerInvariant()];
+                                dstMetaData.fields.Add(SrcFieldName.ToLowerInvariant(), new Models.Domain.MetaFieldModel());
+                                dstMetaDataField = dstMetaData.fields[SrcFieldName.ToLowerInvariant()];
                                 updateDst = true;
                                 HelpChanged = true;
                             }
@@ -1230,54 +1210,54 @@ namespace Contensive.Processor.Models.Domain {
                                 //
                                 // Update Fields
                                 //
-                                dstCdefField.active = srcCdefField.active;
-                                dstCdefField.adminOnly = srcCdefField.adminOnly;
-                                dstCdefField.authorable = srcCdefField.authorable;
-                                dstCdefField.caption = srcCdefField.caption;
-                                dstCdefField.contentId = srcCdefField.contentId;
-                                dstCdefField.defaultValue = srcCdefField.defaultValue;
-                                dstCdefField.developerOnly = srcCdefField.developerOnly;
-                                dstCdefField.editSortPriority = srcCdefField.editSortPriority;
-                                dstCdefField.editTabName = srcCdefField.editTabName;
-                                dstCdefField.fieldTypeId = srcCdefField.fieldTypeId;
-                                dstCdefField.htmlContent = srcCdefField.htmlContent;
-                                dstCdefField.indexColumn = srcCdefField.indexColumn;
-                                dstCdefField.indexSortDirection = srcCdefField.indexSortDirection;
-                                dstCdefField.indexSortOrder = srcCdefField.indexSortOrder;
-                                dstCdefField.indexWidth = srcCdefField.indexWidth;
-                                dstCdefField.lookupContentID = srcCdefField.lookupContentID;
-                                dstCdefField.lookupList = srcCdefField.lookupList;
-                                dstCdefField.manyToManyContentID = srcCdefField.manyToManyContentID;
-                                dstCdefField.manyToManyRuleContentID = srcCdefField.manyToManyRuleContentID;
-                                dstCdefField.ManyToManyRulePrimaryField = srcCdefField.ManyToManyRulePrimaryField;
-                                dstCdefField.ManyToManyRuleSecondaryField = srcCdefField.ManyToManyRuleSecondaryField;
-                                dstCdefField.memberSelectGroupId_set(core, srcCdefField.memberSelectGroupId_get(core));
-                                dstCdefField.nameLc = srcCdefField.nameLc;
-                                dstCdefField.notEditable = srcCdefField.notEditable;
-                                dstCdefField.password = srcCdefField.password;
-                                dstCdefField.readOnly = srcCdefField.readOnly;
-                                dstCdefField.redirectContentID = srcCdefField.redirectContentID;
-                                dstCdefField.redirectID = srcCdefField.redirectID;
-                                dstCdefField.redirectPath = srcCdefField.redirectPath;
-                                dstCdefField.required = srcCdefField.required;
-                                dstCdefField.RSSDescriptionField = srcCdefField.RSSDescriptionField;
-                                dstCdefField.RSSTitleField = srcCdefField.RSSTitleField;
-                                dstCdefField.Scramble = srcCdefField.Scramble;
-                                dstCdefField.textBuffered = srcCdefField.textBuffered;
-                                dstCdefField.uniqueName = srcCdefField.uniqueName;
-                                dstCdefField.isBaseField = srcCdefField.isBaseField;
-                                dstCdefField.set_lookupContentName(core, srcCdefField.get_lookupContentName(core));
-                                dstCdefField.set_manyToManyContentName(core, srcCdefField.get_manyToManyContentName(core));
-                                dstCdefField.set_manyToManyRuleContentName(core, srcCdefField.get_manyToManyRuleContentName(core));
-                                dstCdefField.set_redirectContentName(core, srcCdefField.get_redirectContentName(core));
-                                dstCdefField.installedByCollectionGuid = srcCdefField.installedByCollectionGuid;
-                                dstCdefField.dataChanged = true;
-                                dstCdef.includesAFieldChange = true;
+                                dstMetaDataField.active = srcMetaDataField.active;
+                                dstMetaDataField.adminOnly = srcMetaDataField.adminOnly;
+                                dstMetaDataField.authorable = srcMetaDataField.authorable;
+                                dstMetaDataField.caption = srcMetaDataField.caption;
+                                dstMetaDataField.contentId = srcMetaDataField.contentId;
+                                dstMetaDataField.defaultValue = srcMetaDataField.defaultValue;
+                                dstMetaDataField.developerOnly = srcMetaDataField.developerOnly;
+                                dstMetaDataField.editSortPriority = srcMetaDataField.editSortPriority;
+                                dstMetaDataField.editTabName = srcMetaDataField.editTabName;
+                                dstMetaDataField.fieldTypeId = srcMetaDataField.fieldTypeId;
+                                dstMetaDataField.htmlContent = srcMetaDataField.htmlContent;
+                                dstMetaDataField.indexColumn = srcMetaDataField.indexColumn;
+                                dstMetaDataField.indexSortDirection = srcMetaDataField.indexSortDirection;
+                                dstMetaDataField.indexSortOrder = srcMetaDataField.indexSortOrder;
+                                dstMetaDataField.indexWidth = srcMetaDataField.indexWidth;
+                                dstMetaDataField.lookupContentID = srcMetaDataField.lookupContentID;
+                                dstMetaDataField.lookupList = srcMetaDataField.lookupList;
+                                dstMetaDataField.manyToManyContentID = srcMetaDataField.manyToManyContentID;
+                                dstMetaDataField.manyToManyRuleContentID = srcMetaDataField.manyToManyRuleContentID;
+                                dstMetaDataField.ManyToManyRulePrimaryField = srcMetaDataField.ManyToManyRulePrimaryField;
+                                dstMetaDataField.ManyToManyRuleSecondaryField = srcMetaDataField.ManyToManyRuleSecondaryField;
+                                dstMetaDataField.memberSelectGroupId_set(core, srcMetaDataField.memberSelectGroupId_get(core));
+                                dstMetaDataField.nameLc = srcMetaDataField.nameLc;
+                                dstMetaDataField.notEditable = srcMetaDataField.notEditable;
+                                dstMetaDataField.password = srcMetaDataField.password;
+                                dstMetaDataField.readOnly = srcMetaDataField.readOnly;
+                                dstMetaDataField.redirectContentID = srcMetaDataField.redirectContentID;
+                                dstMetaDataField.redirectID = srcMetaDataField.redirectID;
+                                dstMetaDataField.redirectPath = srcMetaDataField.redirectPath;
+                                dstMetaDataField.required = srcMetaDataField.required;
+                                dstMetaDataField.RSSDescriptionField = srcMetaDataField.RSSDescriptionField;
+                                dstMetaDataField.RSSTitleField = srcMetaDataField.RSSTitleField;
+                                dstMetaDataField.Scramble = srcMetaDataField.Scramble;
+                                dstMetaDataField.textBuffered = srcMetaDataField.textBuffered;
+                                dstMetaDataField.uniqueName = srcMetaDataField.uniqueName;
+                                dstMetaDataField.isBaseField = srcMetaDataField.isBaseField;
+                                dstMetaDataField.set_lookupContentName(core, srcMetaDataField.get_lookupContentName(core));
+                                dstMetaDataField.set_manyToManyContentName(core, srcMetaDataField.get_manyToManyContentName(core));
+                                dstMetaDataField.set_manyToManyRuleContentName(core, srcMetaDataField.get_manyToManyRuleContentName(core));
+                                dstMetaDataField.set_redirectContentName(core, srcMetaDataField.get_redirectContentName(core));
+                                dstMetaDataField.installedByCollectionGuid = srcMetaDataField.installedByCollectionGuid;
+                                dstMetaDataField.dataChanged = true;
+                                dstMetaData.includesAFieldChange = true;
                             }
                             if (HelpChanged) {
-                                dstCdefField.helpCustom = srcCdefField.helpCustom;
-                                dstCdefField.helpDefault = srcCdefField.helpDefault;
-                                dstCdefField.HelpChanged = true;
+                                dstMetaDataField.helpCustom = srcMetaDataField.helpCustom;
+                                dstMetaDataField.helpDefault = srcMetaDataField.helpDefault;
+                                dstMetaDataField.HelpChanged = true;
                             }
                         }
                     }
@@ -1287,15 +1267,15 @@ namespace Contensive.Processor.Models.Domain {
                 // Check SQL Indexes
                 // -------------------------------------------------------------------------------------------------
                 //
-                foreach (CDefMiniCollectionModel.MiniCollectionSQLIndexModel srcSqlIndex in srcCollection.sqlIndexes) {
+                foreach (MetaDataMiniCollectionModel.MiniCollectionSQLIndexModel srcSqlIndex in srcCollection.sqlIndexes) {
                     string srcName = (srcSqlIndex.DataSourceName + "-" + srcSqlIndex.TableName + "-" + srcSqlIndex.IndexName).ToLowerInvariant();
                     updateDst = false;
                     //
                     // Search for this name in the Dst
                     bool indexFound = false;
                     bool indexChanged = false;
-                    CDefMiniCollectionModel.MiniCollectionSQLIndexModel indexToUpdate = new CDefMiniCollectionModel.MiniCollectionSQLIndexModel();
-                    foreach (CDefMiniCollectionModel.MiniCollectionSQLIndexModel dstSqlIndex in dstCollection.sqlIndexes) {
+                    MetaDataMiniCollectionModel.MiniCollectionSQLIndexModel indexToUpdate = new MetaDataMiniCollectionModel.MiniCollectionSQLIndexModel();
+                    foreach (MetaDataMiniCollectionModel.MiniCollectionSQLIndexModel dstSqlIndex in dstCollection.sqlIndexes) {
                         dstName = (dstSqlIndex.DataSourceName + "-" + dstSqlIndex.TableName + "-" + dstSqlIndex.IndexName).ToLowerInvariant();
                         if (textMatch(dstName, srcName)) {
                             //
@@ -1329,7 +1309,7 @@ namespace Contensive.Processor.Models.Domain {
                 string DataBuildVersion = core.siteProperties.dataBuildVersion;
                 foreach (var srcKvp in srcCollection.menus) {
                     string srcKey = srcKvp.Key.ToLowerInvariant();
-                    CDefMiniCollectionModel.MiniCollectionMenuModel srcMenu = srcKvp.Value;
+                    MetaDataMiniCollectionModel.MiniCollectionMenuModel srcMenu = srcKvp.Value;
                     string srcName = srcMenu.Name.ToLowerInvariant();
                     string srcGuid = srcMenu.Guid;
                     string SrcParentName = GenericController.vbLCase(srcMenu.ParentName);
@@ -1338,13 +1318,13 @@ namespace Contensive.Processor.Models.Domain {
                     updateDst = false;
                     //
                     // Search for match using guid
-                    CDefMiniCollectionModel.MiniCollectionMenuModel dstMenuMatch = new CDefMiniCollectionModel.MiniCollectionMenuModel();
+                    MetaDataMiniCollectionModel.MiniCollectionMenuModel dstMenuMatch = new MetaDataMiniCollectionModel.MiniCollectionMenuModel();
                     bool IsMatch = false;
                     string DstKey = null;
                     bool DstIsNavigator = false;
                     foreach (var dstKvp in dstCollection.menus) {
                         string dstKey = dstKvp.Key.ToLowerInvariant();
-                        CDefMiniCollectionModel.MiniCollectionMenuModel dstMenu = dstKvp.Value;
+                        MetaDataMiniCollectionModel.MiniCollectionMenuModel dstMenu = dstKvp.Value;
                         string dstGuid = dstMenu.Guid;
                         if (dstGuid == srcGuid) {
                             DstIsNavigator = dstMenu.IsNavigator;
@@ -1363,7 +1343,7 @@ namespace Contensive.Processor.Models.Domain {
                         // no match found on guid, try name and ( either namespace or parentname )
                         foreach (var dstKvp in dstCollection.menus) {
                             string dstKey = dstKvp.Key.ToLowerInvariant();
-                            CDefMiniCollectionModel.MiniCollectionMenuModel dstMenu = dstKvp.Value;
+                            MetaDataMiniCollectionModel.MiniCollectionMenuModel dstMenu = dstKvp.Value;
                             dstName = GenericController.vbLCase(dstMenu.Name);
                             if ((srcName == dstName) && (SrcIsNavigator == DstIsNavigator)) {
                                 if (SrcIsNavigator) {
@@ -1423,9 +1403,9 @@ namespace Contensive.Processor.Models.Domain {
                 //                '
                 //                ' found a match between Src and Dst
                 //                '
-                //                If SrcIsUserCDef Then
+                //                If SrcIsUsermetadata Then
                 //                    '
-                //                    ' test for cdef attribute changes
+                //                    ' test for metadata attribute changes
                 //                    '
                 //                    With dstCollection.AddOns[dstPtr]
                 //                        okToUpdateDstFromSrc = okToUpdateDstFromSrc Or Not TextMatch(core,.ArgumentList, srcCollection.AddOns[SrcPtr].ArgumentList)
@@ -1441,7 +1421,7 @@ namespace Contensive.Processor.Models.Domain {
                 //        Next
                 //        If DstPtr = dstCollection.AddOnCnt Then
                 //            '
-                //            ' CDef was not found, add it
+                //            ' metadata was not found, add it
                 //            '
                 //            Array.Resize( ref asdf,asdf) // redim preserve  dstCollection.AddOns(dstCollection.AddOnCnt)
                 //            dstCollection.AddOnCnt = DstPtr + 1
@@ -1452,7 +1432,7 @@ namespace Contensive.Processor.Models.Domain {
                 //                '
                 //                ' It okToUpdateDstFromSrc, update the Dst with the Src
                 //                '
-                //                .CDefChanged = True
+                //                .metadataChanged = True
                 //                .ArgumentList = srcCollection.AddOns[SrcPtr].ArgumentList
                 //                .Copy = srcCollection.AddOns[SrcPtr].Copy
                 //                .Link = srcCollection.AddOns[SrcPtr].Link
@@ -1487,7 +1467,7 @@ namespace Contensive.Processor.Models.Domain {
                     }
                     if (dstStylePtr == dstCollection.styleCnt) {
                         //
-                        // CDef was not found, add it
+                        // metadata was not found, add it
                         //
                         Array.Resize(ref dstCollection.styles, dstCollection.styleCnt);
                         dstCollection.styleCnt = dstStylePtr + 1;
@@ -1536,14 +1516,14 @@ namespace Contensive.Processor.Models.Domain {
         //
         //====================================================================================================
         //
-        private static CDefMiniCollectionModel getApplicationCDefMiniCollection(CoreController core, bool isNewBuild, string logPrefix, ref List<string> installedCollections) {
-            var result = new CDefMiniCollectionModel();
+        private static MetaDataMiniCollectionModel getApplicationMetaDataMiniCollection(CoreController core, bool isNewBuild, string logPrefix, ref List<string> installedCollections) {
+            var result = new MetaDataMiniCollectionModel();
             try {
                 if (!isNewBuild) {
                     //
                     // if this is not an empty database, get the application collection, else return empty
-                    string applicationCDefMiniCollectionXml = ApplicationCDefMiniCollection.get(core, true);
-                    result = CDefMiniCollectionModel.installCDefMiniCollection_LoadXml(core, applicationCDefMiniCollectionXml, false, false, isNewBuild, new CDefMiniCollectionModel(), logPrefix, ref installedCollections);
+                    string applicationMetaDataMiniCollectionXml = ApplicationMetaDataMiniCollection.get(core, true);
+                    result = MetaDataMiniCollectionModel.installMetaDataMiniCollection_LoadXml(core, applicationMetaDataMiniCollectionXml, false, false, isNewBuild, new MetaDataMiniCollectionModel(), logPrefix, ref installedCollections);
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
@@ -1554,29 +1534,29 @@ namespace Contensive.Processor.Models.Domain {
         //
         //====================================================================================================
         /// <summary>
-        /// Update a table from a collection cdef node
+        /// Update a table from a collection metadata node
         /// </summary>
-        internal static void installCDefMiniCollection_buildDb_saveCDefToDb(CoreController core, Models.Domain.MetaModel cdef, string BuildVersion) {
+        internal static void installMetaDataMiniCollection_buildDb_saveMetaDataToDb(CoreController core, MetaModel metaData, string BuildVersion) {
             try {
                 //
-                LogController.logInfo(core, "Update db cdef [" + cdef.name + "]");
+                LogController.logInfo(core, "Update db metadata [" + metaData.name + "]");
                 //
                 // -- get contentid and protect content with IsBaseContent true
                 {
-                    if (cdef.dataChanged) {
+                    if (metaData.dataChanged) {
                         //
                         // -- update definition (use SingleRecord as an update flag)
-                        var datasource = DataSourceModel.createByUniqueName(core, cdef.dataSourceName);
-                        MetaController.verifyContent_returnId(core, cdef);
+                        var datasource = DataSourceModel.createByUniqueName(core, metaData.dataSourceName);
+                        MetaController.verifyContent_returnId(core, metaData);
                     }
                     //
                     // -- update Content Field Records and Content Field Help records
-                    MetaModel cdefFieldHelp = MetaModel.createByUniqueName(core, ContentFieldHelpModel.contentName);
-                    foreach (var nameValuePair in cdef.fields) {
+                    MetaModel metaDataFieldHelp = MetaModel.createByUniqueName(core, ContentFieldHelpModel.contentName);
+                    foreach (var nameValuePair in metaData.fields) {
                         MetaFieldModel field = nameValuePair.Value;
                         int fieldId = 0;
                         if (field.dataChanged) {
-                            fieldId = MetaController.verifyContentField_returnId(core, cdef.name, field);
+                            fieldId = MetaController.verifyContentField_returnId(core, metaData.name, field);
                         }
                         //
                         // -- update content field help records
@@ -1618,7 +1598,7 @@ namespace Contensive.Processor.Models.Domain {
         //
         //====================================================================================================
         //
-        private static string GetMenuNameSpace(CoreController core, Dictionary<string, CDefMiniCollectionModel.MiniCollectionMenuModel> menus, CDefMiniCollectionModel.MiniCollectionMenuModel menu, string UsedIDList) {
+        private static string GetMenuNameSpace(CoreController core, Dictionary<string, MetaDataMiniCollectionModel.MiniCollectionMenuModel> menus, MetaDataMiniCollectionModel.MiniCollectionMenuModel menu, string UsedIDList) {
             string returnAttr = "";
             try {
                 string ParentName = null;
@@ -1631,7 +1611,7 @@ namespace Contensive.Processor.Models.Domain {
                 if (!string.IsNullOrEmpty(ParentName)) {
                     LCaseParentName = GenericController.vbLCase(ParentName);
                     foreach (var kvp in menus) {
-                        CDefMiniCollectionModel.MiniCollectionMenuModel testMenu = kvp.Value;
+                        MetaDataMiniCollectionModel.MiniCollectionMenuModel testMenu = kvp.Value;
                         if (GenericController.vbInstr(1, "," + UsedIDList + ",", "," + Ptr.ToString() + ",") == 0) {
                             if (LCaseParentName == GenericController.vbLCase(testMenu.Name) && (menu.IsNavigator == testMenu.IsNavigator)) {
                                 Prefix = GetMenuNameSpace(core, menus, testMenu, UsedIDList + "," + menu.Guid);

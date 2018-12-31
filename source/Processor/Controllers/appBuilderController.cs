@@ -100,6 +100,7 @@ namespace Contensive.Processor.Controllers {
                     var group = GroupModel.create(core, defaultSiteManagerGuid);
                     if (group == null) {
                         LogController.logInfo(core, logPrefix + ", verify site manager group");
+                        group = GroupModel.addEmpty(core);
                         group.name = defaultSiteManagerName;
                         group.caption = defaultSiteManagerName;
                         group.allowBulkEmail = true;
@@ -493,10 +494,10 @@ namespace Contensive.Processor.Controllers {
         /// <param name="inActive"></param>
         private static void verifyRecord(CoreController core, string contentName, string name, string sqlName = "", string sqlValue = "") {
             try {
-                var cdef = MetaModel.createByUniqueName(core, contentName);
-                DataTable dt = core.db.executeQuery("SELECT ID FROM " + cdef.tableName + " WHERE NAME=" + DbController.encodeSQLText(name) + ";");
+                var metaData = MetaModel.createByUniqueName(core, contentName);
+                DataTable dt = core.db.executeQuery("SELECT ID FROM " + metaData.tableName + " WHERE NAME=" + DbController.encodeSQLText(name) + ";");
                 if (dt.Rows.Count == 0) {
-                    string sql1 = "insert into " + cdef.tableName + " (active,name";
+                    string sql1 = "insert into " + metaData.tableName + " (active,name";
                     string sql2 = ") values (1," + DbController.encodeSQLText(name);
                     string sql3 = ")";
                     if (!string.IsNullOrEmpty(sqlName)) {
@@ -623,7 +624,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // Load basic records -- default images are handled in the REsource Library through the /ContensiveBase/config/DefaultValues.txt GetDefaultValue(key) mechanism
                 //
-                if (MetaController.getRecordId( core,"Library File Types", "Image") == 0) {
+                if (MetaController.getRecordIdByUniqueName( core,"Library File Types", "Image") == 0) {
                     verifyRecord(core, "Library File Types", "Image", "ExtensionList", "'GIF,JPG,JPE,JPEG,BMP,PNG'");
                     verifyRecord(core, "Library File Types", "Image", "IsImage", "1");
                     verifyRecord(core, "Library File Types", "Image", "IsVideo", "0");
@@ -631,7 +632,7 @@ namespace Contensive.Processor.Controllers {
                     verifyRecord(core, "Library File Types", "Image", "IsFlash", "0");
                 }
                 //
-                if (MetaController.getRecordId( core,"Library File Types", "Video") == 0) {
+                if (MetaController.getRecordIdByUniqueName( core,"Library File Types", "Video") == 0) {
                     verifyRecord(core, "Library File Types", "Video", "ExtensionList", "'ASX,AVI,WMV,MOV,MPG,MPEG,MP4,QT,RM'");
                     verifyRecord(core, "Library File Types", "Video", "IsImage", "0");
                     verifyRecord(core, "Library File Types", "Video", "IsVideo", "1");
@@ -639,7 +640,7 @@ namespace Contensive.Processor.Controllers {
                     verifyRecord(core, "Library File Types", "Video", "IsFlash", "0");
                 }
                 //
-                if (MetaController.getRecordId( core,"Library File Types", "Audio") == 0) {
+                if (MetaController.getRecordIdByUniqueName( core,"Library File Types", "Audio") == 0) {
                     verifyRecord(core, "Library File Types", "Audio", "ExtensionList", "'AIF,AIFF,ASF,CDA,M4A,M4P,MP2,MP3,MPA,WAV,WMA'");
                     verifyRecord(core, "Library File Types", "Audio", "IsImage", "0");
                     verifyRecord(core, "Library File Types", "Audio", "IsVideo", "0");
@@ -647,7 +648,7 @@ namespace Contensive.Processor.Controllers {
                     verifyRecord(core, "Library File Types", "Audio", "IsFlash", "0");
                 }
                 //
-                if (MetaController.getRecordId( core,"Library File Types", "Word") == 0) {
+                if (MetaController.getRecordIdByUniqueName( core,"Library File Types", "Word") == 0) {
                     verifyRecord(core, "Library File Types", "Word", "ExtensionList", "'DOC'");
                     verifyRecord(core, "Library File Types", "Word", "IsImage", "0");
                     verifyRecord(core, "Library File Types", "Word", "IsVideo", "0");
@@ -655,7 +656,7 @@ namespace Contensive.Processor.Controllers {
                     verifyRecord(core, "Library File Types", "Word", "IsFlash", "0");
                 }
                 //
-                if (MetaController.getRecordId( core,"Library File Types", "Flash") == 0) {
+                if (MetaController.getRecordIdByUniqueName( core,"Library File Types", "Flash") == 0) {
                     verifyRecord(core, "Library File Types", "Flash", "ExtensionList", "'SWF'");
                     verifyRecord(core, "Library File Types", "Flash", "IsImage", "0");
                     verifyRecord(core, "Library File Types", "Flash", "IsVideo", "0");
@@ -663,7 +664,7 @@ namespace Contensive.Processor.Controllers {
                     verifyRecord(core, "Library File Types", "Flash", "IsFlash", "1");
                 }
                 //
-                if (MetaController.getRecordId( core,"Library File Types", "PDF") == 0) {
+                if (MetaController.getRecordIdByUniqueName( core,"Library File Types", "PDF") == 0) {
                     verifyRecord(core, "Library File Types", "PDF", "ExtensionList", "'PDF'");
                     verifyRecord(core, "Library File Types", "PDF", "IsImage", "0");
                     verifyRecord(core, "Library File Types", "PDF", "IsVideo", "0");
@@ -671,7 +672,7 @@ namespace Contensive.Processor.Controllers {
                     verifyRecord(core, "Library File Types", "PDF", "IsFlash", "0");
                 }
                 //
-                if (MetaController.getRecordId( core,"Library File Types", "XLS") == 0) {
+                if (MetaController.getRecordIdByUniqueName( core,"Library File Types", "XLS") == 0) {
                     verifyRecord(core, "Library File Types", "Excel", "ExtensionList", "'XLS'");
                     verifyRecord(core, "Library File Types", "Excel", "IsImage", "0");
                     verifyRecord(core, "Library File Types", "Excel", "IsVideo", "0");
@@ -679,7 +680,7 @@ namespace Contensive.Processor.Controllers {
                     verifyRecord(core, "Library File Types", "Excel", "IsFlash", "0");
                 }
                 //
-                if (MetaController.getRecordId( core,"Library File Types", "PPT") == 0) {
+                if (MetaController.getRecordIdByUniqueName( core,"Library File Types", "PPT") == 0) {
                     verifyRecord(core, "Library File Types", "Power Point", "ExtensionList", "'PPT,PPS'");
                     verifyRecord(core, "Library File Types", "Power Point", "IsImage", "0");
                     verifyRecord(core, "Library File Types", "Power Point", "IsVideo", "0");
@@ -687,7 +688,7 @@ namespace Contensive.Processor.Controllers {
                     verifyRecord(core, "Library File Types", "Power Point", "IsFlash", "0");
                 }
                 //
-                if (MetaController.getRecordId( core,"Library File Types", "Default") == 0) {
+                if (MetaController.getRecordIdByUniqueName( core,"Library File Types", "Default") == 0) {
                     verifyRecord(core, "Library File Types", "Default", "ExtensionList", "''");
                     verifyRecord(core, "Library File Types", "Default", "IsImage", "0");
                     verifyRecord(core, "Library File Types", "Default", "IsVideo", "0");
@@ -734,7 +735,7 @@ namespace Contensive.Processor.Controllers {
                 appendUpgradeLogAddStep(core, core.appConfig.name, "VerifyStates", "Verify States");
                 //
                 verifyCountry(core, "United States", "US");
-                int CountryID = MetaController.getRecordId( core,"Countries", "United States");
+                int CountryID = MetaController.getRecordIdByUniqueName( core,"Countries", "United States");
                 //
                 verifyState(core, "Alaska", "AK", 0.0D, CountryID);
                 verifyState(core, "Alabama", "AL", 0.0D, CountryID);
@@ -806,23 +807,23 @@ namespace Contensive.Processor.Controllers {
         /// <param name="abbreviation"></param>
         private static void verifyCountry(CoreController core, string name, string abbreviation) {
             try {
-                using (var csXfer = new CsModel(core)) {
-                    csXfer.open("Countries", "name=" + DbController.encodeSQLText(name));
-                    if (!csXfer.ok()) {
-                        csXfer.close();
-                        csXfer.insert("Countries");
-                        if (csXfer.ok()) {
-                            csXfer.set("ACTIVE", true);
+                using (var csData = new CsModel(core)) {
+                    csData.open("Countries", "name=" + DbController.encodeSQLText(name));
+                    if (!csData.ok()) {
+                        csData.close();
+                        csData.insert("Countries");
+                        if (csData.ok()) {
+                            csData.set("ACTIVE", true);
                         }
                     }
-                    if (csXfer.ok()) {
-                        csXfer.set("NAME", name);
-                        csXfer.set("Abbreviation", abbreviation);
+                    if (csData.ok()) {
+                        csData.set("NAME", name);
+                        csData.set("Abbreviation", abbreviation);
                         if (GenericController.vbLCase(name) == "united states") {
-                            csXfer.set("DomesticShipping", "1");
+                            csData.set("DomesticShipping", "1");
                         }
                     }
-                    csXfer.close();
+                    csData.close();
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -1021,7 +1022,7 @@ namespace Contensive.Processor.Controllers {
             int returnEntry = 0;
             try {
                 if (!string.IsNullOrEmpty(EntryName.Trim())) {
-                    int addonId = MetaController.getRecordId( core,Models.Db.AddonModel.contentName, AddonName);
+                    int addonId = MetaController.getRecordIdByUniqueName( core,Models.Db.AddonModel.contentName, AddonName);
                     int parentId = verifyNavigatorEntry_getParentIdFromNameSpace(core, menuNameSpace);
                     int contentId = MetaModel.getContentId(core, ContentName);
                     string listCriteria = "(name=" + DbController.encodeSQLText(EntryName) + ")and(Parentid=" + parentId + ")";
@@ -1082,18 +1083,18 @@ namespace Contensive.Processor.Controllers {
                                 Criteria += "and(Parentid=" + parentRecordId + ")";
                             }
                             int RecordID = 0;
-                            using (var csXfer = new CsModel(core)) {
-                                csXfer.open(NavigatorEntryModel.contentName, Criteria, "ID", true, 0,  "ID", 1);
-                                if (csXfer.ok()) {
-                                    RecordID = (csXfer.getInteger("ID"));
+                            using (var csData = new CsModel(core)) {
+                                csData.open(NavigatorEntryModel.contentName, Criteria, "ID", true, 0,  "ID", 1);
+                                if (csData.ok()) {
+                                    RecordID = (csData.getInteger("ID"));
                                 }
-                                csXfer.close();
+                                csData.close();
                                 if (RecordID == 0) {
-                                    csXfer.insert(NavigatorEntryModel.contentName);
-                                    if (csXfer.ok()) {
-                                        RecordID = csXfer.getInteger("ID");
-                                        csXfer.set("name", recordName);
-                                        csXfer.set("parentID", parentRecordId);
+                                    csData.insert(NavigatorEntryModel.contentName);
+                                    if (csData.ok()) {
+                                        RecordID = csData.getInteger("ID");
+                                        csData.set("name", recordName);
+                                        csData.set("parentID", parentRecordId);
                                     }
                                 }
                             }

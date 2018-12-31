@@ -107,10 +107,10 @@ namespace Contensive.Addons.AdminSite {
                             // Get the total record count
                             //
                             SQL = "select count(" + adminData.adminContent.tableName + ".ID) as cnt from " + SQLFrom + " where " + SQLWhere;
-                            using (var csXfer = new CsModel(core)) {
-                                csXfer.openSql(SQL, datasource.name);
-                                if (csXfer.ok()) {
-                                    recordCnt = csXfer.getInteger("cnt");
+                            using (var csData = new CsModel(core)) {
+                                csData.openSql(SQL, datasource.name);
+                                if (csData.ok()) {
+                                    recordCnt = csData.getInteger("cnt");
                                 }
                             }
                             //

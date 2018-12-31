@@ -97,16 +97,17 @@ namespace Contensive.Addons.AdminNavigator {
                     if (EmptyNodeList.Count > 0) {
                         cp.Site.TestPoint("adminNavigator, emptyNodeList from cache=[" + EmptyNodeList + "]");
                     } else {
-                        SQL = "select n.ID from ccMenuEntries n left join ccMenuEntries c on c.parentid=n.id Where c.ID Is Null group by n.id";
-                        CPCSBaseClass cs2 = cp.CSNew();
-                        if (cs2.OpenSQL(SQL)) {
-                            do {
-                                EmptyNodeList.Add(cs2.GetInteger("id").ToString());
-                                cs2.GoNext();
+                        using (CPCSBaseClass cs2 = cp.CSNew()) {
+                            SQL = "select n.ID from ccMenuEntries n left join ccMenuEntries c on c.parentid=n.id Where c.ID Is Null group by n.id";
+                            if (cs2.OpenSQL(SQL)) {
+                                do {
+                                    EmptyNodeList.Add(cs2.GetInteger("id").ToString());
+                                    cs2.GoNext();
+                                }
+                                while (cs2.OK());
                             }
-                            while (cs2.OK());
+                            cs2.Close();
                         }
-                        cs2.Close();
                         cp.Site.TestPoint("adminNavigator, emptyNodeList from db=[" + EmptyNodeList + "]");
                         cp.Cache.Store(BakeName, EmptyNodeList, NavigatorEntryModel.contentTableName);
                     }

@@ -594,22 +594,22 @@ namespace Contensive.Processor.Controllers {
                 int EMailTemplateID = 0;
                 string EmailStatus = null;
                 //
-                using (var csXfer = new CsModel(core)) {
-                    csXfer.openRecord("email", EmailID);
-                    if (!csXfer.ok()) {
+                using (var csData = new CsModel(core)) {
+                    csData.openRecord("email", EmailID);
+                    if (!csData.ok()) {
                         ErrorController.addUserError(core, "There was a problem sending the email confirmation. The email record could not be found.");
                     } else {
-                        EmailSubject = csXfer.getText("Subject");
-                        EmailBody = csXfer.getText("copyFilename");
+                        EmailSubject = csData.getText("Subject");
+                        EmailBody = csData.getText("copyFilename");
                         //
                         // merge in template
                         //
                         EmailTemplate = "";
-                        EMailTemplateID = csXfer.getInteger("EmailTemplateID");
+                        EMailTemplateID = csData.getInteger("EmailTemplateID");
                         if (EMailTemplateID != 0) {
                             using (var CSTemplate = new CsModel(core)) {
                                 CSTemplate.openRecord("Email Templates", EMailTemplateID,  "BodyHTML");
-                                if (csXfer.ok()) {
+                                if (csData.ok()) {
                                     EmailTemplate = CSTemplate.getText("BodyHTML");
                                 }
                             }
@@ -617,7 +617,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // spam footer
                         //
-                        if (csXfer.getBoolean("AllowSpamFooter")) {
+                        if (csData.getBoolean("AllowSpamFooter")) {
                             //
                             // This field is default true, and non-authorable
                             // It will be true in all cases, except a possible unforseen exception
@@ -713,7 +713,7 @@ namespace Contensive.Processor.Controllers {
                                 EmailBody = EmailBody + "<div style=\"clear:both;padding:10px;margin:10px;border:1px dashed #888;\">Administrator<br><br>" + ConfirmFooter + "</div>";
                                 string queryStringForLinkAppend = "";
                                 string sendStatus = "";
-                                if (!queuePersonEmail(core, person, csXfer.getText("FromAddress"), EmailSubject, EmailBody, "", "", true, true, EmailID, EmailTemplate, false, ref sendStatus, queryStringForLinkAppend)) {
+                                if (!queuePersonEmail(core, person, csData.getText("FromAddress"), EmailSubject, EmailBody, "", "", true, true, EmailID, EmailTemplate, false, ref sendStatus, queryStringForLinkAppend)) {
                                     ErrorController.addUserError(core, EmailStatus);
                                 }
                             }

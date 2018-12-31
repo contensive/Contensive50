@@ -1234,13 +1234,9 @@ namespace Contensive.Processor.Controllers {
         /// <param name="dataSourceName"></param>
         public void deleteTableRecord(string guid, string tableName, string dataSourceName = "") {
             try {
-                if (string.IsNullOrEmpty(tableName.Trim())) {
-                    throw new GenericException("tablename cannot be blank");
-                } else if (!isGuid( guid )) {
-                    throw new GenericException("Guid is not valid [" + guid + "]");
-                } else {
-                    executeNonQuery("delete from " + tableName + " where ccguid=" + encodeSQLText(guid) , dataSourceName);
-                }
+                if (string.IsNullOrWhiteSpace(tableName)) { throw new GenericException("tablename cannot be blank"); }
+                if (!isGuid( guid )) { throw new GenericException("Guid is not valid [" + guid + "]"); }
+                executeNonQuery("delete from " + tableName + " where ccguid=" + encodeSQLText(guid), dataSourceName);
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
                 throw;
@@ -1251,22 +1247,16 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// DeleteTableRecords
         /// </summary>
-        /// <param name="DataSourceName"></param>
-        /// <param name="TableName"></param>
-        /// <param name="Criteria"></param>
+        /// <param name="dataSourceName"></param>
+        /// <param name="tableName"></param>
+        /// <param name="criteria"></param>
         //
-        public void deleteTableRecords(string TableName, string Criteria, string DataSourceName) {
+        public void deleteTableRecords(string tableName, string criteria, string dataSourceName) {
             try {
-                if (string.IsNullOrEmpty(DataSourceName)) {
-                    throw new ArgumentException("dataSourceName cannot be blank");
-                } else if (string.IsNullOrEmpty(TableName)) {
-                    throw new ArgumentException("TableName cannot be blank");
-                } else if (string.IsNullOrEmpty(Criteria)) {
-                    throw new ArgumentException("Criteria cannot be blank");
-                } else {
-                    string SQL = "DELETE FROM " + TableName + " WHERE " + Criteria;
-                    executeQuery(SQL, DataSourceName);
-                }
+                if (string.IsNullOrEmpty(dataSourceName)) { throw new ArgumentException("dataSourceName cannot be blank"); }
+                if (string.IsNullOrEmpty(tableName)) { throw new ArgumentException("TableName cannot be blank"); }
+                if (string.IsNullOrEmpty(criteria)) { throw new ArgumentException("Criteria cannot be blank"); }
+                executeQuery("delete from " + tableName + " where " + criteria, dataSourceName);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;

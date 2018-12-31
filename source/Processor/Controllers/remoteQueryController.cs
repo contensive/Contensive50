@@ -26,29 +26,24 @@ namespace Contensive.Processor.Controllers {
         //
         //
         public static string main_GetRemoteQueryKey(CoreController core, string SQL, string dataSourceName = "default", int maxRows = 1000) {
-            string RemoteKey = "";
-            int DataSourceID = 0;
-            //
-            if (maxRows == 0) {
-                maxRows = 1000;
-            }
-            using (var csXfer = new CsModel(core)) {
-                csXfer.insert("Remote Queries");
-                if (csXfer.ok()) {
-                    RemoteKey = GenericController.getGUIDString();
-                    DataSourceID = MetaController.getRecordId(core, "Data Sources", dataSourceName);
-                    csXfer.set("remotekey", RemoteKey);
-                    csXfer.set("datasourceid", DataSourceID);
-                    csXfer.set("sqlquery", SQL);
-                    csXfer.set("maxRows", maxRows);
-                    csXfer.set("dateexpires", DbController.encodeSQLDate(core.doc.profileStartTime.AddDays(1)));
-                    csXfer.set("QueryTypeID", QueryTypeSQL);
-                    csXfer.set("VisitId", core.session.visit.id);
+            string remoteKey = "";
+            if (maxRows == 0) { maxRows = 1000; }
+            using (var cs = new CsModel(core)) {
+                cs.insert("Remote Queries");
+                if (cs.ok()) {
+                    remoteKey = getGUIDString();
+                    cs.set("remotekey", remoteKey);
+                    cs.set("datasourceid", MetaController.getRecordIdByUniqueName(core, "Data Sources", dataSourceName));
+                    cs.set("sqlquery", SQL);
+                    cs.set("maxRows", maxRows);
+                    cs.set("dateexpires", DbController.encodeSQLDate(core.doc.profileStartTime.AddDays(1)));
+                    cs.set("QueryTypeID", QueryTypeSQL);
+                    cs.set("VisitId", core.session.visit.id);
                 }
-                csXfer.close();
+                cs.close();
             }
             //
-            return RemoteKey;
+            return remoteKey;
         }
         //
         //

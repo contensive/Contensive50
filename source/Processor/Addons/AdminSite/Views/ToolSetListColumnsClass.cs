@@ -136,9 +136,9 @@ namespace Contensive.Addons.AdminSite {
                                         }
                                         {
                                             column = new IndexConfigClass.IndexConfigColumnClass();
-                                            using (var csXfer = new CsModel(core)) {
-                                                if (csXfer.openRecord("Content Fields", FieldIDToAdd)) {
-                                                    column.Name = csXfer.getText("name");
+                                            using (var csData = new CsModel(core)) {
+                                                if (csData.openRecord("Content Fields", FieldIDToAdd)) {
+                                                    column.Name = csData.getText("name");
                                                     column.Width = 20;
                                                 }
                                             }

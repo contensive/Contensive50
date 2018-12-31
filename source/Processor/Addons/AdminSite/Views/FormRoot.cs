@@ -24,10 +24,10 @@ namespace Contensive.Addons.AdminSite {
                 addonId = 0;
                 if (core.session.visit.id == core.docProperties.getInteger(RequestNameDashboardReset)) {
                     //$$$$$ cache this
-                    using (var csXfer = new CsModel(core)) {
-                        csXfer.open(Processor.Models.Db.AddonModel.contentName, "ccguid=" + DbController.encodeSQLText(addonGuidDashboard));
-                        if (csXfer.ok()) {
-                            addonId = csXfer.getInteger("id");
+                    using (var csData = new CsModel(core)) {
+                        csData.open(Processor.Models.Db.AddonModel.contentName, "ccguid=" + DbController.encodeSQLText(addonGuidDashboard));
+                        if (csData.ok()) {
+                            addonId = csData.getInteger("id");
                             core.siteProperties.setProperty("AdminRootAddonID", GenericController.encodeText(addonId));
                         }
                     }

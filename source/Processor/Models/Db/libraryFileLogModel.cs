@@ -36,13 +36,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static LibraryFileLogModel addDefault(CoreController core, Domain.MetaModel cdef) {
-            return addDefault<LibraryFileLogModel>(core, cdef);
+        public static LibraryFileLogModel addDefault(CoreController core, Domain.MetaModel metaData) {
+            return addDefault<LibraryFileLogModel>(core, metaData);
         }
         //
         //====================================================================================================
-        public static LibraryFileLogModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.MetaModel cdef) {
-            return addDefault<LibraryFileLogModel>(core, cdef, ref callersCacheNameList);
+        public static LibraryFileLogModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.MetaModel metaData) {
+            return addDefault<LibraryFileLogModel>(core, metaData, ref callersCacheNameList);
         }
         //
         //====================================================================================================

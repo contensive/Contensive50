@@ -33,13 +33,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static DataSourceModel addDefault(CoreController core, Domain.MetaModel cdef) {
-            return addDefault<DataSourceModel>(core, cdef);
+        public static DataSourceModel addDefault(CoreController core, Domain.MetaModel metaData) {
+            return addDefault<DataSourceModel>(core, metaData);
         }
         //
         //====================================================================================================
-        public static DataSourceModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.MetaModel cdef) {
-            return addDefault<DataSourceModel>(core, cdef, ref callersCacheNameList);
+        public static DataSourceModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.MetaModel metaData) {
+            return addDefault<DataSourceModel>(core, metaData, ref callersCacheNameList);
         }
         //
         //====================================================================================================
@@ -206,7 +206,6 @@ namespace Contensive.Processor.Models.Db {
         /// <returns></returns>
         public static DataSourceModel create(CoreController core, int recordId, ref List<string> callersCacheNameList) {
             return (recordId > 0) ? create<DataSourceModel>(core, recordId, ref callersCacheNameList) : getDefaultDatasource(core);
-            //return create<DataSourceModel>(core, recordId, ref callersCacheNameList);
         }
         //
         //====================================================================================================
@@ -217,7 +216,6 @@ namespace Contensive.Processor.Models.Db {
         //====================================================================================================
         public static DataSourceModel createByUniqueName(CoreController core, string recordName, ref List<string> callersCacheNameList) {
             return (string.IsNullOrWhiteSpace(recordName) || (recordName.ToLowerInvariant() == "default")) ? getDefaultDatasource(core) : createByUniqueName<DataSourceModel>(core, recordName, ref callersCacheNameList);
-            //return createByName<DataSourceModel>(core, recordName, ref callersCacheNameList);
         }
         //
         //====================================================================================================
@@ -228,6 +226,15 @@ namespace Contensive.Processor.Models.Db {
         /// <returns></returns>
         public static string getTableInvalidationKey(CoreController core) {
             return getTableCacheKey<DataSourceModel>(core);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// return true if the datasource name is either blank or the word default (in this case, use the config model's datasource
+        /// </summary>
+        /// <returns></returns>
+        public static bool isDataSourceDefault( string datasourceName ) {
+            return (string.IsNullOrWhiteSpace(datasourceName) || (datasourceName.ToLower() == "default"));
         }
     }
 }

@@ -34,13 +34,13 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static SortMethodModel addDefault(CoreController core, Domain.MetaModel cdef) {
-            return addDefault<SortMethodModel>(core, cdef);
+        public static SortMethodModel addDefault(CoreController core, Domain.MetaModel metaData) {
+            return addDefault<SortMethodModel>(core, metaData);
         }
         //
         //====================================================================================================
-        public static SortMethodModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.MetaModel cdef) {
-            return addDefault<SortMethodModel>(core, cdef, ref callersCacheNameList);
+        public static SortMethodModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.MetaModel metaData) {
+            return addDefault<SortMethodModel>(core, metaData, ref callersCacheNameList);
         }
         //
         //====================================================================================================

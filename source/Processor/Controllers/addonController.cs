@@ -879,25 +879,25 @@ namespace Contensive.Processor.Controllers {
                                                                 } else {
                                                                     FieldValue = core.docProperties.getText(FieldName);
                                                                 }
-                                                                using (var csXfer = new CsModel(core)) {
-                                                                    csXfer.open("Copy Content", "name=" + DbController.encodeSQLText(FieldName), "ID");
-                                                                    if (!csXfer.ok()) {
-                                                                        csXfer.close();
-                                                                        csXfer.insert("Copy Content");
+                                                                using (var csData = new CsModel(core)) {
+                                                                    csData.open("Copy Content", "name=" + DbController.encodeSQLText(FieldName), "ID");
+                                                                    if (!csData.ok()) {
+                                                                        csData.close();
+                                                                        csData.insert("Copy Content");
                                                                     }
-                                                                    if (csXfer.ok()) {
-                                                                        csXfer.set("name", FieldName);
+                                                                    if (csData.ok()) {
+                                                                        csData.set("name", FieldName);
                                                                         //
                                                                         // Set copy
                                                                         //
-                                                                        csXfer.set("copy", FieldValue);
+                                                                        csData.set("copy", FieldValue);
                                                                         //
                                                                         // delete duplicates
                                                                         //
-                                                                        csXfer.goNext();
-                                                                        while (csXfer.ok()) {
-                                                                            csXfer.deleteRecord();
-                                                                            csXfer.goNext();
+                                                                        csData.goNext();
+                                                                        while (csData.ok()) {
+                                                                            csData.deleteRecord();
+                                                                            csData.goNext();
                                                                         }
                                                                     }
                                                                 }
@@ -1165,20 +1165,20 @@ namespace Contensive.Processor.Controllers {
                                                             FieldDescription = xml_GetAttribute(IsFound, TabNode, "description", "");
                                                             FieldHTML = GenericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", ""));
                                                             //
-                                                            using (var csXfer = new CsModel(core)) {
-                                                                csXfer.open("Copy Content", "Name=" + DbController.encodeSQLText(FieldName), "ID", false, 0, "id,name,Copy");
-                                                                if (!csXfer.ok()) {
-                                                                    csXfer.close();
-                                                                    csXfer.insert("Copy Content");
-                                                                    if (csXfer.ok()) {
-                                                                        int RecordID = csXfer.getInteger("ID");
-                                                                        csXfer.set("name", FieldName);
-                                                                        csXfer.set("copy", GenericController.encodeText(TabNode.InnerText));
-                                                                        csXfer.save();
+                                                            using (var csData = new CsModel(core)) {
+                                                                csData.open("Copy Content", "Name=" + DbController.encodeSQLText(FieldName), "ID", false, 0, "id,name,Copy");
+                                                                if (!csData.ok()) {
+                                                                    csData.close();
+                                                                    csData.insert("Copy Content");
+                                                                    if (csData.ok()) {
+                                                                        int RecordID = csData.getInteger("ID");
+                                                                        csData.set("name", FieldName);
+                                                                        csData.set("copy", GenericController.encodeText(TabNode.InnerText));
+                                                                        csData.save();
                                                                     }
                                                                 }
-                                                                if (csXfer.ok()) {
-                                                                    FieldValue = csXfer.getText("copy");
+                                                                if (csData.ok()) {
+                                                                    FieldValue = csData.getText("copy");
                                                                 }
                                                             }
                                                             if (FieldHTML) {
@@ -2528,27 +2528,27 @@ namespace Contensive.Processor.Controllers {
                 //
                 s = Content;
                 SelectFieldList = "name,copytext,javascriptonload,javascriptbodyend,stylesfilename,otherheadtags,JSFilename,targetString";
-                using (var csXfer = new CsModel(core)) {
-                    csXfer.openRecord("Wrappers", WrapperID, SelectFieldList);
-                    if (csXfer.ok()) {
-                        Wrapper = csXfer.getText("copytext");
-                        wrapperName = csXfer.getText("name");
-                        TargetString = csXfer.getText("targetString");
+                using (var csData = new CsModel(core)) {
+                    csData.openRecord("Wrappers", WrapperID, SelectFieldList);
+                    if (csData.ok()) {
+                        Wrapper = csData.getText("copytext");
+                        wrapperName = csData.getText("name");
+                        TargetString = csData.getText("targetString");
                         //
                         SourceComment = "wrapper " + wrapperName;
                         if (!string.IsNullOrEmpty(WrapperSourceForComment)) {
                             SourceComment = SourceComment + " for " + WrapperSourceForComment;
                         }
-                        core.html.addScriptCode_onLoad(csXfer.getText("javascriptonload"), SourceComment);
-                        core.html.addScriptCode(csXfer.getText("javascriptbodyend"), SourceComment);
-                        core.html.addHeadTag(csXfer.getText("OtherHeadTags"), SourceComment);
+                        core.html.addScriptCode_onLoad(csData.getText("javascriptonload"), SourceComment);
+                        core.html.addScriptCode(csData.getText("javascriptbodyend"), SourceComment);
+                        core.html.addHeadTag(csData.getText("OtherHeadTags"), SourceComment);
                         //
-                        JSFilename = csXfer.getText("jsfilename");
+                        JSFilename = csData.getText("jsfilename");
                         if (!string.IsNullOrEmpty(JSFilename)) {
                             JSFilename = GenericController.getCdnFileLink(core, JSFilename);
                             core.html.addScriptLinkSrc(JSFilename, SourceComment);
                         }
-                        Copy = csXfer.getText("stylesfilename");
+                        Copy = csData.getText("stylesfilename");
                         if (!string.IsNullOrEmpty(Copy)) {
                             if (GenericController.vbInstr(1, Copy, "://") != 0) {
                             } else if (Copy.Left(1) == "/") {
@@ -2569,7 +2569,7 @@ namespace Contensive.Processor.Controllers {
                             }
                         }
                     }
-                    csXfer.close();
+                    csData.close();
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);

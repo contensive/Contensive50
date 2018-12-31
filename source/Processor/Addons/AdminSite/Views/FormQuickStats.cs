@@ -49,12 +49,12 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // ----- All Visits Today
                 //
-                using (var csXfer = new CsModel(core)) {
+                using (var csData = new CsModel(core)) {
                     sql = "SELECT Count(ccVisits.ID) AS VisitCount, Avg(ccVisits.PageVisits) AS PageCount FROM ccVisits WHERE ((ccVisits.StartTime)>" + DbController.encodeSQLDate(core.doc.profileStartTime.Date) + ");";
-                    csXfer.openSql(sql);
-                    if (csXfer.ok()) {
-                        VisitCount = csXfer.getInteger("VisitCount");
-                        PageCount = csXfer.getNumber("pageCount");
+                    csData.openSql(sql);
+                    if (csData.ok()) {
+                        VisitCount = csData.getInteger("VisitCount");
+                        PageCount = csData.getNumber("pageCount");
                         Stream.Add("<tr>");
                         Stream.Add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "All Visits</span></td>");
                         Stream.Add("<td style=\"width:150px;border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "<a target=\"_blank\" href=\"/" + HtmlController.encodeHtml(core.appConfig.adminRoute + "?" + rnAdminForm + "=" + AdminFormReports + "&rid=3&DateFrom=" + core.doc.profileStartTime + "&DateTo=" + core.doc.profileStartTime.ToShortDateString()) + "\">" + VisitCount + "</A>, " + string.Format("{0:N2}", PageCount) + " pages/visit.</span></td>");
@@ -65,12 +65,12 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // ----- Non-Bot Visits Today
                 //
-                using (var csXfer = new CsModel(core)) {
+                using (var csData = new CsModel(core)) {
                     sql = "SELECT Count(ccVisits.ID) AS VisitCount, Avg(ccVisits.PageVisits) AS PageCount FROM ccVisits WHERE (ccVisits.CookieSupport=1)and((ccVisits.StartTime)>" + DbController.encodeSQLDate(core.doc.profileStartTime.Date) + ");";
-                    csXfer.openSql(sql);
-                    if (csXfer.ok()) {
-                        VisitCount = csXfer.getInteger("VisitCount");
-                        PageCount = csXfer.getNumber("pageCount");
+                    csData.openSql(sql);
+                    if (csData.ok()) {
+                        VisitCount = csData.getInteger("VisitCount");
+                        PageCount = csData.getNumber("pageCount");
                         Stream.Add("<tr>");
                         Stream.Add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "Non-bot Visits</span></td>");
                         Stream.Add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "<a target=\"_blank\" href=\"/" + HtmlController.encodeHtml(core.appConfig.adminRoute + "?" + rnAdminForm + "=" + AdminFormReports + "&rid=3&DateFrom=" + core.doc.profileStartTime.ToShortDateString() + "&DateTo=" + core.doc.profileStartTime.ToShortDateString()) + "\">" + VisitCount + "</A>, " + string.Format("{0:N2}", PageCount) + " pages/visit.</span></td>");
@@ -81,19 +81,19 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // ----- Visits Today by new visitors
                 //
-                using (var csXfer = new CsModel(core)) {
+                using (var csData = new CsModel(core)) {
                     sql = "SELECT Count(ccVisits.ID) AS VisitCount, Avg(ccVisits.PageVisits) AS PageCount FROM ccVisits WHERE (ccVisits.CookieSupport=1)and(ccVisits.StartTime>" + DbController.encodeSQLDate(core.doc.profileStartTime.Date) + ")AND(ccVisits.VisitorNew<>0);";
-                    csXfer.openSql(sql);
-                    if (csXfer.ok()) {
-                        VisitCount = csXfer.getInteger("VisitCount");
-                        PageCount = csXfer.getNumber("pageCount");
+                    csData.openSql(sql);
+                    if (csData.ok()) {
+                        VisitCount = csData.getInteger("VisitCount");
+                        PageCount = csData.getNumber("pageCount");
                         Stream.Add("<tr>");
                         Stream.Add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "Visits by New Visitors</span></td>");
                         Stream.Add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "<a target=\"_blank\" href=\"/" + HtmlController.encodeHtml(core.appConfig.adminRoute + "?" + rnAdminForm + "=" + AdminFormReports + "&rid=3&ExcludeOldVisitors=1&DateFrom=" + core.doc.profileStartTime.ToShortDateString() + "&DateTo=" + core.doc.profileStartTime.ToShortDateString()) + "\">" + VisitCount + "</A>, " + string.Format("{0:N2}", PageCount) + " pages/visit.</span></td>");
                         Stream.Add("<td style=\"border-bottom:1px solid #888;\" valign=top>" + SpanClassAdminNormal + "This includes only new visitors not identified as bots. Pages/visit includes page hits and not ajax or remote method hits.</span></td>");
                         Stream.Add("</tr>");
                     }
-                    csXfer.close();
+                    csData.close();
                 }
                 //
                 Stream.Add("</table>");
@@ -103,13 +103,13 @@ namespace Contensive.Addons.AdminSite {
                 if (true) {
                     Panel = "";
                     Stream.Add("<h2>Current Visits</h2>");
-                    using (var csXfer = new CsModel(core)) {
+                    using (var csData = new CsModel(core)) {
                         sql = "SELECT ccVisits.HTTP_REFERER as referer,ccVisits.remote_addr as Remote_Addr, ccVisits.LastVisitTime as LastVisitTime, ccVisits.PageVisits as PageVisits, ccMembers.Name as MemberName, ccVisits.ID as VisitID, ccMembers.ID as MemberID"
                             + " FROM ccVisits LEFT JOIN ccMembers ON ccVisits.MemberID = ccMembers.ID"
                             + " WHERE (((ccVisits.LastVisitTime)>" + DbController.encodeSQLDate(core.doc.profileStartTime.AddHours(-1)) + "))"
                             + " ORDER BY ccVisits.LastVisitTime DESC;";
-                        csXfer.openSql(sql);
-                        if (csXfer.ok()) {
+                        csData.openSql(sql);
+                        if (csData.ok()) {
                             Panel = Panel + "<table width=\"100%\" border=\"0\" cellspacing=\"1\" cellpadding=\"2\">";
                             Panel = Panel + "<tr bgcolor=\"#B0B0B0\">";
                             Panel = Panel + "<td width=\"20%\" align=\"left\">" + SpanClassAdminNormal + "User</td>";
@@ -120,26 +120,26 @@ namespace Contensive.Addons.AdminSite {
                             Panel = Panel + "<td width=\"30%\" align=\"left\">" + SpanClassAdminNormal + "Referer</td>";
                             Panel = Panel + "</tr>";
                             RowColor = "ccPanelRowEven";
-                            while (csXfer.ok()) {
-                                VisitID = csXfer.getInteger("VisitID");
+                            while (csData.ok()) {
+                                VisitID = csData.getInteger("VisitID");
                                 Panel = Panel + "<tr class=\"" + RowColor + "\">";
-                                Panel = Panel + "<td align=\"left\">" + SpanClassAdminNormal + "<a target=\"_blank\" href=\"/" + HtmlController.encodeHtml(core.appConfig.adminRoute + "?" + rnAdminForm + "=" + AdminFormReports + "&rid=16&MemberID=" + csXfer.getInteger("MemberID")) + "\">" + csXfer.getText("MemberName") + "</A></span></td>";
-                                Panel = Panel + "<td align=\"left\">" + SpanClassAdminNormal + csXfer.getText("Remote_Addr") + "</span></td>";
-                                Panel = Panel + "<td align=\"left\">" + SpanClassAdminNormal + csXfer.getDate("LastVisitTime").ToString("") + "</span></td>";
-                                Panel = Panel + "<td align=\"right\">" + SpanClassAdminNormal + "<a target=\"_blank\" href=\"/" + core.appConfig.adminRoute + "?" + rnAdminForm + "=" + AdminFormReports + "&rid=10&VisitID=" + VisitID + "\">" + csXfer.getText("PageVisits") + "</A></span></td>";
+                                Panel = Panel + "<td align=\"left\">" + SpanClassAdminNormal + "<a target=\"_blank\" href=\"/" + HtmlController.encodeHtml(core.appConfig.adminRoute + "?" + rnAdminForm + "=" + AdminFormReports + "&rid=16&MemberID=" + csData.getInteger("MemberID")) + "\">" + csData.getText("MemberName") + "</A></span></td>";
+                                Panel = Panel + "<td align=\"left\">" + SpanClassAdminNormal + csData.getText("Remote_Addr") + "</span></td>";
+                                Panel = Panel + "<td align=\"left\">" + SpanClassAdminNormal + csData.getDate("LastVisitTime").ToString("") + "</span></td>";
+                                Panel = Panel + "<td align=\"right\">" + SpanClassAdminNormal + "<a target=\"_blank\" href=\"/" + core.appConfig.adminRoute + "?" + rnAdminForm + "=" + AdminFormReports + "&rid=10&VisitID=" + VisitID + "\">" + csData.getText("PageVisits") + "</A></span></td>";
                                 Panel = Panel + "<td align=\"right\">" + SpanClassAdminNormal + "<a target=\"_blank\" href=\"/" + core.appConfig.adminRoute + "?" + rnAdminForm + "=" + AdminFormReports + "&rid=17&VisitID=" + VisitID + "\">" + VisitID + "</A></span></td>";
-                                Panel = Panel + "<td align=\"left\">" + SpanClassAdminNormal + "&nbsp;" + csXfer.getText("referer") + "</span></td>";
+                                Panel = Panel + "<td align=\"left\">" + SpanClassAdminNormal + "&nbsp;" + csData.getText("referer") + "</span></td>";
                                 Panel = Panel + "</tr>";
                                 if (RowColor == "ccPanelRowEven") {
                                     RowColor = "ccPanelRowOdd";
                                 } else {
                                     RowColor = "ccPanelRowEven";
                                 }
-                                csXfer.goNext();
+                                csData.goNext();
                             }
                             Panel = Panel + "</table>";
                         }
-                        csXfer.close();
+                        csData.close();
                     }
                     Stream.Add(core.html.getPanel(Panel, "ccPanel", "ccPanelShadow", "ccPanelHilite", "100%", 0));
                 }

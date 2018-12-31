@@ -13,7 +13,7 @@ namespace Contensive.Processor.Controllers {
     //
     //====================================================================================================
     /// <summary>
-    /// Static methods that support the cdef domain model.
+    /// Static methods that support the metadata domain model.
     /// </summary>
     public class MetaController {
         //
@@ -139,7 +139,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="core"></param>
         /// <returns></returns>
-        public static List<int> getEditableCdefIdList(CoreController core) {
+        public static List<int> getEditableMetaDataIdList(CoreController core) {
             try {
                 string SQL = "Select ccGroupRules.ContentID as ID"
                 + " FROM ((ccmembersrules"
@@ -156,9 +156,9 @@ namespace Contensive.Processor.Controllers {
                 for (int CIDPointer = 0; CIDPointer < CIDCount; CIDPointer++) {
                     int ContentID = encodeInteger(cidDataTable.Rows[CIDPointer][0]);
                     returnList.Add(ContentID);
-                    var CDef = MetaModel.create(core, ContentID);
-                    if (CDef != null) {
-                        returnList.AddRange(CDef.childIdList(core));
+                    var metaData = MetaModel.create(core, ContentID);
+                    if (metaData != null) {
+                        returnList.AddRange(metaData.childIdList(core));
                     }
                 }
                 return returnList;
@@ -204,7 +204,7 @@ namespace Contensive.Processor.Controllers {
                 content.id = 0;
                 content.save(core);
                 //
-                // ----- Load CDef
+                // ----- Load metadata
                 //
                 core.cache.invalidateAll();
                 core.clearMetaData();
@@ -272,21 +272,23 @@ namespace Contensive.Processor.Controllers {
         /// Verify a content entry and return the id. If it does not exist, it is added with default values
         /// </summary>
         /// <param name="core"></param>
-        /// <param name="cdef"></param>
+        /// <param name="contentMetadata"></param>
         /// <returns></returns>
-        public static int verifyContent_returnId(CoreController core, MetaModel cdef) {
+        public static int verifyContent_returnId(CoreController core, MetaModel contentMetadata) {
             int returnContentId = 0;
             try {
-                if (string.IsNullOrWhiteSpace(cdef.name)) { throw new GenericException("Content name can not be blank"); }
-                if (string.IsNullOrWhiteSpace(cdef.tableName)) { throw new GenericException("Content table name can not be blank"); }
+                if (string.IsNullOrWhiteSpace(contentMetadata.name)) { throw new GenericException("Content name can not be blank"); }
+                if (string.IsNullOrWhiteSpace(contentMetadata.tableName)) { throw new GenericException("Content table name can not be blank"); }
                 //
                 // -- verify table
-                core.db.createSQLTable(cdef.dataSourceName, cdef.tableName);
+                core.db.createSQLTable(contentMetadata.dataSourceName, contentMetadata.tableName);
                 //
                 // get contentId, guid, IsBaseContent
-                var content = ContentModel.create(core, cdef.name);
+                var content = ContentModel.createByUniqueName(core, contentMetadata.name);
                 if (content == null) {
-                    content = ContentModel.addDefault(core, cdef);
+                    content = ContentModel.addDefault(core, contentMetadata);
+                    content.name = contentMetadata.name;
+                    content.save(core);
                 }
                 returnContentId = content.id;
                 string contentGuid = content.ccguid;
@@ -295,33 +297,60 @@ namespace Contensive.Processor.Controllers {
                 //
                 // get parentId
                 int parentId = 0;
-                if (!string.IsNullOrEmpty(cdef.parentName)) {
-                    var parentContent = ContentModel.createByUniqueName(core, cdef.parentName);
+                if (!string.IsNullOrEmpty(contentMetadata.parentName)) {
+                    var parentContent = ContentModel.createByUniqueName(core, contentMetadata.parentName);
                     if (parentContent != null) { parentId = parentContent.id; }
                 }
                 //
                 // get InstalledByCollectionID
                 int InstalledByCollectionID = 0;
-                var collection = AddonCollectionModel.create(core, cdef.installedByCollectionGuid);
+                var collection = AddonCollectionModel.create(core, contentMetadata.installedByCollectionGuid);
                 if (collection != null) { InstalledByCollectionID = collection.id; }
                 //
-                // Get the Table Definition ID, create one if missing
-                var table = TableModel.createByUniqueName(core, cdef.tableName);
+                // Get the table object for this content metadata, create one if missing
+                var table = TableModel.createByUniqueName(core, contentMetadata.tableName);
                 if (table == null) {
-                    var tableCdef = MetaModel.createByUniqueName(core, "tables");
-                    table = TableModel.addDefault(core, tableCdef);
+                    //
+                    // -- table model not found, create it - only name and datasource matter
+                    var tableMetaData = MetaModel.createByUniqueName(core, "tables");
+                    if( tableMetaData == null ) {
+                        //
+                        // -- table metadata not fouond, create without defaults
+                        table = TableModel.addEmpty(core);
+                    } else {
+                        //
+                        // -- create model with table metadata defaults
+                        table = TableModel.addDefault(core, tableMetaData);
+                    }
+                    table.name = contentMetadata.tableName;
+                    if ( !DataSourceModel.isDataSourceDefault( contentMetadata.dataSourceName )) {
+                        //
+                        // -- is not the default datasource, open a datasource model for it to get the id
+                        var dataSource = DataSourceModel.createByUniqueName(core, contentMetadata.dataSourceName);
+                        if ( dataSource == null ) {
+                            //
+                            // -- datasource record does not exist, create it now
+                            dataSource = DataSourceModel.addEmpty(core);
+                            dataSource.name = contentMetadata.dataSourceName;
+                            dataSource.save(core);
+                        }
+                    }
+                    table.save(core);
+                    content.contentTableID = table.id;
+                    content.authoringTableID = table.id;
+                    content.save(core);
                 }
                 //
                 // sortmethod - First try lookup by name
                 int defaultSortMethodID = 0;
-                if (!string.IsNullOrEmpty(cdef.defaultSortMethod)) {
-                    var sortMethod = SortMethodModel.createByUniqueName(core, cdef.defaultSortMethod);
+                if (!string.IsNullOrEmpty(contentMetadata.defaultSortMethod)) {
+                    var sortMethod = SortMethodModel.createByUniqueName(core, contentMetadata.defaultSortMethod);
                     if (sortMethod != null) { defaultSortMethodID = sortMethod.id; }
                 }
                 if (defaultSortMethodID == 0) {
                     //
                     // fallback - maybe they put the orderbyclause in (common mistake)
-                    var sortMethodList = SortMethodModel.createList(core, "(OrderByClause=" + DbController.encodeSQLText(cdef.defaultSortMethod) + ")and(active<>0)", "id");
+                    var sortMethodList = SortMethodModel.createList(core, "(OrderByClause=" + DbController.encodeSQLText(contentMetadata.defaultSortMethod) + ")and(active<>0)", "id");
                     if (sortMethodList.Count() > 0) { defaultSortMethodID = sortMethodList.First().id; }
                 }
 
@@ -329,31 +358,31 @@ namespace Contensive.Processor.Controllers {
                 // ----- update record
                 //
                 var sqlList = new SqlFieldListClass();
-                sqlList.add("name", DbController.encodeSQLText(cdef.name));
+                sqlList.add("name", DbController.encodeSQLText(contentMetadata.name));
                 sqlList.add("CREATEKEY", "0");
-                sqlList.add("active", DbController.encodeSQLBoolean(cdef.active));
+                sqlList.add("active", DbController.encodeSQLBoolean(contentMetadata.active));
                 sqlList.add("ContentControlID", DbController.encodeSQLNumber(ContentIDofContent));
-                sqlList.add("AllowAdd", DbController.encodeSQLBoolean(cdef.allowAdd));
-                sqlList.add("AllowDelete", DbController.encodeSQLBoolean(cdef.allowDelete));
+                sqlList.add("AllowAdd", DbController.encodeSQLBoolean(contentMetadata.allowAdd));
+                sqlList.add("AllowDelete", DbController.encodeSQLBoolean(contentMetadata.allowDelete));
                 sqlList.add("AllowWorkflowAuthoring", DbController.encodeSQLBoolean(false));
-                sqlList.add("DeveloperOnly", DbController.encodeSQLBoolean(cdef.developerOnly));
-                sqlList.add("AdminOnly", DbController.encodeSQLBoolean(cdef.adminOnly));
+                sqlList.add("DeveloperOnly", DbController.encodeSQLBoolean(contentMetadata.developerOnly));
+                sqlList.add("AdminOnly", DbController.encodeSQLBoolean(contentMetadata.adminOnly));
                 sqlList.add("ParentID", DbController.encodeSQLNumber(parentId));
                 sqlList.add("DefaultSortMethodID", DbController.encodeSQLNumber(defaultSortMethodID));
-                sqlList.add("DropDownFieldList", DbController.encodeSQLText(encodeEmpty(cdef.dropDownFieldList, "Name")));
+                sqlList.add("DropDownFieldList", DbController.encodeSQLText(encodeEmpty(contentMetadata.dropDownFieldList, "Name")));
                 sqlList.add("ContentTableID", DbController.encodeSQLNumber(table.id));
                 sqlList.add("AuthoringTableID", DbController.encodeSQLNumber(table.id));
                 sqlList.add("ModifiedDate", DbController.encodeSQLDate(DateTime.Now));
                 sqlList.add("CreatedBy", DbController.encodeSQLNumber(SystemMemberID));
                 sqlList.add("ModifiedBy", DbController.encodeSQLNumber(SystemMemberID));
-                sqlList.add("AllowCalendarEvents", DbController.encodeSQLBoolean(cdef.allowCalendarEvents));
-                sqlList.add("AllowContentTracking", DbController.encodeSQLBoolean(cdef.allowContentTracking));
-                sqlList.add("AllowTopicRules", DbController.encodeSQLBoolean(cdef.allowTopicRules));
-                sqlList.add("AllowContentChildTool", DbController.encodeSQLBoolean(cdef.allowContentChildTool));
-                sqlList.add("IconLink", DbController.encodeSQLText(encodeEmpty(cdef.iconLink, "")));
-                sqlList.add("IconHeight", DbController.encodeSQLNumber(cdef.iconHeight));
-                sqlList.add("IconWidth", DbController.encodeSQLNumber(cdef.iconWidth));
-                sqlList.add("IconSprites", DbController.encodeSQLNumber(cdef.iconSprites));
+                sqlList.add("AllowCalendarEvents", DbController.encodeSQLBoolean(contentMetadata.allowCalendarEvents));
+                sqlList.add("AllowContentTracking", DbController.encodeSQLBoolean(contentMetadata.allowContentTracking));
+                sqlList.add("AllowTopicRules", DbController.encodeSQLBoolean(contentMetadata.allowTopicRules));
+                sqlList.add("AllowContentChildTool", DbController.encodeSQLBoolean(contentMetadata.allowContentChildTool));
+                sqlList.add("IconLink", DbController.encodeSQLText(encodeEmpty(contentMetadata.iconLink, "")));
+                sqlList.add("IconHeight", DbController.encodeSQLNumber(contentMetadata.iconHeight));
+                sqlList.add("IconWidth", DbController.encodeSQLNumber(contentMetadata.iconWidth));
+                sqlList.add("IconSprites", DbController.encodeSQLNumber(contentMetadata.iconSprites));
                 sqlList.add("installedByCollectionid", DbController.encodeSQLNumber(InstalledByCollectionID));
                 core.db.updateTableRecord("Default", "ccContent", "ID=" + returnContentId, sqlList);
                 ContentModel.invalidateRecordCache(core, returnContentId);
@@ -362,9 +391,9 @@ namespace Contensive.Processor.Controllers {
                 if (parentId < 1) {
                     MetaFieldModel field = null;
                     //
-                    // CDef does not inherit its fields, create what is needed for a non-inherited CDef
+                    // metadata does not inherit its fields, create what is needed for a non-inherited metadata
                     //
-                    if (!MetaController.isCdefField(core, returnContentId, "ID")) {
+                    if (!MetaController.isMetaDataField(core, returnContentId, "ID")) {
                         field = new Models.Domain.MetaFieldModel {
                             nameLc = "id",
                             active = true,
@@ -373,12 +402,12 @@ namespace Contensive.Processor.Controllers {
                             authorable = false,
                             caption = "ID",
                             defaultValue = "",
-                            isBaseField = cdef.isBaseContent
+                            isBaseField = contentMetadata.isBaseContent
                         };
-                        verifyContentField_returnId(core, cdef.name, field);
+                        verifyContentField_returnId(core, contentMetadata.name, field);
                     }
                     //
-                    if (!MetaController.isCdefField(core, returnContentId, "name")) {
+                    if (!MetaController.isMetaDataField(core, returnContentId, "name")) {
                         field = new Models.Domain.MetaFieldModel {
                             nameLc = "name",
                             active = true,
@@ -387,12 +416,12 @@ namespace Contensive.Processor.Controllers {
                             authorable = true,
                             caption = "Name",
                             defaultValue = "",
-                            isBaseField = cdef.isBaseContent
+                            isBaseField = contentMetadata.isBaseContent
                         };
-                        verifyContentField_returnId(core, cdef.name, field);
+                        verifyContentField_returnId(core, contentMetadata.name, field);
                     }
                     //
-                    if (!MetaController.isCdefField(core, returnContentId, "active")) {
+                    if (!MetaController.isMetaDataField(core, returnContentId, "active")) {
                         field = new Models.Domain.MetaFieldModel {
                             nameLc = "active",
                             active = true,
@@ -401,12 +430,12 @@ namespace Contensive.Processor.Controllers {
                             authorable = true,
                             caption = "Active",
                             defaultValue = "1",
-                            isBaseField = cdef.isBaseContent
+                            isBaseField = contentMetadata.isBaseContent
                         };
-                        verifyContentField_returnId(core, cdef.name, field);
+                        verifyContentField_returnId(core, contentMetadata.name, field);
                     }
                     //
-                    if (!MetaController.isCdefField(core, returnContentId, "sortorder")) {
+                    if (!MetaController.isMetaDataField(core, returnContentId, "sortorder")) {
                         field = new Models.Domain.MetaFieldModel {
                             nameLc = "sortorder",
                             active = true,
@@ -415,12 +444,12 @@ namespace Contensive.Processor.Controllers {
                             authorable = false,
                             caption = "Alpha Sort Order",
                             defaultValue = "",
-                            isBaseField = cdef.isBaseContent
+                            isBaseField = contentMetadata.isBaseContent
                         };
-                        verifyContentField_returnId(core, cdef.name, field);
+                        verifyContentField_returnId(core, contentMetadata.name, field);
                     }
                     //
-                    if (!MetaController.isCdefField(core, returnContentId, "dateadded")) {
+                    if (!MetaController.isMetaDataField(core, returnContentId, "dateadded")) {
                         field = new Models.Domain.MetaFieldModel {
                             nameLc = "dateadded",
                             active = true,
@@ -429,11 +458,11 @@ namespace Contensive.Processor.Controllers {
                             authorable = false,
                             caption = "Date Added",
                             defaultValue = "",
-                            isBaseField = cdef.isBaseContent
+                            isBaseField = contentMetadata.isBaseContent
                         };
-                        verifyContentField_returnId(core, cdef.name, field);
+                        verifyContentField_returnId(core, contentMetadata.name, field);
                     }
-                    if (!MetaController.isCdefField(core, returnContentId, "createdby")) {
+                    if (!MetaController.isMetaDataField(core, returnContentId, "createdby")) {
                         field = new Models.Domain.MetaFieldModel {
                             nameLc = "createdby",
                             active = true,
@@ -444,10 +473,10 @@ namespace Contensive.Processor.Controllers {
                         };
                         field.set_lookupContentName(core, "People");
                         field.defaultValue = "";
-                        field.isBaseField = cdef.isBaseContent;
-                        verifyContentField_returnId(core, cdef.name, field);
+                        field.isBaseField = contentMetadata.isBaseContent;
+                        verifyContentField_returnId(core, contentMetadata.name, field);
                     }
-                    if (!MetaController.isCdefField(core, returnContentId, "modifieddate")) {
+                    if (!MetaController.isMetaDataField(core, returnContentId, "modifieddate")) {
                         field = new Models.Domain.MetaFieldModel {
                             nameLc = "modifieddate",
                             active = true,
@@ -456,11 +485,11 @@ namespace Contensive.Processor.Controllers {
                             authorable = false,
                             caption = "Date Modified",
                             defaultValue = "",
-                            isBaseField = cdef.isBaseContent
+                            isBaseField = contentMetadata.isBaseContent
                         };
-                        verifyContentField_returnId(core, cdef.name, field);
+                        verifyContentField_returnId(core, contentMetadata.name, field);
                     }
-                    if (!MetaController.isCdefField(core, returnContentId, "modifiedby")) {
+                    if (!MetaController.isMetaDataField(core, returnContentId, "modifiedby")) {
                         field = new Models.Domain.MetaFieldModel {
                             nameLc = "modifiedby",
                             active = true,
@@ -471,10 +500,10 @@ namespace Contensive.Processor.Controllers {
                         };
                         field.set_lookupContentName(core, "People");
                         field.defaultValue = "";
-                        field.isBaseField = cdef.isBaseContent;
-                        verifyContentField_returnId(core, cdef.name, field);
+                        field.isBaseField = contentMetadata.isBaseContent;
+                        verifyContentField_returnId(core, contentMetadata.name, field);
                     }
-                    if (!MetaController.isCdefField(core, returnContentId, "ContentControlId")) {
+                    if (!MetaController.isMetaDataField(core, returnContentId, "ContentControlId")) {
                         field = new Models.Domain.MetaFieldModel {
                             nameLc = "contentcontrolid",
                             active = true,
@@ -485,10 +514,10 @@ namespace Contensive.Processor.Controllers {
                         };
                         field.set_lookupContentName(core, "Content");
                         field.defaultValue = "";
-                        field.isBaseField = cdef.isBaseContent;
-                        verifyContentField_returnId(core, cdef.name, field);
+                        field.isBaseField = contentMetadata.isBaseContent;
+                        verifyContentField_returnId(core, contentMetadata.name, field);
                     }
-                    if (!MetaController.isCdefField(core, returnContentId, "CreateKey")) {
+                    if (!MetaController.isMetaDataField(core, returnContentId, "CreateKey")) {
                         field = new Models.Domain.MetaFieldModel {
                             nameLc = "createkey",
                             active = true,
@@ -497,11 +526,11 @@ namespace Contensive.Processor.Controllers {
                             authorable = false,
                             caption = "Create Key",
                             defaultValue = "",
-                            isBaseField = cdef.isBaseContent
+                            isBaseField = contentMetadata.isBaseContent
                         };
-                        verifyContentField_returnId(core, cdef.name, field);
+                        verifyContentField_returnId(core, contentMetadata.name, field);
                     }
-                    if (!MetaController.isCdefField(core, returnContentId, "ccGuid")) {
+                    if (!MetaController.isMetaDataField(core, returnContentId, "ccGuid")) {
                         field = new Models.Domain.MetaFieldModel {
                             nameLc = "ccguid",
                             active = true,
@@ -510,12 +539,12 @@ namespace Contensive.Processor.Controllers {
                             authorable = false,
                             caption = "Guid",
                             defaultValue = "",
-                            isBaseField = cdef.isBaseContent
+                            isBaseField = contentMetadata.isBaseContent
                         };
-                        verifyContentField_returnId(core, cdef.name, field);
+                        verifyContentField_returnId(core, contentMetadata.name, field);
                     }
                     // -- 20171029 - had to un-deprecate because compatibility issues are too timeconsuming
-                    if (!MetaController.isCdefField(core, returnContentId, "ContentCategoryId")) {
+                    if (!MetaController.isMetaDataField(core, returnContentId, "ContentCategoryId")) {
                         field = new Models.Domain.MetaFieldModel {
                             nameLc = "contentcategoryid",
                             active = true,
@@ -524,13 +553,13 @@ namespace Contensive.Processor.Controllers {
                             authorable = false,
                             caption = "Content Category",
                             defaultValue = "",
-                            isBaseField = cdef.isBaseContent
+                            isBaseField = contentMetadata.isBaseContent
                         };
-                        verifyContentField_returnId(core, cdef.name, field);
+                        verifyContentField_returnId(core, contentMetadata.name, field);
                     }
                 }
                 //
-                // ----- Load CDef
+                // ----- Load metadata
                 //
                 ContentModel.invalidateTableCache(core);
                 ContentFieldModel.invalidateTableCache(core);
@@ -544,7 +573,7 @@ namespace Contensive.Processor.Controllers {
         //
         // ====================================================================================================================
         /// <summary>
-        /// Verify a CDef field and return the recordid
+        /// Verify a metadata field and return the recordid
         /// </summary>
         /// <param name="core"></param>
         /// <param name="ContentName"></param>
@@ -585,12 +614,6 @@ namespace Contensive.Processor.Controllers {
                             // This update is not allowed
                             LogController.handleWarn(core, new GenericException("Warning, updating non-base field with base field, content [" + ContentName + "], field [" + field.nameLc + "]"));
                         }
-                        //                    
-                        // Get the TableName and DataSourceID
-                        string LookupContentName = field.get_lookupContentName(core);
-                        string RedirectContentName = field.get_redirectContentName(core);
-                        int MemberSelectGroupID = field.memberSelectGroupId_get(core);
-                        string LookupList = field.lookupList;
                         //
                         // Get the DataSourceName - special case model, returns default object if input not valid
                         var dataSource = DataSourceModel.create(core, table.dataSourceID);
@@ -644,12 +667,12 @@ namespace Contensive.Processor.Controllers {
                         sqlList.add("UNIQUENAME", DbController.encodeSQLBoolean(field.uniqueName));
                         sqlList.add("RSSTITLEFIELD", DbController.encodeSQLBoolean(field.RSSTitleField));
                         sqlList.add("RSSDESCRIPTIONFIELD", DbController.encodeSQLBoolean(field.RSSDescriptionField));
-                        sqlList.add("MEMBERSELECTGROUPID", DbController.encodeSQLNumber(MemberSelectGroupID));
+                        sqlList.add("MEMBERSELECTGROUPID", DbController.encodeSQLNumber(field.memberSelectGroupId_get(core)));
                         sqlList.add("installedByCollectionId", DbController.encodeSQLNumber(InstalledByCollectionID));
                         sqlList.add("EDITTAB", DbController.encodeSQLText(field.editTabName));
                         sqlList.add("SCRAMBLE", DbController.encodeSQLBoolean(false));
                         sqlList.add("ISBASEFIELD", DbController.encodeSQLBoolean(field.isBaseField));
-                        sqlList.add("LOOKUPLIST", DbController.encodeSQLText(LookupList));
+                        sqlList.add("LOOKUPLIST", DbController.encodeSQLText(field.lookupList));
                         int RedirectContentID = 0;
                         int LookupContentID = 0;
                         //
@@ -659,6 +682,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // -- lookup field
                                 //
+                                string LookupContentName = field.get_lookupContentName(core);
                                 if (!string.IsNullOrEmpty(LookupContentName)) {
                                     LookupContentID = MetaModel.getContentId(core, LookupContentName);
                                     if (LookupContentID <= 0) {
@@ -694,6 +718,7 @@ namespace Contensive.Processor.Controllers {
                             case _fieldTypeIdRedirect:
                                 //
                                 // -- redirect field
+                                string RedirectContentName = field.get_redirectContentName(core);
                                 if (!string.IsNullOrEmpty(RedirectContentName)) {
                                     RedirectContentID = MetaModel.getContentId(core, RedirectContentName);
                                     if (RedirectContentID <= 0) {
@@ -742,8 +767,8 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static bool isContentFieldSupported(CoreController core, string contentName, string fieldName) {
             try {
-                var cdef = MetaModel.createByUniqueName(core, contentName);
-                if (cdef != null) { return cdef.fields.ContainsKey(fieldName.ToLowerInvariant()); }
+                var metaData = MetaModel.createByUniqueName(core, contentName);
+                if (metaData != null) { return metaData.fields.ContainsKey(fieldName.ToLowerInvariant()); }
                 return false;
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
@@ -817,8 +842,8 @@ namespace Contensive.Processor.Controllers {
             //    if ((string.IsNullOrEmpty(FieldName)) || (Contentdefinition.fields.Count < 1)) {
             //        throw (new GenericException("Content Name [" + GenericController.encodeText(ContentName) + "] or FieldName [" + FieldName + "] was not valid"));
             //    } else {
-            //        foreach (KeyValuePair<string, Models.Domain.CDefFieldModel> keyValuePair in Contentdefinition.fields) {
-            //            Models.Domain.CDefFieldModel field = keyValuePair.Value;
+            //        foreach (KeyValuePair<string, Models.Domain.metadataFieldModel> keyValuePair in Contentdefinition.fields) {
+            //            Models.Domain.metadataFieldModel field = keyValuePair.Value;
             //            if (FieldName.ToLowerInvariant() == field.nameLc) {
             //                switch (PropertyName.ToUpper()) {
             //                    case "FIELDTYPE":
@@ -911,6 +936,16 @@ namespace Contensive.Processor.Controllers {
         //
         //=============================================================
         /// <summary>
+        /// Legacy method to get a records id from either the guid or name
+        /// </summary>
+        [Obsolete("Use the methods specific to each field type",false)]
+        public static int getRecordId_Legacy(CoreController core, string contentName, string recordGuidOrName) {
+            if (isGuid(recordGuidOrName)) return getRecordId(core, contentName, recordGuidOrName);
+            return getRecordIdByUniqueName(core, contentName, recordGuidOrName);
+        }
+        //
+        //=============================================================
+        /// <summary>
         /// get a record's id from its guid
         /// </summary>
         /// <param name="contentName"></param>
@@ -919,8 +954,9 @@ namespace Contensive.Processor.Controllers {
         //=============================================================
         //
         public static int getRecordId(CoreController core, string contentName, string recordGuid) {
+            if (string.IsNullOrWhiteSpace(recordGuid)) { return 0; }
             var meta = MetaModel.createByUniqueName(core, contentName);
-            if (meta == null) { return 0; }
+            if ((meta == null) || (string.IsNullOrWhiteSpace(meta.tableName))) { return 0; }
             using (DataTable dt = core.db.executeQuery("select top 1 id from " + meta.tableName + " where ccguid=" + DbController.encodeSQLText(recordGuid) + " order by id")) {
                 foreach (DataRow dr in dt.Rows) {
                     return DbController.getDataRowFieldInteger(dr, "id");
@@ -938,8 +974,9 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static int getRecordIdByUniqueName(CoreController core, string contentName, string recordName) {
             try {
+                if (String.IsNullOrWhiteSpace(recordName)) { return 0; }
                 var meta = MetaModel.createByUniqueName(core, contentName);
-                if (meta == null) { return 0; }
+                if ((meta == null) || (String.IsNullOrWhiteSpace(meta.tableName))) { return 0; }
                 using (DataTable dt = core.db.executeQuery("select top 1 id from " + meta.tableName + " where name=" + DbController.encodeSQLText(recordName) + " order by id")) {
                     foreach (DataRow dr in dt.Rows) {
                         return DbController.getDataRowFieldInteger(dr, "id");
@@ -952,15 +989,15 @@ namespace Contensive.Processor.Controllers {
             }
         }
         //
-        // todo rename cdef as meta
+        // todo rename metadata as meta
         //========================================================================
         /// <summary>
-        /// returns true if the cdef field exists
+        /// returns true if the metadata field exists
         /// </summary>
         /// <param name="ContentID"></param>
         /// <param name="FieldName"></param>
         /// <returns></returns>
-        public static bool isCdefField(CoreController core, int ContentID, string FieldName) {
+        public static bool isMetaDataField(CoreController core, int ContentID, string FieldName) {
             var meta = MetaModel.create(core, ContentID);
             if (meta == null) { return false; }
             return meta.fields.ContainsKey(FieldName.Trim().ToLower());
@@ -1007,7 +1044,7 @@ namespace Contensive.Processor.Controllers {
         public static void deleteContentRecords(CoreController core, string contentName, string sqlCriteria, int userId = 0) {
             var meta = MetaModel.createByUniqueName(core, contentName);
             if (meta == null) { return; }
-            core.db.deleteTableRecords(sqlCriteria, meta.tableName, meta.dataSourceName);
+            core.db.deleteTableRecords(meta.tableName, sqlCriteria, meta.dataSourceName);
         }
         //
         //========================================================================
@@ -1344,7 +1381,7 @@ namespace Contensive.Processor.Controllers {
                     // -- Fill ContentControlID fields with new ContentID
                     core.db.executeQuery("Update " + TableName + " Set ContentControlID=" + contentId + " where (ContentControlID Is null);", DataSource.name);
                     //
-                    // ----- Load CDef, Load only if the previous state of autoload was true, Leave Autoload false during load so more do not trigger
+                    // ----- Load metadata, Load only if the previous state of autoload was true, Leave Autoload false during load so more do not trigger
                     core.cache.invalidateAll();
                     core.clearMetaData();
                 }
@@ -1591,9 +1628,9 @@ namespace Contensive.Processor.Controllers {
             //        //
             //        CSPointer = csOpen("Content Watch", "ContentRecordKey=" + encodeSQLText(ContentRecordKey), "", true, 0, false, false, "Link,Clicks");
             //        if (csOk(CSPointer)) {
-            //            result = csXfer.csGetText(CSPointer, "Link");
+            //            result = csData.csGetText(CSPointer, "Link");
             //        }
-            //        csXfer.csClose();
+            //        csData.csClose();
             //        //
             //        if (string.IsNullOrEmpty(result)) {
             //            //
@@ -1607,7 +1644,7 @@ namespace Contensive.Processor.Controllers {
             //                    RecordID = GenericController.encodeInteger(KeySplit[1]);
             //                    if (!string.IsNullOrEmpty(ContentName) & RecordID != 0) {
             //                        if (ContentMetaController.getContentTablename(core, ContentName) == "ccPageContent") {
-            //                            CSPointer = csXfer.csOpenRecord(ContentName, RecordID, false, false, "TemplateID,ParentID");
+            //                            CSPointer = csData.csOpenRecord(ContentName, RecordID, false, false, "TemplateID,ParentID");
             //                            if (csOk(CSPointer)) {
             //                                recordfound = true;
             //                                templateId = csGetInteger(CSPointer, "TemplateID");
@@ -1623,7 +1660,7 @@ namespace Contensive.Processor.Controllers {
             //                            } else {
 
             //                                if (templateId != 0) {
-            //                                    CSPointer = csXfer.csOpenRecord("Page Templates", templateId, false, false, "Link");
+            //                                    CSPointer = csData.csOpenRecord("Page Templates", templateId, false, false, "Link");
             //                                    if (csOk(CSPointer)) {
             //                                        result = csGetText(CSPointer, "Link");
             //                                    }

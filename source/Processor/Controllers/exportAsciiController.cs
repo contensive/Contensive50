@@ -48,22 +48,22 @@ namespace Contensive.Processor.Controllers {
                         if (!core.session.isAuthenticatedAdmin(core)) {
                             sb.Append("Warning: You must be a site administrator to export this information.");
                         } else {
-                            using (var csXfer = new CsModel(core)) {
-                                csXfer.open(iContentName, "", "ID", false, 0, "", PageSize, PageNumber);
+                            using (var csData = new CsModel(core)) {
+                                csData.open(iContentName, "", "ID", false, 0, "", PageSize, PageNumber);
                                 //
                                 // ----- print out the field names
                                 //
-                                if (csXfer.ok()) {
+                                if (csData.ok()) {
                                     sb.Append("\"EID\"");
                                     Delimiter = ",";
-                                    FieldNameVariant = csXfer.getFirstFieldName();
+                                    FieldNameVariant = csData.getFirstFieldName();
                                     while (!string.IsNullOrEmpty(FieldNameVariant)) {
                                         FieldName = GenericController.encodeText(FieldNameVariant);
                                         UcaseFieldName = GenericController.vbUCase(FieldName);
                                         if ((UcaseFieldName != "USERNAME") && (UcaseFieldName != "PASSWORD")) {
                                             sb.Append(Delimiter + "\"" + FieldName + "\"");
                                         }
-                                        FieldNameVariant = csXfer.getNextFieldName();
+                                        FieldNameVariant = csData.getNextFieldName();
                                         ///DoEvents
                                     }
                                     sb.Append("\r\n");
@@ -71,17 +71,17 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // ----- print out the values
                                 //
-                                while (csXfer.ok()) {
-                                    if (!(csXfer.getBoolean("Developer"))) {
-                                        Copy = SecurityController.encodeToken(core, csXfer.getInteger("ID"), core.doc.profileStartTime);
+                                while (csData.ok()) {
+                                    if (!(csData.getBoolean("Developer"))) {
+                                        Copy = SecurityController.encodeToken(core, csData.getInteger("ID"), core.doc.profileStartTime);
                                         sb.Append("\"" + Copy + "\"");
                                         Delimiter = ",";
-                                        FieldNameVariant = csXfer.getFirstFieldName();
+                                        FieldNameVariant = csData.getFirstFieldName();
                                         while (!string.IsNullOrEmpty(FieldNameVariant)) {
                                             FieldName = GenericController.encodeText(FieldNameVariant);
                                             UcaseFieldName = GenericController.vbUCase(FieldName);
                                             if ((UcaseFieldName != "USERNAME") && (UcaseFieldName != "PASSWORD")) {
-                                                Copy = csXfer.getText(FieldName);
+                                                Copy = csData.getText(FieldName);
                                                 if (!string.IsNullOrEmpty(Copy)) {
                                                     Copy = GenericController.vbReplace(Copy, "\"", "'");
                                                     Copy = GenericController.vbReplace(Copy, "\r\n", " ");
@@ -90,11 +90,11 @@ namespace Contensive.Processor.Controllers {
                                                 }
                                                 sb.Append(Delimiter + "\"" + Copy + "\"");
                                             }
-                                            FieldNameVariant = csXfer.getNextFieldName();
+                                            FieldNameVariant = csData.getNextFieldName();
                                         }
                                         sb.Append("\r\n");
                                     }
-                                    csXfer.goNext();
+                                    csData.goNext();
                                 }
                             }
                         }
@@ -107,42 +107,42 @@ namespace Contensive.Processor.Controllers {
                         if (!core.session.isAuthenticatedContentManager(core, iContentName)) {
                             sb.Append("Error: You must be a content manager to export this data.");
                         } else {
-                            using (var csXfer = new CsModel(core)) {
-                                csXfer.open(iContentName, "", "ID", false, 0, "", PageSize, PageNumber);
+                            using (var csData = new CsModel(core)) {
+                                csData.open(iContentName, "", "ID", false, 0, "", PageSize, PageNumber);
                                 //
                                 // ----- print out the field names
-                                if (csXfer.ok()) {
+                                if (csData.ok()) {
                                     Delimiter = "";
-                                    FieldNameVariant = csXfer.getFirstFieldName();
+                                    FieldNameVariant = csData.getFirstFieldName();
                                     while (!string.IsNullOrEmpty(FieldNameVariant)) {
                                         core.appRootFiles.appendFile(TestFilename, Delimiter + "\"" + FieldNameVariant + "\"");
                                         Delimiter = ",";
-                                        FieldNameVariant = csXfer.getNextFieldName();
+                                        FieldNameVariant = csData.getNextFieldName();
                                     }
                                     core.appRootFiles.appendFile(TestFilename, "\r\n");
                                 }
                                 //
                                 // ----- print out the values
-                                while (csXfer.ok()) {
+                                while (csData.ok()) {
                                     Delimiter = "";
-                                    FieldNameVariant = csXfer.getFirstFieldName();
+                                    FieldNameVariant = csData.getFirstFieldName();
                                     while (!string.IsNullOrEmpty(FieldNameVariant)) {
-                                        switch (csXfer.getFieldTypeId(GenericController.encodeText(FieldNameVariant))) {
+                                        switch (csData.getFieldTypeId(GenericController.encodeText(FieldNameVariant))) {
                                             case _fieldTypeIdFileText:
                                             case _fieldTypeIdFileCSS:
                                             case _fieldTypeIdFileXML:
                                             case _fieldTypeIdFileJavascript:
                                             case _fieldTypeIdFileHTML:
-                                                Copy = csXfer.getTextEncoded(GenericController.encodeText(FieldNameVariant));
+                                                Copy = csData.getTextEncoded(GenericController.encodeText(FieldNameVariant));
                                                 break;
                                             case _fieldTypeIdLookup:
-                                                Copy = csXfer.getText(GenericController.encodeText(FieldNameVariant));
+                                                Copy = csData.getText(GenericController.encodeText(FieldNameVariant));
                                                 break;
                                             case _fieldTypeIdRedirect:
                                             case _fieldTypeIdManyToMany:
                                                 break;
                                             default:
-                                                Copy = csXfer.getText(GenericController.encodeText(FieldNameVariant));
+                                                Copy = csData.getText(GenericController.encodeText(FieldNameVariant));
                                                 break;
                                         }
                                         if (!string.IsNullOrEmpty(Copy)) {
@@ -153,11 +153,11 @@ namespace Contensive.Processor.Controllers {
                                         }
                                         core.appRootFiles.appendFile(TestFilename, Delimiter + "\"" + Copy + "\"");
                                         Delimiter = ",";
-                                        FieldNameVariant = csXfer.getNextFieldName();
+                                        FieldNameVariant = csData.getNextFieldName();
                                         ///DoEvents
                                     }
                                     core.appRootFiles.appendFile(TestFilename, "\r\n");
-                                    csXfer.goNext();
+                                    csData.goNext();
                                 }
                             }
                         }

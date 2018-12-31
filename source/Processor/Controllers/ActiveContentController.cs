@@ -285,21 +285,21 @@ namespace Contensive.Processor.Controllers {
                                                             bool AddonIsInline = false;
                                                             string SrcOptionList = "";
                                                             string IconFilename = "";
-                                                            using (var csXfer = new CsModel(core)) {
+                                                            using (var csData = new CsModel(core)) {
                                                                 string Criteria = "";
                                                                 if (!string.IsNullOrEmpty(ACGuid)) {
                                                                     Criteria = "ccguid=" + DbController.encodeSQLText(ACGuid);
                                                                 } else {
                                                                     Criteria = "name=" + DbController.encodeSQLText(ACName.ToUpper());
                                                                 }
-                                                                if (csXfer.open(AddonContentName, Criteria, "Name,ID", false, 0, SelectList)) {
-                                                                    IconFilename = csXfer.getText("IconFilename");
-                                                                    SrcOptionList = csXfer.getText("ArgumentList");
-                                                                    IconWidth = csXfer.getInteger("IconWidth");
-                                                                    IconHeight = csXfer.getInteger("IconHeight");
-                                                                    IconSprites = csXfer.getInteger("IconSprites");
-                                                                    AddonIsInline = csXfer.getBoolean("IsInline");
-                                                                    ACGuid = csXfer.getText("ccGuid");
+                                                                if (csData.open(AddonContentName, Criteria, "Name,ID", false, 0, SelectList)) {
+                                                                    IconFilename = csData.getText("IconFilename");
+                                                                    SrcOptionList = csData.getText("ArgumentList");
+                                                                    IconWidth = csData.getInteger("IconWidth");
+                                                                    IconHeight = csData.getInteger("IconHeight");
+                                                                    IconSprites = csData.getInteger("IconSprites");
+                                                                    AddonIsInline = csData.getBoolean("IsInline");
+                                                                    ACGuid = csData.getText("ccGuid");
                                                                     IconAlt = ACName;
                                                                     IconTitle = "Rendered as the Add-on [" + ACName + "]";
                                                                 } else {
@@ -335,7 +335,7 @@ namespace Contensive.Processor.Controllers {
                                                                             break;
                                                                     }
                                                                 }
-                                                                csXfer.close();
+                                                                csData.close();
                                                             }
                                                             //
                                                             // Build AddonOptionStringHTMLEncoded from SrcOptionList (for names), itself (for current settings), and SrcOptionList (for select options)
@@ -448,16 +448,16 @@ namespace Contensive.Processor.Controllers {
                                             //            string IconIDControlString = "AC," + ACType + "," + fieldName;
                                             //            Copy = AddonController.getAddonIconImg(AdminURL, 0, 0, 0, true, IconIDControlString, "", serverFilePath, "User's Organization " + fieldName, "Renders as [User's Organization " + fieldName + "]", ACInstanceID, 0);
                                             //        } else if (EncodeNonCachableTags) {
-                                            //            if ( !csXfer.csOk(csOrganization)) {
-                                            //                if (!csXfer.csOk(csPeople)) {
-                                            //                    csPeople = csXfer.csOpen(personModel.contentName, "(id=" + personalizationPeopleId + ")");
+                                            //            if ( !csData.csOk(csOrganization)) {
+                                            //                if (!csData.csOk(csPeople)) {
+                                            //                    csPeople = csData.csOpen(personModel.contentName, "(id=" + personalizationPeopleId + ")");
                                             //                }
-                                            //                if ( csXfer.csOk( csPeople)) {
-                                            //                    csOrganization = csXfer.csOpen(organizationModel.contentName, "(id=" + csXfer.csGetInteger(csPeople, "organizationId") + ")");
+                                            //                if ( csData.csOk( csPeople)) {
+                                            //                    csOrganization = csData.csOpen(organizationModel.contentName, "(id=" + csData.csGetInteger(csPeople, "organizationId") + ")");
                                             //                }
                                             //            }
-                                            //            if (csXfer.csOk(csOrganization)) {
-                                            //                Copy = csXfer.csGetLookup(csOrganization, fieldName);
+                                            //            if (csData.csOk(csOrganization)) {
+                                            //                Copy = csData.csGetLookup(csOrganization, fieldName);
                                             //            }
                                             //        }
                                             //        break;
@@ -505,11 +505,11 @@ namespace Contensive.Processor.Controllers {
                                             //                if (genericController.vbUCase(fieldNameInitialCaps) == "EID") {
                                             //                    Copy = SecurityController.encodeToken(core, personalizationPeopleId, DateTime.Now);
                                             //                } else {
-                                            //                    if (!csXfer.csOk(csPeople)) {
-                                            //                        csPeople = csXfer.csOpen(personModel.contentName, "(id=" + personalizationPeopleId + ")");
+                                            //                    if (!csData.csOk(csPeople)) {
+                                            //                        csPeople = csData.csOpen(personModel.contentName, "(id=" + personalizationPeopleId + ")");
                                             //                    }
-                                            //                    if (csXfer.csOk(csPeople)) {
-                                            //                        Copy = csXfer.csGetLookup(csPeople, fieldName);
+                                            //                    if (csData.csOk(csPeople)) {
+                                            //                        Copy = csData.csGetLookup(csPeople, fieldName);
                                             //                    }
                                             //                }
                                             //            }

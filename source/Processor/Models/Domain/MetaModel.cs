@@ -188,7 +188,7 @@ namespace Contensive.Processor.Models.Domain {
         public string installedByCollectionGuid { get; set; }
         //
         /// <summary>
-        /// deprecate one day - domain model cdef calculates hasChild from this. If hasChild is false, contentcontrolid is ignored and queries are from the whole table
+        /// deprecate one day - domain model metadata calculates hasChild from this. If hasChild is false, contentcontrolid is ignored and queries are from the whole table
         /// </summary>
         public int parentID { get; set; }
         //
@@ -235,12 +235,10 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="core"></param>
         /// <returns></returns>
         public List<int> childIdList(CoreController core) {
-            if (( parentID>0 ) && ( _childIdList == null )) {
+            if ( _childIdList == null ) {
                 _childIdList = new List<int>();
                 using (DataTable dt = core.db.executeQuery("select id from cccontent where parentid=" + id)) {
-                    foreach (DataRow row in dt.Rows) {
-                        _childIdList.Add(encodeInteger(row[0]));
-                    }
+                    foreach (DataRow row in dt.Rows) { _childIdList.Add(encodeInteger(row[0])); }
                 }
             }
             return _childIdList;
@@ -263,7 +261,7 @@ namespace Contensive.Processor.Models.Domain {
         //
         //====================================================================================================
         /// <summary>
-        /// Create cdef object from cache or database for provided contentId
+        /// Create metadata object from cache or database for provided contentId
         /// </summary>
         /// <param name="core"></param>
         /// <param name="contentId"></param>
@@ -274,11 +272,11 @@ namespace Contensive.Processor.Models.Domain {
             MetaModel result = null;
             try {
                 if ( content == null ) { return null; }
-                if ((!forceDbLoad) && (core.cdefDictionary.ContainsKey(content.id.ToString()))) { return core.cdefDictionary[content.id.ToString()]; }
-                if (core.cdefDictionary.ContainsKey(content.id.ToString())) {
+                if ((!forceDbLoad) && (core.metaDataDictionary.ContainsKey(content.id.ToString()))) { return core.metaDataDictionary[content.id.ToString()]; }
+                if (core.metaDataDictionary.ContainsKey(content.id.ToString())) {
                     //
                     // -- key is already there, remove it first                        
-                    core.cdefDictionary.Remove(content.id.ToString());
+                    core.metaDataDictionary.Remove(content.id.ToString());
                 }
                 List<string> dependentCacheNameList = new List<string>();
                 if (!forceDbLoad) {
@@ -324,7 +322,7 @@ namespace Contensive.Processor.Models.Domain {
                     using (DataTable dtContent = core.db.executeQuery(sql)) {
                         if (dtContent.Rows.Count == 0) {
                             //
-                            // cdef not found
+                            // metadata not found
                             //
                         } else {
                             result = new Models.Domain.MetaModel();
@@ -362,13 +360,13 @@ namespace Contensive.Processor.Models.Domain {
                             result.aliasID = "ID";
                             result.aliasName = "NAME";
                             //
-                            // load parent cdef fields first so we can overlay the current cdef field
+                            // load parent metadata fields first so we can overlay the current metadata field
                             //
                             if (result.parentID == 0) {
                                 result.parentID = -1;
                             } else {
-                                Models.Domain.MetaModel parentCdef = create(core, result.parentID, loadInvalidFields, forceDbLoad);
-                                foreach (var keyvaluepair in parentCdef.fields) {
+                                Models.Domain.MetaModel parentMetaData = create(core, result.parentID, loadInvalidFields, forceDbLoad);
+                                foreach (var keyvaluepair in parentMetaData.fields) {
                                     Models.Domain.MetaFieldModel parentField = keyvaluepair.Value;
                                     Models.Domain.MetaFieldModel childField = new Models.Domain.MetaFieldModel();
                                     childField = (Models.Domain.MetaFieldModel)parentField.Clone();
@@ -580,7 +578,7 @@ namespace Contensive.Processor.Models.Domain {
                     }
                     setCache(core, content.id, result);
                 }
-                core.cdefDictionary.Add(content.id.ToString(), result);
+                core.metaDataDictionary.Add(content.id.ToString(), result);
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
             }
@@ -593,7 +591,7 @@ namespace Contensive.Processor.Models.Domain {
         //
         //====================================================================================================
         /// <summary>
-        /// Create cdef object from cache or database for provided contentId
+        /// Create metadata object from cache or database for provided contentId
         /// </summary>
         /// <param name="core"></param>
         /// <param name="contentGuid"></param>
@@ -612,7 +610,7 @@ namespace Contensive.Processor.Models.Domain {
         //
         //====================================================================================================
         /// <summary>
-        /// Create cdef object from cache or database for provided contentId
+        /// Create metadata object from cache or database for provided contentId
         /// </summary>
         /// <param name="core"></param>
         /// <param name="contentId"></param>
@@ -631,7 +629,7 @@ namespace Contensive.Processor.Models.Domain {
         //   
         //====================================================================================================
         /// <summary>
-        /// get Cdef from content name. If the cdef is not found, return nothing.
+        /// get metadata from content name. If the metadata is not found, return nothing.
         /// </summary>
         /// <param name="contentName"></param>
         /// <returns></returns>
@@ -641,9 +639,9 @@ namespace Contensive.Processor.Models.Domain {
             return create(core, content, loadInvalidFields, forceDbLoad);
         }
         //
-        public static MetaModel createByUniqueName(CoreController core, string contentName, bool loadInvalidFields) => create(core, contentName, loadInvalidFields, false);
+        public static MetaModel createByUniqueName(CoreController core, string contentName, bool loadInvalidFields) => createByUniqueName(core, contentName, loadInvalidFields, false);
         //
-        public static MetaModel createByUniqueName(CoreController core, string contentName) => create(core, contentName, false, false);
+        public static MetaModel createByUniqueName(CoreController core, string contentName) => createByUniqueName(core, contentName, false, false);
         //
         //========================================================================
         /// <summary>
@@ -688,14 +686,14 @@ namespace Contensive.Processor.Models.Domain {
         /// setup the admin column model for the create methods
         /// </summary>
         /// <param name="core"></param>
-        /// <param name="cdef"></param>
-        private static void create_setAdminColumns(CoreController core, MetaModel cdef) {
+        /// <param name="metaData"></param>
+        private static void create_setAdminColumns(CoreController core, MetaModel metaData) {
             try {
-                if (cdef.id > 0) {
+                if (metaData.id > 0) {
                     int cnt = 0;
                     int FieldWidthTotal = 0;
                     MetaAdminColumnClass adminColumn = null;
-                    foreach (KeyValuePair<string, Models.Domain.MetaFieldModel> keyValuePair in cdef.fields) {
+                    foreach (KeyValuePair<string, Models.Domain.MetaFieldModel> keyValuePair in metaData.fields) {
                         MetaFieldModel field = keyValuePair.Value;
                         bool FieldActive = field.active;
                         int FieldWidth = GenericController.encodeInteger(field.indexWidth);
@@ -708,18 +706,18 @@ namespace Contensive.Processor.Models.Domain {
                             adminColumn.Width = FieldWidth;
                             FieldWidthTotal = FieldWidthTotal + adminColumn.Width;
                             string key = (cnt + (adminColumn.SortPriority * 1000)).ToString().PadLeft(6, '0');
-                            cdef.adminColumns.Add(key, adminColumn);
+                            metaData.adminColumns.Add(key, adminColumn);
                         }
                         cnt += 1;
                     }
                     //
                     // Force the Name field as the only column
-                    if (cdef.fields.Count > 0) {
-                        if (cdef.adminColumns.Count == 0) {
+                    if (metaData.fields.Count > 0) {
+                        if (metaData.adminColumns.Count == 0) {
                             //
                             // Force the Name field as the only column
                             //
-                            if (cdef.fields.ContainsKey("name")) {
+                            if (metaData.fields.ContainsKey("name")) {
                                 adminColumn = new MetaAdminColumnClass();
                                 adminColumn.Name = "Name";
                                 adminColumn.SortDirection = 1;
@@ -727,13 +725,13 @@ namespace Contensive.Processor.Models.Domain {
                                 adminColumn.Width = 100;
                                 FieldWidthTotal = FieldWidthTotal + adminColumn.Width;
                                 string key = ((1000)).ToString().PadLeft(6, '0');
-                                cdef.adminColumns.Add(key, adminColumn);
+                                metaData.adminColumns.Add(key, adminColumn);
                             }
                         }
                         //
                         // Normalize the column widths
                         //
-                        foreach (var keyvaluepair in cdef.adminColumns) {
+                        foreach (var keyvaluepair in metaData.adminColumns) {
                             adminColumn = keyvaluepair.Value;
                             adminColumn.Width = encodeInteger(100 * ((double)adminColumn.Width / (double)FieldWidthTotal));
                         }
@@ -747,17 +745,17 @@ namespace Contensive.Processor.Models.Domain {
         //
         //====================================================================================================
         /// <summary>
-        /// Get cache key for a cdef object in cache
+        /// Get cache key for a metadata object in cache
         /// </summary>
         /// <param name="contentId"></param>
         /// <returns></returns>
         public static string getCacheKey(int contentId) {
-            return CacheController.createCacheKey_forObject("cdef", contentId.ToString());
+            return CacheController.createCacheKey_forObject("metadata", contentId.ToString());
         }
         //
         //====================================================================================================
         /// <summary>
-        /// invalidate the cdef record for a given contentid
+        /// invalidate the metadata record for a given contentid
         /// </summary>
         /// <param name="core"></param>
         /// <param name="contentId"></param>
@@ -767,19 +765,19 @@ namespace Contensive.Processor.Models.Domain {
         //
         //====================================================================================================
         /// <summary>
-        /// update cache for a cdef model
+        /// update cache for a metadata model
         /// </summary>
         /// <param name="core"></param>
         /// <param name="contentId"></param>
-        /// <param name="cdef"></param>
-        public static void setCache(CoreController core, int contentId, MetaModel cdef) {
+        /// <param name="metaData"></param>
+        public static void setCache(CoreController core, int contentId, MetaModel metaData) {
             List<string> dependantList = new List<string>();
-            core.cache.storeObject(getCacheKey(contentId), cdef, dependantList);
+            core.cache.storeObject(getCacheKey(contentId), metaData, dependantList);
         }
         //
         //====================================================================================================
         /// <summary>
-        /// get a cache version of a cdef model
+        /// get a cache version of a metadata model
         /// </summary>
         /// <param name="core"></param>
         /// <param name="contentId"></param>

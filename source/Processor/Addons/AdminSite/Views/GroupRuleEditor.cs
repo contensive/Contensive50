@@ -59,17 +59,17 @@ namespace Contensive.Addons.AdminSite {
                         + " GROUP BY ccGroups.ID, ccContent.Name, ccGroups.Caption, ccGroups.name, ccGroups.SortOrder"
                         + " ORDER BY ccGroups.Caption";
 
-                    using (var csXfer = new CsModel(core)) {
+                    using (var csData = new CsModel(core)) {
                         //
                         // Output all the groups, with the active and dateexpires from those joined
                         //body.Add(adminUIController.EditTableOpen);
                         bool CanSeeHiddenGroups = core.session.isAuthenticatedDeveloper(core);
-                        csXfer.openSql(SQL2, "Default");
-                        while (csXfer.ok()) {
-                            string GroupName = csXfer.getText("GroupName");
+                        csData.openSql(SQL2, "Default");
+                        while (csData.ok()) {
+                            string GroupName = csData.getText("GroupName");
                             if ((GroupName.Left(1) != "_") || CanSeeHiddenGroups) {
-                                string GroupCaption = csXfer.getText("GroupCaption");
-                                int GroupID = csXfer.getInteger("ID");
+                                string GroupCaption = csData.getText("GroupCaption");
+                                int GroupID = csData.getInteger("ID");
                                 if (string.IsNullOrEmpty(GroupCaption)) {
                                     GroupCaption = GroupName;
                                     if (string.IsNullOrEmpty(GroupCaption)) {
@@ -103,7 +103,7 @@ namespace Contensive.Addons.AdminSite {
                                 groupRuleEditor.rowList.Add(row);
                                 GroupCount += 1;
                             }
-                            csXfer.goNext();
+                            csData.goNext();
                         }
                     }
                 }

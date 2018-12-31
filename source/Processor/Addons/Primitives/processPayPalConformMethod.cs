@@ -36,33 +36,33 @@
 //                    //
 //                    // Confirm the order
 //                    //
-//                    csXfer.csOpen("Orders", "(ID=" + ConfirmOrderID + ") and ((OrderCompleted=0)or(OrderCompleted is Null))");
-//                    if (csXfer.csOk()) {
-//                        csXfer.csSet("OrderCompleted", true);
-//                        csXfer.csSet("DateCompleted", core.doc.profileStartTime);
-//                        csXfer.csSet("ccAuthCode", core.docProperties.getText("txn_id"));
-//                        csXfer.csSet("ccActionCode", core.docProperties.getText("payment_status"));
-//                        csXfer.csSet("ccRefCode", core.docProperties.getText("pending_reason"));
-//                        csXfer.csSet("PayMethod", "PayPal " + core.docProperties.getText("payment_type"));
-//                        csXfer.csSet("ShipName", core.docProperties.getText("first_name") + " " + core.docProperties.getText("last_name"));
-//                        csXfer.csSet("ShipAddress", core.docProperties.getText("address_street"));
-//                        csXfer.csSet("ShipCity", core.docProperties.getText("address_city"));
-//                        csXfer.csSet("ShipState", core.docProperties.getText("address_state"));
-//                        csXfer.csSet("ShipZip", core.docProperties.getText("address_zip"));
-//                        csXfer.csSet("BilleMail", core.docProperties.getText("payer_email"));
-//                        csXfer.csSet("ContentControlID", Models.Domain.MetaModel.getContentId(core, "Orders Completed"));
-//                        csXfer.csSave2(CS);
+//                    csData.csOpen("Orders", "(ID=" + ConfirmOrderID + ") and ((OrderCompleted=0)or(OrderCompleted is Null))");
+//                    if (csData.csOk()) {
+//                        csData.csSet("OrderCompleted", true);
+//                        csData.csSet("DateCompleted", core.doc.profileStartTime);
+//                        csData.csSet("ccAuthCode", core.docProperties.getText("txn_id"));
+//                        csData.csSet("ccActionCode", core.docProperties.getText("payment_status"));
+//                        csData.csSet("ccRefCode", core.docProperties.getText("pending_reason"));
+//                        csData.csSet("PayMethod", "PayPal " + core.docProperties.getText("payment_type"));
+//                        csData.csSet("ShipName", core.docProperties.getText("first_name") + " " + core.docProperties.getText("last_name"));
+//                        csData.csSet("ShipAddress", core.docProperties.getText("address_street"));
+//                        csData.csSet("ShipCity", core.docProperties.getText("address_city"));
+//                        csData.csSet("ShipState", core.docProperties.getText("address_state"));
+//                        csData.csSet("ShipZip", core.docProperties.getText("address_zip"));
+//                        csData.csSet("BilleMail", core.docProperties.getText("payer_email"));
+//                        csData.csSet("ContentControlID", Models.Domain.MetaModel.getContentId(core, "Orders Completed"));
+//                        csData.csSave2(CS);
 //                    }
-//                    csXfer.csClose();
+//                    csData.csClose();
 //                    //
 //                    // Empty the cart
 //                    //
-//                    csXfer.csOpen("Visitors", "OrderID=" + ConfirmOrderID);
-//                    if (csXfer.csOk()) {
-//                        csXfer.csSet("OrderID", 0);
-//                        csXfer.csSave2(CS);
+//                    csData.csOpen("Visitors", "OrderID=" + ConfirmOrderID);
+//                    if (csData.csOk()) {
+//                        csData.csSet("OrderID", 0);
+//                        csData.csSave2(CS);
 //                    }
-//                    csXfer.csClose();
+//                    csData.csClose();
 //                    //
 //                    // TEmp fix until HardCodedPage is complete
 //                    //

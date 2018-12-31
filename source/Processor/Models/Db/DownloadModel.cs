@@ -27,12 +27,12 @@ namespace Contensive.Processor.Models.Db {
         ////
         ////====================================================================================================
         //public static AddonModel addDefault(CoreController core, Domain.CDefModel cdef) {
-        //    return addDefault<AddonModel>(core, cdef);
+        //    return addDefault<AddonModel>(core, metaData);
         //}
         ////
         ////====================================================================================================
         //public static AddonModel addDefault(CoreController core, ref List<string> callersCacheNameList, Domain.CDefModel cdef) {
-        //    return addDefault<AddonModel>(core, cdef, ref callersCacheNameList);
+        //    return addDefault<AddonModel>(core, metaData, ref callersCacheNameList);
         //}
         ////
         ////====================================================================================================

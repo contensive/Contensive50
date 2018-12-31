@@ -102,13 +102,13 @@ namespace Contensive.Addons.AdminSite {
                                     if ((string.IsNullOrEmpty(Name)) || (string.IsNullOrEmpty(SQL))) {
                                         Processor.Controllers.ErrorController.addUserError(core, "A name and SQL Query are required to save a new custom report.");
                                     } else {
-                                        using (var csXfer = new CsModel(core)) {
-                                            csXfer.insert("Custom Reports");
-                                            if (csXfer.ok()) {
-                                                csXfer.set("Name", Name);
-                                                csXfer.set(SQLFieldName, SQL);
+                                        using (var csData = new CsModel(core)) {
+                                            csData.insert("Custom Reports");
+                                            if (csData.ok()) {
+                                                csData.set("Name", Name);
+                                                csData.set(SQLFieldName, SQL);
                                             }
-                                            csXfer.close();
+                                            csData.close();
                                         }
                                     }
                                 }
@@ -118,30 +118,30 @@ namespace Contensive.Addons.AdminSite {
                                     for (RowPtr = 0; RowPtr < RowCnt; RowPtr++) {
                                         if (core.docProperties.getBoolean("Row" + RowPtr)) {
                                             RecordID = core.docProperties.getInteger("RowID" + RowPtr);
-                                            using (var csXfer = new CsModel(core)) {
-                                                csXfer.openRecord("Custom Reports", RecordID);
-                                                if (csXfer.ok()) {
-                                                    SQL = csXfer.getText(SQLFieldName);
-                                                    Name = csXfer.getText("Name");
+                                            using (var csData = new CsModel(core)) {
+                                                csData.openRecord("Custom Reports", RecordID);
+                                                if (csData.ok()) {
+                                                    SQL = csData.getText(SQLFieldName);
+                                                    Name = csData.getText("Name");
                                                 }
                                             }
                                             //
-                                            using (var csXfer = new CsModel(core)) {
-                                                csXfer.insert("Tasks");
-                                                if (csXfer.ok()) {
+                                            using (var csData = new CsModel(core)) {
+                                                csData.insert("Tasks");
+                                                if (csData.ok()) {
                                                     RecordName = "CSV Download, Custom Report [" + Name + "]";
                                                     Filename = "CustomReport_" + encodeText(GenericController.dateToSeconds(core.doc.profileStartTime)) + encodeText(GenericController.GetRandomInteger(core)) + ".csv";
-                                                    csXfer.set("Name", RecordName);
-                                                    csXfer.set("Filename", Filename);
+                                                    csData.set("Name", RecordName);
+                                                    csData.set("Filename", Filename);
                                                     if (Format == "XML") {
-                                                        csXfer.set("Command", "BUILDXML");
+                                                        csData.set("Command", "BUILDXML");
                                                     } else {
-                                                        csXfer.set("Command", "BUILDCSV");
+                                                        csData.set("Command", "BUILDCSV");
                                                     }
-                                                    csXfer.set(SQLFieldName, SQL);
+                                                    csData.set(SQLFieldName, SQL);
                                                     Description = Description + "<p>Your Download [" + Name + "] has been requested, and will be available in the <a href=\"?" + rnAdminForm + "=30\">Download Manager</a> when it is complete. This may take a few minutes depending on the size of the report.</p>";
                                                 }
-                                                csXfer.close();
+                                                csData.close();
 
                                             }
                                         }
@@ -201,25 +201,25 @@ namespace Contensive.Addons.AdminSite {
                     //
                     //   Get Data
                     //
-                    using (var csXfer = new CsModel(core)) {
+                    using (var csData = new CsModel(core)) {
                         RowPointer = 0;
-                        if (!csXfer.open("Custom Reports")) {
+                        if (!csData.open("Custom Reports")) {
                             Cells[0, 1] = "There are no custom reports defined";
                             RowPointer = 1;
                         } else {
-                            DataRowCount = csXfer.getRowCount();
-                            while (csXfer.ok() && (RowPointer < PageSize)) {
-                                RecordID = csXfer.getInteger("ID");
+                            DataRowCount = csData.getRowCount();
+                            while (csData.ok() && (RowPointer < PageSize)) {
+                                RecordID = csData.getInteger("ID");
                                 Cells[RowPointer, 0] = HtmlController.checkbox("Row" + RowPointer) + HtmlController.inputHidden("RowID" + RowPointer, RecordID);
-                                Cells[RowPointer, 1] = csXfer.getText("name");
-                                Cells[RowPointer, 2] = csXfer.getText("CreatedBy");
-                                Cells[RowPointer, 3] = csXfer.getDate("DateAdded").ToShortDateString();
+                                Cells[RowPointer, 1] = csData.getText("name");
+                                Cells[RowPointer, 2] = csData.getText("CreatedBy");
+                                Cells[RowPointer, 3] = csData.getDate("DateAdded").ToShortDateString();
                                 //Cells(RowPointer, 4) = "&nbsp;"
                                 RowPointer = RowPointer + 1;
-                                csXfer.goNext();
+                                csData.goNext();
                             }
                         }
-                        csXfer.close();
+                        csData.close();
                     }
                     string Cell = null;
                     Tab0.Add(HtmlController.inputHidden("RowCnt", RowPointer));

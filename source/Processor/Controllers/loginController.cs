@@ -312,11 +312,11 @@ namespace Contensive.Processor.Controllers {
                         //
                         allowEmailLogin = core.siteProperties.getBoolean("allowEmailLogin", false);
                         recordCnt = 0;
-                        using (var csXfer = new CsModel(core)) {
+                        using (var csData = new CsModel(core)) {
                             sqlCriteria = "(email=" + DbController.encodeSQLText(workingEmail) + ")";
                             sqlCriteria = sqlCriteria + "and((dateExpires is null)or(dateExpires>" + DbController.encodeSQLDate(DateTime.Now) + "))";
-                            csXfer.open("People", sqlCriteria, "ID",true,core.session.user.id,"username,password", 1);
-                            if (!csXfer.ok()) {
+                            csData.open("People", sqlCriteria, "ID",true,core.session.user.id,"username,password", 1);
+                            if (!csData.ok()) {
                                 //
                                 // valid login account for this email not found
                                 //
@@ -324,37 +324,37 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     // look for expired account to renew
                                     //
-                                    csXfer.close();
-                                    csXfer.open("People", "((email=" + DbController.encodeSQLText(workingEmail) + "))", "ID");
-                                    if (csXfer.ok()) {
+                                    csData.close();
+                                    csData.open("People", "((email=" + DbController.encodeSQLText(workingEmail) + "))", "ID");
+                                    if (csData.ok()) {
                                         //
                                         // renew this old record
                                         //
                                         //hint = "150"
-                                        csXfer.set("developer", "1");
-                                        csXfer.set("admin", "1");
-                                        if ( csXfer.getDate( "dateExpires") > DateTime.MinValue ) { csXfer.set("dateExpires", DateTime.Now.AddDays(7).Date.ToString());  }
+                                        csData.set("developer", "1");
+                                        csData.set("admin", "1");
+                                        if ( csData.getDate( "dateExpires") > DateTime.MinValue ) { csData.set("dateExpires", DateTime.Now.AddDays(7).Date.ToString());  }
                                     } else {
                                         //
                                         // inject support record
                                         //
-                                        csXfer.close();
-                                        csXfer.insert("people");
-                                        csXfer.set("name", "Contensive Support");
-                                        csXfer.set("email", workingEmail);
-                                        csXfer.set("developer", "1");
-                                        csXfer.set("admin", "1");
-                                        csXfer.set("dateExpires", DateTime.Now.AddDays(7).Date.ToString());
+                                        csData.close();
+                                        csData.insert("people");
+                                        csData.set("name", "Contensive Support");
+                                        csData.set("email", workingEmail);
+                                        csData.set("developer", "1");
+                                        csData.set("admin", "1");
+                                        csData.set("dateExpires", DateTime.Now.AddDays(7).Date.ToString());
                                     }
                                 } else {
                                     ErrorController.addUserError(core, "No current user was found matching this email address. Please try again. ");
                                 }
                             }
-                            if (csXfer.ok()) {
+                            if (csData.ok()) {
                                 FromAddress = core.siteProperties.getText("EmailFromAddress", "info@" + core.webServer.requestDomain);
                                 subject = "Password Request at " + core.webServer.requestDomain;
                                 Message = "";
-                                while (csXfer.ok()) {
+                                while (csData.ok()) {
                                     //hint = "170"
                                     updateUser = false;
                                     if (string.IsNullOrEmpty(Message)) {
@@ -371,7 +371,7 @@ namespace Contensive.Processor.Controllers {
                                     // username
                                     //
                                     //hint = "200"
-                                    Username = csXfer.getText("Username");
+                                    Username = csData.getText("Username");
                                     usernameOK = true;
                                     if (!allowEmailLogin) {
                                         //hint = "210"
@@ -405,7 +405,7 @@ namespace Contensive.Processor.Controllers {
                                         // password
                                         //
                                         //hint = "280"
-                                        Password = csXfer.getText("Password");
+                                        Password = csData.getText("Password");
                                         if (Password.Trim() != Password) {
                                             //hint = "290"
                                             Password = Password.Trim();
@@ -427,12 +427,12 @@ namespace Contensive.Processor.Controllers {
                                         result = true;
                                         if (updateUser) {
                                             //hint = "350"
-                                            csXfer.set("username", Username);
-                                            csXfer.set("password", Password);
+                                            csData.set("username", Username);
+                                            csData.set("password", Password);
                                         }
                                         recordCnt = recordCnt + 1;
                                     }
-                                    csXfer.goNext();
+                                    csData.goNext();
                                 }
                             }
                         }
@@ -474,12 +474,12 @@ namespace Contensive.Processor.Controllers {
                         ErrorController.addUserError(core, ErrorMessage);
                     } else {
                         if (!(core.doc.debug_iUserError != "")) {
-                            using (var csXfer = new CsModel(core)) {
-                                csXfer.open("people", "ID=" + DbController.encodeSQLNumber(core.session.user.id));
-                                if (!csXfer.ok()) {
+                            using (var csData = new CsModel(core)) {
+                                csData.open("people", "ID=" + DbController.encodeSQLNumber(core.session.user.id));
+                                if (!csData.ok()) {
                                     LogController.handleError(core, new Exception("Could not open the current members account to set the username and password."));
                                 } else {
-                                    if ((csXfer.getText("username") != "") || (csXfer.getText("password") != "") || (csXfer.getBoolean("admin")) || (csXfer.getBoolean("developer"))) {
+                                    if ((csData.getText("username") != "") || (csData.getText("password") != "") || (csData.getBoolean("admin")) || (csData.getBoolean("developer"))) {
                                         //
                                         // if the current account can be logged into, you can not join 'into' it
                                         //
@@ -489,14 +489,14 @@ namespace Contensive.Processor.Controllers {
                                     LastName = core.docProperties.getText("lastname");
                                     FullName = FirstName + " " + LastName;
                                     Email = core.docProperties.getText("email");
-                                    csXfer.set("FirstName", FirstName);
-                                    csXfer.set("LastName", LastName);
-                                    csXfer.set("Name", FullName);
-                                    csXfer.set("username", loginForm_Username);
-                                    csXfer.set("password", loginForm_Password);
+                                    csData.set("FirstName", FirstName);
+                                    csData.set("LastName", LastName);
+                                    csData.set("Name", FullName);
+                                    csData.set("username", loginForm_Username);
+                                    csData.set("password", loginForm_Password);
                                     SessionController.authenticateById(core, core.session.user.id, core.session);
                                 }
-                                csXfer.close();
+                                csData.close();
                             }
                         }
                     }

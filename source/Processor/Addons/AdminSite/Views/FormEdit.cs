@@ -407,7 +407,7 @@ namespace Contensive.Addons.AdminSite {
                     //
                     // Page Content
                     //
-                    int TableID = MetaController.getRecordId( core,"Tables", "ccPageContent");
+                    int TableID = MetaController.getRecordIdByUniqueName( core,"Tables", "ccPageContent");
                     string EditSectionButtonBar = AdminUIController.getButtonBarForEdit(core, new EditButtonBarInfoClass() {
                         allowActivate = false,
                         allowAdd = (allowAdd && adminData.adminContent.allowAdd & adminData.editRecord.AllowUserAdd),
@@ -839,8 +839,8 @@ namespace Contensive.Addons.AdminSite {
                             } else {
                                 //
                                 // -- editor failed, determine if it is missing (or inactive). If missing, remove it from the members preferences
-                                using (var csXfer = new CsModel(core)) {
-                                    if (!csXfer.openSql("select id from ccaggregatefunctions where id=" + editorAddonID)) {
+                                using (var csData = new CsModel(core)) {
+                                    if (!csData.openSql("select id from ccaggregatefunctions where id=" + editorAddonID)) {
                                         //
                                         // -- missing, not just inactive
                                         EditorString = "";
@@ -1753,52 +1753,52 @@ namespace Contensive.Addons.AdminSite {
                 int GroupRulesSize = 0;
                 AdminDataModel.GroupRuleType[] GroupRules = { };
                 if (adminData.editRecord.id != 0) {
-                    using (var csXfer = new CsModel(core)) {
+                    using (var csData = new CsModel(core)) {
                         string SQL = "SELECT ccGroups.ID AS ID, ccGroupRules.AllowAdd as allowadd, ccGroupRules.AllowDelete as allowdelete"
                             + " FROM ccGroups LEFT JOIN ccGroupRules ON ccGroups.ID = ccGroupRules.GroupID"
                             + " WHERE (((ccGroupRules.ContentID)=" + adminData.editRecord.id + ") AND ((ccGroupRules.Active)<>0) AND ((ccGroups.Active)<>0))";
-                        if (csXfer.openSql(SQL)) {
+                        if (csData.openSql(SQL)) {
                             GroupRulesSize = 100;
                             GroupRules = new AdminDataModel.GroupRuleType[GroupRulesSize + 1];
-                            while (csXfer.ok()) {
+                            while (csData.ok()) {
                                 if (GroupRulesCount >= GroupRulesSize) {
                                     GroupRulesSize = GroupRulesSize + 100;
                                     Array.Resize(ref GroupRules, GroupRulesSize + 1);
                                 }
-                                GroupRules[GroupRulesCount].GroupID = csXfer.getInteger("ID");
-                                GroupRules[GroupRulesCount].AllowAdd = csXfer.getBoolean("AllowAdd");
-                                GroupRules[GroupRulesCount].AllowDelete = csXfer.getBoolean("AllowDelete");
+                                GroupRules[GroupRulesCount].GroupID = csData.getInteger("ID");
+                                GroupRules[GroupRulesCount].AllowAdd = csData.getBoolean("AllowAdd");
+                                GroupRules[GroupRulesCount].AllowDelete = csData.getBoolean("AllowDelete");
                                 GroupRulesCount += 1;
-                                csXfer.goNext();
+                                csData.goNext();
                             }
                         }
                     }
                 }
                 //
                 // ----- Gather all the groups, sorted by ContentName
-                using (var csXfer = new CsModel(core)) {
+                using (var csData = new CsModel(core)) {
                     string SQL = "SELECT ccGroups.ID AS ID, ccContent.Name AS SectionName, ccGroups.Name AS GroupName, ccGroups.Caption AS GroupCaption, ccGroups.SortOrder"
                         + " FROM ccGroups LEFT JOIN ccContent ON ccGroups.ContentControlID = ccContent.ID"
                         + " Where (((ccGroups.Active) <> " + SQLFalse + ") And ((ccContent.Active) <> " + SQLFalse + "))"
                         + " GROUP BY ccGroups.ID, ccContent.Name, ccGroups.Name, ccGroups.Caption, ccGroups.SortOrder"
                         + " ORDER BY ccContent.Name, ccGroups.Caption, ccGroups.SortOrder";
-                    if (!csXfer.openSql(SQL)) {
+                    if (!csData.openSql(SQL)) {
                         FastString.Add("\r\n<tr><td colspan=\"3\">" + SpanClassAdminSmall + "There are no active groups</span></td></tr>");
                     } else {
                         {
                             string SectionName = "";
                             int GroupCount = 0;
-                            while (csXfer.ok()) {
-                                string GroupName = csXfer.getText("GroupCaption");
+                            while (csData.ok()) {
+                                string GroupName = csData.getText("GroupCaption");
                                 if (string.IsNullOrEmpty(GroupName)) {
-                                    GroupName = csXfer.getText("GroupName");
+                                    GroupName = csData.getText("GroupName");
                                 }
                                 FastString.Add("<tr>");
-                                if (SectionName != csXfer.getText("SectionName")) {
+                                if (SectionName != csData.getText("SectionName")) {
                                     //
                                     // ----- create the next section
                                     //
-                                    SectionName = csXfer.getText("SectionName");
+                                    SectionName = csData.getText("SectionName");
                                     FastString.Add("<td valign=\"top\" align=\"right\">" + SpanClassAdminSmall + SectionName + "</td>");
                                 } else {
                                     FastString.Add("<td valign=\"top\" align=\"right\">&nbsp;</td>");
@@ -1808,13 +1808,13 @@ namespace Contensive.Addons.AdminSite {
                                 int GroupRulesPointer = 0;
                                 if (GroupRulesCount != 0) {
                                     for (GroupRulesPointer = 0; GroupRulesPointer < GroupRulesCount; GroupRulesPointer++) {
-                                        if (GroupRules[GroupRulesPointer].GroupID == csXfer.getInteger("ID")) {
+                                        if (GroupRules[GroupRulesPointer].GroupID == csData.getInteger("ID")) {
                                             GroupFound = true;
                                             break;
                                         }
                                     }
                                 }
-                                FastString.Add("<input type=\"hidden\" name=\"GroupID" + GroupCount + "\" value=\"" + csXfer.getText("ID") + "\">");
+                                FastString.Add("<input type=\"hidden\" name=\"GroupID" + GroupCount + "\" value=\"" + csData.getText("ID") + "\">");
                                 FastString.Add("<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"400\"><tr>");
                                 if (GroupFound) {
                                     FastString.Add("<td width=\"200\">" + SpanClassAdminSmall + HtmlController.checkbox("Group" + GroupCount, true) + GroupName + "</span></td>");
@@ -1829,7 +1829,7 @@ namespace Contensive.Addons.AdminSite {
                                 FastString.Add("</span></td>");
                                 FastString.Add("</tr>");
                                 GroupCount = GroupCount + 1;
-                                csXfer.goNext();
+                                csData.goNext();
                             }
                             FastString.Add("\r\n<input type=\"hidden\" name=\"GroupCount\" value=\"" + GroupCount + "\">");
                         }
