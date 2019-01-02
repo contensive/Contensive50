@@ -20,7 +20,7 @@ namespace Contensive.Processor.Controllers {
         //
         public static string getBlockList(CoreController core) {
             if (!core.doc.emailBlockListStoreLoaded) {
-                core.doc.emailBlockListStore = core.privateFiles.readFileText(emailBlockListFilename);
+                core.doc.emailBlockListStore = core.filePrivate.readFileText(emailBlockListFilename);
                 core.doc.emailBlockListStoreLoaded = true;
             }
             return core.doc.emailBlockListStore;
@@ -50,7 +50,7 @@ namespace Contensive.Processor.Controllers {
                 // add them to the list
                 //
                 core.doc.emailBlockListStore = blockList + "\r\n" + EmailAddress + "\t" + DateTime.Now;
-                core.privateFiles.saveFile(emailBlockListFilename, core.doc.emailBlockListStore);
+                core.filePrivate.saveFile(emailBlockListFilename, core.doc.emailBlockListStore);
                 core.doc.emailBlockListStoreLoaded = false;
             }
         }

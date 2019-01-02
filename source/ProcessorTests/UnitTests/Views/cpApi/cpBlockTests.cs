@@ -116,14 +116,14 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
             try {
                 CPBlockBaseClass block = cp.BlockNew();
                 // act
-                cp.core.appRootFiles.saveFile(filename, templateA);
+                cp.core.fileAppRoot.saveFile(filename, templateA);
                 block.ImportFile(filename);
                 // assert
                 Assert.AreEqual(layoutC, block.GetHtml());
             } catch (Exception) {
                 //
             } finally {
-                cp.core.appRootFiles.deleteFile(filename);
+                cp.core.fileAppRoot.deleteFile(filename);
             }
         }
         //
@@ -166,12 +166,12 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
             try {
                 CPBlockBaseClass block = cp.BlockNew();
                 // act
-                cp.core.appRootFiles.saveFile(filename, layoutA);
+                cp.core.fileAppRoot.saveFile(filename, layoutA);
                 block.OpenFile(filename);
                 // assert
                 Assert.AreEqual(layoutA, block.GetHtml());
             } finally {
-                cp.core.appRootFiles.deleteFile(filename);
+                cp.core.fileAppRoot.deleteFile(filename);
             }
         }
         //

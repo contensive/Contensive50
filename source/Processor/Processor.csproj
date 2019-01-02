@@ -105,6 +105,7 @@
     <Compile Include="Addons\Monitor\siteCheckClass.cs" />
     <Compile Include="Addons\Monitor\GetStatus.cs" />
     <Compile Include="Controllers\PermissionController.cs" />
+    <Compile Include="Controllers\UpgradeController.cs" />
     <Compile Include="Exceptions\Exceptions.cs" />
     <Compile Include="Addons\AdminSite\Views\ControlEditor.cs" />
     <Compile Include="Addons\AdminSite\Views\EmailBounceEditor.cs" />

@@ -123,7 +123,7 @@ namespace Contensive.Processor.Controllers {
                                                     break;
                                                 case "help":
                                                     if (!string.IsNullOrWhiteSpace(metaDataInterfaces.InnerText)) {
-                                                        core.privateFiles.saveFile(workingPath + "Collection.hlp", metaDataInterfaces.InnerText);
+                                                        core.filePrivate.saveFile(workingPath + "Collection.hlp", metaDataInterfaces.InnerText);
                                                     }
                                                     break;
                                                 case "guid":
@@ -146,7 +146,7 @@ namespace Contensive.Processor.Controllers {
                                                             LogController.logInfo(core, errorPrefix + "Collection [" + Collectionname + "] was not installed because the Collection File Link does not point to a valid file [" + CollectionFileLink + "]");
                                                         } else {
                                                             string CollectionFilePath = workingPath + CollectionFileLink.Substring(Pos);
-                                                            core.privateFiles.saveHttpRequestToFile(CollectionFileLink, CollectionFilePath);
+                                                            core.filePrivate.saveHttpRequestToFile(CollectionFileLink, CollectionFilePath);
                                                         }
                                                     }
                                                     break;
@@ -182,7 +182,7 @@ namespace Contensive.Processor.Controllers {
                                                             UserError = "There was an error processing a collection in the download file [" + Collectionname + "]. The ActiveX filename attribute was empty, and the filename could not be read from the link [" + ResourceLink + "].";
                                                             LogController.logInfo(core, errorPrefix + UserError);
                                                         } else {
-                                                            core.privateFiles.saveHttpRequestToFile(ResourceLink, workingPath + ResourceFilename);
+                                                            core.filePrivate.saveHttpRequestToFile(ResourceLink, workingPath + ResourceFilename);
                                                         }
                                                     }
                                                     break;
@@ -243,7 +243,7 @@ namespace Contensive.Processor.Controllers {
                         // Download all files for this collection and build the collection folder(s)
                         //
                         string workingPath = core.addon.getPrivateFilesAddonPath() + "temp_" + GenericController.GetRandomInteger(core) + "\\";
-                        core.privateFiles.createPath(workingPath);
+                        core.filePrivate.createPath(workingPath);
                         //
                         DateTime CollectionLastChangeDate = default(DateTime);
                         UpgradeOK = downloadCollectionFiles(core, workingPath, collectionGuid, ref CollectionLastChangeDate, ref return_ErrorMessage);
@@ -257,7 +257,7 @@ namespace Contensive.Processor.Controllers {
                             }
                         }
                         //
-                        core.privateFiles.deleteFolder(workingPath);
+                        core.filePrivate.deleteFolder(workingPath);
                     }
                     //
                     // Upgrade the server from the collection files
@@ -414,7 +414,7 @@ namespace Contensive.Processor.Controllers {
                                                                             //
                                                                             // Upgrade Needed
                                                                             //
-                                                                            core.privateFiles.createPath(workingPath);
+                                                                            core.filePrivate.createPath(workingPath);
                                                                             DateTime CollectionLastChangeDate = default(DateTime);
                                                                             //
                                                                             returnOk = downloadCollectionFiles(core, workingPath, LibGUID, ref CollectionLastChangeDate, ref return_ErrorMessage);
@@ -423,7 +423,7 @@ namespace Contensive.Processor.Controllers {
                                                                                 returnOk = buildLocalCollectionReposFromFolder(core, workingPath, CollectionLastChangeDate, ref listGuidList, ref return_ErrorMessage);
                                                                             }
                                                                             //
-                                                                            core.privateFiles.deleteFolder(workingPath);
+                                                                            core.filePrivate.deleteFolder(workingPath);
                                                                             //
                                                                             // Upgrade the apps from the collection files, do not install on any apps
                                                                             //
@@ -477,9 +477,9 @@ namespace Contensive.Processor.Controllers {
         public static bool buildLocalCollectionReposFromFolder(CoreController core, string sourcePrivateFolderPath, DateTime CollectionLastChangeDate, ref List<string> return_CollectionGUIDList, ref string return_ErrorMessage) {
             bool success = false;
             try {
-                if (core.privateFiles.pathExists(sourcePrivateFolderPath)) {
+                if (core.filePrivate.pathExists(sourcePrivateFolderPath)) {
                     LogController.logInfo(core, "BuildLocalCollectionFolder, processing files in private folder [" + sourcePrivateFolderPath + "]");
-                    List<CPFileSystemClass.FileDetail> SrcFileNamelist = core.privateFiles.getFileList(sourcePrivateFolderPath);
+                    List<CPFileSystemClass.FileDetail> SrcFileNamelist = core.filePrivate.getFileList(sourcePrivateFolderPath);
                     foreach (CPFileSystemClass.FileDetail file in SrcFileNamelist) {
                         if ((file.Extension == ".zip") || (file.Extension == ".xml")) {
                             string collectionGuid = "";
@@ -503,11 +503,11 @@ namespace Contensive.Processor.Controllers {
             try {
                 string collectionPath = "";
                 string collectionFilename = "";
-                core.privateFiles.splitDosPathFilename(collectionPathFilename, ref collectionPath, ref collectionFilename);
+                core.filePrivate.splitDosPathFilename(collectionPathFilename, ref collectionPath, ref collectionFilename);
                 string CollectionVersionFolderName = "";
                 string Collectionname = "";
                 string CollectionGuid = "";
-                if (!core.privateFiles.pathExists(collectionPath)) {
+                if (!core.filePrivate.pathExists(collectionPath)) {
                     //
                     // The working folder is not there
                     result = false;
@@ -519,15 +519,15 @@ namespace Contensive.Processor.Controllers {
                     // move collection file to a temp directory
                     //
                     string tmpInstallPath = "tmpInstallCollection" + GenericController.getGUIDString() + "\\";
-                    core.privateFiles.copyFile(collectionPathFilename, tmpInstallPath + collectionFilename);
+                    core.filePrivate.copyFile(collectionPathFilename, tmpInstallPath + collectionFilename);
                     if (collectionFilename.ToLowerInvariant().Substring(collectionFilename.Length - 4) == ".zip") {
-                        core.privateFiles.UnzipFile(tmpInstallPath + collectionFilename);
-                        core.privateFiles.deleteFile(tmpInstallPath + collectionFilename);
+                        core.filePrivate.UnzipFile(tmpInstallPath + collectionFilename);
+                        core.filePrivate.deleteFile(tmpInstallPath + collectionFilename);
                     }
                     //
                     // install the individual files
                     //
-                    List<FileDetail> SrcFileNamelist = core.privateFiles.getFileList(tmpInstallPath);
+                    List<FileDetail> SrcFileNamelist = core.filePrivate.getFileList(tmpInstallPath);
                     if (true) {
                         bool CollectionFileFound = false;
                         //
@@ -544,7 +544,7 @@ namespace Contensive.Processor.Controllers {
                                 CollectionFile = new XmlDocument();
                                 bool loadOk = true;
                                 try {
-                                    CollectionFile.LoadXml(core.privateFiles.readFileText(tmpInstallPath + Filename));
+                                    CollectionFile.LoadXml(core.filePrivate.readFileText(tmpInstallPath + Filename));
                                 } catch (Exception ex) {
                                     //
                                     // There was a parse error in this xml file. Set the return message and the flag
@@ -618,7 +618,7 @@ namespace Contensive.Processor.Controllers {
                                                 CollectionFolderName = CollectionFolderName.ToLowerInvariant();
                                             }
                                             string CollectionFolder = core.addon.getPrivateFilesAddonPath() + CollectionFolderName + "\\";
-                                            core.privateFiles.verifyPath(CollectionFolder);
+                                            core.filePrivate.verifyPath(CollectionFolder);
                                             //
                                             // create a collection 'version' folder for these new files
                                             string TimeStamp = "";
@@ -654,9 +654,9 @@ namespace Contensive.Processor.Controllers {
                                             CollectionVersionFolderName = CollectionFolderName + "\\" + TimeStamp;
                                             string CollectionVersionFolder = core.addon.getPrivateFilesAddonPath() + CollectionVersionFolderName;
                                             string CollectionVersionPath = CollectionVersionFolder + "\\";
-                                            core.privateFiles.createPath(CollectionVersionPath);
+                                            core.filePrivate.createPath(CollectionVersionPath);
 
-                                            core.privateFiles.copyFolder(tmpInstallPath, CollectionVersionFolder);
+                                            core.filePrivate.copyFolder(tmpInstallPath, CollectionVersionFolder);
                                             //StatusOK = True
                                             //
                                             // Install activeX and search for importcollections
@@ -766,7 +766,7 @@ namespace Contensive.Processor.Controllers {
                                                                 }
                                                                 //
                                                                 // -- remove child installation working folder
-                                                                core.privateFiles.deleteFolder(ChildWorkingPath);
+                                                                core.filePrivate.deleteFolder(ChildWorkingPath);
                                                             } else {
                                                                 //
                                                                 //
@@ -818,7 +818,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // delete the working folder
                     //
-                    core.privateFiles.deleteFolder(tmpInstallPath);
+                    core.filePrivate.deleteFolder(tmpInstallPath);
                 }
                 //
                 // If the collection parsed correctly, update the Collections.xml file
@@ -866,7 +866,7 @@ namespace Contensive.Processor.Controllers {
                     // Search Local Collection Folder for collection config file (xml file)
                     //
                     string CollectionVersionFolder = core.addon.getPrivateFilesAddonPath() + CollectionVersionFolderName + "\\";
-                    List<FileDetail> srcFileInfoArray = core.privateFiles.getFileList(CollectionVersionFolder);
+                    List<FileDetail> srcFileInfoArray = core.filePrivate.getFileList(CollectionVersionFolder);
                     if (srcFileInfoArray.Count == 0) {
                         LogController.logInfo(core, "installCollectionFromLocalRep [" + CollectionGuid + "], collection folder is empty.");
                         return_ErrorMessage = return_ErrorMessage + "<P>The collection was not installed because the folder containing the Add-on's resources was empty.</P>";
@@ -893,14 +893,14 @@ namespace Contensive.Processor.Controllers {
                                 XmlDocument Doc = new XmlDocument();
                                 string CollectionFilename = file.Name;
                                 bool loadOK = true;
-                                string collectionFileContent = core.privateFiles.readFileText(CollectionVersionFolder + file.Name);
+                                string collectionFileContent = core.filePrivate.readFileText(CollectionVersionFolder + file.Name);
                                 try {
                                     Doc.LoadXml(collectionFileContent);
                                 } catch (Exception) {
                                     //
                                     // error - Need a way to reach the user that submitted the file
                                     //
-                                    LogController.logInfo(core, "installCollectionFromLocalRep, skipping xml file, not valid collection metadata, [" + core.privateFiles.localAbsRootPath + CollectionVersionFolder + file.Name + "].");
+                                    LogController.logInfo(core, "installCollectionFromLocalRep, skipping xml file, not valid collection metadata, [" + core.filePrivate.localAbsRootPath + CollectionVersionFolder + file.Name + "].");
                                     loadOK = false;
                                 }
                                 if (loadOK) {
@@ -991,7 +991,7 @@ namespace Contensive.Processor.Controllers {
                                                                 }
                                                                 //
                                                                 // -- if the filename in the collection file is the wrong case, correct it now
-                                                                filename = core.privateFiles.correctFilenameCase(CollectionVersionFolder + SrcPath + filename);
+                                                                filename = core.filePrivate.correctFilenameCase(CollectionVersionFolder + SrcPath + filename);
                                                                 //
                                                                 // == normalize dst
                                                                 string dstDosPath = FileController.normalizeDosPath(dstPath);
@@ -1001,20 +1001,20 @@ namespace Contensive.Processor.Controllers {
                                                                     case "www":
                                                                         wwwFileList += "\r\n" + dstDosPath + filename;
                                                                         LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], GUID [" + CollectionGuid + "], pass 1, copying file to www, src [" + CollectionVersionFolder + SrcPath + "], dst [" + core.appConfig.localWwwPath + dstDosPath + "].");
-                                                                        core.privateFiles.copyFile(CollectionVersionFolder + SrcPath + filename, dstDosPath + filename, core.appRootFiles);
+                                                                        core.filePrivate.copyFile(CollectionVersionFolder + SrcPath + filename, dstDosPath + filename, core.fileAppRoot);
                                                                         if (GenericController.vbLCase(filename.Substring(filename.Length - 4)) == ".zip") {
                                                                             LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], GUID [" + CollectionGuid + "], pass 1, unzipping www file [" + core.appConfig.localWwwPath + dstDosPath + filename + "].");
-                                                                            core.appRootFiles.UnzipFile(dstDosPath + filename);
+                                                                            core.fileAppRoot.UnzipFile(dstDosPath + filename);
                                                                         }
                                                                         break;
                                                                     case "file":
                                                                     case "content":
                                                                         ContentFileList += "\r\n" + dstDosPath + filename;
                                                                         LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], GUID [" + CollectionGuid + "], pass 1, copying file to content, src [" + CollectionVersionFolder + SrcPath + "], dst [" + dstDosPath + "].");
-                                                                        core.privateFiles.copyFile(CollectionVersionFolder + SrcPath + filename, dstDosPath + filename, core.cdnFiles);
+                                                                        core.filePrivate.copyFile(CollectionVersionFolder + SrcPath + filename, dstDosPath + filename, core.fileCdn);
                                                                         if (GenericController.vbLCase(filename.Substring(filename.Length - 4)) == ".zip") {
                                                                             LogController.logInfo(core, "installCollectionFromLocalRep [" + Collectionname + "], GUID [" + CollectionGuid + "], pass 1, unzipping content file [" + dstDosPath + filename + "].");
-                                                                            core.cdnFiles.UnzipFile(dstDosPath + filename);
+                                                                            core.fileCdn.UnzipFile(dstDosPath + filename);
                                                                         }
                                                                         break;
                                                                     default:
@@ -1803,7 +1803,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             LocalFilename = core.addon.getPrivateFilesAddonPath() + "Collections.xml";
                             //LocalFilename = GetProgramPath & "\Addons\Collections.xml"
-                            core.privateFiles.saveFile(LocalFilename, Doc.OuterXml);
+                            core.filePrivate.saveFile(LocalFilename, Doc.OuterXml);
                             //Doc.Save(core.privateFiles.localAbsRootPath + LocalFilename);
                         }
                     }
@@ -2011,8 +2011,8 @@ namespace Contensive.Processor.Controllers {
                     DstFolder = DstFolder.Left( DstFolder.Length - 1);
                 }
                 //
-                if (core.privateFiles.pathExists(SrcFolder)) {
-                    List< FileDetail> FileInfoArray = core.privateFiles.getFileList(SrcFolder);
+                if (core.filePrivate.pathExists(SrcFolder)) {
+                    List< FileDetail> FileInfoArray = core.filePrivate.getFileList(SrcFolder);
                     foreach (FileDetail file in FileInfoArray) {
                         if ((file.Extension == "dll") || (file.Extension == "exe") || (file.Extension == "zip")) {
                             //
@@ -2028,13 +2028,13 @@ namespace Contensive.Processor.Controllers {
                             //
                             // copy this file to destination
                             //
-                            core.privateFiles.copyFile(SrcPath + file.Name, DstPath + file.Name, core.appRootFiles);
+                            core.filePrivate.copyFile(SrcPath + file.Name, DstPath + file.Name, core.fileAppRoot);
                         }
                     }
                     //
                     // copy folders to dst
                     //
-                    List<FolderDetail> FolderInfoArray = core.privateFiles.getFolderList(SrcFolder);
+                    List<FolderDetail> FolderInfoArray = core.filePrivate.getFolderList(SrcFolder);
                     foreach (FolderDetail folder in FolderInfoArray) {
                         if (("," + BlockFolderList + ",").IndexOf("," + folder.Name + ",", System.StringComparison.OrdinalIgnoreCase)  == -1) {
                             copyInstallPathToDstPath(core, SrcPath + folder.Name + "\\", DstPath + folder.Name + "\\", BlockFileList, "");
@@ -2059,8 +2059,8 @@ namespace Contensive.Processor.Controllers {
                     SrcFolder = SrcFolder.Left( SrcFolder.Length - 1);
                 }
                 //
-                if (core.privateFiles.pathExists(SrcFolder)) {
-                    List<FileDetail> FileInfoArray = core.privateFiles.getFileList(SrcFolder);
+                if (core.filePrivate.pathExists(SrcFolder)) {
+                    List<FileDetail> FileInfoArray = core.filePrivate.getFileList(SrcFolder);
                     foreach (FileDetail file in FileInfoArray) {
                         if (("," + ExcludeFileList + ",").IndexOf("," + file.Name + ",", System.StringComparison.OrdinalIgnoreCase)  != -1) {
                             //
@@ -2082,7 +2082,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // copy folders to dst
                     //
-                    List<FolderDetail> FolderInfoArray = core.privateFiles.getFolderList(SrcFolder);
+                    List<FolderDetail> FolderInfoArray = core.filePrivate.getFolderList(SrcFolder);
                     foreach (FolderDetail folder in FolderInfoArray) {
                         result += GetCollectionFileList(core, SrcPath, SubFolder + folder.Name + "\\", ExcludeFileList);
                     }
@@ -2709,14 +2709,14 @@ namespace Contensive.Processor.Controllers {
                     //
                     // now treat as a regular collection and install - to pickup everything else 
                     string installPrivatePath = "installBaseCollection" + GenericController.GetRandomInteger(core).ToString() + "\\";
-                    core.privateFiles.createPath(installPrivatePath);
-                    core.programFiles.copyFile(baseCollectionFilename, installPrivatePath + baseCollectionFilename, core.privateFiles);
+                    core.filePrivate.createPath(installPrivatePath);
+                    core.programFiles.copyFile(baseCollectionFilename, installPrivatePath + baseCollectionFilename, core.filePrivate);
                     List<string> installedCollectionGuidList = new List<string>();
                     string installErrorMessage = "";
                     if (!installCollectionsFromPrivateFolder(core, installPrivatePath, ref installErrorMessage, ref installedCollectionGuidList, isNewBuild, isRepairMode, ref nonCriticalErrorList, logPrefix, ref blockCollectionList, false)) {
                         throw new GenericException(installErrorMessage);
                     }
-                    core.privateFiles.deleteFolder(installPrivatePath);
+                    core.filePrivate.deleteFolder(installPrivatePath);
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -2739,9 +2739,9 @@ namespace Contensive.Processor.Controllers {
                 string Collectionname = null;
                 //
                 collectionFilePathFilename = core.addon.getPrivateFilesAddonPath() + "Collections.xml";
-                returnXml = core.privateFiles.readFileText(collectionFilePathFilename);
+                returnXml = core.filePrivate.readFileText(collectionFilePathFilename);
                 if (string.IsNullOrWhiteSpace(returnXml)) {
-                    List<FolderDetail> FolderList = core.privateFiles.getFolderList(core.addon.getPrivateFilesAddonPath());
+                    List<FolderDetail> FolderList = core.filePrivate.getFolderList(core.addon.getPrivateFilesAddonPath());
                     if (FolderList.Count > 0) {
                         foreach (FolderDetail folder in FolderList) {
                             FolderName = folder.Name;
@@ -2751,7 +2751,7 @@ namespace Contensive.Processor.Controllers {
                                     Collectionname = FolderName.Left(FolderName.Length - CollectionGuid.Length - 1);
                                     CollectionGuid = CollectionGuid.Left(8) + "-" + CollectionGuid.Substring(8, 4) + "-" + CollectionGuid.Substring(12, 4) + "-" + CollectionGuid.Substring(16, 4) + "-" + CollectionGuid.Substring(20);
                                     CollectionGuid = "{" + CollectionGuid + "}";
-                                    List<FolderDetail> SubFolderList = core.privateFiles.getFolderList(core.addon.getPrivateFilesAddonPath() + "\\" + FolderName);
+                                    List<FolderDetail> SubFolderList = core.filePrivate.getFolderList(core.addon.getPrivateFilesAddonPath() + "\\" + FolderName);
                                     if (SubFolderList.Count>0) {
                                         FolderDetail lastSubFolder = SubFolderList.Last<FolderDetail>();
                                         FolderName = FolderName + "\\" + lastSubFolder.Name;
@@ -2771,7 +2771,7 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                     returnXml = "<CollectionList>" + returnXml + "\r\n</CollectionList>";
-                    core.privateFiles.saveFile(collectionFilePathFilename, returnXml);
+                    core.filePrivate.saveFile(collectionFilePathFilename, returnXml);
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);

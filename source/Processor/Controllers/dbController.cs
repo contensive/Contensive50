@@ -21,6 +21,9 @@ namespace Contensive.Processor.Controllers {
     /// </summary>
     public partial class DbController : IDisposable {
         //
+        /// <summary>
+        /// dependencies
+        /// </summary>
         private CoreController core;
         //
         /// <summary>
@@ -48,32 +51,10 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public int sqlSlowThreshholdMsec { get; set; } = 1000;
         //
+        /// <summary>
+        /// timeout in seconds
+        /// </summary>
         public int sqlCommandTimeout { get; set; } = 30;
-        //
-        //
-        // +++++ start by removing the store - each instance of csController should 
-        //
-        //private ContentSetClass[] contentSetStore = new ContentSetClass[] { };
-        //
-        /// <summary>
-        /// number of elements being used
-        /// </summary>
-        //private int contentSetStoreCount { get; set; }
-        //
-        /// <summary>
-        /// number of elements available for use.
-        /// </summary>
-        //private int contentSetStoreSize { get; set; }
-        //
-        /// <summary>
-        /// How many are added at a time
-        /// </summary>
-        //private const int contentSetStoreChunk = 50;
-        //
-        /// <summary>
-        /// when true, all csOpen, etc, will be setup, but not return any data (csv_IsCSOK false), this is used to generate the csv_ContentSet.Source so we can run a csv_GetContentRows without first opening a recordset
-        /// </summary>
-        //public bool contentSetOpenWithoutRecords = false;
         //
         //==========================================================================================
         /// <summary>
@@ -209,7 +190,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// Execute a command (sql statemwent) and return a dataTable object
+        /// Execute a query (returns data)
         /// </summary>
         /// <param name="sql"></param>
         /// <param name="dataSourceName"></param>
@@ -222,68 +203,79 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Execute a query (returns data)
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="dataSourceName"></param>
+        /// <param name="startRecord"></param>
+        /// <returns></returns>
         public DataTable executeQuery(string sql, string dataSourceName, int startRecord) {
             int tempVar = 0;
             return executeQuery(sql, dataSourceName, startRecord, 9999, ref tempVar);
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Execute a query (returns data)
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="dataSourceName"></param>
+        /// <returns></returns>
         public DataTable executeQuery(string sql, string dataSourceName) {
             int tempVar = 0;
             return executeQuery(sql, dataSourceName, 0, 9999, ref tempVar);
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Execute a query (returns data) on the default datasource
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <returns></returns>
         public DataTable executeQuery(string sql) {
             int tempVar = 0;
             return executeQuery(sql, "", 0, 9999, ref tempVar);
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Execute a query (returns data)
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="dataSourceName"></param>
+        /// <param name="startRecord"></param>
+        /// <param name="maxRecords"></param>
+        /// <param name="recordsReturned"></param>
+        /// <returns></returns>
         public DataTable executeQuery(string sql, string dataSourceName, int startRecord, int maxRecords, ref int recordsReturned) {
             DataTable returnData = new DataTable();
             try {
-                if (!dbEnabled) {
-                    //
-                    // -- db not available
-                } else if (core.serverConfig == null) {
-                    //
-                    // -- server config fail
-                    LogController.handleError( core,new GenericException("Cannot execute Sql in dbController without an application"));
-                } else if (core.appConfig == null) {
-                    //
-                    // -- server config fail
-                    LogController.handleError( core,new GenericException("Cannot execute Sql in dbController without an application"));
-                } else {
-                    string connString = getConnectionStringADONET(core.appConfig.name, dataSourceName);
-                    //returnData = executeSql_noErrorHandling(sql, getConnectionStringADONET(core.appConfig.name, dataSourceName), startRecord, maxRecords, recordsAffected)
-                    //
-                    // REFACTOR
-                    // consider writing cs intrface to sql dataReader object -- one row at a time, vaster.
-                    // https://msdn.microsoft.com/en-us/library/system.data.sqlclient.sqldatareader.aspx
-                    //
-                    Stopwatch sw = Stopwatch.StartNew();
-                    using (SqlConnection connSQL = new SqlConnection(connString)) {
-                        connSQL.Open();
-                        using (SqlCommand cmdSQL = new SqlCommand()) {
-                            cmdSQL.CommandType = CommandType.Text;
-                            cmdSQL.CommandText = sql;
-                            cmdSQL.Connection = connSQL;
-                            using (dynamic adptSQL = new System.Data.SqlClient.SqlDataAdapter(cmdSQL)) {
-                                recordsReturned = adptSQL.Fill(startRecord, maxRecords, returnData);
-                            }
+                if (!dbEnabled) { return new DataTable(); }
+                if (core.serverConfig == null) { LogController.handleError(core, new GenericException("Cannot execute Sql in dbController without an application")); }
+                if (core.appConfig == null) { LogController.handleError(core, new GenericException("Cannot execute Sql in dbController without an application")); }
+                //
+                // REFACTOR
+                // consider writing cs intrface to sql dataReader object -- one row at a time, vaster.
+                // https://msdn.microsoft.com/en-us/library/system.data.sqlclient.sqldatareader.aspx
+                //
+                Stopwatch sw = Stopwatch.StartNew();
+                using (SqlConnection connSQL = new SqlConnection(getConnectionStringADONET(core.appConfig.name, dataSourceName))) {
+                    connSQL.Open();
+                    using (SqlCommand cmdSQL = new SqlCommand()) {
+                        cmdSQL.CommandType = CommandType.Text;
+                        cmdSQL.CommandText = sql;
+                        cmdSQL.Connection = connSQL;
+                        using (dynamic adptSQL = new System.Data.SqlClient.SqlDataAdapter(cmdSQL)) {
+                            recordsReturned = adptSQL.Fill(startRecord, maxRecords, returnData);
                         }
                     }
-                    dbVerified = true;
-                    saveTransactionLog(sql, sw.ElapsedMilliseconds, "query");
                 }
+                dbVerified = true;
+                saveTransactionLog(sql, sw.ElapsedMilliseconds, "query");
             } catch (Exception ex) {
-                ApplicationException newEx = new GenericException("Exception [" + ex.Message + "] executing sql [" + sql + "], datasource [" + dataSourceName + "], startRecord [" + startRecord + "], maxRecords [" + maxRecords + "]", ex);
-                LogController.handleError( core,newEx);
+                LogController.handleError( core, new GenericException("Exception [" + ex.Message + "] executing sql [" + sql + "], datasource [" + dataSourceName + "], startRecord [" + startRecord + "], maxRecords [" + maxRecords + "], recordsReturned [" + recordsReturned + "]", ex));
+                throw;
             }
             return returnData;
         }
@@ -311,30 +303,28 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// execute sql and return records affected
+        /// execute a nonQuery command (non-record returning) and return records affected
         /// </summary>
         /// <param name="sql"></param>
         /// <param name="dataSourceName"></param>
         /// <param name="recordsAffected"></param>
         public void executeNonQuery(string sql, string dataSourceName, ref int recordsAffected) {
             try {
-                if (dbEnabled) {
-                    Stopwatch sw = Stopwatch.StartNew();
-                    string connString = getConnectionStringADONET(core.appConfig.name, dataSourceName);
-                    using (SqlConnection connSQL = new SqlConnection(connString)) {
-                        connSQL.Open();
-                        using (SqlCommand cmdSQL = new SqlCommand()) {
-                            cmdSQL.CommandType = CommandType.Text;
-                            cmdSQL.CommandText = sql;
-                            cmdSQL.Connection = connSQL;
-                            recordsAffected = cmdSQL.ExecuteNonQuery();
-                        }
+                if (!dbEnabled) { return; }
+                Stopwatch sw = Stopwatch.StartNew();
+                using (SqlConnection connSQL = new SqlConnection(getConnectionStringADONET(core.appConfig.name, dataSourceName))) {
+                    connSQL.Open();
+                    using (SqlCommand cmdSQL = new SqlCommand()) {
+                        cmdSQL.CommandType = CommandType.Text;
+                        cmdSQL.CommandText = sql;
+                        cmdSQL.Connection = connSQL;
+                        recordsAffected = cmdSQL.ExecuteNonQuery();
                     }
-                    dbVerified = true;
-                    saveTransactionLog(sql, sw.ElapsedMilliseconds, "non-query");
                 }
+                dbVerified = true;
+                saveTransactionLog(sql, sw.ElapsedMilliseconds, "non-query");
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, new GenericException("Exception [" + ex.Message + "] executing sql [" + sql + "], datasource [" + dataSourceName + "], recordsAffected [" + recordsAffected + "]", ex));
                 throw;
             }
         }
@@ -347,23 +337,21 @@ namespace Contensive.Processor.Controllers {
         /// <param name="dataSourceName"></param>
         public void executeNonQueryAsync(string sql, string dataSourceName = "") {
             try {
-                if (dbEnabled) {
-                    Stopwatch sw = Stopwatch.StartNew();
-                    string connString = getConnectionStringADONET(core.appConfig.name, dataSourceName);
-                    using (SqlConnection connSQL = new SqlConnection(connString)) {
-                        connSQL.Open();
-                        using (SqlCommand cmdSQL = new SqlCommand()) {
-                            cmdSQL.CommandType = CommandType.Text;
-                            cmdSQL.CommandText = sql;
-                            cmdSQL.Connection = connSQL;
-                            cmdSQL.ExecuteNonQueryAsync();
-                        }
+                if (!dbEnabled) { return; }
+                Stopwatch sw = Stopwatch.StartNew();
+                using (SqlConnection connSQL = new SqlConnection(getConnectionStringADONET(core.appConfig.name, dataSourceName))) {
+                    connSQL.Open();
+                    using (SqlCommand cmdSQL = new SqlCommand()) {
+                        cmdSQL.CommandType = CommandType.Text;
+                        cmdSQL.CommandText = sql;
+                        cmdSQL.Connection = connSQL;
+                        cmdSQL.ExecuteNonQueryAsync();
                     }
-                    dbVerified = true;
-                    saveTransactionLog(sql, sw.ElapsedMilliseconds, "non-query-async");
                 }
+                dbVerified = true;
+                saveTransactionLog(sql, sw.ElapsedMilliseconds, "non-query-async");
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, new GenericException("Exception [" + ex.Message + "] executing sql [" + sql + "], datasource [" + dataSourceName + "]", ex));
                 throw;
             }
         }
@@ -385,10 +373,13 @@ namespace Contensive.Processor.Controllers {
                     executeNonQueryAsync(SQL, dataSourceName);
                 }
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, new GenericException("Exception [" + ex.Message + "] updating table [" + tableName + "], criteria [" + criteria + "], dataSourceName [" + dataSourceName + "]", ex));
                 throw;
             }
         }
+        //
+        public void updateTableRecord(string dataSourceName, string tableName, string criteria, SqlFieldListClass sqlList)
+            => updateTableRecord(dataSourceName, tableName, criteria, sqlList, false);
         //
         //========================================================================
         /// <summary>
@@ -398,20 +389,20 @@ namespace Contensive.Processor.Controllers {
         /// <param name="tableName"></param>
         /// <param name="memberId"></param>
         /// <returns></returns>
-        public int insertTableRecordGetId(string dataSourceName, string tableName, int memberId = 0) {
-            int returnId = 0;
+        public int insertTableRecordGetId(string dataSourceName, string tableName, int memberId) {
             try {
                 using (DataTable dt = insertTableRecordGetDataTable(dataSourceName, tableName, memberId)) {
-                    if (dt.Rows.Count > 0) {
-                        returnId = GenericController.encodeInteger(dt.Rows[0]["id"]);
-                    }
+                    if (dt.Rows.Count > 0) { return encodeInteger(dt.Rows[0]["id"]); }
                 }
+                return 0;
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, new GenericException("Exception [" + ex.Message + "] inserting table [" + tableName + "], dataSourceName [" + dataSourceName + "]", ex));
                 throw;
             }
-            return returnId;
         }
+        //
+        public int insertTableRecordGetId(string dataSourceName, string tableName)
+            => insertTableRecordGetId(dataSourceName, tableName, 0);
         //
         //========================================================================
         /// <summary>
@@ -421,17 +412,12 @@ namespace Contensive.Processor.Controllers {
         /// <param name="tableName"></param>
         /// <param name="memberId"></param>
         /// <returns></returns>
-        public DataTable insertTableRecordGetDataTable(string dataSourceName, string tableName, int memberId = 0) {
-            DataTable returnDt = null;
+        public DataTable insertTableRecordGetDataTable(string dataSourceName, string tableName, int memberId) {
             try {
-                SqlFieldListClass sqlList = new SqlFieldListClass();
-                //string CreateKeyString = null;
-                //string sqlDateAdded = null;
-                string sqlGuid = encodeSQLText( GenericController.getGUID());
+                string sqlGuid = encodeSQLText(GenericController.getGUID());
                 string sqlDateAdded = encodeSQLDate(DateTime.Now);
-                //CreateKeyString = encodeSQLNumber(genericController.GetRandomInteger(core));
+                SqlFieldListClass sqlList = new SqlFieldListClass();
                 sqlList.add("ccguid", sqlGuid);
-                //sqlList.add("createkey", CreateKeyString);
                 sqlList.add("dateadded", sqlDateAdded);
                 sqlList.add("createdby", encodeSQLNumber(memberId));
                 sqlList.add("ModifiedDate", sqlDateAdded);
@@ -441,70 +427,73 @@ namespace Contensive.Processor.Controllers {
                 sqlList.add("Active", encodeSQLNumber(1));
                 //
                 insertTableRecord(dataSourceName, tableName, sqlList);
-                returnDt = openTable(dataSourceName, tableName, "(DateAdded=" + sqlDateAdded + ")and(ccguid=" + sqlGuid + ")", "ID DESC", "", 1);
-                //returnDt = openTable(DataSourceName, TableName, "(DateAdded=" + DateAddedString + ")and(CreateKey=" + CreateKeyString + ")", "ID DESC", "", 1);
+                return openTable(dataSourceName, tableName, "(DateAdded=" + sqlDateAdded + ")and(ccguid=" + sqlGuid + ")", "ID DESC", "", 1, 1);
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, new GenericException("Exception [" + ex.Message + "] inserting table [" + tableName + "], dataSourceName [" + dataSourceName + "]", ex));
                 throw;
             }
-            return returnDt;
         }
+        //
+        public DataTable insertTableRecordGetDataTable(string dataSourceName, string tableName)
+            => insertTableRecordGetDataTable(dataSourceName, tableName, 0);
         //
         //========================================================================
         /// <summary>
         /// Insert a record in a table. There is no check for core fields
         /// </summary>
-        /// <param name="DataSourceName"></param>
-        /// <param name="TableName"></param>
+        /// <param name="dataSourceName"></param>
+        /// <param name="tableName"></param>
         /// <param name="sqlList"></param>
-        public void insertTableRecord(string DataSourceName, string TableName, SqlFieldListClass sqlList, bool asyncSave = false ) {
+        public void insertTableRecord(string dataSourceName, string tableName, SqlFieldListClass sqlList, bool asyncSave ) {
             try {
-                if (sqlList.count > 0) {
-                    string sql = "INSERT INTO " + TableName + "(" + sqlList.getNameList() + ")values(" + sqlList.getValueList() + ")";
-                    if ( !asyncSave ) {
-                        executeNonQuery(sql, DataSourceName);
-                    } else {
-                        executeNonQueryAsync(sql, DataSourceName);
-                    }
+                if (sqlList.count == 0) { return; }
+                string sql = "INSERT INTO " + tableName + "(" + sqlList.getNameList() + ")values(" + sqlList.getValueList() + ")";
+                if (!asyncSave) {
+                    executeNonQuery(sql, dataSourceName);
+                    return;
                 }
+                executeNonQueryAsync(sql, dataSourceName);
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, new GenericException("Exception [" + ex.Message + "], inserting table [" + tableName + "], dataSourceName [" + dataSourceName + "]", ex));
                 throw;
             }
         }
+        //
+        public void insertTableRecord(string dataSourceName, string tableName, SqlFieldListClass sqlList)
+            => insertTableRecord(dataSourceName, tableName, sqlList, false);
         //
         //========================================================================
         /// <summary>
         /// Opens the table specified and returns the data in a datatable. Returns all the active records in the table. Find the content record first, just for the dataSource.
         /// </summary>
-        /// <param name="DataSourceName"></param>
-        /// <param name="TableName"></param>
-        /// <param name="Criteria"></param>
-        /// <param name="SortFieldList"></param>
-        /// <param name="SelectFieldList"></param>
-        /// <param name="PageSize"></param>
-        /// <param name="PageNumber"></param>
+        /// <param name="dataSourceName"></param>
+        /// <param name="tableName"></param>
+        /// <param name="criteria"></param>
+        /// <param name="sortFieldList"></param>
+        /// <param name="selectFieldList"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="pageNumber"></param>
         /// <returns></returns>
-        public DataTable openTable(string DataSourceName, string TableName, string Criteria = "", string SortFieldList = "", string SelectFieldList = "", int PageSize = 9999, int PageNumber = 1) {
+        public DataTable openTable(string dataSourceName, string tableName, string criteria, string sortFieldList, string selectFieldList, int pageSize, int pageNumber) {
             DataTable returnDataTable = null;
             try {
                 string SQL = "SELECT";
-                if (string.IsNullOrEmpty(SelectFieldList)) {
+                if (string.IsNullOrEmpty(selectFieldList)) {
                     SQL += " *";
                 } else {
-                    SQL += " " + SelectFieldList;
+                    SQL += " " + selectFieldList;
                 }
-                SQL += " FROM " + TableName;
-                if (!string.IsNullOrEmpty(Criteria)) {
-                    SQL += " WHERE (" + Criteria + ")";
+                SQL += " FROM " + tableName;
+                if (!string.IsNullOrEmpty(criteria)) {
+                    SQL += " WHERE (" + criteria + ")";
                 }
-                if (!string.IsNullOrEmpty(SortFieldList)) {
-                    SQL += " ORDER BY " + SortFieldList;
+                if (!string.IsNullOrEmpty(sortFieldList)) {
+                    SQL += " ORDER BY " + sortFieldList;
                 }
                 //SQL &= ";"
-                returnDataTable = executeQuery(SQL, DataSourceName, (PageNumber - 1) * PageSize, PageSize);
+                returnDataTable = executeQuery(SQL, dataSourceName, (pageNumber - 1) * pageSize, pageSize);
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, new GenericException("Exception [" + ex.Message + "], opening table [" + tableName + "], dataSourceName [" + dataSourceName + "]", ex));
                 throw;
             }
             return returnDataTable;

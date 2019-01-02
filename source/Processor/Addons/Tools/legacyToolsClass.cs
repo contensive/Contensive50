@@ -2518,7 +2518,7 @@ namespace Contensive.Addons.Tools {
                     // Return the content of the file
                     //
                     core.webServer.setResponseContentType("text/text");
-                    result = core.appRootFiles.readFileText(core.docProperties.getText("SourceFile"));
+                    result = core.fileAppRoot.readFileText(core.docProperties.getText("SourceFile"));
                     core.doc.continueProcessing = false;
                 } else {
                     result += GetTableStart;
@@ -2534,7 +2534,7 @@ namespace Contensive.Addons.Tools {
                     // Sub-Folders
                     //
 
-                    SourceFolders = core.appRootFiles.getFolderNameList(StartPath + CurrentPath);
+                    SourceFolders = core.fileAppRoot.getFolderNameList(StartPath + CurrentPath);
                     if (!string.IsNullOrEmpty(SourceFolders)) {
                         FolderSplit = SourceFolders.Split(new[] { "\r\n" }, StringSplitOptions.None);
                         FolderCount = FolderSplit.GetUpperBound(0) + 1;
@@ -2552,7 +2552,7 @@ namespace Contensive.Addons.Tools {
                     //
                     // Files
                     //
-                    SourceFolders = core.appRootFiles.convertFileInfoArrayToParseString(core.appRootFiles.getFileList(StartPath + CurrentPath));
+                    SourceFolders = UpgradeController.Upgrade51ConvertFileInfoArrayToParseString(core.fileAppRoot.getFileList(StartPath + CurrentPath));
                     if (string.IsNullOrEmpty(SourceFolders)) {
                         FileSize = "";
                         FileDate = "";
@@ -3094,7 +3094,7 @@ namespace Contensive.Addons.Tools {
                         cmdDetail.addonId = 0;
                         cmdDetail.addonName = "GetForm_FindAndReplace";
                         cmdDetail.args = GenericController.convertQSNVAArgumentstoDocPropertiesList(core, QS);
-                        TaskSchedulerControllerx.addTaskToQueue(core, cmdDetail, false);
+                        TaskSchedulerController.addTaskToQueue(core, cmdDetail, false);
                         Stream.Add("Find and Replace has been requested for content definitions [" + CDefList + "], finding [" + FindText + "] and replacing with [" + ReplaceText + "]");
                     }
                 } else {
@@ -3180,7 +3180,7 @@ namespace Contensive.Addons.Tools {
                     cmdDetail.addonId = 0;
                     cmdDetail.addonName = "GetForm_IISReset";
                     cmdDetail.args = new Dictionary<string, string>();
-                    TaskSchedulerControllerx.addTaskToQueue(core, cmdDetail, false );
+                    TaskSchedulerController.addTaskToQueue(core, cmdDetail, false );
                 }
                 //
                 // Display form

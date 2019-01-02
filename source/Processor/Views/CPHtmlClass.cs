@@ -378,140 +378,140 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         // deprecated
-        [Obsolete("Use uppercase methods", true)]
-        public override string div(string innerHtml, string htmlName, string htmlClass, string htmlId) => Div(innerHtml, htmlClass, htmlId);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string div(string innerHtml, string htmlName, string htmlClass) => Div(innerHtml, htmlClass);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string div(string innerHtml, string htmlName) => Div(innerHtml);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string div(string innerHtml) => Div(innerHtml);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string adminHint(string innerHtml) => AdminHint(innerHtml);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string h1(string innerHtml, string htmlName, string htmlClass, string htmlId) => H1(innerHtml, htmlClass, htmlId);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string h1(string innerHtml, string htmlName, string htmlClass) => H1(innerHtml, htmlClass);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string h1(string innerHtml, string htmlName) => H1(innerHtml);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string h1(string innerHtml) => H1(innerHtml);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string h2(string innerHtml, string htmlName, string htmlClass, string htmlId) => H2(innerHtml, htmlClass, htmlId);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string h2(string innerHtml, string htmlName, string htmlClass) => H2(innerHtml, htmlClass);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string h2(string innerHtml, string htmlName) => H2(innerHtml);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string h2(string innerHtml) => H2(innerHtml);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string h3(string innerHtml, string htmlName, string htmlClass, string htmlId) => H3(innerHtml, htmlClass, htmlId);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string h3(string innerHtml, string htmlName, string htmlClass) => H3(innerHtml, htmlClass);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string h3(string innerHtml, string htmlName) => H3(innerHtml);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string h3(string innerHtml) => H3(innerHtml);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string h4(string innerHtml, string htmlName, string htmlClass, string htmlId) => H4(innerHtml, htmlClass, htmlId);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string h4(string innerHtml, string htmlName, string htmlClass) => H4(innerHtml, htmlClass);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string h4(string innerHtml, string htmlName) => H4(innerHtml);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string h4(string innerHtml) => H4(innerHtml);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string h5(string innerHtml, string htmlName, string htmlClass, string htmlId) => H5(innerHtml, htmlClass, htmlId);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string h5(string innerHtml, string htmlName, string htmlClass) => H5(innerHtml, htmlClass);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string h5(string innerHtml, string htmlName) => H5(innerHtml);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string h5(string innerHtml) => H5(innerHtml);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string h6(string innerHtml, string htmlName, string htmlClass, string htmlId) => H6(innerHtml, htmlClass, htmlId);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string h6(string innerHtml, string htmlName, string htmlClass) => H6(innerHtml, htmlClass);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string h6(string innerHtml, string htmlName) => H6(innerHtml);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string h6(string innerHtml) => H6(innerHtml);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string p(string innerHtml, string htmlName, string htmlClass, string htmlId) => P(innerHtml, htmlClass, htmlId );
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string p(string innerHtml, string htmlName, string htmlClass) => P(innerHtml, htmlClass);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string p(string innerHtml, string htmlName) => P(innerHtml);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string p(string innerHtml) => P(innerHtml);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string li(string innerHtml, string htmlName, string htmlClass, string htmlId) => Li( innerHtml, htmlClass, htmlId );
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string li(string innerHtml, string htmlName, string htmlClass) => Li(innerHtml, htmlClass);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string li(string innerHtml, string htmlName) => Li(innerHtml);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string li(string innerHtml) => Li(innerHtml);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string ul(string innerHtml, string htmlName, string htmlClass, string htmlId) => Ul(innerHtml, htmlClass, htmlId);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string ul(string innerHtml, string htmlName, string htmlClass) => Ul(innerHtml, htmlClass);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string ul(string innerHtml, string htmlName) => Ul(innerHtml);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string ul(string innerHtml) => Ul(innerHtml);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string ol(string innerHtml, string htmlName, string htmlClass, string htmlId) => HtmlController.genericBlockTag("ol", innerHtml, htmlClass, htmlId);
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string ol(string innerHtml, string htmlName, string htmlClass) => HtmlController.genericBlockTag("ol", innerHtml, htmlClass, "");
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string ol(string innerHtml, string htmlName) => HtmlController.genericBlockTag("ol", innerHtml, "", "");
-        //
-        [Obsolete("Use uppercase methods", true)]
-        public override string ol(string innerHtml) => HtmlController.genericBlockTag("ol", innerHtml);
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string div(string innerHtml, string htmlName, string htmlClass, string htmlId) => Div(innerHtml, htmlClass, htmlId);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string div(string innerHtml, string htmlName, string htmlClass) => Div(innerHtml, htmlClass);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string div(string innerHtml, string htmlName) => Div(innerHtml);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string div(string innerHtml) => Div(innerHtml);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string adminHint(string innerHtml) => AdminHint(innerHtml);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string h1(string innerHtml, string htmlName, string htmlClass, string htmlId) => H1(innerHtml, htmlClass, htmlId);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string h1(string innerHtml, string htmlName, string htmlClass) => H1(innerHtml, htmlClass);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string h1(string innerHtml, string htmlName) => H1(innerHtml);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string h1(string innerHtml) => H1(innerHtml);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string h2(string innerHtml, string htmlName, string htmlClass, string htmlId) => H2(innerHtml, htmlClass, htmlId);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string h2(string innerHtml, string htmlName, string htmlClass) => H2(innerHtml, htmlClass);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string h2(string innerHtml, string htmlName) => H2(innerHtml);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string h2(string innerHtml) => H2(innerHtml);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string h3(string innerHtml, string htmlName, string htmlClass, string htmlId) => H3(innerHtml, htmlClass, htmlId);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string h3(string innerHtml, string htmlName, string htmlClass) => H3(innerHtml, htmlClass);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string h3(string innerHtml, string htmlName) => H3(innerHtml);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string h3(string innerHtml) => H3(innerHtml);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string h4(string innerHtml, string htmlName, string htmlClass, string htmlId) => H4(innerHtml, htmlClass, htmlId);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string h4(string innerHtml, string htmlName, string htmlClass) => H4(innerHtml, htmlClass);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string h4(string innerHtml, string htmlName) => H4(innerHtml);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string h4(string innerHtml) => H4(innerHtml);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string h5(string innerHtml, string htmlName, string htmlClass, string htmlId) => H5(innerHtml, htmlClass, htmlId);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string h5(string innerHtml, string htmlName, string htmlClass) => H5(innerHtml, htmlClass);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string h5(string innerHtml, string htmlName) => H5(innerHtml);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string h5(string innerHtml) => H5(innerHtml);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string h6(string innerHtml, string htmlName, string htmlClass, string htmlId) => H6(innerHtml, htmlClass, htmlId);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string h6(string innerHtml, string htmlName, string htmlClass) => H6(innerHtml, htmlClass);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string h6(string innerHtml, string htmlName) => H6(innerHtml);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string h6(string innerHtml) => H6(innerHtml);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string p(string innerHtml, string htmlName, string htmlClass, string htmlId) => P(innerHtml, htmlClass, htmlId );
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string p(string innerHtml, string htmlName, string htmlClass) => P(innerHtml, htmlClass);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string p(string innerHtml, string htmlName) => P(innerHtml);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string p(string innerHtml) => P(innerHtml);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string li(string innerHtml, string htmlName, string htmlClass, string htmlId) => Li( innerHtml, htmlClass, htmlId );
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string li(string innerHtml, string htmlName, string htmlClass) => Li(innerHtml, htmlClass);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string li(string innerHtml, string htmlName) => Li(innerHtml);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string li(string innerHtml) => Li(innerHtml);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string ul(string innerHtml, string htmlName, string htmlClass, string htmlId) => Ul(innerHtml, htmlClass, htmlId);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string ul(string innerHtml, string htmlName, string htmlClass) => Ul(innerHtml, htmlClass);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string ul(string innerHtml, string htmlName) => Ul(innerHtml);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string ul(string innerHtml) => Ul(innerHtml);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string ol(string innerHtml, string htmlName, string htmlClass, string htmlId) => HtmlController.genericBlockTag("ol", innerHtml, htmlClass, htmlId);
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string ol(string innerHtml, string htmlName, string htmlClass) => HtmlController.genericBlockTag("ol", innerHtml, htmlClass, "");
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string ol(string innerHtml, string htmlName) => HtmlController.genericBlockTag("ol", innerHtml, "", "");
+        ////
+        //[Obsolete("Use uppercase methods", true)]
+        //public override string ol(string innerHtml) => HtmlController.genericBlockTag("ol", innerHtml);
         //
         [Obsolete("Use DateTime htmlValue version", true)]
         public override string InputDate(string htmlName, string htmlValue, string width, string htmlClass, string htmlId) => InputDate(htmlName, encodeDate(htmlValue), htmlClass, htmlId);
@@ -585,13 +585,13 @@ namespace Contensive.Processor {
         [Obsolete("Instead, use cp.cdeFiles.saveUpload() or similar fileSystem object.")]
         public override void ProcessInputFile(string htmlName, string VirtualFilePath) {
             string ignoreFilename = "";
-            cp.core.cdnFiles.upload(htmlName, VirtualFilePath, ref ignoreFilename);
+            cp.core.fileCdn.upload(htmlName, VirtualFilePath, ref ignoreFilename);
         }
         //
         [Obsolete("Instead, use cp.cdeFiles.saveUpload() or similar fileSystem object.")]
         public override void ProcessInputFile(string htmlName) {
             string ignoreFilename = "";
-            cp.core.cdnFiles.upload(htmlName, "upload", ref ignoreFilename);
+            cp.core.fileCdn.upload(htmlName, "upload", ref ignoreFilename);
         }
         //
         // ====================================================================================================

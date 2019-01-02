@@ -7,6 +7,7 @@ using Contensive.BaseClasses;
 using Contensive.Processor.Exceptions;
 using Contensive.Processor.Models.Db;
 using static Contensive.Processor.Constants;
+using System.IO;
 
 namespace Contensive.Processor {
     //
@@ -142,7 +143,7 @@ namespace Contensive.Processor {
         public override string GetFilename(string PathFilename) {
             string filename = "";
             string path = "";
-            cp.core.privateFiles.splitDosPathFilename(PathFilename, ref path, ref filename);
+            cp.core.filePrivate.splitDosPathFilename(PathFilename, ref path, ref filename);
             return filename;
         }
         //
@@ -318,7 +319,7 @@ namespace Contensive.Processor {
                             { "filename", filename }
                         }
                     };
-                    TaskSchedulerControllerx.addTaskToQueue(cp.core, cmdDetail, false);
+                    TaskSchedulerController.addTaskToQueue(cp.core, cmdDetail, false);
                 }
             } catch (Exception) {
                 throw;
@@ -333,6 +334,26 @@ namespace Contensive.Processor {
         /// <returns></returns>
         public override string EncodeAppRootPath(string link) {
             return GenericController.encodeVirtualPath(GenericController.encodeText(link), cp.core.appConfig.cdnFileUrl, appRootPath, cp.core.webServer.requestDomain);
+        }
+        //
+        //==============================================================================================================
+        /// <summary>
+        /// convert fileInfo array to parsable string [filename-attributes-creationTime-lastAccessTime-lastWriteTime-length-entension]
+        /// </summary>
+        /// <param name="FileInfo"></param>
+        /// <returns></returns>
+        public override string Upgrade51ConvertFileInfoArrayToParseString(List<CPFileSystemBaseClass.FileDetail> FileInfo) {
+            return UpgradeController.Upgrade51ConvertFileInfoArrayToParseString(FileInfo);
+        }
+        //
+        //==============================================================================================================
+        /// <summary>
+        /// convert directoryInfo object to parsable string [filename-attributes-creationTime-lastAccessTime-lastWriteTime-extension]
+        /// </summary>
+        /// <param name="DirectoryInfo"></param>
+        /// <returns></returns>
+        public override string Upgrade51ConvertDirectoryInfoArrayToParseString(List<CPFileSystemBaseClass.FolderDetail> DirectoryInfo) {
+            return UpgradeController.Upgrade51ConvertDirectoryInfoArrayToParseString(DirectoryInfo);
         }
         //
         //====================================================================================================
@@ -567,6 +588,7 @@ namespace Contensive.Processor {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+
         ~CPUtilsClass() {
             Dispose(false);
         }

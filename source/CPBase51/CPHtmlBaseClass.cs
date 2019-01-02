@@ -206,140 +206,140 @@ namespace Contensive.BaseClasses {
         //====================================================================================================
         // deprecated
         //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string div(string InnerHtml, string HtmlName, string HtmlClass, string HtmlId);
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string div(string InnerHtml, string HtmlName, string HtmlClass, string HtmlId);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string div(string InnerHtml, string HtmlName, string HtmlClass);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string div(string InnerHtml, string HtmlName);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string div(string InnerHtml);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string p(string InnerHtml, string HtmlName, string HtmlClass, string HtmlId);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string p(string InnerHtml, string HtmlName, string HtmlClass);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string p(string InnerHtml, string HtmlName);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string p(string InnerHtml);
         //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string div(string InnerHtml, string HtmlName, string HtmlClass);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string div(string InnerHtml, string HtmlName);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string div(string InnerHtml);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string p(string InnerHtml, string HtmlName, string HtmlClass, string HtmlId);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string p(string InnerHtml, string HtmlName, string HtmlClass);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string p(string InnerHtml, string HtmlName);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string p(string InnerHtml);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string li(string InnerHtml, string HtmlName, string HtmlClass, string HtmlId);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string li(string InnerHtml, string HtmlName, string HtmlClass);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string li(string InnerHtml, string HtmlName);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string li(string InnerHtml);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string ul(string InnerHtml, string HtmlName, string HtmlClass, string HtmlId);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string ul(string InnerHtml, string HtmlName, string HtmlClass);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string ul(string InnerHtml, string HtmlName);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string ul(string InnerHtml);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string ol(string InnerHtml, string HtmlName, string HtmlClass, string HtmlId);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string ol(string InnerHtml, string HtmlName, string HtmlClass);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string ol(string InnerHtml, string HtmlName);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string ol(string InnerHtml);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string adminHint(string innerHtml);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string h1(string innerHtml, string htmlName, string htmlClass, string htmlId);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string h1(string innerHtml, string htmlName, string htmlClass);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string h1(string innerHtml, string htmlName);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string h1(string innerHtml);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string h2(string innerHtml, string htmlName, string htmlClass, string htmlId);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string h2(string innerHtml, string htmlName, string htmlClass);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string h2(string innerHtml, string htmlName);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string h2(string innerHtml);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string h3(string innerHtml, string htmlName, string htmlClass, string htmlId);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string h3(string innerHtml, string htmlName, string htmlClass);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string h3(string innerHtml, string htmlName);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string h3(string innerHtml);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string h4(string innerHtml, string htmlName, string htmlClass, string htmlId);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string h4(string innerHtml, string htmlName, string htmlClass);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string h4(string innerHtml, string htmlName);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string h4(string innerHtml);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string h5(string innerHtml, string htmlName, string htmlClass, string htmlId);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string h5(string innerHtml, string htmlName, string htmlClass);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string h5(string innerHtml, string htmlName);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string h5(string innerHtml);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string h6(string innerHtml, string htmlName, string htmlClass, string htmlId);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string h6(string innerHtml, string htmlName, string htmlClass);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string h6(string innerHtml, string htmlName);
-        //
-        [Obsolete("Use uppercase method", true)]
-        public abstract string h6(string innerHtml);
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string li(string InnerHtml, string HtmlName, string HtmlClass, string HtmlId);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string li(string InnerHtml, string HtmlName, string HtmlClass);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string li(string InnerHtml, string HtmlName);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string li(string InnerHtml);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string ul(string InnerHtml, string HtmlName, string HtmlClass, string HtmlId);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string ul(string InnerHtml, string HtmlName, string HtmlClass);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string ul(string InnerHtml, string HtmlName);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string ul(string InnerHtml);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string ol(string InnerHtml, string HtmlName, string HtmlClass, string HtmlId);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string ol(string InnerHtml, string HtmlName, string HtmlClass);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string ol(string InnerHtml, string HtmlName);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string ol(string InnerHtml);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string adminHint(string innerHtml);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string h1(string innerHtml, string htmlName, string htmlClass, string htmlId);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string h1(string innerHtml, string htmlName, string htmlClass);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string h1(string innerHtml, string htmlName);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string h1(string innerHtml);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string h2(string innerHtml, string htmlName, string htmlClass, string htmlId);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string h2(string innerHtml, string htmlName, string htmlClass);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string h2(string innerHtml, string htmlName);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string h2(string innerHtml);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string h3(string innerHtml, string htmlName, string htmlClass, string htmlId);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string h3(string innerHtml, string htmlName, string htmlClass);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string h3(string innerHtml, string htmlName);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string h3(string innerHtml);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string h4(string innerHtml, string htmlName, string htmlClass, string htmlId);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string h4(string innerHtml, string htmlName, string htmlClass);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string h4(string innerHtml, string htmlName);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string h4(string innerHtml);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string h5(string innerHtml, string htmlName, string htmlClass, string htmlId);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string h5(string innerHtml, string htmlName, string htmlClass);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string h5(string innerHtml, string htmlName);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string h5(string innerHtml);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string h6(string innerHtml, string htmlName, string htmlClass, string htmlId);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string h6(string innerHtml, string htmlName, string htmlClass);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string h6(string innerHtml, string htmlName);
+        ////
+        //[Obsolete("Use uppercase method", true)]
+        //public abstract string h6(string innerHtml);
         //
         [Obsolete("Use InputDate( string, DateTime, string, string", true)]
         public abstract string InputDate(string htmlName, string htmlValue, string width, string htmlClass, string htmlId);

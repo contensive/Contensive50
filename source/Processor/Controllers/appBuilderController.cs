@@ -841,7 +841,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 appendUpgradeLogAddStep(core, core.appConfig.name, "VerifyCountries", "Verify Countries");
                 //
-                string list = core.appRootFiles.readFileText("cclib\\config\\DefaultCountryList.txt");
+                string list = core.fileAppRoot.readFileText("cclib\\config\\DefaultCountryList.txt");
                 string[] rows  = GenericController.stringSplit(list, "\r\n");
                 foreach( var row in rows) {
                     if (!string.IsNullOrEmpty(row)) {
@@ -1125,7 +1125,7 @@ namespace Contensive.Processor.Controllers {
                 sqlList.add("active", SQLTrue);
                 sqlList.add("ContentControlID", MetaModel.getContentId(core, "Sort Methods").ToString());
                 //
-                dt = core.db.openTable("Default", "ccSortMethods", "Name=" + DbController.encodeSQLText(Name), "ID", "ID", 1);
+                dt = core.db.openTable("Default", "ccSortMethods", "Name=" + DbController.encodeSQLText(Name), "ID", "ID", 1, 1);
                 if (dt.Rows.Count > 0) {
                     //
                     // update sort method

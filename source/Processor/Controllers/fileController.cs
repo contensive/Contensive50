@@ -479,7 +479,7 @@ namespace Contensive.Processor.Controllers {
         //
         //==============================================================================================================
         /// <summary>
-        /// Copies a file to a different file system (wwwFiles, tempFiles, cdnFiles, privateFiles)
+        /// Copies a file to a different file system (FileAppRoot, FileTemp, FileCdn, FilePrivate)
         /// </summary>
         /// <param name="srcPathFilename"></param>
         /// <param name="dstPathFilename"></param>
@@ -562,7 +562,7 @@ namespace Contensive.Processor.Controllers {
         //
         //==============================================================================================================
         /// <summary>
-        /// Copy a file within the same filesystem (wwwFiles, tempFiles, cdnFiles, privateFiles)
+        /// Copy a file within the same filesystem (FileAppRoot, FileTemp, FileCdn, FilePrivate)
         /// </summary>
         /// <param name="srcPathFilename"></param>
         /// <param name="dstPathFilename"></param>
@@ -1042,38 +1042,6 @@ namespace Contensive.Processor.Controllers {
                 LogController.handleError( core,ex);
                 throw;
             }
-        }
-        //
-        //==============================================================================================================
-        /// <summary>
-        /// convert fileInfo array to parsable string [filename-attributes-creationTime-lastAccessTime-lastWriteTime-length-entension]
-        /// </summary>
-        /// <param name="FileInfo"></param>
-        /// <returns></returns>
-        public string convertFileInfoArrayToParseString( List<FileDetail> FileInfo) {
-            var result = new System.Text.StringBuilder();
-            if (FileInfo.Count > 0) {
-                foreach (FileDetail fi in FileInfo) {
-                    result.Append("\r\n" + fi.Name + "\t" + fi.Attributes + "\t" + fi.DateCreated + "\t" + fi.DateLastAccessed + "\t" + fi.DateLastModified + "\t" + fi.Size + "\t" + fi.Extension);
-                }
-            }
-            return result.ToString();
-        }
-        //
-        //==============================================================================================================
-        /// <summary>
-        /// convert directoryInfo object to parsable string [filename-attributes-creationTime-lastAccessTime-lastWriteTime-extension]
-        /// </summary>
-        /// <param name="DirectoryInfo"></param>
-        /// <returns></returns>
-        public string convertDirectoryInfoArrayToParseString(List<FolderDetail> DirectoryInfo) {
-            var result = new System.Text.StringBuilder();
-            if (DirectoryInfo.Count > 0) {
-                foreach (FolderDetail di in DirectoryInfo) {
-                    result.Append( "\r\n" + di.Name + "\t" + (int)di.Attributes + "\t" + di.DateCreated + "\t" + di.DateLastAccessed + "\t" + di.DateLastModified + "\t0\t");
-                }
-            }
-            return result.ToString();
         }
         //
         //=========================================================================================================

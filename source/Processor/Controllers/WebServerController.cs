@@ -145,8 +145,8 @@ namespace Contensive.Processor.Controllers {
                 Cmd = "IISReset.exe";
                 arg = "/restart >> \"" + LogFilename + "\"";
                 runProcess(core, Cmd, arg, true);
-                Copy = core.privateFiles.readFileText(LogFilename);
-                core.privateFiles.deleteFile(LogFilename);
+                Copy = core.filePrivate.readFileText(LogFilename);
+                core.filePrivate.deleteFile(LogFilename);
                 Copy = GenericController.vbReplace(Copy, "\r\n", "\\n");
                 Copy = GenericController.vbReplace(Copy, "\r", "\\n");
                 Copy = GenericController.vbReplace(Copy, "\n", "\\n");
@@ -171,8 +171,8 @@ namespace Contensive.Processor.Controllers {
                 LogFilename = "Temp\\" + GenericController.encodeText(GenericController.GetRandomInteger(core)) + ".Log";
                 Cmd = "%comspec% /c IISReset /stop >> \"" + LogFilename + "\"";
                 runProcess(core, Cmd, "", true);
-                Copy = core.privateFiles.readFileText(LogFilename);
-                core.privateFiles.deleteFile(LogFilename);
+                Copy = core.filePrivate.readFileText(LogFilename);
+                core.filePrivate.deleteFile(LogFilename);
                 Copy = GenericController.vbReplace(Copy, "\r\n", "\\n");
                 Copy = GenericController.vbReplace(Copy, "\r", "\\n");
                 Copy = GenericController.vbReplace(Copy, "\n", "\\n");
@@ -192,13 +192,13 @@ namespace Contensive.Processor.Controllers {
         public void start() {
             try {
                 string Cmd = null;
-                string LogFilename = core.privateFiles.localAbsRootPath + "iisResetPipe.log";
+                string LogFilename = core.filePrivate.localAbsRootPath + "iisResetPipe.log";
                 string Copy = null;
                 //
                 Cmd = "%comspec% /c IISReset /start >> \"" + LogFilename + "\"";
                 runProcess(core, Cmd, "", true);
-                Copy = core.privateFiles.readFileText(LogFilename);
-                core.privateFiles.deleteFile(LogFilename);
+                Copy = core.filePrivate.readFileText(LogFilename);
+                core.filePrivate.deleteFile(LogFilename);
                 Copy = GenericController.vbReplace(Copy, "\r\n", "\\n");
                 Copy = GenericController.vbReplace(Copy, "\r", "\\n");
                 Copy = GenericController.vbReplace(Copy, "\n", "\\n");
@@ -938,8 +938,8 @@ namespace Contensive.Processor.Controllers {
                     }
                     //
                     // -- create temp cclib virtual folder pointed to contensiveBase.
-                    core.appRootFiles.deleteFolder("cclib");
-                    core.appRootFiles.createPath("ContensiveBase");
+                    core.fileAppRoot.deleteFolder("cclib");
+                    core.fileAppRoot.createPath("ContensiveBase");
                     verifyWebsite_VirtualDirectory(core, site, appName, "cclib", phyPath + @"ContensiveBase");
                     //
                     // -- commit any changes

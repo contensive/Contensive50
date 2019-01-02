@@ -4,6 +4,13 @@ using System.Collections.Generic;
 
 namespace Contensive.BaseClasses {
     public abstract class CPFileSystemBaseClass {
+        //
+        //==========================================================================================
+        /// <summary>
+        /// The physical file path of the local storage for this resource
+        /// </summary>
+        public abstract String PhysicalFilePath { get; }
+        //==========================================================================================
         /// <summary>
         /// argument details for file and folder methods
         /// </summary>

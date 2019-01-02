@@ -434,6 +434,22 @@ namespace Contensive.BaseClasses {
         public abstract object SplitDelimited(string wordList, string delimiter);
         //
         //====================================================================================================
+        /// <summary>
+        /// Method used to convert application data from DotNet DirectoryInfo object to internal legacy 4.1 Parse string.
+        /// </summary>
+        /// <param name="DirectoryInfo"></param>
+        /// <returns></returns>
+        public abstract string Upgrade51ConvertDirectoryInfoArrayToParseString(List<CPFileSystemBaseClass.FolderDetail> DirectoryInfo);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Method used to convert application data from DotNet DirectoryInfo object to internal legacy 4.1 Parse string.
+        /// </summary>
+        /// <param name="DirectoryInfo"></param>
+        /// <returns></returns>
+        public abstract string Upgrade51ConvertFileInfoArrayToParseString(List<CPFileSystemBaseClass.FileDetail> DirectoryInfo);
+        //
+        //====================================================================================================
         // deprecated
         //
         [Obsolete("Deprecated, use AppendLog", true)]
@@ -472,7 +488,7 @@ namespace Contensive.BaseClasses {
         [Obsolete("Use System.Net.WebUtility.HtmlDecode()", true)]
         public abstract string DecodeHTML(string source);
         //
-        [Obsolete("Use System.Net.WebUtility.HtmlEnDecode()", true)]
+        [Obsolete("Use System.Net.WebUtility.HtmlEncode()", true)]
         public abstract string EncodeHTML(string source);
         //
         [Obsolete("Use System.Net.WebUtility.UrlEncode()", true)]

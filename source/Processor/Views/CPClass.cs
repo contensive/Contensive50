@@ -291,15 +291,15 @@ namespace Contensive.Processor {
         /// <summary>
         /// expose object for managing content delivery files. This is a publically accessable location that holds content contributed. If remote file mode, this is an AWS S3 bucket
         /// </summary>
-        public override CPFileSystemBaseClass CdnFiles {
+        public override CPFileSystemBaseClass FileCdn {
             get {
-                if (_cdnFiles == null) {
-                    _cdnFiles = new CPFileSystemClass(this, core.cdnFiles);
+                if (_FileCdn == null) {
+                    _FileCdn = new CPFileSystemClass(this, core.fileCdn);
                 }
-                return _cdnFiles;
+                return _FileCdn;
             }
         }
-        private CPFileSystemClass _cdnFiles;
+        private CPFileSystemClass _FileCdn;
         //
         //=========================================================================================================
         /// <summary>
@@ -387,7 +387,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         /// <summary>
-        /// Legacy method that provides access the current application server. AS of v5, access is limited to that provided by privatefiles, wwwRoot, temp and cdnFiles
+        /// Legacy method that provides access the current application server. AS of v5, access is limited to that provided by FilePrivate, wwwRoot, temp and cdnFiles
         /// </summary>
         [Obsolete("deprecated",true)] public override CPFileBaseClass File {
             get {
@@ -438,15 +438,15 @@ namespace Contensive.Processor {
         /// <summary>
         /// Access to private files for the application. Private files are not available online.
         /// </summary>
-        public override CPFileSystemBaseClass PrivateFiles {
+        public override CPFileSystemBaseClass FilePrivate {
             get {
-                if (_privateFiles == null) {
-                    _privateFiles = new CPFileSystemClass(this, core.privateFiles);
+                if (_FilePrivate == null) {
+                    _FilePrivate = new CPFileSystemClass(this, core.filePrivate);
                 }
-                return _privateFiles;
+                return _FilePrivate;
             }
         }
-        private CPFileSystemClass _privateFiles;
+        private CPFileSystemClass _FilePrivate;
         //
         //====================================================================================================
         /// <summary>
@@ -494,15 +494,15 @@ namespace Contensive.Processor {
         /// <summary>
         /// Temporary file storarge
         /// </summary>
-        public override CPFileSystemBaseClass TempFiles {
+        public override CPFileSystemBaseClass FileTemp {
             get {
-                if (_tempFiles == null) {
-                    _tempFiles = new CPFileSystemClass(this, core.tempFiles);
+                if (_FileTemp == null) {
+                    _FileTemp = new CPFileSystemClass(this, core.tempFiles);
                 }
-                return _tempFiles;
+                return _FileTemp;
             }
         }
-        private CPFileSystemClass _tempFiles;
+        private CPFileSystemClass _FileTemp;
  
         //
         //====================================================================================================
@@ -551,14 +551,14 @@ namespace Contensive.Processor {
         /// <summary>
         /// A file object with access to the domain's primary web root files. This is typically where design files are stored, like styles sheets, js, etc.
         /// </summary>
-        public override CPFileSystemBaseClass WwwFiles {
+        public override CPFileSystemBaseClass FileAppRoot {
             get {
-                if (_wwwFiles == null) {
-                    _wwwFiles = new CPFileSystemClass(this, core.appRootFiles);
+                if (_FileAppRoot == null) {
+                    _FileAppRoot = new CPFileSystemClass(this, core.fileAppRoot);
                 }
-                return _wwwFiles;
+                return _FileAppRoot;
             }
-        } private CPFileSystemClass _wwwFiles;
+        } private CPFileSystemClass _FileAppRoot;
         //
         //====================================================================================================
         /// <summary>
@@ -675,14 +675,14 @@ namespace Contensive.Processor {
                     if (_visitorObj != null) {
                         _visitorObj.Dispose();
                     }
-                    if (_cdnFiles != null) {
-                        _cdnFiles.Dispose();
+                    if (_FileCdn != null) {
+                        _FileCdn.Dispose();
                     }
-                    if (_wwwFiles != null) {
-                        _wwwFiles.Dispose();
+                    if (_FileAppRoot != null) {
+                        _FileAppRoot.Dispose();
                     }
-                    if (_privateFiles != null) {
-                        _privateFiles.Dispose();
+                    if (_FilePrivate != null) {
+                        _FilePrivate.Dispose();
                     }
                     if (core != null) {
                         core.Dispose();

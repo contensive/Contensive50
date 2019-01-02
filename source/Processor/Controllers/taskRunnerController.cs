@@ -119,6 +119,12 @@ namespace Contensive.Processor.Controllers {
                     }
                     ProcessTimerInProcess = false;
                 }
+                //
+                // -- log memory usage -- info
+                long workingSetMemory = System.Diagnostics.Process.GetCurrentProcess().WorkingSet64;
+                long virtualMemory = System.Diagnostics.Process.GetCurrentProcess().VirtualMemorySize64;
+                long privateMemory = System.Diagnostics.Process.GetCurrentProcess().PrivateMemorySize64;
+                LogController.forceNLog("TaskRunner exit, workingSetMemory [" + workingSetMemory + "], virtualMemory [" + virtualMemory + "], privateMemory [" + privateMemory + "]", LogController.logLevel.Info);
             } catch (Exception ex) {
                 using (CPClass cp = new CPClass()) {
                     LogController.handleError(cp.core,ex);
@@ -187,7 +193,7 @@ namespace Contensive.Processor.Controllers {
                                             // todo manage multiple executing processes
                                             process.WaitForExit();
                                         }
-                                        Console.WriteLine("runTasks, task complete (" + swTask.ElapsedMilliseconds + "ms)");
+                                        Console.WriteLine("runTasks, app [" + appKVP.Value.name + "], task complete (" + swTask.ElapsedMilliseconds + "ms)");
                                     }
                                     sequentialTaskCount++;
                                 } while (recordsAffected > 0);
@@ -216,7 +222,6 @@ namespace Contensive.Processor.Controllers {
                     foreach (var task in TaskModel.createList(cp.core, "(cmdRunner=" + DbController.encodeSQLText(runnerGuid) + ")and(datestarted is null)", "id")) {
                         //
                         Console.WriteLine("runTask, runTask, task [" + task.name + "], cmdDetail [" + task.cmdDetail + "]");
-                        LogController.logTrace(cp.core, "runTask, task [" + task.name + "], cmdDetail [" + task.cmdDetail + "]");
                         //
                         DateTime dateStarted = DateTime.Now;
                         task.dateStarted = dateStarted;
@@ -250,9 +255,13 @@ namespace Contensive.Processor.Controllers {
                         }
                         task.dateCompleted = DateTime.Now;
                         task.save(cp.core);
+                        //
+                        // -- info log the task running - so info state will log for memory leaks
+                        LogController.forceNLog("TaskRunner exit, task [" + task.name + "], cmdDetail [" + task.cmdDetail + "]", LogController.logLevel.Info);
                     }
                 }
             } catch (Exception ex) {
+                LogController.forceNLog("TaskRunner exception, ex [" + ex.ToString()  + "]", LogController.logLevel.Error);
                 Console.WriteLine("Error: [" + ex.ToString() + "]");
             }
         }

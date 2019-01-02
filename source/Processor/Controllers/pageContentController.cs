@@ -403,7 +403,7 @@ namespace Contensive.Processor.Controllers {
                                 // -- ceate new template named Default
                                 core.doc.pageController.template = PageTemplateModel.addDefault(core, Models.Domain.MetaModel.createByUniqueName(core, PageTemplateModel.contentName));
                                 core.doc.pageController.template.name = defaultTemplateName;
-                                core.doc.pageController.template.bodyHTML = core.appRootFiles.readFileText(defaultTemplateHomeFilename);
+                                core.doc.pageController.template.bodyHTML = core.fileAppRoot.readFileText(defaultTemplateHomeFilename);
                                 core.doc.pageController.template.save(core);
                             }
                             //
@@ -1782,7 +1782,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // ----- Custom Message
                                 //
-                                returnHtml = core.cdnFiles.readFileText(CustomBlockMessageFilename);
+                                returnHtml = core.fileCdn.readFileText(CustomBlockMessageFilename);
                                 break;
                             }
                         case main_BlockSourceLogin: {
@@ -2722,7 +2722,7 @@ namespace Contensive.Processor.Controllers {
                         // if AllowBrief is false, BriefFilename is not loaded
                         //
                         if ((childPage.briefFilename != "") && (childPage.allowBrief)) {
-                            string Brief = encodeText(core.cdnFiles.readFileText(childPage.briefFilename)).Trim(' ');
+                            string Brief = encodeText(core.fileCdn.readFileText(childPage.briefFilename)).Trim(' ');
                             if (!string.IsNullOrEmpty(Brief)) {
                                 activeList +=  "<div class=\"ccListCopy\">" + Brief + "</div>";
                             }

@@ -261,7 +261,7 @@ namespace Contensive.Processor.Controllers {
                         string serializedDataObject = null;
                         using (System.Threading.Mutex mutex = new System.Threading.Mutex(false, serverKey)) {
                             mutex.WaitOne();
-                            serializedDataObject = core.privateFiles.readFileText("appCache\\" + FileController.encodeDosFilename(serverKey + ".txt"));
+                            serializedDataObject = core.filePrivate.readFileText("appCache\\" + FileController.encodeDosFilename(serverKey + ".txt"));
                             mutex.ReleaseMutex();
                         }
                         if (string.IsNullOrEmpty(serializedDataObject)) {
@@ -789,7 +789,7 @@ namespace Contensive.Processor.Controllers {
                         string serializedData = Newtonsoft.Json.JsonConvert.SerializeObject(wrappedObject);
                         using (System.Threading.Mutex mutex = new System.Threading.Mutex(false, serverKey)) {
                             mutex.WaitOne();
-                            core.privateFiles.saveFile("appCache\\" + FileController.encodeDosFilename(serverKey + ".txt"), serializedData);
+                            core.filePrivate.saveFile("appCache\\" + FileController.encodeDosFilename(serverKey + ".txt"), serializedData);
                             mutex.ReleaseMutex();
                         }
                     }

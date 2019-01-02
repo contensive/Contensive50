@@ -33,13 +33,13 @@ namespace Contensive.Addons.Primitives {
                 // 
                 // set this way because the preferences page needs a filename in a site property (enhance later)
                 core.siteProperties.setProperty("RobotsTxtFilename", Filename);
-                result = core.cdnFiles.readFileText(Filename);
+                result = core.fileCdn.readFileText(Filename);
                 if (string.IsNullOrEmpty(result)) {
                     //
                     // save default robots.txt
                     //
                     result = "User-agent: *\r\nDisallow: /admin/\r\nDisallow: /images/";
-                    core.appRootFiles.saveFile(Filename, result);
+                    core.fileAppRoot.saveFile(Filename, result);
                 }
                 result += core.addonCache.robotsTxt;
                 core.webServer.setResponseContentType("text/plain");

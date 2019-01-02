@@ -1192,7 +1192,7 @@ namespace Contensive.Processor.Controllers {
                                 case _fieldTypeIdFileHTML:
                                     FieldValueText = GenericController.encodeText(FieldValueVariant);
                                     if (!string.IsNullOrEmpty(FieldValueText)) {
-                                        FieldValueText = core.cdnFiles.readFileText(FieldValueText);
+                                        FieldValueText = core.fileCdn.readFileText(FieldValueText);
                                     }
                                     if (FieldReadOnly) {
                                         returnResult = FieldValueText;
@@ -1207,7 +1207,7 @@ namespace Contensive.Processor.Controllers {
                                 case _fieldTypeIdFileText:
                                     FieldValueText = GenericController.encodeText(FieldValueVariant);
                                     if (!string.IsNullOrEmpty(FieldValueText)) {
-                                        FieldValueText = core.cdnFiles.readFileText(FieldValueText);
+                                        FieldValueText = core.fileCdn.readFileText(FieldValueText);
                                     }
                                     if (FieldReadOnly) {
                                         returnResult = FieldValueText;
@@ -1224,7 +1224,7 @@ namespace Contensive.Processor.Controllers {
                                 case _fieldTypeIdFileJavascript:
                                     FieldValueText = GenericController.encodeText(FieldValueVariant);
                                     if (!string.IsNullOrEmpty(FieldValueText)) {
-                                        FieldValueText = core.cdnFiles.readFileText(FieldValueText);
+                                        FieldValueText = core.fileCdn.readFileText(FieldValueText);
                                     }
                                     if (FieldReadOnly) {
                                         returnResult = FieldValueText;

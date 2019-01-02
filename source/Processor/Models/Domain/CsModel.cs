@@ -198,7 +198,7 @@ namespace Contensive.Processor {
                                         if (!string.IsNullOrEmpty(SourceFilename)) {
                                             string DestFilename = destination.getFieldFilename(field.nameLc, "", destination.contentName, field.fieldTypeId);
                                             destination.set(field.nameLc, DestFilename);
-                                            core.cdnFiles.copyFile(SourceFilename, DestFilename);
+                                            core.fileCdn.copyFile(SourceFilename, DestFilename);
                                         }
                                     }
                                     break;
@@ -211,7 +211,7 @@ namespace Contensive.Processor {
                                         if (!string.IsNullOrEmpty(SourceFilename)) {
                                             string DestFilename = destination.getFieldFilename(field.nameLc, "", destination.contentName, field.fieldTypeId);
                                             destination.set(field.nameLc, DestFilename);
-                                            core.privateFiles.copyFile(SourceFilename, DestFilename);
+                                            core.filePrivate.copyFile(SourceFilename, DestFilename);
                                         }
                                     }
                                     break;
@@ -255,7 +255,7 @@ namespace Contensive.Processor {
                                     //
                                     // cdn file
                                     string Filename = getRawData(field.nameLc);
-                                    if (!string.IsNullOrEmpty(Filename)) { core.cdnFiles.deleteFile(Filename); }
+                                    if (!string.IsNullOrEmpty(Filename)) { core.fileCdn.deleteFile(Filename); }
                                     break;
                                 }
                             case Constants._fieldTypeIdFileText:
@@ -263,7 +263,7 @@ namespace Contensive.Processor {
                                     //
                                     // private file
                                     string Filename = getRawData(field.nameLc);
-                                    if (!string.IsNullOrEmpty(Filename)) { core.privateFiles.deleteFile(Filename); }
+                                    if (!string.IsNullOrEmpty(Filename)) { core.filePrivate.deleteFile(Filename); }
                                     break;
                                 }
                         }
@@ -848,15 +848,15 @@ namespace Contensive.Processor {
                     //
                     // Filename changed, mark record changed
                     //
-                    core.cdnFiles.saveFile(Filename, copy);
+                    core.fileCdn.saveFile(Filename, copy);
                     set(fieldName, Filename);
                 } else {
-                    string OldCopy = core.cdnFiles.readFileText(Filename);
+                    string OldCopy = core.fileCdn.readFileText(Filename);
                     if (OldCopy != copy) {
                         //
                         // copy changed, mark record changed
                         //
-                        core.cdnFiles.saveFile(Filename, copy);
+                        core.fileCdn.saveFile(Filename, copy);
                         set(fieldName, Filename);
                     }
                 }
@@ -1007,7 +1007,7 @@ namespace Contensive.Processor {
                     case Constants._fieldTypeIdFileJavascript:
                         //
                         // -- cdn file
-                        return core.cdnFiles.readFileText(GenericController.encodeText(rawData));
+                        return core.fileCdn.readFileText(GenericController.encodeText(rawData));
                     case Constants._fieldTypeIdText:
                     case Constants._fieldTypeIdLongText:
                     case Constants._fieldTypeIdHTML:
@@ -1118,7 +1118,7 @@ namespace Contensive.Processor {
                         BlankTest = GenericController.vbReplace(BlankTest, "\t", "");
                         if (string.IsNullOrEmpty(BlankTest)) {
                             if (!string.IsNullOrEmpty(PathFilename)) {
-                                core.cdnFiles.deleteFile(PathFilename);
+                                core.fileCdn.deleteFile(PathFilename);
                                 PathFilename = "";
                             }
                         } else {
@@ -1163,9 +1163,9 @@ namespace Contensive.Processor {
                             }
                             if ((!string.IsNullOrEmpty(pathFilenameOriginal)) && (pathFilenameOriginal != PathFilename)) {
                                 pathFilenameOriginal = GenericController.convertCdnUrlToCdnPathFilename(pathFilenameOriginal);
-                                core.cdnFiles.deleteFile(pathFilenameOriginal);
+                                core.fileCdn.deleteFile(pathFilenameOriginal);
                             }
-                            core.cdnFiles.saveFile(PathFilename, rawValueForDb);
+                            core.fileCdn.saveFile(PathFilename, rawValueForDb);
                         }
                         rawValueForDb = PathFilename;
                         SetNeeded = true;
@@ -1694,7 +1694,7 @@ namespace Contensive.Processor {
                             set(FieldName, Path);
                             Path = GenericController.vbReplace(Path, "\\", "/");
                             Path = GenericController.vbReplace(Path, "/" + Filename, "");
-                            core.cdnFiles.upload(LocalRequestName, Path, ref Filename);
+                            core.fileCdn.upload(LocalRequestName, Path, ref Filename);
                         }
                         break;
                     default:

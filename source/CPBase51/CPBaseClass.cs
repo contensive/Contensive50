@@ -191,12 +191,12 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
-        /// Legacy file object. Use cdnFiles, wwwFiles, privateFiles and tempFiles.
+        /// Legacy file object. Use FileCdn, FileAppRoot, FilePrivate and tempFiles.
         /// </summary>
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        [Obsolete("Legacy file object. Use cdnFiles, wwwFiles, privateFiles and tempFiles.")]
+        [Obsolete("Legacy file object. Use FileCdn, FileAppRoot, FilePrivate and tempFiles.")]
         public abstract CPFileBaseClass File { get; }
         //
         //====================================================================================================
@@ -204,28 +204,28 @@ namespace Contensive.BaseClasses {
         /// read and write cdn files, like content uploads. Sites with static front-ends may put static files here.
         /// </summary>
         /// <returns></returns>
-        public abstract CPFileSystemBaseClass CdnFiles { get; }
+        public abstract CPFileSystemBaseClass FileCdn { get; }
         //
         //====================================================================================================
         /// <summary>
         /// read and write files in the root folder of the application (appRoot, wwwRoot,htdocs,etc)
         /// </summary>
         /// <returns></returns>
-        public abstract CPFileSystemBaseClass WwwFiles { get; }
+        public abstract CPFileSystemBaseClass FileAppRoot { get; }
         //
         //====================================================================================================
         /// <summary>
         /// read and write files not available to the Internet
         /// </summary>
         /// <returns></returns>
-        public abstract CPFileSystemBaseClass PrivateFiles { get; }
+        public abstract CPFileSystemBaseClass FilePrivate { get; }
         //
         //====================================================================================================
         /// <summary>
         /// read and write files in a temporary location.
         /// </summary>
         /// <returns></returns>
-        public abstract CPFileSystemBaseClass TempFiles { get; }
+        public abstract CPFileSystemBaseClass FileTemp { get; }
         //
     }
 }

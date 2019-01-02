@@ -1032,7 +1032,7 @@ namespace Contensive.Addons.AdminSite {
                                         } else {
                                             string filename = "";
                                             string path = "";
-                                            core.cdnFiles.splitDosPathFilename(fieldValue_text, ref path, ref filename);
+                                            core.fileCdn.splitDosPathFilename(fieldValue_text, ref path, ref filename);
                                             EditorString += ("&nbsp;<a href=\"http://" + EncodedLink + "\" target=\"_blank\">" + SpanClassAdminSmall + "[" + filename + "]</A>");
                                         }
                                         EditorString += WhyReadOnlyMsg;
@@ -1160,7 +1160,7 @@ namespace Contensive.Addons.AdminSite {
                                             EncodedLink = HtmlController.encodeHtml(NonEncodedLink);
                                             string filename = "";
                                             string path = "";
-                                            core.cdnFiles.splitDosPathFilename(fieldValue_text, ref path, ref filename);
+                                            core.fileCdn.splitDosPathFilename(fieldValue_text, ref path, ref filename);
                                             EditorString += ("&nbsp;<a href=\"" + EncodedLink + "\" target=\"_blank\">" + SpanClassAdminSmall + "[" + filename + "]</A>");
                                             EditorString += ("&nbsp;&nbsp;&nbsp;Delete:&nbsp;" + HtmlController.checkbox(field.nameLc + ".DeleteFlag", false));
                                             EditorString += ("&nbsp;&nbsp;&nbsp;Change:&nbsp;" + core.html.inputFile(field.nameLc, fieldHtmlId, "file form-control"));

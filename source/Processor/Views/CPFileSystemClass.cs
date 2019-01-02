@@ -30,6 +30,14 @@ namespace Contensive.Processor {
         //
         //==========================================================================================
         /// <summary>
+        /// The physical file path to the local storage used for this file system resource. 
+        /// </summary>
+        public override string PhysicalFilePath {
+            get { return fileSystemController.localAbsRootPath; }
+        }
+        //
+        //==========================================================================================
+        /// <summary>
         /// Append a file with content. NOTE: avoid with all remote file systems
         /// </summary>
         /// <param name="filename"></param>
@@ -158,8 +166,6 @@ namespace Contensive.Processor {
         }
         ~CPFileSystemClass() {
             Dispose(false);
-            
-            
         }
         #endregion
     }
