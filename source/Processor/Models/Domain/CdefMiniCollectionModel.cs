@@ -44,27 +44,6 @@ namespace Contensive.Processor.Models.Domain {
         //
         //====================================================================================================
         /// <summary>
-        /// 20181026 - no longer needed
-        /// Name dictionary of all addons in the miniCollection
-        /// </summary>
-        //public Dictionary<string, miniCollectionAddOnModel> legacyAddOns = new Dictionary<string, miniCollectionAddOnModel>();
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Model of addons in the minicollection
-        /// </summary>
-        //public class miniCollectionAddOnModel {
-        //    public string Name;
-        //    public string Link;
-        //    public string ObjectProgramID;
-        //    public string ArgumentList;
-        //    public string SortOrder;
-        //    public string Copy;
-        //    public bool dataChanged;
-        //}
-        //
-        //====================================================================================================
-        /// <summary>
         /// List of sql indexes for the minicollection
         /// </summary>
         public List<MiniCollectionSQLIndexModel> sqlIndexes = new List<MiniCollectionSQLIndexModel> { };
@@ -144,21 +123,6 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         // [Obsolete("Shared styles deprecated")]
         public string styleSheet;
-        //
-        //====================================================================================================
-        /// <summary>
-        /// List of collections that must be installed before this collection can be installed
-        /// </summary>
-        //public List<ImportCollectionType> collectionImports = new List<ImportCollectionType>();
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Model for imported collections
-        /// </summary>
-        //public struct ImportCollectionType {
-        //    public string Name;
-        //    public string Guid;
-        //}
         //
         //====================================================================================================
         /// <summary>
@@ -718,27 +682,26 @@ namespace Contensive.Processor.Models.Domain {
                 //
                 //----------------------------------------------------------------------------------------------------------------------
                 LogController.logInfo(core, "metadata Load, stage 2: create SQL tables in default datasource");
-                string ContentName = null;
                 //----------------------------------------------------------------------------------------------------------------------
                 //
                 if (true) {
                     string UsedTables = "";
                     foreach (var keypairvalue in Collection.metaData) {
-                        Models.Domain.MetaModel workingMetaData = keypairvalue.Value;
-                        ContentName = workingMetaData.name;
-                        if (workingMetaData.dataChanged) {
-                            LogController.logInfo(core, "creating sql table [" + workingMetaData.tableName + "], datasource [" + workingMetaData.dataSourceName + "]");
-                            if (GenericController.vbLCase(workingMetaData.dataSourceName) == "default" || workingMetaData.dataSourceName == "") {
-                                string TableName = workingMetaData.tableName;
-                                if (GenericController.vbInstr(1, "," + UsedTables + ",", "," + TableName + ",", 1) != 0) {
-                                    //TableName = TableName;
-                                } else {
-                                    UsedTables = UsedTables + "," + TableName;
-                                    core.db.createSQLTable(workingMetaData.dataSourceName, TableName);
-                                }
-                                foreach (var fieldNvp in workingMetaData.fields) {
-                                    MetaFieldModel field = fieldNvp.Value;
-                                    core.db.createSQLTableField(workingMetaData.dataSourceName, TableName, field.nameLc, field.fieldTypeId);
+                        MetaModel contentMetaData = keypairvalue.Value;
+                        if (contentMetaData.dataChanged) {
+                            LogController.logInfo(core, "creating sql table [" + contentMetaData.tableName + "], datasource [" + contentMetaData.dataSourceName + "]");
+                            using (var db = new DbController(core, contentMetaData.dataSourceName)) {
+                                if (GenericController.vbLCase(contentMetaData.dataSourceName) == "default" || contentMetaData.dataSourceName == "") {
+                                    if (GenericController.vbInstr(1, "," + UsedTables + ",", "," + contentMetaData.tableName + ",", 1) != 0) {
+                                        //TableName = TableName;
+                                    } else {
+                                        UsedTables = UsedTables + "," + contentMetaData.tableName;
+                                        db.createSQLTable(contentMetaData.tableName);
+                                    }
+                                    foreach (var fieldNvp in contentMetaData.fields) {
+                                        MetaFieldModel field = fieldNvp.Value;
+                                        db.createSQLTableField(contentMetaData.tableName, field.nameLc, field.fieldTypeId);
+                                    }
                                 }
                             }
                         }
@@ -816,7 +779,7 @@ namespace Contensive.Processor.Models.Domain {
                 LogController.logInfo(core, "metadata Load, stage 7: Verify all field help");
                 //----------------------------------------------------------------------------------------------------------------------
                 //
-                int FieldHelpCID = MetaController.getRecordIdByUniqueName( core,"content", "Content Field Help");
+                int FieldHelpCID = MetaController.getRecordIdByUniqueName(core, "content", "Content Field Help");
                 foreach (var keypairvalue in Collection.metaData) {
                     MetaModel workingMetaData = keypairvalue.Value;
                     foreach (var fieldKeyValuePair in workingMetaData.fields) {
@@ -834,7 +797,7 @@ namespace Contensive.Processor.Models.Domain {
                                 if (DbController.isDataTableOk(rs)) {
                                     FieldHelpID = GenericController.encodeInteger(rs.Rows[0]["id"]);
                                 } else {
-                                    FieldHelpID = core.db.insertTableRecordGetId("default", "ccfieldhelp", 0);
+                                    FieldHelpID = core.db.insertTableRecordGetId("ccfieldhelp", 0);
                                 }
                             }
                             if (FieldHelpID != 0) {
@@ -854,8 +817,10 @@ namespace Contensive.Processor.Models.Domain {
                 //
                 foreach (MetaDataMiniCollectionModel.MiniCollectionSQLIndexModel index in Collection.sqlIndexes) {
                     if (index.dataChanged) {
-                        LogController.logInfo(core, "creating index [" + index.IndexName + "], fields [" + index.FieldNameList + "], on table [" + index.TableName + "]");
-                        core.db.createSQLIndex(index.DataSourceName, index.TableName, index.IndexName, index.FieldNameList);
+                        using (var db = new DbController(core, index.DataSourceName)) {
+                            LogController.logInfo(core, "creating index [" + index.IndexName + "], fields [" + index.FieldNameList + "], on table [" + index.TableName + "]");
+                            db.createSQLIndex(index.TableName, index.IndexName, index.FieldNameList);
+                        }
                     }
                 }
                 core.clearMetaData();

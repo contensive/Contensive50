@@ -242,7 +242,7 @@ function BrowserType() {
 function PageClick(event) {
     console.log("base.PageClick");
     var el;
-    if (activeButton == null) return;
+    if (activeButton == null) { return; }
     if (browser.isIE)
         el = window.event.srcElement;
     else
@@ -260,7 +260,7 @@ function PageClick(event) {
 //
 function ClearMenu() {
     console.log("base.ClearMenu");
-    if (activeButton == null) return;
+    if (activeButton == null) { return; }
     resetButton(activeButton);
     activeButton = null;
 }
@@ -326,9 +326,9 @@ function ccFlyoutButtonClick(event, menuId, position, StyleSheetPrefix, OpenOnHo
     }
     if (button.tagName != 'A') {
         button = getContainer(button, 'A')
-        if (button == null) return false;
+        if (button == null) { return false; }
     }
-    if (menuId == '') return false;
+    if (menuId == '') { return false; }
     width = document.body.scrollWidth;
     height = document.body.scrollHeight;
     button.blur();
@@ -465,8 +465,8 @@ function ccFlyoutPanelButtonHover(event, menuId, StyleSheetPrefix) {
     } else {
         closeSubMenu(menu);
     }
-    if (!(menuId)) return false
-    if (menuId == '') return false;
+    if (!(menuId)) { return false }
+    if (menuId == '') { return false; }
     menu.activeItem = item;
     item.className += " kmaMenuDown " + StyleSheetPrefix + "PanelButtonDown";
     if (item.subMenu == null) {
@@ -583,7 +583,7 @@ function hasClassName(el, name) {
     var i, list;
     list = el.className.split(" ");
     for (i = 0; i < list.length; i++)
-        if (list[i] == name) return true;
+        if (list[i] == name) { return true; }
     return false;
 }
 //
@@ -592,7 +592,7 @@ function hasClassName(el, name) {
 function removeClassName(el, name) {
     console.log("base.removeClassName");
     var i, curList, newList;
-    if (el.className == null) return;
+    if (el.className == null) { return; }
     //newList = new Array();
     curList = el.className.split(" ");
     for (i = 0; i < curList.length; i++)
@@ -610,7 +610,7 @@ function removeClassName(el, name) {
 function removeClassNameAfter(el, name) {
     console.log("base.removeClassNameAfter");
     var i, curList, newList;
-    if (el.className == null) return;
+    if (el.className == null) { return; }
     curList = el.className.split(" ");
     newList = '';
     for (i = 0; i < curList.length; i++)

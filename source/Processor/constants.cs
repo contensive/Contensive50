@@ -62,7 +62,6 @@ namespace Contensive.Processor {
         public const string iconContentCut = "<i title=\"cut\" class=\"fas fa-cut\"></i>";
         public const string iconContentPaste = "<i title=\"paste\" class=\"fas fa-paste\"></i>";
         public const string iconClose = "<i title=\"close\" class=\"fas fa-times\"></i>";
-        //public const string iconClose = "<i title=\"close\" class=\"fas fa-window-close\"></i>";
         public const string iconClose_White = "<span style=\"color:#fff\">" + iconClose + "</span>";
         public const string iconClose_Red = "<span style=\"color:#f00\">" + iconClose + "</span>";
         public const string iconOpen = "<i title=\"open\" class=\"fas fa-angle-double-right\"></i>";
@@ -169,8 +168,6 @@ namespace Contensive.Processor {
         internal const int sitetypebaseaspx = 2;
         internal const int SiteTypeDemoAsp = 3;
         internal const int SiteTypeBasePhp = 4;
-        //
-        //Public Const AddonNewParse = True
         //
         internal const string AddonOptionConstructor_ForBlockText = "AllowGroups=[listid(groups)]checkbox";
         internal const string AddonOptionConstructor_ForBlockTextEnd = "";
@@ -288,14 +285,12 @@ namespace Contensive.Processor {
         internal const string FormTypePageAuthoring = "2s09lmpalb";
         internal const string FormTypeMyProfile = "89aLi180j5";
         internal const string FormTypeLogin = "login";
-        //Public Const FormTypeLogin As String = "l09H58a195"
         internal const string FormTypeSendPassword = "lk0q56am09";
         internal const string FormTypeJoin = "6df38abv00";
         internal const string FormTypeHelpBubbleEditor = "9df019d77sA";
         internal const string FormTypeAddonSettingsEditor = "4ed923aFGw9d";
         internal const string FormTypeAddonStyleEditor = "ar5028jklkfd0s";
         internal const string FormTypeSiteStyleEditor = "fjkq4w8794kdvse";
-        //Public Const FormTypeAggregateFunctionProperties As String = "9wI751270"
         //
         //-----------------------------------------------------------------------
         //   Hardcoded profile form const
@@ -313,8 +308,6 @@ namespace Contensive.Processor {
         //       Intercept pages are complete pages that appear instead of what
         //       the physical page calls.
         //-----------------------------------------------------------------------
-        //
-        //Public Const RequestNameInterceptpage As String = "ccIPage"
         //
         internal const string LegacyInterceptPageSNResourceLibrary = "s033l8dm15";
         internal const string LegacyInterceptPageSNSiteExplorer = "kdif3318sd";
@@ -772,7 +765,6 @@ namespace Contensive.Processor {
         internal const int AdminFormEditPaths = 9; // Edit form for Paths format records
         internal const int AdminFormClose = 10; // Special Case - do a window close instead of displaying a form
         internal const int AdminFormReports = 12; // Call Reports form (admin only)
-                                                  //Public Const AdminFormSpider = 13          ' Call Spider
         internal const int AdminFormEditContent = 14; // Edit form for Content records
         internal const int AdminFormDHTMLEdit = 15; // ActiveX DHTMLEdit form
         internal const int AdminFormEditPageContent = 16;
@@ -1355,11 +1347,6 @@ namespace Contensive.Processor {
             public string content; // the description, title, etc.
             public string addedByMessage; // message used during debug to show where the asset came from
         }
-        //
-        // -- tasks
-        // only task supported is runaddon
-        //public const string buildCsv = "buildcsv";
-        //public const string buildXml = "buildxml";
     }
 
     //

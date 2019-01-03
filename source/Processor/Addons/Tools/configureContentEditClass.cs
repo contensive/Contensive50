@@ -12,7 +12,7 @@ using Contensive.Addons.AdminSite.Controllers;
 //
 namespace Contensive.Addons.Tools {
     //
-    public class configureContentEditClass : Contensive.BaseClasses.AddonBaseClass {
+    public class ConfigureContentEditClass : Contensive.BaseClasses.AddonBaseClass {
         //
         //====================================================================================================
         /// <summary>
@@ -125,7 +125,7 @@ namespace Contensive.Addons.Tools {
                                                         //
                                                         // Create Db field, Field is good but was not before
                                                         //
-                                                        core.db.createSQLTableField(dataSourceName, TableName, formFieldName, formFieldTypeId);
+                                                        core.db.createSQLTableField( TableName, formFieldName, formFieldTypeId);
                                                         StatusMessage = StatusMessage + "<LI>Field [" + formFieldName + "] was saved to this content definition and a database field was created in [" + CDef.tableName + "].</LI>";
                                                     } else if ((string.IsNullOrEmpty(formFieldName)) || (formFieldTypeId == 0)) {
                                                         //
@@ -143,16 +143,16 @@ namespace Contensive.Addons.Tools {
                                                         // Field Type changed, must be done manually
                                                         //
                                                         ErrorMessage += "<LI>Field [" + formFieldName + "] changed type from [" + MetaController.getRecordName(core, "content Field Types", cdefFieldKvp.Value.fieldTypeId) + "] to [" + MetaController.getRecordName(core, "content Field Types", formFieldTypeId) + "]. This may have caused a problem converting content.</LI>";
-                                                        int DataSourceTypeID = core.db.getDataSourceType(dataSourceName);
+                                                        int DataSourceTypeID = core.db.getDataSourceType();
                                                         switch (DataSourceTypeID) {
                                                             case DataSourceTypeODBCMySQL:
-                                                                SQL = "alter table " + CDef.tableName + " change " + cdefFieldKvp.Value.nameLc + " " + cdefFieldKvp.Value.nameLc + " " + core.db.getSQLAlterColumnType(dataSourceName, formFieldTypeId) + ";";
+                                                                SQL = "alter table " + CDef.tableName + " change " + cdefFieldKvp.Value.nameLc + " " + cdefFieldKvp.Value.nameLc + " " + core.db.getSQLAlterColumnType(formFieldTypeId) + ";";
                                                                 break;
                                                             default:
-                                                                SQL = "alter table " + CDef.tableName + " alter column " + cdefFieldKvp.Value.nameLc + " " + core.db.getSQLAlterColumnType(dataSourceName, formFieldTypeId) + ";";
+                                                                SQL = "alter table " + CDef.tableName + " alter column " + cdefFieldKvp.Value.nameLc + " " + core.db.getSQLAlterColumnType(formFieldTypeId) + ";";
                                                                 break;
                                                         }
-                                                        core.db.executeQuery(SQL, dataSourceName);
+                                                        core.db.executeQuery(SQL);
                                                     }
                                                     SQL = "Update ccFields"
                                                 + " Set name=" + DbController.encodeSQLText(formFieldName) + ",type=" + formFieldTypeId + ",caption=" + DbController.encodeSQLText(cp.Doc.GetText("dtfaCaption." + RecordPointer)) + ",DefaultValue=" + DbController.encodeSQLText(cp.Doc.GetText("dtfaDefaultValue." + RecordPointer)) + ",EditSortPriority=" + DbController.encodeSQLText(GenericController.encodeText(cp.Doc.GetInteger("dtfaEditSortPriority." + RecordPointer))) + ",Active=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaActive." + RecordPointer)) + ",ReadOnly=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaReadOnly." + RecordPointer)) + ",Authorable=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaAuthorable." + RecordPointer)) + ",Required=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaRequired." + RecordPointer)) + ",UniqueName=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaUniqueName." + RecordPointer)) + ",TextBuffered=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaTextBuffered." + RecordPointer)) + ",Password=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaPassword." + RecordPointer)) + ",HTMLContent=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaHTMLContent." + RecordPointer)) + ",EditTab=" + DbController.encodeSQLText(cp.Doc.GetText("dtfaEditTab." + RecordPointer)) + ",Scramble=" + DbController.encodeSQLBoolean(cp.Doc.GetBoolean("dtfaScramble." + RecordPointer)) + "";
@@ -302,10 +302,10 @@ namespace Contensive.Addons.Tools {
                         //
                         // Index the sort order
                         //
-                        List<fieldSortClass> fieldList = new List<fieldSortClass>();
+                        List<FieldSortClass> fieldList = new List<FieldSortClass>();
                         int FieldCount = CDef.fields.Count;
                         foreach (var keyValuePair in CDef.fields) {
-                            fieldSortClass fieldSort = new fieldSortClass();
+                            FieldSortClass fieldSort = new FieldSortClass();
                             //Dim field As New appServices_metaDataClass.CDefFieldClass
                             string sortOrder = "";
                             fieldSort.field = keyValuePair.Value;
@@ -327,7 +327,7 @@ namespace Contensive.Addons.Tools {
                         fieldList.Sort((p1, p2) => p1.sort.CompareTo(p2.sort));
                         StringBuilderLegacyController StreamValidRows = new StringBuilderLegacyController();
                         var contentFieldsCdef = Processor.Models.Domain.MetaModel.createByUniqueName(core, "content fields");
-                        foreach (fieldSortClass fieldsort in fieldList) {
+                        foreach (FieldSortClass fieldsort in fieldList) {
                             StringBuilderLegacyController streamRow = new StringBuilderLegacyController();
                             bool rowValid = true;
                             //
@@ -457,50 +457,50 @@ namespace Contensive.Addons.Tools {
                             //
                             // active
                             //
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaActive." + RecordCount, fieldsort.field.active, fieldsort.field.inherited));
+                            streamRow.Add(getForm_ConfigureEdit_CheckBox("dtfaActive." + RecordCount, fieldsort.field.active, fieldsort.field.inherited));
                             //
                             // read only
                             //
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaReadOnly." + RecordCount, fieldsort.field.readOnly, fieldsort.field.inherited));
+                            streamRow.Add(getForm_ConfigureEdit_CheckBox("dtfaReadOnly." + RecordCount, fieldsort.field.readOnly, fieldsort.field.inherited));
                             //
                             // authorable
                             //
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaAuthorable." + RecordCount, fieldsort.field.authorable, fieldsort.field.inherited));
+                            streamRow.Add(getForm_ConfigureEdit_CheckBox("dtfaAuthorable." + RecordCount, fieldsort.field.authorable, fieldsort.field.inherited));
                             //
                             // required
                             //
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaRequired." + RecordCount, fieldsort.field.required, fieldsort.field.inherited));
+                            streamRow.Add(getForm_ConfigureEdit_CheckBox("dtfaRequired." + RecordCount, fieldsort.field.required, fieldsort.field.inherited));
                             //
                             // UniqueName
                             //
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaUniqueName." + RecordCount, fieldsort.field.uniqueName, fieldsort.field.inherited));
+                            streamRow.Add(getForm_ConfigureEdit_CheckBox("dtfaUniqueName." + RecordCount, fieldsort.field.uniqueName, fieldsort.field.inherited));
                             //
                             // text buffered
                             //
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaTextBuffered." + RecordCount, fieldsort.field.textBuffered, fieldsort.field.inherited));
+                            streamRow.Add(getForm_ConfigureEdit_CheckBox("dtfaTextBuffered." + RecordCount, fieldsort.field.textBuffered, fieldsort.field.inherited));
                             //
                             // password
                             //
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaPassword." + RecordCount, fieldsort.field.password, fieldsort.field.inherited));
+                            streamRow.Add(getForm_ConfigureEdit_CheckBox("dtfaPassword." + RecordCount, fieldsort.field.password, fieldsort.field.inherited));
                             //
                             // scramble
                             //
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaScramble." + RecordCount, fieldsort.field.Scramble, fieldsort.field.inherited));
+                            streamRow.Add(getForm_ConfigureEdit_CheckBox("dtfaScramble." + RecordCount, fieldsort.field.Scramble, fieldsort.field.inherited));
                             //
                             // HTML Content
                             //
-                            streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaHTMLContent." + RecordCount, fieldsort.field.htmlContent, fieldsort.field.inherited));
+                            streamRow.Add(getForm_ConfigureEdit_CheckBox("dtfaHTMLContent." + RecordCount, fieldsort.field.htmlContent, fieldsort.field.inherited));
                             //
                             // Admin Only
                             //
                             if (core.session.isAuthenticatedAdmin(core)) {
-                                streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaAdminOnly." + RecordCount, fieldsort.field.adminOnly, fieldsort.field.inherited));
+                                streamRow.Add(getForm_ConfigureEdit_CheckBox("dtfaAdminOnly." + RecordCount, fieldsort.field.adminOnly, fieldsort.field.inherited));
                             }
                             //
                             // Developer Only
                             //
                             if (core.session.isAuthenticatedDeveloper(core)) {
-                                streamRow.Add(GetForm_ConfigureEdit_CheckBox("dtfaDeveloperOnly." + RecordCount, fieldsort.field.developerOnly, fieldsort.field.inherited));
+                                streamRow.Add(getForm_ConfigureEdit_CheckBox("dtfaDeveloperOnly." + RecordCount, fieldsort.field.developerOnly, fieldsort.field.inherited));
                             }
                             //
                             streamRow.Add("</tr>");
@@ -541,7 +541,7 @@ namespace Contensive.Addons.Tools {
         //
         //
         //
-        public static string GetForm_ConfigureEdit_CheckBox(string htmlName, bool selected, bool Inherited) {
+        public static string getForm_ConfigureEdit_CheckBox(string htmlName, bool selected, bool Inherited) {
             string result = "<td class=\"ccPanelInput\" align=\"center\"><nobr>";
             if (Inherited) {
                 result += SpanClassAdminSmall + getYesNo(selected) + "</SPAN>";
@@ -551,7 +551,7 @@ namespace Contensive.Addons.Tools {
             return result + "</nobr></td>";
         }
         //
-        private class fieldSortClass {
+        private class FieldSortClass {
             public string sort;
             public Processor.Models.Domain.MetaFieldModel field;
         }

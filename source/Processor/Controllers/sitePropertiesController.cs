@@ -135,7 +135,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        internal bool AllowAutoLogin {
+        internal bool allowAutoLogin {
             get {
                 return booleanPropertyBase("allowAutoLogin", false, ref _AllowAutoLogin);
             }
@@ -153,7 +153,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public string LoginIconFilename {
+        public string loginIconFilename {
             get {
                 return textPropertyBase("LoginIconFilename", "/ContensiveBase/images/ccLibLogin.GIF", ref _LoginIconFilename);
             }
@@ -308,7 +308,7 @@ namespace Contensive.Processor.Controllers {
                             string SQLNow = DbController.encodeSQLDate(DateTime.Now);
                             string SQL = "UPDATE ccSetup Set FieldValue=" + DbController.encodeSQLText(Value) + ",ModifiedDate=" + SQLNow + " WHERE name=" + DbController.encodeSQLText(propertyName);
                             int recordsAffected = 0;
-                            core.db.executeNonQuery(SQL, "", ref recordsAffected);
+                            core.db.executeNonQuery(SQL, ref recordsAffected);
                             if (recordsAffected == 0) {
                                 SQL = "INSERT INTO ccSetup (ACTIVE,CONTENTCONTROLID,NAME,FIELDVALUE,ModifiedDate,DateAdded)VALUES("
                             + SQLTrue + "," + DbController.encodeSQLNumber(MetaModel.getContentId(core, "site properties")) + "," + DbController.encodeSQLText(propertyName.ToUpper()) + "," + DbController.encodeSQLText(Value) + "," + SQLNow + "," + SQLNow + ");";

@@ -457,7 +457,7 @@ namespace Contensive.Processor.Controllers {
                                 // -- Scripting code
                                 if (addon.scriptingCode != "") {
                                     try {
-                                        if (addon.scriptingLanguageID == (int)ScriptLanguages.Javascript ) {
+                                        if (addon.scriptingLanguageID == (int)ScriptLanguages.Javascript) {
                                             result += execute_Script_JScript(ref addon);
                                         } else {
                                             result += execute_Script_VBScript(ref addon);
@@ -650,7 +650,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // -- unwind recursion count
                             if (core.doc.addonRecursionDepth.ContainsKey(addon.id)) {
-                                if( --core.doc.addonRecursionDepth[addon.id] <=0 ) {
+                                if (--core.doc.addonRecursionDepth[addon.id] <= 0) {
                                     core.doc.addonRecursionDepth.Remove(addon.id);
                                 }
                             }
@@ -1256,9 +1256,9 @@ namespace Contensive.Processor.Controllers {
                                                         DataTable dt = null;
                                                         if (!string.IsNullOrEmpty(FieldSQL)) {
                                                             try {
-                                                                dt = core.db.executeQuery(FieldSQL, FieldDataSource, 0, SQLPageSize);
-                                                                //RS = app.csv_ExecuteSQLCommand(FieldDataSource, FieldSQL, 30, SQLPageSize, 1)
-
+                                                                using (var db = new DbController(core, FieldDataSource)) {
+                                                                    dt = core.db.executeQuery(FieldSQL, 0, SQLPageSize);
+                                                                }
                                                             } catch (Exception) {
                                                                 ErrorNumber = 0;
                                                                 loadOK = false;
@@ -1361,7 +1361,7 @@ namespace Contensive.Processor.Controllers {
                                                         break;
                                                 }
                                             }
-                                            Copy = AdminUIController.getEditPanel(core, true, TabHeading, TabDescription, AdminUIController.editTable( TabCell.Text ));
+                                            Copy = AdminUIController.getEditPanel(core, true, TabHeading, TabDescription, AdminUIController.editTable(TabCell.Text));
                                             if (!string.IsNullOrEmpty(Copy)) {
                                                 adminMenu.addEntry(TabName.Replace(" ", "&nbsp;"), Copy, "ccAdminTab");
                                             }
@@ -2069,9 +2069,9 @@ namespace Contensive.Processor.Controllers {
                         QueryString = core.doc.refreshQueryString;
                         QueryString = GenericController.modifyQueryString(QueryString, RequestNameHardCodedPage, "", false);
                         //QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
-                        return_DialogList = return_DialogList 
+                        return_DialogList = return_DialogList
                             + "<div class=\"ccCon helpDialogCon\">"
-                            + HtmlController.formMultipart_start(core, core.doc.refreshQueryString,"", "ccForm") 
+                            + HtmlController.formMultipart_start(core, core.doc.refreshQueryString, "", "ccForm")
                             + "<table border=0 cellpadding=0 cellspacing=0 class=\"ccBubbleCon\" id=\"HelpBubble" + core.doc.helpCodes.Count + "\" style=\"display:none;visibility:hidden;\">"
                             + "<tr><td class=\"ccHeaderCon\">" + CopyHeader + "</td></tr>"
                             + "<tr><td class=\"ccButtonCon\">" + HtmlController.getHtmlInputSubmit("Update", "HelpBubbleButton") + "</td></tr>"
@@ -2155,9 +2155,9 @@ namespace Contensive.Processor.Controllers {
                         //QueryString = genericController.ModifyQueryString(QueryString, RequestNameInterceptpage, "", False)
                         string Dialog = "";
 
-                        Dialog = Dialog 
+                        Dialog = Dialog
                             + "<div class=\"ccCon helpDialogCon\">"
-                            + HtmlController.formMultipart_start(core, core.doc.refreshQueryString,"", "ccForm") 
+                            + HtmlController.formMultipart_start(core, core.doc.refreshQueryString, "", "ccForm")
                             + "<table border=0 cellpadding=0 cellspacing=0 class=\"ccBubbleCon\" id=\"HelpBubble" + core.doc.helpCodes.Count + "\" style=\"display:none;visibility:hidden;\">"
                             + "<tr><td class=\"ccHeaderCon\">" + CopyHeader + "</td></tr>"
                             + "<tr><td class=\"ccButtonCon\">" + HtmlController.getHtmlInputSubmit("Update", "HelpBubbleButton") + "</td></tr>"
@@ -2211,7 +2211,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     //
                     if (CollectionID != 0) {
-                        CollectionCopy = MetaController.getRecordName( core,"Add-on Collections", CollectionID);
+                        CollectionCopy = MetaController.getRecordName(core, "Add-on Collections", CollectionID);
                         if (!string.IsNullOrEmpty(CollectionCopy)) {
                             CollectionCopy = "This add-on is a member of the " + CollectionCopy + " collection.";
                         } else {
@@ -3067,8 +3067,8 @@ namespace Contensive.Processor.Controllers {
         ~AddonController() {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(false);
-            
-            
+
+
         }
         //
         //====================================================================================================

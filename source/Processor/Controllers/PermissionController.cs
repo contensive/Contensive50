@@ -73,60 +73,6 @@ namespace Contensive.Processor.Controllers {
             }
             return result;
         }
-        ////
-        ////====================================================================================================
-        ///// <summary>
-        ///// returns if the user can edit, add or delete records from a content
-        ///// </summary>
-        ///// <param name="core"></param>
-        ///// <param name="contentName"></param>
-        ///// <param name="returnAllowEdit"></param>
-        ///// <param name="returnAllowAdd"></param>
-        ///// <param name="returnAllowDelete"></param>
-        //public static void getContentAccessRights(CoreController core, string contentName, ref bool returnAllowEdit, ref bool returnAllowAdd, ref bool returnAllowDelete) {
-        //    try {
-        //        returnAllowEdit = false;
-        //        returnAllowAdd = false;
-        //        returnAllowDelete = false;
-        //        if (!core.session.isAuthenticated) {
-        //            //
-        //            // no authenticated, you are not a conent manager
-        //            //
-        //        } else if (string.IsNullOrEmpty(contentName)) {
-        //            //
-        //            // no content given, do not handle the general case -- use authcontext.user.main_IsContentManager2()
-        //            //
-        //        } else if (core.session.isAuthenticatedDeveloper(core)) {
-        //            //
-        //            // developers are always content managers
-        //            //
-        //            returnAllowEdit = true;
-        //            returnAllowAdd = true;
-        //            returnAllowDelete = true;
-        //        } else if (core.session.isAuthenticatedAdmin(core)) {
-        //            //
-        //            // admin is content manager if the CDef is not developer only
-        //            //
-        //            var CDef = CDefModel.create(core, contentName);
-        //            if (CDef.id != 0) {
-        //                if (!CDef.developerOnly) {
-        //                    returnAllowEdit = true;
-        //                    returnAllowAdd = true;
-        //                    returnAllowDelete = true;
-        //                }
-        //            }
-        //        } else {
-        //            //
-        //            // Authenticated and not admin or developer
-        //            //
-        //            int ContentID = Models.Domain.MetaModel.getContentId(core, contentName);
-        //            getContentAccessRights_NonAdminByContentId(core, ContentID, ref returnAllowEdit, ref returnAllowAdd, ref returnAllowDelete, "");
-        //        }
-        //    } catch (Exception ex) {
-        //        LogController.handleError(core, ex);
-        //        throw;
-        //    }
-        //}
         //
         //====================================================================================================
         /// <summary>
@@ -246,7 +192,6 @@ namespace Contensive.Processor.Controllers {
             /// this user can delete the record
             /// </summary>
             public bool allowDelete { get; set; }
-            //public bool AllowCancel { get; set; }
         }
         //
         //

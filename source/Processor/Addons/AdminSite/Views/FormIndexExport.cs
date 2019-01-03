@@ -117,14 +117,14 @@ namespace Contensive.Addons.AdminSite {
                             // Build the SQL
                             //
                             SQL = "select";
-                            if (IsRecordLimitSet && (datasource.type != DataSourceTypeODBCMySQL)) {
+                            if (IsRecordLimitSet && (datasource.dbTypeId != DataSourceTypeODBCMySQL)) {
                                 SQL += " Top " + RecordLimit;
                             }
                             SQL += " " + adminData.adminContent.tableName + ".* From " + SQLFrom + " WHERE " + SQLWhere;
                             if (!string.IsNullOrEmpty(SQLOrderBy)) {
                                 SQL += " Order By" + SQLOrderBy;
                             }
-                            if (IsRecordLimitSet && (datasource.type == DataSourceTypeODBCMySQL)) {
+                            if (IsRecordLimitSet && (datasource.dbTypeId == DataSourceTypeODBCMySQL)) {
                                 SQL += " Limit " + RecordLimit;
                             }
                             //

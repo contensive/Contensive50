@@ -122,11 +122,6 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        //public static TableModel createDefault(CoreController core) {
-        //    return createDefault<TableModel>(core);
-        //}
-        //
-        //====================================================================================================
         /// <summary>
         /// Return a cache key used to represent the table. ONLY used for invalidation. Add this as a dependent key if you want that key cleared when ANY record in the table is changed.
         /// </summary>
@@ -138,7 +133,7 @@ namespace Contensive.Processor.Models.Db {
         //
         public static TableModel createByContentName( CoreController core, string contentName ) {
             var content = ContentModel.createByUniqueName(core, contentName);
-            if (content != null) return create(core, content.contentTableID);
+            if (content != null) { return create(core, content.contentTableID); }
             return null;
         }
     }

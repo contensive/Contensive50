@@ -320,7 +320,7 @@ namespace Contensive.Processor.Controllers {
                                         //} else {
                                         //
                                         // -- if successful, now test for autologin (authentication)
-                                        if (core.siteProperties.AllowAutoLogin & resultSessionContext.user.autoLogin & resultSessionContext.visit.cookieSupport) {
+                                        if (core.siteProperties.allowAutoLogin & resultSessionContext.user.autoLogin & resultSessionContext.visit.cookieSupport) {
                                             //
                                             // -- they allow it, now Check if they were logged in on their last visit
                                             VisitModel lastVisit = VisitModel.getLastVisitByVisitor(core, resultSessionContext.visit.id, resultSessionContext.visitor.id);
@@ -628,8 +628,8 @@ namespace Contensive.Processor.Controllers {
         public bool isAuthenticatedContentManager(CoreController core, MetaModel cdef) {
             bool returnIsContentManager = false;
             try {
-                if (core.session.isAuthenticatedAdmin(core)) return true;
-                if (!isAuthenticated) return false;
+                if (core.session.isAuthenticatedAdmin(core)) { return true; }
+                if (!isAuthenticated) { return false; }
                 //
                 // -- for specific Content
                 returnIsContentManager = PermissionController.getUserContentPermissions(core, cdef).allowEdit;
@@ -650,8 +650,8 @@ namespace Contensive.Processor.Controllers {
         public bool isAuthenticatedContentManager(CoreController core, string ContentName) {
             bool returnIsContentManager = false;
             try {
-                if (core.session.isAuthenticatedAdmin(core)) return true;
-                if (!isAuthenticated) return false;
+                if (core.session.isAuthenticatedAdmin(core)) { return true; }
+                if (!isAuthenticated) { return false; }
                 //
                 if (string.IsNullOrEmpty(ContentName)) {
                     //
@@ -680,8 +680,8 @@ namespace Contensive.Processor.Controllers {
         public bool isAuthenticatedContentManager(CoreController core) {
             bool returnIsContentManager = false;
             try {
-                if (core.session.isAuthenticatedAdmin(core)) return true;
-                if (!isAuthenticated) return false;
+                if (core.session.isAuthenticatedAdmin(core)) { return true; }
+                if (!isAuthenticated) { return false; }
                 //
                 // Is a CM for any content def
                 if ((!_isAuthenticatedContentManagerAnything_loaded) || (_isAuthenticatedContentManagerAnything_userId != user.id)) {

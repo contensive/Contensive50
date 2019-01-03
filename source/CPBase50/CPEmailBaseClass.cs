@@ -38,7 +38,6 @@ namespace Contensive.BaseClasses {
         /// <param name="BodyIsHTML"></param>
         /// <remarks></remarks>
         public abstract void sendGroup(string GroupNameOrIdList, string FromAddress, string Subject, string Body, bool SendImmediately = true, bool BodyIsHTML = true);
-        //Public MustOverride Sub sendGroup(ByVal GroupList As String, ByVal FromAddress As String, ByVal Subject As String, ByVal Body As String, ByVal SendImmediately As Boolean, ByVal BodyIsHTML As Boolean)
         /// <summary>
         /// Send a list of usernames and passwords to the account(s) that include the given email address.
         /// </summary>
@@ -64,7 +63,6 @@ namespace Contensive.BaseClasses {
         /// <param name="BodyIsHTML"></param>
         /// <remarks></remarks>
         public abstract void sendUser(string ToUserID, string FromAddress, string Subject, string Body, bool SendImmediately = true, bool BodyIsHTML = true);
-        //Public MustOverride Sub sendUser(ByVal ToUserID As String, ByVal FromAddress As String, ByVal Subject As String, ByVal Body As String, ByVal SendImmediately As String, ByVal BodyIsHTML As String)
         //
         //====================================================================================================
         // deprecated

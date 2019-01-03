@@ -126,11 +126,6 @@ namespace Contensive.Processor.Models.Db {
         public static int getRecordId(CoreController core, string ccGuid) {
             return BaseModel.getRecordId<RemoteQueryModel>(core, ccGuid);
         }
-        ////
-        ////====================================================================================================
-        //public static RemoteQueryModel createDefault(CoreController core) {
-        //    return createDefault<RemoteQueryModel>(core);
-        //}
         //
         //====================================================================================================
         /// <summary>

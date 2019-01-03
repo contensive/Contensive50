@@ -124,11 +124,6 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        //public static LibraryFileLogModel createDefault(CoreController core) {
-        //    return createDefault<LibraryFileLogModel>(core);
-        //}
-        //
-        //====================================================================================================
         /// <summary>
         /// Return a cache key used to represent the table. ONLY used for invalidation. Add this as a dependent key if you want that key cleared when ANY record in the table is changed.
         /// </summary>

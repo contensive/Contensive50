@@ -113,11 +113,6 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        //public static ContentFieldHelpModel createDefault(CoreController core) {
-        //    return createDefault<ContentFieldHelpModel>(core);
-        //}
-        //
-        //====================================================================================================
         /// <summary>
         /// get the first field help for a field, digard the rest
         /// </summary>

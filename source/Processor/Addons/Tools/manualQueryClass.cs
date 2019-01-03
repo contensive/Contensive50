@@ -13,7 +13,7 @@ using Contensive.Addons.AdminSite.Controllers;
 //
 namespace Contensive.Addons.Tools {
     //
-    public class manualQueryClass : Contensive.BaseClasses.AddonBaseClass {
+    public class ManualQueryClass : Contensive.BaseClasses.AddonBaseClass {
         //
         //====================================================================================================
         /// <summary>
@@ -22,14 +22,14 @@ namespace Contensive.Addons.Tools {
         /// <param name="cp"></param>
         /// <returns></returns>
         public override object Execute(Contensive.BaseClasses.CPBaseClass cpBase) {
-            return GetForm_ManualQuery((CPClass)cpBase);
+            return getForm_ManualQuery((CPClass)cpBase);
         }
         //
         //=============================================================================
         //   Print the manual query form
         //=============================================================================
         //
-        public static string GetForm_ManualQuery(CPClass cp) {
+        public static string getForm_ManualQuery(CPClass cp) {
             string returnHtml = "";
             CoreController core = cp.core;
             try {
@@ -96,7 +96,7 @@ namespace Contensive.Addons.Tools {
                         Stream.Add("<p>" + DateTime.Now + " Executing sql [" + SQL + "] on DataSource [" + datasource.name + "]");
                         DataTable dt = null;
                         try {
-                            dt = core.db.executeQuery(SQL, datasource.name, PageSize * (PageNumber - 1), PageSize);
+                            dt = core.db.executeQuery(SQL, PageSize * (PageNumber - 1), PageSize);
                         } catch (Exception ex) {
                             //
                             // ----- error

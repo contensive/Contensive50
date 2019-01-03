@@ -141,40 +141,6 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        //public static ContentModel createDefault(CoreController core) {
-        //    return createDefault<ContentModel>(core);
-        //}
-        ////
-        ////====================================================================================================
-        ///// <summary>
-        ///// pattern get a list of objects from this model
-        ///// </summary>
-        ///// <param name="cp"></param>
-        ///// <param name="someCriteria"></param>
-        ///// <returns></returns>
-        //public static Dictionary<int, ContentModel> createDict(CoreController core, List<string> callersCacheNameList) {
-        //    Dictionary<int, ContentModel> result = new Dictionary<int, ContentModel>();
-        //    try {
-        //        using ( var cs = new CsController(core) ) {
-        //            if ( cs.openSQL( "select id from " + contentTableName + " where active>0")) {
-        //                do {
-        //                    int id = cs.getInteger("id");
-        //                    result.Add(id, create(core, id));
-        //                    cs.goNext();
-        //                } while (cs.ok());
-        //            }
-        //        }
-        //        //foreach (ContentModel content in createList(core, "")) {
-        //        //    result.Add(content.id, content);
-        //        //}
-        //    } catch (Exception ex) {
-        //        LogController.handleError( core,ex);
-        //        throw;
-        //    }
-        //    return result;
-        //}
-        //
-        //====================================================================================================
         /// <summary>
         /// Return a cache key used to represent the table. ONLY used for invalidation. Add this as a dependent key if you want that key cleared when ANY record in the table is changed.
         /// </summary>

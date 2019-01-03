@@ -436,7 +436,7 @@ namespace Contensive.Processor.Controllers {
                     while (csData.ok()) {
                         string DataSourceName = csData.getText("DataSourceName");
                         string TableName = csData.getText("TableName");
-                        string IndexList = core.db.getSQLIndexList(DataSourceName, TableName);
+                        string IndexList = core.db.getSQLIndexList( TableName);
                         //
                         if (!string.IsNullOrEmpty(IndexList)) {
                             string[] ListRows = GenericController.stringSplit(IndexList, "\r\n");

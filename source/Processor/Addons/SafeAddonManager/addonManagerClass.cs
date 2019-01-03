@@ -217,7 +217,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                         //                                        & " left join ccAddonCollectionRules R on R.AddonID=A.ID" _
                                         //                                        & " where R.CollectionID=" & CollectionID
                                         //                                End If
-                                        //                                CSAddons = core.app.openCsSql_rev("default", SQL)
+                                        //                                CSAddons = core.app.openCsSql_rev( SQL)
                                         //                                Do While core.asv.csv_IsCSOK(CSAddons)
                                         //                                    AddonCnt = Collections(CollectionCnt).AddonCnt
                                         //                                    ReDim Preserve Collections(CollectionCnt).AddonName(AddonCnt)

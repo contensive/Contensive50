@@ -36,11 +36,6 @@ namespace Contensive.Processor.Controllers {
         //
         public System.Web.HttpContext iisContext;
         //
-        //   State values that must be initialized before Init()
-        //   Everything else is derived from these
-        //
-        //Public Property initCounter As Integer = 0        '
-        //
         // -- Buffer request
         public string requestLanguage { get; set; } = ""; // set externally from HTTP_Accept_LANGUAGE
         public string requestHttpAccept { get; set; } = "";
@@ -70,11 +65,7 @@ namespace Contensive.Processor.Controllers {
         public string requestUrlSource { get; set; } = "";
         public string linkForwardSource { get; set; } = ""; // main_ServerPathPage -- set during init
         public string linkForwardError { get; set; } = ""; // always 404
-                                                           //Public Property readStreamJSForm As Boolean = False                  ' When true, the request comes from a browser handling a JSPage script line
         public bool pageExcludeFromAnalytics { get; set; } = false; // For this page - true for remote methods and ajax
-                                                                    //
-                                                                    // refactor - this method stears the stream between controllers, put it in core
-                                                                    //Public Property outStreamDevice As Integer = 0
         public int memberAction { get; set; } = 0; // action to be performed during init
         public string adminMessage { get; set; } = ""; // For more information message
         public string requestPageReferer { get; set; } = ""; // replaced by main_ServerReferrer
@@ -89,10 +80,6 @@ namespace Contensive.Processor.Controllers {
         /// The requesting URL, from protocol to end of quesrystring
         /// </summary>
         public string requestUrl { get; set; } = "";
-        ///// <summary>
-        ///// use file.cdnFileUrl instead. This was legacy path to the content file folder
-        ///// </summary>
-        //public string requestVirtualFilePath { get; set; } = "";
         /// <summary>
         /// The path between the requestDomain and the requestPage. NOTE - breaking change: this used to follow appRootPath and never started with /
         /// </summary>
@@ -1033,11 +1020,9 @@ namespace Contensive.Processor.Controllers {
         //   returns true if the redirect happened OK
         //========================================================================
         //
-        public static bool main_RedirectByRecord_ReturnStatus(CoreController core, string ContentName, int RecordID, string FieldName = "") {
-            bool tempmain_RedirectByRecord_ReturnStatus = false;
-            string MethodName = null;
-            int ContentID = 0;
-            string HostContentName = null;
+        public static bool redirectByRecord_ReturnStatus(CoreController core, string contentName, int recordId, string fieldName = "") {
+            bool result = false;
+            int contentId = 0;
             int HostRecordID = 0;
             bool BlockRedirect = false;
             string iContentName = null;
@@ -1047,17 +1032,12 @@ namespace Contensive.Processor.Controllers {
             string EncodedLink = null;
             string NonEncodedLink = "";
             //
-            iContentName = GenericController.encodeText(ContentName);
-            iRecordID = GenericController.encodeInteger(RecordID);
-            iFieldName = GenericController.encodeEmpty(FieldName, "link");
-            //
-            MethodName = "main_RedirectByRecord_ReturnStatus( " + iContentName + ", " + iRecordID + ", " + GenericController.encodeEmpty(FieldName, "(fieldname empty)") + ")";
-            //
-            tempmain_RedirectByRecord_ReturnStatus = false;
+            iContentName = GenericController.encodeText(contentName);
+            iRecordID = GenericController.encodeInteger(recordId);
+            iFieldName = GenericController.encodeEmpty(fieldName, "link");
             BlockRedirect = false;
             using (var csData = new CsModel(core)) {
-                csData.open(iContentName, "ID=" + iRecordID);
-                if (csData.ok()) {
+                if (csData.open(iContentName, "ID=" + iRecordID)) {
                     //
                     // Assume all Link fields are already encoded -- as this is how they would appear if the admin cut and pasted
                     EncodedLink = encodeText(csData.getText(iFieldName)).Trim(' ');
@@ -1076,9 +1056,10 @@ namespace Contensive.Processor.Controllers {
                                 //       inactive or expired before redirecting
                                 //
                                 LinkPrefix = core.webServer.requestContentWatchPrefix;
-                                ContentID = (csData.getInteger("ContentID"));
-                                HostContentName = MetaController.getContentNameByID(core, ContentID);
-                                if (string.IsNullOrEmpty(HostContentName)) {
+                                contentId = csData.getInteger("ContentID");
+                                var contentMeta = MetaModel.create(core, contentId);
+                                contentMeta.name = MetaController.getContentNameByID(core, contentId);
+                                if (string.IsNullOrEmpty(contentMeta.name)) {
                                     //
                                     // ----- Content Watch with a bad ContentID, mark inactive
                                     //
@@ -1094,7 +1075,7 @@ namespace Contensive.Processor.Controllers {
                                         csData.set("active", 0);
                                     } else {
                                         using (var CSHost = new CsModel(core)) {
-                                            CSHost.open(HostContentName, "ID=" + HostRecordID);
+                                            CSHost.open(contentMeta.name, "ID=" + HostRecordID);
                                             if (!CSHost.ok()) {
                                                 //
                                                 // ----- Content Watch host record not found, mark inactive
@@ -1109,7 +1090,7 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     // ----- if a content watch record is blocked, delete the content tracking
                                     //
-                                    MetaController.deleteContentRules(core, MetaModel.getContentId(core, HostContentName), HostRecordID);
+                                    MetaController.deleteContentRules(core, contentMeta, HostRecordID);
                                 }
                                 break;
                         }
@@ -1122,12 +1103,12 @@ namespace Contensive.Processor.Controllers {
                         if (csData.isFieldSupported("Clicks")) {
                             csData.set("Clicks", (csData.getNumber("Clicks")) + 1);
                         }
-                        core.webServer.redirect(LinkPrefix + NonEncodedLink, "Call to " + MethodName + ", no reason given.", false, false);
-                        tempmain_RedirectByRecord_ReturnStatus = true;
+                        core.webServer.redirect(LinkPrefix + NonEncodedLink, "no reason given.", false, false);
+                        result = true;
                     }
                 }
             }
-            return tempmain_RedirectByRecord_ReturnStatus;
+            return result;
         }
         //
         //========================================================================

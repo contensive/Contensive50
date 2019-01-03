@@ -72,7 +72,7 @@ namespace Contensive.Processor.Models.Db {
         public string jsBodyScriptSrc { get; set; }
         //
         // -- deprecated
-        //Public Property JavaScriptOnLoad As String
+        // -Public Property JavaScriptOnLoad As String
         //====================================================================================================
         public static AddonModel addEmpty(CoreController core) {
             return addEmpty<AddonModel>(core);

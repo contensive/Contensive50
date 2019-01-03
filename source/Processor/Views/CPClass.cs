@@ -237,6 +237,16 @@ namespace Contensive.Processor {
         //
         //=========================================================================================================
         /// <summary>
+        /// Create a datasource. The default datasource is CP.Db
+        /// </summary>
+        /// <param name="DataSourceName"></param>
+        /// <returns></returns>
+        public override CPDbBaseClass DbNew(string DataSourceName) {
+            return new CPDbClass(this, DataSourceName);
+        }
+        //
+        //=========================================================================================================
+        /// <summary>
         /// system version
         /// </summary>
         public override string Version {
@@ -333,7 +343,7 @@ namespace Contensive.Processor {
         /// <summary>
         /// expose object that can be used to configure the web environment if IIS is not used.
         /// </summary>
-        public CPContextClass Context {
+        public CPContextClass context {
             get {
                 if (_contextObj == null) {
                     _contextObj = new CPContextClass(this);
@@ -350,7 +360,7 @@ namespace Contensive.Processor {
         public override CPDbBaseClass Db {
             get {
                 if (_dbObj == null) {
-                    _dbObj = new CPDbClass(this);
+                    _dbObj = new CPDbClass(this,"");
                 }
                 return _dbObj;
             }
@@ -574,7 +584,7 @@ namespace Contensive.Processor {
         // deprecated
         //
         [Obsolete("Use cp.Doc.SetProperty.", true)]
-        public void AddVar(string key, string value) {
+        public void addVar(string key, string value) {
             try {
                 if (!string.IsNullOrEmpty(key)) {
                     this.Doc.SetProperty(key, value);
@@ -602,8 +612,6 @@ namespace Contensive.Processor {
         //
         ~CPClass() {
             Dispose(false);
-            
-            
         }
         //
         //====================================================================================================

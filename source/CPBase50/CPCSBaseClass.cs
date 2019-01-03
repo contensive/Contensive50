@@ -10,7 +10,6 @@ namespace Contensive.BaseClasses {
     public abstract class CPCSBaseClass {
         // todo cs.openRecord -- very important as it will use the cdef model + dbmodels so it will be cached - cs.open() cannot be cached.
         // todo in collection file, in cdef for each text field, include a maxtextlength that will be used throughout to prevent db truncation
-        //public Sub New(ByVal cmcObj As Contensive.Processor.cpCoreClass, ByRef CPParent As CPBaseClass)
         //
         //====================================================================================================
         /// <summary>
@@ -47,9 +46,6 @@ namespace Contensive.BaseClasses {
         /// <returns></returns>
         /// <remarks></remarks>
         public abstract bool Open(string ContentName, string SQLCriteria = "", string SortFieldList = "", bool ActiveOnly = true, string SelectFieldList = "", int PageSize = 10, int PageNumber = 1);
-        //
-        //====================================================================================================
-        //Public MustOverride Function Open(ByVal ContentName As String, Optional ByVal SQLCriteria As String = "", Optional ByVal SortFieldList As String = "", Optional ByVal ActiveOnly As Boolean = True, Optional ByVal SelectFieldList As String = "", Optional ByVal ignore As Integer = 10, Optional ByVal PageNumber As Integer = 1, Optional ByVal PageSize As Integer = 0) As Boolean
         //
         //====================================================================================================
         /// <summary>

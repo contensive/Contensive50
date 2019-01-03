@@ -7,16 +7,7 @@ namespace Contensive.BaseClasses {
     /// CP.Db - This object references the database directly
     /// </summary>
     /// <remarks></remarks>
-    public abstract class CPDbBaseClass {
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Delete the record specified by tablename and recordId
-        /// </summary>
-        /// <param name="dataSourcename"></param>
-        /// <param name="tableName"></param>
-        /// <param name="recordId"></param>
-		public abstract void Delete(string dataSourcename, string tableName, int recordId);
+    public abstract class CPDbBaseClass : IDisposable {
         //
         //====================================================================================================
         /// <summary>
@@ -30,26 +21,8 @@ namespace Contensive.BaseClasses {
         /// <summary>
         /// get the connection string for his 
         /// </summary>
-        /// <param name="dataSourcename"></param>
         /// <returns></returns>
-        public abstract string GetConnectionString(string dataSourcename);
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Return the recordId in the ccTables table for this table
-        /// </summary>
-        /// <param name="tableName"></param>
-        /// <returns></returns>
-		public abstract int GetTableID(string tableName);
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Return true if this is a valid database table in the current application
-        /// </summary>
-        /// <param name="dataSourcename"></param>
-        /// <param name="tableName"></param>
-        /// <returns></returns>
-		public abstract bool IsTable(string dataSourcename, string tableName);
+        public abstract string GetConnectionString();
         //
         //====================================================================================================
         /// <summary>
@@ -58,16 +31,6 @@ namespace Contensive.BaseClasses {
         /// <param name="tableName"></param>
         /// <returns></returns>
         public abstract bool IsTable(string tableName);
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Return true if this is a valid database field in a valid table in the current application
-        /// </summary>
-        /// <param name="dataSourcename"></param>
-        /// <param name="tableName"></param>
-        /// <param name="fieldName"></param>
-        /// <returns></returns>
-        public abstract bool IsTableField(string dataSourcename, string tableName, string fieldName);
         //
         //====================================================================================================
         /// <summary>
@@ -123,30 +86,19 @@ namespace Contensive.BaseClasses {
         /// Execute a query and return a datatable.
         /// </summary>
         /// <param name="sql"></param>
-        /// <param name="dataSourceName"></param>
         /// <param name="startRecord"></param>
         /// <param name="maxRecords"></param>
         /// <returns></returns>
-        public abstract DataTable ExecuteQuery(string sql, string dataSourceName, int startRecord, int maxRecords);
+        public abstract DataTable ExecuteQuery(string sql, int startRecord, int maxRecords);
         //
         //====================================================================================================
         /// <summary>
         /// Execute an sql query and return a datatable.
         /// </summary>
         /// <param name="sql"></param>
-        /// <param name="dataSourceName"></param>
         /// <param name="startRecord"></param>
         /// <returns></returns>
-        public abstract DataTable ExecuteQuery(string sql, string dataSourceName, int startRecord);
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Execute an sql query and return a datatable.
-        /// </summary>
-        /// <param name="sql"></param>
-        /// <param name="dataSourceName"></param>
-        /// <returns></returns>
-        public abstract DataTable ExecuteQuery(string sql, string dataSourceName);
+        public abstract DataTable ExecuteQuery(string sql, int startRecord);
         //
         //====================================================================================================
         /// <summary>
@@ -161,17 +113,8 @@ namespace Contensive.BaseClasses {
         /// Execute an sql command on a specific datasource. No data is returned.
         /// </summary>
         /// <param name="sql"></param>
-        /// <param name="dataSourceName"></param>
         /// <param name="recordsAffected"></param>
-        public abstract void ExecuteNonQuery(string sql, string dataSourceName, ref int recordsAffected);
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Execute an sql command on a specific datasource. No data is returned.
-        /// </summary>
-        /// <param name="sql"></param>
-        /// <param name="dataSourceName"></param>
-        public abstract void ExecuteNonQuery(string sql, string dataSourceName);
+        public abstract void ExecuteNonQuery(string sql, ref int recordsAffected);
         //
         //====================================================================================================
         /// <summary>
@@ -179,14 +122,6 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <param name="sql"></param>
         public abstract void ExecuteNonQuery(string sql);
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Execute an sql command on a specific datasource, returning immediately.
-        /// </summary>
-        /// <param name="sql"></param>
-        /// <param name="dataSourceName"></param>
-        public abstract void ExecuteNonQueryAsync(string sql, string dataSourceName);
         //
         //====================================================================================================
         /// <summary>
@@ -209,9 +144,7 @@ namespace Contensive.BaseClasses {
         /// <param name="DataSourceName"></param>
         /// <param name="pageSize"></param>
         /// <returns></returns>
-        public abstract string GetRemoteQueryKey(string sql, string DataSourceName, int pageSize);
-        //
-        public abstract string GetRemoteQueryKey(string sql, string DataSourceName);
+        public abstract string GetRemoteQueryKey(string sql, int pageSize);
         //
         public abstract string GetRemoteQueryKey(string sql);
         //
@@ -222,6 +155,12 @@ namespace Contensive.BaseClasses {
         /// <param name="remoteQueryKey"></param>
         /// <returns></returns>
         public abstract DataTable ExecuteRemoteQuery(string remoteQueryKey);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Support disposable for non-default datasources
+        /// </summary>
+        public abstract void Dispose();
         //
         //====================================================================================================
         // deprecated
@@ -256,8 +195,47 @@ namespace Contensive.BaseClasses {
         [Obsolete("Use isTableField instead", true)]
         public abstract bool DbIsTableField(string DataSourcename, string TableName, string FieldName);
         //
+        [Obsolete("Deprecated. Use CP.Content.GetTableId().", true)]
+        public abstract int GetTableID(string tableName);
+        //
         [Obsolete("Only Sql Server currently supported", true)]
         public abstract int GetDataSourceType(string DataSourcename);
+        //
+		[Obsolete("Deprecated. Use methods without datasource reference. Instead create non-default datasource with CP.DbNew(datasourcename).", false)]
+        public abstract void Delete(string dataSourcename, string tableName, int recordId);
+        //
+        [Obsolete("Deprecated. Use methods without datasource.", false)]
+        public abstract string GetConnectionString(string dataSourcename);
+        //
+        [Obsolete("Deprecated. Use methods without datasource.", false)]
+        public abstract bool IsTable(string dataSourcename, string tableName);
+        //
+        [Obsolete("Deprecated. Use methods without datasource.", false)]
+        public abstract bool IsTableField(string dataSourcename, string tableName, string fieldName);
+        //
+        [Obsolete("Deprecated. Use methods without datasource.", false)]
+        public abstract DataTable ExecuteQuery(string sql, string dataSourceName, int startRecord, int maxRecords);
+        //
+        [Obsolete("Deprecated. Use methods without datasource.", false)]
+        public abstract DataTable ExecuteQuery(string sql, string dataSourceName, int startRecord);
+        //
+        [Obsolete("Deprecated. Use methods without datasource.", false)]
+        public abstract DataTable ExecuteQuery(string sql, string dataSourceName);
+        //
+        [Obsolete("Deprecated. Use methods without datasource.", false)]
+        public abstract void ExecuteNonQuery(string sql, string dataSourceName, ref int recordsAffected);
+        //
+        [Obsolete("Deprecated. Use methods without datasource.", false)]
+        public abstract void ExecuteNonQuery(string sql, string dataSourceName);
+        //
+        [Obsolete("Deprecated. Use methods without datasource.", false)]
+        public abstract void ExecuteNonQueryAsync(string sql, string dataSourceName);
+        //
+        [Obsolete("Deprecated. Use methods without datasource.", false)]
+        public abstract string GetRemoteQueryKey(string sql, string DataSourceName, int pageSize);
+        //
+        [Obsolete("Deprecated. Use methods without datasource.", false)]
+        public abstract string GetRemoteQueryKey(string sql, string DataSourceName);
     }
 
 }

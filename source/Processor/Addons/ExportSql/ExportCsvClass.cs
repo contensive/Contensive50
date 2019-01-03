@@ -13,16 +13,16 @@ namespace Contensive.Addons.ExportSql {
         /// <param name="cp"></param>
         /// <returns></returns>
         public override object Execute(Contensive.BaseClasses.CPBaseClass cp) {
-            string result = "";
             try {
-                string sql = cp.Doc.GetText("sql");
-                string datasource = cp.Doc.GetText("datasource");
-                DataTable dt = cp.Db.ExecuteQuery(sql, datasource);
-                result = dt.ToCsv();
+                using ( var db = cp.DbNew(cp.Doc.GetText("datasource"))) {
+                    using (DataTable dt = db.ExecuteQuery(cp.Doc.GetText("sql"))) {
+                        return dt.ToCsv();
+                    }
+                }
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }
-            return result;
+            return "";
         }
     }
 }

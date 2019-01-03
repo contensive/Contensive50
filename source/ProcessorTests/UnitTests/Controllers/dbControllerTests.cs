@@ -14,9 +14,9 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
     //====================================================================================================
     //
     [TestClass()]
-    public class dbControllerTests {
+    public class DbControllerTests {
         [TestMethod]
-        public void Controllers_db_encodeSqlTableNameTest() {
+        public void controllers_db_encodeSqlTableNameTest() {
             // arrange
             // act
             // assert
@@ -38,7 +38,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         /// set a value, close, open, and get it back
         /// </summary>
         [TestMethod]
-        public void Controllers_db_csSetCloseOpenGetTest() {
+        public void controllers_db_csSetCloseOpenGetTest() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
                 int testId_test1 = 0;
@@ -83,7 +83,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         /// set a value and get it back
         /// </summary>
         [TestMethod]
-        public void Controllers_db_csSetGetTest() {
+        public void controllers_db_csSetGetTest() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
                 cp.core.db.executeNonQuery("delete from ccMembers where (username='a')or(username='c')");
@@ -106,7 +106,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         /// set a value and get it back
         /// </summary>
         [TestMethod]
-        public void Controllers_db_csSetSaveGetTest() {
+        public void controllers_db_csSetSaveGetTest() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
                 cp.core.db.executeNonQuery("delete from ccMembers where (username='a')or(username='c')");
@@ -129,7 +129,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         //====================================================================================================
         //
         [TestMethod]
-        public void Controllers_db_csGetRowCount() {
+        public void controllers_db_csGetRowCount() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
                 CPCSBaseClass cs = cp.CSNew();
@@ -146,21 +146,21 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         //====================================================================================================
         //
         [TestMethod]
-        public void Controllers_db_isSqlTableField() {
+        public void controllers_db_isSqlTableField() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
                 // act
                 // assert
-                Assert.IsTrue(cp.core.db.isSQLTableField("", "ccmembers", "name"));
-                Assert.IsTrue(cp.core.db.isSQLTableField("", "ccmembers", "NaMe"));
-                Assert.IsFalse(cp.core.db.isSQLTableField("", "ccmembers", "namex"));
+                Assert.IsTrue(cp.core.db.isSQLTableField("ccmembers", "name"));
+                Assert.IsTrue(cp.core.db.isSQLTableField("ccmembers", "NaMe"));
+                Assert.IsFalse(cp.core.db.isSQLTableField("ccmembers", "namex"));
             }
         }
         //
         //====================================================================================================
         //
         [TestMethod]
-        public void Controllers_db_csGoNext() {
+        public void controllers_db_csGoNext() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
                 string name = GenericController.getGUID();
@@ -199,7 +199,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         //====================================================================================================
         //
         [TestMethod]
-        public void Controllers_db_csGoFirst() {
+        public void controllers_db_csGoFirst() {
             using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
                 // arrange
                 string name = GenericController.getGUID();

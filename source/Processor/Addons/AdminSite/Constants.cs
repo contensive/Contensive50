@@ -43,7 +43,6 @@ namespace Contensive.Addons.AdminSite {
         internal const int AdminActionAbortEdit = 20; // Publish record live
         internal const int AdminActionPublishSubmit = 21; // Submit for Workflow Publishing
         internal const int AdminActionPublishApprove = 22; // Approve for Workflow Publishing
-                                                         //Public Const AdminActionWorkflowPublishApproved = 23    ' Publish what was approved
         internal const int AdminActionSetHTMLEdit = 24; // Set Member Property for this field to HTML Edit
         internal const int AdminActionSetTextEdit = 25; // Set Member Property for this field to Text Edit
         internal const int AdminActionSave = 26; // Save Record

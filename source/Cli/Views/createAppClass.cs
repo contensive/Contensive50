@@ -88,7 +88,7 @@ namespace Contensive.CLI {
                             //
                             // Local Mode, compatible with v4.1, cdn in appRoot folder as /" + appName + "/files/
                             //
-                            Console.Write("\n\nLocal Mode, scale-up architecture. Files are stored and accessed on the local server.");
+                            Console.Write("Local Mode, scale-up architecture. Files are stored and accessed on the local server.");
                             appConfig.localWwwPath = cliController.promptForReply("\napp files", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\www\\");
                             appConfig.localFilesPath = cliController.promptForReply("cdn files", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\files\\");
                             appConfig.localPrivatePath = cliController.promptForReply("private files", cp.core.serverConfig.localDataDriveLetter + ":\\inetpub\\" + appName + "\\private\\");

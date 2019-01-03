@@ -309,34 +309,6 @@ namespace Contensive.Processor.Controllers {
             }
             return result;
         }
-        ////
-        ////=================================================================================
-        ///// <summary>
-        ///// Set a record locked
-        ///// </summary>
-        ///// <param name="ContentName"></param>
-        ///// <param name="RecordID"></param>
-        ///// <param name="MemberID"></param>
-        //public void setEditLock(string ContentName, int RecordID, int MemberID) {
-        //    try {
-        //        setEditLock(ContentName, RecordID, MemberID, false);
-        //    } catch (Exception ex) {
-        //        LogController.handleError( core,ex);
-        //        throw;
-        //    }
-        //}
-        ////
-        ////=================================================================================
-        ///// <summary>
-        ///// Set a record locked
-        ///// </summary>
-        ///// <param name="ContentName"></param>
-        ///// <param name="RecordID"></param>
-        ///// <param name="MemberID"></param>
-        //public void clearEditLock(int tableId, int recordId, int userId) {
-        //    string criteria = "(contentRecordKey=" + getContentRecordKey(tableId, recordId) + ")and((DateExpires>" + DbController.encodeSQLDate(DateTime.Now) + ")or(DateExpires Is null))";
-        //    Models.Db.AuthoringControlModel.deleteSelection(core, criteria);
-        //}
         //
         //=================================================================================
         /// <summary>

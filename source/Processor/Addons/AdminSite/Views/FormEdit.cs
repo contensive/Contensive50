@@ -542,7 +542,7 @@ namespace Contensive.Addons.AdminSite {
                     // All other tables (User definined)
                     bool IsPageContent = MetaController.isWithinContent(core, adminData.adminContent.id, MetaModel.getContentId(core, "Page Content"));
                     bool HasChildRecords = MetaController.isContentFieldSupported(core, adminData.adminContent.name, "parentid");
-                    bool AllowMarkReviewed = core.db.isSQLTableField("default", adminData.adminContent.tableName, "DateReviewed");
+                    bool AllowMarkReviewed = core.db.isSQLTableField( adminData.adminContent.tableName, "DateReviewed");
                     string EditSectionButtonBar = AdminUIController.getButtonBarForEdit(core, new EditButtonBarInfoClass() {
                         allowActivate = false,
                         allowAdd = (allowAdd && adminData.adminContent.allowAdd & adminData.editRecord.AllowUserAdd),

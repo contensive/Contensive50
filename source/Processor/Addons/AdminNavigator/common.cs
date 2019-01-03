@@ -76,17 +76,17 @@ namespace Contensive.Addons.AdminNavigator {
         public struct SortNodeType {
             public string Name;
             public int addonid;
-            public int ContentControlID;
-            public int CollectionID;
-            public string NavigatorID;
-            public bool NewWindow;
-            public int ContentID;
-            public string Link;
-            public int NavIconType;
-            public string NavIconTitle;
-            public int HelpAddonID;
-            public int helpCollectionID;
-            public string NodeIDString;
+            public int contentControlId;
+            public int collectionId;
+            public string navigatorId;
+            public bool newWindow;
+            public int contentId;
+            public string link;
+            public int navIconType;
+            public string navIconTitle;
+            public int helpAddonId;
+            public int helpCollectionId;
+            public string nodeIdString;
         }
         //
         public enum NodeTypeEnum {

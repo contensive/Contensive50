@@ -96,7 +96,7 @@ namespace Contensive.Addons.Housekeeping {
                     if (Pos > 1) {
                         DomainNamePrimary = DomainNamePrimary.Left(Pos - 1);
                     }
-                    int DataSourceType = core.db.getDataSourceType("default");
+                    int DataSourceType = core.db.getDataSourceType();
                     //
                     string DefaultMemberName = "";
                     int PeopleCID = MetaModel.getContentId(core, "people");
@@ -191,7 +191,7 @@ namespace Contensive.Addons.Housekeeping {
                             //
                             // Find missing daily summaries, summarize that date
                             //
-                            SQL = core.db.getSQLSelect("default", "ccVisitSummary", "DateNumber", "TimeDuration=24 and DateNumber>=" + OldestVisitSummaryWeCareAbout.Date.ToOADate(), "DateNumber,TimeNumber");
+                            SQL = core.db.getSQLSelect( "ccVisitSummary", "DateNumber", "TimeDuration=24 and DateNumber>=" + OldestVisitSummaryWeCareAbout.Date.ToOADate(), "DateNumber,TimeNumber");
                             using (var csData = new CsModel(core)) {
                                 csData.openSql(SQL, "Default");
                                 DateTime datePtr = OldestVisitSummaryWeCareAbout;
@@ -253,7 +253,7 @@ namespace Contensive.Addons.Housekeeping {
                         {
                             DateTime datePtr = default(DateTime);
                             using (var csData = new CsModel(core)) {
-                                if (!csData.openSql(core.db.getSQLSelect("default", "ccviewingsummary", "DateNumber", "TimeDuration=24 and DateNumber>=" + OldestVisitSummaryWeCareAbout.Date.ToOADate(), "DateNumber Desc", "", 1))) {
+                                if (!csData.openSql(core.db.getSQLSelect("ccviewingsummary", "DateNumber", "TimeDuration=24 and DateNumber>=" + OldestVisitSummaryWeCareAbout.Date.ToOADate(), "DateNumber Desc", "", 1))) {
                                     datePtr = OldestVisitSummaryWeCareAbout;
                                 } else {
                                     datePtr = DateTime.MinValue.AddDays(csData.getInteger("DateNumber"));
@@ -278,7 +278,7 @@ namespace Contensive.Addons.Housekeeping {
                         //
                         DateTime LastTimeSummaryWasRun = VisitArchiveDate;
                         using (var csData = new CsModel(core)) {
-                            if (csData.openSql(core.db.getSQLSelect("default", "ccVisitSummary", "DateAdded", "(timeduration=1)and(Dateadded>" + DbController.encodeSQLDate(VisitArchiveDate) + ")", "id Desc", "", 1))) {
+                            if (csData.openSql(core.db.getSQLSelect("ccVisitSummary", "DateAdded", "(timeduration=1)and(Dateadded>" + DbController.encodeSQLDate(VisitArchiveDate) + ")", "id Desc", "", 1))) {
                                 LastTimeSummaryWasRun = csData.getDate("DateAdded");
                                 logHousekeeping(core, "Update hourly visit summary, last time summary was run was [" + LastTimeSummaryWasRun + "]");
                             } else {
@@ -296,7 +296,7 @@ namespace Contensive.Addons.Housekeeping {
                         DateTime StartOfHour = (new DateTime(LastTimeSummaryWasRun.Year, LastTimeSummaryWasRun.Month, LastTimeSummaryWasRun.Day, LastTimeSummaryWasRun.Hour, 1, 1)).AddHours(-1); // (Int(24 * LastTimeSummaryWasRun) / 24) - PeriodStep
                         DateTime OldestDateAdded = StartOfHour;
                         using (var csData = new CsModel(core)) {
-                            if (csData.openSql(core.db.getSQLSelect("default", "ccVisits", "DateAdded", "LastVisitTime>" + DbController.encodeSQLDate(StartOfHour), "dateadded", "", 1))) {
+                            if (csData.openSql(core.db.getSQLSelect("ccVisits", "DateAdded", "LastVisitTime>" + DbController.encodeSQLDate(StartOfHour), "dateadded", "", 1))) {
                                 OldestDateAdded = csData.getDate("DateAdded");
                                 if (OldestDateAdded < NextSummaryStartDate) {
                                     NextSummaryStartDate = OldestDateAdded;
@@ -391,7 +391,7 @@ namespace Contensive.Addons.Housekeeping {
                 DateTime thirtyDaysAgo = rightNow.AddDays(-30).Date;
                 string appName = core.appConfig.name;
                 bool ArchiveDeleteNoCookie = GenericController.encodeBoolean(core.siteProperties.getText("ArchiveDeleteNoCookie", "1"));
-                int DataSourceType = core.db.getDataSourceType("default");
+                int DataSourceType = core.db.getDataSourceType();
                 int TimeoutSave = core.db.sqlCommandTimeout;
                 core.db.sqlCommandTimeout = 1800;
                 string SQLDateMidnightTwoDaysAgo = DbController.encodeSQLDate(MidnightTwoDaysAgo);
@@ -536,28 +536,28 @@ namespace Contensive.Addons.Housekeeping {
                     // delete visits from the non-cookie visits
                     //
                     logHousekeeping(core, "Deleting visits with no cookie support older than Midnight, Two Days Ago");
-                    core.db.deleteTableRecordChunks("default", "ccvisits", "(CookieSupport=0)and(LastVisitTime<" + SQLDateMidnightTwoDaysAgo + ")", 1000, 10000);
+                    core.db.deleteTableRecordChunks( "ccvisits", "(CookieSupport=0)and(LastVisitTime<" + SQLDateMidnightTwoDaysAgo + ")", 1000, 10000);
                 }
                 //
                 // Visits with no DateAdded
                 //
                 logHousekeeping(core, "Deleting visits with no DateAdded");
-                core.db.deleteTableRecordChunks("default", "ccvisits", "(DateAdded is null)or(DateAdded<=" + DbController.encodeSQLDate(new DateTime(1995, 1, 1)) + ")", 1000, 10000);
+                core.db.deleteTableRecordChunks( "ccvisits", "(DateAdded is null)or(DateAdded<=" + DbController.encodeSQLDate(new DateTime(1995, 1, 1)) + ")", 1000, 10000);
                 //
                 // Visits with no visitor
                 //
                 logHousekeeping(core, "Deleting visits with no DateAdded");
-                core.db.deleteTableRecordChunks("default", "ccvisits", "(VisitorID is null)or(VisitorID=0)", 1000, 10000);
+                core.db.deleteTableRecordChunks( "ccvisits", "(VisitorID is null)or(VisitorID=0)", 1000, 10000);
                 //
                 // viewings with no visit
                 //
                 logHousekeeping(core, "Deleting viewings with null or invalid VisitID");
-                core.db.deleteTableRecordChunks("default", "ccviewings", "(visitid=0 or visitid is null)", 1000, 10000);
+                core.db.deleteTableRecordChunks( "ccviewings", "(visitid=0 or visitid is null)", 1000, 10000);
                 DateTime OldestVisitDate = default(DateTime);
                 //
                 // Get Oldest Visit
                 using (var csData = new CsModel(core)) {
-                    if (csData.openSql(core.db.getSQLSelect("default", "ccVisits", "DateAdded", "", "dateadded", "", 1))) {
+                    if (csData.openSql(core.db.getSQLSelect( "ccVisits", "DateAdded", "", "dateadded", "", 1))) {
                         OldestVisitDate = csData.getDate("DateAdded").Date;
                     }
                 }
@@ -1051,7 +1051,7 @@ namespace Contensive.Addons.Housekeeping {
                 //
                 if (GenericController.encodeBoolean(core.siteProperties.getText("ArchiveAllowFileClean", "false"))) {
                     //
-                    int DSType = core.db.getDataSourceType("");
+                    int DSType = core.db.getDataSourceType();
                     logHousekeeping(core, "Content TextFile types with no controlling record.");
                     using (var csData = new CsModel(core)) {
                         sql = "SELECT DISTINCT ccTables.Name as TableName, ccFields.Name as FieldName"
@@ -1134,12 +1134,12 @@ namespace Contensive.Addons.Housekeeping {
                 // Visits older then archive age
                 //
                 logHousekeeping(core, "Deleting visits before [" + DeleteBeforeDateSQL + "]");
-                core.db.deleteTableRecordChunks("default", "ccVisits", "(DateAdded<" + DeleteBeforeDateSQL + ")", 1000, 10000);
+                core.db.deleteTableRecordChunks( "ccVisits", "(DateAdded<" + DeleteBeforeDateSQL + ")", 1000, 10000);
                 //
                 // Viewings with visits before the first
                 //
                 logHousekeeping(core, "Deleting viewings with visitIDs lower then the lowest ccVisits.ID");
-                core.db.deleteTableRecordChunks("default", "ccviewings", "(visitid<(select min(ID) from ccvisits))", 1000, 10000);
+                core.db.deleteTableRecordChunks( "ccviewings", "(visitid<(select min(ID) from ccvisits))", 1000, 10000);
                 //
                 // Visitors with no visits
                 //
@@ -1195,7 +1195,7 @@ namespace Contensive.Addons.Housekeeping {
                     + " and(Visits=1)"
                     + " and(Username is null)"
                     + " and(email is null)";
-                core.db.deleteTableRecordChunks("default", "ccmembers", SQLCriteria, 1000, 10000);
+                core.db.deleteTableRecordChunks( "ccmembers", SQLCriteria, 1000, 10000);
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
             } finally {

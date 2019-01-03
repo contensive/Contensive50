@@ -165,17 +165,6 @@ namespace Contensive.Processor.Controllers {
         private Controllers.AddonController _addon;
         //
         //===================================================================================================
-        //public MenuFlyoutController menuFlyout {
-        //    get {
-        //        if (_menuFlyout == null) {
-        //            _menuFlyout = new MenuFlyoutController(this);
-        //        }
-        //        return _menuFlyout;
-        //    }
-        //}
-        //private MenuFlyoutController _menuFlyout;
-        //
-        //===================================================================================================
         public PropertyModelClass userProperty {
             get {
                 if (_userProperty == null) {
@@ -398,14 +387,13 @@ namespace Contensive.Processor.Controllers {
         private Controllers.CacheController _cache = null;
         //
         //===================================================================================================
-        // todo - convert to dictionary, one entry per datasource, remove datasource selection from all methods
         /// <summary>
-        /// controller for the application's database
+        /// database datasource for the default datasource
         /// </summary>
         public DbController db {
             get {
                 if (_db == null) {
-                    _db = new DbController(this);
+                    _db = new DbController(this, "default");
                 }
                 return _db;
             }

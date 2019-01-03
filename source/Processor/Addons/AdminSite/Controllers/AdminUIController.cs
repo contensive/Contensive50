@@ -123,9 +123,6 @@ namespace Contensive.Addons.AdminSite.Controllers {
             public PersonModel modifiedBy;
             public DateTime dateAdded;
             public PersonModel createdBy;
-            //public int RootPageID;
-            //public bool SetPageNotFoundPageID;
-            //public bool SetLandingPageID;
             public bool Loaded; // true/false - set true when the field array values are loaded
             public bool Saved; // true if edit record was saved during this page
             public bool userReadOnly; // set if this record can not be edited, for various reasons
@@ -144,7 +141,6 @@ namespace Contensive.Addons.AdminSite.Controllers {
             /// This user can add records to this content
             /// </summary>
             public bool AllowUserAdd;
-            //public bool AllowUserCancel;
             /// <summary>
             /// This user can save the current record
             /// </summary>
@@ -153,10 +149,6 @@ namespace Contensive.Addons.AdminSite.Controllers {
             /// This user can delete the current record
             /// </summary>
             public bool AllowUserDelete;
-            //public bool AllowUserPublish;
-            //public bool AllowUserAbort;
-            //public bool AllowUserSubmit;
-            //public bool AllowUserApprove;
             /// <summary>
             /// set if an edit Lock by anyone else besides the current user
             /// </summary>
@@ -276,7 +268,7 @@ namespace Contensive.Addons.AdminSite.Controllers {
                 foreach (ButtonMetadata button in ButtonList) {
 
                     if (button.isDelete) {
-                        s += getButtonDanger(button.value, "if(!DeleteCheck()) return false;", !AllowDelete);
+                        s += getButtonDanger(button.value, "if(!DeleteCheck()) { return false; }", !AllowDelete);
                     } else if (button.isAdd) {
                         s += getButtonPrimary(button.value, "return processSubmit(this);", !AllowAdd);
                     } else if (button.isClose) {

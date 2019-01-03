@@ -10,7 +10,6 @@ namespace Contensive.BaseClasses {
         public abstract DateTime GetDate(string PropertyName, string DefaultValue = "");
         public abstract int GetInteger(string PropertyName, string DefaultValue = "");
         public abstract double GetNumber(string PropertyName, string DefaultValue = "");
-        //Public MustOverride Function IsProperty(ByVal PropertyName As String) As Boolean
         public abstract int Id { get; }
         public abstract bool IsNew { get; }
         public abstract void SetProperty(string PropertyName, string Value, int TargetVisitorid = 0);

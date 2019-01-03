@@ -2544,7 +2544,7 @@ namespace Contensive.Processor.Controllers {
                     //                                                        UserError = "The add-on being installed is referenced by another add-on in collection [], but this add-on could not be found by the respoective criteria [" & Criteria & "]"
                     //                                                        Call logcontroller.appendInstallLog(core,  "UpgradeAddFromLocalCollection_InstallAddonNode, UserError [" & UserError & "]")
                     //                                                    Else
-                    //                                                        CS2 = csRules.cs_openCsSql_rev("default", "select ID from ccAddonIncludeRules where Addonid=" & SrcAddonID & " and IncludedAddonID=" & addonId)
+                    //                                                        CS2 = csRules.cs_openCsSql_rev( "select ID from ccAddonIncludeRules where Addonid=" & SrcAddonID & " and IncludedAddonID=" & addonId)
                     //                                                        AddRule = Not csRules.cs_ok(CS2)
                     //                                                        Call csRules.cs_Close(CS2)
                     //                                                    End If

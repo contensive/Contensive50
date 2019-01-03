@@ -654,12 +654,6 @@ namespace Contensive.Processor.Controllers {
             }
             return result;
         }
-        ////
-        ////====================================================================================================
-        ////
-        //public string selectFromList(string MenuName, string CurrentValue, string[] lookups, string NoneCaption = "", string htmlId = "") {
-        //    return selectFromList(genericController.encodeText(MenuName), CurrentValue, genericController.encodeText(SelectList), genericController.encodeText(NoneCaption), genericController.encodeText(htmlId));
-        //}
         //
         //====================================================================================================
         /// <summary>
@@ -790,7 +784,7 @@ namespace Contensive.Processor.Controllers {
                         //Link = genericController.modifyLinkQuery(Link, RequestNameInterceptpage, LegacyInterceptPageSNLogin, True)
                         result += "<a href=\"" + HtmlController.encodeHtml(Link) + "\" >";
                     }
-                    IconFilename = core.siteProperties.LoginIconFilename;
+                    IconFilename = core.siteProperties.loginIconFilename;
                     if (GenericController.vbLCase(IconFilename.Left(7)) != "/ContensiveBase/") {
                         IconFilename = GenericController.getCdnFileLink(core, IconFilename);
                     }
@@ -907,12 +901,6 @@ namespace Contensive.Processor.Controllers {
             result += ">";
             return result + innerHtml + "</form>";
         }
-        ////
-        ////====================================================================================================
-        ////
-        //public string inputText(string htmlName, string defaultValue = "", string Height = "", string Width = "", string Id = "", bool PasswordField = false) {
-        //    return inputText(htmlName, defaultValue, genericController.encodeInteger(Height), genericController.encodeInteger(Width), Id, PasswordField, false);
-        //}
         //
         //====================================================================================================
         //

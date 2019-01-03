@@ -32,7 +32,7 @@ namespace Contensive.Processor.Controllers {
             page = new PageContentModel();
             pageToRootList = new List<PageContentModel>();
             template = new PageTemplateModel();
-            ChildPageIdsListed = new List<int>();
+            childPageIdsListed = new List<int>();
         }
         /// <summary>
         /// current page to it's root. List.First is current page, List.Last is rootpage
@@ -54,7 +54,7 @@ namespace Contensive.Processor.Controllers {
         /// Child pages can be listed on Child Page List addons.
         /// If a page has has this page set 
         /// </summary>
-        public List<int> ChildPageIdsListed { get; set; }
+        public List<int> childPageIdsListed { get; set; }
         //
         //========================================================================
         //
@@ -863,7 +863,7 @@ namespace Contensive.Processor.Controllers {
                         if (core.doc.redirectRecordID != 0) {
                             string contentName = MetaController.getContentNameByID(core, core.doc.redirectContentID);
                             if (!string.IsNullOrEmpty(contentName)) {
-                                if (WebServerController.main_RedirectByRecord_ReturnStatus(core, contentName, core.doc.redirectRecordID)) {
+                                if (WebServerController.redirectByRecord_ReturnStatus(core, contentName, core.doc.redirectRecordID)) {
                                     //
                                     //Call AppendLog("main_init(), 3210 - exit for rc/ri redirect ")
                                     //
@@ -1104,7 +1104,7 @@ namespace Contensive.Processor.Controllers {
                             + "or(SourceLink=" + DbController.encodeSQLText(LinkFullPath) + ")"
                             + "or(SourceLink=" + DbController.encodeSQLText(LinkFullPathNoSlash) + ")"
                             + ")";
-                        Sql = core.db.getSQLSelect("", "ccLinkForwards", "ID,DestinationLink,Viewings,GroupID", LinkForwardCriteria, "ID", "", 1);
+                        Sql = core.db.getSQLSelect("ccLinkForwards", "ID,DestinationLink,Viewings,GroupID", LinkForwardCriteria, "ID", "", 1);
                         using (var csData = new CsModel(core)) {
                             csData.openSql(Sql);
                             if (csData.ok()) {
@@ -2640,7 +2640,7 @@ namespace Contensive.Processor.Controllers {
                     } else if ((string.IsNullOrEmpty(UcaseRequestedListName)) && (childPage.parentListName != "")) {
                         //
                         // -- child page has a parentListName but this request does not
-                        if (!core.doc.pageController.ChildPageIdsListed.Contains(childPage.id)) {
+                        if (!core.doc.pageController.childPageIdsListed.Contains(childPage.id)) {
                             //
                             // -- child page has not yet displays, if editing show it as an orphan page
                             if (isAuthoring) {
@@ -2731,7 +2731,7 @@ namespace Contensive.Processor.Controllers {
                         //activeList +=  "<i class=\"fas fa-grip - horizontal\" style=\"color:#222;\"></i></li>";
                         //
                         // -- add child page to childPagesListed list
-                        if (!core.doc.pageController.ChildPageIdsListed.Contains(childPage.id)) { core.doc.pageController.ChildPageIdsListed.Add(childPage.id); }
+                        if (!core.doc.pageController.childPageIdsListed.Contains(childPage.id)) { core.doc.pageController.childPageIdsListed.Add(childPage.id); }
                         ChildListCount = ChildListCount + 1;
                         //.IsDisplayed = True
                     }
@@ -3018,7 +3018,7 @@ namespace Contensive.Processor.Controllers {
         public bool allowThroughPageBlock(CoreController core, int pageId) {
             bool result = false;
             try {
-                if (core.session.isAuthenticatedAdmin(core)) return true;
+                if (core.session.isAuthenticatedAdmin(core)) { return true; }
                 string sql = "SELECT ccMemberRules.MemberID"
                     + " FROM (ccPageContentBlockRules LEFT JOIN ccgroups ON ccPageContentBlockRules.GroupID = ccgroups.ID) LEFT JOIN ccMemberRules ON ccgroups.ID = ccMemberRules.GroupID"
                     + " WHERE (((ccPageContentBlockRules.RecordID)=" + pageId + ")"
@@ -3028,7 +3028,7 @@ namespace Contensive.Processor.Controllers {
                     + " AND ((ccMemberRules.DateExpires) Is Null Or (ccMemberRules.DateExpires)>" + DbController.encodeSQLDate(core.doc.profileStartTime) + ")"
                     + " AND ((ccMemberRules.MemberID)=" + core.session.user.id + "));";
                 int recordsReturned = 0;
-                DataTable dt = core.db.executeQuery(sql,"",1,1, ref recordsReturned);
+                DataTable dt = core.db.executeQuery(sql,1,1, ref recordsReturned);
                 return !recordsReturned.Equals(0);
             } catch (Exception ex) {
                 LogController.handleError(core, ex);

@@ -36,8 +36,6 @@ namespace Contensive.Processor.Models.Db {
         public bool allowMessageFooter { get; set; }
         public bool allowMetaContentNoFollow { get; set; }
         public bool allowMoreInfo { get; set; }
-        //// deprecated 20180701
-        //public bool AllowPrinterVersion { get; set; }
         public bool allowReturnLinkDisplay { get; set; }
         public bool allowReviewedFooter { get; set; }
         public bool allowSeeAlso { get; set; }
@@ -57,9 +55,6 @@ namespace Contensive.Processor.Models.Db {
         public DateTime dateArchive { get; set; }
         public DateTime dateExpires { get; set; }
         public DateTime dateReviewed { get; set; }
-
-
-
         public string headline { get; set; }
         public string imageFilename { get; set; }
         public bool isSecure { get; set; }
@@ -185,11 +180,6 @@ namespace Contensive.Processor.Models.Db {
         public static int getRecordId(CoreController core, string ccGuid) {
             return BaseModel.getRecordId<PageContentModel>(core, ccGuid);
         }
-        //
-        //====================================================================================================
-        //public static PageContentModel createDefault(CoreController core) {
-        //    return createDefault<PageContentModel>(core);
-        //}
         //
         //====================================================================================================
         /// <summary>

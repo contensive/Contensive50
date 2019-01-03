@@ -253,7 +253,6 @@ namespace Contensive.Processor.Models.Domain {
         [Serializable]
         public class MetaAdminColumnClass {
             public string Name;
-            //Public FieldPointer As Integer
             public int Width;
             public int SortPriority;
             public int SortDirection;

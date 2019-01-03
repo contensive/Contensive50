@@ -25,6 +25,12 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
+        public override int GetTableID(string tableName) {
+            throw new NotImplementedException();
+        }
+        //
+        //====================================================================================================
+        //
         public override string GetCopy(string copyName, string DefaultContent) {
             return cp.core.html.getContentCopy(copyName, DefaultContent, cp.core.session.user.id, true, cp.core.session.isAuthenticated);
         }
@@ -374,8 +380,6 @@ namespace Contensive.Processor {
         }
         ~CPContentClass() {
             Dispose(false);
-            
-            
         }
         #endregion
     }

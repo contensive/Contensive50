@@ -33,10 +33,6 @@ namespace Contensive.Processor.Models.Domain {
         /// status used to signal that the app is ok
         /// </summary>
         public AppStatusEnum appStatus = AppStatusEnum.maintenance;
-        //// <summary>
-        //// Mode enum
-        //// </summary>
-        //public appModeEnum appMode = appModeEnum.maintainence;
         /// <summary>
         /// when false, app throws exception
         /// </summary>

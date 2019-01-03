@@ -317,20 +317,6 @@ namespace Contensive.Processor.Controllers {
                 LogController.handleError( core,ex);
             }
         }
-        ////
-        ////====================================================================================================
-        ///// <summary>
-        ///// save an object to cache, with invalidation date and dependentKey
-        ///// 
-        ///// </summary>
-        ///// <param name="key"></param>
-        ///// <param name="content"></param>
-        ///// <param name="invalidationDate"></param>
-        ///// <param name="dependantKey">The cache name of an object that .</param>
-        ///// <remarks></remarks>
-        //public void setObject(string key, object content, DateTime invalidationDate, string dependantKey) {
-        //    setObject(key, content, invalidationDate, new List<string> { dependantKey });
-        //}
         //
         //====================================================================================================
         /// <summary>
@@ -508,25 +494,6 @@ namespace Contensive.Processor.Controllers {
         public void invalidateDbRecord(int recordId, string tableName, string dataSourceName = "default") {
             invalidate(createCacheKey_forDbRecord(recordId, tableName, dataSourceName));
         }
-        ////
-        ////========================================================================
-        ///// <summary>
-        ///// update the dbTablename cache entry. Do this anytime any record is updated in the table
-        ///// </summary>
-        ///// <param name="ContentName"></param>
-        //public void Deprecate_useTable_invalidateAllInContent(string ContentName) {
-        //    try {
-        //        //
-        //        logController.logTrace(core,"invalidateAllObjectsInContent(" + ContentName + ")");
-        //        //
-        //        // -- save the cache key that represents any record in the content, set as a dependent key for saves
-        //        invalidate(ContentName);
-        //        invalidate(CdefController.getContentTablename(core, ContentName));
-        //    } catch (Exception ex) {
-        //        logController.handleError( core,ex);
-        //        throw;
-        //    }
-        //}
         //
         //========================================================================
         /// <summary>

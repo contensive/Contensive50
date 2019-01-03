@@ -121,11 +121,6 @@ namespace Contensive.BaseClasses {
         public abstract void ErrorReport(System.Exception Ex, string Message = "");
         //
         //====================================================================================================
-        //
-        // 20151121 - not needed, removed to resolve compile issue with com compatibility
-        //Public MustOverride Sub ErrorReport(ByVal Err As Microsoft.VisualBasic.ErrObject, Optional ByVal Message As String = "")
-        //
-        //====================================================================================================
         /// <summary>
         /// Run an SQL query on the default datasource and save the data in a CSV file in the filename provided to a record in the tasks table.
         /// </summary>

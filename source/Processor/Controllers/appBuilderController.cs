@@ -522,9 +522,13 @@ namespace Contensive.Processor.Controllers {
             try {
                 //
                 // verify Db field schema for fields handled internally (fix datatime2(0) problem -- need at least 3 digits for precision)
-                var tableList = Models.Db.TableModel.createList(core, "");
+                var tableList = Models.Db.TableModel.createList(core, "","dataSourceId");
+                var dataSource = DataSourceModel.addEmpty(core);
                 foreach (TableModel table in tableList) {
-                    var tableSchema = Models.Domain.TableSchemaModel.getTableSchema(core, table.name, "");
+                    if ( table.dataSourceID != dataSource.id ) { dataSource = DataSourceModel.create(core, table.dataSourceID); }
+                    if ((dataSource == null)) { dataSource = DataSourceModel.addEmpty(core); }
+                    var tableSchema = Models.Domain.TableSchemaModel.getTableSchema(core, table.name, "default");
+
                     if (tableSchema != null) {
                         foreach (Models.Domain.TableSchemaModel.ColumnSchemaModel column in tableSchema.columns) {
                             if ((column.DATA_TYPE.ToLowerInvariant() == "datetime2") && (column.DATETIME_PRECISION < 3)) {
@@ -537,7 +541,7 @@ namespace Contensive.Processor.Controllers {
                                     if ( index.indexKeyList.Contains(column.COLUMN_NAME) ) {
                                         //
                                         LogController.logInfo(core, logPrefix + ", verifySqlFieldCompatibility, index [" + index.index_name + "] must be dropped");
-                                        core.db.deleteSqlIndex("", table.name, index.index_name);
+                                        core.db.deleteSqlIndex(table.name, index.index_name);
                                         indexDropped = true;
                                         //
                                     }
@@ -557,7 +561,7 @@ namespace Contensive.Processor.Controllers {
                                         if (index.indexKeyList.Contains(column.COLUMN_NAME)) {
                                             //
                                             LogController.logInfo(core, logPrefix + ", verifySqlFieldCompatibility, recreating index [" + index.index_name + "]");
-                                            core.db.createSQLIndex("", table.name, index.index_name, index.index_keys);
+                                            core.db.createSQLIndex(table.name, index.index_name, index.index_keys);
                                             //
                                         }
                                     }
@@ -893,92 +897,91 @@ namespace Contensive.Processor.Controllers {
                     LogController.logInfo(core, logPrefix + ", enter");
                     //appendUpgradeLogAddStep(core, core.appConfig.name, "VerifyCoreTables", "Verify Core SQL Tables");
                     //
-                    core.db.createSQLTable("Default", "ccDataSources");
-                    core.db.createSQLTableField("Default", "ccDataSources", "typeId", fieldTypeIdInteger);
-                    core.db.createSQLTableField("Default", "ccDataSources", "address", fieldTypeIdText);
-                    core.db.createSQLTableField("Default", "ccDataSources", "username", fieldTypeIdText);
-                    core.db.createSQLTableField("Default", "ccDataSources", "password", fieldTypeIdText);
-                    core.db.createSQLTableField("Default", "ccDataSources", "ConnString", fieldTypeIdText);
-                    core.db.createSQLTableField("Default", "ccDataSources", "endpoint", fieldTypeIdText);
-                    core.db.createSQLTableField("Default", "ccDataSources", "dbtypeid", fieldTypeIdLookup);
+                    core.db.createSQLTable( "ccDataSources");
+                    core.db.createSQLTableField( "ccDataSources", "username", fieldTypeIdText);
+                    core.db.createSQLTableField( "ccDataSources", "password", fieldTypeIdText);
+                    core.db.createSQLTableField( "ccDataSources", "connString", fieldTypeIdText);
+                    core.db.createSQLTableField( "ccDataSources", "endpoint", fieldTypeIdText);
+                    core.db.createSQLTableField( "ccDataSources", "dbTypeId", fieldTypeIdLookup);
+                    //core.db.createSQLTableField( "ccDataSources", "address", fieldTypeIdText);
                     //
-                    core.db.createSQLTable("Default", "ccTables");
-                    core.db.createSQLTableField("Default", "ccTables", "DataSourceID", fieldTypeIdLookup);
+                    core.db.createSQLTable( "ccTables");
+                    core.db.createSQLTableField( "ccTables", "DataSourceID", fieldTypeIdLookup);
                     //
-                    core.db.createSQLTable("Default", "ccContent");
-                    core.db.createSQLTableField("Default", "ccContent", "ContentTableID", fieldTypeIdInteger);
-                    core.db.createSQLTableField("Default", "ccContent", "AuthoringTableID", fieldTypeIdInteger);
-                    core.db.createSQLTableField("Default", "ccContent", "AllowAdd", fieldTypeIdBoolean);
-                    core.db.createSQLTableField("Default", "ccContent", "AllowDelete", fieldTypeIdBoolean);
-                    core.db.createSQLTableField("Default", "ccContent", "AllowWorkflowAuthoring", fieldTypeIdBoolean);
-                    core.db.createSQLTableField("Default", "ccContent", "DeveloperOnly", fieldTypeIdBoolean);
-                    core.db.createSQLTableField("Default", "ccContent", "AdminOnly", fieldTypeIdBoolean);
-                    core.db.createSQLTableField("Default", "ccContent", "ParentID", fieldTypeIdInteger);
-                    core.db.createSQLTableField("Default", "ccContent", "DefaultSortMethodID", fieldTypeIdInteger);
-                    core.db.createSQLTableField("Default", "ccContent", "DropDownFieldList", fieldTypeIdText);
-                    core.db.createSQLTableField("Default", "ccContent", "EditorGroupID", fieldTypeIdInteger);
-                    core.db.createSQLTableField("Default", "ccContent", "AllowCalendarEvents", fieldTypeIdBoolean);
-                    core.db.createSQLTableField("Default", "ccContent", "AllowContentTracking", fieldTypeIdBoolean);
-                    core.db.createSQLTableField("Default", "ccContent", "AllowTopicRules", fieldTypeIdBoolean);
-                    core.db.createSQLTableField("Default", "ccContent", "AllowContentChildTool", fieldTypeIdBoolean);
-                    core.db.createSQLTableField("Default", "ccContent", "IconLink", fieldTypeIdLink);
-                    core.db.createSQLTableField("Default", "ccContent", "IconHeight", fieldTypeIdInteger);
-                    core.db.createSQLTableField("Default", "ccContent", "IconWidth", fieldTypeIdInteger);
-                    core.db.createSQLTableField("Default", "ccContent", "IconSprites", fieldTypeIdInteger);
-                    core.db.createSQLTableField("Default", "ccContent", "installedByCollectionId", fieldTypeIdInteger);
-                    core.db.createSQLTableField("Default", "ccContent", "IsBaseContent", fieldTypeIdBoolean);
+                    core.db.createSQLTable( "ccContent");
+                    core.db.createSQLTableField( "ccContent", "ContentTableID", fieldTypeIdInteger);
+                    core.db.createSQLTableField( "ccContent", "AuthoringTableID", fieldTypeIdInteger);
+                    core.db.createSQLTableField( "ccContent", "AllowAdd", fieldTypeIdBoolean);
+                    core.db.createSQLTableField( "ccContent", "AllowDelete", fieldTypeIdBoolean);
+                    core.db.createSQLTableField( "ccContent", "AllowWorkflowAuthoring", fieldTypeIdBoolean);
+                    core.db.createSQLTableField( "ccContent", "DeveloperOnly", fieldTypeIdBoolean);
+                    core.db.createSQLTableField( "ccContent", "AdminOnly", fieldTypeIdBoolean);
+                    core.db.createSQLTableField( "ccContent", "ParentID", fieldTypeIdInteger);
+                    core.db.createSQLTableField( "ccContent", "DefaultSortMethodID", fieldTypeIdInteger);
+                    core.db.createSQLTableField( "ccContent", "DropDownFieldList", fieldTypeIdText);
+                    core.db.createSQLTableField( "ccContent", "EditorGroupID", fieldTypeIdInteger);
+                    core.db.createSQLTableField( "ccContent", "AllowCalendarEvents", fieldTypeIdBoolean);
+                    core.db.createSQLTableField( "ccContent", "AllowContentTracking", fieldTypeIdBoolean);
+                    core.db.createSQLTableField( "ccContent", "AllowTopicRules", fieldTypeIdBoolean);
+                    core.db.createSQLTableField( "ccContent", "AllowContentChildTool", fieldTypeIdBoolean);
+                    core.db.createSQLTableField( "ccContent", "IconLink", fieldTypeIdLink);
+                    core.db.createSQLTableField( "ccContent", "IconHeight", fieldTypeIdInteger);
+                    core.db.createSQLTableField( "ccContent", "IconWidth", fieldTypeIdInteger);
+                    core.db.createSQLTableField( "ccContent", "IconSprites", fieldTypeIdInteger);
+                    core.db.createSQLTableField( "ccContent", "installedByCollectionId", fieldTypeIdInteger);
+                    core.db.createSQLTableField( "ccContent", "IsBaseContent", fieldTypeIdBoolean);
                     //
-                    core.db.createSQLTable("Default", "ccFields");
-                    core.db.createSQLTableField("Default", "ccFields", "ContentID", fieldTypeIdInteger);
-                    core.db.createSQLTableField("Default", "ccFields", "Type", fieldTypeIdInteger);
-                    core.db.createSQLTableField("Default", "ccFields", "Caption", fieldTypeIdText);
-                    core.db.createSQLTableField("Default", "ccFields", "ReadOnly", fieldTypeIdBoolean);
-                    core.db.createSQLTableField("Default", "ccFields", "NotEditable", fieldTypeIdBoolean);
-                    core.db.createSQLTableField("Default", "ccFields", "LookupContentID", fieldTypeIdInteger);
-                    core.db.createSQLTableField("Default", "ccFields", "RedirectContentID", fieldTypeIdInteger);
-                    core.db.createSQLTableField("Default", "ccFields", "RedirectPath", fieldTypeIdText);
-                    core.db.createSQLTableField("Default", "ccFields", "RedirectID", fieldTypeIdText);
-                    core.db.createSQLTableField("Default", "ccFields", "HelpMessage", fieldTypeIdLongText); // deprecated but Im chicken to remove this
-                    core.db.createSQLTableField("Default", "ccFields", "UniqueName", fieldTypeIdBoolean);
-                    core.db.createSQLTableField("Default", "ccFields", "TextBuffered", fieldTypeIdBoolean);
-                    core.db.createSQLTableField("Default", "ccFields", "Password", fieldTypeIdBoolean);
-                    core.db.createSQLTableField("Default", "ccFields", "IndexColumn", fieldTypeIdInteger);
-                    core.db.createSQLTableField("Default", "ccFields", "IndexWidth", fieldTypeIdText);
-                    core.db.createSQLTableField("Default", "ccFields", "IndexSortPriority", fieldTypeIdInteger);
-                    core.db.createSQLTableField("Default", "ccFields", "IndexSortDirection", fieldTypeIdInteger);
-                    core.db.createSQLTableField("Default", "ccFields", "EditSortPriority", fieldTypeIdInteger);
-                    core.db.createSQLTableField("Default", "ccFields", "AdminOnly", fieldTypeIdBoolean);
-                    core.db.createSQLTableField("Default", "ccFields", "DeveloperOnly", fieldTypeIdBoolean);
-                    core.db.createSQLTableField("Default", "ccFields", "DefaultValue", fieldTypeIdText);
-                    core.db.createSQLTableField("Default", "ccFields", "Required", fieldTypeIdBoolean);
-                    core.db.createSQLTableField("Default", "ccFields", "HTMLContent", fieldTypeIdBoolean);
-                    core.db.createSQLTableField("Default", "ccFields", "Authorable", fieldTypeIdBoolean);
-                    core.db.createSQLTableField("Default", "ccFields", "ManyToManyContentID", fieldTypeIdInteger);
-                    core.db.createSQLTableField("Default", "ccFields", "ManyToManyRuleContentID", fieldTypeIdInteger);
-                    core.db.createSQLTableField("Default", "ccFields", "ManyToManyRulePrimaryField", fieldTypeIdText);
-                    core.db.createSQLTableField("Default", "ccFields", "ManyToManyRuleSecondaryField", fieldTypeIdText);
-                    core.db.createSQLTableField("Default", "ccFields", "RSSTitleField", fieldTypeIdBoolean);
-                    core.db.createSQLTableField("Default", "ccFields", "RSSDescriptionField", fieldTypeIdBoolean);
-                    core.db.createSQLTableField("Default", "ccFields", "MemberSelectGroupID", fieldTypeIdInteger);
-                    core.db.createSQLTableField("Default", "ccFields", "EditTab", fieldTypeIdText);
-                    core.db.createSQLTableField("Default", "ccFields", "Scramble", fieldTypeIdBoolean);
-                    core.db.createSQLTableField("Default", "ccFields", "LookupList", fieldTypeIdText);
-                    core.db.createSQLTableField("Default", "ccFields", "IsBaseField", fieldTypeIdBoolean);
-                    core.db.createSQLTableField("Default", "ccFields", "installedByCollectionId", fieldTypeIdInteger);
+                    core.db.createSQLTable( "ccFields");
+                    core.db.createSQLTableField( "ccFields", "ContentID", fieldTypeIdInteger);
+                    core.db.createSQLTableField( "ccFields", "Type", fieldTypeIdInteger);
+                    core.db.createSQLTableField( "ccFields", "Caption", fieldTypeIdText);
+                    core.db.createSQLTableField( "ccFields", "ReadOnly", fieldTypeIdBoolean);
+                    core.db.createSQLTableField( "ccFields", "NotEditable", fieldTypeIdBoolean);
+                    core.db.createSQLTableField( "ccFields", "LookupContentID", fieldTypeIdInteger);
+                    core.db.createSQLTableField( "ccFields", "RedirectContentID", fieldTypeIdInteger);
+                    core.db.createSQLTableField( "ccFields", "RedirectPath", fieldTypeIdText);
+                    core.db.createSQLTableField( "ccFields", "RedirectID", fieldTypeIdText);
+                    core.db.createSQLTableField( "ccFields", "HelpMessage", fieldTypeIdLongText); // deprecated but Im chicken to remove this
+                    core.db.createSQLTableField( "ccFields", "UniqueName", fieldTypeIdBoolean);
+                    core.db.createSQLTableField( "ccFields", "TextBuffered", fieldTypeIdBoolean);
+                    core.db.createSQLTableField( "ccFields", "Password", fieldTypeIdBoolean);
+                    core.db.createSQLTableField( "ccFields", "IndexColumn", fieldTypeIdInteger);
+                    core.db.createSQLTableField( "ccFields", "IndexWidth", fieldTypeIdText);
+                    core.db.createSQLTableField( "ccFields", "IndexSortPriority", fieldTypeIdInteger);
+                    core.db.createSQLTableField( "ccFields", "IndexSortDirection", fieldTypeIdInteger);
+                    core.db.createSQLTableField( "ccFields", "EditSortPriority", fieldTypeIdInteger);
+                    core.db.createSQLTableField( "ccFields", "AdminOnly", fieldTypeIdBoolean);
+                    core.db.createSQLTableField( "ccFields", "DeveloperOnly", fieldTypeIdBoolean);
+                    core.db.createSQLTableField( "ccFields", "DefaultValue", fieldTypeIdText);
+                    core.db.createSQLTableField( "ccFields", "Required", fieldTypeIdBoolean);
+                    core.db.createSQLTableField( "ccFields", "HTMLContent", fieldTypeIdBoolean);
+                    core.db.createSQLTableField( "ccFields", "Authorable", fieldTypeIdBoolean);
+                    core.db.createSQLTableField( "ccFields", "ManyToManyContentID", fieldTypeIdInteger);
+                    core.db.createSQLTableField( "ccFields", "ManyToManyRuleContentID", fieldTypeIdInteger);
+                    core.db.createSQLTableField( "ccFields", "ManyToManyRulePrimaryField", fieldTypeIdText);
+                    core.db.createSQLTableField( "ccFields", "ManyToManyRuleSecondaryField", fieldTypeIdText);
+                    core.db.createSQLTableField( "ccFields", "RSSTitleField", fieldTypeIdBoolean);
+                    core.db.createSQLTableField( "ccFields", "RSSDescriptionField", fieldTypeIdBoolean);
+                    core.db.createSQLTableField( "ccFields", "MemberSelectGroupID", fieldTypeIdInteger);
+                    core.db.createSQLTableField( "ccFields", "EditTab", fieldTypeIdText);
+                    core.db.createSQLTableField( "ccFields", "Scramble", fieldTypeIdBoolean);
+                    core.db.createSQLTableField( "ccFields", "LookupList", fieldTypeIdText);
+                    core.db.createSQLTableField( "ccFields", "IsBaseField", fieldTypeIdBoolean);
+                    core.db.createSQLTableField( "ccFields", "installedByCollectionId", fieldTypeIdInteger);
                     //
-                    core.db.createSQLTable("Default", "ccFieldHelp");
-                    core.db.createSQLTableField("Default", "ccFieldHelp", "FieldID", fieldTypeIdLookup);
-                    core.db.createSQLTableField("Default", "ccFieldHelp", "HelpDefault", fieldTypeIdLongText);
-                    core.db.createSQLTableField("Default", "ccFieldHelp", "HelpCustom", fieldTypeIdLongText);
+                    core.db.createSQLTable( "ccFieldHelp");
+                    core.db.createSQLTableField( "ccFieldHelp", "FieldID", fieldTypeIdLookup);
+                    core.db.createSQLTableField( "ccFieldHelp", "HelpDefault", fieldTypeIdLongText);
+                    core.db.createSQLTableField( "ccFieldHelp", "HelpCustom", fieldTypeIdLongText);
                     //
-                    core.db.createSQLTable("Default", "ccSetup");
-                    core.db.createSQLTableField("Default", "ccSetup", "FieldValue", fieldTypeIdText);
-                    core.db.createSQLTableField("Default", "ccSetup", "DeveloperOnly", fieldTypeIdBoolean);
+                    core.db.createSQLTable( "ccSetup");
+                    core.db.createSQLTableField( "ccSetup", "FieldValue", fieldTypeIdText);
+                    core.db.createSQLTableField( "ccSetup", "DeveloperOnly", fieldTypeIdBoolean);
                     //
-                    core.db.createSQLTable("Default", "ccSortMethods");
-                    core.db.createSQLTableField("Default", "ccSortMethods", "OrderByClause", fieldTypeIdText);
+                    core.db.createSQLTable( "ccSortMethods");
+                    core.db.createSQLTableField( "ccSortMethods", "OrderByClause", fieldTypeIdText);
                     //
-                    core.db.createSQLTable("Default", "ccFieldTypes");
+                    core.db.createSQLTable( "ccFieldTypes");
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -1123,21 +1126,21 @@ namespace Contensive.Processor.Controllers {
                 sqlList.add("CreatedBy", "0");
                 sqlList.add("OrderByClause", DbController.encodeSQLText(OrderByCriteria));
                 sqlList.add("active", SQLTrue);
-                sqlList.add("ContentControlID", MetaModel.getContentId(core, "Sort Methods").ToString());
+                sqlList.add("contentControlId", MetaModel.getContentId(core, "Sort Methods").ToString());
                 //
-                dt = core.db.openTable("Default", "ccSortMethods", "Name=" + DbController.encodeSQLText(Name), "ID", "ID", 1, 1);
+                dt = core.db.openTable( "ccSortMethods", "Name=" + DbController.encodeSQLText(Name), "ID", "ID", 1, 1);
                 if (dt.Rows.Count > 0) {
                     //
                     // update sort method
                     //
                     int recordId = GenericController.encodeInteger(dt.Rows[0]["ID"]);
-                    core.db.updateTableRecord("Default", "ccSortMethods", "ID=" + recordId.ToString(), sqlList, true);
+                    core.db.updateTableRecord( "ccSortMethods", "ID=" + recordId.ToString(), sqlList, true);
                     SortMethodModel.invalidateRecordCache(core, recordId);
                 } else {
                     //
                     // Create the new sort method
                     //
-                    core.db.insertTableRecord("Default", "ccSortMethods", sqlList);
+                    core.db.insertTableRecord( "ccSortMethods", sqlList);
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
@@ -1207,8 +1210,8 @@ namespace Contensive.Processor.Controllers {
                 // ----- Replace table if needed
                 //
                 if (TableBad) {
-                    core.db.deleteTable("Default", "ccFieldTypes");
-                    core.db.createSQLTable("Default", "ccFieldTypes");
+                    core.db.deleteTable( "ccFieldTypes");
+                    core.db.createSQLTable( "ccFieldTypes");
                     RowsFound = 0;
                 }
                 //

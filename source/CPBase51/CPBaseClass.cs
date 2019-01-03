@@ -28,6 +28,16 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
+        /// Construct new Db object. CP.Db methods are for the default datasource. 
+        /// Use this method to create a db object for other datasources. 
+        /// See CPDbBaseClass for Db object details 
+        /// </summary>
+        /// <returns>Returns a new Db class. If the Datasource cannot be opened an exception is thrown.</returns>
+        /// <remarks></remarks>
+        public abstract CPDbBaseClass DbNew( string DataSourceName );
+        //
+        //====================================================================================================
+        /// <summary>
         /// Contensive version
         /// </summary>
         /// <value></value>

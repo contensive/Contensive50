@@ -380,7 +380,7 @@ namespace Contensive.Addons.AdminSite {
         /// <returns></returns>
         public static bool userHasContentAccess(CoreController core, int ContentID) {
             try {
-                if (core.session.isAuthenticatedAdmin(core)) return true;
+                if (core.session.isAuthenticatedAdmin(core)) { return true; }
                 //
                 MetaModel cdef = MetaModel.create(core, ContentID);
                 if (cdef != null) {
@@ -465,11 +465,11 @@ namespace Contensive.Addons.AdminSite {
                     // set adminContext.content to the content definition of the requested record
                     //
                     using (var csData = new CsModel(core)) {
-                        csData.openRecord(adminContent.name, requestedRecordId, "ContentControlID");
+                        csData.openRecord(adminContent.name, requestedRecordId, "contentControlId");
                         if (csData.ok()) {
                             editRecord.id = requestedRecordId;
-                            int recordContentId = csData.getInteger("ContentControlID");
-                            //adminContent.id = csData.csGetInteger("ContentControlID");
+                            int recordContentId = csData.getInteger("contentControlId");
+                            //adminContent.id = csData.csGetInteger("contentControlId");
                             if ((recordContentId > 0) && (recordContentId != adminContent.id)) {
                                 adminContent = MetaModel.create(core, recordContentId);
                             }
@@ -828,7 +828,7 @@ namespace Contensive.Addons.AdminSite {
                                         if (field.lookupContentID != 0) {
                                             LookupContentName = MetaController.getContentNameByID(core, field.lookupContentID);
                                             if (!string.IsNullOrEmpty(LookupContentName)) {
-                                                editRecord.fieldsLc[field.nameLc].value = MetaController.getRecordId_Legacy(core, LookupContentName, DefaultValueText);
+                                                editRecord.fieldsLc[field.nameLc].value = MetaController.getRecordIdByUniqueName(core, LookupContentName, DefaultValueText);
                                             }
                                         } else if (field.lookupList != "") {
                                             UCaseDefaultValueText = GenericController.vbUCase(DefaultValueText);

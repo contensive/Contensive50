@@ -3,7 +3,6 @@ using System;
 
 namespace Contensive.BaseClasses {
     public abstract class CPVisitBaseClass {
-        //Public Sub New(ByVal cmcObj As Contensive.Processor.cpCoreClass, ByRef CPParent As CPBaseClass)
         public abstract bool CookieSupport { get; } //Implements BaseClasses.CPVisitBaseClass.CookieSupport
         public abstract string GetProperty(string PropertyName, string DefaultValue = "", int TargetVisitId = 0); //Implements BaseClasses.CPVisitBaseClass.GetProperty
         public abstract string GetText(string PropertyName, string DefaultValue = "");
@@ -11,7 +10,6 @@ namespace Contensive.BaseClasses {
         public abstract DateTime GetDate(string PropertyName, string DefaultValue = "");
         public abstract int GetInteger(string PropertyName, string DefaultValue = "");
         public abstract double GetNumber(string PropertyName, string DefaultValue = "");
-        //Public MustOverride Function IsProperty(ByVal PropertyName As String) As Boolean
         public abstract int Id { get; } //Implements BaseClasses.CPVisitBaseClass.Id
         public abstract DateTime LastTime { get; } //Implements BaseClasses.CPVisitBaseClass.LastTime
         public abstract int LoginAttempts { get; } //Implements BaseClasses.CPVisitBaseClass.LoginAttempts

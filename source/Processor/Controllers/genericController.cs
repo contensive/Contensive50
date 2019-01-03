@@ -2018,16 +2018,6 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// convert a date to the number of days since date.min
-        /// </summary>
-        /// <param name="srcDate"></param>
-        /// <returns></returns>
-        //public static int convertDateToDayPtr(DateTime srcDate) {
-        //    return encodeInteger(DateController.DateDiff(DateController.DateInterval.Day, srcDate, DateTime.MinValue));
-        //}
-        //
-        //====================================================================================================
-        /// <summary>
         /// Encodes an argument in an Addon OptionString (QueryString) for all non-allowed characters
         /// Arg0,Arg1,Arg2,Arg3,Name=Value&Name=VAlue[Option1|Option2]
         /// call this before parsing them together

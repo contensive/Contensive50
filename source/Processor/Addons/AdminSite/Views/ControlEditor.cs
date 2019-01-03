@@ -147,7 +147,7 @@ namespace Contensive.Addons.AdminSite {
                         FieldRequired = GenericController.encodeBoolean(field.required);
                         int FieldValueInteger = (editRecord.contentControlId.Equals(0)) ? adminData.adminContent.id : editRecord.contentControlId;
                         if (!core.session.isAuthenticatedAdmin(core)) {
-                            HTMLFieldString = HTMLFieldString + HtmlController.inputHidden("ContentControlID", FieldValueInteger);
+                            HTMLFieldString = HTMLFieldString + HtmlController.inputHidden("contentControlId", FieldValueInteger);
                         } else {
                             string RecordContentName = editRecord.contentControlId_Name;
                             string TableName2 = MetaController.getContentTablename(core, RecordContentName);
@@ -175,9 +175,9 @@ namespace Contensive.Addons.AdminSite {
                                     //
                                     // This record has a parent, set LimitContentSelectToThisID to the parent's CID
                                     using (var csData = new CsModel(core)) {
-                                        csData.openRecord(RecordContentName, ParentID, "ContentControlID");
+                                        csData.openRecord(RecordContentName, ParentID, "contentControlId");
                                         if (csData.ok()) {
-                                            LimitContentSelectToThisID = csData.getInteger("ContentControlID");
+                                            LimitContentSelectToThisID = csData.getInteger("contentControlId");
                                         }
                                         csData.close();
                                     }
@@ -200,7 +200,7 @@ namespace Contensive.Addons.AdminSite {
                                 TableID = MetaController.getRecordIdByUniqueName(core, "Tables", TableName2);
                                 string CIDList = "";
                                 using (var csData = new CsModel(core)) {
-                                    csData.open("Content", "ContentTableID=" + TableID, "", true, 0, "ContentControlID");
+                                    csData.open("Content", "ContentTableID=" + TableID, "", true, 0, "contentControlId");
                                     while (csData.ok()) {
                                         int ChildCID = csData.getInteger("ID");
                                         if (MetaController.isWithinContent(core, ChildCID, LimitContentSelectToThisID)) {

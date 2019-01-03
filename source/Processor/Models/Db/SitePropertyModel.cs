@@ -117,11 +117,6 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        //public static SitePropertyModel createDefault(CoreController core) {
-        //    return createDefault<SitePropertyModel>(core);
-        //}
-        //
-        //====================================================================================================
         /// <summary>
         /// Return a cache key used to represent the table. ONLY used for invalidation. Add this as a dependent key if you want that key cleared when ANY record in the table is changed.
         /// </summary>

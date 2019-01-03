@@ -56,24 +56,6 @@ namespace Contensive.Processor.Controllers {
             http = new webClientExt();
         }
         //
-        //============================================================================
-        //
-        //Public Function common_getHttpRequest(url As String) As Stream
-        //    Dim returnstream As Stream = Nothing
-        //    Try
-        //        Dim rq As System.Net.WebRequest
-        //        Dim response As System.Net.WebResponse
-        //        '
-        //        rq = System.Net.WebRequest.Create(url)
-        //        rq.Timeout = 60000
-        //        response = rq.GetResponse()
-        //        returnstream = response.GetResponseStream()
-        //    Catch ex As Exception
-        //        Throw (ex)
-        //    End Try
-        //    Return returnstream
-        //End Function
-        //
         //======================================================================================
         //   Requests the doc and saves the body in the file specified
         //
@@ -354,24 +336,6 @@ namespace Contensive.Processor.Controllers {
                 return returnString;
             }
         }
-        //
-        //================================================================
-        //
-        //================================================================
-        //
-        //Public ReadOnly Property responseLength() As String
-        //    Get
-        //        Dim returnString As String = ""
-        //        'Dim ptr As Integer
-        //        '
-        //        Try
-        //            returnString = privateResponseLength
-        //        Catch ex As Exception
-        //            Throw new GenericException("Error in ResponseLength Property, get Method")
-        //        End Try
-        //        Return returnString
-        //    End Get
-        //End Property
         //
         //================================================================
         //

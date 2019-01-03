@@ -271,6 +271,14 @@ namespace Contensive.BaseClasses {
         public abstract string GetListLink(string ContentName);
         //
         //====================================================================================================
+        /// <summary>
+        /// Return the recordId in the ccTables table for this table
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
+		public abstract int GetTableID(string tableName);
+        //
+        //====================================================================================================
         // deprecated
         //
         [Obsolete("Deprecated, template link is not supported", true)]

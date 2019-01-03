@@ -25,6 +25,10 @@ namespace Contensive.Processor.Controllers {
         /// dependencies
         /// </summary>
         private CoreController core;
+        /// <summary>
+        /// The datasouorce used for this instance of the object
+        /// </summary>
+        internal string dataSourceName;
         //
         /// <summary>
         /// default page size. Page size is how many records are read in a single fetch.
@@ -60,8 +64,11 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// constructor
         /// </summary>
-        public DbController(CoreController core) : base() {
+        /// <param name="core">dependencies</param>
+        /// <param name="dataSourceName">The datasource. The default datasource is setup in the config file. Others are in the Datasources table</param>
+        public DbController(CoreController core, string dataSourceName) : base() {
             this.core = core;
+            this.dataSourceName = dataSourceName;
         }
         //
         //====================================================================================================
@@ -70,7 +77,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <returns>
         /// </returns>
-        public string getConnectionStringADONET(string catalogName, string dataSourceName = "") {
+        public string getConnectionStringADONET(string catalogName) {
             //
             // (OLEDB) OLE DB Provider for SQL Server > "Provider=sqloledb;Data Source=MyServerName;Initial Catalog=MyDatabaseName;User Id=MyUsername;Password=MyPassword;"
             //     https://www.codeproject.com/Articles/2304/ADO-Connection-Strings#OLE%20DB%20SqlServer
@@ -109,7 +116,7 @@ namespace Contensive.Processor.Controllers {
                             // -- found in local cache
                             var tempVar = core.dataSourceDictionary[normalizedDataSourceName];
                             returnConnString = ""
-                            + "server=" + tempVar.endPoint + ";"
+                            + "server=" + tempVar.endpoint + ";"
                             + "User Id=" + tempVar.username + ";"
                             + "Password=" + tempVar.password + ";"
                             + "Database=" + catalogName + ";";
@@ -123,70 +130,70 @@ namespace Contensive.Processor.Controllers {
             }
             return returnConnString;
         }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// legacy db model for ole. Leave in place to help remember that future technologies may have to fit into the db model.
-        /// </summary>
-        /// <returns>
-        /// </returns>
-        private string getConnectionStringOLEDB(string catalogName, string dataSourceName) {
-            //
-            // (OLEDB) OLE DB Provider for SQL Server > "Provider=sqloledb;Data Source=MyServerName;Initial Catalog=MyDatabaseName;User Id=MyUsername;Password=MyPassword;"
-            //     https://www.codeproject.com/Articles/2304/ADO-Connection-Strings#OLE%20DB%20SqlServer
-            //
-            // (OLEDB) Microsoft OLE DB Provider for SQL Server connection strings > "Provider=sqloledb;Data Source=myServerAddress;Initial Catalog=myDataBase;User Id = myUsername;Password=myPassword;"
-            //     https://www.connectionstrings.com/microsoft-ole-db-provider-for-sql-server-sqloledb/
-            //
-            // (ADONET) .NET Framework Data Provider for SQL Server > Server=myServerAddress;Database=myDataBase;User Id=myUsername;Password = myPassword;
-            //     https://www.connectionstrings.com/sql-server/
-            //
-            string returnConnString = "";
-            try {
-                string normalizedDataSourceName = DataSourceModel.normalizeDataSourceName(dataSourceName);
-                string defaultConnString = "";
-                string serverUrl = core.serverConfig.defaultDataSourceAddress;
-                if (serverUrl.IndexOf(":") > 0) {
-                    serverUrl = serverUrl.Left(serverUrl.IndexOf(":"));
-                }
-                defaultConnString += ""
-                    + "Provider=sqloledb;"
-                    + "Data Source=" + serverUrl + ";"
-                    + "Initial Catalog=" + catalogName + ";"
-                    + "User Id=" + core.serverConfig.defaultDataSourceUsername + ";"
-                    + "Password=" + core.serverConfig.defaultDataSourcePassword + ";"
-                    + "";
-                //
-                // -- lookup dataSource
-                if ((string.IsNullOrEmpty(normalizedDataSourceName)) || (normalizedDataSourceName == "default")) {
-                    //
-                    // -- default datasource
-                    returnConnString = defaultConnString;
-                } else {
-                    //
-                    // -- custom datasource from Db in primary datasource
-                    if (!core.dataSourceDictionary.ContainsKey(normalizedDataSourceName)) {
-                        //
-                        // -- not found, this is a hard error
-                        throw new GenericException("Datasource [" + normalizedDataSourceName + "] was not found.");
-                    } else {
-                        //
-                        // -- found in local cache
-                        var tempVar = core.dataSourceDictionary[normalizedDataSourceName];
-                        returnConnString += ""
-                            + "Provider=sqloledb;"
-                            + "Data Source=" + tempVar.endPoint + ";"
-                            + "User Id=" + tempVar.username + ";"
-                            + "Password=" + tempVar.password + ";"
-                            + "";
-                    }
-                }
-            } catch (Exception ex) {
-                LogController.handleError( core,ex);
-                throw;
-            }
-            return returnConnString;
-        }
+        ////
+        ////====================================================================================================
+        ///// <summary>
+        ///// legacy db model for ole. Leave in place to help remember that future technologies may have to fit into the db model.
+        ///// </summary>
+        ///// <returns>
+        ///// </returns>
+        //private string getConnectionStringOLEDB(string catalogName) {
+        //    //
+        //    // (OLEDB) OLE DB Provider for SQL Server > "Provider=sqloledb;Data Source=MyServerName;Initial Catalog=MyDatabaseName;User Id=MyUsername;Password=MyPassword;"
+        //    //     https://www.codeproject.com/Articles/2304/ADO-Connection-Strings#OLE%20DB%20SqlServer
+        //    //
+        //    // (OLEDB) Microsoft OLE DB Provider for SQL Server connection strings > "Provider=sqloledb;Data Source=myServerAddress;Initial Catalog=myDataBase;User Id = myUsername;Password=myPassword;"
+        //    //     https://www.connectionstrings.com/microsoft-ole-db-provider-for-sql-server-sqloledb/
+        //    //
+        //    // (ADONET) .NET Framework Data Provider for SQL Server > Server=myServerAddress;Database=myDataBase;User Id=myUsername;Password = myPassword;
+        //    //     https://www.connectionstrings.com/sql-server/
+        //    //
+        //    string returnConnString = "";
+        //    try {
+        //        string normalizedDataSourceName = DataSourceModel.normalizeDataSourceName(dataSourceName);
+        //        string defaultConnString = "";
+        //        string serverUrl = core.serverConfig.defaultDataSourceAddress;
+        //        if (serverUrl.IndexOf(":") > 0) {
+        //            serverUrl = serverUrl.Left(serverUrl.IndexOf(":"));
+        //        }
+        //        defaultConnString += ""
+        //            + "Provider=sqloledb;"
+        //            + "Data Source=" + serverUrl + ";"
+        //            + "Initial Catalog=" + catalogName + ";"
+        //            + "User Id=" + core.serverConfig.defaultDataSourceUsername + ";"
+        //            + "Password=" + core.serverConfig.defaultDataSourcePassword + ";"
+        //            + "";
+        //        //
+        //        // -- lookup dataSource
+        //        if ((string.IsNullOrEmpty(normalizedDataSourceName)) || (normalizedDataSourceName == "default")) {
+        //            //
+        //            // -- default datasource
+        //            returnConnString = defaultConnString;
+        //        } else {
+        //            //
+        //            // -- custom datasource from Db in primary datasource
+        //            if (!core.dataSourceDictionary.ContainsKey(normalizedDataSourceName)) {
+        //                //
+        //                // -- not found, this is a hard error
+        //                throw new GenericException("Datasource [" + normalizedDataSourceName + "] was not found.");
+        //            } else {
+        //                //
+        //                // -- found in local cache
+        //                var tempVar = core.dataSourceDictionary[normalizedDataSourceName];
+        //                returnConnString += ""
+        //                    + "Provider=sqloledb;"
+        //                    + "Data Source=" + tempVar.endPoint + ";"
+        //                    + "User Id=" + tempVar.username + ";"
+        //                    + "Password=" + tempVar.password + ";"
+        //                    + "";
+        //            }
+        //        }
+        //    } catch (Exception ex) {
+        //        LogController.handleError( core,ex);
+        //        throw;
+        //    }
+        //    return returnConnString;
+        //}
         //
         //====================================================================================================
         /// <summary>
@@ -197,9 +204,9 @@ namespace Contensive.Processor.Controllers {
         /// <param name="startRecord"></param>
         /// <param name="maxRecords"></param>
         /// <returns></returns>
-        public DataTable executeQuery(string sql, string dataSourceName, int startRecord, int maxRecords) {
+        public DataTable executeQuery(string sql, int startRecord, int maxRecords) {
             int recordsReturned = 0;
-            return executeQuery(sql, dataSourceName, startRecord, maxRecords, ref recordsReturned);
+            return executeQuery(sql, startRecord, maxRecords, ref recordsReturned);
         }
         //
         //====================================================================================================
@@ -210,21 +217,9 @@ namespace Contensive.Processor.Controllers {
         /// <param name="dataSourceName"></param>
         /// <param name="startRecord"></param>
         /// <returns></returns>
-        public DataTable executeQuery(string sql, string dataSourceName, int startRecord) {
+        public DataTable executeQuery(string sql, int startRecord) {
             int tempVar = 0;
-            return executeQuery(sql, dataSourceName, startRecord, 9999, ref tempVar);
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Execute a query (returns data)
-        /// </summary>
-        /// <param name="sql"></param>
-        /// <param name="dataSourceName"></param>
-        /// <returns></returns>
-        public DataTable executeQuery(string sql, string dataSourceName) {
-            int tempVar = 0;
-            return executeQuery(sql, dataSourceName, 0, 9999, ref tempVar);
+            return executeQuery(sql, startRecord, 9999, ref tempVar);
         }
         //
         //====================================================================================================
@@ -235,7 +230,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public DataTable executeQuery(string sql) {
             int tempVar = 0;
-            return executeQuery(sql, "", 0, 9999, ref tempVar);
+            return executeQuery(sql, 0, 9999, ref tempVar);
         }
         //
         //====================================================================================================
@@ -248,7 +243,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="maxRecords"></param>
         /// <param name="recordsReturned"></param>
         /// <returns></returns>
-        public DataTable executeQuery(string sql, string dataSourceName, int startRecord, int maxRecords, ref int recordsReturned) {
+        public DataTable executeQuery(string sql, int startRecord, int maxRecords, ref int recordsReturned) {
             DataTable returnData = new DataTable();
             try {
                 if (!dbEnabled) { return new DataTable(); }
@@ -260,7 +255,7 @@ namespace Contensive.Processor.Controllers {
                 // https://msdn.microsoft.com/en-us/library/system.data.sqlclient.sqldatareader.aspx
                 //
                 Stopwatch sw = Stopwatch.StartNew();
-                using (SqlConnection connSQL = new SqlConnection(getConnectionStringADONET(core.appConfig.name, dataSourceName))) {
+                using (SqlConnection connSQL = new SqlConnection(getConnectionStringADONET(core.appConfig.name))) {
                     connSQL.Open();
                     using (SqlCommand cmdSQL = new SqlCommand()) {
                         cmdSQL.CommandType = CommandType.Text;
@@ -282,23 +277,12 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// execute sql on a specific datasource. No data is returned.
-        /// </summary>
-        /// <param name="sql"></param>
-        /// <param name="dataSourceName"></param>
-        public void executeNonQuery(string sql, string dataSourceName) {
-            int tempVar = 0;
-            executeNonQuery(sql, dataSourceName, ref tempVar);
-        }
-        //
-        //====================================================================================================
-        /// <summary>
         /// execute sql on a the default datasource. 
         /// </summary>
         /// <param name="sql"></param>
         public void executeNonQuery(string sql) {
             int tempVar = 0;
-            executeNonQuery(sql, "", ref tempVar);
+            executeNonQuery(sql, ref tempVar);
         }
         //
         //====================================================================================================
@@ -308,11 +292,11 @@ namespace Contensive.Processor.Controllers {
         /// <param name="sql"></param>
         /// <param name="dataSourceName"></param>
         /// <param name="recordsAffected"></param>
-        public void executeNonQuery(string sql, string dataSourceName, ref int recordsAffected) {
+        public void executeNonQuery(string sql, ref int recordsAffected) {
             try {
                 if (!dbEnabled) { return; }
                 Stopwatch sw = Stopwatch.StartNew();
-                using (SqlConnection connSQL = new SqlConnection(getConnectionStringADONET(core.appConfig.name, dataSourceName))) {
+                using (SqlConnection connSQL = new SqlConnection(getConnectionStringADONET(core.appConfig.name))) {
                     connSQL.Open();
                     using (SqlCommand cmdSQL = new SqlCommand()) {
                         cmdSQL.CommandType = CommandType.Text;
@@ -335,11 +319,11 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="sql"></param>
         /// <param name="dataSourceName"></param>
-        public void executeNonQueryAsync(string sql, string dataSourceName = "") {
+        public void executeNonQueryAsync(string sql) {
             try {
                 if (!dbEnabled) { return; }
                 Stopwatch sw = Stopwatch.StartNew();
-                using (SqlConnection connSQL = new SqlConnection(getConnectionStringADONET(core.appConfig.name, dataSourceName))) {
+                using (SqlConnection connSQL = new SqlConnection(getConnectionStringADONET(core.appConfig.name))) {
                     connSQL.Open();
                     using (SqlCommand cmdSQL = new SqlCommand()) {
                         cmdSQL.CommandType = CommandType.Text;
@@ -364,13 +348,13 @@ namespace Contensive.Processor.Controllers {
         /// <param name="tableName"></param>
         /// <param name="criteria"></param>
         /// <param name="sqlList"></param>
-        public void updateTableRecord(string dataSourceName, string tableName, string criteria, SqlFieldListClass sqlList, bool asyncSave = false ) {
+        public void updateTableRecord(string tableName, string criteria, SqlFieldListClass sqlList, bool asyncSave = false ) {
             try {
                 string SQL = "update " + tableName + " set " + sqlList.getNameValueList() + " where " + criteria + ";";
                 if (!asyncSave) {
-                    executeNonQuery(SQL, dataSourceName);
+                    executeNonQuery(SQL);
                 } else {
-                    executeNonQueryAsync(SQL, dataSourceName);
+                    executeNonQueryAsync(SQL);
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, new GenericException("Exception [" + ex.Message + "] updating table [" + tableName + "], criteria [" + criteria + "], dataSourceName [" + dataSourceName + "]", ex));
@@ -378,8 +362,8 @@ namespace Contensive.Processor.Controllers {
             }
         }
         //
-        public void updateTableRecord(string dataSourceName, string tableName, string criteria, SqlFieldListClass sqlList)
-            => updateTableRecord(dataSourceName, tableName, criteria, sqlList, false);
+        public void updateTableRecord(string tableName, string criteria, SqlFieldListClass sqlList)
+            => updateTableRecord(tableName, criteria, sqlList, false);
         //
         //========================================================================
         /// <summary>
@@ -389,9 +373,9 @@ namespace Contensive.Processor.Controllers {
         /// <param name="tableName"></param>
         /// <param name="memberId"></param>
         /// <returns></returns>
-        public int insertTableRecordGetId(string dataSourceName, string tableName, int memberId) {
+        public int insertTableRecordGetId(string tableName, int memberId) {
             try {
-                using (DataTable dt = insertTableRecordGetDataTable(dataSourceName, tableName, memberId)) {
+                using (DataTable dt = insertTableRecordGetDataTable(tableName, memberId)) {
                     if (dt.Rows.Count > 0) { return encodeInteger(dt.Rows[0]["id"]); }
                 }
                 return 0;
@@ -401,8 +385,8 @@ namespace Contensive.Processor.Controllers {
             }
         }
         //
-        public int insertTableRecordGetId(string dataSourceName, string tableName)
-            => insertTableRecordGetId(dataSourceName, tableName, 0);
+        public int insertTableRecordGetId(string tableName)
+            => insertTableRecordGetId(tableName, 0);
         //
         //========================================================================
         /// <summary>
@@ -412,30 +396,30 @@ namespace Contensive.Processor.Controllers {
         /// <param name="tableName"></param>
         /// <param name="memberId"></param>
         /// <returns></returns>
-        public DataTable insertTableRecordGetDataTable(string dataSourceName, string tableName, int memberId) {
+        public DataTable insertTableRecordGetDataTable(string tableName, int memberId) {
             try {
                 string sqlGuid = encodeSQLText(GenericController.getGUID());
                 string sqlDateAdded = encodeSQLDate(DateTime.Now);
                 SqlFieldListClass sqlList = new SqlFieldListClass();
-                sqlList.add("ccguid", sqlGuid);
+                sqlList.add("ccGuid", sqlGuid);
                 sqlList.add("dateadded", sqlDateAdded);
                 sqlList.add("createdby", encodeSQLNumber(memberId));
                 sqlList.add("ModifiedDate", sqlDateAdded);
                 sqlList.add("ModifiedBy", encodeSQLNumber(memberId));
-                sqlList.add("ContentControlID", encodeSQLNumber(0));
+                sqlList.add("contentControlId", encodeSQLNumber(0));
                 sqlList.add("Name", encodeSQLText(""));
                 sqlList.add("Active", encodeSQLNumber(1));
                 //
-                insertTableRecord(dataSourceName, tableName, sqlList);
-                return openTable(dataSourceName, tableName, "(DateAdded=" + sqlDateAdded + ")and(ccguid=" + sqlGuid + ")", "ID DESC", "", 1, 1);
+                insertTableRecord(tableName, sqlList);
+                return openTable(tableName, "(DateAdded=" + sqlDateAdded + ")and(ccguid=" + sqlGuid + ")", "ID DESC", "", 1, 1);
             } catch (Exception ex) {
                 LogController.handleError(core, new GenericException("Exception [" + ex.Message + "] inserting table [" + tableName + "], dataSourceName [" + dataSourceName + "]", ex));
                 throw;
             }
         }
         //
-        public DataTable insertTableRecordGetDataTable(string dataSourceName, string tableName)
-            => insertTableRecordGetDataTable(dataSourceName, tableName, 0);
+        public DataTable insertTableRecordGetDataTable(string tableName)
+            => insertTableRecordGetDataTable(tableName, 0);
         //
         //========================================================================
         /// <summary>
@@ -444,23 +428,23 @@ namespace Contensive.Processor.Controllers {
         /// <param name="dataSourceName"></param>
         /// <param name="tableName"></param>
         /// <param name="sqlList"></param>
-        public void insertTableRecord(string dataSourceName, string tableName, SqlFieldListClass sqlList, bool asyncSave ) {
+        public void insertTableRecord(string tableName, SqlFieldListClass sqlList, bool asyncSave ) {
             try {
                 if (sqlList.count == 0) { return; }
                 string sql = "INSERT INTO " + tableName + "(" + sqlList.getNameList() + ")values(" + sqlList.getValueList() + ")";
                 if (!asyncSave) {
-                    executeNonQuery(sql, dataSourceName);
+                    executeNonQuery(sql);
                     return;
                 }
-                executeNonQueryAsync(sql, dataSourceName);
+                executeNonQueryAsync(sql);
             } catch (Exception ex) {
                 LogController.handleError(core, new GenericException("Exception [" + ex.Message + "], inserting table [" + tableName + "], dataSourceName [" + dataSourceName + "]", ex));
                 throw;
             }
         }
         //
-        public void insertTableRecord(string dataSourceName, string tableName, SqlFieldListClass sqlList)
-            => insertTableRecord(dataSourceName, tableName, sqlList, false);
+        public void insertTableRecord(string tableName, SqlFieldListClass sqlList)
+            => insertTableRecord(tableName, sqlList, false);
         //
         //========================================================================
         /// <summary>
@@ -474,7 +458,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="pageSize"></param>
         /// <param name="pageNumber"></param>
         /// <returns></returns>
-        public DataTable openTable(string dataSourceName, string tableName, string criteria, string sortFieldList, string selectFieldList, int pageSize, int pageNumber) {
+        public DataTable openTable(string tableName, string criteria, string sortFieldList, string selectFieldList, int pageSize, int pageNumber) {
             DataTable returnDataTable = null;
             try {
                 string SQL = "SELECT";
@@ -491,7 +475,7 @@ namespace Contensive.Processor.Controllers {
                     SQL += " ORDER BY " + sortFieldList;
                 }
                 //SQL &= ";"
-                returnDataTable = executeQuery(SQL, dataSourceName, (pageNumber - 1) * pageSize, pageSize);
+                returnDataTable = executeQuery(SQL, (pageNumber - 1) * pageSize, pageSize);
             } catch (Exception ex) {
                 LogController.handleError(core, new GenericException("Exception [" + ex.Message + "], opening table [" + tableName + "], dataSourceName [" + dataSourceName + "]", ex));
                 throw;
@@ -521,10 +505,10 @@ namespace Contensive.Processor.Controllers {
         /// <param name="TableName"></param>
         /// <param name="FieldName"></param>
         /// <returns></returns>
-        public bool isSQLTableField(string DataSourceName, string TableName, string FieldName) {
+        public bool isSQLTableField(string TableName, string FieldName) {
             bool returnOK = false;
             try {
-                Models.Domain.TableSchemaModel tableSchema = Models.Domain.TableSchemaModel.getTableSchema(core, TableName, DataSourceName);
+                Models.Domain.TableSchemaModel tableSchema = TableSchemaModel.getTableSchema(core, TableName, dataSourceName);
                 if (tableSchema != null) {
                     returnOK = (null != tableSchema.columns.Find(x => x.COLUMN_NAME.ToLowerInvariant() == FieldName.ToLowerInvariant()));
                 }
@@ -539,13 +523,12 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Returns true if the table exists
         /// </summary>
-        /// <param name="DataSourceName"></param>
         /// <param name="TableName"></param>
         /// <returns></returns>
-        public bool isSQLTable(string DataSourceName, string TableName) {
+        public bool isSQLTable(string TableName) {
             bool ReturnOK = false;
             try {
-                ReturnOK = (!(Models.Domain.TableSchemaModel.getTableSchema(core, TableName, DataSourceName) == null));
+                ReturnOK = (!(Models.Domain.TableSchemaModel.getTableSchema(core, TableName, dataSourceName) == null));
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
@@ -561,13 +544,12 @@ namespace Contensive.Processor.Controllers {
         /// if NoAutoIncrement is true, ID is created an an long
         /// if the table is present, check all core fields
         /// </summary>
-        /// <param name="DataSourceName"></param>
         /// <param name="TableName"></param>
         /// <param name="AllowAutoIncrement"></param>
-        public void createSQLTable(string DataSourceName, string TableName, bool AllowAutoIncrement = true) {
+        public void createSQLTable(string TableName, bool AllowAutoIncrement = true) {
             try {
                 //
-                LogController.logTrace(core, "createSqlTable, DataSourceName [" + DataSourceName + "], TableName [" + TableName + "]");
+                LogController.logTrace(core, "createSqlTable, DataSourceName [" + dataSourceName + "], TableName [" + TableName + "]");
                 //
                 if (string.IsNullOrEmpty(TableName)) {
                     //
@@ -583,43 +565,43 @@ namespace Contensive.Processor.Controllers {
                     //
                     // Local table -- create if not in schema
                     //
-                    if (Models.Domain.TableSchemaModel.getTableSchema(core, TableName, DataSourceName) == null) {
+                    if (Models.Domain.TableSchemaModel.getTableSchema(core, TableName, dataSourceName) == null) {
                         if (!AllowAutoIncrement) {
-                            string SQL = "Create Table " + TableName + "(ID " + getSQLAlterColumnType(DataSourceName, fieldTypeIdInteger) + ");";
-                            executeQuery(SQL, DataSourceName).Dispose();
+                            string SQL = "Create Table " + TableName + "(ID " + getSQLAlterColumnType(fieldTypeIdInteger) + ");";
+                            executeQuery(SQL).Dispose();
                         } else {
-                            string SQL = "Create Table " + TableName + "(ID " + getSQLAlterColumnType(DataSourceName, fieldTypeIdAutoIdIncrement) + ");";
-                            executeQuery(SQL, DataSourceName).Dispose();
+                            string SQL = "Create Table " + TableName + "(ID " + getSQLAlterColumnType(fieldTypeIdAutoIdIncrement) + ");";
+                            executeQuery(SQL).Dispose();
                         }
                     }
                     //
                     // ----- Test the common fields required in all tables
                     //
-                    createSQLTableField(DataSourceName, TableName, "id", fieldTypeIdAutoIdIncrement);
-                    createSQLTableField(DataSourceName, TableName, "name", fieldTypeIdText);
-                    createSQLTableField(DataSourceName, TableName, "dateAdded", fieldTypeIdDate);
-                    createSQLTableField(DataSourceName, TableName, "createdby", fieldTypeIdInteger);
-                    createSQLTableField(DataSourceName, TableName, "modifiedBy", fieldTypeIdInteger);
-                    createSQLTableField(DataSourceName, TableName, "ModifiedDate", fieldTypeIdDate);
-                    createSQLTableField(DataSourceName, TableName, "active", fieldTypeIdBoolean);
-                    createSQLTableField(DataSourceName, TableName, "createKey", fieldTypeIdInteger);
-                    createSQLTableField(DataSourceName, TableName, "sortOrder", fieldTypeIdText);
-                    createSQLTableField(DataSourceName, TableName, "contentControlID", fieldTypeIdInteger);
-                    createSQLTableField(DataSourceName, TableName, "ccGuid", fieldTypeIdText);
+                    createSQLTableField(TableName, "id", fieldTypeIdAutoIdIncrement);
+                    createSQLTableField(TableName, "name", fieldTypeIdText);
+                    createSQLTableField(TableName, "dateAdded", fieldTypeIdDate);
+                    createSQLTableField(TableName, "createdby", fieldTypeIdInteger);
+                    createSQLTableField(TableName, "modifiedBy", fieldTypeIdInteger);
+                    createSQLTableField(TableName, "modifiedDate", fieldTypeIdDate);
+                    createSQLTableField(TableName, "active", fieldTypeIdBoolean);
+                    createSQLTableField(TableName, "sortOrder", fieldTypeIdText);
+                    createSQLTableField(TableName, "contentControlId", fieldTypeIdInteger);
+                    createSQLTableField(TableName, "ccGuid", fieldTypeIdText);
                     // -- 20171029 - deprecating fields makes migration difficult. add back and figure out future path
-                    createSQLTableField(DataSourceName, TableName, "ContentCategoryID", fieldTypeIdInteger);
+                    createSQLTableField(TableName, "createKey", fieldTypeIdInteger);
+                    createSQLTableField(TableName, "contentCategoryId", fieldTypeIdInteger);
                     //
                     // ----- setup core indexes
                     //
-                    // 20171029 primary key dow not need index -- Call createSQLIndex(DataSourceName, TableName, TableName & "Id", "ID")
-                    createSQLIndex(DataSourceName, TableName, TableName + "Active", "ACTIVE");
-                    createSQLIndex(DataSourceName, TableName, TableName + "Name", "NAME");
-                    createSQLIndex(DataSourceName, TableName, TableName + "SortOrder", "SORTORDER");
-                    createSQLIndex(DataSourceName, TableName, TableName + "DateAdded", "DATEADDED");
-                    createSQLIndex(DataSourceName, TableName, TableName + "CreateKey", "CREATEKEY");
-                    createSQLIndex(DataSourceName, TableName, TableName + "ContentControlID", "CONTENTCONTROLID");
-                    createSQLIndex(DataSourceName, TableName, TableName + "ModifiedDate", "MODIFIEDDATE");
-                    createSQLIndex(DataSourceName, TableName, TableName + "ccGuid", "CCGUID");
+                    // 20171029 primary key dow not need index -- Call createSQLIndex( TableName, TableName & "Id", "ID")
+                    createSQLIndex(TableName, TableName + "Active", "active");
+                    createSQLIndex(TableName, TableName + "Name", "name");
+                    createSQLIndex(TableName, TableName + "SortOrder", "sortOrder");
+                    createSQLIndex(TableName, TableName + "DateAdded", "dateAdded");
+                    createSQLIndex(TableName, TableName + "ContentControlId", "contentControlId");
+                    createSQLIndex(TableName, TableName + "ModifiedDate", "modifiedDate");
+                    createSQLIndex(TableName, TableName + "CcGuid", "ccGuid");
+                    //createSQLIndex(TableName, TableName + "CreateKey", "createKey");
                 }
                 Models.Domain.TableSchemaModel.tableSchemaListClear(core);
             } catch (Exception ex) {
@@ -633,58 +615,36 @@ namespace Contensive.Processor.Controllers {
         /// Check for a field in a table in the database, if missing, create the field
         /// </summary>
         /// <param name="DataSourceName"></param>
-        /// <param name="TableName"></param>
-        /// <param name="FieldName"></param>
+        /// <param name="tableName"></param>
+        /// <param name="fieldName"></param>
         /// <param name="fieldType"></param>
         /// <param name="clearMetaCache"></param>
-        public void createSQLTableField(string DataSourceName, string TableName, string FieldName, int fieldType, bool clearMetaCache = false) {
+        public void createSQLTableField(string tableName, string fieldName, int fieldType, bool clearMetaCache = false) {
             try {
-                if ((fieldType == fieldTypeIdRedirect) || (fieldType == fieldTypeIdManyToMany)) {
-                    //
-                    // OK -- contensive fields with no table field
-                    //
-                    //fieldType = fieldType;
-                } else if (string.IsNullOrEmpty(TableName)) {
-                    //
-                    // Bad tablename
-                    //
-                    throw new ArgumentException("Table Name cannot be blank.");
-                } else if (fieldType == 0) {
-                    //
-                    // Bad fieldtype
-                    //
-                    throw new ArgumentException("invalid fieldtype [" + fieldType + "]");
-                } else if (GenericController.vbInstr(1, TableName, ".") != 0) {
-                    //
-                    // External table
-                    //
-                    throw new ArgumentException("Table name cannot include a period(.)");
-                } else if (string.IsNullOrEmpty(FieldName)) {
-                    //
-                    // Bad fieldname
-                    //
-                    throw new ArgumentException("Field name cannot be blank");
-                } else {
-                    if (!isSQLTableField(DataSourceName, TableName, FieldName)) {
-                        string SQL = "ALTER TABLE " + TableName + " ADD " + FieldName + " ";
-                        if (!fieldType.IsNumeric()) {
-                            //
-                            // ----- support old calls
-                            //
-                            SQL += fieldType.ToString();
-                        } else {
-                            //
-                            // ----- translater type into SQL string
-                            //
-                            SQL += getSQLAlterColumnType(DataSourceName, fieldType);
-                        }
-                        executeNonQuery(SQL, DataSourceName);
-                        TableSchemaModel.tableSchemaListClear(core);
+                if ((fieldType == fieldTypeIdRedirect) || (fieldType == fieldTypeIdManyToMany)) { return; }
+                if (string.IsNullOrEmpty(tableName)) { throw new ArgumentException("Table Name cannot be blank."); }
+                if (fieldType == 0) { throw new ArgumentException("invalid fieldtype [" + fieldType + "]"); }
+                if (GenericController.vbInstr(1, tableName, ".") != 0) { throw new ArgumentException("Table name cannot include a period(.)"); }
+                if (string.IsNullOrEmpty(fieldName)) { throw new ArgumentException("Field name cannot be blank"); }
+                if (!isSQLTableField(tableName, fieldName)) {
+                    string SQL = "ALTER TABLE " + tableName + " ADD " + fieldName + " ";
+                    if (!fieldType.IsNumeric()) {
                         //
-                        if (clearMetaCache) {
-                            core.cache.invalidateAll();
-                            core.clearMetaData();
-                        }
+                        // ----- support old calls
+                        //
+                        SQL += fieldType.ToString();
+                    } else {
+                        //
+                        // ----- translater type into SQL string
+                        //
+                        SQL += getSQLAlterColumnType(fieldType);
+                    }
+                    executeNonQuery(SQL);
+                    TableSchemaModel.tableSchemaListClear(core);
+                    //
+                    if (clearMetaCache) {
+                        core.cache.invalidateAll();
+                        core.clearMetaData();
                     }
                 }
             } catch (Exception ex) {
@@ -699,9 +659,9 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="DataSourceName"></param>
         /// <param name="TableName"></param>
-        public void deleteTable(string DataSourceName, string TableName) {
+        public void deleteTable(string TableName) {
             try {
-                executeQuery("DROP TABLE " + TableName, DataSourceName).Dispose();
+                executeQuery("DROP TABLE " + TableName).Dispose();
                 core.cache.invalidateAll();
                 core.clearMetaData();
             } catch (Exception ex) {
@@ -717,10 +677,10 @@ namespace Contensive.Processor.Controllers {
         /// <param name="DataSourceName"></param>
         /// <param name="TableName"></param>
         /// <param name="FieldName"></param>
-        public void deleteTableField(string DataSourceName, string TableName, string FieldName) {
+        public void deleteTableField(string TableName, string FieldName) {
             try {
-                if (isSQLTableField(DataSourceName, TableName, FieldName)) {
-                    executeQuery("ALTER TABLE " + TableName + " DROP COLUMN " + FieldName + ";", DataSourceName);
+                if (isSQLTableField(TableName, FieldName)) {
+                    executeQuery("ALTER TABLE " + TableName + " DROP COLUMN " + FieldName + ";");
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -737,14 +697,13 @@ namespace Contensive.Processor.Controllers {
         /// <param name="IndexName"></param>
         /// <param name="FieldNames"></param>
         /// <param name="clearMetaCache"></param>
-        public void createSQLIndex(string DataSourceName, string TableName, string IndexName, string FieldNames, bool clearMetaCache = false) {
+        public void createSQLIndex(string TableName, string IndexName, string FieldNames, bool clearMetaCache = false) {
             try {
-                Models.Domain.TableSchemaModel ts = null;
                 if (!(string.IsNullOrEmpty(TableName) && string.IsNullOrEmpty(IndexName) & string.IsNullOrEmpty(FieldNames))) {
-                    ts = Models.Domain.TableSchemaModel.getTableSchema(core, TableName, DataSourceName);
+                    TableSchemaModel ts = TableSchemaModel.getTableSchema(core, TableName, dataSourceName);
                     if (ts != null) {
                         if (null == ts.indexes.Find(x => x.index_name.ToLowerInvariant() == IndexName.ToLowerInvariant())) {
-                            executeQuery("CREATE INDEX [" + IndexName + "] ON [" + TableName + "]( " + FieldNames + " );", DataSourceName);
+                            executeQuery("CREATE INDEX [" + IndexName + "] ON [" + TableName + "]( " + FieldNames + " );");
                             if (clearMetaCache) {
                                 core.cache.invalidateAll();
                                 core.clearMetaData();
@@ -765,7 +724,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="DataSourceName"></param>
         /// <param name="fieldType"></param>
         /// <returns></returns>
-        public string getSQLAlterColumnType(string DataSourceName, int fieldType) {
+        public string getSQLAlterColumnType(int fieldType) {
             string returnType = "";
             try {
                 switch (fieldType) {
@@ -856,17 +815,13 @@ namespace Contensive.Processor.Controllers {
         /// <param name="DataSourceName"></param>
         /// <param name="TableName"></param>
         /// <param name="IndexName"></param>
-        public void deleteSqlIndex(string DataSourceName, string TableName, string IndexName) {
+        public void deleteSqlIndex(string TableName, string IndexName) {
             try {
-                Models.Domain.TableSchemaModel ts = null;
-                int DataSourceType = 0;
-                string sql = null;
-                //
-                ts = Models.Domain.TableSchemaModel.getTableSchema(core, TableName, DataSourceName);
+                TableSchemaModel ts = TableSchemaModel.getTableSchema(core, TableName, dataSourceName);
                 if (ts != null) {
                     if (null != ts.indexes.Find(x => x.index_name.ToLowerInvariant() == IndexName.ToLowerInvariant())) {
-                        DataSourceType = getDataSourceType(DataSourceName);
-                        switch (DataSourceType) {
+                        string sql = "";
+                        switch (getDataSourceType()) {
                             case Constants.DataSourceTypeODBCAccess:
                                 sql = "DROP INDEX " + IndexName + " On " + TableName + ";";
                                 break;
@@ -876,7 +831,7 @@ namespace Contensive.Processor.Controllers {
                                 sql = "DROP INDEX [" + TableName + "].[" + IndexName + "];";
                                 break;
                         }
-                        executeQuery(sql, DataSourceName);
+                        executeQuery(sql);
                         core.cache.invalidateAll();
                         core.clearMetaData();
                     }
@@ -895,7 +850,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="DataSourceName"></param>
         /// <returns></returns>
         //
-        public int getDataSourceType(string DataSourceName) {
+        public int getDataSourceType() {
             return Constants.DataSourceTypeODBCSQLServer;
         }
         //
@@ -1107,18 +1062,13 @@ namespace Contensive.Processor.Controllers {
         /// <param name="expression"></param>
         /// <returns></returns>
         public static string encodeSQLText(string expression) {
-            string returnResult = "";
-            if (expression == null) {
-                returnResult = "null";
+            if (expression == null) { return "null"; }
+            string returnResult = GenericController.encodeText(expression);
+            if (string.IsNullOrEmpty(returnResult)) {
+                return "null";
             } else {
-                returnResult = GenericController.encodeText(expression);
-                if (string.IsNullOrEmpty(returnResult)) {
-                    returnResult = "null";
-                } else {
-                    returnResult = "'" + GenericController.vbReplace(returnResult, "'", "''") + "'";
-                }
+                return "'" + GenericController.vbReplace(returnResult, "'", "''") + "'";
             }
-            return returnResult;
         }
         //
         // ====================================================================================================
@@ -1140,21 +1090,13 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         //
         public static string encodeSQLDate(DateTime expressionDate) {
-            string returnResult = "";
             try {
-                if (Convert.IsDBNull(expressionDate)) {
-                    returnResult = "null";
-                } else {
-                    if (expressionDate == DateTime.MinValue) {
-                        returnResult = "null";
-                    } else {
-                        returnResult = "'" + expressionDate.ToString("yyyy-MM-dd HH:mm:ss.fff") + "'";
-                    }
-                }
+                if (Convert.IsDBNull(expressionDate)) { return "null"; }
+                if (expressionDate == DateTime.MinValue) { return "null"; }
+                return "'" + expressionDate.ToString("yyyy-MM-dd HH:mm:ss.fff") + "'";
             } catch (Exception ) {
                 throw;
             }
-            return returnResult;
         }
         //
         //========================================================================
@@ -1182,15 +1124,8 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         //
         public static string encodeSQLBoolean(bool expression) {
-            string returnResult = SQLFalse;
-            try {
-                if (expression) {
-                    returnResult = SQLTrue;
-                }
-            } catch (Exception) {
-                throw;
-            }
-            return returnResult;
+            if (expression) { return SQLTrue; }
+            return SQLFalse;
         }
         //
         //========================================================================
@@ -1201,15 +1136,11 @@ namespace Contensive.Processor.Controllers {
         /// <param name="tableName"></param>
         /// <param name="recordId"></param>
         //
-        public void deleteTableRecord(int recordId, string tableName, string dataSourceName = "") {
+        public void deleteTableRecord(int recordId, string tableName) {
             try {
-                if (string.IsNullOrEmpty(tableName.Trim())) {
-                    throw new GenericException("tablename cannot be blank");
-                } else if (recordId <= 0) {
-                    throw new GenericException("record id is not valid [" + recordId + "]");
-                } else {
-                    executeNonQuery("delete from " + tableName + " where id=" + recordId, dataSourceName);
-                }
+                if (string.IsNullOrEmpty(tableName.Trim())) { throw new GenericException("tablename cannot be blank"); }
+                if (recordId <= 0) { throw new GenericException("record id is not valid [" + recordId + "]"); }
+                executeNonQuery("delete from " + tableName + " where id=" + recordId);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
@@ -1221,11 +1152,11 @@ namespace Contensive.Processor.Controllers {
         /// <param name="guid"></param>
         /// <param name="tableName"></param>
         /// <param name="dataSourceName"></param>
-        public void deleteTableRecord(string guid, string tableName, string dataSourceName = "") {
+        public void deleteTableRecord(string guid, string tableName) {
             try {
                 if (string.IsNullOrWhiteSpace(tableName)) { throw new GenericException("tablename cannot be blank"); }
                 if (!isGuid( guid )) { throw new GenericException("Guid is not valid [" + guid + "]"); }
-                executeNonQuery("delete from " + tableName + " where ccguid=" + encodeSQLText(guid), dataSourceName);
+                executeNonQuery("delete from " + tableName + " where ccguid=" + encodeSQLText(guid));
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
                 throw;
@@ -1240,12 +1171,11 @@ namespace Contensive.Processor.Controllers {
         /// <param name="tableName"></param>
         /// <param name="criteria"></param>
         //
-        public void deleteTableRecords(string tableName, string criteria, string dataSourceName) {
+        public void deleteTableRecords(string tableName, string criteria) {
             try {
-                if (string.IsNullOrEmpty(dataSourceName)) { throw new ArgumentException("dataSourceName cannot be blank"); }
                 if (string.IsNullOrEmpty(tableName)) { throw new ArgumentException("TableName cannot be blank"); }
                 if (string.IsNullOrEmpty(criteria)) { throw new ArgumentException("Criteria cannot be blank"); }
-                executeQuery("delete from " + tableName + " where " + criteria, dataSourceName);
+                executeQuery("delete from " + tableName + " where " + criteria);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
@@ -1264,7 +1194,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="groupBy"></param>
         /// <param name="recordLimit"></param>
         /// <returns></returns>
-        public string getSQLSelect(string dataSourceName, string from, string fieldList, string where, string orderBy, string groupBy, int recordLimit) {
+        public string getSQLSelect(string from, string fieldList, string where, string orderBy, string groupBy, int recordLimit) {
             string sql = "select";
             if (recordLimit != 0) { sql += " top " + recordLimit; }
             sql += (string.IsNullOrWhiteSpace(fieldList)) ? " *" : " " + fieldList;
@@ -1275,15 +1205,15 @@ namespace Contensive.Processor.Controllers {
             return sql;
         }
         //
-        public string getSQLSelect(string dataSourceName, string from, string fieldList, string where, string orderBy, string groupBy) => getSQLSelect(dataSourceName, from, fieldList, where, orderBy, groupBy, 0);
+        public string getSQLSelect(string from, string fieldList, string where, string orderBy, string groupBy) => getSQLSelect(from, fieldList, where, orderBy, groupBy, 0);
         //
-        public string getSQLSelect(string dataSourceName, string from, string fieldList, string where, string orderBy) => getSQLSelect(dataSourceName, from, fieldList, where, orderBy, "", 0);
+        public string getSQLSelect(string from, string fieldList, string where, string orderBy) => getSQLSelect(from, fieldList, where, orderBy, "", 0);
         //
-        public string getSQLSelect(string dataSourceName, string from, string fieldList, string where) => getSQLSelect(dataSourceName, from, fieldList, where, "", "", 0);
+        public string getSQLSelect(string from, string fieldList, string where) => getSQLSelect(from, fieldList, where, "", "", 0);
         //
-        public string getSQLSelect(string dataSourceName, string from, string fieldList) => getSQLSelect(dataSourceName, from, fieldList, "", "", "", 0);
+        public string getSQLSelect(string from, string fieldList) => getSQLSelect(from, fieldList, "", "", "", 0);
         //
-        public string getSQLSelect(string dataSourceName, string from) => getSQLSelect(dataSourceName, from, "", "", "", "", 0);
+        public string getSQLSelect(string from) => getSQLSelect(from, "", "", "", "", 0);
         //
         //========================================================================
         /// <summary>
@@ -1293,10 +1223,10 @@ namespace Contensive.Processor.Controllers {
         /// <param name="TableName"></param>
         /// <returns></returns>
         //
-        public string getSQLIndexList(string DataSourceName, string TableName) {
+        public string getSQLIndexList(string TableName) {
             string returnList = "";
             try {
-                Models.Domain.TableSchemaModel ts = Models.Domain.TableSchemaModel.getTableSchema(core, TableName, DataSourceName);
+                Models.Domain.TableSchemaModel ts = Models.Domain.TableSchemaModel.getTableSchema(core, TableName, dataSourceName);
                 if (ts != null) {
                     foreach ( TableSchemaModel.IndexSchemaModel index in ts.indexes) {
                         returnList += "," + index.index_name;
@@ -1322,7 +1252,7 @@ namespace Contensive.Processor.Controllers {
         public DataTable getTableSchemaData(string tableName) {
             DataTable returnDt = new DataTable();
             try {
-                string connString = getConnectionStringADONET(core.appConfig.name, "default");
+                string connString = getConnectionStringADONET(core.appConfig.name);
                 using (SqlConnection connSQL = new SqlConnection(connString)) {
                     connSQL.Open();
                     returnDt = connSQL.GetSchema("Tables", new[] { core.appConfig.name, null, tableName, null });
@@ -1347,7 +1277,7 @@ namespace Contensive.Processor.Controllers {
                 if (string.IsNullOrEmpty(tableName.Trim())) {
                     throw new ArgumentException("tablename cannot be blank");
                 } else {
-                    string connString = getConnectionStringADONET(core.appConfig.name, "default");
+                    string connString = getConnectionStringADONET(core.appConfig.name);
                     using (SqlConnection connSQL = new SqlConnection(connString)) {
                         connSQL.Open();
                         returnDt = connSQL.GetSchema("Columns", new[] { core.appConfig.name, null, tableName, null });
@@ -1368,7 +1298,7 @@ namespace Contensive.Processor.Controllers {
                 if (string.IsNullOrEmpty(tableName.Trim())) {
                     throw new ArgumentException("tablename cannot be blank");
                 } else {
-                    string connString = getConnectionStringADONET(core.appConfig.name, "default");
+                    string connString = getConnectionStringADONET(core.appConfig.name);
                     using (SqlConnection connSQL = new SqlConnection(connString)) {
                         connSQL.Open();
                         returnDt = connSQL.GetSchema("Indexes", new[] { core.appConfig.name, null, tableName, null });
@@ -1454,7 +1384,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="Criteria"></param>
         /// <param name="ChunkSize"></param>
         /// <param name="MaxChunkCount"></param>
-        public void deleteTableRecordChunks(string DataSourceName, string TableName, string Criteria, int ChunkSize = 1000, int MaxChunkCount = 1000) {
+        public void deleteTableRecordChunks(string TableName, string Criteria, int ChunkSize = 1000, int MaxChunkCount = 1000) {
             //
             int PreviousCount = 0;
             int CurrentCount = 0;
@@ -1465,12 +1395,12 @@ namespace Contensive.Processor.Controllers {
             //dim dt as datatable
             int DataSourceType;
             //
-            DataSourceType = getDataSourceType(DataSourceName);
+            DataSourceType = getDataSourceType();
             if ((DataSourceType != DataSourceTypeODBCSQLServer) && (DataSourceType != DataSourceTypeODBCAccess)) {
                 //
                 // If not SQL server, just delete them
                 //
-                deleteTableRecords(TableName, Criteria, DataSourceName);
+                deleteTableRecords(TableName, Criteria);
             } else {
                 //
                 // ----- Clear up to date for the properties
@@ -1495,12 +1425,12 @@ namespace Contensive.Processor.Controllers {
                     CurrentCount = GenericController.encodeInteger(dt.Rows[0][0]);
                 }
                 while ((CurrentCount != 0) && (PreviousCount != CurrentCount) && (LoopCount < iChunkCount)) {
-                    if (getDataSourceType(DataSourceName) == DataSourceTypeODBCMySQL) {
+                    if (getDataSourceType() == DataSourceTypeODBCMySQL) {
                         SQL = "delete from " + TableName + " where id in (select ID from " + TableName + " where " + Criteria + " limit " + iChunkSize + ")";
                     } else {
                         SQL = "delete from " + TableName + " where id in (select top " + iChunkSize + " ID from " + TableName + " where " + Criteria + ")";
                     }
-                    executeQuery(SQL, DataSourceName);
+                    executeQuery(SQL);
                     PreviousCount = CurrentCount;
                     SQL = "select count(*) as RecordCount from " + TableName + " where " + Criteria;
                     dt = executeQuery(SQL);

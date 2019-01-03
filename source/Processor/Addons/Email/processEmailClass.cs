@@ -165,7 +165,7 @@ namespace Contensive.Addons.Email {
         /// <param name="IsNewDay"></param>
         private void ProcessConditionalEmail(CoreController core) {
             try {
-                int dataSourceType = core.db.getDataSourceType("default");
+                int dataSourceType = core.db.getDataSourceType();
                 string BounceAddress = core.siteProperties.getText("EmailBounceAddress", "");
                 DateTime rightNow = DateTime.Now;
                 DateTime rightNowDate = rightNow.Date;

@@ -408,7 +408,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// main_GetPageDynamicLinkWithArgs
         /// </summary>
-        /// <param name="ContentControlID"></param>
+        /// <param name="contentControlID"></param>
         /// <param name="PageID"></param>
         /// <param name="DefaultLink"></param>
         /// <param name="IsRootPage"></param>
@@ -417,18 +417,18 @@ namespace Contensive.Processor.Controllers {
         /// <param name="MenuLinkOverRide"></param>
         /// <param name="UseContentWatchLink"></param>
         /// <returns></returns>
-        internal string main_GetPageDynamicLinkWithArgs(int ContentControlID, int PageID, string DefaultLink, bool IsRootPage, int templateId, int SectionID, string MenuLinkOverRide, bool UseContentWatchLink) {
+        internal string main_GetPageDynamicLinkWithArgs(int contentControlID, int PageID, string DefaultLink, bool IsRootPage, int templateId, int SectionID, string MenuLinkOverRide, bool UseContentWatchLink) {
             string resultLink = "";
             try {
                 if (!string.IsNullOrEmpty(MenuLinkOverRide)) {
                     //
                     // -- redirect to this page record
-                    resultLink = "?rc=" + ContentControlID + "&ri=" + PageID;
+                    resultLink = "?rc=" + contentControlID + "&ri=" + PageID;
                 } else {
                     if (UseContentWatchLink) {
                         //
                         // -- Legacy method - lookup link from a table set during the last page hit
-                        resultLink = getContentWatchLinkByID(ContentControlID, PageID, DefaultLink, false);
+                        resultLink = getContentWatchLinkByID(contentControlID, PageID, DefaultLink, false);
                     } else {
                         //
                         // -- Current method - all pages are in the Template, Section, Page structure
@@ -448,7 +448,7 @@ namespace Contensive.Processor.Controllers {
                             } else {
                                 //
                                 // -- fallback, use content watch
-                                resultLink = getContentWatchLinkByID(ContentControlID, PageID, "", false);
+                                resultLink = getContentWatchLinkByID(contentControlID, PageID, "", false);
                             }
                         }
                         if ((PageID == 0) || (IsRootPage)) {

@@ -124,36 +124,6 @@ namespace Contensive.Processor.Models.Domain {
             }
             return returnModel;
         }
-        ////
-        ////====================================================================================================
-        ///// <summary>
-        ///// get the server configuration and assign an application to the appConf
-        ///// </summary>
-        ///// <param name="cp"></param>
-        ///// <param name="recordId"></param>
-        //public static Models.Domain.serverConfigModel getObject(coreController core, string appName) {
-        //    serverConfigModel returnModel = null;
-        //    try {
-        //        returnModel = getObject(core);
-        //        if (!string.IsNullOrEmpty(appName)) {
-        //            if (!returnModel.apps.ContainsKey(appName.ToLowerInvariant())) {
-        //                //
-        //                // -- application not configured
-        //                returnModel.appConfig = null;
-        //                throw new Exception("application [" + appName + "] was not found in this server group.");
-        //            } else {
-        //                returnModel.appConfig = returnModel.apps[appName.ToLowerInvariant()];
-        //                //
-        //                // -- no, leave the status setup with the last status saved -- there is not status that describes how it is running, because there is not server. This is the status of the configuration, OK or building
-        //                // -- build is set when the app is created, and OK is set at the end of upgrade
-        //                //returnModel.appConfig.appStatus = appStatusEnum.OK
-        //            }
-        //        }
-        //    } catch (Exception ex) {
-        //        logController.handleException( core,ex, "exception in serverConfigModel.getObject");
-        //    }
-        //    return returnModel;
-        //}
         //
         //====================================================================================================
         /// <summary>

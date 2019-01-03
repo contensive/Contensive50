@@ -51,16 +51,6 @@ namespace Contensive.Processor.Models.Db {
         /// To save a tasks output, create a download record and set this field with its id.
         /// </summary>
         public int resultDownloadId { get; set; }
-
-        //
-        // -- deprecated fields. This information should be stored in cmdDetails
-        //
-        //public string command { get; set; }
-        //public string dataSource { get; set; }
-        //public string importMapFilename { get; set; }
-        //public string notifyEmail { get; set; }
-        //public string resultMessage { get; set; }
-        //public string sqlQuery { get; set; }
         //
         //====================================================================================================
         public static TaskModel addDefault(CoreController core, Domain.MetaModel metaData) {
@@ -149,11 +139,6 @@ namespace Contensive.Processor.Models.Db {
         public static int getRecordId(CoreController core, string ccGuid) {
             return BaseModel.getRecordId<TaskModel>(core, ccGuid);
         }
-        //
-        //====================================================================================================
-        //public static TaskModel createDefault(CoreController core) {
-        //    return createDefault<TaskModel>(core);
-        //}
         //
         //====================================================================================================
         /// <summary>

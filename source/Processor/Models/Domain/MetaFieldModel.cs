@@ -342,13 +342,10 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         public int lookupContentID { get; set; }
         public string get_lookupContentName(CoreController core) {
-            if ((_lookupContentName == null)&&(lookupContentID>0)) {
-                if (lookupContentID > 0) {
-                    _lookupContentName = "";
-                    var content = ContentModel.create(core, lookupContentID);
-                    if (content != null) _lookupContentName = content.name;
-                }
-                //_lookupContentName = MetaController.getContentNameByID(core, lookupContentID);
+            if ((_lookupContentName == null) && (lookupContentID>0)) {
+                _lookupContentName = "";
+                var content = ContentModel.create(core, lookupContentID);
+                if (content != null) { _lookupContentName = content.name; }
             }
             return _lookupContentName;
         }
@@ -395,7 +392,6 @@ namespace Contensive.Processor.Models.Domain {
                 if (_memberSelectGroupName != null) {
                     var group = GroupModel.createByUniqueName(core, _memberSelectGroupName);
                     _memberSelectGroupId = (group == null) ? 0 : group.id;
-                    //_memberSelectGroupId = MetaController.getRecordId( core,"groups", GenericController.encodeText(_memberSelectGroupName));
                 };
             }
             return (GenericController.encodeInteger(_memberSelectGroupId));

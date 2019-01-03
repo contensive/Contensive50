@@ -76,7 +76,17 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override void Delete(string GroupNameIdOrGuid) => GroupModel.delete(core, GroupNameIdOrGuid);
+        public override void Delete(string GroupNameIdOrGuid) {
+            if ( GenericController.isGuid(GroupNameIdOrGuid )) {
+                GroupModel.delete(core, GroupNameIdOrGuid);
+                return;
+            }
+            if ( GroupNameIdOrGuid.IsNumeric()) {
+                GroupModel.delete(core, GenericController.encodeInteger( GroupNameIdOrGuid));
+                return;
+            }
+            GroupModel.delete(core, "name=" + DbController.encodeSQLText(GroupNameIdOrGuid));
+        }
         //
         //====================================================================================================
         //
@@ -84,7 +94,12 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override int GetId(string GroupNameOrGuid) => MetaController.getRecordId_Legacy( core,"groups", GroupNameOrGuid);
+        public override int GetId(string GroupNameOrGuid) {
+            if (GenericController.isGuid(GroupNameOrGuid)) {
+                return MetaController.getRecordId(core, "groups", GroupNameOrGuid);
+            }
+            return MetaController.getRecordIdByUniqueName(core, "groups", GroupNameOrGuid);
+        }
         //
         //====================================================================================================
         //

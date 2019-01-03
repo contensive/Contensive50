@@ -50,7 +50,7 @@
 //                        csData.csSet("ShipState", core.docProperties.getText("address_state"));
 //                        csData.csSet("ShipZip", core.docProperties.getText("address_zip"));
 //                        csData.csSet("BilleMail", core.docProperties.getText("payer_email"));
-//                        csData.csSet("ContentControlID", Models.Domain.MetaModel.getContentId(core, "Orders Completed"));
+//                        csData.csSet("contentControlId", Models.Domain.MetaModel.getContentId(core, "Orders Completed"));
 //                        csData.csSave2(CS);
 //                    }
 //                    csData.csClose();

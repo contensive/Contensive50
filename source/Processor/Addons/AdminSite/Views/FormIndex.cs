@@ -117,7 +117,7 @@ namespace Contensive.Addons.AdminSite {
                             // Assumble the SQL
                             //
                             SQL = "select";
-                            if (datasource.type != DataSourceTypeODBCMySQL) {
+                            if (datasource.dbTypeId != DataSourceTypeODBCMySQL) {
                                 SQL += " Top " + (IndexConfig.recordTop + IndexConfig.recordsPerPage);
                             }
                             SQL += " " + sqlFieldList + " From " + sqlFrom;
@@ -127,7 +127,7 @@ namespace Contensive.Addons.AdminSite {
                             if (!string.IsNullOrEmpty(sqlOrderBy)) {
                                 SQL += " Order By" + sqlOrderBy;
                             }
-                            if (datasource.type == DataSourceTypeODBCMySQL) {
+                            if (datasource.dbTypeId == DataSourceTypeODBCMySQL) {
                                 SQL += " Limit " + (IndexConfig.recordTop + IndexConfig.recordsPerPage);
                             }
                             //
@@ -1686,7 +1686,7 @@ namespace Contensive.Addons.AdminSite {
                 SubFilterList = "";
                 if (GenericController.vbLCase(TableName) == GenericController.vbLCase("ccMembers")) {
                     using (var csData = new CsModel(core)) {
-                        csData.openSql(core.db.getSQLSelect("default", "ccGroups", "ID,Caption,Name", "(active<>0)", "Caption,Name"));
+                        csData.openSql(core.db.getSQLSelect( "ccGroups", "ID,Caption,Name", "(active<>0)", "Caption,Name"));
                         while (csData.ok()) {
                             string Name = csData.getText("Name");
                             Ptr = 0;

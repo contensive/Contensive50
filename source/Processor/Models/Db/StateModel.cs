@@ -116,11 +116,6 @@ namespace Contensive.Processor.Models.Db {
         public static int getRecordId(CoreController core, string ccGuid) {
             return BaseModel.getRecordId<StateModel>(core, ccGuid);
         }
-        ////
-        ////====================================================================================================
-        //public static StateModel createDefault(CoreController core) {
-        //    return createDefault<StateModel>(core);
-        //}
         //
         //====================================================================================================
         /// <summary>

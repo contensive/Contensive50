@@ -18,7 +18,6 @@ namespace Contensive.Processor.Models.Db {
         public bool authorable { get; set; }
         public string caption { get; set; }
         public int contentID { get; set; }
-        //public bool createResourceFilesOnRoot { get; set; }
         public string defaultValue { get; set; }
         public bool developerOnly { get; set; }
         public int editorAddonID { get; set; }
@@ -39,7 +38,6 @@ namespace Contensive.Processor.Models.Db {
         public int memberSelectGroupID { get; set; }
         public bool notEditable { get; set; }
         public bool password { get; set; }
-        //public string prefixForRootResourceFiles { get; set; }
         public bool readOnly { get; set; }
         public int redirectContentID { get; set; }
         public string redirectID { get; set; }
@@ -150,11 +148,6 @@ namespace Contensive.Processor.Models.Db {
         public static int getRecordId(CoreController core, string ccGuid) {
             return BaseModel.getRecordId<ContentFieldModel>(core, ccGuid);
         }
-        //
-        //====================================================================================================
-        //public static ContentFieldModel createDefault(CoreController core) {
-        //    return createDefault<ContentFieldModel>(core);
-        //}
         //
         //====================================================================================================
         /// <summary>

@@ -40,10 +40,6 @@ namespace Contensive.Processor {
         /// Can be read. True if created with open() or openSql(), false if created with openForUpdate()
         /// </summary>
         private bool readable;
-        /// <summary>
-        /// true if it was created here
-        /// </summary>
-        //private bool newRecord;
         ///// <summary>
         ///// ***** should be removed. This should be the same as metaData.name
         ///// </summary>
@@ -56,10 +52,6 @@ namespace Contensive.Processor {
         /// data that needs to be written to the database on the next save
         /// </summary>
         private Dictionary<string, string> writeCache;
-        /// <summary>
-        /// Set when CS is opened and if a save happens
-        /// </summary>
-        //private bool isModified;
         ///// <summary>
         ///// The read object, null when empty otherwise it needs to be disposed
         ///// </summary>
@@ -92,10 +84,6 @@ namespace Contensive.Processor {
         /// number of columns in the fieldNames and readCache
         /// </summary>
         private int resultColumnCount;
-        ///// <summary>
-        ///// readCache is at the last record
-        ///// </summary>
-        // private bool resultEOF;
         /// <summary>
         /// 2-D array of the result rows/columns
         /// </summary>
@@ -271,8 +259,10 @@ namespace Contensive.Processor {
                 }
                 //
                 int recordId = getInteger("ID");
-                core.db.deleteTableRecord(recordId, contentMeta.tableName, contentMeta.dataSourceName);
-                MetaController.deleteContentRules(core, contentMeta.id, recordId);
+                using (var db = new DbController(core, contentMeta.dataSourceName)) {
+                    db.deleteTableRecord(recordId, contentMeta.tableName);
+                }
+                MetaController.deleteContentRules(core, contentMeta, recordId);
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
                 throw;
@@ -379,7 +369,9 @@ namespace Contensive.Processor {
                 sqlList.add("DATEADDED", sqlDateAdded);
                 sqlList.add("CONTENTCONTROLID", DbController.encodeSQLNumber(meta.id));
                 sqlList.add("CREATEDBY", DbController.encodeSQLNumber(userId));
-                core.db.insertTableRecord(meta.dataSourceName, meta.tableName, sqlList);
+                using (var db = new DbController(core, meta.dataSourceName)) {
+                    db.insertTableRecord(meta.tableName, sqlList);
+                }
                 //
                 // ----- Get the record back so we can use the ID
                 return open(contentName, "(ccguid=" + sqlGuid + ")And(DateAdded=" + sqlDateAdded + ")", "ID DESC", false, userId);
@@ -885,8 +877,6 @@ namespace Contensive.Processor {
             }
         }
         //       
-        //public bool csOk(int ignore) => csOk();
-        //       
         //========================================================================
         /// <summary>
         /// Returns the Source for the csv_ContentSet
@@ -958,14 +948,14 @@ namespace Contensive.Processor {
                         //
                         // -- DateTime
                         DateTime dateValue = GenericController.encodeDate(rawData);
-                        if (dateValue == DateTime.MinValue ) { return string.Empty; }
+                        if (dateValue == DateTime.MinValue) { return string.Empty; }
                         if (dateValue.Equals(dateValue.Date)) { return dateValue.ToString("d"); }
                         return dateValue.ToString();
                     case Constants._fieldTypeIdLookup:
                         //
                         // -- Lookup
                         if (!rawData.IsNumeric()) { return string.Empty; }
-                        if (field.lookupContentID>0 ) {
+                        if (field.lookupContentID > 0) {
                             string LookupContentName = MetaController.getContentNameByID(core, field.lookupContentID);
                             if (!string.IsNullOrEmpty(LookupContentName)) {
                                 //
@@ -1260,203 +1250,201 @@ namespace Contensive.Processor {
                 if (!ok()) { return; }
                 if (this.writeCache.Count == 0) { return; }
                 if (!(this.createdByQuery)) { throw new ArgumentException("The dataset cannot be updated because it was created with a query and not a content table."); }
-                {
-                    var contentSet = this;
-                    if (this.contentMeta == null) {
-                        //
-                        // -- dataset not updatable
-                        throw new ArgumentException("The dataset cannot be updated because it was not created from a valid content table.");
-                    } else {
-                        //
-                        // -- get id from read cache or write cache. if id=0 save is insert, else save is update
-                        int id = getInteger("ID");
-                        string sqlDelimiter = "";
-                        string sqlUpdate = "";
-                        DateTime sqlModifiedDate = DateTime.Now;
-                        int sqlModifiedBy = this.userId;
-                        bool AuthorableFieldUpdate = false;
-                        int FieldFoundCount = 0;
-                        string SQLCriteriaUnique = "";
-                        string UniqueViolationFieldList = "";
-                        foreach (var keyValuePair in this.writeCache) {
-                            string fieldName = keyValuePair.Key;
-                            string ucaseFieldName = GenericController.vbUCase(fieldName);
-                            object writeCacheValue = keyValuePair.Value;
-                            if (ucaseFieldName == "ID") {
-                                //
-                                // do not add to update, it is hardcoded to update where clause
-                            } else if (ucaseFieldName == "MODIFIEDBY") {
-                                //
-                                // capture and block it - it is hardcoded in sql
-                                //
-                                AuthorableFieldUpdate = true;
-                                sqlModifiedBy = GenericController.encodeInteger(writeCacheValue);
-                            } else if (ucaseFieldName == "MODIFIEDDATE") {
-                                //
-                                // capture and block it - it is hardcoded in sql
-                                //
-                                AuthorableFieldUpdate = true;
-                                sqlModifiedDate = GenericController.encodeDate(writeCacheValue);
-                            } else {
-                                //
-                                // let these field be added to the sql
-                                //
-                                //recordInactive = (ucaseFieldName == "ACTIVE" && (!GenericController.encodeBoolean(writeCacheValue)));
-                                FieldFoundCount += 1;
-                                Models.Domain.MetaFieldModel field = this.contentMeta.fields[fieldName.ToLowerInvariant()];
-                                string SQLSetPair = "";
-                                bool FieldReadOnly = field.readOnly;
-                                bool FieldAdminAuthorable = ((!field.readOnly) && (!field.notEditable) && (field.authorable));
-                                //
-                                // ----- Set SQLSetPair to the name=value pair for the SQL statement
-                                //
-                                switch (field.fieldTypeId) {
-                                    case Constants._fieldTypeIdRedirect:
-                                    case Constants._fieldTypeIdManyToMany:
-                                        break;
-                                    case Constants._fieldTypeIdInteger:
-                                    case Constants._fieldTypeIdLookup:
-                                    case Constants._fieldTypeIdAutoIdIncrement:
-                                    case Constants._fieldTypeIdMemberSelect:
-                                        SQLSetPair = fieldName + "=" + DbController.encodeSQLNumber(encodeInteger(writeCacheValue));
-                                        break;
-                                    case Constants._fieldTypeIdCurrency:
-                                    case Constants._fieldTypeIdFloat:
-                                        SQLSetPair = fieldName + "=" + DbController.encodeSQLNumber(encodeNumber(writeCacheValue));
-                                        break;
-                                    case Constants._fieldTypeIdBoolean:
-                                        SQLSetPair = fieldName + "=" + DbController.encodeSQLBoolean(encodeBoolean(writeCacheValue));
-                                        break;
-                                    case Constants._fieldTypeIdDate:
-                                        SQLSetPair = fieldName + "=" + DbController.encodeSQLDate(encodeDate(writeCacheValue));
-                                        break;
-                                    case Constants._fieldTypeIdText:
-                                        string Copy = encodeText(writeCacheValue);
-                                        if (Copy.Length > 255) {
-                                            Copy = Copy.Left(255);
-                                        }
-                                        if (field.Scramble) {
-                                            Copy = TextScramble(core, Copy);
-                                        }
-                                        SQLSetPair = fieldName + "=" + DbController.encodeSQLText(Copy);
-                                        break;
-                                    case Constants._fieldTypeIdLink:
-                                    case Constants._fieldTypeIdResourceLink:
-                                    case Constants._fieldTypeIdFile:
-                                    case Constants._fieldTypeIdFileImage:
-                                    case Constants._fieldTypeIdFileText:
-                                    case Constants._fieldTypeIdFileCSS:
-                                    case Constants._fieldTypeIdFileXML:
-                                    case Constants._fieldTypeIdFileJavascript:
-                                    case Constants._fieldTypeIdFileHTML:
-                                        string filename = encodeText(writeCacheValue);
-                                        if (filename.Length > 255) {
-                                            filename = filename.Left(255);
-                                        }
-                                        SQLSetPair = fieldName + "=" + DbController.encodeSQLText(filename);
-                                        break;
-                                    case Constants._fieldTypeIdLongText:
-                                    case Constants._fieldTypeIdHTML:
-                                        SQLSetPair = fieldName + "=" + DbController.encodeSQLText(GenericController.encodeText(writeCacheValue));
-                                        break;
-                                    default:
-                                        //
-                                        // Invalid fieldtype
-                                        //
-                                        throw new GenericException("Can Not save this record because the field [" + field.nameLc + "] has an invalid field type Id [" + field.fieldTypeId + "]");
-                                }
-                                if (!string.IsNullOrEmpty(SQLSetPair)) {
-                                    //
-                                    // ----- Set the new value in the 
-                                    //
-                                    if (this.resultColumnCount > 0) {
-                                        for (int ColumnPtr = 0; ColumnPtr < this.resultColumnCount; ColumnPtr++) {
-                                            if (this.fieldNames[ColumnPtr] == ucaseFieldName) {
-                                                this.readCache[ColumnPtr, this.readCacheRowPtr] = writeCacheValue.ToString();
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    if (field.uniqueName & (GenericController.encodeText(writeCacheValue) != "")) {
-                                        //
-                                        // ----- set up for unique name check
-                                        //
-                                        if (!string.IsNullOrEmpty(SQLCriteriaUnique)) {
-                                            SQLCriteriaUnique += "Or";
-                                            UniqueViolationFieldList += ",";
-                                        }
-                                        string writeCacheValueText = GenericController.encodeText(writeCacheValue);
-                                        if (writeCacheValueText.Length < 255) {
-                                            UniqueViolationFieldList += field.nameLc + "=\"" + writeCacheValueText + "\"";
-                                        } else {
-                                            UniqueViolationFieldList += field.nameLc + "=\"" + writeCacheValueText.Left(255) + "...\"";
-                                        }
-                                        switch (field.fieldTypeId) {
-                                            case Constants._fieldTypeIdRedirect:
-                                            case Constants._fieldTypeIdManyToMany:
-                                                break;
-                                            default:
-                                                SQLCriteriaUnique += "(" + field.nameLc + "=" + MetaController.encodeSQL(writeCacheValue, field.fieldTypeId) + ")";
-                                                break;
-                                        }
-                                    }
-                                    //
-                                    // ----- update live record
-                                    //
-                                    sqlUpdate = sqlUpdate + sqlDelimiter + SQLSetPair;
-                                    sqlDelimiter = ",";
-                                    if (FieldAdminAuthorable) {
-                                        AuthorableFieldUpdate = true;
-                                    }
-                                }
-                            }
-                        }
-                        //
-                        // -- clear write cache
-                        // 20180314 - no, dont cleare the write cache for now because a subsequent read will replace the original read's value, which may be updated by the save
-                        //this.writeCache = new Dictionary<string, string>();
-                        //
-                        // ----- Set ModifiedBy,ModifiedDate Fields if an admin visible field has changed
-                        if (AuthorableFieldUpdate) {
-                            if (!string.IsNullOrEmpty(sqlUpdate)) {
-                                //
-                                // ----- Authorable Fields Updated in non-Authoring Mode, set Live Record Modified
-                                //
-                                sqlUpdate = sqlUpdate + ",MODIFIEDDATE=" + DbController.encodeSQLDate(sqlModifiedDate) + ",MODIFIEDBY=" + DbController.encodeSQLNumber(sqlModifiedBy);
-                            }
-                        }
-                        //
-                        // ----- Do the unique check on the content table, if necessary
-                        //
-                        if (!string.IsNullOrEmpty(SQLCriteriaUnique)) {
-                            string sqlUnique = "SELECT ID FROM " + this.contentMeta.tableName + " WHERE (ID<>" + id + ")AND(" + SQLCriteriaUnique + ")and(" + this.contentMeta.legacyContentControlCriteria + ");";
-                            using (DataTable dt = core.db.executeQuery(sqlUnique, this.contentMeta.dataSourceName)) {
-                                //
-                                // -- unique violation
-                                if (dt.Rows.Count > 0) {
-                                    LogController.logWarn(core, "Can not save record to content [" + this.contentMeta.name + "] because it would create a non-unique record for one or more of the following field(s) [" + UniqueViolationFieldList + "]");
-                                    return;
-                                }
-                            }
-                        }
-                        if (FieldFoundCount > 0) {
+                if (this.contentMeta == null) { throw new ArgumentException("The dataset cannot be updated because it was not created from a valid content table."); }
+                //
+                // -- create the Db controller instance
+                using (var db = new DbController(core, this.contentMeta.dataSourceName)) {
+                    string sqlUpdate = "";
+                    DateTime sqlModifiedDate = DateTime.Now;
+                    int sqlModifiedBy = this.userId;
+                    bool AuthorableFieldUpdate = false;
+                    int FieldFoundCount = 0;
+                    string SQLCriteriaUnique = "";
+                    string UniqueViolationFieldList = "";
+                    string sqlDelimiter = "";
+                    foreach (var keyValuePair in this.writeCache) {
+                        string fieldName = keyValuePair.Key;
+                        string ucaseFieldName = GenericController.vbUCase(fieldName);
+                        object writeCacheValue = keyValuePair.Value;
+                        if (ucaseFieldName == "ID") {
                             //
-                            // ----- update live table (non-workflowauthoring and non-authorable fields)
+                            // do not add to update, it is hardcoded to update where clause
+                        } else if (ucaseFieldName == "MODIFIEDBY") {
                             //
-                            if (!string.IsNullOrEmpty(sqlUpdate)) {
-                                string SQLUpdate = "UPDATE " + this.contentMeta.tableName + " SET " + sqlUpdate + " WHERE ID=" + id + ";";
-                                if (asyncSave) {
-                                    core.db.executeNonQueryAsync(SQLUpdate, this.contentMeta.dataSourceName);
-                                } else {
-                                    core.db.executeNonQuery(SQLUpdate, this.contentMeta.dataSourceName);
+                            // capture and block it - it is hardcoded in sql
+                            //
+                            AuthorableFieldUpdate = true;
+                            sqlModifiedBy = GenericController.encodeInteger(writeCacheValue);
+                        } else if (ucaseFieldName == "MODIFIEDDATE") {
+                            //
+                            // capture and block it - it is hardcoded in sql
+                            //
+                            AuthorableFieldUpdate = true;
+                            sqlModifiedDate = GenericController.encodeDate(writeCacheValue);
+                        } else {
+                            //
+                            // let these field be added to the sql
+                            //
+                            //recordInactive = (ucaseFieldName == "ACTIVE" && (!GenericController.encodeBoolean(writeCacheValue)));
+                            FieldFoundCount += 1;
+                            Models.Domain.MetaFieldModel field = this.contentMeta.fields[fieldName.ToLowerInvariant()];
+                            string SQLSetPair = "";
+                            bool FieldReadOnly = field.readOnly;
+                            bool FieldAdminAuthorable = ((!field.readOnly) && (!field.notEditable) && (field.authorable));
+                            //
+                            // ----- Set SQLSetPair to the name=value pair for the SQL statement
+                            //
+                            switch (field.fieldTypeId) {
+                                case Constants._fieldTypeIdRedirect:
+                                case Constants._fieldTypeIdManyToMany:
+                                    break;
+                                case Constants._fieldTypeIdInteger:
+                                case Constants._fieldTypeIdLookup:
+                                case Constants._fieldTypeIdAutoIdIncrement:
+                                case Constants._fieldTypeIdMemberSelect:
+                                    SQLSetPair = fieldName + "=" + DbController.encodeSQLNumber(encodeInteger(writeCacheValue));
+                                    break;
+                                case Constants._fieldTypeIdCurrency:
+                                case Constants._fieldTypeIdFloat:
+                                    SQLSetPair = fieldName + "=" + DbController.encodeSQLNumber(encodeNumber(writeCacheValue));
+                                    break;
+                                case Constants._fieldTypeIdBoolean:
+                                    SQLSetPair = fieldName + "=" + DbController.encodeSQLBoolean(encodeBoolean(writeCacheValue));
+                                    break;
+                                case Constants._fieldTypeIdDate:
+                                    SQLSetPair = fieldName + "=" + DbController.encodeSQLDate(encodeDate(writeCacheValue));
+                                    break;
+                                case Constants._fieldTypeIdText:
+                                    string Copy = encodeText(writeCacheValue);
+                                    if (Copy.Length > 255) {
+                                        Copy = Copy.Left(255);
+                                    }
+                                    if (field.Scramble) {
+                                        Copy = TextScramble(core, Copy);
+                                    }
+                                    SQLSetPair = fieldName + "=" + DbController.encodeSQLText(Copy);
+                                    break;
+                                case Constants._fieldTypeIdLink:
+                                case Constants._fieldTypeIdResourceLink:
+                                case Constants._fieldTypeIdFile:
+                                case Constants._fieldTypeIdFileImage:
+                                case Constants._fieldTypeIdFileText:
+                                case Constants._fieldTypeIdFileCSS:
+                                case Constants._fieldTypeIdFileXML:
+                                case Constants._fieldTypeIdFileJavascript:
+                                case Constants._fieldTypeIdFileHTML:
+                                    string filename = encodeText(writeCacheValue);
+                                    if (filename.Length > 255) {
+                                        filename = filename.Left(255);
+                                    }
+                                    SQLSetPair = fieldName + "=" + DbController.encodeSQLText(filename);
+                                    break;
+                                case Constants._fieldTypeIdLongText:
+                                case Constants._fieldTypeIdHTML:
+                                    SQLSetPair = fieldName + "=" + DbController.encodeSQLText(GenericController.encodeText(writeCacheValue));
+                                    break;
+                                default:
+                                    //
+                                    // Invalid fieldtype
+                                    //
+                                    throw new GenericException("Can Not save this record because the field [" + field.nameLc + "] has an invalid field type Id [" + field.fieldTypeId + "]");
+                            }
+                            if (!string.IsNullOrEmpty(SQLSetPair)) {
+                                //
+                                // ----- Set the new value in the 
+                                //
+                                if (this.resultColumnCount > 0) {
+                                    for (int ColumnPtr = 0; ColumnPtr < this.resultColumnCount; ColumnPtr++) {
+                                        if (this.fieldNames[ColumnPtr] == ucaseFieldName) {
+                                            this.readCache[ColumnPtr, this.readCacheRowPtr] = writeCacheValue.ToString();
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (field.uniqueName & (GenericController.encodeText(writeCacheValue) != "")) {
+                                    //
+                                    // ----- set up for unique name check
+                                    //
+                                    if (!string.IsNullOrEmpty(SQLCriteriaUnique)) {
+                                        SQLCriteriaUnique += "Or";
+                                        UniqueViolationFieldList += ",";
+                                    }
+                                    string writeCacheValueText = GenericController.encodeText(writeCacheValue);
+                                    if (writeCacheValueText.Length < 255) {
+                                        UniqueViolationFieldList += field.nameLc + "=\"" + writeCacheValueText + "\"";
+                                    } else {
+                                        UniqueViolationFieldList += field.nameLc + "=\"" + writeCacheValueText.Left(255) + "...\"";
+                                    }
+                                    switch (field.fieldTypeId) {
+                                        case Constants._fieldTypeIdRedirect:
+                                        case Constants._fieldTypeIdManyToMany:
+                                            break;
+                                        default:
+                                            SQLCriteriaUnique += "(" + field.nameLc + "=" + MetaController.encodeSQL(writeCacheValue, field.fieldTypeId) + ")";
+                                            break;
+                                    }
+                                }
+                                //
+                                // ----- update live record
+                                //
+                                sqlUpdate = sqlUpdate + sqlDelimiter + SQLSetPair;
+                                sqlDelimiter = ",";
+                                if (FieldAdminAuthorable) {
+                                    AuthorableFieldUpdate = true;
                                 }
                             }
                         }
-                        this.lastUsed = DateTime.Now;
-                        //
-                        // -- invalidate the special cache name used to detect a change in any record
-                        core.cache.invalidateDbRecord(id, this.contentMeta.tableName, this.contentMeta.dataSourceName);
                     }
+                    //
+                    // -- clear write cache
+                    // 20180314 - no, dont cleare the write cache for now because a subsequent read will replace the original read's value, which may be updated by the save
+                    //this.writeCache = new Dictionary<string, string>();
+                    //
+                    // ----- Set ModifiedBy,ModifiedDate Fields if an admin visible field has changed
+                    if (AuthorableFieldUpdate) {
+                        if (!string.IsNullOrEmpty(sqlUpdate)) {
+                            //
+                            // ----- Authorable Fields Updated in non-Authoring Mode, set Live Record Modified
+                            //
+                            sqlUpdate = sqlUpdate 
+                                + ",modifiedDate=" + DbController.encodeSQLDate(sqlModifiedDate) 
+                                + ",modifiedBy=" + DbController.encodeSQLNumber(sqlModifiedBy);
+                        }
+                    }
+                    //
+                    // -- get id from read cache or write cache. if id=0 save is insert, else save is update
+                    int id = getInteger("ID");
+                    //
+                    // ----- Do the unique check on the content table, if necessary
+                    //
+                    if (!string.IsNullOrEmpty(SQLCriteriaUnique)) {
+                        string sqlUnique = "select id from " + this.contentMeta.tableName + " where (id<>" + id + ")and(" + SQLCriteriaUnique + ")and(" + this.contentMeta.legacyContentControlCriteria + ");";
+                        using (DataTable dt = db.executeQuery(sqlUnique)) {
+                            //
+                            // -- unique violation
+                            if (dt.Rows.Count > 0) {
+                                LogController.logWarn(core, "Can not save record to content [" + this.contentMeta.name + "] because it would create a non-unique record for one or more of the following field(s) [" + UniqueViolationFieldList + "]");
+                                return;
+                            }
+                        }
+                    }
+                    if (FieldFoundCount > 0) {
+                        //
+                        // ----- update live table (non-workflowauthoring and non-authorable fields)
+                        //
+                        if (!string.IsNullOrEmpty(sqlUpdate)) {
+                            string SQLUpdate = "update " + this.contentMeta.tableName + " set " + sqlUpdate + " where id=" + id + ";";
+                            if (asyncSave) {
+                                db.executeNonQueryAsync(SQLUpdate);
+                            } else {
+                                db.executeNonQuery(SQLUpdate);
+                            }
+                        }
+                    }
+                    this.lastUsed = DateTime.Now;
+                    //
+                    // -- invalidate the special cache name used to detect a change in any record
+                    core.cache.invalidateDbRecord(id, this.contentMeta.tableName, this.contentMeta.dataSourceName);
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
@@ -1978,7 +1966,9 @@ namespace Contensive.Processor {
                 this.dataSourceName = dataSourceName;
                 this.sqlSelectFieldList = "";
                 this.sqlSource = sql;
-                this.dt = core.db.executeQuery(sql, dataSourceName, pageSize * (pageNumber - 1), pageSize);
+                using( var db = new DbController( core, dataSourceName )) {
+                    this.dt = core.db.executeQuery(sql, pageSize * (pageNumber - 1), pageSize);
+                }
                 initAfterOpen(0);
                 return ok();
             } catch (Exception ex) {

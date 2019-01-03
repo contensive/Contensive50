@@ -55,7 +55,7 @@ namespace Contensive.Processor.Models.Domain {
         //
         public bool isFile {
             get {
-                if (!string.IsNullOrEmpty(_fileName)) return true;
+                if (!string.IsNullOrEmpty(_fileName)) { return true; }
                 return false;
             }
         }

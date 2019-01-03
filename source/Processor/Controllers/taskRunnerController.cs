@@ -29,7 +29,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         private System.Timers.Timer processTimer { get; set; }
         private const int ProcessTimerMsecPerTick = 5000; // Check processs every 5 seconds
-        private bool ProcessTimerInProcess { get; set; }
+        private bool processTimerInProcess { get; set; }
         //
         // ----- Alarms within Process Timer
         //
@@ -102,11 +102,11 @@ namespace Contensive.Processor.Controllers {
         protected void processTimerTick(object sender, EventArgs e) {
             try {
                 // non-thread safe. Use lock to prevent re-entry?
-                if (ProcessTimerInProcess) {
+                if (processTimerInProcess) {
                     //
                     Console.WriteLine("taskRunner.processTimerTick, skip -- processTimerInProcess true");
                 } else {
-                    ProcessTimerInProcess = true;
+                    processTimerInProcess = true;
                     //
                     // run tasks in task
                     //
@@ -117,7 +117,7 @@ namespace Contensive.Processor.Controllers {
                             runTasks(cpCluster.core);
                         }
                     }
-                    ProcessTimerInProcess = false;
+                    processTimerInProcess = false;
                 }
                 //
                 // -- log memory usage -- info
@@ -160,7 +160,7 @@ namespace Contensive.Processor.Controllers {
                                         + "\r\n BEGIN TRANSACTION"
                                         + "\r\n update cctasks set cmdRunner=" + DbController.encodeSQLText(runnerGuid) + " where id in (select top 1 id from cctasks where (cmdRunner is null)and(datestarted is null))"
                                         + "\r\n COMMIT TRANSACTION";
-                                    cpApp.core.db.executeNonQuery(sql,"",ref recordsAffected);
+                                    cpApp.core.db.executeNonQuery(sql,ref recordsAffected);
                                     if (recordsAffected == 0) {
                                         //
                                         // -- no tasks found

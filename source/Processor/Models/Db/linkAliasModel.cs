@@ -26,7 +26,6 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         // -- instance properties
-        //Public Property Link As String
         public int pageID { get; set; }
         public string queryStringSuffix { get; set; }
         // 
@@ -131,11 +130,6 @@ namespace Contensive.Processor.Models.Db {
         public static int getRecordId(CoreController core, string ccGuid) {
             return BaseModel.getRecordId<LinkAliasModel>(core, ccGuid);
         }
-        //
-        //====================================================================================================
-        //public static LinkAliasModel createDefault(CoreController core) {
-        //    return createDefault<LinkAliasModel>(core);
-        //}
         //
         //====================================================================================================
         public static List<LinkAliasModel> createList(CoreController core, int pageId, string queryStringSuffix) {

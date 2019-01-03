@@ -111,11 +111,6 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        //public static AddonIncludeRuleModel createDefault(CoreController core) {
-        //    return createDefault<AddonIncludeRuleModel>(core);
-        //}
-        //
-        //====================================================================================================
         /// <summary>
         /// Return a cache key used to represent the table. ONLY used for invalidation. Add this as a dependent key if you want that key cleared when ANY record in the table is changed.
         /// </summary>
@@ -124,23 +119,5 @@ namespace Contensive.Processor.Models.Db {
         public static string getTableInvalidationKey(CoreController core) {
             return getTableCacheKey<AddonIncludeRuleModel>(core);
         }
-        ////
-        ////====================================================================================================
-        ///// <summary>
-        ///// return a dictionary of addonId each with a list of included addon Ids
-        ///// </summary>
-        ///// <param name="core"></param>
-        ///// <returns></returns>
-        //public static  Dictionary<int, List<int>> getIncludeRuleDict( CoreController core) {
-        //    var result = new Dictionary<int, List<int>>();
-        //    foreach ( AddonIncludeRuleModel addonRule  in createList( core , "" )) {
-        //        if (!result.ContainsKey(addonRule.addonID)) {
-        //            result.Add(addonRule.addonID, new List<int>() { addonRule.includedAddonID });
-        //        } else {
-        //            result[addonRule.addonID].Add(addonRule.includedAddonID);
-        //        }
-        //    }
-        //    return result;
-        //}
     }
 }

@@ -266,9 +266,6 @@ namespace Contensive.BaseClasses {
         //
         // Deprecated methods
         //
-        //public abstract void Save(string key, string Value);
-        //public abstract void Save(string key, string Value, string tagCommaList);
-        //
         [Obsolete("use Store() instead", true)]
         public abstract void setKey(string key, object Value);
         //

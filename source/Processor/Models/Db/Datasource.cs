@@ -9,7 +9,7 @@ namespace Contensive.Processor.Models.Db {
         //====================================================================================================
         //-- const
         public const string contentName = "data sources";
-        private const string contentTableName = "ccDataSources";
+        public const string contentTableName = "ccDataSources";
         public const string contentDataSource = "default";
         public const bool nameFieldIsUnique = true;
         //
@@ -21,11 +21,11 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         // -- instance properties
-        public string ConnString { get; set; }
-        public string endPoint { get; set; }
+        public string connString { get; set; }
+        public string endpoint { get; set; }
         public string username { get; set; }
         public string password { get; set; }
-        public int type { get; set; }
+        public int dbTypeId { get; set; }
         // 
         //====================================================================================================
         public static DataSourceModel addEmpty(CoreController core) {
@@ -106,11 +106,6 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        //public static DataSourceModel createDefault(CoreController core) {
-        //    return createDefault<DataSourceModel>(core);
-        //}
-        //
-        //====================================================================================================
         public static Dictionary<string, DataSourceModel> getNameDict(CoreController core) {
             Dictionary<string, DataSourceModel> result = new Dictionary<string, DataSourceModel>();
             try {
@@ -124,15 +119,6 @@ namespace Contensive.Processor.Models.Db {
                         }
                     } while (true);
                 }
-                //if (cs.open(contentName, "", "id", true, "id")) {
-                //    do {
-                //        var tmpList = new List<string>();
-                //        DataSourceModel instance = create(core, cs.getInteger("id"), ref tmpList);
-                //        if (instance != null) {
-                //            result.Add(instance.name.ToLowerInvariant(), instance);
-                //        }
-                //    } while (true);
-                //}
                 if (!result.ContainsKey("default")) {
                     result.Add("default", getDefaultDatasource(core));
                 }
@@ -154,13 +140,13 @@ namespace Contensive.Processor.Models.Db {
                 result = new DataSourceModel {
                     active = true,
                     ccguid = "",
-                    ConnString = "",
+                    connString = "",
                     contentControlID = 0,
                     createdBy = 0,
                     createKey = 0,
                     dateAdded = DateTime.MinValue,
-                    type = (int)DataSourceTypeEnum.sqlServerNative,
-                    endPoint = core.serverConfig.defaultDataSourceAddress,
+                    dbTypeId = (int)DataSourceTypeEnum.sqlServerNative,
+                    endpoint = core.serverConfig.defaultDataSourceAddress,
                     name = "default",
                     password = core.serverConfig.password,
                     username = core.serverConfig.username

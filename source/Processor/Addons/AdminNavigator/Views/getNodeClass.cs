@@ -7,7 +7,7 @@ using Contensive.Processor.Controllers;
 using Contensive.Processor.Models.Db;
 
 namespace Contensive.Addons.AdminNavigator {
-    public class getNodeClass : AddonBaseClass {
+    public class GetNodeClass : AddonBaseClass {
         //
         public struct NavigatorEnvironment {
             public string adminUrl;
@@ -29,10 +29,11 @@ namespace Contensive.Addons.AdminNavigator {
             try {
                 //
                 // setup environment
-                NavigatorEnvironment env = new NavigatorEnvironment();
-                env.adminUrl = CP.Site.GetText("adminurl");
-                env.buildVersion = CP.Site.GetText("buildversion");
-                env.isDeveloper = CP.User.IsDeveloper;
+                NavigatorEnvironment env = new NavigatorEnvironment {
+                    adminUrl = CP.Site.GetText("adminurl"),
+                    buildVersion = CP.Site.GetText("buildversion"),
+                    isDeveloper = CP.User.IsDeveloper
+                };
                 if (env.isDeveloper) {
                     env.addonEditAddonUrlPrefix = env.adminUrl + "?cid=" + CP.Content.GetID("add-ons") + "&af=4&id=";
                     env.addonEditCollectionUrlPrefix = env.adminUrl + "?cid=" + CP.Content.GetID("add-on collections") + "&af=4&id=";
@@ -62,7 +63,7 @@ namespace Contensive.Addons.AdminNavigator {
                     CP.Doc.AddHeadJavascript(NavigatorJS);
                 }
             } catch (Exception ex) {
-                HandleError(CP, ex);
+                CP.Site.ErrorReport(ex);
             }
             return returnHtml;
         }
@@ -334,7 +335,7 @@ namespace Contensive.Addons.AdminNavigator {
                                         }
                                         addonid = cs4.GetInteger("ID");
                                         NavIconTitleHtmlEncoded = System.Net.WebUtility.HtmlEncode(Name);
-                                        ContentControlID = cs4.GetInteger("ContentControlID");
+                                        ContentControlID = cs4.GetInteger("contentControlId");
                                         switch (cs4.GetInteger("navtypeid")) {
                                             case 2:
                                                 NavIconType = common.NavIconTypeReport;
@@ -393,7 +394,7 @@ namespace Contensive.Addons.AdminNavigator {
                                                 //}
                                             }
                                             NavIconTitleHtmlEncoded = System.Net.WebUtility.HtmlEncode(Name);
-                                            ContentControlID = cs7.GetInteger("ContentControlID");
+                                            ContentControlID = cs7.GetInteger("contentControlId");
                                             nodeHtml += GetNode(cp, env, 0, ContentControlID, 0, 0, ContentID, "", 0, 0, Name, LegacyMenuControlID, EmptyNodeList, "", common.NavIconTypeContent, NavIconTitleHtmlEncoded, AutoManageAddons, common.NodeTypeEnum.NodeTypeContent, false, true, OpenNodeList, NodeIDString, ref NodeNavigatorJS, linkSuffixList);
                                             Return_NavigatorJS = Return_NavigatorJS + NodeNavigatorJS;
                                         }
@@ -522,7 +523,7 @@ namespace Contensive.Addons.AdminNavigator {
                                     Name = Convert.ToString(cs5.GetText("name")).Trim(' ');
                                     addonid = cs5.GetInteger("AddonID");
                                     NavIconTitleHtmlEncoded = System.Net.WebUtility.HtmlEncode(Name);
-                                    ContentControlID = cs5.GetInteger("ContentControlID");
+                                    ContentControlID = cs5.GetInteger("contentControlId");
                                     s = s + GetNode(cp, env, 0, ContentControlID, 0, 0, 0, "", addonid, 0, Name, LegacyMenuControlID, EmptyNodeList, "", common.NavIconTypeAddon, NavIconTitleHtmlEncoded, AutoManageAddons, common.NodeTypeEnum.NodeTypeAddon, false, false, OpenNodeList, NodeIDString, ref NodeNavigatorJS, new List<string>());
                                     Return_NavigatorJS = Return_NavigatorJS + NodeNavigatorJS;
                                     cs5.GoNext();
@@ -531,12 +532,12 @@ namespace Contensive.Addons.AdminNavigator {
                             }
                             cs5.Close();
                             //
-                            //CS = Main.OpenCSSQL("default", SQL)
+                            //CS = Main.OpenCSSQL( SQL)
                             //Do While Main.iscsok(CS)
                             //    Name = Trim(csx.getText("name"))
                             //    addonid = csx.getInteger( "AddonID")
                             //    NavIconTitleHtmlEncoded = System.Net.WebUtility.HtmlEncode(Name)
-                            //    ContentControlID = csx.getInteger( "ContentControlID")
+                            //    ContentControlID = csx.getInteger( "contentControlId")
                             //    s = s & GetNavigatorNode(cp,0, ContentControlID, 0, 0, 0, "", addonid, 0, Name, LegacyMenuControlID, EmptyNodeList, "", NavIconTypeAddon, NavIconTitleHtmlEncoded, AutoManageAddons, NodeTypeEnum.NodeTypeAddon, False, False, OpenNodeList, NodeIDString, NodeNavigatorJS,"")
                             //    Return_NavigatorJS = Return_NavigatorJS & NodeNavigatorJS
                             //    Call Main.NextCSRecord(CS)
@@ -556,7 +557,7 @@ namespace Contensive.Addons.AdminNavigator {
                                 EmptyNodeList.Add(TopParentNode);
                             }
                             //'
-                            //CS = Main.OpenCSSQL("default", SQL)
+                            //CS = Main.OpenCSSQL( SQL)
                             //BlockSubNodes = False
                             //If Not Main.iscsok(CS) Then
                             //    '
@@ -621,7 +622,7 @@ namespace Contensive.Addons.AdminNavigator {
                             }
                             cs8.Close();
                             //.
-                            //CS = Main.OpenCSSQL("default", GetMenuSQL("((Parentid=0)or(Parentid is null))", NavigatorContentName))
+                            //CS = Main.OpenCSSQL( GetMenuSQL("((Parentid=0)or(Parentid is null))", NavigatorContentName))
                             //Do While Main.iscsok(CS)
                             //    Name = Trim(csx.getText("name"))
                             //    NavigatorID = csx.getInteger("ID")
@@ -692,7 +693,7 @@ namespace Contensive.Addons.AdminNavigator {
                                         EmptyNodeList.Add(TopParentNode);
                                     }
                                     //'
-                                    //CS = Main.OpenCSSQL("default", SQL)
+                                    //CS = Main.OpenCSSQL( SQL)
                                     //BlockSubNodes = False
                                     //'NodeIDStringPrefix = "n"
                                     //If Not Main.iscsok(CS) Then
@@ -748,7 +749,7 @@ namespace Contensive.Addons.AdminNavigator {
                                             NavIconTitleHtmlEncoded = System.Net.WebUtility.HtmlEncode("Edit '" + RecordName + "' in '" + ContentName + "'");
                                             IconNoSubNodes = common.IconRecord;
                                             IconNoSubNodes = IconNoSubNodes.Replace("{title}", NavIconTitleHtmlEncoded);
-                                            Link = "?id=" + NavigatorID + "&cid=" + csChildList.GetInteger("ContentControlID") + "&af=4";
+                                            Link = "?id=" + NavigatorID + "&cid=" + csChildList.GetInteger("contentControlId") + "&af=4";
                                             ATag = "<a href=\"" + Link + "\" title=\"" + NavIconTitleHtmlEncoded + "\">";
                                             s = s + "<div class=\"ccNavLink ccNavLinkEmpty\">" + ATag + IconNoSubNodes + "</a>&nbsp;" + ATag + RecordName + "</a></div>";
                                             Ptr = Ptr + 1;
@@ -765,7 +766,7 @@ namespace Contensive.Addons.AdminNavigator {
                                     //CS = Main.openCSContent(ContentName, , , , , , "ID,Name,ContentControlID", 20, 1)
                                     // SQL = "select top 20 " _
                                     //     & " ID,Name,ContentControlID from " & ContentTableName
-                                    // CS = Main.OpenCSSQL("default", SQL)
+                                    // CS = Main.OpenCSSQL( SQL)
                                     //Ptr = 0
                                     //If Main.iscsok(CS) Then
                                     //    EmptyNodeList = Replace(EmptyNodeList, "," & TopParentNode, "")
@@ -782,7 +783,7 @@ namespace Contensive.Addons.AdminNavigator {
                                     //        NavIconTitleHtmlEncoded = System.Net.WebUtility.HtmlEncode("Edit '" & RecordName & "' in '" & ContentName & "'")
                                     //        IconNoSubNodes = IconRecord
                                     //        IconNoSubNodes = Replace(IconNoSubNodes, "{title}", NavIconTitleHtmlEncoded)
-                                    //        Link = "?id=" & NavigatorID & "&cid=" & csx.getInteger("ContentControlID") & "&af=4"
+                                    //        Link = "?id=" & NavigatorID & "&cid=" & csx.getInteger("contentControlId") & "&af=4"
                                     //        ATag = "<a href=""" & Link & """ title=""" & NavIconTitleHtmlEncoded & """>"
                                     //        s = s & cr & "<div class=""ccNavLink ccNavLinkEmpty"">" & ATag & IconNoSubNodes & "</a>&nbsp;" & ATag & RecordName & "</a></div>"
                                     //        Ptr = Ptr + 1
@@ -819,7 +820,7 @@ namespace Contensive.Addons.AdminNavigator {
                             if (string.IsNullOrEmpty(NavIconTitle)) {
                                 NavIconTitle = Name;
                             }
-                            ContentControlID = csChildList.GetInteger("ContentControlID");
+                            ContentControlID = csChildList.GetInteger("contentControlId");
                             if (Name.ToLower() == "all content") {
                                 //
                                 // special case: any Navigator Entry named 'all content' returns the content list
@@ -867,7 +868,7 @@ namespace Contensive.Addons.AdminNavigator {
                 // ----- /Timer Trace
                 //
             } catch (Exception ex) {
-                HandleError(cp, ex);
+                cp.Site.ErrorReport(ex);
             }
             return returnNav;
         }
@@ -913,9 +914,9 @@ namespace Contensive.Addons.AdminNavigator {
                             SortNodes.Add(new common.SortNodeType() {
                                 Name = Convert.ToString(cs10.GetText("name")).Trim(' '),
                                 addonid = cs10.GetInteger("ID"),
-                                NavIconTitle = SortNodes[SortPtr].Name,
-                                ContentControlID = cs10.GetInteger("ContentControlID"),
-                                NavIconType = AdminNavIconTypeSetting
+                                navIconTitle = SortNodes[SortPtr].Name,
+                                contentControlId = cs10.GetInteger("contentControlId"),
+                                navIconType = AdminNavIconTypeSetting
                             });
                             cs10.GoNext();
                         }
@@ -941,18 +942,18 @@ namespace Contensive.Addons.AdminNavigator {
                             }
                             SortNodes.Add(new common.SortNodeType() {
                                 Name = name,
-                                NavigatorID = cs11.GetInteger("ID").ToString(),
-                                CollectionID = cs11.GetInteger("CollectionID"),
-                                NewWindow = cs11.GetBoolean("newwindow"),
-                                ContentID = cs11.GetInteger("ContentID"),
-                                Link = Convert.ToString(cs11.GetText("LinkPage")).Trim(' '),
+                                navigatorId = cs11.GetInteger("ID").ToString(),
+                                collectionId = cs11.GetInteger("CollectionID"),
+                                newWindow = cs11.GetBoolean("newwindow"),
+                                contentId = cs11.GetInteger("ContentID"),
+                                link = Convert.ToString(cs11.GetText("LinkPage")).Trim(' '),
                                 addonid = cs11.GetInteger("AddonID"),
-                                NavIconType = cs11.GetInteger("NavIconType"),
-                                NavIconTitle = title,
-                                HelpAddonID = cs11.GetInteger("HelpAddonID"),
-                                helpCollectionID = cs11.GetInteger("HelpCollectionID"),
-                                ContentControlID = cs11.GetInteger("ContentControlID"),
-                                NodeIDString = NodeIDString
+                                navIconType = cs11.GetInteger("NavIconType"),
+                                navIconTitle = title,
+                                helpAddonId = cs11.GetInteger("HelpAddonID"),
+                                helpCollectionId = cs11.GetInteger("HelpCollectionID"),
+                                contentControlId = cs11.GetInteger("contentControlId"),
+                                nodeIdString = NodeIDString
                             });
                             SortPtr = SortPtr + 1;
                             cs11.GoNext();
@@ -967,14 +968,14 @@ namespace Contensive.Addons.AdminNavigator {
                         EmptyNodeList.Add(TopParentNode);
                     } else {
                         foreach (var sortNode in SortNodes) {
-                            returnNav = returnNav + GetNode(cp, env, sortNode.CollectionID, sortNode.ContentControlID, sortNode.helpCollectionID, sortNode.HelpAddonID, sortNode.ContentID, sortNode.Link, sortNode.addonid, 0, sortNode.Name, LegacyMenuControlID, EmptyNodeList, sortNode.NavigatorID, sortNode.NavIconType, System.Net.WebUtility.HtmlEncode(sortNode.NavIconTitle), AutoManageAddons, NodeType, sortNode.NewWindow, BlockSubNodes, OpenNodeList, sortNode.NodeIDString, ref NodeDraggableJS, new List<string>());
+                            returnNav = returnNav + GetNode(cp, env, sortNode.collectionId, sortNode.contentControlId, sortNode.helpCollectionId, sortNode.helpAddonId, sortNode.contentId, sortNode.link, sortNode.addonid, 0, sortNode.Name, LegacyMenuControlID, EmptyNodeList, sortNode.navigatorId, sortNode.navIconType, System.Net.WebUtility.HtmlEncode(sortNode.navIconTitle), AutoManageAddons, NodeType, sortNode.newWindow, BlockSubNodes, OpenNodeList, sortNode.nodeIdString, ref NodeDraggableJS, new List<string>());
                             Return_DraggableJS = Return_DraggableJS + NodeDraggableJS;
 
                         }
                     }
                 }
             } catch (Exception ex) {
-                HandleError(cp, ex);
+                cp.Site.ErrorReport(ex);
             }
             return returnNav;
         }
@@ -1437,27 +1438,6 @@ namespace Contensive.Addons.AdminNavigator {
         //
         private void errorReport(CPBaseClass cp, Exception ex, string method) {
             cp.Site.ErrorReport(ex, "Unexpected error in sampleClass." + method);
-        }
-        //
-        //====================================================================================================
-        //
-        public void HandleError(CPBaseClass cp, Exception ex, string className, string methodName, string cause) {
-            try {
-                string errMsg = className + "." + methodName + ", cause=[" + cause + "], ex=[" + ex.ToString() + "]";
-                cp.Site.ErrorReport(ex, errMsg);
-            } catch (Exception) {
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        public void HandleError(CPBaseClass cp, Exception ex) {
-            StackFrame frame = new StackFrame(1);
-            System.Reflection.MethodBase method = frame.GetMethod();
-            System.Type type = method.DeclaringType;
-            string methodName = method.Name;
-            //
-            HandleError(cp, ex, type.Name, methodName, "unexpected exception");
         }
     }
 }

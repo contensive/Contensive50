@@ -41,7 +41,7 @@ namespace Contensive.Addons.AdminNavigator {
 				string AdminNavContentOpened = null;
 				string AdminNavContentClosed = null;
 				string AdminNav = null;
-				getNodeClass GetNode = null;
+				GetNodeClass GetNode = null;
 				//
 				OpenNodeList = cp.Visit.GetText("AdminNavOpenNodeList", "");
 				AdminNavOpen = cp.Utils.EncodeBoolean(cp.Visit.GetText("AdminNavOpen", "1"));
@@ -49,7 +49,7 @@ namespace Contensive.Addons.AdminNavigator {
 					//
 					// draw the page with Nav Opened
 					//
-					GetNode = new getNodeClass();
+					GetNode = new GetNodeClass();
 					cp.Doc.SetProperty("nodeid", "0");
 					AdminNav = GetNode.Execute(cp).ToString();
 					AdminNavHeadOpened = ""

@@ -20,7 +20,7 @@ using Contensive.Addons.AdminSite.Controllers;
 using Contensive.Processor.Models.Domain;
 //
 namespace Contensive.Addons.Tools {
-    public class legacyToolsClass {
+    public class LegacyToolsClass {
         //========================================================================
         // This file and its contents are copyright by Kidwell McGowan Associates.
         //========================================================================
@@ -146,7 +146,7 @@ namespace Contensive.Addons.Tools {
         /// </summary>
         /// <param name="cp"></param>
         /// <remarks></remarks>
-        public legacyToolsClass(CoreController core) : base() {
+        public LegacyToolsClass(CoreController core) : base() {
             this.core = core;
         }
         //
@@ -230,11 +230,11 @@ namespace Contensive.Addons.Tools {
                             case AdminFormToolConfigureEdit:
                                 //
                                 //Call Stream.Add(core.addon.execute(guid_ToolConfigureEdit))
-                                Stream.Add( configureContentEditClass.configureContentEdit(core.cp_forAddonExecutionOnly));
+                                Stream.Add( ConfigureContentEditClass.configureContentEdit(core.cp_forAddonExecutionOnly));
                                 break;
                             case AdminFormToolManualQuery:
                                 //
-                                Stream.Add( manualQueryClass.GetForm_ManualQuery(core.cp_forAddonExecutionOnly));
+                                Stream.Add( ManualQueryClass.getForm_ManualQuery(core.cp_forAddonExecutionOnly));
                                 break;
                             case AdminFormToolCreateChildContent:
                                 //
@@ -417,7 +417,9 @@ namespace Contensive.Addons.Tools {
                     Stream.Add(SpanClassAdminSmall);
                     Stream.Add("<P>Creating content [" + ContentName + "] on table [" + TableName + "] on Datasource [" + datasource.name + "].</P>");
                     if ((!string.IsNullOrEmpty(ContentName)) && (!string.IsNullOrEmpty(TableName)) && (!string.IsNullOrEmpty(datasource.name))) {
-                        core.db.createSQLTable(datasource.name, TableName);
+                        using (var db = new DbController(core, datasource.name)) {
+                            db.createSQLTable(TableName);
+                        }
                         MetaController.createContentFromSQLTable(core,datasource, TableName, ContentName);
                         core.cache.invalidateAll();
                         core.clearMetaData();
@@ -1571,7 +1573,7 @@ namespace Contensive.Addons.Tools {
         private string GetForm_SyncTables() {
             string returnValue = "";
             try {
-                Processor.Models.Domain.MetaModel CD = null;
+                Processor.Models.Domain.MetaModel metadata = null;
                 StringBuilderLegacyController Stream = new StringBuilderLegacyController();
                 string[,] ContentNameArray = null;
                 int ContentNameCount = 0;
@@ -1591,15 +1593,17 @@ namespace Contensive.Addons.Tools {
                         csData.open("Content", "", "", false, 0, "id");
                         if (csData.ok()) {
                             do {
-                                CD = Processor.Models.Domain.MetaModel.create(core, csData.getInteger("id"));
-                                TableName = CD.tableName;
-                                Stream.Add("Synchronizing Content " + CD.name + " to table " + TableName + "<br>");
-                                core.db.createSQLTable(CD.dataSourceName, TableName);
-                                if (CD.fields.Count > 0) {
-                                    foreach (var keyValuePair in CD.fields) {
-                                        Processor.Models.Domain.MetaFieldModel field = keyValuePair.Value;
-                                        Stream.Add("...Field " + field.nameLc + "<br>");
-                                        core.db.createSQLTableField(CD.dataSourceName, TableName, field.nameLc, field.fieldTypeId);
+                                metadata = Processor.Models.Domain.MetaModel.create(core, csData.getInteger("id"));
+                                TableName = metadata.tableName;
+                                Stream.Add("Synchronizing Content " + metadata.name + " to table " + TableName + "<br>");
+                                using( var db = new DbController( core, metadata.dataSourceName )) {
+                                    db.createSQLTable(TableName);
+                                    if (metadata.fields.Count > 0) {
+                                        foreach (var keyValuePair in metadata.fields) {
+                                            MetaFieldModel field = keyValuePair.Value;
+                                            Stream.Add("...Field " + field.nameLc + "<br>");
+                                            db.createSQLTableField(TableName, field.nameLc, field.fieldTypeId);
+                                        }
                                     }
                                 }
                                 csData.goNext();
@@ -2225,125 +2229,126 @@ namespace Contensive.Addons.Tools {
                         DataSource = csData.getText("DataSourceID");
                     }
                 }
-                //
-                if ((TableID != 0) && (TableID == core.docProperties.getInteger("previoustableid")) && (!string.IsNullOrEmpty(Button))) {
+                using( var db = new DbController( core, DataSource )) {
                     //
-                    // Drop Indexes
-                    //
-                    Count = core.docProperties.getInteger("DropCount");
-                    if (Count > 0) {
-                        for (Pointer = 0; Pointer < Count; Pointer++) {
-                            if (core.docProperties.getBoolean("DropIndex." + Pointer)) {
-                                IndexName = core.docProperties.getText("DropIndexName." + Pointer);
-                                result += "<br>Dropping index [" + IndexName + "] from table [" + TableName + "]";
-                                core.db.deleteSqlIndex("Default", TableName, IndexName);
+                    if ((TableID != 0) && (TableID == core.docProperties.getInteger("previoustableid")) && (!string.IsNullOrEmpty(Button))) {
+                        //
+                        // Drop Indexes
+                        //
+                        Count = core.docProperties.getInteger("DropCount");
+                        if (Count > 0) {
+                            for (Pointer = 0; Pointer < Count; Pointer++) {
+                                if (core.docProperties.getBoolean("DropIndex." + Pointer)) {
+                                    IndexName = core.docProperties.getText("DropIndexName." + Pointer);
+                                    result += "<br>Dropping index [" + IndexName + "] from table [" + TableName + "]";
+                                    db.deleteSqlIndex(TableName, IndexName);
+                                }
+                            }
+                        }
+                        //
+                        // Add Indexes
+                        //
+                        Count = core.docProperties.getInteger("AddCount");
+                        if (Count > 0) {
+                            for (Pointer = 0; Pointer < Count; Pointer++) {
+                                if (core.docProperties.getBoolean("AddIndex." + Pointer)) {
+                                    //IndexName = core.main_GetStreamText2("AddIndexFieldName." & Pointer)
+                                    FieldName = core.docProperties.getText("AddIndexFieldName." + Pointer);
+                                    IndexName = TableName + FieldName;
+                                    result += "<br>Adding index [" + IndexName + "] to table [" + TableName + "] for field [" + FieldName + "]";
+                                    db.createSQLIndex(TableName, IndexName, FieldName);
+                                }
                             }
                         }
                     }
                     //
-                    // Add Indexes
+                    //result += htmlController.form_start(core);
+                    TableColSpan = 3;
+                    result += HtmlController.tableStart(2, 0, 0);
                     //
-                    Count = core.docProperties.getInteger("AddCount");
-                    if (Count > 0) {
-                        for (Pointer = 0; Pointer < Count; Pointer++) {
-                            if (core.docProperties.getBoolean("AddIndex." + Pointer)) {
-                                //IndexName = core.main_GetStreamText2("AddIndexFieldName." & Pointer)
-                                FieldName = core.docProperties.getText("AddIndexFieldName." + Pointer);
-                                IndexName = TableName + FieldName;
-                                result += "<br>Adding index [" + IndexName + "] to table [" + TableName + "] for field [" + FieldName + "]";
-                                core.db.createSQLIndex(DataSource, TableName, IndexName, FieldName);
+                    // Select Table Form
+                    //
+                    result += HtmlController.tableRow("<br><br><B>Select table to index</b>", TableColSpan, false);
+                    result += HtmlController.tableRow(core.html.selectFromContent("TableID", TableID, "Tables", "", "Select a SQL table to start"), TableColSpan, false);
+                    if (TableID != 0) {
+                        //
+                        // Add/Drop Indexes form
+                        //
+                        result += HtmlController.inputHidden("PreviousTableID", TableID);
+                        //
+                        // Drop Indexes
+                        //
+                        result += HtmlController.tableRow("<br><br><B>Select indexes to remove</b>", TableColSpan, TableRowEven);
+                        RSSchema = db.getIndexSchemaData(TableName);
+
+
+                        if (RSSchema.Rows.Count == 0) {
+                            //
+                            // ----- no result
+                            //
+                            Copy += DateTime.Now + " A schema was returned, but it contains no indexs.";
+                            result += HtmlController.tableRow(Copy, TableColSpan, TableRowEven);
+                        } else {
+
+                            Rows = db.convertDataTabletoArray(RSSchema);
+                            RowMax = Rows.GetUpperBound(1);
+                            for (RowPointer = 0; RowPointer <= RowMax; RowPointer++) {
+                                IndexName = GenericController.encodeText(Rows[5, RowPointer]);
+                                if (!string.IsNullOrEmpty(IndexName)) {
+                                    result += HtmlController.tableRowStart();
+                                    Copy = HtmlController.checkbox("DropIndex." + RowPointer, false) + HtmlController.inputHidden("DropIndexName." + RowPointer, IndexName) + GenericController.encodeText(IndexName);
+                                    result += HtmlController.td(Copy, "", 0, TableRowEven);
+                                    result += HtmlController.td(GenericController.encodeText(Rows[17, RowPointer]), "", 0, TableRowEven);
+                                    result += HtmlController.td("&nbsp;", "", 0, TableRowEven);
+                                    result += kmaEndTableRow;
+                                    TableRowEven = !TableRowEven;
+                                }
                             }
+                            result += HtmlController.inputHidden("DropCount", RowMax + 1);
                         }
-                    }
-                }
-                //
-                //result += htmlController.form_start(core);
-                TableColSpan = 3;
-                result += HtmlController.tableStart(2, 0, 0);
-                //
-                // Select Table Form
-                //
-                result += HtmlController.tableRow("<br><br><B>Select table to index</b>", TableColSpan, false);
-                result += HtmlController.tableRow(core.html.selectFromContent("TableID", TableID, "Tables","", "Select a SQL table to start"), TableColSpan, false);
-                if (TableID != 0) {
-                    //
-                    // Add/Drop Indexes form
-                    //
-                    result += HtmlController.inputHidden("PreviousTableID", TableID);
-                    //
-                    // Drop Indexes
-                    //
-                    result += HtmlController.tableRow("<br><br><B>Select indexes to remove</b>", TableColSpan, TableRowEven);
-                    RSSchema = core.db.getIndexSchemaData(TableName);
-
-
-                    if (RSSchema.Rows.Count == 0) {
                         //
-                        // ----- no result
+                        // Add Indexes
                         //
-                        Copy += DateTime.Now + " A schema was returned, but it contains no indexs.";
-                        result += HtmlController.tableRow(Copy, TableColSpan, TableRowEven);
-                    } else {
+                        TableRowEven = false;
+                        result += HtmlController.tableRow("<br><br><B>Select database fields to index</b>", TableColSpan, TableRowEven);
+                        RSSchema = db.getColumnSchemaData(TableName);
+                        if (RSSchema.Rows.Count == 0) {
+                            //
+                            // ----- no result
+                            //
+                            Copy += DateTime.Now + " A schema was returned, but it contains no indexs.";
+                            result += HtmlController.tableRow(Copy, TableColSpan, TableRowEven);
+                        } else {
 
-                        Rows = core.db.convertDataTabletoArray(RSSchema);
-                        RowMax = Rows.GetUpperBound(1);
-                        for (RowPointer = 0; RowPointer <= RowMax; RowPointer++) {
-                            IndexName = GenericController.encodeText(Rows[5, RowPointer]);
-                            if (!string.IsNullOrEmpty(IndexName)) {
+                            Rows = db.convertDataTabletoArray(RSSchema);
+                            //
+                            RowMax = Rows.GetUpperBound(1);
+                            for (RowPointer = 0; RowPointer <= RowMax; RowPointer++) {
                                 result += HtmlController.tableRowStart();
-                                Copy = HtmlController.checkbox("DropIndex." + RowPointer, false) + HtmlController.inputHidden("DropIndexName." + RowPointer, IndexName) + GenericController.encodeText(IndexName);
-                                result += HtmlController.td(Copy,"",0, TableRowEven);
-                                result += HtmlController.td(GenericController.encodeText(Rows[17, RowPointer]),"",0, TableRowEven);
-                                result += HtmlController.td("&nbsp;","",0, TableRowEven);
+                                Copy = HtmlController.checkbox("AddIndex." + RowPointer, false) + HtmlController.inputHidden("AddIndexFieldName." + RowPointer, Rows[3, RowPointer]) + GenericController.encodeText(Rows[3, RowPointer]);
+                                result += HtmlController.td(Copy, "", 0, TableRowEven);
+                                result += HtmlController.td("&nbsp;", "", 0, TableRowEven);
+                                result += HtmlController.td("&nbsp;", "", 0, TableRowEven);
                                 result += kmaEndTableRow;
                                 TableRowEven = !TableRowEven;
                             }
+                            result += HtmlController.inputHidden("AddCount", RowMax + 1);
                         }
-                        result += HtmlController.inputHidden("DropCount", RowMax + 1);
+                        //
+                        // Spacers
+                        //
+                        result += HtmlController.tableRowStart();
+                        result += HtmlController.td(nop2(300, 1), "200");
+                        result += HtmlController.td(nop2(200, 1), "200");
+                        result += HtmlController.td("&nbsp;", "100%");
+                        result += kmaEndTableRow;
                     }
+                    result += kmaEndTable;
                     //
-                    // Add Indexes
+                    // Buttons
                     //
-                    TableRowEven = false;
-                    result += HtmlController.tableRow("<br><br><B>Select database fields to index</b>", TableColSpan, TableRowEven);
-                    RSSchema = core.db.getColumnSchemaData(TableName);
-                    if (RSSchema.Rows.Count == 0) {
-                        //
-                        // ----- no result
-                        //
-                        Copy += DateTime.Now + " A schema was returned, but it contains no indexs.";
-                        result += HtmlController.tableRow(Copy, TableColSpan, TableRowEven);
-                    } else {
-
-                        Rows = core.db.convertDataTabletoArray(RSSchema);
-                        //
-                        RowMax = Rows.GetUpperBound(1);
-                        for (RowPointer = 0; RowPointer <= RowMax; RowPointer++) {
-                            result += HtmlController.tableRowStart();
-                            Copy = HtmlController.checkbox("AddIndex." + RowPointer, false) + HtmlController.inputHidden("AddIndexFieldName." + RowPointer, Rows[3, RowPointer]) + GenericController.encodeText(Rows[3, RowPointer]);
-                            result += HtmlController.td(Copy,"",0, TableRowEven);
-                            result += HtmlController.td("&nbsp;","",0, TableRowEven);
-                            result += HtmlController.td("&nbsp;","",0, TableRowEven);
-                            result += kmaEndTableRow;
-                            TableRowEven = !TableRowEven;
-                        }
-                        result += HtmlController.inputHidden("AddCount", RowMax + 1);
-                    }
-                    //
-                    // Spacers
-                    //
-                    result += HtmlController.tableRowStart();
-                    result += HtmlController.td(nop2(300, 1), "200");
-                    result += HtmlController.td(nop2(200, 1), "200");
-                    result += HtmlController.td("&nbsp;", "100%");
-                    result += kmaEndTableRow;
+                    result = AdminUIController.getToolForm(core, result, ButtonList);
                 }
-                result += kmaEndTable;
-                //
-                // Buttons
-                //
-                result = AdminUIController.getToolForm(core, result, ButtonList);
-                //result = adminUIController.getToolFormOpen(core, ButtonList) + result + adminUIController.getToolFormClose(core, ButtonList);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
             }
@@ -2528,7 +2533,7 @@ namespace Contensive.Addons.Tools {
                     if (CurrentPath != ParentPath) {
                         FileSize = "";
                         FileDate = "";
-                        result += GetForm_LogFiles_Details_GetRow("<A href=\"" + core.webServer.requestPage + "?SetPath=" + ParentPath + "\">" + FolderOpenImage + "</A>", "<A href=\"" + core.webServer.requestPage + "?SetPath=" + ParentPath + "\">" + ParentPath + "</A>", FileSize, FileDate, RowEven);
+                        result += getForm_LogFiles_Details_GetRow("<A href=\"" + core.webServer.requestPage + "?SetPath=" + ParentPath + "\">" + FolderOpenImage + "</A>", "<A href=\"" + core.webServer.requestPage + "?SetPath=" + ParentPath + "\">" + ParentPath + "</A>", FileSize, FileDate, RowEven);
                     }
                     //
                     // Sub-Folders
@@ -2545,7 +2550,7 @@ namespace Contensive.Addons.Tools {
                                 FolderName = LineSplit[0];
                                 FileSize = LineSplit[1];
                                 FileDate = LineSplit[2];
-                                result += GetForm_LogFiles_Details_GetRow("<A href=\"" + core.webServer.requestPage + "?SetPath=" + CurrentPath + "\\" + FolderName + "\">" + FolderClosedImage + "</A>", "<A href=\"" + core.webServer.requestPage + "?SetPath=" + CurrentPath + "\\" + FolderName + "\">" + FolderName + "</A>", FileSize, FileDate, RowEven);
+                                result += getForm_LogFiles_Details_GetRow("<A href=\"" + core.webServer.requestPage + "?SetPath=" + CurrentPath + "\\" + FolderName + "\">" + FolderClosedImage + "</A>", "<A href=\"" + core.webServer.requestPage + "?SetPath=" + CurrentPath + "\\" + FolderName + "\">" + FolderName + "</A>", FileSize, FileDate, RowEven);
                             }
                         }
                     }
@@ -2556,7 +2561,7 @@ namespace Contensive.Addons.Tools {
                     if (string.IsNullOrEmpty(SourceFolders)) {
                         FileSize = "";
                         FileDate = "";
-                        result += GetForm_LogFiles_Details_GetRow(SpacerImage, "no files were found in this folder", FileSize, FileDate, RowEven);
+                        result += getForm_LogFiles_Details_GetRow(SpacerImage, "no files were found in this folder", FileSize, FileDate, RowEven);
                     } else {
                         FolderSplit = SourceFolders.Split(new[] { "\r\n" }, StringSplitOptions.None);
                         FolderCount = FolderSplit.GetUpperBound(0) + 1;
@@ -2573,7 +2578,7 @@ namespace Contensive.Addons.Tools {
                                 QueryString = GenericController.modifyQueryString(QueryString, "at", AdminFormToolLogFileView, true);
                                 QueryString = GenericController.modifyQueryString(QueryString, "SourceFile", FileURL, true);
                                 CellCopy = "<A href=\"" + core.webServer.requestPath + "?" + QueryString + "\" target=\"_blank\">" + Filename + "</A>";
-                                result += GetForm_LogFiles_Details_GetRow(SpacerImage, CellCopy, FileSize, FileDate, RowEven);
+                                result += getForm_LogFiles_Details_GetRow(SpacerImage, CellCopy, FileSize, FileDate, RowEven);
                             }
                         }
                     }
@@ -2590,7 +2595,7 @@ namespace Contensive.Addons.Tools {
         //   Table Rows
         //=============================================================================
         //
-        public string GetForm_LogFiles_Details_GetRow(string Cell0, string Cell1, string Cell2, string Cell3, bool RowEven) {
+        public string getForm_LogFiles_Details_GetRow(string Cell0, string Cell1, string Cell2, string Cell3, bool RowEven) {
             string tempGetForm_LogFiles_Details_GetRow = null;
             //
             string ClassString = null;
@@ -3090,10 +3095,11 @@ namespace Contensive.Addons.Tools {
                         FindText = core.docProperties.getText("FindText");
                         ReplaceText = core.docProperties.getText("ReplaceText");
                         QS = "app=" + encodeNvaArgument(core.appConfig.name) + "&FindText=" + encodeNvaArgument(FindText) + "&ReplaceText=" + encodeNvaArgument(ReplaceText) + "&CDefNameList=" + encodeNvaArgument(CDefList);
-                        var cmdDetail = new TaskModel.CmdDetailClass();
-                        cmdDetail.addonId = 0;
-                        cmdDetail.addonName = "GetForm_FindAndReplace";
-                        cmdDetail.args = GenericController.convertQSNVAArgumentstoDocPropertiesList(core, QS);
+                        var cmdDetail = new TaskModel.CmdDetailClass {
+                            addonId = 0,
+                            addonName = "GetForm_FindAndReplace",
+                            args = GenericController.convertQSNVAArgumentstoDocPropertiesList(core, QS)
+                        };
                         TaskSchedulerController.addTaskToQueue(core, cmdDetail, false);
                         Stream.Add("Find and Replace has been requested for content definitions [" + CDefList + "], finding [" + FindText + "] and replacing with [" + ReplaceText + "]");
                     }
@@ -3176,10 +3182,11 @@ namespace Contensive.Addons.Tools {
                     LogController.logDebug(core, "Restarting IIS");
                     core.webServer.redirect("/ContensiveBase/Popup/WaitForIISReset.htm");
                     Thread.Sleep(2000);
-                    var cmdDetail = new TaskModel.CmdDetailClass();
-                    cmdDetail.addonId = 0;
-                    cmdDetail.addonName = "GetForm_IISReset";
-                    cmdDetail.args = new Dictionary<string, string>();
+                    var cmdDetail = new TaskModel.CmdDetailClass {
+                        addonId = 0,
+                        addonName = "GetForm_IISReset",
+                        args = new Dictionary<string, string>()
+                    };
                     TaskSchedulerController.addTaskToQueue(core, cmdDetail, false );
                 }
                 //
