@@ -115,7 +115,7 @@ namespace Contensive.BaseClasses {
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public abstract CPHtmlBaseClass Html { get; }
+        public abstract CPHtml5BaseClass Html { get; }
         //
         //====================================================================================================
         /// <summary>

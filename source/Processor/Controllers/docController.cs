@@ -23,7 +23,7 @@ namespace Contensive.Processor.Controllers {
             //
             pageController = new PageContentController();
             domain = new DomainModel();
-            wysiwygAddonList = new Dictionary<CPHtmlBaseClass.EditorContentType, string>();
+            wysiwygAddonList = new Dictionary<CPHtml5BaseClass.EditorContentType, string>();
         }
         /// <summary>
         /// parent object
@@ -71,7 +71,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public string htmlForEndOfBody { get; set; } = "";
         //
-        public Dictionary<CPHtmlBaseClass.EditorContentType, string> wysiwygAddonList;
+        public Dictionary<CPHtml5BaseClass.EditorContentType, string> wysiwygAddonList;
         //
         // -- others to be sorted
         public int editWrapperCnt { get; set; } = 0;

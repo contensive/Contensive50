@@ -206,15 +206,15 @@ namespace Contensive.Addons.AdminSite {
                 //
                 // ----- determine contentType for editor
                 //
-                CPHtmlBaseClass.EditorContentType ContentType;
+                CPHtml5BaseClass.EditorContentType ContentType;
                 if (GenericController.vbLCase(adminData.adminContent.name) == "email templates") {
-                    ContentType = CPHtmlBaseClass.EditorContentType.contentTypeEmailTemplate;
+                    ContentType = CPHtml5BaseClass.EditorContentType.contentTypeEmailTemplate;
                 } else if (GenericController.vbLCase(adminData.adminContent.tableName) == "cctemplates") {
-                    ContentType = CPHtmlBaseClass.EditorContentType.contentTypeWebTemplate;
+                    ContentType = CPHtml5BaseClass.EditorContentType.contentTypeWebTemplate;
                 } else if (GenericController.vbLCase(adminData.adminContent.tableName) == "ccemail") {
-                    ContentType = CPHtmlBaseClass.EditorContentType.contentTypeEmail;
+                    ContentType = CPHtml5BaseClass.EditorContentType.contentTypeEmail;
                 } else {
-                    ContentType = CPHtmlBaseClass.EditorContentType.contentTypeWeb;
+                    ContentType = CPHtml5BaseClass.EditorContentType.contentTypeWeb;
                 }
                 //
                 //-----Create edit page
@@ -610,7 +610,7 @@ namespace Contensive.Addons.AdminSite {
         /// <param name="IsTemplateTable"></param>
         /// <param name="editorAddonListJSON"></param>
         /// <returns></returns>
-        public static string getTab(CoreController core, AdminDataModel adminData, int RecordID, int ContentID, bool record_readOnly, bool IsLandingPage, bool IsRootPage, string EditTab, CPHtmlBaseClass.EditorContentType EditorContext, ref string return_NewFieldList, int TemplateIDForStyles, int HelpCnt, int[] HelpIDCache, string[] helpDefaultCache, string[] HelpCustomCache, bool AllowHelpMsgCustom, KeyPtrController helpIdIndex, string[] fieldTypeDefaultEditors, string fieldEditorPreferenceList, string styleList, string styleOptionList, int emailIdForStyles, bool IsTemplateTable, string editorAddonListJSON) {
+        public static string getTab(CoreController core, AdminDataModel adminData, int RecordID, int ContentID, bool record_readOnly, bool IsLandingPage, bool IsRootPage, string EditTab, CPHtml5BaseClass.EditorContentType EditorContext, ref string return_NewFieldList, int TemplateIDForStyles, int HelpCnt, int[] HelpIDCache, string[] helpDefaultCache, string[] HelpCustomCache, bool AllowHelpMsgCustom, KeyPtrController helpIdIndex, string[] fieldTypeDefaultEditors, string fieldEditorPreferenceList, string styleList, string styleOptionList, int emailIdForStyles, bool IsTemplateTable, string editorAddonListJSON) {
             string returnHtml = "";
             try {
                 // todo
@@ -1543,7 +1543,7 @@ namespace Contensive.Addons.AdminSite {
         /// <param name="IsTemplateTable"></param>
         /// <param name="editorAddonListJSON"></param>
         /// <returns></returns>
-        public static string getTabs(CoreController core, AdminDataModel adminData, TabController adminMenu, bool readOnlyField, bool IsLandingPage, bool IsRootPage, CPHtmlBaseClass.EditorContentType EditorContext, bool allowAjaxTabs, int TemplateIDForStyles, string[] fieldTypeDefaultEditors, string fieldEditorPreferenceList, string styleList, string styleOptionList, int emailIdForStyles, bool IsTemplateTable, string editorAddonListJSON) {
+        public static string getTabs(CoreController core, AdminDataModel adminData, TabController adminMenu, bool readOnlyField, bool IsLandingPage, bool IsRootPage, CPHtml5BaseClass.EditorContentType EditorContext, bool allowAjaxTabs, int TemplateIDForStyles, string[] fieldTypeDefaultEditors, string fieldEditorPreferenceList, string styleList, string styleOptionList, int emailIdForStyles, bool IsTemplateTable, string editorAddonListJSON) {
             string returnHtml = "";
             try {
                 // todo

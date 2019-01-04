@@ -427,15 +427,15 @@ namespace Contensive.Processor {
         /// <summary>
         /// Properties and methods helpful in creating html documents
         /// </summary>
-        public override CPHtmlBaseClass Html {
+        public override CPHtml5BaseClass Html {
             get {
                 if (_htmlObj == null) {
-                    _htmlObj = new CPHtmlClass(this);
+                    _htmlObj = new CPHtml5Class(this);
                 }
                 return _htmlObj;
             }
         }
-        private CPHtmlClass _htmlObj;
+        private CPHtml5Class _htmlObj;
         //
         [Obsolete("Deprecated. To access addon details of the addon running, create a model with the cp.addon.id",true)]
         public override CPAddonBaseClass MyAddon {

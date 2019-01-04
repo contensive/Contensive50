@@ -276,6 +276,7 @@
     <Compile Include="Views\CPFileSystemClass.cs" />
     <Compile Include="Views\CPGroupClass.cs" />
     <Compile Include="Views\CPHtmlClass.cs" />
+    <Compile Include="Views\CPHtml5Class.cs" />
     <Compile Include="Views\CPRequestClass.cs" />
     <Compile Include="Views\CPResponseClass.cs" />
     <Compile Include="Views\CPSiteClass.cs" />

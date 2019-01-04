@@ -59,6 +59,7 @@
     <Compile Include="CPFileBaseClass.cs" />
     <Compile Include="CPFileSystemBaseClass.cs" />
     <Compile Include="CPGroupBaseClass.cs" />
+    <Compile Include="CPHtml5BaseClass.cs" />
     <Compile Include="CPHtmlBaseClass.cs" />
     <Compile Include="CPRequestBaseClass.cs" />
     <Compile Include="CPResponseBaseClass.cs" />
@@ -71,7 +72,6 @@
     <Compile Include="Model\SimplestDataModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <None Include="CPBase2.snk" />
   </ItemGroup>

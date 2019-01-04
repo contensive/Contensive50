@@ -1392,7 +1392,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="contentType"></param>
         /// <returns></returns>
-        public string getWysiwygAddonList( BaseClasses.CPHtmlBaseClass.EditorContentType contentType) {
+        public string getWysiwygAddonList( BaseClasses.CPHtml5BaseClass.EditorContentType contentType) {
             string result = "";
             try {
                 if (core.doc.wysiwygAddonList.ContainsKey(contentType)) {
@@ -1422,7 +1422,7 @@ namespace Contensive.Processor.Controllers {
                     Index.setPtr("Block Text", ItemsCnt);
                     ItemsCnt += 1;
                     //
-                    if ((contentType == CPHtmlBaseClass.EditorContentType.contentTypeEmail) || (contentType == CPHtmlBaseClass.EditorContentType.contentTypeEmailTemplate)) {
+                    if ((contentType == CPHtml5BaseClass.EditorContentType.contentTypeEmail) || (contentType == CPHtml5BaseClass.EditorContentType.contentTypeEmailTemplate)) {
                         //
                         // ----- Email Only AC tags
                         //
@@ -1440,7 +1440,7 @@ namespace Contensive.Processor.Controllers {
                         Index.setPtr("Personalization", ItemsCnt);
                         ItemsCnt += 1;
                         //
-                        if (contentType == CPHtmlBaseClass.EditorContentType.contentTypeEmailTemplate) {
+                        if (contentType == CPHtml5BaseClass.EditorContentType.contentTypeEmailTemplate) {
                             //
                             // Editing Email Templates
                             //   This is a special case
@@ -1496,13 +1496,13 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- addons
                     string Criteria = "(1=1)";
-                    if (contentType == CPHtmlBaseClass.EditorContentType.contentTypeEmail) {
+                    if (contentType == CPHtml5BaseClass.EditorContentType.contentTypeEmail) {
                         //
                         // select only addons with email placement (dont need to check main_version bc if email, must be >4.0.325
                         //
                         Criteria = Criteria + "and(email<>0)";
                     } else {
-                        if (contentType == CPHtmlBaseClass.EditorContentType.contentTypeWeb) {
+                        if (contentType == CPHtml5BaseClass.EditorContentType.contentTypeWeb) {
                             //
                             // Non Templates
                             Criteria = Criteria + "and(content<>0)";
@@ -1520,7 +1520,7 @@ namespace Contensive.Processor.Controllers {
                             while (csData.ok()) {
                                 string addonGuid = csData.getText("ccguid");
                                 string ObjectProgramID2 = csData.getText("ObjectProgramID");
-                                if ((contentType == CPHtmlBaseClass.EditorContentType.contentTypeEmail) && (!string.IsNullOrEmpty(ObjectProgramID2))) {
+                                if ((contentType == CPHtml5BaseClass.EditorContentType.contentTypeEmail) && (!string.IsNullOrEmpty(ObjectProgramID2))) {
                                     //
                                     // Block activex addons from email
                                     //
