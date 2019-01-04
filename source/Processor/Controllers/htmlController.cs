@@ -1180,7 +1180,7 @@ namespace Contensive.Processor.Controllers {
                                 case _fieldTypeIdFileHTML:
                                     FieldValueText = GenericController.encodeText(FieldValueVariant);
                                     if (!string.IsNullOrEmpty(FieldValueText)) {
-                                        FieldValueText = core.fileCdn.readFileText(FieldValueText);
+                                        FieldValueText = core.cdnFiles.readFileText(FieldValueText);
                                     }
                                     if (FieldReadOnly) {
                                         returnResult = FieldValueText;
@@ -1195,7 +1195,7 @@ namespace Contensive.Processor.Controllers {
                                 case _fieldTypeIdFileText:
                                     FieldValueText = GenericController.encodeText(FieldValueVariant);
                                     if (!string.IsNullOrEmpty(FieldValueText)) {
-                                        FieldValueText = core.fileCdn.readFileText(FieldValueText);
+                                        FieldValueText = core.cdnFiles.readFileText(FieldValueText);
                                     }
                                     if (FieldReadOnly) {
                                         returnResult = FieldValueText;
@@ -1212,7 +1212,7 @@ namespace Contensive.Processor.Controllers {
                                 case _fieldTypeIdFileJavascript:
                                     FieldValueText = GenericController.encodeText(FieldValueVariant);
                                     if (!string.IsNullOrEmpty(FieldValueText)) {
-                                        FieldValueText = core.fileCdn.readFileText(FieldValueText);
+                                        FieldValueText = core.cdnFiles.readFileText(FieldValueText);
                                     }
                                     if (FieldReadOnly) {
                                         returnResult = FieldValueText;
@@ -1369,6 +1369,10 @@ namespace Contensive.Processor.Controllers {
         public static string inputHidden(string TagName, int TagValue) => inputHidden(TagName, TagValue.ToString());
         public static string inputHidden(string TagName, int TagValue, string htmlClass) => inputHidden(TagName, TagValue.ToString(), htmlClass);
         public static string inputHidden(string TagName, int TagValue, string htmlClass, string htmlId) => inputHidden(TagName, TagValue.ToString(), htmlClass, htmlId);
+        //
+        public static string inputHidden(string TagName, double TagValue) => inputHidden(TagName, TagValue.ToString());
+        public static string inputHidden(string TagName, double TagValue, string htmlClass) => inputHidden(TagName, TagValue.ToString(), htmlClass);
+        public static string inputHidden(string TagName, double TagValue, string htmlClass, string htmlId) => inputHidden(TagName, TagValue.ToString(), htmlClass, htmlId);
         //
         public static string inputHidden(string TagName, DateTime TagValue) => inputHidden(TagName, TagValue.ToString());
         public static string inputHidden(string TagName, DateTime TagValue, string htmlClass) => inputHidden(TagName, TagValue.ToString(), htmlClass);

@@ -813,7 +813,7 @@ namespace Contensive.Processor.Controllers {
                                                                     if (!string.IsNullOrEmpty(FieldValue)) {
                                                                         Filename = FieldValue;
                                                                         VirtualFilePath = "Settings/" + FieldName + "/";
-                                                                        core.fileCdn.upload(FieldName, VirtualFilePath, ref Filename);
+                                                                        core.cdnFiles.upload(FieldName, VirtualFilePath, ref Filename);
                                                                         core.siteProperties.setProperty(FieldName, VirtualFilePath + Filename);
                                                                     }
                                                                     break;
@@ -825,7 +825,7 @@ namespace Contensive.Processor.Controllers {
                                                                         Filename = DefaultFilename;
                                                                         core.siteProperties.setProperty(FieldName, DefaultFilename);
                                                                     }
-                                                                    core.fileAppRoot.saveFile(Filename, FieldValue);
+                                                                    core.wwwfiles.saveFile(Filename, FieldValue);
                                                                     break;
                                                                 case "cssfile":
                                                                     //
@@ -835,7 +835,7 @@ namespace Contensive.Processor.Controllers {
                                                                         Filename = DefaultFilename;
                                                                         core.siteProperties.setProperty(FieldName, DefaultFilename);
                                                                     }
-                                                                    core.fileAppRoot.saveFile(Filename, FieldValue);
+                                                                    core.wwwfiles.saveFile(Filename, FieldValue);
                                                                     break;
                                                                 case "xmlfile":
                                                                     //
@@ -845,7 +845,7 @@ namespace Contensive.Processor.Controllers {
                                                                         Filename = DefaultFilename;
                                                                         core.siteProperties.setProperty(FieldName, DefaultFilename);
                                                                     }
-                                                                    core.fileAppRoot.saveFile(Filename, FieldValue);
+                                                                    core.wwwfiles.saveFile(Filename, FieldValue);
                                                                     break;
                                                                 case "currency":
                                                                     //
@@ -913,7 +913,7 @@ namespace Contensive.Processor.Controllers {
                                                                 FieldName = xml_GetAttribute(IsFound, TabNode, "name", "");
                                                                 fieldfilename = xml_GetAttribute(IsFound, TabNode, "filename", "");
                                                                 FieldValue = core.docProperties.getText(FieldName);
-                                                                core.fileAppRoot.saveFile(fieldfilename, FieldValue);
+                                                                core.wwwfiles.saveFile(fieldfilename, FieldValue);
                                                             }
                                                             break;
                                                         case "dbquery":
@@ -1060,7 +1060,7 @@ namespace Contensive.Processor.Controllers {
                                                                                 EncodedLink = encodeURL(NonEncodedLink);
                                                                                 string FieldValuefilename = "";
                                                                                 string FieldValuePath = "";
-                                                                                core.filePrivate.splitDosPathFilename(FieldValue, ref FieldValuePath, ref FieldValuefilename);
+                                                                                core.privateFiles.splitDosPathFilename(FieldValue, ref FieldValuePath, ref FieldValuefilename);
                                                                                 Copy = ""
                                                                                 + "<a href=\"http://" + EncodedLink + "\" target=\"_blank\">[" + FieldValuefilename + "]</A>"
                                                                                 + "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" + HtmlController.checkbox(FieldName + ".DeleteFlag", false) + "&nbsp;&nbsp;&nbsp;Change:&nbsp;" + core.html.inputFile(FieldName);
@@ -1221,8 +1221,8 @@ namespace Contensive.Processor.Controllers {
                                                         FieldValue = TabNode.InnerText;
                                                         FieldHTML = GenericController.encodeBoolean(xml_GetAttribute(IsFound, TabNode, "html", ""));
                                                         if (!string.IsNullOrEmpty(fieldfilename)) {
-                                                            if (core.fileAppRoot.fileExists(fieldfilename)) {
-                                                                FieldValue = core.fileCdn.readFileText(fieldfilename);
+                                                            if (core.wwwfiles.fileExists(fieldfilename)) {
+                                                                FieldValue = core.cdnFiles.readFileText(fieldfilename);
                                                             }
                                                         }
                                                         if (FieldHTML) {
@@ -1591,7 +1591,7 @@ namespace Contensive.Processor.Controllers {
                     } else {
                         //
                         // -- foreground - appRootPath
-                        appPath = core.filePrivate.joinPath(core.fileAppRoot.localAbsRootPath, "bin\\");
+                        appPath = core.privateFiles.joinPath(core.wwwfiles.localAbsRootPath, "bin\\");
                     }
 
 
@@ -1618,8 +1618,8 @@ namespace Contensive.Processor.Controllers {
                             if (string.IsNullOrEmpty(AddonVersionPath)) {
                                 throw new GenericException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "]. The collection path was not checked because the collection [" + addonCollection.name + "] was not found in the \\private\\addons\\Collections.xml file. Try re-installing the collection");
                             } else {
-                                string AddonPath = core.filePrivate.joinPath(getPrivateFilesAddonPath(), AddonVersionPath);
-                                string appAddonPath = core.filePrivate.joinPath(core.filePrivate.localAbsRootPath, AddonPath);
+                                string AddonPath = core.privateFiles.joinPath(getPrivateFilesAddonPath(), AddonVersionPath);
+                                string appAddonPath = core.privateFiles.joinPath(core.privateFiles.localAbsRootPath, AddonPath);
                                 result = execute_assembly_byFilePath(addon, appAddonPath, false, ref AddonFound);
                                 if (!AddonFound) {
                                     throw new GenericException(warningMessage + " Not found in developer path [" + commonAssemblyPath + "] and application path [" + appPath + "] or collection path [" + appAddonPath + "].");

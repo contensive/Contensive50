@@ -1174,7 +1174,7 @@ namespace Contensive.Processor.Controllers {
                                                                                     //
                                                                                     if (RecordWidth == 0 || RecordHeight == 0) {
                                                                                         sf = new ImageEditController();
-                                                                                        if (sf.load(ImageVirtualFilename, core.fileCdn)) {
+                                                                                        if (sf.load(ImageVirtualFilename, core.cdnFiles)) {
                                                                                             file.width = sf.width;
                                                                                             file.height = sf.height;
                                                                                             file.save(core);
@@ -1205,7 +1205,7 @@ namespace Contensive.Processor.Controllers {
                                                                                             // This happens when you hit 'reset' on the image properties dialog
                                                                                             //
                                                                                             sf = new ImageEditController();
-                                                                                            if (sf.load(ImageVirtualFilename, core.fileCdn)) {
+                                                                                            if (sf.load(ImageVirtualFilename, core.cdnFiles)) {
                                                                                                 ImageWidth = sf.width;
                                                                                                 ImageHeight = sf.height;
                                                                                             }
@@ -1276,7 +1276,7 @@ namespace Contensive.Processor.Controllers {
                                                                                                     // Alt image has not been built
                                                                                                     //
                                                                                                     sf = new ImageEditController();
-                                                                                                    if (!sf.load(RecordVirtualFilename, core.fileCdn)) {
+                                                                                                    if (!sf.load(RecordVirtualFilename, core.cdnFiles)) {
                                                                                                         //
                                                                                                         // image load failed, use raw filename
                                                                                                         //
@@ -1332,7 +1332,7 @@ namespace Contensive.Processor.Controllers {
                                                                                                         // Save new file
                                                                                                         //
                                                                                                         NewImageFilename = RecordFilenameNoExt + "-" + ImageAltSize + "." + RecordFilenameExt;
-                                                                                                        sf.save(ImageVirtualFilePath + NewImageFilename, core.fileCdn);
+                                                                                                        sf.save(ImageVirtualFilePath + NewImageFilename, core.cdnFiles);
                                                                                                         //
                                                                                                         // Update image record
                                                                                                         //

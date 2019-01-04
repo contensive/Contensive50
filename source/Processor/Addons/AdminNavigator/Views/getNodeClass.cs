@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Contensive.BaseClasses;
+using Contensive.Processor;
 using Contensive.Processor.Controllers;
 using Contensive.Processor.Models.Db;
 
@@ -191,7 +192,7 @@ namespace Contensive.Addons.AdminNavigator {
                             CPCSBaseClass cs3 = cp.CSNew();
                             NodeType = common.NodeTypeEnum.NodeTypeCollection;
                             BlockSubNodes = false;
-                            if (cs3.Open("Add-on Collections", Criteria, "name", true, FieldList, 9999, 1)) {
+                            if (cs3.Open("Add-on Collections", Criteria, "name", true, FieldList, Constants.sqlPageSizeDefault, 1)) {
                                 do {
                                     Name = Convert.ToString(cs3.GetText("name")).Trim(' ');
                                     NavIconTitle = Name;

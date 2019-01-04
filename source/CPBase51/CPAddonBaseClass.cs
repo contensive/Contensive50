@@ -146,12 +146,66 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
+        /// Install addon collection from a file in private files
+        /// </summary>
+        /// <param name="privatePathFilename"></param>
+        /// <param name="returnUserError"></param>
+        /// <returns></returns>
+        public abstract int InstallCollectionFileAsync(string privatePathFilename);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Install addon collection by its guid from the addon collection library
+        /// </summary>
+        /// <param name="collectionGuid"></param>
+        /// <param name="returnUserError"></param>
+        /// <returns></returns>
+        public abstract bool InstallCollectionsFromFolder(string privateFolder, bool deleteFolderWhenDone, ref string returnUserError);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Install addon collection by its guid from the addon collection library
+        /// </summary>
+        /// <param name="collectionGuid"></param>
+        /// <param name="returnUserError"></param>
+        /// <returns></returns>
+        public abstract int InstallCollectionsFromFolderAsync(string privateFolder, bool deleteFolderWhenDone);
+        //
+        //====================================================================================================
+        /// <summary>
         /// Install addon collection by its guid from the addon collection library
         /// </summary>
         /// <param name="collectionGuid"></param>
         /// <param name="returnUserError"></param>
         /// <returns></returns>
         public abstract bool InstallCollectionFromLibrary(string collectionGuid, ref string returnUserError);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Install addon collection by its guid from the addon collection library
+        /// </summary>
+        /// <param name="collectionGuid"></param>
+        /// <param name="returnUserError"></param>
+        /// <returns></returns>
+        public abstract int InstallCollectionFromLibraryAsync(string collectionGuid);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Install addon collection by its guid from the addon collection library
+        /// </summary>
+        /// <param name="collectionGuid"></param>
+        /// <param name="returnUserError"></param>
+        /// <returns></returns>
+        public abstract bool InstallCollectionFromLink(string link, ref string returnUserError);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Install addon collection by its guid from the addon collection library
+        /// </summary>
+        /// <param name="collectionGuid"></param>
+        /// <param name="returnUserError"></param>
+        /// <returns></returns>
+        public abstract int InstallCollectionFromLinkAsync(string link);
         //
         //====================================================================================================
         /// <summary>

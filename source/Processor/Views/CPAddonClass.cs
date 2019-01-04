@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Contensive.BaseClasses;
+using Contensive.Processor.Controllers;
 
 namespace Contensive.Processor {
     //
@@ -166,11 +167,45 @@ namespace Contensive.Processor {
             return returnOk;
         }
         //
+        public override int InstallCollectionFileAsync(string privatePathFilename ) { throw new NotImplementedException(); }
+        //
         //====================================================================================================
-        // todo - complete this method
-        public override bool InstallCollectionFromLibrary(string collectionGuid, ref string returnUserError) {
-            return false;
+        /// <summary>
+        /// Install all addon collections in a folder asynchonously. Optionally delete the folder. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
+        /// </summary>
+        /// <param name="privateFolder"></param>
+        /// <param name="deleteFolderWhenDone"></param>
+        /// <returns></returns>
+        public override bool InstallCollectionsFromFolder(string privateFolder, bool deleteFolderWhenDone, ref string returnUserError) {
+            string ignoreUserMessage = "";
+            List<string> ignoreList1 = new List<string>();
+            List<string> ignoreList2 = new List<string>();
+            string logPrefix = "CPUtilsClass.installCollectionsFromFolder";
+            var installedCollections = new List<string>();
+            return CollectionController.installCollectionsFromPrivateFolder(cp.core, privateFolder, ref ignoreUserMessage, ref ignoreList1, false, false, ref ignoreList2, logPrefix, ref installedCollections, true);
         }
+        //
+        public override int InstallCollectionsFromFolderAsync(string privateFolder, bool deleteFolderWhenDone) { throw new NotImplementedException(); }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Install an addon collections from the collection library asynchonously. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
+        /// </summary>
+        public override bool InstallCollectionFromLibrary(string collectionGuid, ref string returnUserError) {
+            string ignoreUserMessage = "";
+            var installedCollections = new List<string>();
+            string logPrefix = "installCollectionFromLibrary";
+            var nonCriticalErrorList = new List<string>();
+            return CollectionController.installCollectionFromRemoteRepo(cp.core, collectionGuid, ref ignoreUserMessage, "", false, false, ref nonCriticalErrorList, logPrefix, ref installedCollections);
+        }
+        //
+        public override int InstallCollectionFromLibraryAsync(string collectionGuid) { throw new NotImplementedException(); }
+        //
+        //====================================================================================================
+        //
+        public override bool InstallCollectionFromLink(string link, ref string returnUserError) { throw new NotImplementedException(); }
+        //
+        public override int InstallCollectionFromLinkAsync(string link) { throw new NotImplementedException(); }
         //
         //====================================================================================================
         // Deprecated methods

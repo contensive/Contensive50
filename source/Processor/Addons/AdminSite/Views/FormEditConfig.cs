@@ -70,17 +70,17 @@ namespace Contensive.Addons.AdminSite {
                                     }
                                 }
                             }
-                            core.filePrivate.saveFile(InnovaEditorFeaturefilename, "admin:" + AdminList + "\r\ncontentmanager:" + CMList + "\r\npublic:" + PublicList);
+                            core.privateFiles.saveFile(InnovaEditorFeaturefilename, "admin:" + AdminList + "\r\ncontentmanager:" + CMList + "\r\npublic:" + PublicList);
                             //
                             // Clear the editor style rules template cache so next edit gets new background color
                             string EditorStyleRulesFilename = GenericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", "0", 1, 99, 1);
-                            core.filePrivate.deleteFile(EditorStyleRulesFilename);
+                            core.privateFiles.deleteFile(EditorStyleRulesFilename);
                             //
                             using (var csData = new CsModel(core)) {
                                 csData.openSql("select id from cctemplates");
                                 while (csData.ok()) {
                                     EditorStyleRulesFilename = GenericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", csData.getText("ID"), 1, 99, 1);
-                                    core.filePrivate.deleteFile(EditorStyleRulesFilename);
+                                    core.privateFiles.deleteFile(EditorStyleRulesFilename);
                                     csData.goNext();
                                 }
                             }
@@ -88,7 +88,7 @@ namespace Contensive.Addons.AdminSite {
                         if (Button != ButtonOK) {
                             //
                             // Draw the form
-                            string FeatureList = core.fileCdn.readFileText(InnovaEditorFeaturefilename);
+                            string FeatureList = core.cdnFiles.readFileText(InnovaEditorFeaturefilename);
                             if (string.IsNullOrEmpty(FeatureList)) {
                                 FeatureList = "admin:" + InnovaEditorFeatureList + "\r\ncontentmanager:" + InnovaEditorFeatureList + "\r\npublic:" + InnovaEditorPublicFeatureList;
                             }

@@ -329,48 +329,7 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <param name="guid"></param>
         /// <returns></returns>
-        public abstract bool IsGuid(string guid);
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Install an addon collection file asynchonously. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
-        /// </summary>
-        /// <param name="privateFile"></param>
-        /// <returns></returns>
-        public abstract int InstallCollectionFromFile(string privateFile);
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Install all addon collections in a folder asynchonously. Optionally delete the folder. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
-        /// </summary>
-        /// <param name="privateFolder"></param>
-        /// <param name="deleteFolderWhenDone"></param>
-        /// <returns></returns>
-        public abstract int InstallCollectionsFromFolder(string privateFolder, bool deleteFolderWhenDone);
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Install all addon collections in a folder asynchonously. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
-        /// </summary>
-        /// <param name="privateFolder"></param>
-        /// <returns></returns>
-        public abstract int InstallCollectionsFromFolder(string privateFolder);
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Install an addon collections from the collection library asynchonously. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
-        /// </summary>
-        /// <param name="collectionGuid"></param>
-        /// <returns></returns>
-        public abstract int InstallCollectionFromLibrary(string collectionGuid);
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Install an addon collections from an endpoint asynchonously. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
-        /// </summary>
-        /// <param name="link"></param>
-        /// <returns></returns>
-        public abstract int InstallCollectionFromLink(string link);
+        public abstract bool isGuid(string guid);
         //
         //====================================================================================================
         /// <summary>
@@ -529,36 +488,53 @@ namespace Contensive.BaseClasses {
         //
         [Obsolete("Deprecated, some server audits fail if Md5 use detected.")]
         public abstract string hashMd5(string source);
+        ////
         //
-        [Obsolete("Deprecated, use correct case method.", true)]
-        public abstract bool isGuid(string guid);
-        //
-        [Obsolete("Deprecated, use correct case method.", true)]
+        //====================================================================================================
+        /// <summary>
+        /// Install an addon collection file asynchonously. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
+        /// </summary>
+        /// <param name="privateFile"></param>
+        /// <returns></returns>
+        [Obsolete("Deprecated, use CP.Addon.InstallCollectionFile().", true)]
         public abstract int installCollectionFromFile(string privateFile);
         //
-        [Obsolete("Deprecated, use correct case method.", true)]
+        //====================================================================================================
+        /// <summary>
+        /// Install all addon collections in a folder asynchonously. Optionally delete the folder. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
+        /// </summary>
+        /// <param name="privateFolder"></param>
+        /// <param name="deleteFolderWhenDone"></param>
+        /// <returns></returns>
+        [Obsolete("Deprecated, use CP.Addon.InstallCollectionFile().", true)]
         public abstract int installCollectionsFromFolder(string privateFolder, bool deleteFolderWhenDone);
         //
-        [Obsolete("Deprecated, use correct case method.", true)]
+        //====================================================================================================
+        /// <summary>
+        /// Install all addon collections in a folder asynchonously. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
+        /// </summary>
+        /// <param name="privateFolder"></param>
+        /// <returns></returns>
+        [Obsolete("Deprecated, use CP.Addon.InstallCollectionFile().", true)]
         public abstract int installCollectionsFromFolder(string privateFolder);
         //
-        [Obsolete("Deprecated, use correct case method.", true)]
+        //====================================================================================================
+        /// <summary>
+        /// Install an addon collections from the collection library asynchonously. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
+        /// </summary>
+        /// <param name="collectionGuid"></param>
+        /// <returns></returns>
+        [Obsolete("Deprecated, use CP.Addon.InstallCollectionFromLibrary().", true)]
         public abstract int installCollectionFromLibrary(string collectionGuid);
         //
-        [Obsolete("Deprecated, use correct case method.", true)]
+        //====================================================================================================
+        /// <summary>
+        /// Install an addon collections from an endpoint asynchonously. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
+        /// </summary>
+        /// <param name="link"></param>
+        /// <returns></returns>
+        [Obsolete("Deprecated, use CP.Addon.InstallCollectionFromLink().", true)]
         public abstract int installCollectionFromLink(string link);
-
-
-
-
-
-
-
-
-
-
-
-
     }
 }
 

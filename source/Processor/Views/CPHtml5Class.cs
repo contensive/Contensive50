@@ -9,9 +9,9 @@ namespace Contensive.Processor {
     public class CPHtml5Class : BaseClasses.CPHtml5BaseClass, IDisposable {
         //
         #region COM GUIDs
-        public const string ClassId = "637E3815-0DA6-4672-84E9-A319D85F2101";
-        public const string InterfaceId = "24267471-9CE4-44F9-B4BD-8E9CE357D6E6";
-        public const string EventsId = "4021B791-0F55-4841-90AE-64C7FAFB9756";
+        public const string ClassId = "8FE3846B-80BA-4645-9388-2831825845E8";
+        public const string InterfaceId = "46584DEE-091F-4068-86DD-13CA3167F17D";
+        public const string EventsId = "E73FCC6E-BAE6-4945-93DA-9E1A74539598";
         #endregion
         /// <summary>
         /// dependencies
@@ -26,12 +26,6 @@ namespace Contensive.Processor {
         //
         public CPHtml5Class(CPClass cpParent) : base() {
             cp = cpParent;
-        }
-        //
-        // ====================================================================================================
-        //
-        public override void AddEvent(string htmlId, string domEvent, string javaScript) {
-            cp.core.html.javascriptAddEvent(htmlId, domEvent, javaScript);
         }
         //
         // ====================================================================================================
@@ -181,6 +175,10 @@ namespace Contensive.Processor {
         public override string Hidden(string htmlName, int htmlValue, string htmlClass) => HtmlController.inputHidden(htmlName, htmlValue, htmlClass);
         public override string Hidden(string htmlName, int htmlValue) => HtmlController.inputHidden(htmlName, htmlValue);
         //
+        public override string Hidden(string htmlName, double htmlValue, string htmlClass, string htmlId) => HtmlController.inputHidden(htmlName, htmlValue, htmlClass, htmlId);
+        public override string Hidden(string htmlName, double htmlValue, string htmlClass) => HtmlController.inputHidden(htmlName, htmlValue, htmlClass);
+        public override string Hidden(string htmlName, double htmlValue) => HtmlController.inputHidden(htmlName, htmlValue);
+        //
         public override string Hidden(string htmlName, bool htmlValue, string htmlClass, string htmlId) => HtmlController.inputHidden(htmlName, htmlValue, htmlClass, htmlId);
         public override string Hidden(string htmlName, bool htmlValue, string htmlClass) => HtmlController.inputHidden(htmlName, htmlValue, htmlClass);
         public override string Hidden(string htmlName, bool htmlValue) => HtmlController.inputHidden(htmlName, htmlValue);
@@ -188,11 +186,6 @@ namespace Contensive.Processor {
         public override string Hidden(string htmlName, DateTime htmlValue, string htmlClass, string htmlId) => HtmlController.inputHidden(htmlName, htmlValue, htmlClass, htmlId);
         public override string Hidden(string htmlName, DateTime htmlValue, string htmlClass) => HtmlController.inputHidden(htmlName, htmlValue, htmlClass);
         public override string Hidden(string htmlName, DateTime htmlValue) => HtmlController.inputHidden(htmlName, htmlValue);
-        //
-        // ====================================================================================================
-        //
-        public override string Indent(string sourceHtml, int tabCnt) => HtmlController.indent(sourceHtml, tabCnt);
-        public override string Indent(string sourceHtml) => HtmlController.indent(sourceHtml);
         //
         // ====================================================================================================
         //
@@ -298,28 +291,25 @@ namespace Contensive.Processor {
         //
         // ==========================================================================================
         //
+        public override string RadioBox(string htmlName, string htmlValue, string currentValue, string htmlClass, string htmlId) => cp.core.html.inputRadio(htmlName, htmlValue, currentValue, htmlId, htmlClass);
+        public override string RadioBox(string htmlName, string htmlValue, string currentValue, string htmlClass) => cp.core.html.inputRadio(htmlName, htmlValue, currentValue, "", htmlClass);
+        public override string RadioBox(string htmlName, string htmlValue, string currentValue) => cp.core.html.inputRadio(htmlName, htmlValue, currentValue);
         //
-        public override string RadioBox(string htmlName, int htmlValue, int currentValue, string htmlClass, string htmlId) {
-            return cp.core.html.inputRadio(htmlName, htmlValue.ToString(), currentValue.ToString(), htmlId, htmlClass);
-        }
-        public override string RadioBox(string htmlName, int htmlValue, int currentValue, string htmlClass) {
-            throw new NotImplementedException();
-        }
-
-        public override string RadioBox(string htmlName, int htmlValue, int currentValue) {
-            throw new NotImplementedException();
-        }
-        public override string RadioBox(string htmlName, string htmlValue, string currentValue, string htmlClass, string htmlId) {
-            return cp.core.html.inputRadio(htmlName, htmlValue, currentValue, htmlId, htmlClass);
-        }
+        public override string RadioBox(string htmlName, int htmlValue, int currentValue, string htmlClass, string htmlId) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(), currentValue.ToString(), htmlId, htmlClass);
+        public override string RadioBox(string htmlName, int htmlValue, int currentValue, string htmlClass) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(), currentValue.ToString(), "", htmlClass);
+        public override string RadioBox(string htmlName, int htmlValue, int currentValue) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(), currentValue.ToString());
         //
-        public override string RadioBox(string htmlName, string htmlValue, string currentValue, string htmlClass) {
-            throw new NotImplementedException();
-        }
+        public override string RadioBox(string htmlName, double htmlValue, double currentValue, string htmlClass, string htmlId) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(), currentValue.ToString(), htmlId, htmlClass);
+        public override string RadioBox(string htmlName, double htmlValue, double currentValue, string htmlClass) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(), currentValue.ToString(),"",htmlClass);
+        public override string RadioBox(string htmlName, double htmlValue, double currentValue) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(), currentValue.ToString());
         //
-        public override string RadioBox(string htmlName, string htmlValue, string currentValue) {
-            throw new NotImplementedException();
-        }
+        public override string RadioBox(string htmlName, DateTime htmlValue, DateTime currentValue, string htmlClass, string htmlId) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(), currentValue.ToString(), htmlId, htmlClass);
+        public override string RadioBox(string htmlName, DateTime htmlValue, DateTime currentValue, string htmlClass) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(), currentValue.ToString(), "", htmlClass);
+        public override string RadioBox(string htmlName, DateTime htmlValue, DateTime currentValue) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(), currentValue.ToString());
+        //
+        public override string RadioBox(string htmlName, bool htmlValue, bool currentValue, string htmlClass, string htmlId) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(), currentValue.ToString(), htmlId, htmlClass);
+        public override string RadioBox(string htmlName, bool htmlValue, bool currentValue, string htmlClass) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(), currentValue.ToString(), "", htmlClass);
+        public override string RadioBox(string htmlName, bool htmlValue, bool currentValue) => cp.core.html.inputRadio(htmlName, htmlValue.ToString(), currentValue.ToString());
         //
         // ==========================================================================================
         //

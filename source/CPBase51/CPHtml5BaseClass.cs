@@ -159,6 +159,18 @@ namespace Contensive.BaseClasses {
         public abstract string RadioBox(string htmlName, int htmlValue, int currentValue, string htmlClass);
         public abstract string RadioBox(string htmlName, int htmlValue, int currentValue);
         //
+        public abstract string RadioBox(string htmlName, double htmlValue, double currentValue, string htmlClass, string htmlId);
+        public abstract string RadioBox(string htmlName, double htmlValue, double currentValue, string htmlClass);
+        public abstract string RadioBox(string htmlName, double htmlValue, double currentValue);
+        //
+        public abstract string RadioBox(string htmlName, bool htmlValue, bool currentValue, string htmlClass, string htmlId);
+        public abstract string RadioBox(string htmlName, bool htmlValue, bool currentValue, string htmlClass);
+        public abstract string RadioBox(string htmlName, bool htmlValue, bool currentValue);
+        //
+        public abstract string RadioBox(string htmlName, DateTime htmlValue, DateTime currentValue, string htmlClass, string htmlId);
+        public abstract string RadioBox(string htmlName, DateTime htmlValue, DateTime currentValue, string htmlClass);
+        public abstract string RadioBox(string htmlName, DateTime htmlValue, DateTime currentValue);
+        //
         public abstract string SelectContent(string htmlName, string htmlValue, string contentName, string sqlCriteria, string noneCaption, string htmlClass, string htmlId);
         public abstract string SelectContent(string htmlName, string htmlValue, string contentName, string sqlCriteria, string noneCaption, string htmlClass);
         public abstract string SelectContent(string htmlName, string htmlValue, string contentName, string sqlCriteria, string noneCaption);
@@ -175,11 +187,6 @@ namespace Contensive.BaseClasses {
         public abstract string SelectUser(string htmlName, int htmlValue, int groupId, string noneCaption);
         public abstract string SelectUser(string htmlName, int htmlValue, int groupId);
         //
-        public abstract string Indent(string sourceHtml, int tabCnt);
-        public abstract string Indent(string sourceHtml);
-        //
-        public abstract void AddEvent(string htmlId, string domEvent, string javaScript);
-        //
         public abstract string Button(string htmlName, string htmlValue, string htmlClass, string htmlId);
         public abstract string Button(string htmlName, string htmlValue, string htmlClass);
         public abstract string Button(string htmlName, string htmlValue);
@@ -194,6 +201,10 @@ namespace Contensive.BaseClasses {
         public abstract string Hidden(string htmlName, int htmlValue, string htmlClass, string htmlId);
         public abstract string Hidden(string htmlName, int htmlValue, string htmlClass);
         public abstract string Hidden(string htmlName, int htmlValue);
+        //
+        public abstract string Hidden(string htmlName, double htmlValue, string htmlClass, string htmlId);
+        public abstract string Hidden(string htmlName, double htmlValue, string htmlClass);
+        public abstract string Hidden(string htmlName, double htmlValue);
         //
         public abstract string Hidden(string htmlName, bool htmlValue, string htmlClass, string htmlId);
         public abstract string Hidden(string htmlName, bool htmlValue, string htmlClass);

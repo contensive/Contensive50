@@ -143,7 +143,7 @@ namespace Contensive.Processor {
         public override string GetFilename(string PathFilename) {
             string filename = "";
             string path = "";
-            cp.core.filePrivate.splitDosPathFilename(PathFilename, ref path, ref filename);
+            cp.core.privateFiles.splitDosPathFilename(PathFilename, ref path, ref filename);
             return filename;
         }
         //
@@ -202,77 +202,8 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         //
-        public override bool IsGuid(string guid) {
+        public override bool isGuid(string guid) {
             return GenericController.common_isGuid(guid);
-        }
-        // todo implement taskId return value, create cp.task object to track task status
-        //====================================================================================================
-        /// <summary>
-        /// Install an addon collection file asynchonously. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
-        /// </summary>
-        /// <param name="privateFile"></param>
-        /// <returns></returns>
-        public override int InstallCollectionFromFile(string privateFile) {
-            int taskId = 0;
-            string ignoreUserMessage = "";
-            string ignoreGuid = "";
-            var ignoreList = new List<string> { };
-            var installedCollections = new List<string>();
-            CollectionController.installCollectionsFromPrivateFile(cp.core, privateFile, ref ignoreUserMessage, ref ignoreGuid, false, true, ref ignoreList, "CPUtilsClass.installCollectionFromFile [" + privateFile + "]", ref installedCollections);
-            return taskId;
-        }
-        // todo implement taskId return value, create cp.task object to track task status
-        //====================================================================================================
-        /// <summary>
-        /// Install all addon collections in a folder asynchonously. Optionally delete the folder. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
-        /// </summary>
-        /// <param name="privateFolder"></param>
-        /// <param name="deleteFolderWhenDone"></param>
-        /// <returns></returns>
-        public override int InstallCollectionsFromFolder(string privateFolder, bool deleteFolderWhenDone) {
-            int taskId = 0;
-            string ignoreUserMessage = "";
-            List<string> ignoreList1 = new List<string>();
-            List<string> ignoreList2 = new List<string>();
-            string logPrefix = "CPUtilsClass.installCollectionsFromFolder";
-            var installedCollections = new List<string>();
-            CollectionController.installCollectionsFromPrivateFolder(cp.core, privateFolder, ref ignoreUserMessage, ref ignoreList1, false, false, ref ignoreList2, logPrefix, ref installedCollections, true);
-            return taskId;
-        }
-        // todo implement taskId return value, create cp.task object to track task status
-        //====================================================================================================
-        /// <summary>
-        /// Install all addon collections in a folder asynchonously. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
-        /// </summary>
-        /// <param name="privateFolder"></param>
-        /// <returns></returns>
-        public override int InstallCollectionsFromFolder(string privateFolder) {
-            return InstallCollectionsFromFolder(privateFolder, false);
-        }
-        // todo implement taskId return value, create cp.task object to track task status
-        //====================================================================================================
-        /// <summary>
-        /// Install an addon collections from the collection library asynchonously. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
-        /// </summary>
-        public override int InstallCollectionFromLibrary(string collectionGuid ) {
-            int taskId = 0;
-            string ignoreUserMessage = "";
-            var installedCollections = new List<string>();
-            string logPrefix = "installCollectionFromLibrary";
-            var nonCriticalErrorList = new List<string>();
-            CollectionController.installCollectionFromRemoteRepo(cp.core, collectionGuid, ref ignoreUserMessage, "", false, false, ref nonCriticalErrorList, logPrefix, ref installedCollections);
-            return taskId;
-        }
-        // todo implement taskId return value, create cp.task object to track task status
-        //====================================================================================================
-        /// <summary>
-        /// Install an addon collections from an endpoint asynchonously. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
-        /// </summary>
-        /// <param name="privateFolder"></param>
-        /// <param name="deleteFolderWhenDone"></param>
-        /// <returns></returns>
-        public override int InstallCollectionFromLink(string link) {
-            throw new NotImplementedException("installCollectionFromLink not implemented");
         }
         //
         //====================================================================================================
@@ -404,44 +335,40 @@ namespace Contensive.Processor {
             return cp.core.programFiles.readFileText("Resources\\WaitPageOpen.htm");
         }
         //
-        [Obsolete("Deprecated, use cp.addon.Execute", true)]
-        public override string ExecuteAddon(string IdGuidOrName, int WrapperId) => (string)cp.Addon.Execute(
-            IdGuidOrName,
-            new addonExecuteContext() {
-                addonType = addonContext.ContextPage,
-                wrapperID = WrapperId,
-                instanceGuid = cp.core.docProperties.getText("instanceId")
-            }
-        );
-        //
-        [Obsolete("Deprecated, use cp.addon.Execute", true)]
-        public override string ExecuteAddon(string IdGuidOrName) => (string)cp.Addon.Execute(
-            IdGuidOrName,
-            new addonExecuteContext() {
-                addonType = addonContext.ContextPage,
-                instanceGuid = cp.core.docProperties.getText("instanceId")
-            }
-        );
-        //
-        [Obsolete("Deprecated, use cp.addon.Execute", true)]
-        public override string ExecuteAddon(string IdGuidOrName, addonContext context) => (string)cp.Addon.Execute(
-            IdGuidOrName,
-            new addonExecuteContext() {
+        public string ExecuteAddon(string addonIDGuidOrName, int wrapperId, addonContext context) {
+            addonExecuteContext executeContext = new addonExecuteContext() {
                 addonType = context,
-                instanceGuid = cp.core.docProperties.getText("instanceId")
+                instanceGuid = cp.core.docProperties.getText("instanceId"),
+                wrapperID = wrapperId
+            };
+            if (addonIDGuidOrName.IsNumeric()) {
+                return (string)cp.Addon.Execute(EncodeInteger(addonIDGuidOrName), executeContext);
+            } else if (isGuid(addonIDGuidOrName)) {
+                return (string)cp.Addon.Execute(addonIDGuidOrName, executeContext);
+            } else {
+                return (string)cp.Addon.ExecuteByUniqueName(addonIDGuidOrName, executeContext);
             }
-        );
+        }
         //
         [Obsolete("Deprecated, use cp.addon.Execute", true)]
-        public override string ExecuteAddonAsProcess(string AddonIDGuidOrName) {
+        public override string ExecuteAddon(string addonIDGuidOrName) => ExecuteAddon(addonIDGuidOrName, 0, addonContext.ContextPage);
+        //
+        [Obsolete("Deprecated, use cp.addon.Execute", true)]
+        public override string ExecuteAddon(string addonIDGuidOrName, int WrapperId) => ExecuteAddon(addonIDGuidOrName, WrapperId, addonContext.ContextPage);
+        //
+        [Obsolete("Deprecated, use cp.addon.Execute", true)]
+        public override string ExecuteAddon(string addonIDGuidOrName, addonContext context) => ExecuteAddon(addonIDGuidOrName, 0, context);
+        //
+        [Obsolete("Deprecated, use cp.addon.Execute", true)]
+        public override string ExecuteAddonAsProcess(string addonIDGuidOrName) {
             try {
                 Models.Db.AddonModel addon = null;
-                if (EncodeInteger(AddonIDGuidOrName) > 0) {
-                    addon = cp.core.addonCache.getAddonById(EncodeInteger(AddonIDGuidOrName));
-                } else if (GenericController.isGuid(AddonIDGuidOrName)) {
-                    addon = cp.core.addonCache.getAddonByGuid(AddonIDGuidOrName);
+                if (addonIDGuidOrName.IsNumeric()) {
+                    addon = cp.core.addonCache.getAddonById(EncodeInteger(addonIDGuidOrName));
+                } else if (GenericController.isGuid(addonIDGuidOrName)) {
+                    addon = cp.core.addonCache.getAddonByGuid(addonIDGuidOrName);
                 } else {
-                    addon = cp.core.addonCache.getAddonByName(AddonIDGuidOrName);
+                    addon = cp.core.addonCache.getAddonByName(addonIDGuidOrName);
                 }
                 if (addon != null) {
                     cp.core.addon.executeAsync(addon);
@@ -479,36 +406,6 @@ namespace Contensive.Processor {
         [Obsolete("Deprecated. Use native methods to convert date formats.", true)]
         public override DateTime DecodeGMTDate(string GMTDate) {
             return GenericController.deprecatedDecodeGMTDate(GMTDate);
-        }
-        //
-        [Obsolete("Deprecated.", true)]
-        public override bool isGuid(string guid) {
-            throw new NotImplementedException();
-        }
-        //
-        [Obsolete("Deprecated.", true)]
-        public override int installCollectionFromFile(string privateFile) {
-            throw new NotImplementedException();
-        }
-        //
-        [Obsolete("Deprecated.", true)]
-        public override int installCollectionsFromFolder(string privateFolder, bool deleteFolderWhenDone) {
-            throw new NotImplementedException();
-        }
-        //
-        [Obsolete("Deprecated.", true)]
-        public override int installCollectionsFromFolder(string privateFolder) {
-            throw new NotImplementedException();
-        }
-        //
-        [Obsolete("Deprecated.", true)]
-        public override int installCollectionFromLibrary(string collectionGuid) {
-            throw new NotImplementedException();
-        }
-        //
-        [Obsolete("Deprecated.", true)]
-        public override int installCollectionFromLink(string link) {
-            throw new NotImplementedException();
         }
         [Obsolete("Use SeparateURL(), true ")]
         public override void ParseURL(string url, ref string return_protocol, ref string return_domain, ref string return_port, ref string return_path, ref string return_page, ref string return_queryString) {
@@ -559,6 +456,71 @@ namespace Contensive.Processor {
         public override string hashMd5(string source) {
             throw new NotImplementedException("hashMd5 not implemented");
             //Return HashPasswordForStoringInConfigFile(source, "md5")
+        }
+        // todo implement taskId return value, create cp.task object to track task status
+        //====================================================================================================
+        /// <summary>
+        /// Install an addon collection file asynchonously. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
+        /// </summary>
+        /// <param name="privateFile"></param>
+        /// <returns></returns>
+        [Obsolete("Deprecated, use cp.addon methods.", true)]
+        public override int installCollectionFromFile(string privateFile) {
+            string ignore = "";
+            cp.Addon.InstallCollectionFile(privateFile, ref ignore);
+            return 0;
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Install all addon collections in a folder asynchonously. Optionally delete the folder. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
+        /// </summary>
+        /// <param name="privateFolder"></param>
+        /// <param name="deleteFolderWhenDone"></param>
+        /// <returns></returns>
+        [Obsolete("Deprecated, use cp.addon methods.", true)]
+        public override int installCollectionsFromFolder(string privateFolder, bool deleteFolderWhenDone) {
+            string ignore = "";
+            cp.Addon.InstallCollectionsFromFolder(privateFolder, deleteFolderWhenDone, ref ignore);
+            return 0;
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Install all addon collections in a folder asynchonously. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
+        /// </summary>
+        /// <param name="privateFolder"></param>
+        /// <returns></returns>
+        [Obsolete("Deprecated, use cp.addon methods.", true)]
+        public override int installCollectionsFromFolder(string privateFolder) {
+            string ignore = "";
+            cp.Addon.InstallCollectionsFromFolder(privateFolder, false, ref ignore);
+            return 0;
+        }
+        // todo implement taskId return value, create cp.task object to track task status
+        //====================================================================================================
+        /// <summary>
+        /// Install an addon collections from the collection library asynchonously. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
+        /// </summary>
+        [Obsolete("Deprecated, use cp.addon methods.", true)]
+        public override int installCollectionFromLibrary(string collectionGuid) {
+            string ignore = "";
+            cp.Addon.InstallCollectionFromLibrary(collectionGuid, ref ignore);
+            return 0;
+        }
+        // todo implement taskId return value, create cp.task object to track task status
+        //====================================================================================================
+        /// <summary>
+        /// Install an addon collections from an endpoint asynchonously. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
+        /// </summary>
+        /// <param name="privateFolder"></param>
+        /// <param name="deleteFolderWhenDone"></param>
+        /// <returns></returns>
+        [Obsolete("Deprecated, use cp.addon methods.", true)]
+        public override int installCollectionFromLink(string link) {
+            string ignore = "";
+            cp.Addon.InstallCollectionFromLink(link, ref ignore);
+            return 0;
         }
         //
         // dispose

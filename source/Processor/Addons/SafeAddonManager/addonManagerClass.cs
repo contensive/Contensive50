@@ -469,7 +469,7 @@ namespace Contensive.Addons.SafeAddonManager {
                             //
                             List<string> uploadedCollectionPathFilenames = new List<string>();
                             CollectionFilename = "";
-                            if (core.filePrivate.upload("MetaFile", InstallFolder, ref CollectionFilename)) {
+                            if (core.privateFiles.upload("MetaFile", InstallFolder, ref CollectionFilename)) {
                                 status += "<br>Uploaded collection file [" + CollectionFilename + "]";
                                 uploadedCollectionPathFilenames.Add(InstallFolder + CollectionFilename);
                                 AllowInstallFromFolder = true;
@@ -478,7 +478,7 @@ namespace Contensive.Addons.SafeAddonManager {
                             //todo  NOTE: The ending condition of VB 'For' loops is tested only on entry to the loop. Instant C# has created a temporary variable in order to use the initial value of core.docProperties.getInteger("UploadCount") for every iteration:
                             int tempVar = core.docProperties.getInteger("UploadCount");
                             for (Ptr = 0; Ptr < tempVar; Ptr++) {
-                                if (core.filePrivate.upload("Upload" + Ptr, InstallFolder, ref CollectionFilename)) {
+                                if (core.privateFiles.upload("Upload" + Ptr, InstallFolder, ref CollectionFilename)) {
                                     status += "<br>Uploaded collection file [" + CollectionFilename + "]";
                                     uploadedCollectionPathFilenames.Add(InstallFolder + CollectionFilename);
                                     AllowInstallFromFolder = true;
@@ -520,7 +520,7 @@ namespace Contensive.Addons.SafeAddonManager {
                         //
                         if (AllowInstallFromFolder) {
                             //InstallFolder = core.asv.config.physicalFilePath & InstallFolderName & "\"
-                            if (core.filePrivate.pathExists(privateFilesInstallPath)) {
+                            if (core.privateFiles.pathExists(privateFilesInstallPath)) {
                                 string logPrefix = "SafeModeAddonManager";
                                 UpgradeOK = CollectionController.installCollectionsFromPrivateFolder(core, privateFilesInstallPath, ref ErrorMessage, ref InstalledCollectionGuidList, false, true, ref nonCriticalErrorList, logPrefix, ref installedCollections, true);
                                 if (!UpgradeOK) {

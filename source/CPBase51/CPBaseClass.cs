@@ -115,7 +115,16 @@ namespace Contensive.BaseClasses {
         /// <value></value>
         /// <returns></returns>
         /// <remarks></remarks>
-        public abstract CPHtml5BaseClass Html { get; }
+        public abstract CPHtmlBaseClass Html { get; }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// The HTML class handles functions used to read and produce HTML elements. See CPHtmlBaseClass for more details.
+        /// </summary>
+        /// <value></value>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public abstract CPHtml5BaseClass Html5 { get; }
         //
         //====================================================================================================
         /// <summary>
@@ -214,28 +223,28 @@ namespace Contensive.BaseClasses {
         /// read and write cdn files, like content uploads. Sites with static front-ends may put static files here.
         /// </summary>
         /// <returns></returns>
-        public abstract CPFileSystemBaseClass FileCdn { get; }
+        public abstract CPFileSystemBaseClass CdnFiles { get; }
         //
         //====================================================================================================
         /// <summary>
         /// read and write files in the root folder of the application (appRoot, wwwRoot,htdocs,etc)
         /// </summary>
         /// <returns></returns>
-        public abstract CPFileSystemBaseClass FileAppRoot { get; }
+        public abstract CPFileSystemBaseClass WwwFiles { get; }
         //
         //====================================================================================================
         /// <summary>
         /// read and write files not available to the Internet
         /// </summary>
         /// <returns></returns>
-        public abstract CPFileSystemBaseClass FilePrivate { get; }
+        public abstract CPFileSystemBaseClass PrivateFiles { get; }
         //
         //====================================================================================================
         /// <summary>
         /// read and write files in a temporary location.
         /// </summary>
         /// <returns></returns>
-        public abstract CPFileSystemBaseClass FileTemp { get; }
+        public abstract CPFileSystemBaseClass TempFiles { get; }
         //
     }
 }

@@ -299,20 +299,6 @@ namespace Contensive.Processor {
         //
         //=========================================================================================================
         /// <summary>
-        /// expose object for managing content delivery files. This is a publically accessable location that holds content contributed. If remote file mode, this is an AWS S3 bucket
-        /// </summary>
-        public override CPFileSystemBaseClass FileCdn {
-            get {
-                if (_FileCdn == null) {
-                    _FileCdn = new CPFileSystemClass(this, core.fileCdn);
-                }
-                return _FileCdn;
-            }
-        }
-        private CPFileSystemClass _FileCdn;
-        //
-        //=========================================================================================================
-        /// <summary>
         /// expose object for managing cache. This cache designed to cache Db record objects and Domain Objects
         /// </summary>
         public override CPCacheBaseClass Cache {
@@ -427,15 +413,29 @@ namespace Contensive.Processor {
         /// <summary>
         /// Properties and methods helpful in creating html documents
         /// </summary>
-        public override CPHtml5BaseClass Html {
+        public override CPHtmlBaseClass Html {
             get {
                 if (_htmlObj == null) {
-                    _htmlObj = new CPHtml5Class(this);
+                    _htmlObj = new CPHtmlClass(this);
                 }
                 return _htmlObj;
             }
         }
-        private CPHtml5Class _htmlObj;
+        private CPHtmlClass _htmlObj;
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Properties and methods helpful in creating html documents
+        /// </summary>
+        public override CPHtml5BaseClass Html5 {
+            get {
+                if (_html5Obj == null) {
+                    _html5Obj = new CPHtml5Class(this);
+                }
+                return _html5Obj;
+            }
+        }
+        private CPHtml5Class _html5Obj;
         //
         [Obsolete("Deprecated. To access addon details of the addon running, create a model with the cp.addon.id",true)]
         public override CPAddonBaseClass MyAddon {
@@ -443,20 +443,6 @@ namespace Contensive.Processor {
                 return Addon;
             }
         }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Access to private files for the application. Private files are not available online.
-        /// </summary>
-        public override CPFileSystemBaseClass FilePrivate {
-            get {
-                if (_FilePrivate == null) {
-                    _FilePrivate = new CPFileSystemClass(this, core.filePrivate);
-                }
-                return _FilePrivate;
-            }
-        }
-        private CPFileSystemClass _FilePrivate;
         //
         //====================================================================================================
         /// <summary>
@@ -502,21 +488,6 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         /// <summary>
-        /// Temporary file storarge
-        /// </summary>
-        public override CPFileSystemBaseClass FileTemp {
-            get {
-                if (_FileTemp == null) {
-                    _FileTemp = new CPFileSystemClass(this, core.tempFiles);
-                }
-                return _FileTemp;
-            }
-        }
-        private CPFileSystemClass _FileTemp;
- 
-        //
-        //====================================================================================================
-        /// <summary>
         /// An object that provides basic methods helpful is application execute.
         /// </summary>
         public override CPUtilsBaseClass Utils {
@@ -559,19 +530,6 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         /// <summary>
-        /// A file object with access to the domain's primary web root files. This is typically where design files are stored, like styles sheets, js, etc.
-        /// </summary>
-        public override CPFileSystemBaseClass FileAppRoot {
-            get {
-                if (_FileAppRoot == null) {
-                    _FileAppRoot = new CPFileSystemClass(this, core.fileAppRoot);
-                }
-                return _FileAppRoot;
-            }
-        } private CPFileSystemClass _FileAppRoot;
-        //
-        //====================================================================================================
-        /// <summary>
         /// The route map is a dictionary of route names and route details that tell how to execute the route
         /// </summary>
         public RouteMapModel routeMap {
@@ -579,6 +537,62 @@ namespace Contensive.Processor {
                 return core.routeMap;
             }
         }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Temporary file storarge
+        /// </summary>
+        public override CPFileSystemBaseClass TempFiles {
+            get {
+                if (_FileTemp == null) {
+                    _FileTemp = new CPFileSystemClass(this, core.tempFiles);
+                }
+                return _FileTemp;
+            }
+        }
+        private CPFileSystemClass _FileTemp;
+        //
+        //====================================================================================================
+        /// <summary>
+        /// A file object with access to the domain's primary web root files. This is typically where design files are stored, like styles sheets, js, etc.
+        /// </summary>
+        public override CPFileSystemBaseClass WwwFiles {
+            get {
+                if (_FileAppRoot == null) {
+                    _FileAppRoot = new CPFileSystemClass(this, core.wwwfiles);
+                }
+                return _FileAppRoot;
+            }
+        }
+        private CPFileSystemClass _FileAppRoot;
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Access to private files for the application. Private files are not available online.
+        /// </summary>
+        public override CPFileSystemBaseClass PrivateFiles {
+            get {
+                if (_PrivateFiles == null) {
+                    _PrivateFiles = new CPFileSystemClass(this, core.privateFiles);
+                }
+                return _PrivateFiles;
+            }
+        }
+        private CPFileSystemClass _PrivateFiles;
+        //
+        //=========================================================================================================
+        /// <summary>
+        /// expose object for managing content delivery files. This is a publically accessable location that holds content contributed. If remote file mode, this is an AWS S3 bucket
+        /// </summary>
+        public override CPFileSystemBaseClass CdnFiles {
+            get {
+                if (_CdnFiles == null) {
+                    _CdnFiles = new CPFileSystemClass(this, core.cdnFiles);
+                }
+                return _CdnFiles;
+            }
+        }
+        private CPFileSystemClass _CdnFiles;
         //
         //=========================================================================================================
         // deprecated
@@ -683,14 +697,14 @@ namespace Contensive.Processor {
                     if (_visitorObj != null) {
                         _visitorObj.Dispose();
                     }
-                    if (_FileCdn != null) {
-                        _FileCdn.Dispose();
+                    if (_CdnFiles != null) {
+                        _CdnFiles.Dispose();
                     }
                     if (_FileAppRoot != null) {
                         _FileAppRoot.Dispose();
                     }
-                    if (_FilePrivate != null) {
-                        _FilePrivate.Dispose();
+                    if (_PrivateFiles != null) {
+                        _PrivateFiles.Dispose();
                     }
                     if (core != null) {
                         core.Dispose();

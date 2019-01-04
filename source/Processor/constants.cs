@@ -41,10 +41,22 @@ namespace Contensive.Processor {
         //
         internal const int codeVersion = 0;
         //
-        // -- cache names
+        //========================================================================
+        // Sql/Db
+        //
+        internal const string SQLTrue = "1";
+        internal const string SQLFalse = "0";
+        //
+        internal const int sqlPageSizeDefault = 9999;
+        //
+        //========================================================================
+        // cache names
+        //
         internal const string cacheObject_addonCache = "addonCache";
         //
-        // -- symbols 
+        //========================================================================
+        // html
+        //
         public const string iconNotAvailable = "<i title=\"not available\" class=\"fas fa-ban\"></i>";
         public const string iconExpand = "<i title=\"expand\" class=\"fas fa-chevron-circle-up\"></i>";
         public const string iconContract = "<i title=\"contract\" class=\"fas fa-chevron-circle-down\"></i>";
@@ -68,11 +80,6 @@ namespace Contensive.Processor {
         public const string iconOpen_White = "<span style=\"color:#fff\">" + iconOpen + "</span>";
         public const string iconGrip = "<i title=\"paste content\" class=\"fas fa-grip-horizontal\"></i>";
         public const string iconContentPaste_Green = "<span style=\"color:#0c0\">" + iconContentPaste + "</span>";
-        //
-        /// <summary>
-        /// deprecated. legacy was "/" and it was used in path in front of path. Path now includes a leading slash
-        /// </summary>
-        internal const string appRootPath = "";
         //
         // -- buttons
         internal const string ButtonCreateFields = " Create Fields ";
@@ -1215,13 +1222,6 @@ namespace Contensive.Processor {
         [System.Runtime.InteropServices.DllImport("kernel32", EntryPoint = "GetCurrentProcessId", ExactSpelling = true, CharSet = System.Runtime.InteropServices.CharSet.Ansi, SetLastError = true)]
         public static extern int getCurrentProcessId();
         //
-        //========================================================================
-        //   Declarations for SetPiorityClass
-        //========================================================================
-        //
-        internal const string SQLTrue = "1";
-        internal const string SQLFalse = "0";
-        //
         public static readonly DateTime dateMinValue = new DateTime(1899, 12, 30);
         //
         internal const string kmaEndTable = "</table >";
@@ -1347,6 +1347,12 @@ namespace Contensive.Processor {
             public string content; // the description, title, etc.
             public string addedByMessage; // message used during debug to show where the asset came from
         }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// deprecated. legacy was "/" and it was used in path in front of path. Path now includes a leading slash
+        /// </summary>
+        internal const string appRootPath = "";
     }
 
     //

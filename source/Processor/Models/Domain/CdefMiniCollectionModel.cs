@@ -872,7 +872,7 @@ namespace Contensive.Processor.Models.Domain {
                 //----------------------------------------------------------------------------------------------------------------------
                 //
                 if (Collection.styleCnt > 0) {
-                    string SiteStyles = core.fileCdn.readFileText("templates/styles.css");
+                    string SiteStyles = core.cdnFiles.readFileText("templates/styles.css");
                     string[] SiteStyleSplit = { };
                     int SiteStyleCnt = 0;
                     if (!string.IsNullOrEmpty(SiteStyles.Trim(' '))) {
@@ -934,7 +934,7 @@ namespace Contensive.Processor.Models.Domain {
                             + "\r\nStyles added " + DateTime.Now + "\r\n*/"
                             + "\r\n" + StyleSheetAdd;
                     }
-                    core.fileAppRoot.saveFile("templates/styles.css", SiteStyles);
+                    core.wwwfiles.saveFile("templates/styles.css", SiteStyles);
                     //
                     // -- Update stylesheet cache
                     core.siteProperties.setProperty("StylesheetSerialNumber", "-1");

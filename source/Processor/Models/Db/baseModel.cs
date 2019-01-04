@@ -115,7 +115,7 @@ namespace Contensive.Processor.Models.Db {
                         // todo if internalcore is not set, throw an error
                         if ((!string.IsNullOrEmpty(filename)) && (internalcore != null)) {
                             contentLoaded = true;
-                            _content = internalcore.fileCdn.readFileText(filename);
+                            _content = internalcore.cdnFiles.readFileText(filename);
                         }
                     }
                     return _content;
@@ -847,14 +847,14 @@ namespace Contensive.Processor.Models.Db {
                                             //
                                             // -- empty content and valid filename, delete the file and clear the filename
                                             sqlPairs.add(instanceProperty.Name, "");
-                                            core.fileCdn.deleteFile(filename);
+                                            core.cdnFiles.deleteFile(filename);
                                         } else {
                                             //
                                             // -- save content
                                             if (string.IsNullOrEmpty(filename)) {
                                                 filename = FileController.getVirtualRecordUnixPathFilename(tableName, instanceProperty.Name.ToLowerInvariant(), id, fieldTypeId);
                                             }
-                                            core.fileCdn.saveFile(filename, content);
+                                            core.cdnFiles.saveFile(filename, content);
                                             sqlPairs.add(instanceProperty.Name, DbController.encodeSQLText(filename));
                                         }
                                     }

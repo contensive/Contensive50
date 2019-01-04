@@ -2523,7 +2523,7 @@ namespace Contensive.Addons.Tools {
                     // Return the content of the file
                     //
                     core.webServer.setResponseContentType("text/text");
-                    result = core.fileAppRoot.readFileText(core.docProperties.getText("SourceFile"));
+                    result = core.wwwfiles.readFileText(core.docProperties.getText("SourceFile"));
                     core.doc.continueProcessing = false;
                 } else {
                     result += GetTableStart;
@@ -2539,7 +2539,7 @@ namespace Contensive.Addons.Tools {
                     // Sub-Folders
                     //
 
-                    SourceFolders = core.fileAppRoot.getFolderNameList(StartPath + CurrentPath);
+                    SourceFolders = core.wwwfiles.getFolderNameList(StartPath + CurrentPath);
                     if (!string.IsNullOrEmpty(SourceFolders)) {
                         FolderSplit = SourceFolders.Split(new[] { "\r\n" }, StringSplitOptions.None);
                         FolderCount = FolderSplit.GetUpperBound(0) + 1;
@@ -2557,7 +2557,7 @@ namespace Contensive.Addons.Tools {
                     //
                     // Files
                     //
-                    SourceFolders = UpgradeController.Upgrade51ConvertFileInfoArrayToParseString(core.fileAppRoot.getFileList(StartPath + CurrentPath));
+                    SourceFolders = UpgradeController.Upgrade51ConvertFileInfoArrayToParseString(core.wwwfiles.getFileList(StartPath + CurrentPath));
                     if (string.IsNullOrEmpty(SourceFolders)) {
                         FileSize = "";
                         FileDate = "";

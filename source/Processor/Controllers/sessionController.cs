@@ -369,7 +369,7 @@ namespace Contensive.Processor.Controllers {
                                     string botFileContent = core.cache.getObject<string>("DefaultBotNameList");
                                     if (string.IsNullOrEmpty(botFileContent)) {
                                         string Filename = "config\\VisitNameList.txt";
-                                        botFileContent = core.filePrivate.readFileText(Filename);
+                                        botFileContent = core.privateFiles.readFileText(Filename);
                                         if (string.IsNullOrEmpty(botFileContent)) {
                                             botFileContent = ""
                                                 + "\r\n//"
@@ -392,7 +392,7 @@ namespace Contensive.Processor.Controllers {
                                                 + "\r\nUnknown Bot\trobot\t\tr"
                                                 + "\r\nUnknown Bot\tcrawl\t\tr"
                                                 + "";
-                                            core.filePrivate.saveFile(Filename, botFileContent);
+                                            core.privateFiles.saveFile(Filename, botFileContent);
                                         }
                                         core.cache.storeObject("DefaultBotNameList", botFileContent, DateTime.Now.AddHours(1), new List<string>());
                                     }

@@ -6,7 +6,7 @@ using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 
 namespace Contensive.Processor {
-    public class CPHtmlClass: BaseClasses.CPHtmlBaseClass, IDisposable {
+    public class CPHtmlClass: CPHtmlBaseClass, IDisposable {
         //
         #region COM GUIDs
         public const string ClassId = "637E3815-0DA6-4672-84E9-A319D85F2101";
@@ -346,12 +346,12 @@ namespace Contensive.Processor {
         //
         public override void ProcessInputFile(string htmlName, string VirtualFilePath) {
             string ignoreFilename = "";
-            cp.core.fileCdn.upload(htmlName, VirtualFilePath, ref ignoreFilename);
+            cp.core.cdnFiles.upload(htmlName, VirtualFilePath, ref ignoreFilename);
         }
         //
         public override void ProcessInputFile(string htmlName) {
             string ignoreFilename = "";
-            cp.core.fileCdn.upload(htmlName, "upload", ref ignoreFilename);
+            cp.core.cdnFiles.upload(htmlName, "upload", ref ignoreFilename);
         }
 
         //

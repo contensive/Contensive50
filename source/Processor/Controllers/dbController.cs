@@ -219,7 +219,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public DataTable executeQuery(string sql, int startRecord) {
             int tempVar = 0;
-            return executeQuery(sql, startRecord, 9999, ref tempVar);
+            return executeQuery(sql, startRecord, Constants.sqlPageSizeDefault, ref tempVar);
         }
         //
         //====================================================================================================
@@ -230,7 +230,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public DataTable executeQuery(string sql) {
             int tempVar = 0;
-            return executeQuery(sql, 0, 9999, ref tempVar);
+            return executeQuery(sql, 0, Constants.sqlPageSizeDefault, ref tempVar);
         }
         //
         //====================================================================================================

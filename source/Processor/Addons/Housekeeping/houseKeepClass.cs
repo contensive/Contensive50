@@ -1066,7 +1066,7 @@ namespace Contensive.Addons.Housekeeping {
                             string FieldName = csData.getText("FieldName");
                             string TableName = csData.getText("TableName");
                             string PathName = TableName + "\\" + FieldName;
-                            List<CPFileSystemBaseClass.FileDetail> FileList = core.fileCdn.getFileList(PathName);
+                            List<CPFileSystemBaseClass.FileDetail> FileList = core.cdnFiles.getFileList(PathName);
                             if (FileList.Count > 0) {
                                 core.db.executeQuery("CREATE INDEX temp" + FieldName + " ON " + TableName + " (" + FieldName + ")");
                                 foreach (CPFileSystemBaseClass.FileDetail file in FileList) {
@@ -1077,12 +1077,12 @@ namespace Contensive.Addons.Housekeeping {
                                     if (FileSize == 0) {
                                         sql = "update " + TableName + " set " + FieldName + "=null where (" + FieldName + "=" + DbController.encodeSQLText(VirtualFileName) + ")or(" + FieldName + "=" + DbController.encodeSQLText(VirtualLink) + ")";
                                         core.db.executeQuery(sql);
-                                        core.fileCdn.deleteFile(VirtualFileName);
+                                        core.cdnFiles.deleteFile(VirtualFileName);
                                     } else {
                                         using (var csTest = new CsModel(core)) {
                                             sql = "SELECT ID FROM " + TableName + " WHERE (" + FieldName + "=" + DbController.encodeSQLText(VirtualFileName) + ")or(" + FieldName + "=" + DbController.encodeSQLText(VirtualLink) + ")";
                                             if (!csTest.openSql(sql)) {
-                                                core.fileCdn.deleteFile(VirtualFileName);
+                                                core.cdnFiles.deleteFile(VirtualFileName);
                                             }
                                         }
                                     }
@@ -1493,10 +1493,10 @@ namespace Contensive.Addons.Housekeeping {
         private void HouseKeep_App_Daily_LogFolder(CoreController core, string FolderName, DateTime LastMonth) {
             try {
                 logHousekeeping(core, "Deleting files from folder [" + FolderName + "] older than " + LastMonth);
-                List<CPFileSystemBaseClass.FileDetail> FileList = core.filePrivate.getFileList(FolderName);
+                List<CPFileSystemBaseClass.FileDetail> FileList = core.privateFiles.getFileList(FolderName);
                 foreach (CPFileSystemBaseClass.FileDetail file in FileList) {
                     if (file.DateCreated < LastMonth) {
-                        core.filePrivate.deleteFile(FolderName + "/" + file.Name);
+                        core.privateFiles.deleteFile(FolderName + "/" + file.Name);
                     }
                 }
                 return;
@@ -1526,18 +1526,18 @@ namespace Contensive.Addons.Housekeeping {
                             case "mastervisitnamelist":
                                 //
                                 // Read in the interfaces and save to Add-ons
-                                core.filePrivate.saveFile("config\\VisitNameList.txt", Copy);
+                                core.privateFiles.saveFile("config\\VisitNameList.txt", Copy);
                                 break;
                             case "masteremailbouncefilters":
                                 //
                                 // save the updated filters file
-                                core.filePrivate.saveFile("config\\EmailBounceFilters.txt", Copy);
+                                core.privateFiles.saveFile("config\\EmailBounceFilters.txt", Copy);
                                 break;
                             case "mastermobilebrowserlist":
                                 //
                                 // save the updated filters file
                                 //
-                                core.filePrivate.saveFile("config\\MobileBrowserList.txt", Copy);
+                                core.privateFiles.saveFile("config\\MobileBrowserList.txt", Copy);
                                 break;
                         }
                     }
@@ -1799,7 +1799,7 @@ namespace Contensive.Addons.Housekeeping {
                 bool loadOK = true;
                 try {
                     collectionFileFilename = core.addon.getPrivateFilesAddonPath() + "Collections.xml";
-                    string collectionFileContent = core.filePrivate.readFileText(collectionFileFilename);
+                    string collectionFileContent = core.privateFiles.readFileText(collectionFileFilename);
                     Doc.LoadXml(collectionFileContent);
                 } catch (Exception) {
                     logHousekeeping(core, "RegisterAddonFolder, Hint=[" + hint + "], Error loading Collections.xml file.");
@@ -1874,8 +1874,8 @@ namespace Contensive.Addons.Housekeeping {
                                         CollectionRootPath = CollectionRootPath.Left(Pos - 1);
                                         Path = core.addon.getPrivateFilesAddonPath() + "\\" + CollectionRootPath + "\\";
                                         List<FolderDetail> FolderList = new List<FolderDetail>();
-                                        if (core.filePrivate.pathExists(Path)) {
-                                            FolderList = core.filePrivate.getFolderList(Path);
+                                        if (core.privateFiles.pathExists(Path)) {
+                                            FolderList = core.privateFiles.getFolderList(Path);
                                         }
                                         if (FolderList.Count == 0) {
                                             //
@@ -1931,7 +1931,7 @@ namespace Contensive.Addons.Housekeeping {
                                                     } else {
                                                         if (FolderPtr < (FolderList.Count - 3)) {
                                                             logHousekeeping(core, "....Deleting path because non-active and not one of the newest 2 [" + Path + dir.Name + "]");
-                                                            core.filePrivate.deleteFolder(Path + dir.Name);
+                                                            core.privateFiles.deleteFolder(Path + dir.Name);
                                                         }
                                                     }
                                                 }

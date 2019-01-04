@@ -186,7 +186,7 @@ namespace Contensive.Processor {
                                         if (!string.IsNullOrEmpty(SourceFilename)) {
                                             string DestFilename = destination.getFieldFilename(field.nameLc, "", destination.contentName, field.fieldTypeId);
                                             destination.set(field.nameLc, DestFilename);
-                                            core.fileCdn.copyFile(SourceFilename, DestFilename);
+                                            core.cdnFiles.copyFile(SourceFilename, DestFilename);
                                         }
                                     }
                                     break;
@@ -199,7 +199,7 @@ namespace Contensive.Processor {
                                         if (!string.IsNullOrEmpty(SourceFilename)) {
                                             string DestFilename = destination.getFieldFilename(field.nameLc, "", destination.contentName, field.fieldTypeId);
                                             destination.set(field.nameLc, DestFilename);
-                                            core.filePrivate.copyFile(SourceFilename, DestFilename);
+                                            core.privateFiles.copyFile(SourceFilename, DestFilename);
                                         }
                                     }
                                     break;
@@ -243,7 +243,7 @@ namespace Contensive.Processor {
                                     //
                                     // cdn file
                                     string Filename = getRawData(field.nameLc);
-                                    if (!string.IsNullOrEmpty(Filename)) { core.fileCdn.deleteFile(Filename); }
+                                    if (!string.IsNullOrEmpty(Filename)) { core.cdnFiles.deleteFile(Filename); }
                                     break;
                                 }
                             case Constants._fieldTypeIdFileText:
@@ -251,7 +251,7 @@ namespace Contensive.Processor {
                                     //
                                     // private file
                                     string Filename = getRawData(field.nameLc);
-                                    if (!string.IsNullOrEmpty(Filename)) { core.filePrivate.deleteFile(Filename); }
+                                    if (!string.IsNullOrEmpty(Filename)) { core.privateFiles.deleteFile(Filename); }
                                     break;
                                 }
                         }
@@ -840,15 +840,15 @@ namespace Contensive.Processor {
                     //
                     // Filename changed, mark record changed
                     //
-                    core.fileCdn.saveFile(Filename, copy);
+                    core.cdnFiles.saveFile(Filename, copy);
                     set(fieldName, Filename);
                 } else {
-                    string OldCopy = core.fileCdn.readFileText(Filename);
+                    string OldCopy = core.cdnFiles.readFileText(Filename);
                     if (OldCopy != copy) {
                         //
                         // copy changed, mark record changed
                         //
-                        core.fileCdn.saveFile(Filename, copy);
+                        core.cdnFiles.saveFile(Filename, copy);
                         set(fieldName, Filename);
                     }
                 }
@@ -997,7 +997,7 @@ namespace Contensive.Processor {
                     case Constants._fieldTypeIdFileJavascript:
                         //
                         // -- cdn file
-                        return core.fileCdn.readFileText(GenericController.encodeText(rawData));
+                        return core.cdnFiles.readFileText(GenericController.encodeText(rawData));
                     case Constants._fieldTypeIdText:
                     case Constants._fieldTypeIdLongText:
                     case Constants._fieldTypeIdHTML:
@@ -1108,7 +1108,7 @@ namespace Contensive.Processor {
                         BlankTest = GenericController.vbReplace(BlankTest, "\t", "");
                         if (string.IsNullOrEmpty(BlankTest)) {
                             if (!string.IsNullOrEmpty(PathFilename)) {
-                                core.fileCdn.deleteFile(PathFilename);
+                                core.cdnFiles.deleteFile(PathFilename);
                                 PathFilename = "";
                             }
                         } else {
@@ -1153,9 +1153,9 @@ namespace Contensive.Processor {
                             }
                             if ((!string.IsNullOrEmpty(pathFilenameOriginal)) && (pathFilenameOriginal != PathFilename)) {
                                 pathFilenameOriginal = GenericController.convertCdnUrlToCdnPathFilename(pathFilenameOriginal);
-                                core.fileCdn.deleteFile(pathFilenameOriginal);
+                                core.cdnFiles.deleteFile(pathFilenameOriginal);
                             }
-                            core.fileCdn.saveFile(PathFilename, rawValueForDb);
+                            core.cdnFiles.saveFile(PathFilename, rawValueForDb);
                         }
                         rawValueForDb = PathFilename;
                         SetNeeded = true;
@@ -1570,16 +1570,16 @@ namespace Contensive.Processor {
             => openGroupUsers(groupList, sqlCriteria, sortFieldList, activeOnly, pageSize, 1);
         //
         public bool openGroupUsers(List<string> groupList, string sqlCriteria, string sortFieldList, bool activeOnly)
-            => openGroupUsers(groupList, sqlCriteria, sortFieldList, activeOnly, 9999, 1);
+            => openGroupUsers(groupList, sqlCriteria, sortFieldList, activeOnly, Constants.sqlPageSizeDefault, 1);
         //
         public bool openGroupUsers(List<string> groupList, string sqlCriteria, string sortFieldList)
-            => openGroupUsers(groupList, sqlCriteria, sortFieldList, true, 9999, 1);
+            => openGroupUsers(groupList, sqlCriteria, sortFieldList, true, Constants.sqlPageSizeDefault, 1);
         //
         public bool openGroupUsers(List<string> groupList, string sqlCriteria)
-            => openGroupUsers(groupList, sqlCriteria, "", true, 9999, 1);
+            => openGroupUsers(groupList, sqlCriteria, "", true, Constants.sqlPageSizeDefault, 1);
         //
         public bool openGroupUsers(List<string> groupList)
-            => openGroupUsers(groupList, "", "", true, 9999, 1);
+            => openGroupUsers(groupList, "", "", true, Constants.sqlPageSizeDefault, 1);
         //
         //========================================================================
         /// <summary>
@@ -1682,7 +1682,7 @@ namespace Contensive.Processor {
                             set(FieldName, Path);
                             Path = GenericController.vbReplace(Path, "\\", "/");
                             Path = GenericController.vbReplace(Path, "/" + Filename, "");
-                            core.fileCdn.upload(LocalRequestName, Path, ref Filename);
+                            core.cdnFiles.upload(LocalRequestName, Path, ref Filename);
                         }
                         break;
                     default:
@@ -1813,13 +1813,13 @@ namespace Contensive.Processor {
             => openContentWatchList(core, listName, sortFieldList, activeOnly, pageSize, 1);
         //
         public bool openContentWatchList(CoreController core, string listName, string sortFieldList, bool activeOnly)
-            => openContentWatchList(core, listName, sortFieldList, activeOnly, 1000, 1);
+            => openContentWatchList(core, listName, sortFieldList, activeOnly, Constants.sqlPageSizeDefault, 1);
         //
         public bool openContentWatchList(CoreController core, string listName, string sortFieldList)
-            => openContentWatchList(core, listName, sortFieldList, true, 1000, 1);
+            => openContentWatchList(core, listName, sortFieldList, true, Constants.sqlPageSizeDefault, 1);
         //
         public bool openContentWatchList(CoreController core, string listName)
-            => openContentWatchList(core, listName, "", true, 1000, 1);
+            => openContentWatchList(core, listName, "", true, Constants.sqlPageSizeDefault, 1);
         //
         //========================================================================
         //
@@ -1925,25 +1925,25 @@ namespace Contensive.Processor {
         }
         //
         public bool open(string contentName, string sqlCriteria, string sqlOrderBy, bool activeOnly, int memberId)
-            => open(contentName, sqlCriteria, sqlOrderBy, activeOnly, memberId, "", 9999, 1);
+            => open(contentName, sqlCriteria, sqlOrderBy, activeOnly, memberId, "", Constants.sqlPageSizeDefault, 1);
         //
         public bool open(string contentName, string sqlCriteria, string sqlOrderBy, bool activeOnly, int memberId, string sqlSelectFieldList, int PageSize)
             => open(contentName, sqlCriteria, sqlOrderBy, activeOnly, memberId, sqlSelectFieldList, PageSize, 1);
         //
         public bool open(string contentName, string sqlCriteria, string sqlOrderBy, bool activeOnly, int memberId, string sqlSelectFieldList)
-            => open(contentName, sqlCriteria, sqlOrderBy, activeOnly, memberId, sqlSelectFieldList, 9999, 1);
+            => open(contentName, sqlCriteria, sqlOrderBy, activeOnly, memberId, sqlSelectFieldList, Constants.sqlPageSizeDefault, 1);
         //
         public bool open(string contentName, string sqlCriteria, string sqlOrderBy, bool activeOnly)
-            => open(contentName, sqlCriteria, sqlOrderBy, activeOnly, 0, "", 9999, 1);
+            => open(contentName, sqlCriteria, sqlOrderBy, activeOnly, 0, "", Constants.sqlPageSizeDefault, 1);
         //
         public bool open(string contentName, string sqlCriteria, string sqlOrderBy)
-            => open(contentName, sqlCriteria, sqlOrderBy, true, 0, "", 9999, 1);
+            => open(contentName, sqlCriteria, sqlOrderBy, true, 0, "", Constants.sqlPageSizeDefault, 1);
         //
         public bool open(string contentName, string sqlCriteria)
-            => open(contentName, sqlCriteria, "", true, 0, "", 9999, 1);
+            => open(contentName, sqlCriteria, "", true, 0, "", Constants.sqlPageSizeDefault, 1);
         //
         public bool open(string contentName)
-            => open(contentName, "", "", true, 0, "", 9999, 1);
+            => open(contentName, "", "", true, 0, "", Constants.sqlPageSizeDefault, 1);
         //
         //========================================================================
         /// <summary>
@@ -1979,9 +1979,9 @@ namespace Contensive.Processor {
         //
         public bool openSql(string sql, string dataSourceName, int pageSize) => openSql(sql, dataSourceName, pageSize, 1);
         //
-        public bool openSql(string sql, string dataSourceName) => openSql(sql, dataSourceName, 9999, 1);
+        public bool openSql(string sql, string dataSourceName) => openSql(sql, dataSourceName, Constants.sqlPageSizeDefault, 1);
         //
-        public bool openSql(string sql) => openSql(sql, "default", 9999, 1);
+        public bool openSql(string sql) => openSql(sql, "default", Constants.sqlPageSizeDefault, 1);
         //
         //========================================================================
         // Dispose

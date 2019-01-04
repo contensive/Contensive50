@@ -31,7 +31,7 @@ namespace Contensive.Addons.Primitives {
                     //
                     // Save the site sites
                     //
-                    core.fileAppRoot.saveFile(DynamicStylesFilename, core.docProperties.getText("SiteStyles"));
+                    core.wwwfiles.saveFile(DynamicStylesFilename, core.docProperties.getText("SiteStyles"));
                     if (core.docProperties.getBoolean(RequestNameInlineStyles)) {
                         //
                         // Inline Styles

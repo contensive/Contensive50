@@ -698,7 +698,7 @@ namespace Contensive.Processor.Controllers {
                                         }
                                     }
                                     if (!string.IsNullOrEmpty(ArgName)) {
-                                        CmdAccumulator = core.fileAppRoot.readFileText(ArgName);
+                                        CmdAccumulator = core.wwwfiles.readFileText(ArgName);
                                     }
                                     break;
                                 }

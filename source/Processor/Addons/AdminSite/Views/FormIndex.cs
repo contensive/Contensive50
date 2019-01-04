@@ -1868,7 +1868,7 @@ namespace Contensive.Addons.AdminSite {
                         // rw( "n/a" )
                         Filename = csData.getText(field.nameLc);
                         if (!string.IsNullOrEmpty(Filename)) {
-                            string Copy = core.fileCdn.readFileText(Filename);
+                            string Copy = core.cdnFiles.readFileText(Filename);
                             Stream.Add(Copy);
                         }
                         break;

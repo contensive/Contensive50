@@ -43,7 +43,7 @@ namespace Contensive.Addons.Tools {
                     SQLFilename = "SQLArchive" + core.session.user.id.ToString("000000000") + ".txt";
                     core.userProperty.setProperty("SQLArchive", SQLFilename);
                 }
-                string SQLArchive = core.fileCdn.readFileText(SQLFilename);
+                string SQLArchive = core.cdnFiles.readFileText(SQLFilename);
                 //
                 // Read in arguments if available
                 //
@@ -82,7 +82,7 @@ namespace Contensive.Addons.Tools {
                                 SQLArchive += line + "\r\n";
                             }
                         }
-                        core.fileCdn.saveFile(SQLFilename, SQLArchive);
+                        core.cdnFiles.saveFile(SQLFilename, SQLArchive);
                     }
                     //
                     // Run the SQL

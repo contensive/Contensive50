@@ -198,7 +198,7 @@ namespace Contensive.Processor.Controllers {
                             if (core.appConfig != null) {
                                 //
                                 // -- use app log space
-                                fileSystem = core.filePrivate;
+                                fileSystem = core.privateFiles;
                             }
                         }
                         //

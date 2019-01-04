@@ -216,21 +216,21 @@ namespace Contensive.Processor {
         [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", true)]
         public override string PhysicalFilePath {
             get {
-                return cp.core.fileCdn.localAbsRootPath;
+                return cp.core.cdnFiles.localAbsRootPath;
             }
         }
         //
         [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", true)]
         public override string PhysicalInstallPath {
             get {
-                return cp.core.filePrivate.localAbsRootPath;
+                return cp.core.privateFiles.localAbsRootPath;
             }
         }
         //
         [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", true)]
         public override string PhysicalWWWPath {
             get {
-                return cp.core.fileAppRoot.localAbsRootPath;
+                return cp.core.wwwfiles.localAbsRootPath;
             }
         }
         //

@@ -1444,7 +1444,7 @@ namespace Contensive.Addons.AdminSite {
                                                     string unixPathFilename = csData.getFieldFilename(fieldName, filename);
                                                     string dosPathFilename = GenericController.convertToDosSlash(unixPathFilename);
                                                     string dosPath = GenericController.getPath(dosPathFilename);
-                                                    cp.core.fileCdn.upload(fieldName, dosPath, ref filename);
+                                                    cp.core.cdnFiles.upload(fieldName, dosPath, ref filename);
                                                     csData.set(fieldName, unixPathFilename);
                                                     recordChanged = true;
                                                     fieldChanged = true;
@@ -1961,7 +1961,7 @@ namespace Contensive.Addons.AdminSite {
                                 case ButtonOK:
                                     //
                                     cp.core.siteProperties.setProperty("Allow CSS Reset", cp.core.docProperties.getBoolean(RequestNameAllowCSSReset));
-                                    cp.core.fileCdn.saveFile(DynamicStylesFilename, cp.core.docProperties.getText("StyleEditor"));
+                                    cp.core.cdnFiles.saveFile(DynamicStylesFilename, cp.core.docProperties.getText("StyleEditor"));
                                     if (cp.core.docProperties.getBoolean(RequestNameInlineStyles)) {
                                         //
                                         // Inline Styles
@@ -1989,13 +1989,13 @@ namespace Contensive.Addons.AdminSite {
                                     // delete all templateid based editorstylerule files, build on-demand
                                     //
                                     EditorStyleRulesFilename = GenericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", "0", 1, 99, 1);
-                                    cp.core.fileCdn.deleteFile(EditorStyleRulesFilename);
+                                    cp.core.cdnFiles.deleteFile(EditorStyleRulesFilename);
                                     //
                                     using (var csData = new CsModel(cp.core)) {
                                         csData.openSql("select id from cctemplates");
                                         while (csData.ok()) {
                                             EditorStyleRulesFilename = GenericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", csData.getText("ID"), 1, 99, 1);
-                                            cp.core.fileCdn.deleteFile(EditorStyleRulesFilename);
+                                            cp.core.cdnFiles.deleteFile(EditorStyleRulesFilename);
                                             csData.goNext();
                                         }
                                         csData.close();
@@ -2160,7 +2160,7 @@ namespace Contensive.Addons.AdminSite {
                             SaveContentTracking(cp, adminData);
                             //
                             EditorStyleRulesFilename = GenericController.vbReplace(EditorStyleRulesFilenamePattern, "$templateid$", editRecord.id.ToString(), 1, 99, 1);
-                            cp.core.filePrivate.deleteFile(EditorStyleRulesFilename);
+                            cp.core.privateFiles.deleteFile(EditorStyleRulesFilename);
                             //Case "CCSHAREDSTYLES"
                             //    '
                             //    ' save and clear editorstylerules for any template

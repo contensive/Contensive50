@@ -845,7 +845,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 appendUpgradeLogAddStep(core, core.appConfig.name, "VerifyCountries", "Verify Countries");
                 //
-                string list = core.fileAppRoot.readFileText("cclib\\config\\DefaultCountryList.txt");
+                string list = core.wwwfiles.readFileText("cclib\\config\\DefaultCountryList.txt");
                 string[] rows  = GenericController.stringSplit(list, "\r\n");
                 foreach( var row in rows) {
                     if (!string.IsNullOrEmpty(row)) {
