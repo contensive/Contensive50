@@ -97,7 +97,7 @@ function CheckInputs(TargetID, SetValue) {
     var e, ptr;
     e = document.getElementsByTagName('input');
     for (ptr = 0; ptr < e.length; ptr++) {
-        if (e[ptr].id == TargetID) { e[ptr].checked = SetValue }
+        if (e[ptr].id === TargetID) { e[ptr].checked = SetValue }
     }
 }
 //
@@ -105,7 +105,7 @@ function CheckInputs(TargetID, SetValue) {
 //
 function SetFieldName(FieldName) {
     console.log("base.SetFieldName");
-    document.all['fn'].value = FieldName; return true;
+    document.all["fn"].value = FieldName; return true;
 }
 //
 // ----- hide select menus
@@ -123,7 +123,7 @@ function hideselect(hiddenIn) {
     }
     // Hide MS Selects
     if (browser.isIE) {
-        //alert('ie');
+        //alert("ie");
         objs = document.getElementsByTagName("SELECT");
         for (i = 0; i < objs.length; i++) {
             if (selectsHidden && menuClicks == 0) {
@@ -142,15 +142,15 @@ function hideselect(hiddenIn) {
                 var p = objs[i].getElementsByTagName("param");
                 for (pi = 0; pi < p.length; pi++) {
                     paramName = p[pi].name.toLowerCase();
-                    if (paramName == 'wmode') {
+                    if (paramName == "wmode") {
                         wmode = p[pi].value;
                         if (wmode) {
                             wmode = wmode.toLowerCase();
-                            if (wmode == 'opaque') {
+                            if (wmode == "opaque") {
                                 // it hides itself
-                            } else if (wmode == 'transparent') {
+                            } else if (wmode == "transparent") {
                                 // it hides itself
-                            } else if (wmode == 'window') {
+                            } else if (wmode == "window") {
                                 // it hides itself
                                 objs[i].style.visibility = "hidden";
                             } else {
@@ -172,11 +172,11 @@ function hideselect(hiddenIn) {
                 if (wmode) {
                     wmode = wmode.toLowerCase();
                 }
-                if (wmode == 'opaque') {
+                if (wmode == "opaque") {
                     // it hides itself
-                } else if (wmode == 'transparent') {
+                } else if (wmode == "transparent") {
                     // it hides itself
-                } else if (wmode == 'window') {
+                } else if (wmode == "window") {
                     // it hides itself
                 } else {
                     objs[i].style.visibility = "hidden";
@@ -319,11 +319,11 @@ function ccFlyoutButtonClick(event, menuId, position, StyleSheetPrefix, OpenOnHo
     } else {
         button = event.currentTarget;
     }
-    if (button.tagName != 'A') {
-        button = getContainer(button, 'A')
+    if (button.tagName != "A") {
+        button = getContainer(button, "A")
         if (button == null) { return false; }
     }
-    if (menuId == '') { return false; }
+    if (menuId == "") { return false; }
     width = document.body.scrollWidth;
     height = document.body.scrollHeight;
     button.blur();
@@ -336,7 +336,7 @@ function ccFlyoutButtonClick(event, menuId, position, StyleSheetPrefix, OpenOnHo
         resetButton(activeButton);
     if (button != activeButton || updated == 1) {
         updated = 0;
-        // Update the button's style so it looks down
+        // Update the button"s style so it looks down
         if (clickButton != 2) {
             button.className += " kmaMenuDown " + StyleSheetPrefix + "ButtonDown";
         }
@@ -461,7 +461,7 @@ function ccFlyoutPanelButtonHover(event, menuId, StyleSheetPrefix) {
         closeSubMenu(menu);
     }
     if (!(menuId)) { return false }
-    if (menuId == '') { return false; }
+    if (menuId == "") { return false; }
     menu.activeItem = item;
     item.className += " kmaMenuDown " + StyleSheetPrefix + "PanelButtonDown";
     if (item.subMenu == null) {
@@ -531,7 +531,7 @@ function menuInit(menu) {
     var i, j;
     itemList = menu.getElementsByTagName("A");
     if (itemList.length == 0) {
-        //menu.title = 'Select One';
+        //menu.title = "Select One";
         menu.activeItem = null
         return false;
     }
@@ -542,7 +542,7 @@ function menuInit(menu) {
         w -= dw;
         itemList[0].style.width = w + "px";
     }
-    //menu.title = 'Select One';
+    //menu.title = "Select One";
     menu.activeItem = null
 }
 //
@@ -592,9 +592,9 @@ function removeClassName(el, name) {
     curList = el.className.split(" ");
     for (i = 0; i < curList.length; i++)
         if (curList[i] != name) {
-            newList = newList + ' ' + curList[i];
+            newList = newList + " " + curList[i];
         } else {
-            //newList=newList+' '+curList[i];
+            //newList=newList+" "+curList[i];
             el.className = newList;
             return;
         }
@@ -607,12 +607,12 @@ function removeClassNameAfter(el, name) {
     var i, curList, newList;
     if (el.className == null) { return; }
     curList = el.className.split(" ");
-    newList = '';
+    newList = "";
     for (i = 0; i < curList.length; i++)
         if (curList[i] != name) {
-            newList = newList + ' ' + curList[i];
+            newList = newList + " " + curList[i];
         } else {
-            // newList=newList+' '+curList[i];
+            // newList=newList+" "+curList[i];
             el.className = newList;
             return;
         }
@@ -681,8 +681,8 @@ function updateClipboardLinksInit() {
 function SaveFieldPlus(ObjectName) {
     console.log("base.SaveFieldPlus");
     var RefreshTemp;
-    RefreshTemp = document.all.tags('div')[ObjectName].innerHTML;
-    document.all[ObjectName + 'Field'].value = RefreshTemp;
+    RefreshTemp = document.all.tags("div")[ObjectName].innerHTML;
+    document.all[ObjectName + "Field"].value = RefreshTemp;
 }
 //
 //----------
@@ -707,14 +707,14 @@ function OpenACPropertyWindow(EditorObject, ACObject) {
 //
 function OpenSiteExplorerWindow(TargetInputID) {
     console.log("base.OpenSiteExplorerWindow");
-    window.open('?ccIPage=kdif3318sd&LinkObjectName=' + TargetInputID, 'PageSelector', 'menubar=no,toolbar=no,location=no,status=no,scrollbars=yes,resizable')
+    window.open("?ccIPage=kdif3318sd&LinkObjectName=" + TargetInputID, "PageSelector", "menubar=no,toolbar=no,location=no,status=no,scrollbars=yes,resizable")
 }
 //
 //----------
 //
 function OpenResourceLinkWindow(TargetInputID) {
     console.log("base.OpenResourceLinkWindow");
-    window.open('/admin/index.asp?ccIPage=s033l8dm15&SourceMode=0&LinkObjectName=' + TargetInputID, 'ResourceSelector', 'menubar=no,toolbar=no,location=no,status=no,scrollbars=yes,resizable')
+    window.open("/admin/index.asp?ccIPage=s033l8dm15&SourceMode=0&LinkObjectName=" + TargetInputID, "ResourceSelector", "menubar=no,toolbar=no,location=no,status=no,scrollbars=yes,resizable")
 }
 //
 //----------
@@ -748,7 +748,7 @@ function OpenAddonPropertyWindow(AddonIconObj, AdminURL) {
     } catch (err) {
     }
     if ((!addonOptionString) && (addonGuid)) {
-        cj.ajax.qsCallback('ajaxfn=ccGetDefaultAddonOptionString&guid=' + addonGuid, OpenAPWithOptionString, AdminURL)
+        cj.ajax.qsCallback("ajaxfn=ccGetDefaultAddonOptionString&guid=" + addonGuid, OpenAPWithOptionString, AdminURL)
     } else {
         return OpenAPWithOptionString(addonOptionString, AdminURL);
     }
@@ -776,47 +776,47 @@ function OpenAPWithOptionString(addonOptionString, AdminURL) {
     var CurrentValue;
     var OptionValue;
     var OptionCaption;
-    var buttonRow = '';
-    var args = '';
+    var buttonRow = "";
+    var args = "";
     RawString = new String(globalAddonIconObj.id);
     SplitString = RawString.split(",")
-    Spacer = '<img src=/ContensiveBase/Images/Spacer.gif width=1 height=20>'
-    s = '';
-    s += '<table border=0 cellpadding="5" cellspacing="0" width="100%">';
+    Spacer = "<img src=/ContensiveBase/Images/Spacer.gif width=1 height=20>"
+    s = "";
+    s += "<table border=0 cellpadding=\"5\" cellspacing=\"0\" width=\"100%\">";
     PairPointer = 0
-    NVPair = addonOptionString.split('&');
+    NVPair = addonOptionString.split("&");
     RowPtr = 0;
     while (NVPair[PairPointer]) {
-        PairSplit = NVPair[PairPointer].split('=');
+        PairSplit = NVPair[PairPointer].split("=");
         if (PairSplit[0]) {
             NameVar = PairSplit[0];
             NameVar = DecodeAddonOptionArgument(NameVar);
-            ValueVar = '';
-            Options = '';
+            ValueVar = "";
+            Options = "";
             if (PairSplit[1]) {
-                PairSplit[0] = '';
-                ValueVar = PairSplit.join('=');
+                PairSplit[0] = "";
+                ValueVar = PairSplit.join("=");
                 ValueVar = ValueVar.substr(1);
             }
-            OptionStart = ValueVar.indexOf('[');
-            OptionEnd = ValueVar.indexOf(']');
-            FormInput = '';
+            OptionStart = ValueVar.indexOf("[");
+            OptionEnd = ValueVar.indexOf("]");
+            FormInput = "";
             if ((OptionStart != -1) && (OptionEnd != -1)) {
                 // selector in format: name=value[caption:option|caption:option]type
                 var Type = ValueVar.substr(OptionEnd + 1).toLowerCase()
-                CurrentValue = '';
+                CurrentValue = "";
                 if (OptionStart > 0) {
                     CurrentValue = ValueVar.slice(0, OptionStart);
                     CurrentValue = DecodeAddonOptionArgument(CurrentValue);
                 }
-                var CurrentValueList = ',' + CurrentValue + ','
+                var CurrentValueList = "," + CurrentValue + ","
                 CurrentValueList = CurrentValueList.toLowerCase();
                 Options = ValueVar.slice(OptionStart + 1, OptionEnd);
-                OptionSplit = Options.split('|');
+                OptionSplit = Options.split("|");
                 OptionPtr = 0;
                 while (OptionSplit[OptionPtr]) {
                     OptionValue = OptionSplit[OptionPtr]
-                    Pos = OptionValue.indexOf(':')
+                    Pos = OptionValue.indexOf(":")
                     if (Pos > -1) {
                         OptionCaption = OptionValue.substr(0, Pos);
                         OptionCaption = DecodeAddonOptionArgument(OptionCaption)
@@ -827,45 +827,45 @@ function OpenAPWithOptionString(addonOptionString, AdminURL) {
                         OptionCaption = OptionValue;
                     }
                     switch (Type) {
-                        case 'checkbox':
-                            if (CurrentValueList.indexOf(',' + OptionValue.toLowerCase() + ',') >= 0) {
-                                FormInput += '<div style="white-space:nowrap"><input type="checkbox" name="' + NameVar + '" value="' + OptionValue + '" checked="checked"/>' + OptionCaption + '</div>';
+                        case "checkbox":
+                            if (CurrentValueList.indexOf("," + OptionValue.toLowerCase() + ",") >= 0) {
+                                FormInput += "<div style=\"white-space:nowrap\"><input type=\"checkbox\" name=\"" + NameVar + "\" value=\"" + OptionValue + "\" checked=\"checked\"/>" + OptionCaption + "</div>";
                             } else {
-                                FormInput += '<div style="white-space:nowrap"><input type="checkbox" name="' + NameVar + '" value="' + OptionValue + '" />' + OptionCaption + '</div>';
+                                FormInput += "<div style=\"white-space:nowrap\"><input type=\"checkbox\" name=\"" + NameVar + "\" value=\"" + OptionValue + "\" />" + OptionCaption + "</div>";
                             }
                             break;
-                        case 'radio':
-                            if (CurrentValueList.indexOf(',' + OptionValue.toLowerCase() + ',') >= 0) {
-                                FormInput += '<div style="white-space:nowrap"><input type="radio" name="' + NameVar + '" value="' + OptionValue + '" checked="checked"/>' + OptionCaption + '</div>';
+                        case "radio":
+                            if (CurrentValueList.indexOf("," + OptionValue.toLowerCase() + ",") >= 0) {
+                                FormInput += "<div style=\"white-space:nowrap\"><input type=\"radio\" name=\"" + NameVar + "\" value=\"" + OptionValue + "\" checked=\"checked\"/>" + OptionCaption + "</div>";
                             } else {
-                                FormInput += '<div style="white-space:nowrap"><input type="radio" name="' + NameVar + '" value="' + OptionValue + '" />' + OptionCaption + '</div>';
+                                FormInput += "<div style=\"white-space:nowrap\"><input type=\"radio\" name=\"" + NameVar + "\" value=\"" + OptionValue + "\" />" + OptionCaption + "</div>";
                             }
                             break;
                         default:
                             if (CurrentValue == OptionValue) {
-                                FormInput += '<option value="' + OptionValue + '" selected>' + OptionCaption + '</option>';
+                                FormInput += "<option value=\"" + OptionValue + "\" selected>" + OptionCaption + "</option>";
                             } else {
-                                FormInput += '<option value="' + OptionValue + '">' + OptionCaption + '</option>';
+                                FormInput += "<option value=\"" + OptionValue + "\">" + OptionCaption + "</option>";
                             }
                     }
                     OptionPtr++;
                 }
                 switch (Type) {
-                    case 'checkbox':
-                        FormInput += '<INPUT ID="NVType' + PairPointer + '" name="' + NameVar + '" Type=Hidden Value="checkbox">';
-                        FormInput += '<INPUT ID="NV' + PairPointer + '" name="' + NameVar + '" Type=Hidden Value="checkbox">';
+                    case "checkbox":
+                        FormInput += "<INPUT ID=\"NVType" + PairPointer + "\" name=\"" + NameVar + "\" Type=Hidden Value=\"checkbox\">";
+                        FormInput += "<INPUT ID=\"NV" + PairPointer + "\" name=\"" + NameVar + "\" Type=Hidden Value=\"checkbox\">";
                         break;
-                    case 'radio':
-                        FormInput += '<INPUT ID="NVType' + PairPointer + '" name="' + NameVar + '" Type=Hidden Value="radio">';
-                        FormInput += '<INPUT ID="NV' + PairPointer + '" name="' + NameVar + '" Type=Hidden Value="radio">';
+                    case "radio":
+                        FormInput += "<INPUT ID=\"NVType" + PairPointer + "\" name=\"" + NameVar + "\" Type=Hidden Value=\"radio\">";
+                        FormInput += "<INPUT ID=\"NV" + PairPointer + "\" name=\"" + NameVar + "\" Type=Hidden Value=\"radio\">";
                         break;
-                    case 'resourcelink':
+                    case "resourcelink":
                         ValueVar = DecodeAddonOptionArgument(ValueVar)
-                        FormInput += '<INPUT ID="NVType' + PairPointer + '" name="' + NameVar + '" Type=Hidden Value="resourcelink">';
-                        FormInput += '<INPUT Name="' + NameVar + '" Type=Text ID="NV' + PairPointer + '" Value="' + CurrentValue + '" Size=20>';
-                        FormInput += '&nbsp;<a href="#" onClick="'
-                        FormInput += "window.open('" + AdminURL + "?ccIPage=s033l8dm15&SourceMode=0&LinkObjectName=NV" + PairPointer + "','ResourceSelector','menubar=no,toolbar=no,location=no,status=no,scrollbars=yes,resizable');"
-                        FormInput += 'return false;"><img src="/ContensiveBase/images/ResourceLink1616.gif" width=16 height=16 border=0 alt="Link to a resource" title="Link to a resource"></a>'
+                        FormInput += "<INPUT ID=\"NVType" + PairPointer + "\" name=\"" + NameVar + "\" Type=Hidden Value=\"resourcelink\">";
+                        FormInput += "<INPUT Name=\"" + NameVar + "\" Type=Text ID=\"NV" + PairPointer + "\" Value=\"" + CurrentValue + "\" Size=20>";
+                        FormInput += "&nbsp;<a href=\"#\" onClick=\""
+                        FormInput += "window.open(\"" + AdminURL + "?ccIPage=s033l8dm15&SourceMode=0&LinkObjectName=NV" + PairPointer + "\",\"ResourceSelector\",\"menubar=no,toolbar=no,location=no,status=no,scrollbars=yes,resizable\");"
+                        FormInput += "return false;\"><img src=\"/ContensiveBase/images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>"
                         break;
                     default:
                         FormInput += '<INPUT ID="NVType' + PairPointer + '" name="' + NameVar + '" Type=Hidden Value="select">';
