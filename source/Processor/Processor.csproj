@@ -216,7 +216,6 @@
     <Compile Include="Controllers\LogController.cs" />
     <Compile Include="Controllers\LoginController.cs" />
     <Compile Include="Controllers\TabController.cs" />
-    <Compile Include="Controllers\MenuFlyoutController.cs" />
     <Compile Include="Controllers\PageContentController.cs" />
     <Compile Include="Controllers\RemoteQueryController.cs" />
     <Compile Include="Controllers\SecurityController.cs" />

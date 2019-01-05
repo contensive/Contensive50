@@ -78,58 +78,20 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="IncludeBaseFields"></param>
         /// <returns></returns>
-        public static string get( CoreController core, bool IncludeBaseFields = false) {
+        public static string get(CoreController core, bool IncludeBaseFields = false) {
             string tempGetXMLContentDefinition3 = null;
             try {
-                //
+                string appName = core.appConfig.name;
                 string ContentName = "";
-                int FieldCnt = 0;
-                string FieldName = null;
-                int FieldContentID = 0;
-                int LastFieldID = 0;
-                int RecordID = 0;
-                string RecordName = null;
-                int AuthoringTableID = 0;
-                string HelpDefault = null;
-                int HelpCnt = 0;
-                int fieldId = 0;
-                string fieldType = null;
-                int ContentTableID = 0;
-                string TableName = null;
-                string DataSourceName = null;
-                int DefaultSortMethodID = 0;
-                string DefaultSortMethod = null;
-                int EditorGroupID = 0;
-                string EditorGroupName = null;
-                int ParentID = 0;
-                string ParentName = null;
+                string iContentName = ContentName;
                 int ContentID = 0;
-                System.Text.StringBuilder sb = new System.Text.StringBuilder();
-                string iContentName = null;
-                DataTable dt = null;
+                //DataTable dt = null;
                 string SQL = null;
-                bool FoundMenuTable = false;
-                int Ptr = 0;
-                string[,] Tables = null;
-                int TableCnt = 0;
-                string[,] Sorts = null;
-                int SortCnt = 0;
-                string[,] Groups = null;
-                int GroupCnt = 0;
-                string[,] Contents = null;
-                int ContentCnt = 0;
-                string[,] CFields = null;
-                int CFieldCnt = 0;
-                int CFieldPtr = 0;
-                string appName;
-                //
-                appName = core.appConfig.name;
-                iContentName = ContentName;
                 if (!string.IsNullOrEmpty(iContentName)) {
-                    SQL = "select id from cccontent where name=" + DbController.encodeSQLText(iContentName);
-                    dt = core.db.executeQuery(SQL);
-                    if (dt.Rows.Count > 0) {
-                        ContentID = GenericController.encodeInteger(dt.Rows[0]["id"]);
+                    using (var dt = core.db.executeQuery("select id from cccontent where name=" + DbController.encodeSQLText(iContentName))) {
+                        if (dt.Rows.Count > 0) {
+                            ContentID = GenericController.encodeInteger(dt.Rows[0]["id"]);
+                        }
                     }
                 }
                 if (!string.IsNullOrEmpty(iContentName) && (ContentID == 0)) {
@@ -139,47 +101,42 @@ namespace Contensive.Processor.Controllers {
                 } else {
                     //
                     // Build table lookup
-                    //
-                    SQL = "select T.ID,T.Name as TableName,D.Name as DataSourceName from ccTables T Left Join ccDataSources D on D.ID=T.DataSourceID";
-                    dt = core.db.executeQuery(SQL);
-                    Tables = core.db.convertDataTabletoArray(dt);
-                    if (Tables == null) {
-                        TableCnt = 0;
-                    } else {
-                        TableCnt = Tables.GetUpperBound(1) + 1;
+                    string[,] Tables = { };
+                    int TableCnt = 0;
+                    using (var dt = core.db.executeQuery("select T.ID,T.Name as TableName,D.Name as DataSourceName from ccTables T Left Join ccDataSources D on D.ID=T.DataSourceID")) {
+                        Tables = core.db.convertDataTabletoArray(dt);
+                        if (Tables != null) { TableCnt = Tables.GetUpperBound(1) + 1; }
                     }
                     //
                     // Build SortMethod lookup
-                    //
-                    SQL = "select ID,Name from ccSortMethods";
-                    dt = core.db.executeQuery(SQL);
-                    Sorts = core.db.convertDataTabletoArray(dt);
-                    if (Sorts == null) {
-                        SortCnt = 0;
-                    } else {
-                        SortCnt = Sorts.GetUpperBound(1) + 1;
+                    string[,] Sorts = { };
+                    int SortCnt = 0;
+                    using (var dt = core.db.executeQuery("select ID,Name from ccSortMethods")) {
+                        Sorts = core.db.convertDataTabletoArray(dt);
+                        if (Sorts != null) {
+                            SortCnt = Sorts.GetUpperBound(1) + 1;
+                        }
                     }
                     //
                     // Build SortMethod lookup
-                    //
-                    SQL = "select ID,Name from ccGroups";
-                    dt = core.db.executeQuery(SQL);
-                    Groups = core.db.convertDataTabletoArray(dt);
-                    if (Groups == null) {
-                        GroupCnt = 0;
-                    } else {
-                        GroupCnt = Groups.GetUpperBound(1) + 1;
+                    string[,] Groups = { };
+                    int GroupCnt = 0;
+                    using (var dt = core.db.executeQuery("select ID,Name from ccGroups")) {
+                        Groups = core.db.convertDataTabletoArray(dt);
+                        if (Groups != null) {
+                            GroupCnt = Groups.GetUpperBound(1) + 1;
+                        }
                     }
                     //
                     // Build Content lookup
                     //
-                    SQL = "select id,name from ccContent";
-                    dt = core.db.executeQuery(SQL);
-                    Contents = core.db.convertDataTabletoArray(dt);
-                    if (Contents == null) {
-                        ContentCnt = 0;
-                    } else {
-                        ContentCnt = Contents.GetUpperBound(1) + 1;
+                    string[,] Contents = { };
+                    int ContentCnt = 0;
+                    using (var dt = core.db.executeQuery("select id,name from ccContent")) {
+                        Contents = core.db.convertDataTabletoArray(dt);
+                        if (Contents != null) {
+                            ContentCnt = Contents.GetUpperBound(1) + 1;
+                        }
                     }
                     //
                     // select all the fields
@@ -195,211 +152,211 @@ namespace Contensive.Processor.Controllers {
                             + " where (f.Type<>0)"
                             + "";
                     }
-                    if (!IncludeBaseFields) {
-                        SQL += " and ((f.IsBaseField is null)or(f.IsBaseField=0))";
-                    }
+                    if (!IncludeBaseFields) { SQL += " and ((f.IsBaseField is null)or(f.IsBaseField=0))"; }
+                    string[,] CFields = { };
+                    int CFieldCnt = 0;
                     SQL += " order by f.contentid,f.id,h.id desc";
-                    dt = core.db.executeQuery(SQL);
-                    CFields = core.db.convertDataTabletoArray(dt);
-                    CFieldCnt = CFields.GetUpperBound(1) + 1;
+                    using (var dt = core.db.executeQuery(SQL)) {
+                        CFields = core.db.convertDataTabletoArray(dt);
+                        CFieldCnt = CFields.GetUpperBound(1) + 1;
+                    }
                     //
                     // select the content
-                    //
-                    if (ContentID != 0) {
-                        SQL = "select " + ContentSelectList + " from ccContent where (id=" + ContentID + ")and(contenttableid is not null)and(contentcontrolid is not null) order by id";
-                    } else {
-                        SQL = "select " + ContentSelectList + " from ccContent where (name<>'')and(name is not null)and(contenttableid is not null)and(contentcontrolid is not null) order by id";
-                    }
-                    dt = core.db.executeQuery(SQL);
-                    //
-                    // create output
-                    //
-                    CFieldPtr = 0;
-                    foreach (DataRow dr in dt.Rows) {
+                    System.Text.StringBuilder sb = new System.Text.StringBuilder();
+                    bool FoundMenuTable = false;
+                    using (var dt = core.db.executeQuery(SQL)) {
                         //
-                        // ----- <cdef>
-                        //
-                        iContentName = encodeXmlAttributeFieldValue(appName, dr, "Name");
-                        ContentID = GenericController.encodeInteger(dr["ID"]);
-                        sb.Append("\r\n\t<CDef");
-                        sb.Append(" Name=\"" + iContentName + "\"");
-                        if ((!encodeBoolean(dr["isBaseContent"])) || IncludeBaseFields) {
-                            sb.Append(" Active=\"" + encodeXmlAttributeFieldValue(appName, dr, "Active") + "\"");
-                            sb.Append(" AdminOnly=\"" + encodeXmlAttributeFieldValue(appName, dr, "AdminOnly") + "\"");
-                            //sb.Append( " AliasID=""" & GetRSXMLAttribute( appname,RS, "AliasID") & """")
-                            //sb.Append( " AliasName=""" & GetRSXMLAttribute( appname,RS, "AliasName") & """")
-                            sb.Append(" AllowAdd=\"" + encodeXmlAttributeFieldValue(appName, dr, "AllowAdd") + "\"");
-                            sb.Append(" AllowCalendarEvents=\"" + encodeXmlAttributeFieldValue(appName, dr, "AllowCalendarEvents") + "\"");
-                            sb.Append(" AllowContentChildTool=\"" + encodeXmlAttributeFieldValue(appName, dr, "AllowContentChildTool") + "\"");
-                            sb.Append(" AllowContentTracking=\"" + encodeXmlAttributeFieldValue(appName, dr, "AllowContentTracking") + "\"");
-                            sb.Append(" AllowDelete=\"" + encodeXmlAttributeFieldValue(appName, dr, "AllowDelete") + "\"");
-                            //sb.Append(" AllowMetaContent=""" & GetRSXMLAttribute(appName, dr, "AllowMetaContent") & """")
-                            sb.Append(" AllowTopicRules=\"" + encodeXmlAttributeFieldValue(appName, dr, "AllowTopicRules") + "\"");
-                            sb.Append(" AllowWorkflowAuthoring=\"" + encodeXmlAttributeFieldValue(appName, dr, "AllowWorkflowAuthoring") + "\"");
+                        // create output
+                        if (ContentID != 0) {
+                            SQL = "select " + ContentSelectList + " from ccContent where (id=" + ContentID + ")and(contenttableid is not null)and(contentcontrolid is not null) order by id";
+                        } else {
+                            SQL = "select " + ContentSelectList + " from ccContent where (name<>'')and(name is not null)and(contenttableid is not null)and(contentcontrolid is not null) order by id";
+                        }
+                        int CFieldPtr = 0;
+                        foreach (DataRow dr in dt.Rows) {
                             //
-                            AuthoringTableID = GenericController.encodeInteger(dr["AuthoringTableID"]);
-                            TableName = "";
-                            DataSourceName = "";
-                            if (AuthoringTableID != 0) {
-                                for (Ptr = 0; Ptr < TableCnt; Ptr++) {
-                                    if (GenericController.encodeInteger(Tables[0, Ptr]) == AuthoringTableID) {
-                                        TableName = GenericController.encodeText(Tables[1, Ptr]);
-                                        DataSourceName = GenericController.encodeText(Tables[2, Ptr]);
-                                        break;
-                                    }
-                                }
-                            }
-                            if (string.IsNullOrEmpty(DataSourceName)) {
-                                DataSourceName = "Default";
-                            }
-                            if (GenericController.vbUCase(TableName) == "CCMENUENTRIES") {
-                                FoundMenuTable = true;
-                            }
-                            sb.Append(" AuthoringDataSourceName=\"" + encodeXMLattribute(DataSourceName) + "\"");
-                            sb.Append(" AuthoringTableName=\"" + encodeXMLattribute(TableName) + "\"");
+                            // ----- <cdef>
                             //
-                            ContentTableID = GenericController.encodeInteger(dr["ContentTableID"]);
-                            if (ContentTableID != AuthoringTableID) {
-                                if (ContentTableID != 0) {
-                                    TableName = "";
-                                    DataSourceName = "";
+                            iContentName = encodeXmlAttributeFieldValue(appName, dr, "Name");
+                            ContentID = GenericController.encodeInteger(dr["ID"]);
+                            sb.Append("\r\n\t<CDef");
+                            sb.Append(" Name=\"" + iContentName + "\"");
+                            if ((!encodeBoolean(dr["isBaseContent"])) || IncludeBaseFields) {
+                                sb.Append(" Active=\"" + encodeXmlAttributeFieldValue(appName, dr, "Active") + "\"");
+                                sb.Append(" AdminOnly=\"" + encodeXmlAttributeFieldValue(appName, dr, "AdminOnly") + "\"");
+                                sb.Append(" AllowAdd=\"" + encodeXmlAttributeFieldValue(appName, dr, "AllowAdd") + "\"");
+                                sb.Append(" AllowCalendarEvents=\"" + encodeXmlAttributeFieldValue(appName, dr, "AllowCalendarEvents") + "\"");
+                                sb.Append(" AllowContentChildTool=\"" + encodeXmlAttributeFieldValue(appName, dr, "AllowContentChildTool") + "\"");
+                                sb.Append(" AllowContentTracking=\"" + encodeXmlAttributeFieldValue(appName, dr, "AllowContentTracking") + "\"");
+                                sb.Append(" AllowDelete=\"" + encodeXmlAttributeFieldValue(appName, dr, "AllowDelete") + "\"");
+                                sb.Append(" AllowTopicRules=\"" + encodeXmlAttributeFieldValue(appName, dr, "AllowTopicRules") + "\"");
+                                sb.Append(" AllowWorkflowAuthoring=\"" + encodeXmlAttributeFieldValue(appName, dr, "AllowWorkflowAuthoring") + "\"");
+                                //
+                                int AuthoringTableID = GenericController.encodeInteger(dr["AuthoringTableID"]);
+                                string TableName = "";
+                                string DataSourceName = "";
+                                int Ptr = 0;
+                                if (AuthoringTableID != 0) {
                                     for (Ptr = 0; Ptr < TableCnt; Ptr++) {
-                                        if (GenericController.encodeInteger(Tables[0, Ptr]) == ContentTableID) {
+                                        if (GenericController.encodeInteger(Tables[0, Ptr]) == AuthoringTableID) {
                                             TableName = GenericController.encodeText(Tables[1, Ptr]);
                                             DataSourceName = GenericController.encodeText(Tables[2, Ptr]);
                                             break;
                                         }
                                     }
-                                    if (string.IsNullOrEmpty(DataSourceName)) {
-                                        DataSourceName = "Default";
+                                }
+                                if (string.IsNullOrEmpty(DataSourceName)) {
+                                    DataSourceName = "Default";
+                                }
+                                if (GenericController.vbUCase(TableName) == "CCMENUENTRIES") {
+                                    FoundMenuTable = true;
+                                }
+                                sb.Append(" AuthoringDataSourceName=\"" + encodeXMLattribute(DataSourceName) + "\"");
+                                sb.Append(" AuthoringTableName=\"" + encodeXMLattribute(TableName) + "\"");
+                                //
+                                int ContentTableID = GenericController.encodeInteger(dr["ContentTableID"]);
+                                if (ContentTableID != AuthoringTableID) {
+                                    if (ContentTableID != 0) {
+                                        TableName = "";
+                                        DataSourceName = "";
+                                        for (Ptr = 0; Ptr < TableCnt; Ptr++) {
+                                            if (GenericController.encodeInteger(Tables[0, Ptr]) == ContentTableID) {
+                                                TableName = GenericController.encodeText(Tables[1, Ptr]);
+                                                DataSourceName = GenericController.encodeText(Tables[2, Ptr]);
+                                                break;
+                                            }
+                                        }
+                                        if (string.IsNullOrEmpty(DataSourceName)) {
+                                            DataSourceName = "Default";
+                                        }
                                     }
                                 }
+                                sb.Append(" ContentDataSourceName=\"" + encodeXMLattribute(DataSourceName) + "\"");
+                                sb.Append(" ContentTableName=\"" + encodeXMLattribute(TableName) + "\"");
+                                //
+                                int DefaultSortMethodID = GenericController.encodeInteger(dr["DefaultSortMethodID"]);
+                                string DefaultSortMethod = cacheLookup(DefaultSortMethodID, Sorts);
+                                sb.Append(" DefaultSortMethod=\"" + encodeXMLattribute(DefaultSortMethod) + "\"");
+                                //
+                                sb.Append(" DeveloperOnly=\"" + encodeXmlAttributeFieldValue(appName, dr, "DeveloperOnly") + "\"");
+                                sb.Append(" DropDownFieldList=\"" + encodeXmlAttributeFieldValue(appName, dr, "DropDownFieldList") + "\"");
+                                //
+                                int EditorGroupID = GenericController.encodeInteger(dr["EditorGroupID"]);
+                                string EditorGroupName = cacheLookup(EditorGroupID, Groups);
+                                sb.Append(" EditorGroupName=\"" + encodeXMLattribute(EditorGroupName) + "\"");
+                                //
+                                int ParentID = GenericController.encodeInteger(dr["ParentID"]);
+                                string ParentName = cacheLookup(ParentID, Contents);
+                                sb.Append(" Parent=\"" + encodeXMLattribute(ParentName) + "\"");
+                                //
+                                sb.Append(" IconLink=\"" + encodeXmlAttributeFieldValue(appName, dr, "IconLink") + "\"");
+                                sb.Append(" IconHeight=\"" + encodeXmlAttributeFieldValue(appName, dr, "IconHeight") + "\"");
+                                sb.Append(" IconWidth=\"" + encodeXmlAttributeFieldValue(appName, dr, "IconWidth") + "\"");
+                                sb.Append(" IconSprites=\"" + encodeXmlAttributeFieldValue(appName, dr, "IconSprites") + "\"");
+                                sb.Append(" isbasecontent=\"" + encodeXmlAttributeFieldValue(appName, dr, "IsBaseContent") + "\"");
                             }
-                            sb.Append(" ContentDataSourceName=\"" + encodeXMLattribute(DataSourceName) + "\"");
-                            sb.Append(" ContentTableName=\"" + encodeXMLattribute(TableName) + "\"");
+                            sb.Append(" guid=\"" + encodeXmlAttributeFieldValue(appName, dr, "ccGuid") + "\"");
+                            sb.Append(" >");
                             //
-                            DefaultSortMethodID = GenericController.encodeInteger(dr["DefaultSortMethodID"]);
-                            DefaultSortMethod = cacheLookup(DefaultSortMethodID, Sorts);
-                            sb.Append(" DefaultSortMethod=\"" + encodeXMLattribute(DefaultSortMethod) + "\"");
+                            // ----- <field>
                             //
-                            sb.Append(" DeveloperOnly=\"" + encodeXmlAttributeFieldValue(appName, dr, "DeveloperOnly") + "\"");
-                            sb.Append(" DropDownFieldList=\"" + encodeXmlAttributeFieldValue(appName, dr, "DropDownFieldList") + "\"");
-                            //
-                            EditorGroupID = GenericController.encodeInteger(dr["EditorGroupID"]);
-                            EditorGroupName = cacheLookup(EditorGroupID, Groups);
-                            sb.Append(" EditorGroupName=\"" + encodeXMLattribute(EditorGroupName) + "\"");
-                            //
-                            ParentID = GenericController.encodeInteger(dr["ParentID"]);
-                            ParentName = cacheLookup(ParentID, Contents);
-                            sb.Append(" Parent=\"" + encodeXMLattribute(ParentName) + "\"");
-                            //
-                            sb.Append(" IconLink=\"" + encodeXmlAttributeFieldValue(appName, dr, "IconLink") + "\"");
-                            sb.Append(" IconHeight=\"" + encodeXmlAttributeFieldValue(appName, dr, "IconHeight") + "\"");
-                            sb.Append(" IconWidth=\"" + encodeXmlAttributeFieldValue(appName, dr, "IconWidth") + "\"");
-                            sb.Append(" IconSprites=\"" + encodeXmlAttributeFieldValue(appName, dr, "IconSprites") + "\"");
-                            sb.Append(" isbasecontent=\"" + encodeXmlAttributeFieldValue(appName, dr, "IsBaseContent") + "\"");
-                        }
-                        sb.Append(" guid=\"" + encodeXmlAttributeFieldValue(appName, dr, "ccGuid") + "\"");
-                        sb.Append(" >");
-                        //
-                        // ----- <field>
-                        //
-                        FieldCnt = 0;
-                        fieldId = 0;
-                        while (CFieldPtr < CFieldCnt) {
-                            LastFieldID = fieldId;
-                            fieldId = GenericController.encodeInteger(CFields[f_ID, CFieldPtr]);
-                            FieldName = GenericController.encodeText(CFields[f_Name, CFieldPtr]);
-                            FieldContentID = GenericController.encodeInteger(CFields[f_contentid, CFieldPtr]);
-                            if (FieldContentID > ContentID) {
-                                break;
-                            } else if ((FieldContentID == ContentID) && (fieldId != LastFieldID)) {
-                                if (IncludeBaseFields || (",id,dateadded,createdby,modifiedby,ContentControlID,CreateKey,ModifiedDate,ccguid,".IndexOf("," + FieldName + ",", System.StringComparison.OrdinalIgnoreCase)  == -1)) {
-                                    sb.Append("\r\n\t\t<Field");
-                                    fieldType = MetaController.getFieldTypeNameFromFieldTypeId( core, encodeInteger(CFields[f_Type, CFieldPtr]));
-                                    sb.Append(" Name=\"" + xmlValueText(FieldName) + "\"");
-                                    sb.Append(" active=\"" + xmlValueBoolean(CFields[f_Active, CFieldPtr]) + "\"");
-                                    sb.Append(" AdminOnly=\"" + xmlValueBoolean(CFields[f_AdminOnly, CFieldPtr]) + "\"");
-                                    sb.Append(" Authorable=\"" + xmlValueBoolean(CFields[f_Authorable, CFieldPtr]) + "\"");
-                                    sb.Append(" Caption=\"" + xmlValueText(CFields[f_Caption, CFieldPtr]) + "\"");
-                                    sb.Append(" DeveloperOnly=\"" + xmlValueBoolean(CFields[f_DeveloperOnly, CFieldPtr]) + "\"");
-                                    sb.Append(" EditSortPriority=\"" + xmlValueText(CFields[f_EditSortPriority, CFieldPtr]) + "\"");
-                                    sb.Append(" FieldType=\"" + fieldType + "\"");
-                                    sb.Append(" HTMLContent=\"" + xmlValueBoolean(CFields[f_HTMLContent, CFieldPtr]) + "\"");
-                                    sb.Append(" IndexColumn=\"" + xmlValueText(CFields[f_IndexColumn, CFieldPtr]) + "\"");
-                                    sb.Append(" IndexSortDirection=\"" + xmlValueText(CFields[f_IndexSortDirection, CFieldPtr]) + "\"");
-                                    sb.Append(" IndexSortOrder=\"" + xmlValueText(CFields[f_IndexSortPriority, CFieldPtr]) + "\"");
-                                    sb.Append(" IndexWidth=\"" + xmlValueText(CFields[f_IndexWidth, CFieldPtr]) + "\"");
-                                    sb.Append(" RedirectID=\"" + xmlValueText(CFields[f_RedirectID, CFieldPtr]) + "\"");
-                                    sb.Append(" RedirectPath=\"" + xmlValueText(CFields[f_RedirectPath, CFieldPtr]) + "\"");
-                                    sb.Append(" Required=\"" + xmlValueBoolean(CFields[f_Required, CFieldPtr]) + "\"");
-                                    sb.Append(" TextBuffered=\"" + xmlValueBoolean(CFields[f_TextBuffered, CFieldPtr]) + "\"");
-                                    sb.Append(" UniqueName=\"" + xmlValueBoolean(CFields[f_UniqueName, CFieldPtr]) + "\"");
-                                    sb.Append(" DefaultValue=\"" + xmlValueText(CFields[f_DefaultValue, CFieldPtr]) + "\"");
-                                    sb.Append(" RSSTitle=\"" + xmlValueBoolean(CFields[f_RSSTitleField, CFieldPtr]) + "\"");
-                                    sb.Append(" RSSDescription=\"" + xmlValueBoolean(CFields[f_RSSDescriptionField, CFieldPtr]) + "\"");
-                                    sb.Append(" EditTab=\"" + xmlValueText(CFields[f_EditTab, CFieldPtr]) + "\"");
-                                    sb.Append(" Scramble=\"" + xmlValueBoolean(CFields[f_Scramble, CFieldPtr]) + "\"");
-                                    sb.Append(" LookupList=\"" + xmlValueText(CFields[f_LookupList, CFieldPtr]) + "\"");
-                                    sb.Append(" NotEditable=\"" + xmlValueBoolean(CFields[f_NotEditable, CFieldPtr]) + "\"");
-                                    sb.Append(" Password=\"" + xmlValueBoolean(CFields[f_Password, CFieldPtr]) + "\"");
-                                    sb.Append(" ReadOnly=\"" + xmlValueBoolean(CFields[f_ReadOnly, CFieldPtr]) + "\"");
-                                    sb.Append(" ManyToManyRulePrimaryField=\"" + xmlValueText(CFields[f_ManyToManyRulePrimaryField, CFieldPtr]) + "\"");
-                                    sb.Append(" ManyToManyRuleSecondaryField=\"" + xmlValueText(CFields[f_ManyToManyRuleSecondaryField, CFieldPtr]) + "\"");
-                                    sb.Append(" IsModified=\"" + (encodeInteger(CFields[f_ModifiedBy, CFieldPtr]) != 0) + "\"");
-                                    if (true) {
-                                        sb.Append(" IsBaseField=\"" + xmlValueBoolean(CFields[f_IsBaseField, CFieldPtr]) + "\"");
-                                    }
-                                    //
-                                    RecordID = GenericController.encodeInteger(CFields[f_LookupContentID, CFieldPtr]);
-                                    RecordName = cacheLookup(RecordID, Contents);
-                                    sb.Append(" LookupContent=\"" + HtmlController.encodeHtml(RecordName) + "\"");
-                                    //
-                                    RecordID = GenericController.encodeInteger(CFields[f_RedirectContentID, CFieldPtr]);
-                                    RecordName = cacheLookup(RecordID, Contents);
-                                    sb.Append(" RedirectContent=\"" + HtmlController.encodeHtml(RecordName) + "\"");
-                                    //
-                                    RecordID = GenericController.encodeInteger(CFields[f_ManyToManyContentID, CFieldPtr]);
-                                    RecordName = cacheLookup(RecordID, Contents);
-                                    sb.Append(" ManyToManyContent=\"" + HtmlController.encodeHtml(RecordName) + "\"");
-                                    //
-                                    RecordID = GenericController.encodeInteger(CFields[f_ManyToManyRuleContentID, CFieldPtr]);
-                                    RecordName = cacheLookup(RecordID, Contents);
-                                    sb.Append(" ManyToManyRuleContent=\"" + HtmlController.encodeHtml(RecordName) + "\"");
-                                    //
-                                    RecordID = GenericController.encodeInteger(CFields[f_MemberSelectGroupId, CFieldPtr]);
-                                    RecordName = "";
-                                    if (RecordID>0) {
-                                        RecordName = MetaController.getRecordName( core,"groups", RecordID);
-                                    }
-                                    sb.Append(" MemberSelectGroup=\"" + xmlValueText(CFields[f_MemberSelectGroupId, CFieldPtr]) + "\"");
+                            int FieldCnt = 0;
+                            int fieldId = 0;
+                            while (CFieldPtr < CFieldCnt) {
+                                int LastFieldID = fieldId;
+                                fieldId = GenericController.encodeInteger(CFields[f_ID, CFieldPtr]);
+                                string FieldName = GenericController.encodeText(CFields[f_Name, CFieldPtr]);
+                                int FieldContentID = GenericController.encodeInteger(CFields[f_contentid, CFieldPtr]);
+                                if (FieldContentID > ContentID) {
+                                    break;
+                                } else if ((FieldContentID == ContentID) && (fieldId != LastFieldID)) {
+                                    if (IncludeBaseFields || (",id,dateadded,createdby,modifiedby,ContentControlID,CreateKey,ModifiedDate,ccguid,".IndexOf("," + FieldName + ",", System.StringComparison.OrdinalIgnoreCase) == -1)) {
+                                        sb.Append("\r\n\t\t<Field");
+                                        string fieldType = MetaController.getFieldTypeNameFromFieldTypeId(core, encodeInteger(CFields[f_Type, CFieldPtr]));
+                                        sb.Append(" Name=\"" + xmlValueText(FieldName) + "\"");
+                                        sb.Append(" active=\"" + xmlValueBoolean(CFields[f_Active, CFieldPtr]) + "\"");
+                                        sb.Append(" AdminOnly=\"" + xmlValueBoolean(CFields[f_AdminOnly, CFieldPtr]) + "\"");
+                                        sb.Append(" Authorable=\"" + xmlValueBoolean(CFields[f_Authorable, CFieldPtr]) + "\"");
+                                        sb.Append(" Caption=\"" + xmlValueText(CFields[f_Caption, CFieldPtr]) + "\"");
+                                        sb.Append(" DeveloperOnly=\"" + xmlValueBoolean(CFields[f_DeveloperOnly, CFieldPtr]) + "\"");
+                                        sb.Append(" EditSortPriority=\"" + xmlValueText(CFields[f_EditSortPriority, CFieldPtr]) + "\"");
+                                        sb.Append(" FieldType=\"" + fieldType + "\"");
+                                        sb.Append(" HTMLContent=\"" + xmlValueBoolean(CFields[f_HTMLContent, CFieldPtr]) + "\"");
+                                        sb.Append(" IndexColumn=\"" + xmlValueText(CFields[f_IndexColumn, CFieldPtr]) + "\"");
+                                        sb.Append(" IndexSortDirection=\"" + xmlValueText(CFields[f_IndexSortDirection, CFieldPtr]) + "\"");
+                                        sb.Append(" IndexSortOrder=\"" + xmlValueText(CFields[f_IndexSortPriority, CFieldPtr]) + "\"");
+                                        sb.Append(" IndexWidth=\"" + xmlValueText(CFields[f_IndexWidth, CFieldPtr]) + "\"");
+                                        sb.Append(" RedirectID=\"" + xmlValueText(CFields[f_RedirectID, CFieldPtr]) + "\"");
+                                        sb.Append(" RedirectPath=\"" + xmlValueText(CFields[f_RedirectPath, CFieldPtr]) + "\"");
+                                        sb.Append(" Required=\"" + xmlValueBoolean(CFields[f_Required, CFieldPtr]) + "\"");
+                                        sb.Append(" TextBuffered=\"" + xmlValueBoolean(CFields[f_TextBuffered, CFieldPtr]) + "\"");
+                                        sb.Append(" UniqueName=\"" + xmlValueBoolean(CFields[f_UniqueName, CFieldPtr]) + "\"");
+                                        sb.Append(" DefaultValue=\"" + xmlValueText(CFields[f_DefaultValue, CFieldPtr]) + "\"");
+                                        sb.Append(" RSSTitle=\"" + xmlValueBoolean(CFields[f_RSSTitleField, CFieldPtr]) + "\"");
+                                        sb.Append(" RSSDescription=\"" + xmlValueBoolean(CFields[f_RSSDescriptionField, CFieldPtr]) + "\"");
+                                        sb.Append(" EditTab=\"" + xmlValueText(CFields[f_EditTab, CFieldPtr]) + "\"");
+                                        sb.Append(" Scramble=\"" + xmlValueBoolean(CFields[f_Scramble, CFieldPtr]) + "\"");
+                                        sb.Append(" LookupList=\"" + xmlValueText(CFields[f_LookupList, CFieldPtr]) + "\"");
+                                        sb.Append(" NotEditable=\"" + xmlValueBoolean(CFields[f_NotEditable, CFieldPtr]) + "\"");
+                                        sb.Append(" Password=\"" + xmlValueBoolean(CFields[f_Password, CFieldPtr]) + "\"");
+                                        sb.Append(" ReadOnly=\"" + xmlValueBoolean(CFields[f_ReadOnly, CFieldPtr]) + "\"");
+                                        sb.Append(" ManyToManyRulePrimaryField=\"" + xmlValueText(CFields[f_ManyToManyRulePrimaryField, CFieldPtr]) + "\"");
+                                        sb.Append(" ManyToManyRuleSecondaryField=\"" + xmlValueText(CFields[f_ManyToManyRuleSecondaryField, CFieldPtr]) + "\"");
+                                        sb.Append(" IsModified=\"" + (encodeInteger(CFields[f_ModifiedBy, CFieldPtr]) != 0) + "\"");
+                                        if (true) {
+                                            sb.Append(" IsBaseField=\"" + xmlValueBoolean(CFields[f_IsBaseField, CFieldPtr]) + "\"");
+                                        }
+                                        //
+                                        int RecordID = GenericController.encodeInteger(CFields[f_LookupContentID, CFieldPtr]);
+                                        string RecordName = cacheLookup(RecordID, Contents);
+                                        sb.Append(" LookupContent=\"" + HtmlController.encodeHtml(RecordName) + "\"");
+                                        //
+                                        RecordID = GenericController.encodeInteger(CFields[f_RedirectContentID, CFieldPtr]);
+                                        RecordName = cacheLookup(RecordID, Contents);
+                                        sb.Append(" RedirectContent=\"" + HtmlController.encodeHtml(RecordName) + "\"");
+                                        //
+                                        RecordID = GenericController.encodeInteger(CFields[f_ManyToManyContentID, CFieldPtr]);
+                                        RecordName = cacheLookup(RecordID, Contents);
+                                        sb.Append(" ManyToManyContent=\"" + HtmlController.encodeHtml(RecordName) + "\"");
+                                        //
+                                        RecordID = GenericController.encodeInteger(CFields[f_ManyToManyRuleContentID, CFieldPtr]);
+                                        RecordName = cacheLookup(RecordID, Contents);
+                                        sb.Append(" ManyToManyRuleContent=\"" + HtmlController.encodeHtml(RecordName) + "\"");
+                                        //
+                                        RecordID = GenericController.encodeInteger(CFields[f_MemberSelectGroupId, CFieldPtr]);
+                                        RecordName = "";
+                                        if (RecordID > 0) {
+                                            RecordName = MetaController.getRecordName(core, "groups", RecordID);
+                                        }
+                                        sb.Append(" MemberSelectGroup=\"" + xmlValueText(CFields[f_MemberSelectGroupId, CFieldPtr]) + "\"");
 
 
-                                    sb.Append(" >");
-                                    //
-                                    HelpCnt = 0;
-                                    HelpDefault = xmlValueText(CFields[f_helpcustom, CFieldPtr]);
-                                    if (string.IsNullOrEmpty(HelpDefault)) {
-                                        HelpDefault = xmlValueText(CFields[f_helpdefault, CFieldPtr]);
+                                        sb.Append(" >");
+                                        //
+                                        int HelpCnt = 0;
+                                        string HelpDefault = xmlValueText(CFields[f_helpcustom, CFieldPtr]);
+                                        if (string.IsNullOrEmpty(HelpDefault)) {
+                                            HelpDefault = xmlValueText(CFields[f_helpdefault, CFieldPtr]);
+                                        }
+                                        if (!string.IsNullOrEmpty(HelpDefault)) {
+                                            sb.Append("\r\n\t\t\t<HelpDefault>" + HelpDefault + "</HelpDefault>");
+                                            HelpCnt = HelpCnt + 1;
+                                        }
+                                        if (HelpCnt > 0) {
+                                            sb.Append("\r\n\t\t");
+                                        }
+                                        sb.Append("</Field>");
                                     }
-                                    if (!string.IsNullOrEmpty(HelpDefault)) {
-                                        sb.Append("\r\n\t\t\t<HelpDefault>" + HelpDefault + "</HelpDefault>");
-                                        HelpCnt = HelpCnt + 1;
-                                    }
-                                    if (HelpCnt > 0) {
-                                        sb.Append("\r\n\t\t");
-                                    }
-                                    sb.Append("</Field>");
+                                    FieldCnt = FieldCnt + 1;
                                 }
-                                FieldCnt = FieldCnt + 1;
+                                CFieldPtr = CFieldPtr + 1;
                             }
-                            CFieldPtr = CFieldPtr + 1;
+                            //
+                            if (FieldCnt > 0) {
+                                sb.Append("\r\n\t");
+                            }
+                            sb.Append("</CDef>");
                         }
-                        //
-                        if (FieldCnt > 0) {
-                            sb.Append("\r\n\t");
-                        }
-                        sb.Append("</CDef>");
                     }
                     if (string.IsNullOrEmpty(ContentName)) {
                         //
@@ -411,8 +368,8 @@ namespace Contensive.Processor.Controllers {
                     }
                     tempGetXMLContentDefinition3 = "<" + CollectionFileRootNode + " name=\"Application\" guid=\"" + ApplicationCollectionGuid + "\">" + sb.ToString() + "\r\n</" + CollectionFileRootNode + ">";
                 }
-            } catch( Exception ex ) {
-                LogController.handleError( core,ex);
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
             }
             return tempGetXMLContentDefinition3;
         }
@@ -427,7 +384,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 System.Text.StringBuilder sb = new System.Text.StringBuilder();
                 string appName = core.appConfig.name;
-                string SQL  = ""
+                string SQL = ""
                     + " select D.name as DataSourceName,T.name as TableName"
                     + " from cctables T left join ccDataSources d on D.ID=T.DataSourceID"
                     + " where t.active<>0";
@@ -436,7 +393,7 @@ namespace Contensive.Processor.Controllers {
                     while (csData.ok()) {
                         string DataSourceName = csData.getText("DataSourceName");
                         string TableName = csData.getText("TableName");
-                        string IndexList = core.db.getSQLIndexList( TableName);
+                        string IndexList = core.db.getSQLIndexList(TableName);
                         //
                         if (!string.IsNullOrEmpty(IndexList)) {
                             string[] ListRows = GenericController.stringSplit(IndexList, "\r\n");
@@ -494,8 +451,8 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
                 result = sb.ToString();
-            } catch( Exception ex ) {
-                LogController.handleError( core,ex);
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
             }
             return result;
         }
@@ -510,10 +467,10 @@ namespace Contensive.Processor.Controllers {
             string s = "";
             try {
                 string appName = core.appConfig.name;
-                s = s + getAdminMenus_MenuEntries( core );
+                s = s + getAdminMenus_MenuEntries(core);
                 s = s + getAdminMenus_NavigatorEntries(core);
-            } catch( Exception ex ) {
-                LogController.handleError( core,ex);
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
             }
             return s;
         }
@@ -527,56 +484,43 @@ namespace Contensive.Processor.Controllers {
         private static string getAdminMenus_NavigatorEntries(CoreController core) {
             string result = "";
             try {
-                int NavIconType = 0;
-                string NavIconTitle = null;
-                 System.Text.StringBuilder sb = new System.Text.StringBuilder();
-                DataTable dt = null;
-                string menuNameSpace = null;
-                string RecordName = null;
-                int ParentID = 0;
-                int MenuContentID = 0;
-                string[] SplitArray = null;
-                int SplitIndex = 0;
-                string appName;
-
-                //
-                // ****************************** if cdef not loaded, this fails
-                //
-                appName = core.appConfig.name;
-                MenuContentID = MetaController.getRecordIdByUniqueName( core,"Content", Processor.Models.Db.NavigatorEntryModel.contentName);
-                dt = core.db.executeQuery("select * from ccMenuEntries where (contentcontrolid=" + MenuContentID + ")and(name<>'')");
-                if (dt.Rows.Count > 0) {
-                    NavIconType = 0;
-                    NavIconTitle = "";
-                    foreach (DataRow rsDr in dt.Rows) {
-                        RecordName = GenericController.encodeText(rsDr["Name"]);
-                        ParentID = GenericController.encodeInteger(rsDr["ParentID"]);
-                        menuNameSpace = getMenuNameSpace(core, ParentID, "");
-                        sb.Append("<NavigatorEntry Name=\"" + encodeXMLattribute(RecordName) + "\"");
-                        sb.Append(" NameSpace=\"" + menuNameSpace + "\"");
-                        sb.Append(" LinkPage=\"" + encodeXmlAttributeFieldValue(appName, rsDr, "LinkPage") + "\"");
-                        sb.Append(" ContentName=\"" + encodeXmlAttributeFieldLookup(core, appName, rsDr, "ContentID", "ccContent") + "\"");
-                        sb.Append(" AdminOnly=\"" + encodeXmlAttributeFieldValue(appName, rsDr, "AdminOnly") + "\"");
-                        sb.Append(" DeveloperOnly=\"" + encodeXmlAttributeFieldValue(appName, rsDr, "DeveloperOnly") + "\"");
-                        sb.Append(" NewWindow=\"" + encodeXmlAttributeFieldValue(appName, rsDr, "NewWindow") + "\"");
-                        sb.Append(" Active=\"" + encodeXmlAttributeFieldValue(appName, rsDr, "Active") + "\"");
-                        sb.Append(" AddonName=\"" + encodeXmlAttributeFieldLookup(core, appName, rsDr, "AddonID", "ccAggregateFunctions") + "\"");
-                        sb.Append(" SortOrder=\"" + encodeXmlAttributeFieldValue(appName, rsDr, "SortOrder") + "\"");
-                        NavIconType = GenericController.encodeInteger(encodeXmlAttributeFieldValue(appName, rsDr, "NavIconType"));
-                        NavIconTitle = encodeXmlAttributeFieldValue(appName, rsDr, "NavIconTitle");
-                        sb.Append(" NavIconTitle=\"" + NavIconTitle + "\"");
-                        SplitArray = (NavIconTypeList + ",help").Split(',');
-                        SplitIndex = NavIconType - 1;
-                        if ((SplitIndex >= 0) && (SplitIndex <= SplitArray.GetUpperBound(0))) {
-                            sb.Append(" NavIconType=\"" + SplitArray[SplitIndex] + "\"");
+                string appName = core.appConfig.name;
+                int MenuContentID = MetaController.getRecordIdByUniqueName(core, "Content", Processor.Models.Db.NavigatorEntryModel.contentName);
+                System.Text.StringBuilder sb = new System.Text.StringBuilder();
+                using (DataTable dt = core.db.executeQuery("select * from ccMenuEntries where (contentcontrolid=" + MenuContentID + ")and(name<>'')")) {
+                    if (dt.Rows.Count > 0) {
+                        int NavIconType = 0;
+                        string NavIconTitle = "";
+                        foreach (DataRow rsDr in dt.Rows) {
+                            string RecordName = GenericController.encodeText(rsDr["Name"]);
+                            int ParentID = GenericController.encodeInteger(rsDr["ParentID"]);
+                            string menuNameSpace = getMenuNameSpace(core, ParentID, "");
+                            sb.Append("<NavigatorEntry Name=\"" + encodeXMLattribute(RecordName) + "\"");
+                            sb.Append(" NameSpace=\"" + menuNameSpace + "\"");
+                            sb.Append(" LinkPage=\"" + encodeXmlAttributeFieldValue(appName, rsDr, "LinkPage") + "\"");
+                            sb.Append(" ContentName=\"" + encodeXmlAttributeFieldLookup(core, appName, rsDr, "ContentID", "ccContent") + "\"");
+                            sb.Append(" AdminOnly=\"" + encodeXmlAttributeFieldValue(appName, rsDr, "AdminOnly") + "\"");
+                            sb.Append(" DeveloperOnly=\"" + encodeXmlAttributeFieldValue(appName, rsDr, "DeveloperOnly") + "\"");
+                            sb.Append(" NewWindow=\"" + encodeXmlAttributeFieldValue(appName, rsDr, "NewWindow") + "\"");
+                            sb.Append(" Active=\"" + encodeXmlAttributeFieldValue(appName, rsDr, "Active") + "\"");
+                            sb.Append(" AddonName=\"" + encodeXmlAttributeFieldLookup(core, appName, rsDr, "AddonID", "ccAggregateFunctions") + "\"");
+                            sb.Append(" SortOrder=\"" + encodeXmlAttributeFieldValue(appName, rsDr, "SortOrder") + "\"");
+                            NavIconType = GenericController.encodeInteger(encodeXmlAttributeFieldValue(appName, rsDr, "NavIconType"));
+                            NavIconTitle = encodeXmlAttributeFieldValue(appName, rsDr, "NavIconTitle");
+                            sb.Append(" NavIconTitle=\"" + NavIconTitle + "\"");
+                            string[] SplitArray = (NavIconTypeList + ",help").Split(',');
+                            int SplitIndex = NavIconType - 1;
+                            if ((SplitIndex >= 0) && (SplitIndex <= SplitArray.GetUpperBound(0))) {
+                                sb.Append(" NavIconType=\"" + SplitArray[SplitIndex] + "\"");
+                            }
+                            sb.Append(" guid=\"" + encodeXmlAttributeFieldValue(appName, rsDr, "ccGuid") + "\"");
+                            sb.Append("></NavigatorEntry>\r\n");
                         }
-                        sb.Append(" guid=\"" + encodeXmlAttributeFieldValue(appName, rsDr, "ccGuid") + "\"");
-                        sb.Append("></NavigatorEntry>\r\n");
                     }
                 }
                 result = sb.ToString();
-            } catch( Exception ex ) {
-                LogController.handleError( core,ex);
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
             }
             return result;
         }
@@ -592,11 +536,10 @@ namespace Contensive.Processor.Controllers {
             try {
                 System.Text.StringBuilder sb = new System.Text.StringBuilder();
                 string appName = core.appConfig.name;
-                int MenuContentID = MetaController.getRecordIdByUniqueName( core,"Content", Processor.Models.Db.NavigatorEntryModel.contentName);
-                DataTable rs = core.db.executeQuery("select * from ccMenuEntries where (contentcontrolid=" + MenuContentID + ")and(name<>'')");
-                if (DbController.isDataTableOk(rs)) {
-                    if (true) {
-                        foreach (DataRow dr in rs.Rows) {
+                int MenuContentID = MetaController.getRecordIdByUniqueName(core, "Content", Processor.Models.Db.NavigatorEntryModel.contentName);
+                using (DataTable dt = core.db.executeQuery("select * from ccMenuEntries where (contentcontrolid=" + MenuContentID + ")and(name<>'')")) {
+                    if (DbController.isDataTableOk(dt)) {
+                        foreach (DataRow dr in dt.Rows) {
                             string RecordName = GenericController.encodeText(dr["Name"]);
                             sb.Append("<MenuEntry Name=\"" + encodeXMLattribute(RecordName) + "\"");
                             sb.Append(" ParentName=\"" + encodeXmlAttributeFieldLookup(core, appName, dr, "ParentID", "ccMenuEntries") + "\"");
@@ -606,16 +549,14 @@ namespace Contensive.Processor.Controllers {
                             sb.Append(" DeveloperOnly=\"" + encodeXmlAttributeFieldValue(appName, dr, "DeveloperOnly") + "\"");
                             sb.Append(" NewWindow=\"" + encodeXmlAttributeFieldValue(appName, dr, "NewWindow") + "\"");
                             sb.Append(" Active=\"" + encodeXmlAttributeFieldValue(appName, dr, "Active") + "\"");
-                            if (true) {
-                                sb.Append(" AddonName=\"" + encodeXmlAttributeFieldLookup(core, appName, dr, "AddonID", "ccAggregateFunctions") + "\"");
-                            }
+                            sb.Append(" AddonName=\"" + encodeXmlAttributeFieldLookup(core, appName, dr, "AddonID", "ccAggregateFunctions") + "\"");
                             sb.Append("/>\r\n");
                         }
                     }
                 }
                 result = sb.ToString();
-            } catch( Exception ex ) {
-                LogController.handleError( core,ex);
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
             }
             return result;
         }
@@ -642,23 +583,16 @@ namespace Contensive.Processor.Controllers {
         /// <param name="RecordID"></param>
         /// <returns></returns>
         private static string getTableRecordName(CoreController core, string TableName, int RecordID) {
-            string tempGetTableRecordName = null;
             try {
-                //
-                DataTable dt = null;
-                string appName;
-                //
-                appName = core.appConfig.name;
-                if (RecordID != 0 & !string.IsNullOrEmpty(TableName)) {
-                    dt = core.db.executeQuery("select Name from " + TableName + " where ID=" + RecordID);
-                    if (dt.Rows.Count > 0) {
-                        tempGetTableRecordName = dt.Rows[0][0].ToString();
+                if ((RecordID != 0) && (!string.IsNullOrEmpty(TableName))) {
+                    using (DataTable dt = core.db.executeQuery("select Name from " + TableName + " where ID=" + RecordID)) {
+                        if (dt.Rows.Count > 0) { return dt.Rows[0][0].ToString(); }
                     }
                 }
-            } catch( Exception ex ) {
-                LogController.handleError( core,ex);
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
             }
-            return tempGetTableRecordName;
+            return "";
         }
         //
         //====================================================================================================
@@ -696,65 +630,48 @@ namespace Contensive.Processor.Controllers {
         /// <param name="UsedIDString"></param>
         /// <returns></returns>
         private static string getMenuNameSpace(CoreController core, int RecordID, string UsedIDString) {
-            string tempgetMenuNameSpace = null;
+            string result = "";
             try {
-                //
-                DataTable rs = null;
-                int ParentID = 0;
-                string RecordName = "";
-                string ParentSpace = "";
-                string appName;
-                //
-                appName = core.appConfig.name;
                 if (RecordID != 0) {
                     if (GenericController.vbInstr(1, "," + UsedIDString + ",", "," + RecordID + ",", 1) != 0) {
                         LogController.logError(core, "getMenuNameSpace, Circular reference found in UsedIDString [" + UsedIDString + "] getting ccMenuEntries namespace for recordid [" + RecordID + "]");
-                        tempgetMenuNameSpace = "";
                     } else {
                         UsedIDString = UsedIDString + "," + RecordID;
-                        ParentID = 0;
+                        int ParentID = 0;
+                        string RecordName = "";
                         if (RecordID != 0) {
-                            rs = core.db.executeQuery("select Name,ParentID from ccMenuEntries where ID=" + RecordID);
-                            if (DbController.isDataTableOk(rs)) {
-                                ParentID = GenericController.encodeInteger(rs.Rows[0]["ParentID"]);
-                                RecordName = GenericController.encodeText(rs.Rows[0]["Name"]);
-                            }
-                            if (DbController.isDataTableOk(rs)) {
-                                if (false) {
-                                    //RS.Close()
+                            using (DataTable dt = core.db.executeQuery("select Name,ParentID from ccMenuEntries where ID=" + RecordID)) {
+                                if (DbController.isDataTableOk(dt)) {
+                                    ParentID = GenericController.encodeInteger(dt.Rows[0]["ParentID"]);
+                                    RecordName = GenericController.encodeText(dt.Rows[0]["Name"]);
                                 }
-                                //RS = Nothing
                             }
                         }
                         if (!string.IsNullOrEmpty(RecordName)) {
                             if (ParentID == RecordID) {
                                 //
                                 // circular reference
-                                //
                                 LogController.logError(core, "getMenuNameSpace, Circular reference found (ParentID=RecordID) getting ccMenuEntries namespace for recordid [" + RecordID + "]");
-                                tempgetMenuNameSpace = "";
                             } else {
+                                string ParentSpace = "";
                                 if (ParentID != 0) {
                                     //
                                     // get next parent
-                                    //
                                     ParentSpace = getMenuNameSpace(core, ParentID, UsedIDString);
                                 }
                                 if (!string.IsNullOrEmpty(ParentSpace)) {
-                                    tempgetMenuNameSpace = ParentSpace + "." + RecordName;
+                                    result = ParentSpace + "." + RecordName;
                                 } else {
-                                    tempgetMenuNameSpace = RecordName;
+                                    result = RecordName;
                                 }
                             }
-                        } else {
-                            tempgetMenuNameSpace = "";
                         }
                     }
                 }
-            } catch( Exception ex ) {
-                LogController.handleError( core,ex);
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
             }
-            return tempgetMenuNameSpace;
+            return result;
         }
         //
         //====================================================================================================
@@ -765,20 +682,14 @@ namespace Contensive.Processor.Controllers {
         /// <param name="Cache"></param>
         /// <returns></returns>
         private static string cacheLookup(int RecordID, object[,] Cache) {
-            string tempCacheLookup = null;
-            //
-            int Ptr = 0;
-            //
-            tempCacheLookup = "";
             if (RecordID != 0) {
-                for (Ptr = 0; Ptr <= Cache.GetUpperBound(1); Ptr++) {
+                for (int Ptr = 0; Ptr <= Cache.GetUpperBound(1); Ptr++) {
                     if (GenericController.encodeInteger(Cache[0, Ptr]) == RecordID) {
-                        tempCacheLookup = GenericController.encodeText(Cache[1, Ptr]);
-                        break;
+                        return GenericController.encodeText(Cache[1, Ptr]);
                     }
                 }
             }
-            return tempCacheLookup;
+            return "";
         }
         //
         //====================================================================================================

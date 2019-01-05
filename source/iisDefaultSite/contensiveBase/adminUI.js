@@ -2,11 +2,6 @@
 //
 // -- contensive base: included for all base addons: adminSite, pageManager, etc
 //
-var ImagePropertyEditorObject;
-var DialogObject;
-var ACPropertyEditorObject;
-var ACPropertyObject;
-var TableCellPropertyObject;
 var TableRowPropertyObject;
 var TablePropertyObject;
 var TableBodyPropertyObject;
@@ -692,6 +687,7 @@ function SaveFieldPlus(ObjectName) {
 //
 //----------
 //
+var DialogObject;
 function OpenImagePropertyWindow(EditorObject, ImageObject) {
     console.log("base.OpenImagePropertyWindow");
     DialogObject = ImageObject;
@@ -700,6 +696,7 @@ function OpenImagePropertyWindow(EditorObject, ImageObject) {
 //
 //----------
 //
+var ACPropertyObject;
 function OpenACPropertyWindow(EditorObject, ACObject) {
     console.log("base.OpenACPropertyWindow");
     ACPropertyObject = ACObject;
@@ -1269,6 +1266,7 @@ function setEditor(objectName) {
 //
 //----------
 //
+var TableCellPropertyObject;
 function editorRightClick(prefix, divName) {
     console.log("base.editorRightClick");
     var possibleTableElement;

@@ -145,15 +145,11 @@ namespace Contensive.Addons.Email {
                     }
                     CSEmail.close();
                 }
-                //
                 return;
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
+                throw (new GenericException("Unexpected exception"));
             }
-            //ErrorTrap:
-            throw (new GenericException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "trap error", "App.EXEName", "ProcessEmailClass", "ProcessEmail_GroupEmail", Err.Number, Err.Source, Err.Description, True, True, "")
-                                                                  //todo  TASK: Calls to the VB 'Err' function are not converted by Instant C#:
-                                                                  //Microsoft.VisualBasic.Information.Err().Clear();
         }
         //
         //====================================================================================================

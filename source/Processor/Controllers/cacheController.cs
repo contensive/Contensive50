@@ -138,7 +138,6 @@ namespace Contensive.Processor.Controllers {
                                     Newtonsoft.Json.Linq.JArray data = (Newtonsoft.Json.Linq.JArray)wrappedContent.content;
                                     result = data.ToObject<objectClass>();
                                 } else if (wrappedContent.content==null) {
-                                    //} else if ((wrappedContent.content is string) && (!(typeof(objectClass) is string))) {
                                     //
                                     // -- if cache data was left as a string (might be empty), and return object is not string, there was an error
                                     result = default(objectClass);
@@ -150,15 +149,9 @@ namespace Contensive.Processor.Controllers {
                             }
                         }
                     }
-                    //logController.appendCacheLog(core,"getObject(" + key + "), exit(" + sw.ElapsedMilliseconds + "ms)");
-                    //sw.Stop();
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
-                // 20171222 
-                // -- cache errors should be warnings, not critical errors. Dont take down the application over a cache issue.
-                // -- cache errors likely did not original above the cache api, so failing the caller would not be productive
-                //throw;
             }
             return result;
         }
@@ -267,13 +260,10 @@ namespace Contensive.Processor.Controllers {
                         if (string.IsNullOrEmpty(serializedDataObject)) {
                             LogController.logTrace(core,"getWrappedContent(" + key + "), file miss");
                         } else {
-                            //logController.appendCacheLog(core,"getWrappedContent(" + key + "), file hit, write to memory cache");
                             result = Newtonsoft.Json.JsonConvert.DeserializeObject<CacheWrapperClass>(serializedDataObject);
                             storeWrappedObject_MemoryCache(serverKey, result);
                         }
-                        if (result != null) {
-                            //logController.appendCacheLog(core,"getWrappedContent(" + key + "), fileCache hit");
-                        } else {
+                        if (result == null) {
                             LogController.logTrace(core,"getWrappedContent(" + key + "), fileCache miss");
                         }
                     }
@@ -528,7 +518,6 @@ namespace Contensive.Processor.Controllers {
             }
 
         }
-
         //
         //====================================================================================================
         /// <summary>

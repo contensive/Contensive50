@@ -122,33 +122,18 @@ namespace Contensive.Processor.Controllers {
                             memberRule.save(core);
                         }
                     }           
-                    //
-                    //---------------------------------------------------------------------
-                    // ----- Convert Database fields for new Db
-                    //---------------------------------------------------------------------
-                    //
                     if (isNewBuild) {
                         //
                         // -- set build version so a scratch build will not go through data conversion
                         DataBuildVersion = core.codeVersion();
                         core.siteProperties.dataBuildVersion = core.codeVersion();
                     }
-                    //
-                    //---------------------------------------------------------------------
-                    // ----- Upgrade Database fields if not new
-                    //---------------------------------------------------------------------
-                    //
                     if (string.CompareOrdinal(DataBuildVersion, core.codeVersion()) < 0) {
                         //
                         // -- data updates
                         LogController.logInfo(core, logPrefix + ", run database conversions, DataBuildVersion [" + DataBuildVersion + "], software version [" + core.codeVersion() + "]");
                         Upgrade_Conversion(core, DataBuildVersion, logPrefix);
                     }
-                    //
-                    //---------------------------------------------------------------------
-                    // ----- Verify content needed internally
-                    //---------------------------------------------------------------------
-                    //
                     LogController.logInfo(core, logPrefix + ", verify records required");
                     //
                     //  menus are created in ccBase.xml, this just checks for dups
@@ -160,11 +145,6 @@ namespace Contensive.Processor.Controllers {
                     verifyLibraryFileTypes(core);
                     verifyDefaultGroups(core);
                     //
-                    //---------------------------------------------------------------------
-                    // ----- Set Default SitePropertyDefaults
-                    //       must be after upgrade_conversion
-                    //---------------------------------------------------------------------
-                    //
                     LogController.logInfo(core, logPrefix + ", verify Site Properties");
                     if (repair) {
                         //
@@ -174,7 +154,6 @@ namespace Contensive.Processor.Controllers {
                     }
                     //
                     // todo remove site properties not used, put all in preferences
-                    //core.siteProperties.getText("AllowAutoHomeSectionOnce", genericController.encodeText(isNewBuild));
                     core.siteProperties.getText("AllowAutoLogin", "False");
                     core.siteProperties.getText("AllowBake", "True");
                     core.siteProperties.getText("AllowChildMenuHeadline", "True");
@@ -185,8 +164,6 @@ namespace Contensive.Processor.Controllers {
                     core.siteProperties.getText("ConvertContentText2HTML", "False");
                     core.siteProperties.getText("AllowMemberJoin", "False");
                     core.siteProperties.getText("AllowPasswordEmail", "True");
-                    //core.siteProperties.getText("AllowPathBlocking", "True");
-                    //core.siteProperties.getText("AllowPopupErrors", "True");
                     core.siteProperties.getText("AllowTestPointLogging", "False");
                     core.siteProperties.getText("AllowTestPointPrinting", "False");
                     core.siteProperties.getText("AllowTrapEmail", "True");
@@ -222,23 +199,14 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                     //
-                    //---------------------------------------------------------------------
-                    // ----- Changes that effect the web server or content files, not the Database
-                    //---------------------------------------------------------------------
-                    //
                     int StyleSN = (core.siteProperties.getInteger("StylesheetSerialNumber"));
                     if (StyleSN > 0) {
                         StyleSN += 1;
                         core.siteProperties.setProperty("StylesheetSerialNumber", StyleSN.ToString());
-                        // too lazy
-                        //Call core.app.publicFiles.SaveFile(core.app.genericController.convertCdnUrlToCdnPathFilename("templates\Public" & StyleSN & ".css"), core.app.csv_getStyleSheetProcessed)
-                        //Call core.app.publicFiles.SaveFile(core.app.genericController.convertCdnUrlToCdnPathFilename("templates\Admin" & StyleSN & ".css", core.app.csv_getStyleSheetDefault)
                     }
                     //
                     // clear all cache
-                    //
                     core.cache.invalidateAll();
-                    //
                     if (isNewBuild) {
                         //
                         // -- primary domain
@@ -264,7 +232,6 @@ namespace Contensive.Processor.Controllers {
                         }
                         defaultTemplate.bodyHTML = Properties.Resources.DefaultTemplateHtml;
                         defaultTemplate.save(core);
-                        //
                         domain.defaultTemplateId = defaultTemplate.id;
                         domain.name = primaryDomain;
                         domain.pageNotFoundPageId = landingPage.id;
@@ -282,38 +249,23 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                     //
-                    //---------------------------------------------------------------------
                     // ----- internal upgrade complete
-                    //---------------------------------------------------------------------
-                    //
                     {
                         LogController.logInfo(core, logPrefix + ", internal upgrade complete, set Buildversion to " + core.codeVersion());
                         core.siteProperties.setProperty("BuildVersion", core.codeVersion());
                         //
-                        //---------------------------------------------------------------------
                         // ----- Upgrade local collections
-                        //       This would happen if this is the first site to upgrade after a new build is installed
-                        //       (can not be in startup because new addons might fail with DbVersions)
-                        //       This means a dataupgrade is required with a new build - You can expect errors
-                        //---------------------------------------------------------------------
-                        //
                         {
-                            //
-                            // 4.1.575 - 8/28 - put this code behind the DbOnly check, makes DbOnly beuild MUCH faster
-                            //
                             string ErrorMessage = "";
                             LogController.logInfo(core, logPrefix + ", upgrading All Local Collections to new server build.");
                             bool UpgradeOK = CollectionController.upgradeLocalCollectionRepoFromRemoteCollectionRepo(core, ref ErrorMessage, isNewBuild, repair, ref  nonCriticalErrorList, logPrefix, ref installedCollections);
                             if (!string.IsNullOrEmpty(ErrorMessage)) {
-                                throw (new GenericException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, " & ErrorMessage, "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
+                                throw (new GenericException("Unexpected exception"));
                             } else if (!UpgradeOK) {
-                                throw (new GenericException("Unexpected exception")); //core.handleLegacyError3(core.appConfig.name, "During UpgradeAllLocalCollectionsFromLib3 call, NotOK was returned without an error message", "dll", "builderClass", "Upgrade2", 0, "", "", False, True, "")
+                                throw (new GenericException("Unexpected exception")); 
                             }
                             //
-                            //---------------------------------------------------------------------
                             // ----- Upgrade all collection for this app (in case collections were installed before the upgrade
-                            //---------------------------------------------------------------------
-                            //
                             string Collectionname = null;
                             string CollectionGuid = null;
                             bool localCollectionFound = false;
@@ -418,10 +370,7 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                     //
-                    //---------------------------------------------------------------------
                     // ----- Explain, put up a link and exit without continuing
-                    //---------------------------------------------------------------------
-                    //
                     core.cache.invalidateAll();
                     LogController.logInfo(core, logPrefix + ", Upgrade Complete");
                 }
@@ -456,21 +405,13 @@ namespace Contensive.Processor.Controllers {
         //
         private static void verifyAdminMenus(CoreController core, string DataBuildVersion) {
             try {
-                DataTable dt = null;
-                //
-                // ----- remove duplicate menus that may have been added during faulty upgrades
-                //
-                string FieldNew = null;
-                string FieldLast = null;
-                int FieldRecordID = 0;
-                //Dim dt As DataTable
-                dt = core.db.executeQuery("Select ID,Name,ParentID from ccMenuEntries where (active<>0) Order By ParentID,Name");
+                DataTable dt = core.db.executeQuery("Select ID,Name,ParentID from ccMenuEntries where (active<>0) Order By ParentID,Name");
                 if (dt.Rows.Count > 0) {
-                    FieldLast = "";
+                    string FieldLast = "";
                     for (var rowptr = 0; rowptr < dt.Rows.Count; rowptr++) {
-                        FieldNew = GenericController.encodeText(dt.Rows[rowptr]["name"]) + "." + GenericController.encodeText(dt.Rows[rowptr]["parentid"]);
+                        string FieldNew = GenericController.encodeText(dt.Rows[rowptr]["name"]) + "." + GenericController.encodeText(dt.Rows[rowptr]["parentid"]);
                         if (FieldNew == FieldLast) {
-                            FieldRecordID = GenericController.encodeInteger(dt.Rows[rowptr]["ID"]);
+                            int FieldRecordID = GenericController.encodeInteger(dt.Rows[rowptr]["ID"]);
                             core.db.executeQuery("Update ccMenuEntries set active=0 where ID=" + FieldRecordID + ";");
                         }
                         FieldLast = FieldNew;
@@ -603,11 +544,9 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         private static void verifyLibraryFolders(CoreController core) {
             try {
-                DataTable dt = null;
                 //
                 appendUpgradeLogAddStep(core, core.appConfig.name, "VerifyLibraryFolders", "Verify Library Folders: Images and Downloads");
-                //
-                dt = core.db.executeQuery("select id from cclibraryfiles");
+                DataTable dt = core.db.executeQuery("select id from cclibraryfiles");
                 if (dt.Rows.Count == 0) {
                     verifyRecord(core, "Library Folders", "Images");
                     verifyRecord(core, "Library Folders", "Downloads");
@@ -627,7 +566,6 @@ namespace Contensive.Processor.Controllers {
             try {
                 //
                 // Load basic records -- default images are handled in the REsource Library through the /ContensiveBase/config/DefaultValues.txt GetDefaultValue(key) mechanism
-                //
                 if (MetaController.getRecordIdByUniqueName( core,"Library File Types", "Image") == 0) {
                     verifyRecord(core, "Library File Types", "Image", "ExtensionList", "'GIF,JPG,JPE,JPEG,BMP,PNG'");
                     verifyRecord(core, "Library File Types", "Image", "IsImage", "1");
@@ -635,7 +573,6 @@ namespace Contensive.Processor.Controllers {
                     verifyRecord(core, "Library File Types", "Image", "IsDownload", "1");
                     verifyRecord(core, "Library File Types", "Image", "IsFlash", "0");
                 }
-                //
                 if (MetaController.getRecordIdByUniqueName( core,"Library File Types", "Video") == 0) {
                     verifyRecord(core, "Library File Types", "Video", "ExtensionList", "'ASX,AVI,WMV,MOV,MPG,MPEG,MP4,QT,RM'");
                     verifyRecord(core, "Library File Types", "Video", "IsImage", "0");
@@ -868,14 +805,10 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         public static void verifyDefaultGroups(CoreController core) {
             try {
-                //
-                int GroupID = 0;
-                string SQL = null;
-                //
                 appendUpgradeLogAddStep(core, core.appConfig.name, "VerifyDefaultGroups", "Verify Default Groups");
                 //
-                GroupID = GroupController.add(core, "Site Managers");
-                SQL = "Update ccContent Set EditorGroupID=" + DbController.encodeSQLNumber(GroupID) + " where EditorGroupID is null;";
+                int GroupID = GroupController.add(core, "Site Managers");
+                string SQL = "Update ccContent Set EditorGroupID=" + DbController.encodeSQLNumber(GroupID) + " where EditorGroupID is null;";
                 core.db.executeQuery(SQL);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -891,11 +824,9 @@ namespace Contensive.Processor.Controllers {
         /// <param name="logPrefix"></param>
         internal static void verifyBasicTables(CoreController core, string logPrefix) {
             try {
-                //
                 {
                     logPrefix += "-verifyBasicTables";
                     LogController.logInfo(core, logPrefix + ", enter");
-                    //appendUpgradeLogAddStep(core, core.appConfig.name, "VerifyCoreTables", "Verify Core SQL Tables");
                     //
                     core.db.createSQLTable( "ccDataSources");
                     core.db.createSQLTableField( "ccDataSources", "username", fieldTypeIdText);
@@ -903,7 +834,6 @@ namespace Contensive.Processor.Controllers {
                     core.db.createSQLTableField( "ccDataSources", "connString", fieldTypeIdText);
                     core.db.createSQLTableField( "ccDataSources", "endpoint", fieldTypeIdText);
                     core.db.createSQLTableField( "ccDataSources", "dbTypeId", fieldTypeIdLookup);
-                    //core.db.createSQLTableField( "ccDataSources", "address", fieldTypeIdText);
                     //
                     core.db.createSQLTable( "ccTables");
                     core.db.createSQLTableField( "ccTables", "DataSourceID", fieldTypeIdLookup);
@@ -1119,27 +1049,23 @@ namespace Contensive.Processor.Controllers {
         private static void verifySortMethod(CoreController core, string Name, string OrderByCriteria) {
             try {
                 //
-                DataTable dt = null;
                 SqlFieldListClass sqlList = new SqlFieldListClass();
-                //
                 sqlList.add("name", DbController.encodeSQLText(Name));
                 sqlList.add("CreatedBy", "0");
                 sqlList.add("OrderByClause", DbController.encodeSQLText(OrderByCriteria));
                 sqlList.add("active", SQLTrue);
                 sqlList.add("contentControlId", MetaModel.getContentId(core, "Sort Methods").ToString());
                 //
-                dt = core.db.openTable( "ccSortMethods", "Name=" + DbController.encodeSQLText(Name), "ID", "ID", 1, 1);
+                DataTable dt = core.db.openTable( "ccSortMethods", "Name=" + DbController.encodeSQLText(Name), "ID", "ID", 1, 1);
                 if (dt.Rows.Count > 0) {
                     //
                     // update sort method
-                    //
                     int recordId = GenericController.encodeInteger(dt.Rows[0]["ID"]);
                     core.db.updateTableRecord( "ccSortMethods", "ID=" + recordId.ToString(), sqlList, true);
                     SortMethodModel.invalidateRecordCache(core, recordId);
                 } else {
                     //
                     // Create the new sort method
-                    //
                     core.db.insertTableRecord( "ccSortMethods", sqlList);
                 }
             } catch (Exception ex) {
@@ -1174,14 +1100,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 //
                 int RowsFound = 0;
-                int CID = 0;
                 bool TableBad = false;
-                int RowsNeeded = 0;
-                //
-                // ----- make sure there are enough records
-                //
-                TableBad = false;
-                RowsFound = 0;
                 using (DataTable rs = core.db.executeQuery("Select ID from ccFieldTypes order by id")) {
                     if (!DbController.isDataTableOk(rs)) {
                         //
@@ -1217,9 +1136,9 @@ namespace Contensive.Processor.Controllers {
                 //
                 // ----- Add the number of rows needed
                 //
-                RowsNeeded = fieldTypeIdMax - RowsFound;
+                int RowsNeeded = fieldTypeIdMax - RowsFound;
                 if (RowsNeeded > 0) {
-                    CID = MetaModel.getContentId(core, "Content Field Types");
+                    int CID = MetaModel.getContentId(core, "Content Field Types");
                     if (CID <= 0) {
                         //
                         // Problem

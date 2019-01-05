@@ -109,30 +109,6 @@ namespace Contensive.Processor.Controllers {
                                 string AddonOptionStringHTMLEncoded = null;
                                 string ACInstanceID = null;
                                 switch (ElementTag) {
-                                    case "FORM":
-                                        //
-                                        // Form created in content
-                                        // EncodeEditIcons -> remove the
-                                        //
-                                        if (EncodeNonCachableTags) {
-                                            FormCount = FormCount + 1;
-                                            //
-                                            // 5/14/2009 - DM said it is OK to remove UserResponseForm Processing
-                                            // however, leave this one because it is needed to make current forms work.
-                                            //
-                                            // 20180914 - contensiveuserform deprecated (has not been used forever, so not needed)
-                                            //if ((Copy.IndexOf("contensiveuserform=1", System.StringComparison.OrdinalIgnoreCase) != -1) || (Copy.IndexOf("contensiveuserform=\"1\"", System.StringComparison.OrdinalIgnoreCase) != -1)) {
-                                            //    //
-                                            //    // if it has "contensiveuserform=1" in the form tag, remove it from the form and add the hidden that makes it work
-                                            //    //
-                                            //    Copy = genericController.vbReplace(Copy, "ContensiveUserForm=1", "", 1, 99, 1);
-                                            //    Copy = genericController.vbReplace(Copy, "ContensiveUserForm=\"1\"", "", 1, 99, 1);
-                                            //    if (!encodeForWysiwygEditor) {
-                                            //        Copy += "<input type=hidden name=ContensiveUserForm value=1>";
-                                            //    }
-                                            //}
-                                        }
-                                        break;
                                     case "INPUT":
                                         if (EncodeNonCachableTags) {
                                             FormInputCount = FormInputCount + 1;
@@ -1997,9 +1973,7 @@ namespace Contensive.Processor.Controllers {
         /// Convert an active content field (html data stored with <ac></ac> html tags) to a wysiwyg editor request (html with edit icon <img> for <ac></ac>)
         /// </summary>
         public static string renderHtmlForWysiwygEditor(CoreController core, string editorValue) {
-            string result = editorValue;
-            result = encode(core, result, 0, "", 0, 0, false, false, false, true, true, false, "", "", false, 0, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple, false, null, false);
-            return result;
+            return encode(core, editorValue, 0, "", 0, 0, false, false, false, true, true, false, "", "", false, 0, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple, false, null, false);
         }
         //
         //====================================================================================================
