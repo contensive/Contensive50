@@ -98,8 +98,8 @@ namespace Contensive.Processor.Models.Db {
         }
         //
         //====================================================================================================
-        public static PersonModel create(CoreController core, int recordId) {
-            return create<PersonModel>(core, recordId);
+        public static PersonModel create(BaseClasses.CPBaseClass cp, int recordId) {
+            return create<PersonModel>(((CPClass)cp).core, recordId);
         }
         //
         //====================================================================================================

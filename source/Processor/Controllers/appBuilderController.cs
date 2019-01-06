@@ -69,7 +69,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- verify root developer
                     LogController.logInfo(core, logPrefix + ", verify developer user");
-                    var root = PersonModel.create(core, defaultRootUserGuid);
+                    var root = PersonModel.create(core.cp_forAddonExecutionOnly, defaultRootUserGuid);
                     if (root == null) {
                         LogController.logInfo(core, logPrefix + ", root user guid not found, test for root username");
                         var rootList = PersonModel.createList(core, "(username='root')");
