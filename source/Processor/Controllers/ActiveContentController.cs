@@ -92,6 +92,7 @@ namespace Contensive.Processor.Controllers {
                     HtmlParserController KmaHTML = new HtmlParserController(core);
                     KmaHTML.Load(result);
                     StringBuilderLegacyController Stream = new StringBuilderLegacyController(); int ElementPointer = 0;
+                    int FormCount = 0;
                     int FormInputCount = 0;
                     if (KmaHTML.ElementCount > 0) {
                         ElementPointer = 0;

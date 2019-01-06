@@ -9,7 +9,7 @@ namespace Contensive.Processor.Controllers {
     /// <summary>
     /// Handle the nitty-gritty of reading and writing the xml file for collections and CDefMiniCollections
     /// </summary>
-    public static class AppMetaDataMiniCollection {
+    public static class ApplicationMetaDataMiniCollection {
         //
         // ----- global scope variables
         //
@@ -101,8 +101,6 @@ namespace Contensive.Processor.Controllers {
                 } else {
                     //
                     // Build table lookup
-                    var tableList = Models.Db.TableModel.createList(core, SQL);
-
                     string[,] Tables = { };
                     int TableCnt = 0;
                     using (var dt = core.db.executeQuery("select T.ID,T.Name as TableName,D.Name as DataSourceName from ccTables T Left Join ccDataSources D on D.ID=T.DataSourceID")) {

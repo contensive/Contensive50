@@ -1169,13 +1169,13 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="dataSourceName"></param>
         /// <param name="tableName"></param>
-        /// <param name="sqlCriteria"></param>
+        /// <param name="criteria"></param>
         //
-        public void deleteTableRecords(string tableName, string sqlCriteria) {
+        public void deleteTableRecords(string tableName, string criteria) {
             try {
                 if (string.IsNullOrEmpty(tableName)) { throw new ArgumentException("TableName cannot be blank"); }
-                if (string.IsNullOrEmpty(sqlCriteria)) { throw new ArgumentException("Criteria cannot be blank"); }
-                executeQuery("delete from " + tableName + " where " + sqlCriteria);
+                if (string.IsNullOrEmpty(criteria)) { throw new ArgumentException("Criteria cannot be blank"); }
+                executeQuery("delete from " + tableName + " where " + criteria);
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
@@ -1347,16 +1347,20 @@ namespace Contensive.Processor.Controllers {
         public string[,] convertDataTabletoArray(DataTable dt) {
             string[,] rows = { { } };
             try {
+                int columnCnt = 0;
+                int rowCnt = 0;
+                int cPtr = 0;
+                int rPtr = 0;
                 //
                 // 20150717 check for no columns
                 if ((dt.Rows.Count > 0) && (dt.Columns.Count > 0)) {
-                    int columnCnt = dt.Columns.Count;
-                    int rowCnt = dt.Rows.Count;
+                    columnCnt = dt.Columns.Count;
+                    rowCnt = dt.Rows.Count;
                     // 20150717 change from rows(columnCnt,rowCnt) because other routines appear to use this count
                     rows = new string[columnCnt, rowCnt];
-                    int rPtr = 0;
+                    rPtr = 0;
                     foreach (DataRow dr in dt.Rows) {
-                        int cPtr = 0;
+                        cPtr = 0;
                         foreach (DataColumn cell in dt.Columns) {
                             rows[cPtr, rPtr] = GenericController.encodeText(dr[cell]);
                             cPtr += 1;

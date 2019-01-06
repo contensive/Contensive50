@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Contensive.Processor.Controllers;
 //
 namespace Contensive.Processor.Models.Db {
-    public class ContentFieldModel : DbModel {
+    public class ContentFieldModel : BaseModel {
         //
         //====================================================================================================
         //-- const
@@ -53,7 +53,7 @@ namespace Contensive.Processor.Models.Db {
         // 
         //====================================================================================================
         public static ContentFieldModel addEmpty(CoreController core) {
-            return AddEmpty<ContentFieldModel>(core);
+            return addEmpty<ContentFieldModel>(core);
         }
         //
         //====================================================================================================
@@ -136,17 +136,17 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return DbModel.getRecordName<ContentFieldModel>(core, recordId);
+            return BaseModel.getRecordName<ContentFieldModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return DbModel.getRecordName<ContentFieldModel>(core, ccGuid);
+            return BaseModel.getRecordName<ContentFieldModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return DbModel.getRecordId<ContentFieldModel>(core, ccGuid);
+            return BaseModel.getRecordId<ContentFieldModel>(core, ccGuid);
         }
         //
         //====================================================================================================

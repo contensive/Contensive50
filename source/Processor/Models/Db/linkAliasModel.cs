@@ -15,7 +15,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Models.Db {
-    public class LinkAliasModel : DbModel {
+    public class LinkAliasModel : BaseModel {
         //
         //====================================================================================================
         //-- const
@@ -31,7 +31,7 @@ namespace Contensive.Processor.Models.Db {
         // 
         //====================================================================================================
         public static LinkAliasModel addEmpty(CoreController core) {
-            return AddEmpty<LinkAliasModel>(core);
+            return addEmpty<LinkAliasModel>(core);
         }
         //
         //====================================================================================================
@@ -118,17 +118,17 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return DbModel.getRecordName<LinkAliasModel>(core, recordId);
+            return BaseModel.getRecordName<LinkAliasModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return DbModel.getRecordName<LinkAliasModel>(core, ccGuid);
+            return BaseModel.getRecordName<LinkAliasModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return DbModel.getRecordId<LinkAliasModel>(core, ccGuid);
+            return BaseModel.getRecordId<LinkAliasModel>(core, ccGuid);
         }
         //
         //====================================================================================================

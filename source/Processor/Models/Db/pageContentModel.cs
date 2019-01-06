@@ -15,7 +15,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Models.Db {
-    public class PageContentModel : DbModel {
+    public class PageContentModel : BaseModel {
         //
         //====================================================================================================
         //-- const
@@ -85,7 +85,7 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static PageContentModel addEmpty(CoreController core) {
-            return AddEmpty<PageContentModel>(core);
+            return addEmpty<PageContentModel>(core);
         }
         //
         //====================================================================================================
@@ -168,17 +168,17 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return DbModel.getRecordName<PageContentModel>(core, recordId);
+            return BaseModel.getRecordName<PageContentModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return DbModel.getRecordName<PageContentModel>(core, ccGuid);
+            return BaseModel.getRecordName<PageContentModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return DbModel.getRecordId<PageContentModel>(core, ccGuid);
+            return BaseModel.getRecordId<PageContentModel>(core, ccGuid);
         }
         //
         //====================================================================================================

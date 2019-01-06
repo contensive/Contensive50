@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Contensive.Processor.Controllers;
 //
 namespace Contensive.Processor.Models.Db {
-    public class GroupModel : DbModel {
+    public class GroupModel : BaseModel {
         //
         //====================================================================================================
         //-- const
@@ -22,7 +22,7 @@ namespace Contensive.Processor.Models.Db {
         // 
         //====================================================================================================
         public static GroupModel addEmpty(CoreController core) {
-            return AddEmpty<GroupModel>(core);
+            return addEmpty<GroupModel>(core);
         }
         //
         //====================================================================================================
@@ -100,17 +100,17 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return DbModel.getRecordName<GroupModel>(core, recordId);
+            return BaseModel.getRecordName<GroupModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return DbModel.getRecordName<GroupModel>(core, ccGuid);
+            return BaseModel.getRecordName<GroupModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return DbModel.getRecordId<GroupModel>(core, ccGuid);
+            return BaseModel.getRecordId<GroupModel>(core, ccGuid);
         }
         //
         //====================================================================================================

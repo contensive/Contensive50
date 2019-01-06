@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Contensive.Processor.Controllers;
 //
 namespace Contensive.Processor.Models.Db {
-    public class AuthoringControlModel : DbModel {
+    public class AuthoringControlModel : BaseModel {
         //
         //====================================================================================================
         //-- const
@@ -32,7 +32,7 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         //
-        public static AuthoringControlModel addEmpty(CoreController core) => AddEmpty<AuthoringControlModel>(core);
+        public static AuthoringControlModel addEmpty(CoreController core) => addEmpty<AuthoringControlModel>(core);
         //
         //====================================================================================================
         //
@@ -99,15 +99,15 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         //
-        public static string getRecordName(CoreController core, int recordId) => DbModel.getRecordName<AuthoringControlModel>(core, recordId);
+        public static string getRecordName(CoreController core, int recordId) => BaseModel.getRecordName<AuthoringControlModel>(core, recordId);
         //
         //====================================================================================================
         //
-        public static string getRecordName(CoreController core, string ccGuid) => DbModel.getRecordName<AuthoringControlModel>(core, ccGuid);
+        public static string getRecordName(CoreController core, string ccGuid) => BaseModel.getRecordName<AuthoringControlModel>(core, ccGuid);
         //
         //====================================================================================================
         //
-        public static int getRecordId(CoreController core, string ccGuid) => DbModel.getRecordId<AuthoringControlModel>(core, ccGuid);
+        public static int getRecordId(CoreController core, string ccGuid) => BaseModel.getRecordId<AuthoringControlModel>(core, ccGuid);
         //
         //====================================================================================================
         /// <summary>
@@ -119,6 +119,6 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         //
-        public static void deleteSelection(CoreController core, string sqlCriteria) => DbModel.deleteSelection<AuthoringControlModel>(core, sqlCriteria);
+        public static void deleteSelection(CoreController core, string sqlCriteria) => BaseModel.deleteSelection<AuthoringControlModel>(core, sqlCriteria);
     }
 }

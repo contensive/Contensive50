@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Contensive.Processor.Controllers;
 //
 namespace Contensive.Processor.Models.Db {
-    public class EmailModel : DbModel {
+    public class EmailModel : BaseModel {
         //
         //====================================================================================================
         //-- const
@@ -21,7 +21,7 @@ namespace Contensive.Processor.Models.Db {
         public DateTime conditionExpireDate { get; set; }
         public int conditionID { get; set; }
         public int conditionPeriod { get; set; }
-        public DbModel.FieldTypeTextFile copyFilename { get; set; }
+        public BaseModel.FieldTypeTextFile copyFilename { get; set; }
         public int emailTemplateID { get; set; }
         public int emailWizardID { get; set; }
         public string fromAddress { get; set; }
@@ -29,7 +29,7 @@ namespace Contensive.Processor.Models.Db {
         public DateTime lastSendTestDate { get; set; }
         public DateTime scheduleDate { get; set; }
         public bool sent { get; set; }
-        public DbModel.FieldTypeCSSFile stylesFilename { get; set; }
+        public BaseModel.FieldTypeCSSFile stylesFilename { get; set; }
         public string subject { get; set; }
         public bool submitted { get; set; }
         public int testMemberID { get; set; }
@@ -37,7 +37,7 @@ namespace Contensive.Processor.Models.Db {
         // 
         //====================================================================================================
         public static EmailModel addEmpty(CoreController core) {
-            return AddEmpty<EmailModel>(core);
+            return addEmpty<EmailModel>(core);
         }
         //
         //====================================================================================================
@@ -115,17 +115,17 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return DbModel.getRecordName<EmailModel>(core, recordId);
+            return BaseModel.getRecordName<EmailModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return DbModel.getRecordName<EmailModel>(core, ccGuid);
+            return BaseModel.getRecordName<EmailModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return DbModel.getRecordId<EmailModel>(core, ccGuid);
+            return BaseModel.getRecordId<EmailModel>(core, ccGuid);
         }
         //
         //====================================================================================================

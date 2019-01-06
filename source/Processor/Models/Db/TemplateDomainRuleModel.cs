@@ -15,7 +15,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Models.Db {
-    public class TemplateDomainRuleModel : DbModel {
+    public class TemplateDomainRuleModel : BaseModel {
         //
         //====================================================================================================
         //-- const
@@ -31,7 +31,7 @@ namespace Contensive.Processor.Models.Db {
         // 
         //====================================================================================================
         public static TemplateDomainRuleModel addEmpty(CoreController core) {
-            return AddEmpty<TemplateDomainRuleModel>(core);
+            return addEmpty<TemplateDomainRuleModel>(core);
         }
         //
         //====================================================================================================
@@ -109,17 +109,17 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return DbModel.getRecordName<TemplateDomainRuleModel>(core, recordId);
+            return BaseModel.getRecordName<TemplateDomainRuleModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return DbModel.getRecordName<TemplateDomainRuleModel>(core, ccGuid);
+            return BaseModel.getRecordName<TemplateDomainRuleModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return DbModel.getRecordId<TemplateDomainRuleModel>(core, ccGuid);
+            return BaseModel.getRecordId<TemplateDomainRuleModel>(core, ccGuid);
         }
         //
         //====================================================================================================

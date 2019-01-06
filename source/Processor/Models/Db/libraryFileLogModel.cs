@@ -15,7 +15,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Models.Db {
-    public class LibraryFileLogModel : DbModel {
+    public class LibraryFileLogModel : BaseModel {
         //
         //====================================================================================================
         //-- const
@@ -32,7 +32,7 @@ namespace Contensive.Processor.Models.Db {
         // 
         //====================================================================================================
         public static LibraryFileLogModel addEmpty(CoreController core) {
-            return AddEmpty<LibraryFileLogModel>(core);
+            return addEmpty<LibraryFileLogModel>(core);
         }
         //
         //====================================================================================================
@@ -110,17 +110,17 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return DbModel.getRecordName<LibraryFileLogModel>(core, recordId);
+            return BaseModel.getRecordName<LibraryFileLogModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return DbModel.getRecordName<LibraryFileLogModel>(core, ccGuid);
+            return BaseModel.getRecordName<LibraryFileLogModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return DbModel.getRecordId<LibraryFileLogModel>(core, ccGuid);
+            return BaseModel.getRecordId<LibraryFileLogModel>(core, ccGuid);
         }
         //
         //====================================================================================================

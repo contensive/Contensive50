@@ -15,7 +15,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Models.Db {
-    public class LinkForwardModel : DbModel {
+    public class LinkForwardModel : BaseModel {
         //
         //====================================================================================================
         //-- const
@@ -33,7 +33,7 @@ namespace Contensive.Processor.Models.Db {
         // 
         //====================================================================================================
         public static LinkForwardModel addEmpty(CoreController core) {
-            return AddEmpty<LinkForwardModel>(core);
+            return addEmpty<LinkForwardModel>(core);
         }
         //
         //====================================================================================================
@@ -120,17 +120,17 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return DbModel.getRecordName<LinkForwardModel>(core, recordId);
+            return BaseModel.getRecordName<LinkForwardModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return DbModel.getRecordName<LinkForwardModel>(core, ccGuid);
+            return BaseModel.getRecordName<LinkForwardModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return DbModel.getRecordId<LinkForwardModel>(core, ccGuid);
+            return BaseModel.getRecordId<LinkForwardModel>(core, ccGuid);
         }
         //
         //====================================================================================================

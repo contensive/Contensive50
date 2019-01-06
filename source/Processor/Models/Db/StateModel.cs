@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Contensive.Processor.Controllers;
 //
 namespace Contensive.Processor.Models.Db {
-    public class StateModel : DbModel {
+    public class StateModel : BaseModel {
         //
         //====================================================================================================
         //-- const
@@ -21,7 +21,7 @@ namespace Contensive.Processor.Models.Db {
         // todo -- add addEmpty to all models
         //====================================================================================================
         public static StateModel addEmpty(CoreController core) {
-            return AddEmpty<StateModel>(core);
+            return addEmpty<StateModel>(core);
         }
         //
         //====================================================================================================
@@ -104,17 +104,17 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return DbModel.getRecordName<StateModel>(core, recordId);
+            return BaseModel.getRecordName<StateModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return DbModel.getRecordName<StateModel>(core, ccGuid);
+            return BaseModel.getRecordName<StateModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return DbModel.getRecordId<StateModel>(core, ccGuid);
+            return BaseModel.getRecordId<StateModel>(core, ccGuid);
         }
         //
         //====================================================================================================
