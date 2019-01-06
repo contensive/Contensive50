@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Contensive.Processor.Controllers;
 //
 namespace Contensive.Processor.Models.Db {
-    public class AddonCollectionModel : BaseModel {
+    public class AddonCollectionModel : DbModel {
         //
         //====================================================================================================
         //-- const
@@ -29,7 +29,7 @@ namespace Contensive.Processor.Models.Db {
         // 
         //====================================================================================================
         public static AddonCollectionModel addEmpty(CoreController core) {
-            return addEmpty<AddonCollectionModel>(core);
+            return AddEmpty<AddonCollectionModel>(core);
         }
         //
         //====================================================================================================
@@ -107,17 +107,17 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return BaseModel.getRecordName<AddonCollectionModel>(core, recordId);
+            return DbModel.getRecordName<AddonCollectionModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return BaseModel.getRecordName<AddonCollectionModel>(core, ccGuid);
+            return DbModel.getRecordName<AddonCollectionModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return BaseModel.getRecordId<AddonCollectionModel>(core, ccGuid);
+            return DbModel.getRecordId<AddonCollectionModel>(core, ccGuid);
         }
         //
         //====================================================================================================

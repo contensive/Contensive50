@@ -283,7 +283,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 int downloadId = 0;
                 if (!string.IsNullOrEmpty(downloadName)) {
-                    var download = BaseModel.addDefault<DownloadModel>(core, MetaModel.createByUniqueName(core, DownloadModel.contentName));
+                    var download = DbModel.addDefault<DownloadModel>(core, MetaModel.createByUniqueName(core, DownloadModel.contentName));
                     download.name = downloadName;
                     download.dateRequested = DateTime.Now;
                     download.requestedBy = core.session.user.id;
@@ -308,7 +308,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- add it to the queue and shell out to the command
                 if (resultTaskAdded) {
-                    var task = TaskModel.addEmpty<TaskModel>(core);
+                    var task = TaskModel.AddEmpty<TaskModel>(core);
                     task.name = "addon [#" + cmdDetail.addonId + "," + cmdDetail.addonName + "]";
                     task.cmdDetail = cmdDetailJson;
                     task.resultDownloadId = downloadId;

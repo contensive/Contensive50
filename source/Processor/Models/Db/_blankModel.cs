@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Contensive.Processor.Controllers;
 //
 namespace Contensive.Processor.Models.Db {
-    public class _BlankModel : BaseModel {
+    public class _BlankModel : DbModel {
         //
         //====================================================================================================
         //-- const
@@ -20,7 +20,7 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         //
-        public static _BlankModel addEmpty(CoreController core) => addEmpty<_BlankModel>(core);
+        public static _BlankModel addEmpty(CoreController core) => AddEmpty<_BlankModel>(core);
         //
         //====================================================================================================
         //
@@ -87,15 +87,15 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         //
-        public static string getRecordName(CoreController core, int recordId) => BaseModel.getRecordName<_BlankModel>(core, recordId);
+        public static string getRecordName(CoreController core, int recordId) => DbModel.getRecordName<_BlankModel>(core, recordId);
         //
         //====================================================================================================
         //
-        public static string getRecordName(CoreController core, string ccGuid) => BaseModel.getRecordName<_BlankModel>(core, ccGuid);
+        public static string getRecordName(CoreController core, string ccGuid) => DbModel.getRecordName<_BlankModel>(core, ccGuid);
         //
         //====================================================================================================
         //
-        public static int getRecordId(CoreController core, string ccGuid) => BaseModel.getRecordId<_BlankModel>(core, ccGuid);
+        public static int getRecordId(CoreController core, string ccGuid) => DbModel.getRecordId<_BlankModel>(core, ccGuid);
         //
         //====================================================================================================
         /// <summary>
@@ -107,6 +107,6 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         //
-        public static void deleteSelection(CoreController core, string sqlCriteria) => BaseModel.deleteSelection<_BlankModel>(core, sqlCriteria);
+        public static void deleteSelection(CoreController core, string sqlCriteria) => DbModel.deleteSelection<_BlankModel>(core, sqlCriteria);
     }
 }

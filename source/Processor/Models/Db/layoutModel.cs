@@ -15,14 +15,14 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Models.Db {
-    public class LayoutModel : BaseModel {
+    public class LayoutModel : DbModel {
         //
         //====================================================================================================
-        //-- const
-        public static string contentName { get { return "layouts"; } }
-        public static string contentTableName { get { return "ccLayouts"; } }
-        public static string contentDataSource { get { return "default"; } }
-        public static bool nameFieldIsUnique { get { return true; } }
+        //-- const. MUST be exposed const. NOT wrapped in property
+        public const string contentName = "layouts";
+        public const string contentTableName = "ccLayouts";
+        public const string contentDataSource = "default";
+        public const bool nameFieldIsUnique = true;
         //
         //====================================================================================================
         // -- instance properties

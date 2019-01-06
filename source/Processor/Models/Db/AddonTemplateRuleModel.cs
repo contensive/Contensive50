@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Contensive.Processor.Controllers;
 //
 namespace Contensive.Processor.Models.Db {
-    public class AddonTemplateRuleModel : BaseModel {
+    public class AddonTemplateRuleModel : DbModel {
         //
         //====================================================================================================
         //-- const
@@ -19,7 +19,7 @@ namespace Contensive.Processor.Models.Db {
         // 
         //====================================================================================================
         public static AddonTemplateRuleModel addEmpty(CoreController core) {
-            return addEmpty<AddonTemplateRuleModel>(core);
+            return AddEmpty<AddonTemplateRuleModel>(core);
         }
         //
         //====================================================================================================
@@ -97,17 +97,17 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return BaseModel.getRecordName<AddonTemplateRuleModel>(core, recordId);
+            return DbModel.getRecordName<AddonTemplateRuleModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return BaseModel.getRecordName<AddonTemplateRuleModel>(core, ccGuid);
+            return DbModel.getRecordName<AddonTemplateRuleModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return BaseModel.getRecordId<AddonTemplateRuleModel>(core, ccGuid);
+            return DbModel.getRecordId<AddonTemplateRuleModel>(core, ccGuid);
         }
         //
         //====================================================================================================

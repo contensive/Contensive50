@@ -8,7 +8,15 @@ namespace Contensive.BaseClasses {
     /// CP - The object passed to an addon in the add-ons execute method. See the AddonBaseClass for details of the addon execute method.
     /// </summary>
     /// <remarks></remarks>
+    ///
     public abstract class CPBaseClass {
+        //
+        //====================================================================================================
+        /// <summary>
+        /// object to support dbModel creation
+        /// </summary>
+        /// <returns></returns>
+        public abstract CPDbModelBaseClass DbModelNew();
         //
         //====================================================================================================
         /// <summary>

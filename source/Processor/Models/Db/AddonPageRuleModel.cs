@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Contensive.Processor.Controllers;
 //
 namespace Contensive.Processor.Models.Db {
-    public class AddonPageRuleModel : BaseModel {
+    public class AddonPageRuleModel : DbModel {
         //
         //====================================================================================================
         //-- const
@@ -19,7 +19,7 @@ namespace Contensive.Processor.Models.Db {
         // 
         //====================================================================================================
         public static AddonPageRuleModel addEmpty(CoreController core) {
-            return addEmpty<AddonPageRuleModel>(core);
+            return AddEmpty<AddonPageRuleModel>(core);
         }
         //
         //====================================================================================================
@@ -97,17 +97,17 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return BaseModel.getRecordName<AddonPageRuleModel>(core, recordId);
+            return DbModel.getRecordName<AddonPageRuleModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return BaseModel.getRecordName<AddonPageRuleModel>(core, ccGuid);
+            return DbModel.getRecordName<AddonPageRuleModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return BaseModel.getRecordId<AddonPageRuleModel>(core, ccGuid);
+            return DbModel.getRecordId<AddonPageRuleModel>(core, ccGuid);
         }
         //
         //====================================================================================================

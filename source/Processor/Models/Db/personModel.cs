@@ -15,7 +15,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Models.Db {
-    public class PersonModel : BaseModel {
+    public class PersonModel : DbModel {
         //
         //====================================================================================================
         //-- const
@@ -84,7 +84,7 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static PersonModel addEmpty(CoreController core) {
-            return addEmpty<PersonModel>(core);
+            return AddEmpty<PersonModel>(core);
         }
         //
         //====================================================================================================

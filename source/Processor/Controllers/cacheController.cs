@@ -384,7 +384,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="guid"></param>
         /// <param name="recordId"></param>
         /// <param name="content"></param>
-        public void StoreDbModel<T>(string guid, int recordId, object content) where T : BaseModel {
+        public void StoreDbModel<T>(string guid, int recordId, object content) where T : DbModel {
             Type derivedType = this.GetType();
             FieldInfo fieldInfoTable = derivedType.GetField("contentTableName");
             if (fieldInfoTable == null) {

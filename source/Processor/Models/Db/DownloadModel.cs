@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Contensive.Processor.Controllers;
 //
 namespace Contensive.Processor.Models.Db {
-    public class DownloadModel : BaseModel {
+    public class DownloadModel : DbModel {
         //
         //====================================================================================================
         //-- const

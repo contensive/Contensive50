@@ -225,7 +225,7 @@
     <Compile Include="Controllers\TaskRunnerController.cs" />
     <Compile Include="Controllers\TaskSchedulerController.cs" />
     <Compile Include="Controllers\WorkflowController.cs" />
-    <Compile Include="Controllers\ApplicationCDefMiniCollection.cs" />
+    <Compile Include="Controllers\AppMetaDataMiniCollection.cs" />
     <Compile Include="Controllers\XmlController.cs" />
     <Compile Include="Controllers\QuickEditController.cs" />
     <Compile Include="Controllers\MetaController.cs" />
@@ -269,6 +269,7 @@
     <Compile Include="Views\CPContextClass.cs" />
     <Compile Include="Views\CPCSClass.cs" />
     <Compile Include="Views\CPDbClass.cs" />
+    <Compile Include="Views\CPDbModelClass.cs" />
     <Compile Include="Views\CPDocClass.cs" />
     <Compile Include="Views\CPEmailClass.cs" />
     <Compile Include="Views\CPFileClass.cs" />
@@ -301,7 +302,7 @@
     <Compile Include="Models\Db\AddonModel.cs" />
     <Compile Include="Models\Db\AddonPageRuleModel.cs" />
     <Compile Include="Models\Db\AddonTemplateRuleModel.cs" />
-    <Compile Include="Models\Db\BaseModel.cs" />
+    <Compile Include="Models\Db\DbModel.cs" />
     <Compile Include="Models\Db\ContentFieldHelpModel.cs" />
     <Compile Include="Models\Db\ContentFieldModel.cs" />
     <Compile Include="Models\Db\ContentModel.cs" />

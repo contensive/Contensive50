@@ -53,6 +53,7 @@
     <Compile Include="CPCacheBaseClass.cs" />
     <Compile Include="CPContentBaseClass.cs" />
     <Compile Include="CPCSBaseClass.cs" />
+    <Compile Include="CPDbModelBaseClass.cs" />
     <Compile Include="CPDbBaseClass.cs" />
     <Compile Include="CPDocBaseClass.cs" />
     <Compile Include="CPEmailBaseClass.cs" />

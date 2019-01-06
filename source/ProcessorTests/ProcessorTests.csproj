@@ -122,6 +122,7 @@
     <Compile Include="UnitTests\Controllers\genericControllerUnitTests.cs" />
     <Compile Include="UnitTests\Controllers\iisControllerUnitTests.cs" />
     <Compile Include="UnitTests\Controllers\_blank.cs" />
+    <Compile Include="UnitTests\Models\DbModelTests.cs" />
     <Compile Include="UnitTests\Models\routeDictionaryModelTests.cs" />
     <Compile Include="UnitTests\Views\cpApi\cpBlockTests.cs" />
     <Compile Include="UnitTests\Views\cpApi\cpCacheTests.cs" />

@@ -6,7 +6,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Models.Db {
-    public class TaskModel : BaseModel {
+    public class TaskModel : DbModel {
         //
         //====================================================================================================
         //-- const
@@ -37,7 +37,7 @@ namespace Contensive.Processor.Models.Db {
         /// <summary>
         /// The file where the output of the command is stored. 
         /// </summary>
-        public BaseModel.FieldTypeTextFile filename { get; set; }
+        public DbModel.FieldTypeTextFile filename { get; set; }
         /// <summary>
         /// datetime when the task completes
         /// </summary>
@@ -127,17 +127,17 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return BaseModel.getRecordName<TaskModel>(core, recordId);
+            return DbModel.getRecordName<TaskModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return BaseModel.getRecordName<TaskModel>(core, ccGuid);
+            return DbModel.getRecordName<TaskModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return BaseModel.getRecordId<TaskModel>(core, ccGuid);
+            return DbModel.getRecordId<TaskModel>(core, ccGuid);
         }
         //
         //====================================================================================================

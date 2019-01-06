@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Contensive.Processor.Controllers;
 //
 namespace Contensive.Processor.Models.Db {
-    public class EmailTemplateModel : BaseModel {
+    public class EmailTemplateModel : DbModel {
         //
         //====================================================================================================
         //-- const
@@ -19,7 +19,7 @@ namespace Contensive.Processor.Models.Db {
         // 
         //====================================================================================================
         public static EmailTemplateModel addEmpty(CoreController core) {
-            return addEmpty<EmailTemplateModel>(core);
+            return AddEmpty<EmailTemplateModel>(core);
         }
         //
         //====================================================================================================
@@ -97,17 +97,17 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return BaseModel.getRecordName<EmailTemplateModel>(core, recordId);
+            return DbModel.getRecordName<EmailTemplateModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return BaseModel.getRecordName<EmailTemplateModel>(core, ccGuid);
+            return DbModel.getRecordName<EmailTemplateModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return BaseModel.getRecordId<EmailTemplateModel>(core, ccGuid);
+            return DbModel.getRecordId<EmailTemplateModel>(core, ccGuid);
         }
         //
         //====================================================================================================

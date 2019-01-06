@@ -15,7 +15,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Models.Db {
-    public class LanguageModel : BaseModel {
+    public class LanguageModel : DbModel {
         //
         //====================================================================================================
         //-- const
@@ -26,7 +26,7 @@ namespace Contensive.Processor.Models.Db {
         // 
         //====================================================================================================
         public static LanguageModel addEmpty(CoreController core) {
-            return addEmpty<LanguageModel>(core);
+            return AddEmpty<LanguageModel>(core);
         }
         //
         //====================================================================================================
@@ -108,17 +108,17 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return BaseModel.getRecordName<LanguageModel>(core, recordId);
+            return DbModel.getRecordName<LanguageModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return BaseModel.getRecordName<LanguageModel>(core, ccGuid);
+            return DbModel.getRecordName<LanguageModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return BaseModel.getRecordId<LanguageModel>(core, ccGuid);
+            return DbModel.getRecordId<LanguageModel>(core, ccGuid);
         }
         //
         //====================================================================================================
