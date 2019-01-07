@@ -489,9 +489,9 @@ namespace Contensive.Processor.Controllers {
         /// update the transaction log
         /// </summary>
         /// <param name="LogEntry"></param>
-        private void saveTransactionLog(string sql, long ElapsedMilliseconds, string sqlMethodType) {
-            string logMsg = "type [" + sqlMethodType + "], duration [" + ElapsedMilliseconds + "ms], sql [" + sql.Replace("\r", "").Replace("\n", "") + "]";
-            if (ElapsedMilliseconds > sqlSlowThreshholdMsec) {
+        private void saveTransactionLog(string sql, long elapsedMilliseconds, string sqlMethodType) {
+            string logMsg = "type [" + sqlMethodType + "], duration [" + elapsedMilliseconds + "ms], sql [" + sql.Replace("\r", "").Replace("\n", "") + "]";
+            if (elapsedMilliseconds > sqlSlowThreshholdMsec) {
                 LogController.logWarn(core, "Slow Query " + logMsg);
             } else {
                 LogController.logDebug(core, logMsg);
@@ -503,15 +503,15 @@ namespace Contensive.Processor.Controllers {
         /// Returns true if the field exists in the table
         /// </summary>
         /// <param name="DataSourceName"></param>
-        /// <param name="TableName"></param>
-        /// <param name="FieldName"></param>
+        /// <param name="tableName"></param>
+        /// <param name="fieldName"></param>
         /// <returns></returns>
-        public bool isSQLTableField(string TableName, string FieldName) {
+        public bool isSQLTableField(string tableName, string fieldName) {
             bool returnOK = false;
             try {
-                Models.Domain.TableSchemaModel tableSchema = TableSchemaModel.getTableSchema(core, TableName, dataSourceName);
+                Models.Domain.TableSchemaModel tableSchema = TableSchemaModel.getTableSchema(core, tableName, dataSourceName);
                 if (tableSchema != null) {
-                    returnOK = (null != tableSchema.columns.Find(x => x.COLUMN_NAME.ToLowerInvariant() == FieldName.ToLowerInvariant()));
+                    returnOK = (null != tableSchema.columns.Find(x => x.COLUMN_NAME.ToLowerInvariant() == fieldName.ToLowerInvariant()));
                 }
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
@@ -524,12 +524,12 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Returns true if the table exists
         /// </summary>
-        /// <param name="TableName"></param>
+        /// <param name="tableName"></param>
         /// <returns></returns>
-        public bool isSQLTable(string TableName) {
+        public bool isSQLTable(string tableName) {
             bool ReturnOK = false;
             try {
-                ReturnOK = (!(Models.Domain.TableSchemaModel.getTableSchema(core, TableName, dataSourceName) == null));
+                ReturnOK = (!(Models.Domain.TableSchemaModel.getTableSchema(core, tableName, dataSourceName) == null));
             } catch (Exception ex) {
                 LogController.handleError( core,ex);
                 throw;
@@ -545,19 +545,19 @@ namespace Contensive.Processor.Controllers {
         /// if NoAutoIncrement is true, ID is created an an long
         /// if the table is present, check all core fields
         /// </summary>
-        /// <param name="TableName"></param>
-        /// <param name="AllowAutoIncrement"></param>
-        public void createSQLTable(string TableName, bool AllowAutoIncrement = true) {
+        /// <param name="tableName"></param>
+        /// <param name="allowAutoIncrement"></param>
+        public void createSQLTable(string tableName, bool allowAutoIncrement = true) {
             try {
                 //
-                LogController.logTrace(core, "createSqlTable, DataSourceName [" + dataSourceName + "], TableName [" + TableName + "]");
+                LogController.logTrace(core, "createSqlTable, DataSourceName [" + dataSourceName + "], TableName [" + tableName + "]");
                 //
-                if (string.IsNullOrEmpty(TableName)) {
+                if (string.IsNullOrEmpty(tableName)) {
                     //
                     // tablename required
                     //
                     throw new ArgumentException("Tablename can not be blank.");
-                } else if (GenericController.vbInstr(1, TableName, ".") != 0) {
+                } else if (GenericController.vbInstr(1, tableName, ".") != 0) {
                     //
                     // Remote table -- remote system controls remote tables
                     //
@@ -566,42 +566,42 @@ namespace Contensive.Processor.Controllers {
                     //
                     // Local table -- create if not in schema
                     //
-                    if (Models.Domain.TableSchemaModel.getTableSchema(core, TableName, dataSourceName) == null) {
-                        if (!AllowAutoIncrement) {
-                            string SQL = "Create Table " + TableName + "(ID " + getSQLAlterColumnType( CPContentBaseClass.fileTypeIdEnum.Integer) + ");";
+                    if (Models.Domain.TableSchemaModel.getTableSchema(core, tableName, dataSourceName) == null) {
+                        if (!allowAutoIncrement) {
+                            string SQL = "Create Table " + tableName + "(ID " + getSQLAlterColumnType( CPContentBaseClass.fileTypeIdEnum.Integer) + ");";
                             executeQuery(SQL).Dispose();
                         } else {
-                            string SQL = "Create Table " + TableName + "(ID " + getSQLAlterColumnType( CPContentBaseClass.fileTypeIdEnum.AutoIdIncrement) + ");";
+                            string SQL = "Create Table " + tableName + "(ID " + getSQLAlterColumnType( CPContentBaseClass.fileTypeIdEnum.AutoIdIncrement) + ");";
                             executeQuery(SQL).Dispose();
                         }
                     }
                     //
                     // ----- Test the common fields required in all tables
                     //
-                    createSQLTableField(TableName, "id",  CPContentBaseClass.fileTypeIdEnum.AutoIdIncrement);
-                    createSQLTableField(TableName, "name",  CPContentBaseClass.fileTypeIdEnum.Text);
-                    createSQLTableField(TableName, "dateAdded",  CPContentBaseClass.fileTypeIdEnum.Date);
-                    createSQLTableField(TableName, "createdby",  CPContentBaseClass.fileTypeIdEnum.Integer);
-                    createSQLTableField(TableName, "modifiedBy",  CPContentBaseClass.fileTypeIdEnum.Integer);
-                    createSQLTableField(TableName, "modifiedDate",  CPContentBaseClass.fileTypeIdEnum.Date);
-                    createSQLTableField(TableName, "active",  CPContentBaseClass.fileTypeIdEnum.Boolean);
-                    createSQLTableField(TableName, "sortOrder",  CPContentBaseClass.fileTypeIdEnum.Text);
-                    createSQLTableField(TableName, "contentControlId",  CPContentBaseClass.fileTypeIdEnum.Integer);
-                    createSQLTableField(TableName, "ccGuid",  CPContentBaseClass.fileTypeIdEnum.Text);
+                    createSQLTableField(tableName, "id",  CPContentBaseClass.fileTypeIdEnum.AutoIdIncrement);
+                    createSQLTableField(tableName, "name",  CPContentBaseClass.fileTypeIdEnum.Text);
+                    createSQLTableField(tableName, "dateAdded",  CPContentBaseClass.fileTypeIdEnum.Date);
+                    createSQLTableField(tableName, "createdby",  CPContentBaseClass.fileTypeIdEnum.Integer);
+                    createSQLTableField(tableName, "modifiedBy",  CPContentBaseClass.fileTypeIdEnum.Integer);
+                    createSQLTableField(tableName, "modifiedDate",  CPContentBaseClass.fileTypeIdEnum.Date);
+                    createSQLTableField(tableName, "active",  CPContentBaseClass.fileTypeIdEnum.Boolean);
+                    createSQLTableField(tableName, "sortOrder",  CPContentBaseClass.fileTypeIdEnum.Text);
+                    createSQLTableField(tableName, "contentControlId",  CPContentBaseClass.fileTypeIdEnum.Integer);
+                    createSQLTableField(tableName, "ccGuid",  CPContentBaseClass.fileTypeIdEnum.Text);
                     // -- 20171029 - deprecating fields makes migration difficult. add back and figure out future path
-                    createSQLTableField(TableName, "createKey",  CPContentBaseClass.fileTypeIdEnum.Integer);
-                    createSQLTableField(TableName, "contentCategoryId",  CPContentBaseClass.fileTypeIdEnum.Integer);
+                    createSQLTableField(tableName, "createKey",  CPContentBaseClass.fileTypeIdEnum.Integer);
+                    createSQLTableField(tableName, "contentCategoryId",  CPContentBaseClass.fileTypeIdEnum.Integer);
                     //
                     // ----- setup core indexes
                     //
                     // 20171029 primary key dow not need index -- Call createSQLIndex( TableName, TableName & "Id", "ID")
-                    createSQLIndex(TableName, TableName + "Active", "active");
-                    createSQLIndex(TableName, TableName + "Name", "name");
-                    createSQLIndex(TableName, TableName + "SortOrder", "sortOrder");
-                    createSQLIndex(TableName, TableName + "DateAdded", "dateAdded");
-                    createSQLIndex(TableName, TableName + "ContentControlId", "contentControlId");
-                    createSQLIndex(TableName, TableName + "ModifiedDate", "modifiedDate");
-                    createSQLIndex(TableName, TableName + "CcGuid", "ccGuid");
+                    createSQLIndex(tableName, tableName + "Active", "active");
+                    createSQLIndex(tableName, tableName + "Name", "name");
+                    createSQLIndex(tableName, tableName + "SortOrder", "sortOrder");
+                    createSQLIndex(tableName, tableName + "DateAdded", "dateAdded");
+                    createSQLIndex(tableName, tableName + "ContentControlId", "contentControlId");
+                    createSQLIndex(tableName, tableName + "ModifiedDate", "modifiedDate");
+                    createSQLIndex(tableName, tableName + "CcGuid", "ccGuid");
                     //createSQLIndex(TableName, TableName + "CreateKey", "createKey");
                 }
                 Models.Domain.TableSchemaModel.tableSchemaListClear(core);
@@ -619,8 +619,8 @@ namespace Contensive.Processor.Controllers {
         /// <param name="tableName"></param>
         /// <param name="fieldName"></param>
         /// <param name="fieldType"></param>
-        /// <param name="clearMetaCache"></param>
-        public void createSQLTableField(string tableName, string fieldName, CPContentBaseClass.fileTypeIdEnum fieldType, bool clearMetaCache = false) {
+        /// <param name="clearMetadataCache">If true, the metadata cache is cleared on success.</param>
+        public void createSQLTableField(string tableName, string fieldName, CPContentBaseClass.fileTypeIdEnum fieldType, bool clearMetadataCache = false) {
             try {
                 if ((fieldType ==  CPContentBaseClass.fileTypeIdEnum.Redirect) || (fieldType ==  CPContentBaseClass.fileTypeIdEnum.ManyToMany)) { return; }
                 if (string.IsNullOrEmpty(tableName)) { throw new ArgumentException("Table Name cannot be blank."); }
@@ -628,22 +628,10 @@ namespace Contensive.Processor.Controllers {
                 if (GenericController.vbInstr(1, tableName, ".") != 0) { throw new ArgumentException("Table name cannot include a period(.)"); }
                 if (string.IsNullOrEmpty(fieldName)) { throw new ArgumentException("Field name cannot be blank"); }
                 if (!isSQLTableField(tableName, fieldName)) {
-                    string SQL = "ALTER TABLE " + tableName + " ADD " + fieldName + " ";
-                    if (!fieldType.IsNumeric()) {
-                        //
-                        // ----- support old calls
-                        //
-                        SQL += fieldType.ToString();
-                    } else {
-                        //
-                        // ----- translater type into SQL string
-                        //
-                        SQL += getSQLAlterColumnType(fieldType);
-                    }
-                    executeNonQuery(SQL);
+                    executeNonQuery("ALTER TABLE " + tableName + " ADD " + fieldName + " " + getSQLAlterColumnType(fieldType));
                     TableSchemaModel.tableSchemaListClear(core);
                     //
-                    if (clearMetaCache) {
+                    if (clearMetadataCache) {
                         core.cache.invalidateAll();
                         core.clearMetaData();
                     }

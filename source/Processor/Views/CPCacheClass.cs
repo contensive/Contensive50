@@ -110,11 +110,12 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override void Store(string key, object value, string dependentKey) => cp.core.cache.storeObject(key, value, new List<string>() { dependentKey });
+        public override void Store(string key, object value, string dependentKey)
+            => cp.core.cache.storeObject(key, value, dependentKey.Split(',').ToList());
         //
         //====================================================================================================
         //
-        public override void Store(string key, object value, DateTime invalidationDate, string dependentKey) => cp.core.cache.storeObject(key, value, invalidationDate, new List<string>() { dependentKey } );
+        public override void Store(string key, object value, DateTime invalidationDate, string dependentKey) => cp.core.cache.storeObject(key, value, invalidationDate, dependentKey.Split(',').ToList());
         //
         //====================================================================================================
         /// <summary>

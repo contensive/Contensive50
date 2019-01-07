@@ -52,7 +52,7 @@ namespace Contensive.Processor {
         //========================================================================
         // cache names
         //
-        internal const string cacheObject_addonCache = "addonCache";
+        internal const string cacheName_addonCachePersistent = "addonCache";
         //
         //========================================================================
         // html

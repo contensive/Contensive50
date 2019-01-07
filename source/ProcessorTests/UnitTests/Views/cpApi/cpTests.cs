@@ -86,12 +86,12 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         /// </summary>
         [TestMethod]
         public void Views_cp_ExecuteRouteTest() {
+            //reviewed 20190107
+            //
             // todo - this method fails when run with all the tests, passes when run alone. Might be the route cache not clearing after change
+            //
             // arrange
-            // todo - change all create/dispose for cp and core to using to make sure everything disposes
             using (CPClass cp = new CPClass(testAppName)) {
-                // todo -- make cs constructor for most common cs.open cases, add dispose, then use using pattern (saves steps)
-                CPCSBaseClass cs = cp.CSNew();
                 string addonName = "testAddon-2-" + cp.Utils.GetRandomInteger().ToString();
                 int recordId = 0;
                 string htmlText = "12345";
@@ -101,16 +101,22 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
                 string activeScript = "function m\nm=cp.doc.getText(\"echo\")\nend function";
                 string echoText = "text added to document";
                 //
-                if (cs.Insert(Contensive.Processor.Models.Db.AddonModel.contentName)) {
-                    recordId = cs.GetInteger("id");
-                    cs.SetField("name", addonName);
-                    cs.SetField("copytext", htmlText);
-                    cs.SetField("copy", wysiwygText);
-                    cs.SetField("ccGuid", addonGuid);
-                    cs.SetField("scriptingcode", activeScript);
-                    cs.SetField("remotemethod", "1");
+                using (CPCSBaseClass cs = cp.CSNew()) {
+                    if (cs.Insert(Contensive.Processor.Models.Db.AddonModel.contentName)) {
+                        recordId = cs.GetInteger("id");
+                        cs.SetField("name", addonName);
+                        cs.SetField("copytext", htmlText);
+                        cs.SetField("copy", wysiwygText);
+                        cs.SetField("ccGuid", addonGuid);
+                        cs.SetField("scriptingcode", activeScript);
+                        cs.SetField("remotemethod", "1");
+                    }
                 }
-                cs.Close();
+                // -- invalidate route map cache
+                Processor.Models.Domain.RouteMapModel.invalidateCache(cp.core);
+                // - clear local route map cache 
+                cp.core.routeMapCacheClear();
+                //
                 cp.Doc.SetProperty("echo", echoText);
                 // act
                 string result = cp.executeRoute(addonName);

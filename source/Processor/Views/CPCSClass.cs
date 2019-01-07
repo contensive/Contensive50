@@ -333,20 +333,32 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override string GetFilename(string fieldName, string OriginalFilename, string ContentName) {
+        public override string GetFilename(string fieldName, string originalFilename, string contentName) {
             try {
-                return cs.getFieldFilename(fieldName, OriginalFilename, ContentName, 0);
+                return cs.getFieldFilename(fieldName, originalFilename, contentName, 0);
             } catch (Exception ex) {
                 LogController.handleError( cp.core,ex);
                 throw;
             }
         }
         //
-        public override string GetFilename(string fieldName, string originalFilename)
-            => GetFilename(fieldName, originalFilename);
+        public override string GetFilename(string fieldName, string originalFilename) {
+            try {
+                return cs.getFieldFilename(fieldName, originalFilename);
+            } catch (Exception ex) {
+                LogController.handleError(cp.core, ex);
+                throw;
+            }
+        }
 
-        public override string GetFilename(string fieldName)
-            => GetFilename(fieldName, "");
+        public override string GetFilename(string fieldName) {
+            try {
+                return cs.getFieldFilename(fieldName, "");
+            } catch (Exception ex) {
+                LogController.handleError(cp.core, ex);
+                throw;
+            }
+        }
         //
         //====================================================================================================
         //

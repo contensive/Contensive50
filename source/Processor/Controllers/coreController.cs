@@ -328,17 +328,30 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public AddonCacheModel addonCache {
             get {
-                if (_addonCache == null) {
-                    _addonCache = cache.getObject<AddonCacheModel>(cacheObject_addonCache);
-                    if (_addonCache == null) {
-                        _addonCache = new AddonCacheModel(this);
-                        cache.storeObject(cacheObject_addonCache, _addonCache);
+                if (_addonCacheNonPersistent == null) {
+                    _addonCacheNonPersistent = cache.getObject<AddonCacheModel>(cacheName_addonCachePersistent);
+                    if (_addonCacheNonPersistent == null) {
+                        _addonCacheNonPersistent = new AddonCacheModel(this);
+                        cache.storeObject(cacheName_addonCachePersistent, _addonCacheNonPersistent);
                     }
                 }
-                return _addonCache;
+                return _addonCacheNonPersistent;
             }
         }
-        private AddonCacheModel _addonCache = null;
+        private AddonCacheModel _addonCacheNonPersistent = null;
+        /// <summary>
+        /// method to clear the core instance of routeMap. Explained in routeMap.
+        /// </summary>
+        public void addonCacheClearNonPersistent() {
+            _addonCacheNonPersistent = null;
+        }
+        /// <summary>
+        /// method to clear the core instance of routeMap. Explained in routeMap.
+        /// </summary>
+        public void addonCacheClear() {
+            cache.invalidate(cacheName_addonCachePersistent);
+            _addonCacheNonPersistent = null;
+        }
         //
         //===================================================================================================
         /// <summary>
@@ -481,9 +494,12 @@ namespace Contensive.Processor.Controllers {
         }
         private RouteMapModel _routeMap = null;
         /// <summary>
-        /// method to clear the core instance of routeMap. Explained in routeMap.
+        /// clear the addon cache, the persistent routeMap, and the non-persistent RouteMap
         /// </summary>
-        public void routeMapClearLocalCache() {
+        public void routeMapCacheClear() {
+            // 
+            addonCacheClear();
+            Models.Domain.RouteMapModel.invalidateCache(this);
             _routeMap = null;
         }
         //
@@ -1207,19 +1223,15 @@ namespace Contensive.Processor.Controllers {
                 switch (GenericController.vbLCase(TableName)) {
                     case LinkForwardModel.contentTableName:
                         //
-                        Models.Domain.RouteMapModel.invalidateCache(this);
-                        routeMapClearLocalCache();
+                        routeMapCacheClear();
                         break;
                     case LinkAliasModel.contentTableName:
                         //
-                        Models.Domain.RouteMapModel.invalidateCache(this);
-                        routeMapClearLocalCache();
+                        routeMapCacheClear();
                         break;
                     case AddonModel.contentTableName:
                         //
-                        Models.Domain.RouteMapModel.invalidateCache(this);
-                        routeMapClearLocalCache();
-                        cache.invalidate(cacheObject_addonCache);
+                        routeMapCacheClear();
                         cache.invalidateDbRecord(RecordID, TableName);
                         break;
                     case PersonModel.contentTableName:

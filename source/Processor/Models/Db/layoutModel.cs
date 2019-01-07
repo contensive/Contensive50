@@ -18,14 +18,14 @@ namespace Contensive.Processor.Models.Db {
     public class LayoutModel : DbModel {
         //
         //====================================================================================================
-        //-- const
-        public static string contentName { get { return "layouts"; } }
-        public static string contentTableName { get { return "ccLayouts"; } }
-        public static string contentDataSource { get { return "default"; } }
-        public static bool nameFieldIsUnique { get { return true; } }
+        //-- const (must be public const, not property)
+        public const string contentName = "layouts";
+        public const string contentTableName = "ccLayouts";
+        public const string contentDataSource = "default";
+        public const bool nameFieldIsUnique = true;
         //
         //====================================================================================================
-        // -- instance properties
+        // -- instance properties (must be properties not fields)
         public FieldTypeHTMLFile layout { get; set; }
         public string stylesFilename { get; set; }
     }

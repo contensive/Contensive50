@@ -130,20 +130,50 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         /// cp.cache invalidate on content save
         /// </summary>
         [TestMethod]
-        public void Views_cpCache_TagInvalidationString() {
-            // arrange
-            CPClass cp = new CPClass(testAppName);
-            cp.core.siteProperties.setProperty("AllowBake", true);
-            // act
-            cp.Cache.Store("keyA", "testValue", "a,b,c,d,e");
-            // assert
-            Assert.AreEqual(cp.Cache.GetText("keyA"), "testValue");
-            // act
-            cp.Cache.Invalidate("c");
-            // assert
-            Assert.AreEqual(cp.Cache.GetText("keyA"), "");
-            // dispose
-            cp.Dispose();
+        public void Views_cpCache_TagInvalidationListString() {
+            // reviewed 20190107
+            using (CPClass cp = new CPClass(testAppName)) {
+                // arrange
+                cp.core.siteProperties.setProperty("AllowBake", true);
+                var dependentKeyList = new List<string>() { { "a" }, { "b" }, { "c" }, { "d" }, { "e" }, };
+                // act
+                cp.Cache.Store("keyA", "testValue1", dependentKeyList);
+                cp.Cache.Store("keyB", "testValue2" );
+                // assert
+                Assert.AreEqual(cp.Cache.GetText("keyA"), "testValue1");
+                Assert.AreEqual(cp.Cache.GetText("keyB"), "testValue2");
+                // act
+                cp.Cache.Invalidate("c");
+                // assert
+                Assert.AreEqual("", cp.Cache.GetText("keyA"));
+                Assert.AreEqual("testValue2", cp.Cache.GetText("keyB"));
+                // dispose
+            }
+        }
+        //====================================================================================================
+        /// <summary>
+        /// cp.cache invalidate on content save
+        /// </summary>
+        [TestMethod]
+        public void Views_cpCache_TagInvalidationCommaString() {
+            // reviewed 20190107
+            using (CPClass cp = new CPClass(testAppName)) {
+                // arrange
+                cp.core.siteProperties.setProperty("AllowBake", true);
+                string dependentKeyCommaList = "a,b,c,d,e";
+                // act
+                cp.Cache.Store("keyA", "testValue1", dependentKeyCommaList);
+                cp.Cache.Store("keyB", "testValue2");
+                // assert
+                Assert.AreEqual(cp.Cache.GetText("keyA"), "testValue1");
+                Assert.AreEqual(cp.Cache.GetText("keyB"), "testValue2");
+                // act
+                cp.Cache.Invalidate("c");
+                // assert
+                Assert.AreEqual("", cp.Cache.GetText("keyA"));
+                Assert.AreEqual("testValue2", cp.Cache.GetText("keyB"));
+                // dispose
+            }
         }
     }
 }

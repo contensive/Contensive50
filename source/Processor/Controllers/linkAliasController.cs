@@ -226,7 +226,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // -- force route reload if this is a webserver page
                             Models.Domain.RouteMapModel.invalidateCache(core);
-                            core.routeMapClearLocalCache();
+                            core.routeMapCacheClear();
                         }
                     }
                 }
