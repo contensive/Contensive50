@@ -9,6 +9,7 @@ using Contensive.Processor.Models.Db;
 using Contensive.Processor.Models.Domain;
 using Contensive.Processor.Controllers;
 using Contensive.Addons.AdminSite.Controllers;
+using Contensive.BaseClasses;
 //
 namespace Contensive.Addons.Tools {
     //
@@ -72,7 +73,7 @@ namespace Contensive.Addons.Tools {
                                 for (RecordPointer = 0; RecordPointer < RecordCount; RecordPointer++) {
                                     //
                                     string formFieldName = cp.Doc.GetText("dtfaName." + RecordPointer);
-                                    int formFieldTypeId = cp.Doc.GetInteger("dtfaType." + RecordPointer);
+                                    CPContentBaseClass.fileTypeIdEnum  formFieldTypeId = (CPContentBaseClass.fileTypeIdEnum)cp.Doc.GetInteger("dtfaType." + RecordPointer);
                                     formFieldId = GenericController.encodeInteger(cp.Doc.GetInteger("dtfaID." + RecordPointer));
                                     bool formFieldInherited = cp.Doc.GetBoolean("dtfaInherited." + RecordPointer);
                                     //
@@ -142,7 +143,7 @@ namespace Contensive.Addons.Tools {
                                                         //
                                                         // Field Type changed, must be done manually
                                                         //
-                                                        ErrorMessage += "<LI>Field [" + formFieldName + "] changed type from [" + MetaController.getRecordName(core, "content Field Types", cdefFieldKvp.Value.fieldTypeId) + "] to [" + MetaController.getRecordName(core, "content Field Types", formFieldTypeId) + "]. This may have caused a problem converting content.</LI>";
+                                                        ErrorMessage += "<LI>Field [" + formFieldName + "] changed type from [" + MetaController.getRecordName(core, "content Field Types", (int)cdefFieldKvp.Value.fieldTypeId) + "] to [" + MetaController.getRecordName(core, "content Field Types", (int)formFieldTypeId) + "]. This may have caused a problem converting content.</LI>";
                                                         int DataSourceTypeID = core.db.getDataSourceType();
                                                         switch (DataSourceTypeID) {
                                                             case DataSourceTypeODBCMySQL:
@@ -428,7 +429,7 @@ namespace Contensive.Addons.Tools {
                             streamRow.Add("<td class=\"ccPanelInput\" align=\"left\"><nobr>");
                             if (fieldsort.field.inherited) {
                                 using (var csData = new CsModel(core)) {
-                                    csData.openRecord("Content Field Types", fieldsort.field.fieldTypeId);
+                                    csData.openRecord("Content Field Types", (int)fieldsort.field.fieldTypeId);
                                     if (!csData.ok()) {
                                         streamRow.Add(SpanClassAdminSmall + "Unknown[" + fieldsort.field.fieldTypeId + "]</SPAN>");
                                     } else {
@@ -436,7 +437,7 @@ namespace Contensive.Addons.Tools {
                                     }
                                 }
                             } else if (FieldLocked) {
-                                streamRow.Add(MetaController.getRecordName(core, "content field types", fieldsort.field.fieldTypeId) + HtmlController.inputHidden("dtfaType." + RecordCount, fieldsort.field.fieldTypeId));
+                                streamRow.Add(MetaController.getRecordName(core, "content field types", (int)fieldsort.field.fieldTypeId) + HtmlController.inputHidden("dtfaType." + RecordCount, (int)fieldsort.field.fieldTypeId));
                             } else {
                                 string TypeSelect = TypeSelectTemplate;
                                 TypeSelect = GenericController.vbReplace(TypeSelect, "menuname", "dtfaType." + RecordCount, 1, 99, 1);

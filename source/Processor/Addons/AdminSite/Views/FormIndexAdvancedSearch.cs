@@ -8,6 +8,7 @@ using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
 using static Contensive.Addons.AdminSite.Controllers.AdminUIController;
 using Contensive.Addons.AdminSite.Controllers;
+using Contensive.BaseClasses;
 
 namespace Contensive.Addons.AdminSite {
     public class FormIndexAdvancedSearchClass {
@@ -30,15 +31,15 @@ namespace Contensive.Addons.AdminSite {
                 int FieldPtr = 0;
                 bool RowEven = false;
                 string RQS = null;
-                string[] FieldNames = null;
-                string[] FieldCaption = null;
+                string[] FieldNames = { };
+                string[] FieldCaption = { };
                 int[] fieldId = null;
-                int[] fieldTypeId = null;
-                string[] FieldValue = null;
-                int[] FieldMatchOptions = null;
+                CPContentBaseClass.fileTypeIdEnum[] fieldTypeId = { };
+                string[] FieldValue = { };
+                int[] FieldMatchOptions = { };
                 int FieldMatchOption = 0;
-                string[] FieldLookupContentName = null;
-                string[] FieldLookupList = null;
+                string[] FieldLookupContentName = { };
+                string[] FieldLookupList = { };
                 int ContentID = 0;
                 int FieldCnt = 0;
                 int FieldSize = 0;
@@ -157,7 +158,7 @@ namespace Contensive.Addons.AdminSite {
                     FieldCaption[FieldPtr] = field.caption;
                     fieldId[FieldPtr] = field.id;
                     fieldTypeId[FieldPtr] = field.fieldTypeId;
-                    if (fieldTypeId[FieldPtr] == fieldTypeIdLookup) {
+                    if (fieldTypeId[FieldPtr] == CPContentBaseClass.fileTypeIdEnum.Lookup) {
                         ContentID = field.lookupContentID;
                         if (ContentID > 0) {
                             FieldLookupContentName[FieldPtr] = MetaController.getContentNameByID(core, ContentID);
@@ -248,7 +249,7 @@ namespace Contensive.Addons.AdminSite {
                     RowEven = ((RowPointer % 2) == 0);
                     FieldMatchOption = FieldMatchOptions[FieldPtr];
                     switch (fieldTypeId[FieldPtr]) {
-                        case _fieldTypeIdDate:
+                        case CPContentBaseClass.fileTypeIdEnum.Date:
                             //
                             // Date
 
@@ -270,10 +271,10 @@ namespace Contensive.Addons.AdminSite {
 
 
                         //genericController.vbReplace(result, ">", ">")
-                        case _fieldTypeIdCurrency:
-                        case _fieldTypeIdFloat:
-                        case _fieldTypeIdInteger:
-                        case _fieldTypeIdAutoIdIncrement:
+                        case CPContentBaseClass.fileTypeIdEnum.Currency:
+                        case CPContentBaseClass.fileTypeIdEnum.Float:
+                        case CPContentBaseClass.fileTypeIdEnum.Integer:
+                        case CPContentBaseClass.fileTypeIdEnum.AutoIdIncrement:
                             //
                             // -- Numeric - changed FindWordMatchEnum.MatchEquals to MatchInclude to be compatible with Find Search
                             returnForm = returnForm + "<tr>"
@@ -292,8 +293,8 @@ namespace Contensive.Addons.AdminSite {
                             + "</tr>";
                             RowPointer += 1;
                             break;
-                        case _fieldTypeIdFile:
-                        case _fieldTypeIdFileImage:
+                        case CPContentBaseClass.fileTypeIdEnum.File:
+                        case CPContentBaseClass.fileTypeIdEnum.FileImage:
                             //
                             // File
                             //
@@ -309,7 +310,7 @@ namespace Contensive.Addons.AdminSite {
                             + "</tr>";
                             RowPointer = RowPointer + 1;
                             break;
-                        case _fieldTypeIdBoolean:
+                        case CPContentBaseClass.fileTypeIdEnum.Boolean:
                             //
                             // Boolean
                             //
@@ -324,13 +325,13 @@ namespace Contensive.Addons.AdminSite {
                             + "</td>"
                             + "</tr>";
                             break;
-                        case _fieldTypeIdText:
-                        case _fieldTypeIdLongText:
-                        case _fieldTypeIdHTML:
-                        case _fieldTypeIdFileHTML:
-                        case _fieldTypeIdFileCSS:
-                        case _fieldTypeIdFileJavascript:
-                        case _fieldTypeIdFileXML:
+                        case CPContentBaseClass.fileTypeIdEnum.Text:
+                        case CPContentBaseClass.fileTypeIdEnum.LongText:
+                        case CPContentBaseClass.fileTypeIdEnum.HTML:
+                        case CPContentBaseClass.fileTypeIdEnum.FileHTML:
+                        case CPContentBaseClass.fileTypeIdEnum.FileCSS:
+                        case CPContentBaseClass.fileTypeIdEnum.FileJavascript:
+                        case CPContentBaseClass.fileTypeIdEnum.FileXML:
                             //
                             // Text
                             //
@@ -348,8 +349,8 @@ namespace Contensive.Addons.AdminSite {
                             + "</tr>";
                             RowPointer = RowPointer + 1;
                             break;
-                        case _fieldTypeIdLookup:
-                        case _fieldTypeIdMemberSelect:
+                        case CPContentBaseClass.fileTypeIdEnum.Lookup:
+                        case CPContentBaseClass.fileTypeIdEnum.MemberSelect:
                             //
                             // Lookup
                             returnForm = returnForm + "<tr>"

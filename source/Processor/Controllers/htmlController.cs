@@ -1113,7 +1113,7 @@ namespace Contensive.Processor.Controllers {
                 string FieldValueVariant = "";
                 string FieldValueText = null;
                 int FieldValueInteger = 0;
-                int fieldTypeId = 0;
+                CPContentBaseClass.fileTypeIdEnum fieldTypeId = 0;
                 bool FieldReadOnly = false;
                 bool FieldPassword = false;
                 bool fieldFound = false;
@@ -1166,7 +1166,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 //
                                 //
-                                case _fieldTypeIdHTML:
+                                case CPContentBaseClass.fileTypeIdEnum.HTML:
                                     FieldValueText = GenericController.encodeText(FieldValueVariant);
                                     if (FieldReadOnly) {
                                         returnResult = FieldValueText;
@@ -1177,7 +1177,7 @@ namespace Contensive.Processor.Controllers {
                                     // html files, read from cdnFiles and use html editor
                                     //
                                     break;
-                                case _fieldTypeIdFileHTML:
+                                case CPContentBaseClass.fileTypeIdEnum.FileHTML:
                                     FieldValueText = GenericController.encodeText(FieldValueVariant);
                                     if (!string.IsNullOrEmpty(FieldValueText)) {
                                         FieldValueText = core.cdnFiles.readFileText(FieldValueText);
@@ -1192,7 +1192,7 @@ namespace Contensive.Processor.Controllers {
                                     // text cdnFiles files, read from cdnFiles and use text editor
                                     //
                                     break;
-                                case _fieldTypeIdFileText:
+                                case CPContentBaseClass.fileTypeIdEnum.FileText:
                                     FieldValueText = GenericController.encodeText(FieldValueVariant);
                                     if (!string.IsNullOrEmpty(FieldValueText)) {
                                         FieldValueText = core.cdnFiles.readFileText(FieldValueText);
@@ -1207,9 +1207,9 @@ namespace Contensive.Processor.Controllers {
                                     // text public files, read from core.cdnFiles and use text editor
                                     //
                                     break;
-                                case _fieldTypeIdFileCSS:
-                                case _fieldTypeIdFileXML:
-                                case _fieldTypeIdFileJavascript:
+                                case CPContentBaseClass.fileTypeIdEnum.FileCSS:
+                                case CPContentBaseClass.fileTypeIdEnum.FileXML:
+                                case CPContentBaseClass.fileTypeIdEnum.FileJavascript:
                                     FieldValueText = GenericController.encodeText(FieldValueVariant);
                                     if (!string.IsNullOrEmpty(FieldValueText)) {
                                         FieldValueText = core.cdnFiles.readFileText(FieldValueText);
@@ -1224,7 +1224,7 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     //
                                     break;
-                                case _fieldTypeIdBoolean:
+                                case CPContentBaseClass.fileTypeIdEnum.Boolean:
                                     if (FieldReadOnly) {
                                         returnResult = GenericController.encodeText(GenericController.encodeBoolean(FieldValueVariant));
                                     } else {
@@ -1234,15 +1234,15 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     //
                                     break;
-                                case _fieldTypeIdAutoIdIncrement:
+                                case CPContentBaseClass.fileTypeIdEnum.AutoIdIncrement:
                                     returnResult = GenericController.encodeText(GenericController.encodeNumber(FieldValueVariant));
                                     //
                                     //
                                     //
                                     break;
-                                case _fieldTypeIdFloat:
-                                case _fieldTypeIdCurrency:
-                                case _fieldTypeIdInteger:
+                                case CPContentBaseClass.fileTypeIdEnum.Float:
+                                case CPContentBaseClass.fileTypeIdEnum.Currency:
+                                case CPContentBaseClass.fileTypeIdEnum.Integer:
                                     FieldValueVariant = GenericController.encodeNumber(FieldValueVariant).ToString();
                                     if (FieldReadOnly) {
                                         returnResult = GenericController.encodeText(FieldValueVariant);
@@ -1253,7 +1253,7 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     //
                                     break;
-                                case _fieldTypeIdFile:
+                                case CPContentBaseClass.fileTypeIdEnum.File:
                                     FieldValueText = GenericController.encodeText(FieldValueVariant);
                                     if (FieldReadOnly) {
                                         returnResult = FieldValueText;
@@ -1264,7 +1264,7 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     //
                                     break;
-                                case _fieldTypeIdFileImage:
+                                case CPContentBaseClass.fileTypeIdEnum.FileImage:
                                     FieldValueText = GenericController.encodeText(FieldValueVariant);
                                     if (FieldReadOnly) {
                                         returnResult = FieldValueText;
@@ -1275,7 +1275,7 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     //
                                     break;
-                                case _fieldTypeIdLookup:
+                                case CPContentBaseClass.fileTypeIdEnum.Lookup:
                                     FieldValueInteger = GenericController.encodeInteger(FieldValueVariant);
                                     FieldLookupContentName = MetaController.getContentNameByID(core, FieldLookupContentID);
                                     if (!string.IsNullOrEmpty(FieldLookupContentName)) {
@@ -1306,7 +1306,7 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     //
                                     break;
-                                case _fieldTypeIdMemberSelect:
+                                case CPContentBaseClass.fileTypeIdEnum.MemberSelect:
                                     FieldValueInteger = GenericController.encodeInteger(FieldValueVariant);
                                     returnResult = selectUserFromGroup(fieldName, FieldValueInteger, FieldMemberSelectGroupID);
                                     //
@@ -1834,7 +1834,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 string FieldTypeDefaultEditorAddonIdList = EditorController.getFieldTypeDefaultEditorAddonIdList(core);
                 string[] FieldTypeDefaultEditorAddonIds = FieldTypeDefaultEditorAddonIdList.Split(',');
-                int FieldTypeDefaultEditorAddonId = GenericController.encodeInteger(FieldTypeDefaultEditorAddonIds[fieldTypeIdHTML]);
+                int FieldTypeDefaultEditorAddonId = GenericController.encodeInteger(FieldTypeDefaultEditorAddonIds[(int)CPContentBaseClass.fileTypeIdEnum.HTML]);
                 if (FieldTypeDefaultEditorAddonId == 0) {
                     //
                     //    use default wysiwyg
@@ -1846,7 +1846,7 @@ namespace Contensive.Processor.Controllers {
                     Dictionary<string, string> arguments = new Dictionary<string, string> {
                         { "editorName", htmlName },
                         { "editorValue", DefaultValue },
-                        { "editorFieldType", fieldTypeIdHTML.ToString() },
+                        { "editorFieldType", ((int)CPContentBaseClass.fileTypeIdEnum.HTML).ToString() },
                         { "editorReadOnly", readOnlyfield.ToString() },
                         { "editorWidth", styleWidth },
                         { "editorHeight", styleHeight },
@@ -1951,7 +1951,7 @@ namespace Contensive.Processor.Controllers {
             string ArgValue = null;
             string AddonOptionConstructor = "";
             string addonOption_String = "";
-            int fieldType = 0;
+            CPContentBaseClass.fileTypeIdEnum fieldType = 0;
             string Copy = "";
             int RecordID = 0;
             string FieldName = null;
@@ -2128,14 +2128,14 @@ namespace Contensive.Processor.Controllers {
                             while (!string.IsNullOrEmpty(FieldName)) {
                                 fieldType = csData.getFieldTypeId(FieldName);
                                 switch (fieldType) {
-                                    case _fieldTypeIdLongText:
-                                    case _fieldTypeIdText:
-                                    case _fieldTypeIdFileText:
-                                    case _fieldTypeIdFileCSS:
-                                    case _fieldTypeIdFileXML:
-                                    case _fieldTypeIdFileJavascript:
-                                    case _fieldTypeIdHTML:
-                                    case _fieldTypeIdFileHTML:
+                                    case CPContentBaseClass.fileTypeIdEnum.LongText:
+                                    case CPContentBaseClass.fileTypeIdEnum.Text:
+                                    case CPContentBaseClass.fileTypeIdEnum.FileText:
+                                    case CPContentBaseClass.fileTypeIdEnum.FileCSS:
+                                    case CPContentBaseClass.fileTypeIdEnum.FileXML:
+                                    case CPContentBaseClass.fileTypeIdEnum.FileJavascript:
+                                    case CPContentBaseClass.fileTypeIdEnum.HTML:
+                                    case CPContentBaseClass.fileTypeIdEnum.FileHTML:
                                         Copy = csData.getText(FieldName);
                                         PosACInstanceID = GenericController.vbInstr(1, Copy, "ACInstanceID=\"" + ACInstanceID + "\"", 1);
                                         if (PosACInstanceID != 0) {

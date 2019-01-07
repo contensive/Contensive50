@@ -12,6 +12,7 @@ using Contensive.Processor.Models.Domain;
 using System.Linq;
 using static Contensive.BaseClasses.CPFileSystemBaseClass;
 using Contensive.Processor.Exceptions;
+using Contensive.BaseClasses;
 
 namespace Contensive.Processor.Controllers {
     // todo: rework how adds are installed, this change can be done after weave launch
@@ -1605,7 +1606,7 @@ namespace Contensive.Processor.Controllers {
                                                                                             if (FieldNode.Name.ToLowerInvariant() == "field") {
                                                                                                 bool IsFieldFound = false;
                                                                                                 string FieldName = XmlController.GetXMLAttribute(core, IsFound, FieldNode, "name", "").ToLowerInvariant();
-                                                                                                int fieldTypeId = -1;
+                                                                                                CPContentBaseClass.fileTypeIdEnum fieldTypeId = 0;
                                                                                                 int FieldLookupContentID = -1;
                                                                                                 foreach (var keyValuePair in metaData.fields) {
                                                                                                     Models.Domain.MetaFieldModel field = keyValuePair.Value;
@@ -1619,13 +1620,13 @@ namespace Contensive.Processor.Controllers {
                                                                                                 if (IsFieldFound) {
                                                                                                     string FieldValue = FieldNode.InnerText;
                                                                                                     switch (fieldTypeId) {
-                                                                                                        case _fieldTypeIdAutoIdIncrement:
-                                                                                                        case _fieldTypeIdRedirect: {
+                                                                                                        case CPContentBaseClass.fileTypeIdEnum.AutoIdIncrement:
+                                                                                                        case CPContentBaseClass.fileTypeIdEnum.Redirect: {
                                                                                                                 //
                                                                                                                 // not supported
                                                                                                                 break;
                                                                                                             }
-                                                                                                        case _fieldTypeIdLookup: {
+                                                                                                        case CPContentBaseClass.fileTypeIdEnum.Lookup: {
                                                                                                                 //
                                                                                                                 // read in text value, if a guid, use it, otherwise assume name
                                                                                                                 if (FieldLookupContentID != 0) {

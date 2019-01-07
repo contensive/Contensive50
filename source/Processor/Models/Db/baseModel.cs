@@ -6,6 +6,8 @@ using Contensive.Processor.Controllers;
 using static Contensive.Processor.Constants;
 using System.Data;
 using Contensive.Processor.Exceptions;
+using System.Text;
+using Contensive.BaseClasses;
 //
 namespace Contensive.Processor.Models.Db {
     //
@@ -55,7 +57,7 @@ namespace Contensive.Processor.Models.Db {
     //       - when building the model, if another model is added, that model returns its cachenames in the cacheNameList to be added as dependentObjects
     //
     //
-    public abstract class BaseModel {
+    public class DbModel {
         //
         //====================================================================================================
         //-- const must be set in derived clases
@@ -66,7 +68,7 @@ namespace Contensive.Processor.Models.Db {
         //====================================================================================================
         //-- field types
         //
-        public abstract class FieldTypeFileBase {
+        public class FieldTypeFileBase {
             //
             // -- 
             // during load
@@ -240,7 +242,7 @@ namespace Contensive.Processor.Models.Db {
         /// <summary>
         /// simple constructor needed for deserialization
         /// </summary>
-        public BaseModel() {
+        public DbModel() {
             //
         }
         //
@@ -251,7 +253,7 @@ namespace Contensive.Processor.Models.Db {
         /// <typeparam name="T"></typeparam>
         /// <param name="core"></param>
         /// <returns></returns>
-        public static T addDefault<T>(CoreController core, Domain.MetaModel metaData) where T : BaseModel {
+        public static T addDefault<T>(CoreController core, Domain.MetaModel metaData) where T : DbModel {
             var callersCacheNameList = new List<string>();
             return addDefault<T>(core, metaData, ref callersCacheNameList);
         }
@@ -263,10 +265,10 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="core"></param>
         /// <param name="callersCacheNameList"></param>
         /// <returns></returns>
-        public static T addDefault<T>(CoreController core, Domain.MetaModel metaData, ref List<string> callersCacheNameList) where T : BaseModel {
+        public static T addDefault<T>(CoreController core, Domain.MetaModel metaData, ref List<string> callersCacheNameList) where T : DbModel {
             T result = default(T);
             try {
-                result = addEmpty<T>(core);
+                result = AddEmpty<T>(core);
                 if (result != null) {
                     foreach (PropertyInfo modelProperty in result.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
                         string propertyName = modelProperty.Name;
@@ -350,7 +352,7 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="core"></param>
         /// <param name="callersCacheNameList"></param>
         /// <returns></returns>
-        public static T addEmpty<T>(CoreController core) where T : BaseModel {
+        public static T AddEmpty<T>(CoreController core) where T : DbModel {
             T result = default(T);
             try {
                 if (core.serverConfig == null) {
@@ -382,7 +384,7 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="core"></param>
         /// <param name="recordId"></param>
         /// <returns></returns>
-        public static T create<T>(CoreController core, int recordId) where T : BaseModel {
+        public static T create<T>(CoreController core, int recordId) where T : DbModel {
             var tempVar = new List<string>();
             return create<T>(core, recordId, ref tempVar);
         }
@@ -394,7 +396,7 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="cp"></param>
         /// <param name="recordId">The id of the record to be read into the new object</param>
         /// <param name="callersCacheNameList">Any cachenames effected by this record will be added to this list. If the method consumer creates a cache object, add these cachenames to its dependent cachename list.</param>
-        public static T create<T>(CoreController core, int recordId, ref List<string> callersCacheNameList) where T : BaseModel {
+        public static T create<T>(CoreController core, int recordId, ref List<string> callersCacheNameList) where T : DbModel {
             T result = default(T);
             try {
                 if (core.serverConfig == null) {
@@ -466,7 +468,7 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="core"></param>
         /// <param name="recordGuid"></param>
         /// <returns></returns>
-        public static T create<T>(CoreController core, string recordGuid) where T : BaseModel {
+        public static T create<T>(CoreController core, string recordGuid) where T : DbModel {
             var tempVar = new List<string>();
             return create<T>(core, recordGuid, ref tempVar);
         }
@@ -477,7 +479,7 @@ namespace Contensive.Processor.Models.Db {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="recordGuid"></param>
-        public static T create<T>(CoreController core, string recordGuid, ref List<string> callersCacheNameList) where T : BaseModel {
+        public static T create<T>(CoreController core, string recordGuid, ref List<string> callersCacheNameList) where T : DbModel {
             T result = default(T);
             try {
                 if (core.serverConfig == null) {
@@ -520,7 +522,7 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="core"></param>
         /// <param name="recordName"></param>
         /// <returns></returns>
-        public static T createByUniqueName<T>(CoreController core, string recordName) where T : BaseModel {
+        public static T createByUniqueName<T>(CoreController core, string recordName) where T : DbModel {
             var cacheNameList = new List<string>();
             return createByUniqueName<T>(core, recordName, ref cacheNameList);
         }
@@ -532,7 +534,7 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="cp"></param>
         /// <param name="recordName"></param>
         /// <param name="callersCacheNameList">method will add the cache name to this list.</param>
-        public static T createByUniqueName<T>(CoreController core, string recordName, ref List<string> callersCacheNameList) where T : BaseModel {
+        public static T createByUniqueName<T>(CoreController core, string recordName, ref List<string> callersCacheNameList) where T : DbModel {
             T result = default(T);
             try {
                 if (core.serverConfig == null) {
@@ -576,7 +578,7 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="cp"></param>
         /// <param name="sqlCriteria"></param>
         /// <param name="callersCacheKeyList"></param>
-        private static T loadRecord<T>(CoreController core, DataRow row, ref List<string> callersCacheKeyList) where T : BaseModel {
+        private static T loadRecord<T>(CoreController core, DataRow row, ref List<string> callersCacheKeyList) where T : DbModel {
             T modelInstance = default(T);
             try {
                 if (row != null) {
@@ -668,7 +670,7 @@ namespace Contensive.Processor.Models.Db {
                         // -- set primary cache to the object created
                         // -- set secondary caches to the primary cache
                         // -- add all cachenames to the injected cachenamelist
-                        if (modelInstance is BaseModel baseInstance) {
+                        if (modelInstance is DbModel baseInstance) {
                             string datasourceName = derivedDataSourceName(instanceType);
                             string cacheKey = CacheController.createCacheKey_forDbRecord(baseInstance.id, tableName, datasourceName);
                             callersCacheKeyList.Add(cacheKey);
@@ -699,180 +701,116 @@ namespace Contensive.Processor.Models.Db {
         /// <returns></returns>
         public int save(CoreController core, bool asyncSave = false) {
             try {
-                if (core.serverConfig == null) {
-                    //
-                    // -- cannot use models without an application
-                    LogController.handleError(core, new GenericException("Cannot use data models without a valid server configuration."));
-                } else if (core.appConfig == null) {
-                    //
-                    // -- cannot use models without an application
-                    LogController.handleError(core, new GenericException("Cannot use data models without a valid application configuration."));
-                } else {
-                    //CsController cs = new CsController(core);
-                    Type instanceType = this.GetType();
-                    string tableName = derivedTableName(instanceType);
-                    string datasourceName = derivedDataSourceName(instanceType);
-                    var sqlPairs = new SqlFieldListClass();
-                    using (var db = new DbController(core, derivedDataSourceName(instanceType))) {
-                        foreach (PropertyInfo instanceProperty in this.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
-                            switch (instanceProperty.Name.ToLowerInvariant()) {
-                                case "id":
-                                    //id = cs.getInteger("id");
-                                    break;
-                                case "ccguid":
-                                    if (string.IsNullOrEmpty(ccguid)) {
-                                        ccguid = Controllers.GenericController.getGUID();
-                                    }
-                                    //string value = instanceProperty.GetValue(this, null).ToString();
-                                    sqlPairs.add(instanceProperty.Name, DbController.encodeSQLText(instanceProperty.GetValue(this, null).ToString()));
-                                    //cs.setField(instanceProperty.Name, instanceProperty.GetValue(this, null).ToString());
-                                    break;
-                                default:
-                                    int fieldTypeId = 0;
-                                    bool fileContentUpdated = false;
-                                    bool fileFieldContentUpdated = false;
-                                    string fileFieldContent = "";
-                                    string fileFieldFilename = "";
-
-                                    string content = "";
-                                    switch (instanceProperty.PropertyType.Name) {
-                                        case "Int32":
-                                            Int32 valueInt32;
-                                            int.TryParse(instanceProperty.GetValue(this, null).ToString(), out valueInt32);
-                                            sqlPairs.add(instanceProperty.Name, DbController.encodeSQLNumber(valueInt32));
-                                            //cs.setField(instanceProperty.Name, valueInt32);
-                                            break;
-                                        case "Boolean":
-                                            bool valueBool;
-                                            bool.TryParse(instanceProperty.GetValue(this, null).ToString(), out valueBool);
-                                            sqlPairs.add(instanceProperty.Name, DbController.encodeSQLBoolean(valueBool));
-                                            //cs.setField(instanceProperty.Name, valueBool);
-                                            break;
-                                        case "DateTime":
-                                            DateTime valueDate;
-                                            DateTime.TryParse(instanceProperty.GetValue(this, null).ToString(), out valueDate);
-                                            sqlPairs.add(instanceProperty.Name, DbController.encodeSQLDate(valueDate));
-                                            //cs.setField(instanceProperty.Name, valueDate);
-                                            break;
-                                        case "Double":
-                                            double valueDbl;
-                                            double.TryParse(instanceProperty.GetValue(this, null).ToString(), out valueDbl);
-                                            sqlPairs.add(instanceProperty.Name, DbController.encodeSQLNumber(valueDbl));
-                                            //cs.setField(instanceProperty.Name, valueDbl);
-                                            break;
-                                        case "FieldTypeTextFile": {
-                                                fieldTypeId = fieldTypeIdFileText;
-                                                FieldTypeTextFile fileProperty = (FieldTypeTextFile)instanceProperty.GetValue(this);
-                                                fileProperty.internalcore = core;
-                                                PropertyInfo fileFieldContentProperty = instanceProperty.PropertyType.GetProperty("content");
-                                                fileFieldContent = (string)fileFieldContentProperty.GetValue(fileProperty);
-                                                PropertyInfo fileFieldContentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
-                                                fileFieldContentUpdated = (bool)fileFieldContentUpdatedProperty.GetValue(fileProperty);
-                                                PropertyInfo fileFieldFilenameProperty = instanceProperty.PropertyType.GetProperty("filename");
-                                                fileFieldFilename = (string)fileFieldFilenameProperty.GetValue(fileProperty);
-                                            }
-                                            break;
-                                        case "FieldTypeJavascriptFile": {
-                                                fieldTypeId = fieldTypeIdFileJavascript;
-                                                FieldTypeJavascriptFile fileProperty = (FieldTypeJavascriptFile)instanceProperty.GetValue(this);
-                                                fileProperty.internalcore = core;
-                                                PropertyInfo fileFieldContentProperty = instanceProperty.PropertyType.GetProperty("content");
-                                                fileFieldContent = (string)fileFieldContentProperty.GetValue(fileProperty);
-                                                PropertyInfo fileFieldContentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
-                                                fileFieldContentUpdated = (bool)fileFieldContentUpdatedProperty.GetValue(fileProperty);
-                                                PropertyInfo fileFieldFilenameProperty = instanceProperty.PropertyType.GetProperty("filename");
-                                                fileFieldFilename = (string)fileFieldFilenameProperty.GetValue(fileProperty);
-                                            }
-                                            break;
-                                        case "FieldTypeCSSFile": {
-                                                fieldTypeId = fieldTypeIdFileCSS;
-                                                FieldTypeCSSFile fileProperty = (FieldTypeCSSFile)instanceProperty.GetValue(this);
-                                                fileProperty.internalcore = core;
-                                                PropertyInfo fileFieldContentProperty = instanceProperty.PropertyType.GetProperty("content");
-                                                fileFieldContent = (string)fileFieldContentProperty.GetValue(fileProperty);
-                                                PropertyInfo fileFieldContentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
-                                                fileFieldContentUpdated = (bool)fileFieldContentUpdatedProperty.GetValue(fileProperty);
-                                                PropertyInfo fileFieldFilenameProperty = instanceProperty.PropertyType.GetProperty("filename");
-                                                fileFieldFilename = (string)fileFieldFilenameProperty.GetValue(fileProperty);
-                                            }
-                                            break;
-                                        case "FieldTypeHTMLFile": {
-                                                fieldTypeId = fieldTypeIdFileHTML;
-                                                FieldTypeHTMLFile fileProperty = (FieldTypeHTMLFile)instanceProperty.GetValue(this);
-                                                fileProperty.internalcore = core;
-                                                PropertyInfo fileFieldContentProperty = instanceProperty.PropertyType.GetProperty("content");
-                                                fileFieldContent = (string)fileFieldContentProperty.GetValue(fileProperty);
-                                                PropertyInfo fileFieldContentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
-                                                fileFieldContentUpdated = (bool)fileFieldContentUpdatedProperty.GetValue(fileProperty);
-                                                PropertyInfo fileFieldFilenameProperty = instanceProperty.PropertyType.GetProperty("filename");
-                                                fileFieldFilename = (string)fileFieldFilenameProperty.GetValue(fileProperty);
-                                            }
-                                            break;
-                                        //if (fileFieldContentUpdated) {
-                                        //    //
-                                        //    string readBufferfilename = cs.getValue(instanceProperty.Name);
-                                        //    if (string.IsNullOrEmpty(fileFieldContent)) {
-                                        //        //
-                                        //        // -- empty content, delete file, clear filename from Db field
-                                        //        if (!string.IsNullOrEmpty(readBufferfilename)) {
-                                        //            cs.setField(instanceProperty.Name, "");
-                                        //            core.cdnFiles.deleteFile(readBufferfilename);
-                                        //        }
-                                        //    } else {
-                                        //        //
-                                        //        // -- save content
-                                        //        string filename = (!string.IsNullOrEmpty(fileFieldFilename)) ? fileFieldFilename : readBufferfilename;
-                                        //        if (string.IsNullOrEmpty(filename)) filename = FileController.getVirtualRecordUnixPathFilename(tableName, instanceProperty.Name.ToLower(), id, fieldTypeId);
-                                        //        core.cdnFiles.saveFile(filename, fileFieldContent);
-                                        //        cs.setFieldFilename(instanceProperty.Name, filename);
-                                        //    }
-                                        //}
-                                        //break;
-                                        default:
-                                            sqlPairs.add(instanceProperty.Name, DbController.encodeSQLText(instanceProperty.GetValue(this, null).ToString()));
-                                            break;
-                                    }
-                                    if (fileContentUpdated) {
-                                        string filename = fileFieldFilename;
-                                        if ((String.IsNullOrEmpty(filename)) && (id != 0)) {
+                if (isAppInvalid(core)) { return 0; }
+                Type instanceType = this.GetType();
+                string tableName = derivedTableName(instanceType);
+                string datasourceName = derivedDataSourceName(instanceType);
+                var sqlPairs = new SqlFieldListClass();
+                using (var db = new DbController(core, derivedDataSourceName(instanceType))) {
+                    foreach (PropertyInfo instanceProperty in this.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
+                        switch (instanceProperty.Name.ToLowerInvariant()) {
+                            case "id":
+                                break;
+                            case "ccguid":
+                                if (string.IsNullOrEmpty(ccguid)) { ccguid = GenericController.getGUID(); }
+                                sqlPairs.add(instanceProperty.Name, DbController.encodeSQLText(instanceProperty.GetValue(this, null).ToString()));
+                                break;
+                            default:
+                                CPContentBaseClass.fileTypeIdEnum  fieldTypeId = 0;
+                                bool fileFieldContentUpdated = false;
+                                FieldTypeFileBase fileProperty = null;
+                                switch (instanceProperty.PropertyType.Name) {
+                                    case "Int32":
+                                        Int32 valueInt32 = (int)instanceProperty.GetValue(this);
+                                        sqlPairs.add(instanceProperty.Name, DbController.encodeSQLNumber(valueInt32));
+                                        break;
+                                    case "Boolean":
+                                        bool valueBool = (bool)instanceProperty.GetValue(this);
+                                        sqlPairs.add(instanceProperty.Name, DbController.encodeSQLBoolean(valueBool));
+                                        break;
+                                    case "DateTime":
+                                        DateTime valueDate = (DateTime)instanceProperty.GetValue(this, null);
+                                        sqlPairs.add(instanceProperty.Name, DbController.encodeSQLDate(valueDate));
+                                        break;
+                                    case "Double":
+                                        double valueDbl = (double)instanceProperty.GetValue(this);
+                                        sqlPairs.add(instanceProperty.Name, DbController.encodeSQLNumber(valueDbl));
+                                        break;
+                                    case "FieldTypeTextFile": {
+                                            fieldTypeId = CPContentBaseClass.fileTypeIdEnum.FileText;
+                                            fileProperty = (FieldTypeTextFile)instanceProperty.GetValue(this);
+                                        }
+                                        break;
+                                    case "FieldTypeJavascriptFile": {
+                                            fieldTypeId = CPContentBaseClass.fileTypeIdEnum.FileJavascript;
+                                            fileProperty = (FieldTypeJavascriptFile)instanceProperty.GetValue(this);
+                                        }
+                                        break;
+                                    case "FieldTypeCSSFile": {
+                                            fieldTypeId = CPContentBaseClass.fileTypeIdEnum.FileCSS;
+                                            fileProperty = (FieldTypeCSSFile)instanceProperty.GetValue(this);
+                                        }
+                                        break;
+                                    case "FieldTypeHTMLFile": {
+                                            fieldTypeId = CPContentBaseClass.fileTypeIdEnum.FileHTML;
+                                            fileProperty = (FieldTypeHTMLFile)instanceProperty.GetValue(this);
+                                        }
+                                        break;
+                                    default:
+                                        sqlPairs.add(instanceProperty.Name, DbController.encodeSQLText(instanceProperty.GetValue(this, null).ToString()));
+                                        break;
+                                }
+                                if (!fieldTypeId.Equals(0)) {
+                                    fileProperty.internalcore = core;
+                                    PropertyInfo fileFieldContentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
+                                    fileFieldContentUpdated = (bool)fileFieldContentUpdatedProperty.GetValue(fileProperty);
+                                    if (fileFieldContentUpdated) {
+                                        PropertyInfo fileFieldFilenameProperty = instanceProperty.PropertyType.GetProperty("filename");
+                                        string fileFieldFilename = (string)fileFieldFilenameProperty.GetValue(fileProperty);
+                                        if ((String.IsNullOrEmpty(fileFieldFilename)) && (id != 0)) {
                                             // 
                                             // -- if record exists and file property's filename is not set, get the filename from the Db
                                             using (System.Data.DataTable dt = db.executeQuery("select " + instanceProperty.Name + " from " + tableName + " where (id=" + id + ")")) {
                                                 if (dt.Rows.Count > 0) {
-                                                    filename = GenericController.encodeText(dt.Rows[0][instanceProperty.Name]);
+                                                    fileFieldFilename = GenericController.encodeText(dt.Rows[0][instanceProperty.Name]);
                                                 }
                                             }
                                         }
-                                        if ((string.IsNullOrEmpty(content)) && (!string.IsNullOrEmpty(filename))) {
+                                        PropertyInfo fileFieldContentProperty = instanceProperty.PropertyType.GetProperty("content");
+                                        string fileFieldContent = (string)fileFieldContentProperty.GetValue(fileProperty);
+                                        if ((string.IsNullOrEmpty(fileFieldContent)) && (!string.IsNullOrEmpty(fileFieldFilename))) {
                                             //
                                             // -- empty content and valid filename, delete the file and clear the filename
                                             sqlPairs.add(instanceProperty.Name, "");
-                                            core.cdnFiles.deleteFile(filename);
+                                            core.cdnFiles.deleteFile(fileFieldFilename);
+                                            fileFieldFilenameProperty.SetValue(fileProperty, string.Empty);
                                         } else {
                                             //
                                             // -- save content
-                                            if (string.IsNullOrEmpty(filename)) {
-                                                filename = FileController.getVirtualRecordUnixPathFilename(tableName, instanceProperty.Name.ToLowerInvariant(), id, fieldTypeId);
+                                            if (string.IsNullOrEmpty(fileFieldFilename)) {
+                                                fileFieldFilename = FileController.getVirtualRecordUnixPathFilename(tableName, instanceProperty.Name.ToLowerInvariant(), id, fieldTypeId);
+                                                fileFieldFilenameProperty.SetValue(fileProperty, fileFieldFilename);
                                             }
-                                            core.cdnFiles.saveFile(filename, content);
-                                            sqlPairs.add(instanceProperty.Name, DbController.encodeSQLText(filename));
+                                            core.cdnFiles.saveFile(fileFieldFilename, fileFieldContent);
+                                            sqlPairs.add(instanceProperty.Name, DbController.encodeSQLText(fileFieldFilename));
                                         }
                                     }
-                                    break;
-                            }
-                        }
-                        if (sqlPairs.count > 0) {
-                            if (id == 0) { id = db.insertTableRecordGetId(tableName); }
-                            db.updateTableRecord(tableName, "(id=" + id.ToString() + ")", sqlPairs, asyncSave);
+
+                                }
+                                break;
                         }
                     }
-                    //
-                    // -- object is here, but the cache was invalidated, setting
-                    string cacheKey = CacheController.createCacheKey_forDbRecord(id, tableName, datasourceName);
-                    core.cache.storeObject(cacheKey, this);
-                    core.cache.storePtr(CacheController.createCachePtr_forDbRecord_guid(ccguid, tableName, datasourceName), cacheKey);
-                    if (derivedNameFieldIsUnique(instanceType)) core.cache.storePtr(CacheController.createCachePtr_forDbRecord_uniqueName(name, tableName, datasourceName), cacheKey);
+                    if (sqlPairs.count > 0) {
+                        if (id == 0) { id = db.insertTableRecordGetId(tableName); }
+                        db.updateTableRecord(tableName, "(id=" + id.ToString() + ")", sqlPairs, asyncSave);
+                    }
                 }
+                //
+                // -- object is here, but the cache was invalidated, setting
+                string cacheKey = CacheController.createCacheKey_forDbRecord(id, tableName, datasourceName);
+                core.cache.storeObject(cacheKey, this);
+                core.cache.storePtr(CacheController.createCachePtr_forDbRecord_guid(ccguid, tableName, datasourceName), cacheKey);
+                if (derivedNameFieldIsUnique(instanceType)) core.cache.storePtr(CacheController.createCachePtr_forDbRecord_uniqueName(name, tableName, datasourceName), cacheKey);
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
                 throw;
@@ -886,25 +824,15 @@ namespace Contensive.Processor.Models.Db {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="recordId"></param>
-        public static void delete<T>(CoreController core, int recordId) where T : BaseModel {
+        public static void delete<T>(CoreController core, int recordId) where T : DbModel {
             try {
-                if (core.serverConfig == null) {
-                    //
-                    // -- cannot use models without an application
-                    LogController.handleError(core, new GenericException("Cannot use data models without a valid server configuration."));
-                } else if (core.appConfig == null) {
-                    //
-                    // -- cannot use models without an application
-                    LogController.handleError(core, new GenericException("Cannot use data models without a valid application configuration."));
-                } else {
-                    if (recordId > 0) {
-                        Type instanceType = typeof(T);
-                        using (var db = new DbController(core, derivedDataSourceName(instanceType))) {
-                            string tableName = derivedTableName(instanceType);
-                            db.deleteTableRecord(recordId, tableName);
-                            core.cache.invalidate(CacheController.createCacheKey_forDbRecord(recordId, tableName, derivedDataSourceName(instanceType)));
-                        }
-                    }
+                if (isAppInvalid(core)) { return; }
+                if (recordId <= 0) { return; }
+                string dataSourceName = derivedDataSourceName(typeof(T));
+                using (var db = new DbController(core, dataSourceName)) {
+                    string tableName = derivedTableName(typeof(T));
+                    db.deleteTableRecord(recordId, tableName);
+                    core.cache.invalidate(CacheController.createCacheKey_forDbRecord(recordId, tableName, dataSourceName));
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
@@ -917,28 +845,17 @@ namespace Contensive.Processor.Models.Db {
         /// delete an existing database record by guid
         /// </summary>
         /// <param name="cp"></param>
-        /// <param name="ccguid"></param>
-        public static void delete<T>(CoreController core, string ccguid) where T : BaseModel {
+        /// <param name="guid"></param>
+        public static void delete<T>(CoreController core, string guid) where T : DbModel {
             try {
-                if (core.serverConfig == null) {
-                    //
-                    // -- cannot use models without an application
-                    LogController.handleError(core, new GenericException("Cannot use data models without a valid server configuration."));
-                } else if (core.appConfig == null) {
-                    //
-                    // -- cannot use models without an application
-                    LogController.handleError(core, new GenericException("Cannot use data models without a valid application configuration."));
-                } else {
-                    if (!string.IsNullOrEmpty(ccguid)) {
-                        Type instanceType = typeof(T);
-                        BaseModel instance = create<BaseModel>(core, ccguid);
-                        if (instance != null) {
-                            invalidateRecordCache<T>(core, instance.id);
-                            using (var db = new DbController(core, derivedDataSourceName(instanceType))) {
-                                db.deleteTableRecord(ccguid, derivedTableName(instanceType));
-                            }
-                        }
-                    }
+                if (isAppInvalid(core)) { return; }
+                if (string.IsNullOrEmpty(guid)) { return; }
+                // todo change cache invalidate to key ptr, and we do not need to open the record first
+                DbModel instance = create<DbModel>(core, guid);
+                if (instance == null) { return; }
+                invalidateRecordCache<T>(core, instance.id);
+                using (var db = new DbController(core, derivedDataSourceName(typeof(T)))) {
+                    db.deleteTableRecord(guid, derivedTableName(typeof(T)));
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
@@ -953,36 +870,23 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="cp"></param>
         /// <param name="sqlCriteria"></param>
         /// <returns></returns>
-        public static List<T> createList<T>(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) where T : BaseModel {
-            List<T> result = new List<T>();
+        public static List<T> createList<T>(CoreController core, string sqlCriteria, string sqlOrderBy, List<string> callersCacheNameList) where T : DbModel {
             try {
-                if (core.serverConfig == null) {
-                    //
-                    // -- cannot use models without an application
-                    LogController.handleError(core, new GenericException("Cannot use data models without a valid server configuration."));
-                } else if (core.appConfig == null) {
-                    //
-                    // -- cannot use models without an application
-                    LogController.handleError(core, new GenericException("Cannot use data models without a valid application configuration."));
-                } else {
-                    Type instanceType = typeof(T);
-                    using (var db = new DbController(core, derivedDataSourceName(instanceType))) {
-                        using (var dt = db.executeQuery(getSelectSql<T>(core, null, sqlCriteria, sqlOrderBy))) {
-                            T instance = default(T);
-                            foreach (DataRow row in dt.Rows) {
-                                instance = loadRecord<T>(core, row, ref callersCacheNameList);
-                                if (instance != null) {
-                                    result.Add(instance);
-                                }
-                            }
+                List<T> result = new List<T>();
+                if (isAppInvalid(core)) { return result; }
+                using (var db = new DbController(core, derivedDataSourceName(typeof(T)))) {
+                    using (var dt = db.executeQuery(getSelectSql<T>(core, null, sqlCriteria, sqlOrderBy))) {
+                        foreach (DataRow row in dt.Rows) {
+                            T instance = loadRecord<T>(core, row, ref callersCacheNameList);
+                            if (instance != null) { result.Add(instance); }
                         }
                     }
                 }
+                return result;
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
                 throw;
             }
-            return result;
         }
         //
         //====================================================================================================
@@ -994,7 +898,7 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="sqlCriteria"></param>
         /// <param name="sqlOrderBy"></param>
         /// <returns></returns>
-        public static List<T> createList<T>(CoreController core, string sqlCriteria, string sqlOrderBy) where T : BaseModel => createList<T>(core, sqlCriteria, sqlOrderBy, new List<string> { });
+        public static List<T> createList<T>(CoreController core, string sqlCriteria, string sqlOrderBy) where T : DbModel => createList<T>(core, sqlCriteria, sqlOrderBy, new List<string> { });
         //
         //====================================================================================================
         /// <summary>
@@ -1004,9 +908,9 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="core"></param>
         /// <param name="sqlCriteria"></param>
         /// <returns></returns>
-        public static List<T> createList<T>(CoreController core, string sqlCriteria) where T : BaseModel => createList<T>(core, sqlCriteria, "id", new List<string> { });
+        public static List<T> createList<T>(CoreController core, string sqlCriteria) where T : DbModel => createList<T>(core, sqlCriteria, "id", new List<string> { });
         //
-        public static List<T> createList<T>(CoreController core) where T : BaseModel => createList<T>(core, "", "id", new List<string> { });
+        public static List<T> createList<T>(CoreController core) where T : DbModel => createList<T>(core, "", "id", new List<string> { });
         //
         //====================================================================================================
         /// <summary>
@@ -1014,22 +918,13 @@ namespace Contensive.Processor.Models.Db {
         /// </summary>
         /// <param name="core"></param>
         /// <param name="recordId"></param>
-        public static void invalidateRecordCache<T>(CoreController core, int recordId) where T : BaseModel {
+        public static void invalidateRecordCache<T>(CoreController core, int recordId) where T : DbModel {
             try {
-                if (core.serverConfig == null) {
-                    //
-                    // -- cannot use models without an application
-                    LogController.handleError(core, new GenericException("Cannot use data models without a valid server configuration."));
-                } else if (core.appConfig == null) {
-                    //
-                    // -- cannot use models without an application
-                    LogController.handleError(core, new GenericException("Cannot use data models without a valid application configuration."));
-                } else {
-                    object instanceType = typeof(T);
-                    core.cache.invalidateDbRecord(recordId, derivedTableName((Type)instanceType));
-                }
+                if (isAppInvalid(core)) { return; }
+                core.cache.invalidateDbRecord(recordId, derivedTableName(typeof(T)));
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
+                throw;
             }
         }
         //
@@ -1039,23 +934,25 @@ namespace Contensive.Processor.Models.Db {
         /// </summary>
         /// <param name="core"></param>
         /// <param name="recordId"></param>
-        public static void invalidateTableCache<T>(CoreController core) where T : BaseModel {
+        public static void invalidateTableCache<T>(CoreController core) where T : DbModel {
             try {
-                if (core.serverConfig == null) {
-                    //
-                    // -- cannot use models without an application
-                    LogController.handleError(core, new GenericException("Cannot use data models without a valid server configuration."));
-                } else if (core.appConfig == null) {
-                    //
-                    // -- cannot use models without an application
-                    LogController.handleError(core, new GenericException("Cannot use data models without a valid application configuration."));
-                } else {
-                    object instanceType = typeof(T);
-                    core.cache.invalidateAllKeysInTable(derivedTableName((Type)instanceType));
-                }
+                if (isAppInvalid(core)) { return; }
+                core.cache.invalidateAllKeysInTable(derivedTableName(typeof(T)));
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
+                throw;
             }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// get the name of the record, returning empty string if the record is null
+        /// </summary>
+        /// <param name="cp"></param>
+        /// <param name="recordId"></param>record
+        /// <returns></returns>
+        private static string getRecordName<T>(CoreController core, T record) where T : DbModel {
+            return (record != null) ? record.name : string.Empty;
         }
         //
         //====================================================================================================
@@ -1065,17 +962,13 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="cp"></param>
         /// <param name="recordId"></param>record
         /// <returns></returns>
-        public static string getRecordName<T>(CoreController core, int recordId) where T : BaseModel {
+        public static string getRecordName<T>(CoreController core, int recordId) where T : DbModel {
             try {
-                var record = create<BaseModel>(core, recordId);
-                if (record != null) {
-                    return record.name;
-                }
-                return "";
+                return getRecordName<DbModel>(core, create<DbModel>(core, recordId));
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
+                throw;
             }
-            return "";
         }
         //
         //====================================================================================================
@@ -1085,17 +978,13 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="cp"></param>
         /// <param name="guid"></param>record
         /// <returns></returns>
-        public static string getRecordName<T>(CoreController core, string guid) where T : BaseModel {
+        public static string getRecordName<T>(CoreController core, string guid) where T : DbModel {
             try {
-                var record = create<BaseModel>(core, guid);
-                if (record != null) {
-                    return record.name;
-                }
-                return "";
+                return getRecordName<DbModel>(core, create<DbModel>(core, guid));
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
+                throw;
             }
-            return "";
         }
         //
         //====================================================================================================
@@ -1105,17 +994,15 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="cp"></param>
         /// <param name="guid"></param>record
         /// <returns></returns>
-        public static int getRecordId<T>(CoreController core, string guid) where T : BaseModel {
+        public static int getRecordId<T>(CoreController core, string guid) where T : DbModel {
             try {
-                var record = create<BaseModel>(core, guid);
-                if (record != null) {
-                    return record.id;
-                }
+                var record = create<DbModel>(core, guid);
+                if (record != null) { return record.id; }
                 return 0;
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
+                throw;
             }
-            return 0;
         }
         //
         //====================================================================================================
@@ -1125,35 +1012,22 @@ namespace Contensive.Processor.Models.Db {
         /// <typeparam name="T"></typeparam>
         /// <param name="core"></param>
         /// <returns></returns>
-        public static T createEmpty<T>(CoreController core) where T : BaseModel {
-            T instance = default(T);
+        public static T createEmpty<T>(CoreController core) where T : DbModel {
             try {
-                if (core.serverConfig == null) {
-                    //
-                    // -- cannot use models without an application
-                    LogController.handleError(core, new GenericException("Cannot use data models without a valid server configuration."));
-                } else if (core.appConfig == null) {
-                    //
-                    // -- cannot use models without an application
-                    LogController.handleError(core, new GenericException("Cannot use data models without a valid application configuration."));
-                } else {
-                    Type instanceType = typeof(T);
-                    instance = (T)Activator.CreateInstance(instanceType);
-                    string guid = GenericController.getGUID();
-                    DateTime rightNow = DateTime.Now;
-                    instance.GetType().GetProperty("ccguid", BindingFlags.Instance | BindingFlags.Public).SetValue(instance, guid, null);
-                    instance.GetType().GetProperty("dateadded", BindingFlags.Instance | BindingFlags.Public).SetValue(instance, rightNow, null);
-                    instance.GetType().GetProperty("createdby", BindingFlags.Instance | BindingFlags.Public).SetValue(instance, core.session.user.id, null);
-                    instance.GetType().GetProperty("modifieddate", BindingFlags.Instance | BindingFlags.Public).SetValue(instance, rightNow, null);
-                    instance.GetType().GetProperty("modifiedby", BindingFlags.Instance | BindingFlags.Public).SetValue(instance, core.session.user.id, null);
-                    instance.GetType().GetProperty("ccguid", BindingFlags.Instance | BindingFlags.Public).SetValue(instance, "", null);
-                    instance.GetType().GetProperty("active", BindingFlags.Instance | BindingFlags.Public).SetValue(instance, 0, null);
-                    //instance.GetType().GetProperty("contentcontrolid", BindingFlags.Instance | BindingFlags.Public).SetValue(instance, 0, null);
-                }
-            } catch (Exception) {
+                T instance = (T)Activator.CreateInstance(typeof(T));
+                if (isAppInvalid(core)) { return instance; }
+                DateTime rightNow = DateTime.Now;
+                instance.GetType().GetProperty("active", BindingFlags.Instance | BindingFlags.Public).SetValue(instance, 0, null);
+                instance.GetType().GetProperty("ccguid", BindingFlags.Instance | BindingFlags.Public).SetValue(instance, GenericController.getGUID(), null);
+                instance.GetType().GetProperty("dateadded", BindingFlags.Instance | BindingFlags.Public).SetValue(instance, rightNow, null);
+                instance.GetType().GetProperty("modifieddate", BindingFlags.Instance | BindingFlags.Public).SetValue(instance, rightNow, null);
+                instance.GetType().GetProperty("createdby", BindingFlags.Instance | BindingFlags.Public).SetValue(instance, core.session.user.id, null);
+                instance.GetType().GetProperty("modifiedby", BindingFlags.Instance | BindingFlags.Public).SetValue(instance, core.session.user.id, null);
+                return instance;
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
                 throw;
             }
-            return instance;
         }
         //
         //====================================================================================================
@@ -1164,9 +1038,8 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="core"></param>
         /// <param name="recordId"></param>
         /// <returns></returns>
-        public static T readRecordCache<T>(CoreController core, int recordId) where T : BaseModel {
-            Type instanceType = typeof(T);
-            T result = core.cache.getObject<T>(CacheController.createCacheKey_forDbRecord(recordId, derivedTableName(instanceType), derivedDataSourceName(instanceType)));
+        private static T readRecordCache<T>(CoreController core, int recordId) where T : DbModel {
+            T result = core.cache.getObject<T>(CacheController.createCacheKey_forDbRecord(recordId, derivedTableName(typeof(T)), derivedDataSourceName(typeof(T))));
             restoreCacheDataObjects(core, result);
             return result;
         }
@@ -1179,9 +1052,8 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="core"></param>
         /// <param name="ccGuid"></param>
         /// <returns></returns>
-        public static T readRecordCacheByGuidPtr<T>(CoreController core, string ccGuid) where T : BaseModel {
-            Type instanceType = typeof(T);
-            T result = core.cache.getObject<T>(CacheController.createCachePtr_forDbRecord_guid(ccGuid, derivedTableName(instanceType), derivedDataSourceName(instanceType)));
+        private static T readRecordCacheByGuidPtr<T>(CoreController core, string ccGuid) where T : DbModel {
+            T result = core.cache.getObject<T>(CacheController.createCachePtr_forDbRecord_guid(ccGuid, derivedTableName(typeof(T)), derivedDataSourceName(typeof(T))));
             restoreCacheDataObjects(core, result);
             return result;
         }
@@ -1194,9 +1066,8 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="core"></param>
         /// <param name="uniqueName"></param>
         /// <returns></returns>
-        public static T readRecordCacheByUniqueNamePtr<T>(CoreController core, string uniqueName) where T : BaseModel {
-            Type instanceType = typeof(T);
-            T result = core.cache.getObject<T>(CacheController.createCachePtr_forDbRecord_uniqueName(uniqueName, derivedTableName(instanceType), derivedDataSourceName(instanceType)));
+        private static T readRecordCacheByUniqueNamePtr<T>(CoreController core, string uniqueName) where T : DbModel {
+            T result = core.cache.getObject<T>(CacheController.createCachePtr_forDbRecord_uniqueName(uniqueName, derivedTableName(typeof(T)), derivedDataSourceName(typeof(T))));
             restoreCacheDataObjects(core, result);
             return result;
         }
@@ -1205,19 +1076,18 @@ namespace Contensive.Processor.Models.Db {
         /// <summary>
         /// After reading a cached Db object, go through instance properties and verify internal core objects populated
         /// </summary>
-        public static void restoreCacheDataObjects<T>(CoreController core, T restoredInstance) {
-            if (restoredInstance != null) {
-                foreach (PropertyInfo instanceProperty in restoredInstance.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
-                    // todo change test to is-subsclass-of-fieldCdnFile
-                    switch (instanceProperty.PropertyType.Name) {
-                        case "FieldTypeTextFile":
-                        case "FieldTypeCSSFile":
-                        case "FieldTypeHTMLFile":
-                        case "FieldTypeJavascriptFile":
-                            FieldTypeFileBase fileProperty = (FieldTypeFileBase)instanceProperty.GetValue(restoredInstance);
-                            fileProperty.internalcore = core;
-                            break;
-                    }
+        private static void restoreCacheDataObjects<T>(CoreController core, T restoredInstance) {
+            if (restoredInstance == null) { return; }
+            foreach (PropertyInfo instanceProperty in restoredInstance.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
+                // todo change test to is-subsclass-of-fieldCdnFile
+                switch (instanceProperty.PropertyType.Name) {
+                    case "FieldTypeTextFile":
+                    case "FieldTypeCSSFile":
+                    case "FieldTypeHTMLFile":
+                    case "FieldTypeJavascriptFile":
+                        FieldTypeFileBase fileProperty = (FieldTypeFileBase)instanceProperty.GetValue(restoredInstance);
+                        fileProperty.internalcore = core;
+                        break;
                 }
             }
         }
@@ -1229,29 +1099,35 @@ namespace Contensive.Processor.Models.Db {
         /// <typeparam name="T"></typeparam>
         /// <param name="core"></param>
         /// <param name="fieldList"></param>
-        /// <param name="criteria"></param>
-        /// <param name="orderBy"></param>
+        /// <param name="sqlCriteria"></param>
+        /// <param name="sqlOrderBy"></param>
         /// <returns></returns>
-        public static string getSelectSql<T>(CoreController core, List<string> fieldList = null, string criteria = "", string orderBy = "") where T : BaseModel {
-            string result = "";
-            Type instanceType = typeof(T);
-            string tableName = derivedTableName(instanceType);
-            if (fieldList == null) {
-                fieldList = new List<string>();
-                T modelInstance = (T)Activator.CreateInstance(instanceType);
-                foreach (PropertyInfo modelProperty in modelInstance.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
-                    fieldList.Add(modelProperty.Name);
+        public static string getSelectSql<T>(CoreController core, List<string> fieldList, string sqlCriteria, string sqlOrderBy) where T : DbModel {
+            try {
+                if (fieldList == null) {
+                    fieldList = new List<string>();
+                    T instance = (T)Activator.CreateInstance(typeof(T));
+                    foreach (PropertyInfo modelProperty in instance.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
+                        fieldList.Add(modelProperty.Name);
+                    }
                 }
+                var sb = (new StringBuilder("select ")).Append(string.Join(",", fieldList.ToArray()))
+                    .Append(" from ").Append(derivedTableName(typeof(T)))
+                    .Append(" where (active>0)");
+                if (!string.IsNullOrEmpty(sqlCriteria)) { sb.Append("and(" + sqlCriteria + ")"); }
+                if (!string.IsNullOrEmpty(sqlOrderBy)) { sb.Append(" order by " + sqlOrderBy); }
+                return sb.ToString();
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+                throw;
             }
-            result = "select " + string.Join(",", fieldList.ToArray()) + " from " + tableName + " where (active>0)";
-            if (!string.IsNullOrEmpty(criteria)) {
-                result += "and(" + criteria + ")";
-            }
-            if (!string.IsNullOrEmpty(orderBy)) {
-                result += " order by " + orderBy;
-            }
-            return result;
         }
+        //
+        public static string getSelectSql<T>(CoreController core, List<string> fieldList, string criteria) where T : DbModel => getSelectSql<T>(core, fieldList, criteria, null);
+        //
+        public static string getSelectSql<T>(CoreController core, List<string> fieldList) where T : DbModel => getSelectSql<T>(core, fieldList, null, null);
+        //
+        public static string getSelectSql<T>(CoreController core) where T : DbModel => getSelectSql<T>(core, null, null, null);
         //
         //====================================================================================================
         /// <summary>
@@ -1261,7 +1137,12 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="core"></param>
         /// <returns></returns>
         public static string getTableCacheKey<T>(CoreController core) {
-            return CacheController.createCacheKey_forDbTable(derivedTableName(typeof(T)));
+            try {
+                return CacheController.createCacheKey_forDbTable(derivedTableName(typeof(T)));
+            } catch (Exception ex) {
+                LogController.handleError(core, ex);
+                throw;
+            }
         }
         //
         //====================================================================================================
@@ -1271,29 +1152,28 @@ namespace Contensive.Processor.Models.Db {
         /// <typeparam name="T"></typeparam>
         /// <param name="core"></param>
         /// <param name="sqlCriteria"></param>
-        public static void deleteSelection<T>(CoreController core, string sqlCriteria) where T : BaseModel {
+        public static void deleteSelection<T>(CoreController core, string sqlCriteria) where T : DbModel {
             try {
-                if (core.serverConfig == null) {
-                    //
-                    // -- cannot use models without an application
-                    LogController.handleError(core, new GenericException("Cannot use data models without a valid server configuration."));
-                } else if (core.appConfig == null) {
-                    //
-                    // -- cannot use models without an application
-                    LogController.handleError(core, new GenericException("Cannot use data models without a valid application configuration."));
-                } else {
-                    if (!string.IsNullOrEmpty(sqlCriteria)) {
-                        Type instanceType = typeof(T);
-                        using (var db = new DbController(core, derivedDataSourceName(instanceType))) {
-                            string tableName = derivedTableName(instanceType);
-                            db.deleteTableRecords(tableName, sqlCriteria);
-                        }
-                    }
+                if (isAppInvalid(core)) { return; }
+                if (string.IsNullOrEmpty(sqlCriteria)) { return; }
+                using (var db = new DbController(core, derivedDataSourceName(typeof(T)))) {
+                    db.deleteTableRecords(derivedTableName(typeof(T)), sqlCriteria);
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
                 throw;
             }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// if invalid application, log the error and return true
+        /// </summary>
+        /// <returns></returns>
+        private static bool isAppInvalid(CoreController core) {
+            if ((core.serverConfig != null) && (core.appConfig != null)) { return false; }
+            LogController.handleError(core, new GenericException("Cannot use data models without a valid server and application configuration."));
+            return true;
         }
     }
 }

@@ -3,6 +3,7 @@ using System;
 using System.Data;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
+using Contensive.BaseClasses;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -272,7 +273,7 @@ namespace Contensive.Processor.Controllers {
                                 } else if ((FieldContentID == ContentID) && (fieldId != LastFieldID)) {
                                     if (IncludeBaseFields || (",id,dateadded,createdby,modifiedby,ContentControlID,CreateKey,ModifiedDate,ccguid,".IndexOf("," + FieldName + ",", System.StringComparison.OrdinalIgnoreCase) == -1)) {
                                         sb.Append("\r\n\t\t<Field");
-                                        string fieldType = MetaController.getFieldTypeNameFromFieldTypeId(core, encodeInteger(CFields[f_Type, CFieldPtr]));
+                                        string fieldType = MetaController.getFieldTypeNameFromFieldTypeId(core, (CPContentBaseClass.fileTypeIdEnum)encodeInteger(CFields[f_Type, CFieldPtr]));
                                         sb.Append(" Name=\"" + xmlValueText(FieldName) + "\"");
                                         sb.Append(" active=\"" + xmlValueBoolean(CFields[f_Active, CFieldPtr]) + "\"");
                                         sb.Append(" AdminOnly=\"" + xmlValueBoolean(CFields[f_AdminOnly, CFieldPtr]) + "\"");

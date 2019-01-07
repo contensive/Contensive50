@@ -1,6 +1,7 @@
 ﻿
 using System;
 using static Contensive.Processor.Constants;
+using Contensive.BaseClasses;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -128,18 +129,18 @@ namespace Contensive.Processor.Controllers {
                                     FieldNameVariant = csData.getFirstFieldName();
                                     while (!string.IsNullOrEmpty(FieldNameVariant)) {
                                         switch (csData.getFieldTypeId(GenericController.encodeText(FieldNameVariant))) {
-                                            case _fieldTypeIdFileText:
-                                            case _fieldTypeIdFileCSS:
-                                            case _fieldTypeIdFileXML:
-                                            case _fieldTypeIdFileJavascript:
-                                            case _fieldTypeIdFileHTML:
+                                            case CPContentBaseClass.fileTypeIdEnum.FileText:
+                                            case CPContentBaseClass.fileTypeIdEnum.FileCSS:
+                                            case CPContentBaseClass.fileTypeIdEnum.FileXML:
+                                            case CPContentBaseClass.fileTypeIdEnum.FileJavascript:
+                                            case CPContentBaseClass.fileTypeIdEnum.FileHTML:
                                                 Copy = csData.getTextEncoded(GenericController.encodeText(FieldNameVariant));
                                                 break;
-                                            case _fieldTypeIdLookup:
+                                            case CPContentBaseClass.fileTypeIdEnum.Lookup:
                                                 Copy = csData.getText(GenericController.encodeText(FieldNameVariant));
                                                 break;
-                                            case _fieldTypeIdRedirect:
-                                            case _fieldTypeIdManyToMany:
+                                            case CPContentBaseClass.fileTypeIdEnum.Redirect:
+                                            case CPContentBaseClass.fileTypeIdEnum.ManyToMany:
                                                 break;
                                             default:
                                                 Copy = csData.getText(GenericController.encodeText(FieldNameVariant));
