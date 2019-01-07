@@ -353,22 +353,11 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="callersCacheNameList"></param>
         /// <returns></returns>
         public static T addEmpty<T>(CoreController core) where T : DbModel {
-            T result = default(T);
             try {
-                if (core.serverConfig == null) {
-                    //
-                    // -- cannot use models without an application
-                    LogController.handleError(core, new GenericException("Cannot use data models without a valid server configuration."));
-                } else if (core.appConfig == null) {
-                    //
-                    // -- cannot use models without an application
-                    LogController.handleError(core, new GenericException("Cannot use data models without a valid application configuration."));
-                } else {
-                    Type instanceType = typeof(T);
-                    string tableName = derivedTableName(instanceType);
-                    using (var db = new DbController(core, derivedDataSourceName(instanceType))) {
-                        result = create<T>(core, db.insertTableRecordGetId(tableName, core.session.user.id));
-                    }
+                T result = default(T);
+                if (isAppInvalid(core)) { return result; }
+                using (var db = new DbController(core, derivedDataSourceName(typeof(T)))) {
+                    return create<T>(core, db.insertTableRecordGetId(derivedTableName(typeof(T)), core.session.user.id));
                 }
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
@@ -397,67 +386,53 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="recordId">The id of the record to be read into the new object</param>
         /// <param name="callersCacheNameList">Any cachenames effected by this record will be added to this list. If the method consumer creates a cache object, add these cachenames to its dependent cachename list.</param>
         public static T create<T>(CoreController core, int recordId, ref List<string> callersCacheNameList) where T : DbModel {
-            T result = default(T);
             try {
-                if (core.serverConfig == null) {
-                    //
-                    // -- cannot use models without an application
-                    LogController.handleError(core, new GenericException("Cannot use data models without a valid server configuration."));
-                } else if (core.appConfig == null) {
-                    //
-                    // -- cannot use models without an application
-                    LogController.handleError(core, new GenericException("Cannot use data models without a valid application configuration."));
-                } else {
-                    if (recordId > 0) {
-                        result = readRecordCache<T>(core, recordId);
-                        if (result == null) {
-                            using (var db = new DbController(core, derivedDataSourceName(typeof(T)))) {
-                                using (var dt = db.executeQuery(getSelectSql<T>(core, null, "(id=" + recordId + ")", ""))) {
-                                    if (dt != null) {
-                                        if (dt.Rows.Count > 0) {
-                                            result = loadRecord<T>(core, dt.Rows[0], ref callersCacheNameList);
-                                        }
-                                    }
-                                }
-
-                            }
-
-                        }
-                        //
-                        // -- store core in all extended fields that need it (file fields so content read can happen on demand instead of at load)
-                        if (result != null) {
-                            foreach (PropertyInfo instanceProperty in result.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
-                                switch (instanceProperty.PropertyType.Name) {
-                                    case "FieldTypeJavascriptFile": {
-                                            FieldTypeJavascriptFile fileProperty = (FieldTypeJavascriptFile)instanceProperty.GetValue(result);
-                                            fileProperty.internalcore = core;
-                                            break;
-                                        }
-                                    case "FieldTypeCSSFile": {
-                                            FieldTypeCSSFile fileProperty = (FieldTypeCSSFile)instanceProperty.GetValue(result);
-                                            fileProperty.internalcore = core;
-                                            break;
-                                        }
-                                    case "FieldTypeHTMLFile": {
-                                            FieldTypeHTMLFile fileProperty = (FieldTypeHTMLFile)instanceProperty.GetValue(result);
-                                            fileProperty.internalcore = core;
-                                            break;
-                                        }
-                                    case "FieldTypeTextFile": {
-                                            FieldTypeTextFile fileProperty = (FieldTypeTextFile)instanceProperty.GetValue(result);
-                                            fileProperty.internalcore = core;
-                                            break;
-                                        }
-                                }
+                T result = default(T);
+                if (isAppInvalid(core)) { return result; }
+                if ( recordId <= 0) { return result; }
+                result = readRecordCache<T>(core, recordId);
+                if (result == null) {
+                    using (var db = new DbController(core, derivedDataSourceName(typeof(T)))) {
+                        using (var dt = db.executeQuery(getSelectSql<T>(core, null, "(id=" + recordId + ")", ""))) {
+                            if (dt != null) {
+                                if (dt.Rows.Count > 0) { result = loadRecord<T>(core, dt.Rows[0], ref callersCacheNameList); }
                             }
                         }
                     }
                 }
+                //
+                // -- store core in all extended fields that need it (file fields so content read can happen on demand instead of at load)
+                if (result != null) {
+                    foreach (PropertyInfo instanceProperty in result.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
+                        switch (instanceProperty.PropertyType.Name) {
+                            case "FieldTypeJavascriptFile": {
+                                    FieldTypeJavascriptFile fileProperty = (FieldTypeJavascriptFile)instanceProperty.GetValue(result);
+                                    fileProperty.internalcore = core;
+                                    break;
+                                }
+                            case "FieldTypeCSSFile": {
+                                    FieldTypeCSSFile fileProperty = (FieldTypeCSSFile)instanceProperty.GetValue(result);
+                                    fileProperty.internalcore = core;
+                                    break;
+                                }
+                            case "FieldTypeHTMLFile": {
+                                    FieldTypeHTMLFile fileProperty = (FieldTypeHTMLFile)instanceProperty.GetValue(result);
+                                    fileProperty.internalcore = core;
+                                    break;
+                                }
+                            case "FieldTypeTextFile": {
+                                    FieldTypeTextFile fileProperty = (FieldTypeTextFile)instanceProperty.GetValue(result);
+                                    fileProperty.internalcore = core;
+                                    break;
+                                }
+                        }
+                    }
+                }
+                return result;
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
                 throw;
             }
-            return result;
         }
         //
         //====================================================================================================
@@ -469,8 +444,8 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="recordGuid"></param>
         /// <returns></returns>
         public static T create<T>(CoreController core, string recordGuid) where T : DbModel {
-            var tempVar = new List<string>();
-            return create<T>(core, recordGuid, ref tempVar);
+            var cacheNameList = new List<string>();
+            return create<T>(core, recordGuid, ref cacheNameList);
         }
         //
         //====================================================================================================
@@ -480,38 +455,24 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="cp"></param>
         /// <param name="recordGuid"></param>
         public static T create<T>(CoreController core, string recordGuid, ref List<string> callersCacheNameList) where T : DbModel {
-            T result = default(T);
             try {
-                if (core.serverConfig == null) {
-                    //
-                    // -- cannot use models without an application
-                    LogController.handleError(core, new GenericException("Cannot use data models without a valid server configuration."));
-                } else if (core.appConfig == null) {
-                    //
-                    // -- cannot use models without an application
-                    LogController.handleError(core, new GenericException("Cannot use data models without a valid application configuration."));
-                } else {
-                    if (!string.IsNullOrEmpty(recordGuid)) {
-                        result = readRecordCacheByGuidPtr<T>(core, recordGuid);
-                        if (result == null) {
-                            using (var db = new DbController(core, derivedDataSourceName(typeof(T)))) {
-                                using (var dt = db.executeQuery(getSelectSql<T>(core, null, "(ccGuid=" + DbController.encodeSQLText(recordGuid) + ")", ""))) {
-                                    if (dt != null) {
-                                        if (dt.Rows.Count > 0) {
-                                            result = loadRecord<T>(core, dt.Rows[0], ref callersCacheNameList);
-                                        }
-                                    }
-                                }
-                            }
+                T result = default(T);
+                if (isAppInvalid(core)) { return result; }
+                if (string.IsNullOrEmpty(recordGuid)) { return result; }
+                result = readRecordCacheByGuidPtr<T>(core, recordGuid);
+                if (result != null) { return result; }
+                using (var db = new DbController(core, derivedDataSourceName(typeof(T)))) {
+                    using (var dt = db.executeQuery(getSelectSql<T>(core, null, "(ccGuid=" + DbController.encodeSQLText(recordGuid) + ")", ""))) {
+                        if (dt != null) {
+                            if (dt.Rows.Count > 0) { return loadRecord<T>(core, dt.Rows[0], ref callersCacheNameList); }
                         }
                     }
                 }
+                return result;
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
                 throw;
-                throw;
             }
-            return result;
         }
         //
         //====================================================================================================
@@ -535,40 +496,30 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="recordName"></param>
         /// <param name="callersCacheNameList">method will add the cache name to this list.</param>
         public static T createByUniqueName<T>(CoreController core, string recordName, ref List<string> callersCacheNameList) where T : DbModel {
-            T result = default(T);
             try {
-                if (core.serverConfig == null) {
+                T result = default(T);
+                if (isAppInvalid(core)) { return result; }
+                if (!string.IsNullOrEmpty(recordName)) {
                     //
-                    // -- cannot use models without an application
-                    LogController.handleError(core, new GenericException("Cannot use data models without a valid server configuration."));
-                } else if (core.appConfig == null) {
-                    //
-                    // -- cannot use models without an application
-                    LogController.handleError(core, new GenericException("Cannot use data models without a valid application configuration."));
-                } else {
-                    if (!string.IsNullOrEmpty(recordName)) {
-                        Type instanceType = typeof(T);
-                        //
-                        // -- if allowCache, then this subclass is for a content that has a unique name. read the name pointer
-                        result = (derivedNameFieldIsUnique(instanceType)) ? readRecordCacheByUniqueNamePtr<T>(core, recordName) : null;
-                        if (result == null) {
-                            using (var db = new DbController(core, derivedDataSourceName(typeof(T)))) {
-                                using (var dt = db.executeQuery(getSelectSql<T>(core, null, "(name=" + DbController.encodeSQLText(recordName) + ")", ""))) {
-                                    if (dt != null) {
-                                        if (dt.Rows.Count > 0) {
-                                            result = loadRecord<T>(core, dt.Rows[0], ref callersCacheNameList);
-                                        }
+                    // -- if allowCache, then this subclass is for a content that has a unique name. read the name pointer
+                    result = (derivedNameFieldIsUnique(typeof(T))) ? readRecordCacheByUniqueNamePtr<T>(core, recordName) : null;
+                    if (result == null) {
+                        using (var db = new DbController(core, derivedDataSourceName(typeof(T)))) {
+                            using (var dt = db.executeQuery(getSelectSql<T>(core, null, "(name=" + DbController.encodeSQLText(recordName) + ")", ""))) {
+                                if (dt != null) {
+                                    if (dt.Rows.Count > 0) {
+                                        return loadRecord<T>(core, dt.Rows[0], ref callersCacheNameList);
                                     }
                                 }
                             }
                         }
                     }
                 }
+                return result;
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
                 throw;
             }
-            return result;
         }
         //
         //====================================================================================================
@@ -579,15 +530,11 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="sqlCriteria"></param>
         /// <param name="callersCacheKeyList"></param>
         private static T loadRecord<T>(CoreController core, DataRow row, ref List<string> callersCacheKeyList) where T : DbModel {
-            T modelInstance = default(T);
             try {
+                T modelInstance = default(T);
                 if (row != null) {
-                    //filename = GenericController.encodeText(dt.Rows[0][instanceProperty.Name]);
                     Type instanceType = typeof(T);
-                    string tableName = derivedTableName(instanceType);
-                    int recordId = GenericController.encodeInteger(row["id"]);
                     modelInstance = (T)Activator.CreateInstance(instanceType);
-
                     foreach (PropertyInfo modelProperty in modelInstance.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
                         string propertyName = modelProperty.Name;
                         string propertyValue = row[propertyName].ToString();
@@ -672,6 +619,7 @@ namespace Contensive.Processor.Models.Db {
                         // -- add all cachenames to the injected cachenamelist
                         if (modelInstance is DbModel baseInstance) {
                             string datasourceName = derivedDataSourceName(instanceType);
+                            string tableName = derivedTableName(instanceType);
                             string cacheKey = CacheController.createCacheKey_forDbRecord(baseInstance.id, tableName, datasourceName);
                             callersCacheKeyList.Add(cacheKey);
                             core.cache.storeObject(cacheKey, modelInstance);
@@ -686,11 +634,11 @@ namespace Contensive.Processor.Models.Db {
                         }
                     }
                 }
+                return modelInstance;
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
                 throw;
             }
-            return modelInstance;
         }
         //
         //====================================================================================================
