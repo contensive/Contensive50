@@ -15,7 +15,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Models.Db {
-    public class LibraryFilesModel : BaseModel {
+    public class LibraryFilesModel : DbModel {
         //
         //====================================================================================================
         //-- const
@@ -117,17 +117,17 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return BaseModel.getRecordName<LibraryFilesModel>(core, recordId);
+            return DbModel.getRecordName<LibraryFilesModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return BaseModel.getRecordName<LibraryFilesModel>(core, ccGuid);
+            return DbModel.getRecordName<LibraryFilesModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return BaseModel.getRecordId<LibraryFilesModel>(core, ccGuid);
+            return DbModel.getRecordId<LibraryFilesModel>(core, ccGuid);
         }
         //
         //====================================================================================================

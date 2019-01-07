@@ -268,7 +268,7 @@ namespace Contensive.Processor.Models.Db {
         public static T addDefault<T>(CoreController core, Domain.MetaModel metaData, ref List<string> callersCacheNameList) where T : DbModel {
             T result = default(T);
             try {
-                result = AddEmpty<T>(core);
+                result = addEmpty<T>(core);
                 if (result != null) {
                     foreach (PropertyInfo modelProperty in result.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
                         string propertyName = modelProperty.Name;
@@ -352,7 +352,7 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="core"></param>
         /// <param name="callersCacheNameList"></param>
         /// <returns></returns>
-        public static T AddEmpty<T>(CoreController core) where T : DbModel {
+        public static T addEmpty<T>(CoreController core) where T : DbModel {
             T result = default(T);
             try {
                 if (core.serverConfig == null) {

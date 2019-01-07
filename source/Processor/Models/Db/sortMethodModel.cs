@@ -15,7 +15,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Models.Db {
-    public class SortMethodModel : BaseModel {
+    public class SortMethodModel : DbModel {
         //
         //====================================================================================================
         //-- const
@@ -108,17 +108,17 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return BaseModel.getRecordName<SortMethodModel>(core, recordId);
+            return DbModel.getRecordName<SortMethodModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return BaseModel.getRecordName<SortMethodModel>(core, ccGuid);
+            return DbModel.getRecordName<SortMethodModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return BaseModel.getRecordId<SortMethodModel>(core, ccGuid);
+            return DbModel.getRecordId<SortMethodModel>(core, ccGuid);
         }
         //
         //====================================================================================================

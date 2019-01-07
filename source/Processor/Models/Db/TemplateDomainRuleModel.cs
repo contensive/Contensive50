@@ -15,7 +15,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Models.Db {
-    public class TemplateDomainRuleModel : BaseModel {
+    public class TemplateDomainRuleModel : DbModel {
         //
         //====================================================================================================
         //-- const
@@ -109,17 +109,17 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return BaseModel.getRecordName<TemplateDomainRuleModel>(core, recordId);
+            return DbModel.getRecordName<TemplateDomainRuleModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return BaseModel.getRecordName<TemplateDomainRuleModel>(core, ccGuid);
+            return DbModel.getRecordName<TemplateDomainRuleModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return BaseModel.getRecordId<TemplateDomainRuleModel>(core, ccGuid);
+            return DbModel.getRecordId<TemplateDomainRuleModel>(core, ccGuid);
         }
         //
         //====================================================================================================

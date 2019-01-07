@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using Contensive.Processor.Controllers;
 //
 namespace Contensive.Processor.Models.Db {
-    public class ConditionalEmailModel : BaseModel {
+    public class ConditionalEmailModel : DbModel {
         //
         //====================================================================================================
         //-- const
@@ -101,17 +101,17 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, int recordId) {
-            return BaseModel.getRecordName<ConditionalEmailModel>(core, recordId);
+            return DbModel.getRecordName<ConditionalEmailModel>(core, recordId);
         }
         //
         //====================================================================================================
         public static string getRecordName(CoreController core, string ccGuid) {
-            return BaseModel.getRecordName<ConditionalEmailModel>(core, ccGuid);
+            return DbModel.getRecordName<ConditionalEmailModel>(core, ccGuid);
         }
         //
         //====================================================================================================
         public static int getRecordId(CoreController core, string ccGuid) {
-            return BaseModel.getRecordId<ConditionalEmailModel>(core, ccGuid);
+            return DbModel.getRecordId<ConditionalEmailModel>(core, ccGuid);
         }
         //
         //====================================================================================================

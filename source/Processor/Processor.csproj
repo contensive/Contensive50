@@ -301,7 +301,7 @@
     <Compile Include="Models\Db\AddonModel.cs" />
     <Compile Include="Models\Db\AddonPageRuleModel.cs" />
     <Compile Include="Models\Db\AddonTemplateRuleModel.cs" />
-    <Compile Include="Models\Db\BaseModel.cs" />
+    <Compile Include="Models\Db\DbModel.cs" />
     <Compile Include="Models\Db\ContentFieldHelpModel.cs" />
     <Compile Include="Models\Db\ContentFieldModel.cs" />
     <Compile Include="Models\Db\ContentModel.cs" />
