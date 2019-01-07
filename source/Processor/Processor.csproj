@@ -269,7 +269,6 @@
     <Compile Include="Views\CPContextClass.cs" />
     <Compile Include="Views\CPCSClass.cs" />
     <Compile Include="Views\CPDbClass.cs" />
-    <Compile Include="Views\CPDbModelClass.cs" />
     <Compile Include="Views\CPDocClass.cs" />
     <Compile Include="Views\CPEmailClass.cs" />
     <Compile Include="Views\CPFileClass.cs" />

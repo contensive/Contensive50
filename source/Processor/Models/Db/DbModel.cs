@@ -7,6 +7,7 @@ using static Contensive.Processor.Constants;
 using System.Data;
 using Contensive.Processor.Exceptions;
 using System.Text;
+using Contensive.BaseClasses;
 //
 namespace Contensive.Processor.Models.Db {
     //
@@ -56,7 +57,7 @@ namespace Contensive.Processor.Models.Db {
     //       - when building the model, if another model is added, that model returns its cachenames in the cacheNameList to be added as dependentObjects
     //
     //
-    public class DbModel : Contensive.BaseClasses.CPDbModelBaseClass {
+    public class DbModel {
         //
         //====================================================================================================
         //-- const must be set in derived clases
@@ -67,7 +68,7 @@ namespace Contensive.Processor.Models.Db {
         //====================================================================================================
         //-- field types
         //
-        public new class FieldTypeFileBase {
+        public class FieldTypeFileBase {
             //
             // -- 
             // during load
@@ -136,13 +137,13 @@ namespace Contensive.Processor.Models.Db {
             public CoreController internalcore { get; set; } = null;
         }
         //
-        public new class FieldTypeTextFile : FieldTypeFileBase {
+        public class FieldTypeTextFile : FieldTypeFileBase {
         }
-        public new class FieldTypeJavascriptFile : FieldTypeFileBase {
+        public class FieldTypeJavascriptFile : FieldTypeFileBase {
         }
-        public new class FieldTypeCSSFile : FieldTypeFileBase {
+        public class FieldTypeCSSFile : FieldTypeFileBase {
         }
-        public new class FieldTypeHTMLFile : FieldTypeFileBase {
+        public class FieldTypeHTMLFile : FieldTypeFileBase {
         }
         //
         //====================================================================================================
@@ -150,47 +151,47 @@ namespace Contensive.Processor.Models.Db {
         /// <summary>
         /// identity integer, primary key for every table
         /// </summary>
-        public override int id { get; set; }
+        public int id { get; set; }
         /// <summary>
         /// name of the record used for lookup lists
         /// </summary>
-        public override string name { get; set; }
+        public string name { get; set; }
         /// <summary>
         /// optional guid, created automatically in the model
         /// </summary>
-        public override string ccguid { get; set; }
+        public string ccguid { get; set; }
         /// <summary>
         /// optionally can be used to disable a record. Must be implemented in each query
         /// </summary>
-        public override bool active { get; set; }
+        public bool active { get; set; }
         /// <summary>
         /// id of the metadata record in ccContent that controls the display and handing for this record
         /// </summary>
-        public override int contentControlID { get; set; }
+        public int contentControlID { get; set; }
         /// <summary>
         /// foreign key to ccmembers table, populated by admin when record added.
         /// </summary>
-        public override int createdBy { get; set; }
+        public int createdBy { get; set; }
         /// <summary>
         /// used when creating new record
         /// </summary>
-        public override int createKey { get; set; }
+        public int createKey { get; set; }
         /// <summary>
         /// date record added, populated by admin when record added.
         /// </summary>
-        public override DateTime dateAdded { get; set; }
+        public DateTime dateAdded { get; set; }
         /// <summary>
         /// foreign key to ccmembers table set to user who modified the record last in the admin site
         /// </summary>
-        public override int modifiedBy { get; set; }
+        public int modifiedBy { get; set; }
         /// <summary>
         /// date when the record was last modified in the admin site
         /// </summary>
-        public override DateTime modifiedDate { get; set; }
+        public DateTime modifiedDate { get; set; }
         /// <summary>
         /// optionally used to sort recrods in the table
         /// </summary>
-        public override string sortOrder { get; set; }
+        public string sortOrder { get; set; }
         //
         //====================================================================================================
         /// <summary>
@@ -351,7 +352,7 @@ namespace Contensive.Processor.Models.Db {
         /// <param name="core"></param>
         /// <param name="callersCacheNameList"></param>
         /// <returns></returns>
-        public override static T AddEmpty<T>(CoreController core) where T : DbModel {
+        public static T AddEmpty<T>(CoreController core) where T : DbModel {
             T result = default(T);
             try {
                 if (core.serverConfig == null) {
@@ -711,16 +712,13 @@ namespace Contensive.Processor.Models.Db {
                             case "id":
                                 break;
                             case "ccguid":
-                                if (string.IsNullOrEmpty(ccguid)) { ccguid = GenericController.getGUID();}
+                                if (string.IsNullOrEmpty(ccguid)) { ccguid = GenericController.getGUID(); }
                                 sqlPairs.add(instanceProperty.Name, DbController.encodeSQLText(instanceProperty.GetValue(this, null).ToString()));
                                 break;
                             default:
-                                int fieldTypeId = 0;
-                                bool fileContentUpdated = false;
+                                CPContentBaseClass.fileTypeIdEnum  fieldTypeId = 0;
                                 bool fileFieldContentUpdated = false;
-                                string fileFieldContent = "";
-                                string fileFieldFilename = "";
-                                string content = "";
+                                FieldTypeFileBase fileProperty = null;
                                 switch (instanceProperty.PropertyType.Name) {
                                     case "Int32":
                                         Int32 valueInt32 = (int)instanceProperty.GetValue(this);
@@ -739,82 +737,65 @@ namespace Contensive.Processor.Models.Db {
                                         sqlPairs.add(instanceProperty.Name, DbController.encodeSQLNumber(valueDbl));
                                         break;
                                     case "FieldTypeTextFile": {
-                                            fieldTypeId = fieldTypeIdFileText;
-                                            FieldTypeTextFile fileProperty = (FieldTypeTextFile)instanceProperty.GetValue(this);
-                                            fileProperty.internalcore = core;
-                                            PropertyInfo fileFieldContentProperty = instanceProperty.PropertyType.GetProperty("content");
-                                            fileFieldContent = (string)fileFieldContentProperty.GetValue(fileProperty);
-                                            PropertyInfo fileFieldContentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
-                                            fileFieldContentUpdated = (bool)fileFieldContentUpdatedProperty.GetValue(fileProperty);
-                                            PropertyInfo fileFieldFilenameProperty = instanceProperty.PropertyType.GetProperty("filename");
-                                            fileFieldFilename = (string)fileFieldFilenameProperty.GetValue(fileProperty);
+                                            fieldTypeId = CPContentBaseClass.fileTypeIdEnum.FileText;
+                                            fileProperty = (FieldTypeTextFile)instanceProperty.GetValue(this);
                                         }
                                         break;
                                     case "FieldTypeJavascriptFile": {
-                                            fieldTypeId = fieldTypeIdFileJavascript;
-                                            FieldTypeJavascriptFile fileProperty = (FieldTypeJavascriptFile)instanceProperty.GetValue(this);
-                                            fileProperty.internalcore = core;
-                                            PropertyInfo fileFieldContentProperty = instanceProperty.PropertyType.GetProperty("content");
-                                            fileFieldContent = (string)fileFieldContentProperty.GetValue(fileProperty);
-                                            PropertyInfo fileFieldContentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
-                                            fileFieldContentUpdated = (bool)fileFieldContentUpdatedProperty.GetValue(fileProperty);
-                                            PropertyInfo fileFieldFilenameProperty = instanceProperty.PropertyType.GetProperty("filename");
-                                            fileFieldFilename = (string)fileFieldFilenameProperty.GetValue(fileProperty);
+                                            fieldTypeId = CPContentBaseClass.fileTypeIdEnum.FileJavascript;
+                                            fileProperty = (FieldTypeJavascriptFile)instanceProperty.GetValue(this);
                                         }
                                         break;
                                     case "FieldTypeCSSFile": {
-                                            fieldTypeId = fieldTypeIdFileCSS;
-                                            FieldTypeCSSFile fileProperty = (FieldTypeCSSFile)instanceProperty.GetValue(this);
-                                            fileProperty.internalcore = core;
-                                            PropertyInfo fileFieldContentProperty = instanceProperty.PropertyType.GetProperty("content");
-                                            fileFieldContent = (string)fileFieldContentProperty.GetValue(fileProperty);
-                                            PropertyInfo fileFieldContentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
-                                            fileFieldContentUpdated = (bool)fileFieldContentUpdatedProperty.GetValue(fileProperty);
-                                            PropertyInfo fileFieldFilenameProperty = instanceProperty.PropertyType.GetProperty("filename");
-                                            fileFieldFilename = (string)fileFieldFilenameProperty.GetValue(fileProperty);
+                                            fieldTypeId = CPContentBaseClass.fileTypeIdEnum.FileCSS;
+                                            fileProperty = (FieldTypeCSSFile)instanceProperty.GetValue(this);
                                         }
                                         break;
                                     case "FieldTypeHTMLFile": {
-                                            fieldTypeId = fieldTypeIdFileHTML;
-                                            FieldTypeHTMLFile fileProperty = (FieldTypeHTMLFile)instanceProperty.GetValue(this);
-                                            fileProperty.internalcore = core;
-                                            PropertyInfo fileFieldContentProperty = instanceProperty.PropertyType.GetProperty("content");
-                                            fileFieldContent = (string)fileFieldContentProperty.GetValue(fileProperty);
-                                            PropertyInfo fileFieldContentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
-                                            fileFieldContentUpdated = (bool)fileFieldContentUpdatedProperty.GetValue(fileProperty);
-                                            PropertyInfo fileFieldFilenameProperty = instanceProperty.PropertyType.GetProperty("filename");
-                                            fileFieldFilename = (string)fileFieldFilenameProperty.GetValue(fileProperty);
+                                            fieldTypeId = CPContentBaseClass.fileTypeIdEnum.FileHTML;
+                                            fileProperty = (FieldTypeHTMLFile)instanceProperty.GetValue(this);
                                         }
                                         break;
                                     default:
                                         sqlPairs.add(instanceProperty.Name, DbController.encodeSQLText(instanceProperty.GetValue(this, null).ToString()));
                                         break;
                                 }
-                                if (fileContentUpdated) {
-                                    string filename = fileFieldFilename;
-                                    if ((String.IsNullOrEmpty(filename)) && (id != 0)) {
-                                        // 
-                                        // -- if record exists and file property's filename is not set, get the filename from the Db
-                                        using (System.Data.DataTable dt = db.executeQuery("select " + instanceProperty.Name + " from " + tableName + " where (id=" + id + ")")) {
-                                            if (dt.Rows.Count > 0) {
-                                                filename = GenericController.encodeText(dt.Rows[0][instanceProperty.Name]);
+                                if (!fieldTypeId.Equals(0)) {
+                                    fileProperty.internalcore = core;
+                                    PropertyInfo fileFieldContentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
+                                    fileFieldContentUpdated = (bool)fileFieldContentUpdatedProperty.GetValue(fileProperty);
+                                    if (fileFieldContentUpdated) {
+                                        PropertyInfo fileFieldFilenameProperty = instanceProperty.PropertyType.GetProperty("filename");
+                                        string fileFieldFilename = (string)fileFieldFilenameProperty.GetValue(fileProperty);
+                                        if ((String.IsNullOrEmpty(fileFieldFilename)) && (id != 0)) {
+                                            // 
+                                            // -- if record exists and file property's filename is not set, get the filename from the Db
+                                            using (System.Data.DataTable dt = db.executeQuery("select " + instanceProperty.Name + " from " + tableName + " where (id=" + id + ")")) {
+                                                if (dt.Rows.Count > 0) {
+                                                    fileFieldFilename = GenericController.encodeText(dt.Rows[0][instanceProperty.Name]);
+                                                }
                                             }
                                         }
-                                    }
-                                    if ((string.IsNullOrEmpty(content)) && (!string.IsNullOrEmpty(filename))) {
-                                        //
-                                        // -- empty content and valid filename, delete the file and clear the filename
-                                        sqlPairs.add(instanceProperty.Name, "");
-                                        core.cdnFiles.deleteFile(filename);
-                                    } else {
-                                        //
-                                        // -- save content
-                                        if (string.IsNullOrEmpty(filename)) {
-                                            filename = FileController.getVirtualRecordUnixPathFilename(tableName, instanceProperty.Name.ToLowerInvariant(), id, fieldTypeId);
+                                        PropertyInfo fileFieldContentProperty = instanceProperty.PropertyType.GetProperty("content");
+                                        string fileFieldContent = (string)fileFieldContentProperty.GetValue(fileProperty);
+                                        if ((string.IsNullOrEmpty(fileFieldContent)) && (!string.IsNullOrEmpty(fileFieldFilename))) {
+                                            //
+                                            // -- empty content and valid filename, delete the file and clear the filename
+                                            sqlPairs.add(instanceProperty.Name, "");
+                                            core.cdnFiles.deleteFile(fileFieldFilename);
+                                            fileFieldFilenameProperty.SetValue(fileProperty, string.Empty);
+                                        } else {
+                                            //
+                                            // -- save content
+                                            if (string.IsNullOrEmpty(fileFieldFilename)) {
+                                                fileFieldFilename = FileController.getVirtualRecordUnixPathFilename(tableName, instanceProperty.Name.ToLowerInvariant(), id, fieldTypeId);
+                                                fileFieldFilenameProperty.SetValue(fileProperty, fileFieldFilename);
+                                            }
+                                            core.cdnFiles.saveFile(fileFieldFilename, fileFieldContent);
+                                            sqlPairs.add(instanceProperty.Name, DbController.encodeSQLText(fileFieldFilename));
                                         }
-                                        core.cdnFiles.saveFile(filename, content);
-                                        sqlPairs.add(instanceProperty.Name, DbController.encodeSQLText(filename));
                                     }
+
                                 }
                                 break;
                         }

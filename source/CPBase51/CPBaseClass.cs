@@ -13,13 +13,6 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
-        /// object to support dbModel creation
-        /// </summary>
-        /// <returns></returns>
-        public abstract CPDbModelBaseClass DbModelNew();
-        //
-        //====================================================================================================
-        /// <summary>
         /// Construct new Block object. See CPBlockBaseClass for Block Details
         /// </summary>
         /// <returns></returns>

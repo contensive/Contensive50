@@ -11,6 +11,7 @@ using static Contensive.Processor.Constants;
 using System.Linq;
 using static Contensive.BaseClasses.CPFileSystemBaseClass;
 using Contensive.Processor.Exceptions;
+using Contensive.BaseClasses;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -1298,7 +1299,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Create a filename for the virtual directory for field types not associated to upload files
         /// </summary>
-        public static string getVirtualRecordUnixPathFilename(string tableName, string fieldName, int recordID, int fieldType) {
+        public static string getVirtualRecordUnixPathFilename(string tableName, string fieldName, int recordID, CPContentClass.fileTypeIdEnum fieldType) {
             string result = "";
             string idFilename = recordID.ToString();
             if (recordID == 0) {
@@ -1307,16 +1308,16 @@ namespace Contensive.Processor.Controllers {
                 idFilename = recordID.ToString().PadLeft(12, '0');
             }
             switch (fieldType) {
-                case _fieldTypeIdFileCSS:
+                case CPContentBaseClass.fileTypeIdEnum.FileCSS:
                     result = getVirtualTableFieldUnixPath(tableName, fieldName) + idFilename + ".css";
                     break;
-                case _fieldTypeIdFileXML:
+                case CPContentBaseClass.fileTypeIdEnum.FileXML:
                     result = getVirtualTableFieldUnixPath(tableName, fieldName) + idFilename + ".xml";
                     break;
-                case _fieldTypeIdFileJavascript:
+                case CPContentBaseClass.fileTypeIdEnum.FileJavascript:
                     result = getVirtualTableFieldUnixPath(tableName, fieldName) + idFilename + ".js";
                     break;
-                case _fieldTypeIdFileHTML:
+                case CPContentBaseClass.fileTypeIdEnum.FileHTML:
                     result = getVirtualTableFieldUnixPath(tableName, fieldName) + idFilename + ".html";
                     break;
                 default:

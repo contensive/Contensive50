@@ -7,6 +7,7 @@ using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using System.Linq;
+using Contensive.BaseClasses;
 //
 namespace Contensive.Processor.Models.Domain {
     //
@@ -371,7 +372,7 @@ namespace Contensive.Processor.Models.Domain {
                                     childField = (Models.Domain.MetaFieldModel)parentField.Clone();
                                     childField.inherited = true;
                                     result.fields.Add(childField.nameLc.ToLowerInvariant(), childField);
-                                    if (!((parentField.fieldTypeId == fieldTypeIdManyToMany) || (parentField.fieldTypeId == fieldTypeIdRedirect))) {
+                                    if (!((parentField.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.ManyToMany) || (parentField.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.Redirect))) {
                                         if (!result.selectList.Contains(parentField.nameLc)) {
                                             result.selectList.Add(parentField.nameLc);
                                         }
@@ -485,7 +486,7 @@ namespace Contensive.Processor.Models.Domain {
                                             }
                                             Models.Domain.MetaFieldModel field = new Models.Domain.MetaFieldModel();
                                             int fieldIndexColumn = -1;
-                                            int fieldTypeId = GenericController.encodeInteger(fieldRow[15]);
+                                            CPContentBaseClass.fileTypeIdEnum fieldTypeId = (CPContentBaseClass.fileTypeIdEnum)GenericController.encodeInteger(fieldRow[15]);
                                             if (GenericController.encodeText(fieldRow[4]) != "") {
                                                 fieldIndexColumn = GenericController.encodeInteger(fieldRow[4]);
                                             }
@@ -495,10 +496,10 @@ namespace Contensive.Processor.Models.Domain {
                                             //
                                             bool fieldHtmlContent = GenericController.encodeBoolean(fieldRow[25]);
                                             if (fieldHtmlContent) {
-                                                if (fieldTypeId == fieldTypeIdLongText) {
-                                                    fieldTypeId = fieldTypeIdHTML;
-                                                } else if (fieldTypeId == fieldTypeIdFileText) {
-                                                    fieldTypeId = fieldTypeIdFileHTML;
+                                                if (fieldTypeId == CPContentBaseClass.fileTypeIdEnum.LongText) {
+                                                    fieldTypeId = CPContentBaseClass.fileTypeIdEnum.HTML;
+                                                } else if (fieldTypeId == CPContentBaseClass.fileTypeIdEnum.FileText) {
+                                                    fieldTypeId = CPContentBaseClass.fileTypeIdEnum.FileHTML;
                                                 }
                                             }
                                             field.active = GenericController.encodeBoolean(fieldRow[24]);
@@ -558,7 +559,7 @@ namespace Contensive.Processor.Models.Domain {
                                             field.HelpChanged = false;
                                             result.fields.Add(fieldNameLower, field);
                                             //REFACTOR
-                                            if ((field.fieldTypeId != fieldTypeIdManyToMany) && (field.fieldTypeId != fieldTypeIdRedirect) && (!result.selectList.Contains(fieldNameLower))) {
+                                            if ((field.fieldTypeId != CPContentBaseClass.fileTypeIdEnum.ManyToMany) && (field.fieldTypeId != CPContentBaseClass.fileTypeIdEnum.Redirect) && (!result.selectList.Contains(fieldNameLower))) {
                                                 //
                                                 // add only fields that can be selected
                                                 result.selectList.Add(fieldNameLower);

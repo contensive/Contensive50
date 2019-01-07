@@ -235,48 +235,51 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override int AddContentField(string contentName, string fieldName, int fieldType) {
-            Models.Domain.MetaFieldModel field = new Models.Domain.MetaFieldModel();
-            field.active = true;
-            field.adminOnly = false;
-            field.authorable = true;
-            field.blockAccess = false;
-            field.caption = fieldName;
-            field.contentId = Models.Domain.MetaModel.getContentId(cp.core, contentName);
-            field.developerOnly = false;
-            field.editSortPriority = 9999;
-            field.editTabName = "";
-            field.fieldTypeId = fieldType;
-            field.htmlContent = false;
-            field.indexColumn = 0;
-            field.indexSortDirection = 0;
-            field.indexSortOrder = 0;
-            field.indexWidth = "";
-            field.installedByCollectionGuid = "";
-            field.isBaseField = false;
-            field.lookupContentID = 0;
-            //field.lookupContentName = ""
-            field.lookupList = "";
-            field.manyToManyContentID = 0;
-            field.set_manyToManyContentName(cp.core, "");
-            field.manyToManyRuleContentID = 0;
-            field.set_manyToManyRuleContentName(cp.core, "");
-            field.ManyToManyRulePrimaryField = "";
-            field.ManyToManyRuleSecondaryField = "";
-            field.memberSelectGroupId_set( cp.core, 0 );
+        public override int AddContentField(string contentName, string fieldName, CPContentBaseClass.fileTypeIdEnum fieldType) {
+            Models.Domain.MetaFieldModel field = new Models.Domain.MetaFieldModel {
+                active = true,
+                adminOnly = false,
+                authorable = true,
+                blockAccess = false,
+                caption = fieldName,
+                contentId = Models.Domain.MetaModel.getContentId(cp.core, contentName),
+                developerOnly = false,
+                editSortPriority = 9999,
+                editTabName = "",
+                fieldTypeId = fieldType,
+                htmlContent = false,
+                indexColumn = 0,
+                indexSortDirection = 0,
+                indexSortOrder = 0,
+                indexWidth = "",
+                installedByCollectionGuid = "",
+                isBaseField = false,
+                lookupContentID = 0,
+                lookupList = "",
+                manyToManyContentID = 0,
+                manyToManyRuleContentID = 0,
+                ManyToManyRulePrimaryField = "",
+                ManyToManyRuleSecondaryField = "",
+                password = false,
+                readOnly = false,
+                redirectContentID = 0,
+                redirectID = "",
+                redirectPath = "",
+                required = false,
+                Scramble = false,
+                textBuffered = false,
+                uniqueName = false
+            };
+            field.memberSelectGroupId_set(cp.core, 0);
             field.nameLc = fieldName.ToLowerInvariant();
-            field.password = false;
-            field.readOnly = false;
-            field.redirectContentID = 0;
             field.set_redirectContentName(cp.core, "");
-            field.redirectID = "";
-            field.redirectPath = "";
-            field.required = false;
-            field.Scramble = false;
-            field.textBuffered = false;
-            field.uniqueName = false;
+            field.set_manyToManyContentName(cp.core, "");
+            field.set_manyToManyRuleContentName(cp.core, "");
             return MetaController.verifyContentField_returnId(cp.core, contentName, field);
         }
+        //
+        public override int AddContentField(string contentName, string fieldName, int fieldTypeId)
+            => AddContentField(contentName, fieldName, (CPContentBaseClass.fileTypeIdEnum)fieldTypeId);
         //
         //====================================================================================================
         //

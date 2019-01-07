@@ -244,6 +244,8 @@ namespace Contensive.BaseClasses {
         /// <returns></returns>
         public abstract int AddContentField(string ContentName, string FieldName, int FieldType);
         //
+        public abstract int AddContentField(string ContentName, string FieldName, fileTypeIdEnum fileTypeEnum);
+        //
         //====================================================================================================
         /// <summary>
         /// Delete a content from the system, sqlTable is left intact. Use db.DeleteTable to drop the table
@@ -307,6 +309,36 @@ namespace Contensive.BaseClasses {
         //
         [Obsolete("deprecated, use GetFieldMeta and use the property", true)]
         public abstract string GetFieldProperty(string ContentName, string FieldName, string PropertyName);
+        //
+        public enum GoogleVisualizationStatusEnum {
+            OK = 1,
+            warning = 2,
+            ErrorStatus = 3
+        }
+        public enum fileTypeIdEnum {
+            Integer = 1,
+            Text = 2,
+            LongText = 3,
+            Boolean = 4,
+            Date = 5,
+            File = 6,
+            Lookup = 7,
+            Redirect = 8,
+            Currency = 9,
+            FileText = 10,
+            FileImage = 11,
+            Float = 12,
+            AutoIdIncrement = 13,
+            ManyToMany = 14,
+            MemberSelect = 15,
+            FileCSS = 16,
+            FileXML = 17,
+            FileJavascript = 18,
+            Link = 19,
+            ResourceLink = 20,
+            HTML = 21,
+            FileHTML = 22
+        }
     }
 
 }

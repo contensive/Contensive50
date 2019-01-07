@@ -247,16 +247,6 @@ namespace Contensive.Processor {
         //
         //=========================================================================================================
         /// <summary>
-        /// Create a DbModel instance. DbModels are objects that implement Db records
-        /// </summary>
-        /// <param name="DataSourceName"></param>
-        /// <returns></returns>
-        public override CPDbModelBaseClass DbModelNew() {
-            return new CPDbModelClass();
-        }
-        //
-        //=========================================================================================================
-        /// <summary>
         /// system version
         /// </summary>
         public override string Version {

@@ -8,6 +8,7 @@ using Contensive.Processor.Models.Domain;
 using System.Data;
 using System.Linq;
 using Contensive.Processor.Exceptions;
+using Contensive.BaseClasses;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -398,7 +399,7 @@ namespace Contensive.Processor.Controllers {
                             field = new Models.Domain.MetaFieldModel {
                                 nameLc = "id",
                                 active = true,
-                                fieldTypeId = fieldTypeIdAutoIdIncrement,
+                                fieldTypeId = CPContentBaseClass.fileTypeIdEnum.AutoIdIncrement,
                                 editSortPriority = 100,
                                 authorable = false,
                                 caption = "ID",
@@ -412,7 +413,7 @@ namespace Contensive.Processor.Controllers {
                             field = new Models.Domain.MetaFieldModel {
                                 nameLc = "name",
                                 active = true,
-                                fieldTypeId = fieldTypeIdText,
+                                fieldTypeId = CPContentBaseClass.fileTypeIdEnum.Text,
                                 editSortPriority = 110,
                                 authorable = true,
                                 caption = "Name",
@@ -426,7 +427,7 @@ namespace Contensive.Processor.Controllers {
                             field = new Models.Domain.MetaFieldModel {
                                 nameLc = "active",
                                 active = true,
-                                fieldTypeId = fieldTypeIdBoolean,
+                                fieldTypeId = CPContentBaseClass.fileTypeIdEnum.Boolean,
                                 editSortPriority = 200,
                                 authorable = true,
                                 caption = "Active",
@@ -440,7 +441,7 @@ namespace Contensive.Processor.Controllers {
                             field = new Models.Domain.MetaFieldModel {
                                 nameLc = "sortorder",
                                 active = true,
-                                fieldTypeId = fieldTypeIdText,
+                                fieldTypeId = CPContentBaseClass.fileTypeIdEnum.Text,
                                 editSortPriority = 2000,
                                 authorable = false,
                                 caption = "Alpha Sort Order",
@@ -454,7 +455,7 @@ namespace Contensive.Processor.Controllers {
                             field = new Models.Domain.MetaFieldModel {
                                 nameLc = "dateadded",
                                 active = true,
-                                fieldTypeId = fieldTypeIdDate,
+                                fieldTypeId = CPContentBaseClass.fileTypeIdEnum.Date,
                                 editSortPriority = 9999,
                                 authorable = false,
                                 caption = "Date Added",
@@ -467,7 +468,7 @@ namespace Contensive.Processor.Controllers {
                             field = new Models.Domain.MetaFieldModel {
                                 nameLc = "createdby",
                                 active = true,
-                                fieldTypeId = fieldTypeIdLookup,
+                                fieldTypeId = CPContentBaseClass.fileTypeIdEnum.Lookup,
                                 editSortPriority = 9999,
                                 authorable = false,
                                 caption = "Created By"
@@ -481,7 +482,7 @@ namespace Contensive.Processor.Controllers {
                             field = new Models.Domain.MetaFieldModel {
                                 nameLc = "modifieddate",
                                 active = true,
-                                fieldTypeId = fieldTypeIdDate,
+                                fieldTypeId = CPContentBaseClass.fileTypeIdEnum.Date,
                                 editSortPriority = 9999,
                                 authorable = false,
                                 caption = "Date Modified",
@@ -494,7 +495,7 @@ namespace Contensive.Processor.Controllers {
                             field = new Models.Domain.MetaFieldModel {
                                 nameLc = "modifiedby",
                                 active = true,
-                                fieldTypeId = fieldTypeIdLookup,
+                                fieldTypeId = CPContentBaseClass.fileTypeIdEnum.Lookup,
                                 editSortPriority = 9999,
                                 authorable = false,
                                 caption = "Modified By"
@@ -508,7 +509,7 @@ namespace Contensive.Processor.Controllers {
                             field = new Models.Domain.MetaFieldModel {
                                 nameLc = "contentcontrolid",
                                 active = true,
-                                fieldTypeId = fieldTypeIdLookup,
+                                fieldTypeId = CPContentBaseClass.fileTypeIdEnum.Lookup,
                                 editSortPriority = 9999,
                                 authorable = false,
                                 caption = "Controlling Content"
@@ -522,7 +523,7 @@ namespace Contensive.Processor.Controllers {
                             field = new Models.Domain.MetaFieldModel {
                                 nameLc = "createkey",
                                 active = true,
-                                fieldTypeId = fieldTypeIdInteger,
+                                fieldTypeId = CPContentBaseClass.fileTypeIdEnum.Integer,
                                 editSortPriority = 9999,
                                 authorable = false,
                                 caption = "Create Key",
@@ -535,7 +536,7 @@ namespace Contensive.Processor.Controllers {
                             field = new Models.Domain.MetaFieldModel {
                                 nameLc = "ccguid",
                                 active = true,
-                                fieldTypeId = fieldTypeIdText,
+                                fieldTypeId = CPContentBaseClass.fileTypeIdEnum.Text,
                                 editSortPriority = 9999,
                                 authorable = false,
                                 caption = "Guid",
@@ -549,7 +550,7 @@ namespace Contensive.Processor.Controllers {
                             field = new Models.Domain.MetaFieldModel {
                                 nameLc = "contentcategoryid",
                                 active = true,
-                                fieldTypeId = fieldTypeIdInteger,
+                                fieldTypeId = CPContentBaseClass.fileTypeIdEnum.Integer,
                                 editSortPriority = 9999,
                                 authorable = false,
                                 caption = "Content Category",
@@ -631,10 +632,10 @@ namespace Contensive.Processor.Controllers {
                             }
                             //
                             // Create or update the Table Field
-                            if (field.fieldTypeId == fieldTypeIdRedirect) {
+                            if (field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.Redirect) {
                                 //
                                 // Redirect Field
-                            } else if (field.fieldTypeId == fieldTypeIdManyToMany) {
+                            } else if (field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.ManyToMany) {
                                 //
                                 // ManyToMany Field
                             } else {
@@ -648,7 +649,7 @@ namespace Contensive.Processor.Controllers {
                             sqlList.add("ACTIVE", DbController.encodeSQLBoolean(field.active));
                             sqlList.add("MODIFIEDBY", DbController.encodeSQLNumber(SystemMemberID));
                             sqlList.add("MODIFIEDDATE", DbController.encodeSQLDate(DateTime.Now));
-                            sqlList.add("TYPE", DbController.encodeSQLNumber(field.fieldTypeId));
+                            sqlList.add("TYPE", DbController.encodeSQLNumber((int)field.fieldTypeId));
                             sqlList.add("CAPTION", DbController.encodeSQLText(field.caption));
                             sqlList.add("ReadOnly", DbController.encodeSQLBoolean(field.readOnly));
                             sqlList.add("REQUIRED", DbController.encodeSQLBoolean(field.required));
@@ -681,7 +682,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // -- conditional fields
                             switch (field.fieldTypeId) {
-                                case _fieldTypeIdLookup:
+                                case  CPContentBaseClass.fileTypeIdEnum.Lookup:
                                     //
                                     // -- lookup field
                                     //
@@ -694,7 +695,7 @@ namespace Contensive.Processor.Controllers {
                                     }
                                     sqlList.add("LOOKUPCONTENTID", DbController.encodeSQLNumber(LookupContentID));
                                     break;
-                                case _fieldTypeIdManyToMany:
+                                case  CPContentBaseClass.fileTypeIdEnum.ManyToMany:
                                     //
                                     // -- many-to-many field
                                     //
@@ -718,7 +719,7 @@ namespace Contensive.Processor.Controllers {
                                     sqlList.add("MANYTOMANYRULEPRIMARYFIELD", DbController.encodeSQLText(field.ManyToManyRulePrimaryField));
                                     sqlList.add("MANYTOMANYRULESECONDARYFIELD", DbController.encodeSQLText(field.ManyToManyRuleSecondaryField));
                                     break;
-                                case _fieldTypeIdRedirect:
+                                case  CPContentBaseClass.fileTypeIdEnum.Redirect:
                                     //
                                     // -- redirect field
                                     string RedirectContentName = field.get_redirectContentName(core);
@@ -1064,36 +1065,36 @@ namespace Contensive.Processor.Controllers {
         /// <param name="expression"></param>
         /// <param name="fieldType"></param>
         /// <returns></returns>
-        public static string encodeSQL(object expression, int fieldType = _fieldTypeIdText) {
+        public static string encodeSQL(object expression, CPContentBaseClass.fileTypeIdEnum fieldType = CPContentBaseClass.fileTypeIdEnum.Text) {
             try {
                 switch (fieldType) {
-                    case _fieldTypeIdBoolean:
+                    case CPContentBaseClass.fileTypeIdEnum.Boolean:
                         return DbController.encodeSQLBoolean(GenericController.encodeBoolean(expression));
-                    case _fieldTypeIdCurrency:
-                    case _fieldTypeIdFloat:
+                    case CPContentBaseClass.fileTypeIdEnum.Currency:
+                    case CPContentBaseClass.fileTypeIdEnum.Float:
                         return DbController.encodeSQLNumber(GenericController.encodeNumber(expression));
-                    case _fieldTypeIdAutoIdIncrement:
-                    case _fieldTypeIdInteger:
-                    case _fieldTypeIdLookup:
-                    case _fieldTypeIdMemberSelect:
+                    case CPContentBaseClass.fileTypeIdEnum.AutoIdIncrement:
+                    case CPContentBaseClass.fileTypeIdEnum.Integer:
+                    case CPContentBaseClass.fileTypeIdEnum.Lookup:
+                    case CPContentBaseClass.fileTypeIdEnum.MemberSelect:
                         return DbController.encodeSQLNumber(GenericController.encodeInteger(expression));
-                    case _fieldTypeIdDate:
+                    case CPContentBaseClass.fileTypeIdEnum.Date:
                         return DbController.encodeSQLDate(GenericController.encodeDate(expression));
-                    case _fieldTypeIdLongText:
-                    case _fieldTypeIdHTML:
+                    case CPContentBaseClass.fileTypeIdEnum.LongText:
+                    case CPContentBaseClass.fileTypeIdEnum.HTML:
                         return DbController.encodeSQLText(GenericController.encodeText(expression));
-                    case _fieldTypeIdFile:
-                    case _fieldTypeIdFileImage:
-                    case _fieldTypeIdLink:
-                    case _fieldTypeIdResourceLink:
-                    case _fieldTypeIdRedirect:
-                    case _fieldTypeIdManyToMany:
-                    case _fieldTypeIdText:
-                    case _fieldTypeIdFileText:
-                    case _fieldTypeIdFileJavascript:
-                    case _fieldTypeIdFileXML:
-                    case _fieldTypeIdFileCSS:
-                    case _fieldTypeIdFileHTML:
+                    case CPContentBaseClass.fileTypeIdEnum.File:
+                    case CPContentBaseClass.fileTypeIdEnum.FileImage:
+                    case CPContentBaseClass.fileTypeIdEnum.Link:
+                    case CPContentBaseClass.fileTypeIdEnum.ResourceLink:
+                    case CPContentBaseClass.fileTypeIdEnum.Redirect:
+                    case CPContentBaseClass.fileTypeIdEnum.ManyToMany:
+                    case CPContentBaseClass.fileTypeIdEnum.Text:
+                    case CPContentBaseClass.fileTypeIdEnum.FileText:
+                    case CPContentBaseClass.fileTypeIdEnum.FileJavascript:
+                    case CPContentBaseClass.fileTypeIdEnum.FileXML:
+                    case CPContentBaseClass.fileTypeIdEnum.FileCSS:
+                    case CPContentBaseClass.fileTypeIdEnum.FileHTML:
                         return DbController.encodeSQLText(GenericController.encodeText(expression));
                     default:
                         throw new GenericException("Unknown Field Type [" + fieldType + "");
@@ -1220,77 +1221,77 @@ namespace Contensive.Processor.Controllers {
         /// <param name="fieldType"></param>
         /// <returns></returns>
         //
-        public static string getFieldTypeNameFromFieldTypeId(CoreController core, int fieldType) {
+        public static string getFieldTypeNameFromFieldTypeId(CoreController core, CPContentBaseClass.fileTypeIdEnum fieldType) {
             string returnFieldTypeName = "";
             try {
                 switch (fieldType) {
-                    case _fieldTypeIdBoolean:
+                    case  CPContentBaseClass.fileTypeIdEnum.Boolean:
                         returnFieldTypeName = FieldTypeNameBoolean;
                         break;
-                    case _fieldTypeIdCurrency:
+                    case  CPContentBaseClass.fileTypeIdEnum.Currency:
                         returnFieldTypeName = FieldTypeNameCurrency;
                         break;
-                    case _fieldTypeIdDate:
+                    case  CPContentBaseClass.fileTypeIdEnum.Date:
                         returnFieldTypeName = FieldTypeNameDate;
                         break;
-                    case _fieldTypeIdFile:
+                    case  CPContentBaseClass.fileTypeIdEnum.File:
                         returnFieldTypeName = FieldTypeNameFile;
                         break;
-                    case _fieldTypeIdFloat:
+                    case  CPContentBaseClass.fileTypeIdEnum.Float:
                         returnFieldTypeName = FieldTypeNameFloat;
                         break;
-                    case _fieldTypeIdFileImage:
+                    case  CPContentBaseClass.fileTypeIdEnum.FileImage:
                         returnFieldTypeName = FieldTypeNameImage;
                         break;
-                    case _fieldTypeIdLink:
+                    case  CPContentBaseClass.fileTypeIdEnum.Link:
                         returnFieldTypeName = FieldTypeNameLink;
                         break;
-                    case _fieldTypeIdResourceLink:
+                    case  CPContentBaseClass.fileTypeIdEnum.ResourceLink:
                         returnFieldTypeName = FieldTypeNameResourceLink;
                         break;
-                    case _fieldTypeIdInteger:
+                    case  CPContentBaseClass.fileTypeIdEnum.Integer:
                         returnFieldTypeName = FieldTypeNameInteger;
                         break;
-                    case _fieldTypeIdLongText:
+                    case  CPContentBaseClass.fileTypeIdEnum.LongText:
                         returnFieldTypeName = FieldTypeNameLongText;
                         break;
-                    case _fieldTypeIdLookup:
+                    case  CPContentBaseClass.fileTypeIdEnum.Lookup:
                         returnFieldTypeName = FieldTypeNameLookup;
                         break;
-                    case _fieldTypeIdMemberSelect:
+                    case  CPContentBaseClass.fileTypeIdEnum.MemberSelect:
                         returnFieldTypeName = FieldTypeNameMemberSelect;
                         break;
-                    case _fieldTypeIdRedirect:
+                    case  CPContentBaseClass.fileTypeIdEnum.Redirect:
                         returnFieldTypeName = FieldTypeNameRedirect;
                         break;
-                    case _fieldTypeIdManyToMany:
+                    case  CPContentBaseClass.fileTypeIdEnum.ManyToMany:
                         returnFieldTypeName = FieldTypeNameManyToMany;
                         break;
-                    case _fieldTypeIdFileText:
+                    case  CPContentBaseClass.fileTypeIdEnum.FileText:
                         returnFieldTypeName = FieldTypeNameTextFile;
                         break;
-                    case _fieldTypeIdFileCSS:
+                    case  CPContentBaseClass.fileTypeIdEnum.FileCSS:
                         returnFieldTypeName = FieldTypeNameCSSFile;
                         break;
-                    case _fieldTypeIdFileXML:
+                    case  CPContentBaseClass.fileTypeIdEnum.FileXML:
                         returnFieldTypeName = FieldTypeNameXMLFile;
                         break;
-                    case _fieldTypeIdFileJavascript:
+                    case  CPContentBaseClass.fileTypeIdEnum.FileJavascript:
                         returnFieldTypeName = FieldTypeNameJavascriptFile;
                         break;
-                    case _fieldTypeIdText:
+                    case  CPContentBaseClass.fileTypeIdEnum.Text:
                         returnFieldTypeName = FieldTypeNameText;
                         break;
-                    case _fieldTypeIdHTML:
+                    case  CPContentBaseClass.fileTypeIdEnum.HTML:
                         returnFieldTypeName = FieldTypeNameHTML;
                         break;
-                    case _fieldTypeIdFileHTML:
+                    case  CPContentBaseClass.fileTypeIdEnum.FileHTML:
                         returnFieldTypeName = FieldTypeNameHTMLFile;
                         break;
                     default:
-                        if (fieldType == fieldTypeIdAutoIdIncrement) {
+                        if (fieldType == CPContentBaseClass.fileTypeIdEnum.AutoIdIncrement) {
                             returnFieldTypeName = "AutoIncrement";
-                        } else if (fieldType == fieldTypeIdMemberSelect) {
+                        } else if (fieldType == CPContentBaseClass.fileTypeIdEnum.MemberSelect) {
                             returnFieldTypeName = "MemberSelect";
                         } else {
                             //
@@ -1434,7 +1435,7 @@ namespace Contensive.Processor.Controllers {
                     case "ACTIVE":
                         field.caption = "Active";
                         field.editSortPriority = 200;
-                        field.fieldTypeId = fieldTypeIdBoolean;
+                        field.fieldTypeId = CPContentBaseClass.fileTypeIdEnum.Boolean;
                         field.defaultValue = "1";
                         break;
                     case "DATEADDED":
@@ -1444,7 +1445,7 @@ namespace Contensive.Processor.Controllers {
                         break;
                     case "CREATEDBY":
                         field.caption = "Created By";
-                        field.fieldTypeId = fieldTypeIdLookup;
+                        field.fieldTypeId = CPContentBaseClass.fileTypeIdEnum.Lookup;
                         field.set_lookupContentName(core, "Members");
                         field.readOnly = true;
                         field.editSortPriority = 5030;
@@ -1456,7 +1457,7 @@ namespace Contensive.Processor.Controllers {
                         break;
                     case "MODIFIEDBY":
                         field.caption = "Modified By";
-                        field.fieldTypeId = fieldTypeIdLookup;
+                        field.fieldTypeId = CPContentBaseClass.fileTypeIdEnum.Lookup;
                         field.set_lookupContentName(core, "Members");
                         field.readOnly = true;
                         field.editSortPriority = 5050;
@@ -1471,7 +1472,7 @@ namespace Contensive.Processor.Controllers {
                         break;
                     case "CONTENTCONTROLID":
                         field.caption = "Content Definition";
-                        field.fieldTypeId = fieldTypeIdLookup;
+                        field.fieldTypeId = CPContentBaseClass.fileTypeIdEnum.Lookup;
                         field.set_lookupContentName(core, "Content");
                         field.editSortPriority = 5070;
                         field.authorable = true;
@@ -1507,7 +1508,7 @@ namespace Contensive.Processor.Controllers {
                         break;
                     case "ORGANIZATIONID":
                         field.caption = "Organization";
-                        field.fieldTypeId = fieldTypeIdLookup;
+                        field.fieldTypeId = CPContentBaseClass.fileTypeIdEnum.Lookup;
                         field.set_lookupContentName(core, "Organizations");
                         field.editSortPriority = 2005;
                         field.authorable = true;
@@ -1515,30 +1516,30 @@ namespace Contensive.Processor.Controllers {
                         break;
                     case "COPYFILENAME":
                         field.caption = "Copy";
-                        field.fieldTypeId = fieldTypeIdFileHTML;
+                        field.fieldTypeId = CPContentBaseClass.fileTypeIdEnum.FileHTML;
                         field.textBuffered = true;
                         field.editSortPriority = 2010;
                         break;
                     case "BRIEFFILENAME":
                         field.caption = "Overview";
-                        field.fieldTypeId = fieldTypeIdFileHTML;
+                        field.fieldTypeId = CPContentBaseClass.fileTypeIdEnum.FileHTML;
                         field.textBuffered = true;
                         field.editSortPriority = 2020;
                         field.htmlContent = false;
                         break;
                     case "IMAGEFILENAME":
                         field.caption = "Image";
-                        field.fieldTypeId = fieldTypeIdFile;
+                        field.fieldTypeId = CPContentBaseClass.fileTypeIdEnum.File;
                         field.editSortPriority = 2040;
                         break;
                     case "THUMBNAILFILENAME":
                         field.caption = "Thumbnail";
-                        field.fieldTypeId = fieldTypeIdFile;
+                        field.fieldTypeId = CPContentBaseClass.fileTypeIdEnum.File;
                         field.editSortPriority = 2050;
                         break;
                     case "CONTENTID":
                         field.caption = "Content";
-                        field.fieldTypeId = fieldTypeIdLookup;
+                        field.fieldTypeId = CPContentBaseClass.fileTypeIdEnum.Lookup;
                         field.set_lookupContentName(core, "Content");
                         field.readOnly = false;
                         field.editSortPriority = 2060;
@@ -1548,21 +1549,21 @@ namespace Contensive.Processor.Controllers {
                         break;
                     case "PARENTID":
                         field.caption = "Parent";
-                        field.fieldTypeId = fieldTypeIdLookup;
+                        field.fieldTypeId = CPContentBaseClass.fileTypeIdEnum.Lookup;
                         field.set_lookupContentName(core, ContentName);
                         field.readOnly = false;
                         field.editSortPriority = 3000;
                         break;
                     case "MEMBERID":
                         field.caption = "Member";
-                        field.fieldTypeId = fieldTypeIdLookup;
+                        field.fieldTypeId = CPContentBaseClass.fileTypeIdEnum.Lookup;
                         field.set_lookupContentName(core, "Members");
                         field.readOnly = false;
                         field.editSortPriority = 3005;
                         break;
                     case "CONTACTMEMBERID":
                         field.caption = "Contact";
-                        field.fieldTypeId = fieldTypeIdLookup;
+                        field.fieldTypeId = CPContentBaseClass.fileTypeIdEnum.Lookup;
                         field.set_lookupContentName(core, "Members");
                         field.readOnly = false;
                         field.editSortPriority = 3010;

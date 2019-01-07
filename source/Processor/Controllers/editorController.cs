@@ -1,4 +1,5 @@
 ﻿
+using Contensive.BaseClasses;
 using System;
 using System.Data;
 using static Contensive.Processor.Constants;
@@ -122,7 +123,8 @@ namespace Contensive.Processor.Controllers {
                 //
                 // load default editors into editors() - these are the editors used when there is no editorPreference
                 //   editors(fieldtypeid) = addonid
-                string[] editorAddonIds = new string[fieldTypeIdMax + 1];
+                int fieldTypeIdMax = Enum.GetNames(typeof(CPContentBaseClass)).Length;
+                string[] editorAddonIds = new string[fieldTypeIdMax];
                 string SQL = ""
                     + " select"
                     + " t.id as contentfieldtypeid"

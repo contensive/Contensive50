@@ -18,6 +18,7 @@ using System.Threading;
 using Contensive.Processor.Exceptions;
 using Contensive.Addons.AdminSite.Controllers;
 using Contensive.Processor.Models.Domain;
+using Contensive.BaseClasses;
 //
 namespace Contensive.Addons.Tools {
     public class LegacyToolsClass {
@@ -846,37 +847,37 @@ namespace Contensive.Addons.Tools {
                             // display the column if it is not in use
                             //
                             if (skipField) {
-                                if (field.fieldTypeId == fieldTypeIdFileText) {
+                                if (field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.FileText) {
                                     //
                                     // text filename can not be search
                                     //
                                     Stream.Add("<IMG src=\"/ContensiveBase/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (text file field)<br>");
-                                } else if (field.fieldTypeId == fieldTypeIdFileCSS) {
+                                } else if (field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.FileCSS) {
                                     //
                                     // text filename can not be search
                                     //
                                     Stream.Add("<IMG src=\"/ContensiveBase/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (css file field)<br>");
-                                } else if (field.fieldTypeId == fieldTypeIdFileXML) {
+                                } else if (field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.FileXML) {
                                     //
                                     // text filename can not be search
                                     //
                                     Stream.Add("<IMG src=\"/ContensiveBase/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (xml file field)<br>");
-                                } else if (field.fieldTypeId == fieldTypeIdFileJavascript) {
+                                } else if (field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.FileJavascript) {
                                     //
                                     // text filename can not be search
                                     //
                                     Stream.Add("<IMG src=\"/ContensiveBase/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (javascript file field)<br>");
-                                } else if (field.fieldTypeId == fieldTypeIdLongText) {
+                                } else if (field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.LongText) {
                                     //
                                     // long text can not be search
                                     //
                                     Stream.Add("<IMG src=\"/ContensiveBase/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (long text field)<br>");
-                                } else if (field.fieldTypeId == fieldTypeIdFileImage) {
+                                } else if (field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.FileImage) {
                                     //
                                     // long text can not be search
                                     //
                                     Stream.Add("<IMG src=\"/ContensiveBase/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (image field)<br>");
-                                } else if (field.fieldTypeId == fieldTypeIdRedirect) {
+                                } else if (field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.Redirect) {
                                     //
                                     // long text can not be search
                                     //
@@ -907,427 +908,7 @@ namespace Contensive.Addons.Tools {
             }
             return result;
         }
-        ////
-        ////=============================================================================
-        //// checks Content against Database tables
-        ////=============================================================================
-        ////
-        //private string GetForm_ContentDiagnostic() {
-        //    string result = "";
-        //    try {
-        //        //
-        //        string SQL = null;
-        //        string DataSourceName = null;
-        //        string TableName = null;
-        //        string ContentName = null;
-        //        int RecordID = 0;
-        //        int ErrorCount = 0;
-        //        string FieldName = null;
-        //        string bitBucket = null;
-        //        int ContentID = 0;
-        //        int TestRecordID = 0;
-        //        int fieldType = 0;
-        //        int RedirectContentID = 0;
-        //        int LookupContentID = 0;
-        //        string LookupList = null;
-        //        string DiagProblem = null;
-        //        int iDiagActionCount = 0;
-        //        int DiagActionPointer = 0;
-        //        string DiagAction = null;
-        //        DiagActionType[] DiagActions = null;
-        //        string Button = null;
-        //        bool FieldRequired = false;
-        //        bool FieldAuthorable = false;
-        //        StringBuilderLegacyController Stream = new StringBuilderLegacyController();
-        //        string ButtonList = null;
-        //        //
-        //        const string ButtonFix = "Make Corrections";
-        //        const string ButtonFixAndRun = "Make Corrections and Run Diagnostic";
-        //        const string ButtonRun = "Run Diagnostic";
-        //        //
-        //        ButtonList = ButtonRun;
-        //        //
-        //        Stream.Add(AdminUIController.getToolFormTitle("Content Diagnostic", "This tool finds Content and Table problems. To run successfully, the Site Property 'TrapErrors' must be set to true."));
-        //        Stream.Add(SpanClassAdminNormal + "<br>");
-        //        //
-        //        iDiagActionCount = core.docProperties.getInteger("DiagActionCount");
-        //        Button = core.docProperties.getText("Button");
-        //        if ((iDiagActionCount != 0) && ((Button == ButtonFix) || (Button == ButtonFixAndRun))) {
-        //            //
-        //            //-----------------------------------------------------------------------------------------------
-        //            // ----- Perform actions from previous Diagnostic
-        //            //-----------------------------------------------------------------------------------------------
-        //            //
-        //            Stream.Add("<br>");
-        //            for (DiagActionPointer = 0; DiagActionPointer <= iDiagActionCount; DiagActionPointer++) {
-        //                DiagAction = core.docProperties.getText("DiagAction" + DiagActionPointer);
-        //                Stream.Add("Perform Action " + DiagActionPointer + " - " + DiagAction + "<br>");
-        //                switch (GenericController.encodeInteger(DiagArgument(DiagAction, 0))) {
-        //                    case DiagActionSetFieldType:
-        //                        //
-        //                        // ----- Set Field Type
-        //                        //
-        //                        ContentID = Local_GetContentID(DiagArgument(DiagAction, 1));
-        //                        using (var csData = new CsModel(core)) {
-        //                            if (csData.csOpen("Content Fields", "(ContentID=" + ContentID + ")and(Name=" + DbController.encodeSQLText(DiagArgument(DiagAction, 2)) + ")")) {
-        //                                csData.csSet("Type", DiagArgument(DiagAction, 3));
-        //                            }
-        //                        }
-        //                        //end case
-        //                        break;
-        //                    case DiagActionSetFieldInactive:
-        //                        //
-        //                        // ----- Set Field Inactive
-        //                        //
-        //                        ContentID = Local_GetContentID(DiagArgument(DiagAction, 1));
-        //                        using (var csData = new CsModel(core)) {
-        //                            if (csData.csOpen("Content Fields", "(ContentID=" + ContentID + ")and(Name=" + DbController.encodeSQLText(DiagArgument(DiagAction, 2)) + ")")) {
-        //                                csData.csSet("active", 0);
-        //                            }
-        //                        }
-        //                        //end case
-        //                        break;
-        //                    case DiagActionDeleteRecord:
-        //                        //
-        //                        // ----- Delete Record
-        //                        //
-        //                        ContentName = DiagArgument(DiagAction, 1);
-        //                        RecordID = GenericController.encodeInteger(DiagArgument(DiagAction, 2));
-        //                        MetaController.deleteContentRecord(core, ContentName, RecordID);
-        //                        //end case
-        //                        break;
-        //                    case DiagActionContentDeDupe:
-        //                        ContentName = DiagArgument(DiagAction, 1);
-        //                        using (var csData = new CsModel(core)) {
-        //                            csData.csOpen("Content", "name=" + DbController.encodeSQLText(ContentName), "ID");
-        //                            if (csData.csOk()) {
-        //                                csData.csGoNext();
-        //                                while (csData.csOk()) {
-        //                                    csData.csSet("active", 0);
-        //                                    csData.csGoNext();
-        //                                }
-        //                            }
-        //                        }
-        //                        //end case
-        //                        break;
-        //                    case DiagActionSetRecordInactive:
-        //                        //
-        //                        // ----- Set Field Inactive
-        //                        //
-        //                        ContentName = DiagArgument(DiagAction, 1);
-        //                        RecordID = GenericController.encodeInteger(DiagArgument(DiagAction, 2));
-        //                        csData.csOpen(ContentName, "(ID=" + RecordID + ")");
-        //                        if (csData.csOk()) {
-        //                            csData.csSet("active", 0);
-        //                        }
-        //                        csData.csClose();
-        //                        //end case
-        //                        break;
-        //                    case DiagActionSetFieldNotRequired:
-        //                        //
-        //                        // ----- Set Field not-required
-        //                        //
-        //                        ContentName = DiagArgument(DiagAction, 1);
-        //                        RecordID = GenericController.encodeInteger(DiagArgument(DiagAction, 2));
-        //                        csData.csOpen(ContentName, "(ID=" + RecordID + ")");
-        //                        if (csData.csOk()) {
-        //                            csData.csSet("required", 0);
-        //                        }
-        //                        csData.csClose();
-        //                        //end case
-        //                        break;
-        //                }
-        //            }
-        //        }
-        //        if ((Button == ButtonRun) || (Button == ButtonFixAndRun)) {
-        //            //
-        //            // Process input
-        //            //
-        //            if (!core.siteProperties.trapErrors) {
-        //                //
-        //                // TrapErrors must be true to run this tools
-        //                //
-        //                Stream.Add("Site Property 'TrapErrors' is currently set false. This property must be true to run Content Diagnostics successfully.<br>");
-        //            } else {
-        //                core.html.enableOutputBuffer(false);
-        //                //
-        //                // ----- check Content Sources for duplicates
-        //                //
-        //                if (DiagActionCount < DiagActionCountMax) {
-        //                    Stream.Add(GetDiagHeader("Checking Content Definition Duplicates...<br>"));
-        //                    //
-        //                    SQL = "SELECT Count(ccContent.ID) AS RecordCount, ccContent.Name AS Name, ccContent.Active"
-        //                            + " From ccContent"
-        //                            + " GROUP BY ccContent.Name, ccContent.Active"
-        //                            + " Having (((Count(ccContent.ID)) > 1) And ((ccContent.active) <> 0))"
-        //                            + " ORDER BY Count(ccContent.ID) DESC;";
-        //                    CSPointer = csData.csOpenSql(SQL,"Default");
-        //                    if (csData.csOk()) {
-        //                        while (csData.csOk()) {
-        //                            DiagProblem = "PROBLEM: There are " + csData.csGetText(CSPointer, "RecordCount") + " records in the Content table with the name [" + csData.csGetText(CSPointer, "Name") + "]";
-        //                            DiagActions = new  DiagActionType[3];
-        //                            DiagActions[0].Name = "Ignore, or handle this issue manually";
-        //                            DiagActions[0].Command = "";
-        //                            DiagActions[1].Name = "Mark all duplicate definitions inactive";
-        //                            DiagActions[1].Command = DiagActionContentDeDupe.ToString() + "," + csData.csGetValue(CSPointer, "name");
-        //                            Stream.Add(GetDiagError(DiagProblem, DiagActions));
-        //                            csData.csGoNext();
-        //                        }
-        //                    }
-        //                    csData.csClose();
-        //                }
-        //                //
-        //                // ----- Content Fields
-        //                //
-        //                if (DiagActionCount < DiagActionCountMax) {
-        //                    Stream.Add(GetDiagHeader("Checking Content Fields...<br>"));
-        //                    //
-        //                    SQL = "SELECT ccFields.required AS FieldRequired, ccFields.Authorable AS FieldAuthorable, ccFields.Type AS FieldType, ccFields.Name AS FieldName, ccContent.ID AS ContentID, ccContent.Name AS ContentName, ccTables.Name AS TableName, ccDataSources.Name AS DataSourceName"
-        //                            + " FROM (ccFields LEFT JOIN ccContent ON ccFields.ContentID = ccContent.ID) LEFT JOIN (ccTables LEFT JOIN ccDataSources ON ccTables.DataSourceID = ccDataSources.ID) ON ccContent.ContentTableID = ccTables.ID"
-        //                            + " WHERE (((ccFields.Active)<>0) AND ((ccContent.Active)<>0) AND ((ccTables.Active)<>0)) OR (((ccFields.Active)<>0) AND ((ccContent.Active)<>0) AND ((ccTables.Active)<>0));";
-        //                    csData.csOpenSql(SQL,"Default");
-        //                    if (!csData.csOk()) {
-        //                        DiagProblem = "PROBLEM: No Content entries were found in the content table.";
-        //                        DiagActions = new DiagActionType[2];
-        //                        DiagActions[0].Name = "Ignore, or handle this issue manually";
-        //                        DiagActions[0].Command = "";
-        //                        Stream.Add(GetDiagError(DiagProblem, DiagActions));
-        //                    } else {
-        //                        while (csData.csOk() && (DiagActionCount < DiagActionCountMax)) {
-        //                            FieldName = csData.csGetText("FieldName");
-        //                            fieldType = csData.csGetInteger("FieldType");
-        //                            FieldRequired = csData.csGetBoolean("FieldRequired");
-        //                            FieldAuthorable = csData.csGetBoolean("FieldAuthorable");
-        //                            ContentName = csData.csGetText("ContentName");
-        //                            TableName = csData.csGetText("TableName");
-        //                            DataSourceName = csData.csGetText("DataSourceName");
-        //                            if (string.IsNullOrEmpty(DataSourceName)) {
-        //                                DataSourceName = "Default";
-        //                            }
-        //                            if (FieldRequired && (!FieldAuthorable)) {
-        //                                DiagProblem = "PROBLEM: Field [" + FieldName + "] in Content Definition [" + ContentName + "] is required, but is not referenced on the Admin Editing page. This will prevent content definition records from being saved.";
-        //                                DiagActions = new DiagActionType[2];
-        //                                DiagActions[0].Name = "Ignore, or handle this issue manually";
-        //                                DiagActions[0].Command = "";
-        //                                DiagActions[1].Name = "Set this Field inactive";
-        //                                DiagActions[1].Command = DiagActionSetFieldInactive.ToString() + "," + ContentName + "," + FieldName;
-        //                                DiagActions[1].Name = "Set this Field not required";
-        //                                DiagActions[1].Command = DiagActionSetFieldNotRequired.ToString() + "," + ContentName + "," + FieldName;
-        //                                Stream.Add(GetDiagError(DiagProblem, DiagActions));
-        //                            }
-        //                            if ((!string.IsNullOrEmpty(FieldName)) && (fieldType != fieldTypeIdRedirect) && (fieldType != fieldTypeIdManyToMany)) {
-        //                                SQL = "SELECT " + FieldName + " FROM " + TableName + " WHERE ID=0;";
-        //                                CSTest = csData.csOpenSql( SQL, DataSourceName);
-        //                                if (CSTest == -1) {
-        //                                    DiagProblem = "PROBLEM: Field [" + FieldName + "] in Content Definition [" + ContentName + "] could not be read from database table [" + TableName + "] on datasource [" + DataSourceName + "].";
-        //                                    DiagActions = new DiagActionType[2];
-        //                                    DiagActions[0].Name = "Ignore, or handle this issue manually";
-        //                                    DiagActions[0].Command = "";
-        //                                    DiagActions[1].Name = "Set this Content Definition Field inactive";
-        //                                    DiagActions[1].Command = DiagActionSetFieldInactive.ToString() + "," + ContentName + "," + FieldName;
-        //                                    Stream.Add(GetDiagError(DiagProblem, DiagActions));
-        //                                }
-        //                            }
-        //                            csData.csClose(ref CSTest);
-        //                            csData.csGoNext();
-        //                        }
-        //                    }
-        //                    csData.csClose();
-        //                }
-        //                //
-        //                // ----- Insert Content Testing
-        //                //
-        //                if (DiagActionCount < DiagActionCountMax) {
-        //                    Stream.Add(GetDiagHeader("Checking Content Insertion...<br>"));
-        //                    //
-        //                    CSContent = csData.csOpen("Content");
-        //                    if (!csData.csOk(CSContent)) {
-        //                        DiagProblem = "PROBLEM: No Content entries were found in the content table.";
-        //                        DiagActions = new DiagActionType[2];
-        //                        DiagActions[0].Name = "Ignore, or handle this issue manually";
-        //                        DiagActions[0].Command = "";
-        //                        Stream.Add(GetDiagError(DiagProblem, DiagActions));
-        //                    } else {
-        //                        while (csData.csOk(CSContent) && (DiagActionCount < DiagActionCountMax)) {
-        //                            ContentID = csData.csGetInteger(CSContent, "ID");
-        //                            ContentName = csData.csGetText(CSContent, "name");
-        //                            CSTestRecord = csData.insert(ContentName);
-        //                            if (!csData.csOk(CSTestRecord)) {
-        //                                DiagProblem = "PROBLEM: Could not insert a record using Content Definition [" + ContentName + "]";
-        //                                DiagActions = new DiagActionType[2];
-        //                                DiagActions[0].Name = "Ignore, or handle this issue manually";
-        //                                DiagActions[0].Command = "";
-        //                                Stream.Add(GetDiagError(DiagProblem, DiagActions));
-        //                            } else {
-        //                                TestRecordID = csData.csGetInteger(CSTestRecord, "id");
-        //                                if (TestRecordID == 0) {
-        //                                    DiagProblem = "PROBLEM: Content Definition [" + ContentName + "] does not support the required field [ID]\"";
-        //                                    DiagActions = new DiagActionType[2];
-        //                                    DiagActions[0].Name = "Ignore, or handle this issue manually";
-        //                                    DiagActions[0].Command = "";
-        //                                    DiagActions[1].Name = "Set this Content Definition inactive";
-        //                                    DiagActions[1].Command = DiagActionSetRecordInactive.ToString() + ",Content," + ContentID;
-        //                                    Stream.Add(GetDiagError(DiagProblem, DiagActions));
-        //                                } else {
-        //                                    CSFields = csData.csOpen("Content Fields", "ContentID=" + ContentID);
-        //                                    while (csData.csOk(CSFields)) {
-        //                                        //
-        //                                        // ----- read the value of the field to test its presents
-        //                                        //
-        //                                        FieldName = csData.csGetText(CSFields, "name");
-        //                                        fieldType = csData.csGetInteger(CSFields, "Type");
-        //                                        switch (fieldType) {
-        //                                            case _fieldTypeIdManyToMany:
-        //                                                //
-        //                                                //   skip it
-        //                                                //
-        //                                                break;
-        //                                            case _fieldTypeIdRedirect:
-        //                                                //
-        //                                                // ----- redirect type, check redirect contentid
-        //                                                //
-        //                                                RedirectContentID = csData.csGetInteger(CSFields, "RedirectContentID");
-        //                                                ErrorCount = core.doc.errorCount;
-        //                                                bitBucket = Local_GetContentNameByID(RedirectContentID);
-        //                                                if (IsNull(bitBucket) || (ErrorCount != core.doc.errorCount)) {
-        //                                                    DiagProblem = "PROBLEM: Content Field [" + ContentName + "].[" + FieldName + "] is a Redirection type, but the ContentID [" + RedirectContentID + "] is not valid.";
-        //                                                    if (string.IsNullOrEmpty(FieldName)) {
-        //                                                        DiagProblem = DiagProblem + " Also, the field has no name attribute so these diagnostics can not automatically mark the field inactive.";
-        //                                                        DiagActions = new DiagActionType[2];
-        //                                                        DiagActions[0].Name = "Ignore, or handle this issue manually";
-        //                                                        DiagActions[0].Command = "";
-        //                                                        Stream.Add(GetDiagError(DiagProblem, DiagActions));
-        //                                                    } else {
-        //                                                        DiagActions = new DiagActionType[3];
-        //                                                        DiagActions[0].Name = "Ignore, or handle this issue manually";
-        //                                                        DiagActions[0].Command = "";
-        //                                                        DiagActions[1].Name = "Set this Content Definition Field inactive";
-        //                                                        DiagActions[1].Command = DiagActionSetFieldInactive.ToString() + "," + ContentName + "," + FieldName;
-        //                                                        Stream.Add(GetDiagError(DiagProblem, DiagActions));
-        //                                                    }
-        //                                                }
-        //                                                break;
-        //                                            case _fieldTypeIdLookup:
-        //                                                //
-        //                                                // ----- lookup type, read value and check lookup contentid
-        //                                                //
-        //                                                ErrorCount = core.doc.errorCount;
-        //                                                bitBucket = csData.csGetValue(CSTestRecord, FieldName);
-        //                                                if (ErrorCount != core.doc.errorCount) {
-        //                                                    DiagProblem = "PROBLEM: An error occurred reading the value of Content Field [" + ContentName + "].[" + FieldName + "]";
-        //                                                    DiagActions = new DiagActionType[2];
-        //                                                    DiagActions[0].Name = "Ignore, or handle this issue manually";
-        //                                                    DiagActions[0].Command = "";
-        //                                                    Stream.Add(GetDiagError(DiagProblem, DiagActions));
-        //                                                } else {
-        //                                                    bitBucket = "";
-        //                                                    LookupList = csData.csGetText(CSFields, "Lookuplist");
-        //                                                    LookupContentID = csData.csGetInteger(CSFields, "LookupContentID");
-        //                                                    if (LookupContentID != 0) {
-        //                                                        ErrorCount = core.doc.errorCount;
-        //                                                        bitBucket = Local_GetContentNameByID(LookupContentID);
-        //                                                    }
-        //                                                    if ((string.IsNullOrEmpty(LookupList)) && ((LookupContentID == 0) || (string.IsNullOrEmpty(bitBucket)) || (ErrorCount != core.doc.errorCount))) {
-        //                                                        DiagProblem = "Content Field [" + ContentName + "].[" + FieldName + "] is a Lookup type, but LookupList is blank and LookupContentID [" + LookupContentID + "] is not valid.";
-        //                                                        DiagActions = new DiagActionType[3];
-        //                                                        DiagActions[0].Name = "Ignore, or handle this issue manually";
-        //                                                        DiagActions[0].Command = "";
-        //                                                        DiagActions[1].Name = "Convert the field to an Integer so no lookup is provided.";
-        //                                                        DiagActions[1].Command = DiagActionSetFieldType.ToString() + "," + ContentName + "," + FieldName + "," + encodeText(fieldTypeIdInteger);
-        //                                                        Stream.Add(GetDiagError(DiagProblem, DiagActions));
-        //                                                    }
-        //                                                }
-        //                                                break;
-        //                                            default:
-        //                                                //
-        //                                                // ----- check for value in database
-        //                                                //
-        //                                                ErrorCount = core.doc.errorCount;
-        //                                                bitBucket = csData.csGetValue(CSTestRecord, FieldName);
-        //                                                if (ErrorCount != core.doc.errorCount) {
-        //                                                    DiagProblem = "PROBLEM: An error occurred reading the value of Content Field [" + ContentName + "].[" + FieldName + "]";
-        //                                                    DiagActions = new DiagActionType[4];
-        //                                                    DiagActions[0].Name = "Ignore, or handle this issue manually";
-        //                                                    DiagActions[0].Command = "";
-        //                                                    DiagActions[1].Name = "Add this field into the Content Definitions Content (and Authoring) Table.";
-        //                                                    DiagActions[1].Command = "x";
-        //                                                    Stream.Add(GetDiagError(DiagProblem, DiagActions));
-        //                                                }
-        //                                                break;
-        //                                        }
-        //                                        csData.csGoNext(CSFields);
-        //                                    }
-        //                                }
-        //                                csData.csClose(ref CSFields);
-        //                                csData.csClose(ref CSTestRecord);
-        //                                MetaController.deleteContentRecord( core,ContentName, TestRecordID);
-        //                            }
-        //                            csData.csGoNext(CSContent);
-        //                        }
-        //                    }
-        //                    csData.csClose(ref CSContent);
-        //                }
-        //                //
-        //                // ----- Check Navigator Entries
-        //                //
-        //                if (DiagActionCount < DiagActionCountMax) {
-        //                    Stream.Add(GetDiagHeader("Checking Navigator Entries...<br>"));
-        //                    CSPointer = csData.csOpen(Processor.Models.Db.NavigatorEntryModel.contentName);
-        //                    if (!csData.csOk()) {
-        //                        DiagProblem = "PROBLEM: Could not open the [Navigator Entries] content.";
-        //                        DiagActions = new DiagActionType[4];
-        //                        DiagActions[0].Name = "Ignore, or handle this issue manually";
-        //                        DiagActions[0].Command = "";
-        //                        Stream.Add(GetDiagError(DiagProblem, DiagActions));
-        //                    } else {
-        //                        while (csData.csOk() && (DiagActionCount < DiagActionCountMax)) {
-        //                            ContentID = csData.csGetInteger( "ContentID");
-        //                            if (ContentID != 0) {
-        //                                CSContent = csData.csOpen("Content", "ID=" + ContentID);
-        //                                if (!csData.csOk(CSContent)) {
-        //                                    DiagProblem = "PROBLEM: Menu Entry [" + csData.csGetText(CSPointer, "name") + "] points to an invalid Content Definition.";
-        //                                    DiagActions = new DiagActionType[4];
-        //                                    DiagActions[0].Name = "Ignore, or handle this issue manually";
-        //                                    DiagActions[0].Command = "";
-        //                                    DiagActions[1].Name = "Remove this menu entry";
-        //                                    DiagActions[1].Command = DiagActionDeleteRecord.ToString() + ",Navigator Entries," + csData.csGetInteger( "ID");
-        //                                    Stream.Add(GetDiagError(DiagProblem, DiagActions));
-        //                                }
-        //                                csData.csClose(ref CSContent);
-        //                            }
-        //                            csData.csGoNext();
-        //                        }
-        //                    }
-        //                    csData.csClose();
-        //                }
-        //                if (DiagActionCount >= DiagActionCountMax) {
-        //                    DiagProblem = "Diagnostic Problem Limit (" + DiagActionCountMax + ") has been reached. Resolve the above issues to see more.";
-        //                    DiagActions = new DiagActionType[2];
-        //                    DiagActions[0].Name = "";
-        //                    DiagActions[0].Command = "";
-        //                    Stream.Add(GetDiagError(DiagProblem, DiagActions));
-        //                }
-        //                //
-        //                // ----- Done with diagnostics
-        //                //
-        //                Stream.Add(HtmlController.inputHidden("DiagActionCount", DiagActionCount));
-        //            }
-        //        }
-        //        //
-        //        // start diagnostic button
-        //        //
-        //        Stream.Add("</SPAN>");
-        //        if (DiagActionCount > 0) {
-        //            ButtonList = ButtonList + "," + ButtonFix;
-        //            ButtonList = ButtonList + "," + ButtonFixAndRun;
-        //        }
-        //        result = AdminUIController.getToolForm(core, Stream.Text, ButtonList);
-        //        //result = adminUIController.getToolFormOpen(core, ButtonList) + Stream.Text + adminUIController.getToolFormClose(core, ButtonList);
-        //    } catch (Exception ex) {
-        //        LogController.handleError( core,ex);
-        //    }
-        //    return result;
-        //}
+
         //
         //=============================================================================
         // Normalize the Index page Columns, setting proper values for IndexColumn, etc.

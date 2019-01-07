@@ -8,6 +8,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
 using Contensive.Addons.AdminSite.Controllers;
+using Contensive.BaseClasses;
 
 namespace Contensive.Addons.AdminSite {
     public class ToolSetListColumnsClass {
@@ -358,47 +359,47 @@ namespace Contensive.Addons.AdminSite {
                             //
                             // display the column if it is not in use
                             if ((IndexConfig.columns.Find(x => x.Name == field.nameLc) == null)) {
-                                if (field.fieldTypeId == fieldTypeIdFile) {
+                                if (field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.File) {
                                     //
                                     // file can not be search
                                     Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (file field)"));
-                                } else if (field.fieldTypeId == fieldTypeIdFileText) {
+                                } else if (field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.FileText) {
                                     //
                                     // filename can not be search
                                     Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (text file field)"));
-                                } else if (field.fieldTypeId == fieldTypeIdFileHTML) {
+                                } else if (field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.FileHTML) {
                                     //
                                     // filename can not be search
                                     Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (html file field)"));
-                                } else if (field.fieldTypeId == fieldTypeIdFileCSS) {
+                                } else if (field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.FileCSS) {
                                     //
                                     // css filename can not be search
                                     Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (css file field)"));
-                                } else if (field.fieldTypeId == fieldTypeIdFileXML) {
+                                } else if (field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.FileXML) {
                                     //
                                     // xml filename can not be search
                                     Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (xml file field)"));
-                                } else if (field.fieldTypeId == fieldTypeIdFileJavascript) {
+                                } else if (field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.FileJavascript) {
                                     //
                                     // javascript filename can not be search
                                     Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (javascript file field)"));
-                                } else if (field.fieldTypeId == fieldTypeIdLongText) {
+                                } else if (field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.LongText) {
                                     //
                                     // long text can not be search
                                     Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (long text field)"));
-                                } else if (field.fieldTypeId == fieldTypeIdHTML) {
+                                } else if (field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.HTML) {
                                     //
                                     // long text can not be search
                                     Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (long text field)"));
-                                } else if (field.fieldTypeId == fieldTypeIdFileImage) {
+                                } else if (field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.FileImage) {
                                     //
                                     // long text can not be search
                                     Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (image field)"));
-                                } else if (field.fieldTypeId == fieldTypeIdRedirect) {
+                                } else if (field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.Redirect) {
                                     //
                                     // long text can not be search
                                     Stream.Add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (redirect field)"));
-                                } else if (field.fieldTypeId == fieldTypeIdManyToMany) {
+                                } else if (field.fieldTypeId == CPContentBaseClass.fileTypeIdEnum.ManyToMany) {
                                     //
                                     // many to many can not be search
                                     Stream.Add(HtmlController.div( iconNotAvailable + "&nbsp;" + field.caption + " (many-to-many field)"));

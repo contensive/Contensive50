@@ -11,6 +11,7 @@ using Contensive.Addons.Tools;
 using static Contensive.Addons.AdminSite.Controllers.AdminUIController;
 using Contensive.Processor.Exceptions;
 using Contensive.Addons.AdminSite.Controllers;
+using Contensive.BaseClasses;
 
 namespace Contensive.Addons.AdminSite {
     public class GetHtmlBodyClass : Contensive.BaseClasses.AddonBaseClass {
@@ -1421,15 +1422,15 @@ namespace Contensive.Addons.AdminSite {
                                     // ----- save the value by field type
                                     //
                                     switch (field.fieldTypeId) {
-                                        case _fieldTypeIdAutoIdIncrement:
-                                        case _fieldTypeIdRedirect: {
+                                        case CPContentBaseClass.fileTypeIdEnum.AutoIdIncrement:
+                                        case CPContentBaseClass.fileTypeIdEnum.Redirect: {
                                                 //
                                                 // do nothing with these
                                                 //
                                                 break;
                                             }
-                                        case _fieldTypeIdFile:
-                                        case _fieldTypeIdFileImage: {
+                                        case CPContentBaseClass.fileTypeIdEnum.File:
+                                        case CPContentBaseClass.fileTypeIdEnum.FileImage: {
                                                 //
                                                 // filenames, upload to cdnFiles
                                                 //
@@ -1451,7 +1452,7 @@ namespace Contensive.Addons.AdminSite {
                                                 }
                                                 break;
                                             }
-                                        case _fieldTypeIdBoolean: {
+                                        case CPContentBaseClass.fileTypeIdEnum.Boolean: {
                                                 //
                                                 // boolean
                                                 //
@@ -1463,8 +1464,8 @@ namespace Contensive.Addons.AdminSite {
                                                 }
                                                 break;
                                             }
-                                        case _fieldTypeIdCurrency:
-                                        case _fieldTypeIdFloat: {
+                                        case CPContentBaseClass.fileTypeIdEnum.Currency:
+                                        case CPContentBaseClass.fileTypeIdEnum.Float: {
                                                 //
                                                 // Floating pointer numbers
                                                 //
@@ -1476,7 +1477,7 @@ namespace Contensive.Addons.AdminSite {
                                                 }
                                                 break;
                                             }
-                                        case _fieldTypeIdDate: {
+                                        case CPContentBaseClass.fileTypeIdEnum.Date: {
                                                 //
                                                 // Date
                                                 //
@@ -1488,8 +1489,8 @@ namespace Contensive.Addons.AdminSite {
                                                 }
                                                 break;
                                             }
-                                        case _fieldTypeIdInteger:
-                                        case _fieldTypeIdLookup: {
+                                        case CPContentBaseClass.fileTypeIdEnum.Integer:
+                                        case CPContentBaseClass.fileTypeIdEnum.Lookup: {
                                                 //
                                                 // Integers
                                                 //
@@ -1501,14 +1502,14 @@ namespace Contensive.Addons.AdminSite {
                                                 }
                                                 break;
                                             }
-                                        case _fieldTypeIdLongText:
-                                        case _fieldTypeIdText:
-                                        case _fieldTypeIdFileText:
-                                        case _fieldTypeIdFileCSS:
-                                        case _fieldTypeIdFileXML:
-                                        case _fieldTypeIdFileJavascript:
-                                        case _fieldTypeIdHTML:
-                                        case _fieldTypeIdFileHTML: {
+                                        case CPContentBaseClass.fileTypeIdEnum.LongText:
+                                        case CPContentBaseClass.fileTypeIdEnum.Text:
+                                        case CPContentBaseClass.fileTypeIdEnum.FileText:
+                                        case CPContentBaseClass.fileTypeIdEnum.FileCSS:
+                                        case CPContentBaseClass.fileTypeIdEnum.FileXML:
+                                        case CPContentBaseClass.fileTypeIdEnum.FileJavascript:
+                                        case CPContentBaseClass.fileTypeIdEnum.HTML:
+                                        case CPContentBaseClass.fileTypeIdEnum.FileHTML: {
                                                 //
                                                 // Text
                                                 //
@@ -1520,7 +1521,7 @@ namespace Contensive.Addons.AdminSite {
                                                 }
                                                 break;
                                             }
-                                        case _fieldTypeIdManyToMany: {
+                                        case CPContentBaseClass.fileTypeIdEnum.ManyToMany: {
                                                 //
                                                 // Many to Many checklist
                                                 //

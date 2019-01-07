@@ -1,6 +1,7 @@
 ﻿
 using System;
 using System.Data;
+using Contensive.BaseClasses;
 using Contensive.Processor.Controllers;
 using Contensive.Processor.Models.Db;
 
@@ -39,7 +40,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// The type of data the field holds
         /// </summary>
-        public int fieldTypeId { get; set; }
+        public CPContentBaseClass.fileTypeIdEnum fieldTypeId { get; set; }
         //
         //====================================================================================================
         /// <summary>

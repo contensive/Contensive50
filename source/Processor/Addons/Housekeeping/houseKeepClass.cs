@@ -692,7 +692,7 @@ namespace Contensive.Addons.Housekeeping {
                 string FieldNew = null;
                 int FieldRecordID = 0;
                 using (var csData = new CsModel(core)) {
-                    csData.openSql("Select ID, ContentID, Type, Caption from ccFields where (active<>0)and(Type=" + fieldTypeIdRedirect + ") Order By ContentID, Caption, ID");
+                    csData.openSql("Select ID, ContentID, Type, Caption from ccFields where (active<>0)and(Type=" +(int) CPContentBaseClass.fileTypeIdEnum.Redirect + ") Order By ContentID, Caption, ID");
                     FieldLast = "";
                     while (csData.ok()) {
                         FieldContentID = csData.getInteger("Contentid");
@@ -712,7 +712,7 @@ namespace Contensive.Addons.Housekeeping {
                 using (var csData = new CsModel(core)) {
                     FieldLast = "";
                     string FieldName = null;
-                    csData.openSql("Select ID, Name, ContentID, Type from ccFields where (active<>0)and(Type<>" + fieldTypeIdRedirect + ") Order By ContentID, Name, Type, ID");
+                    csData.openSql("Select ID, Name, ContentID, Type from ccFields where (active<>0)and(Type<>" +(int) CPContentBaseClass.fileTypeIdEnum.Redirect + ") Order By ContentID, Name, Type, ID");
                     while (csData.ok()) {
                         int fieldType = csData.getInteger("Type");
                         FieldContentID = csData.getInteger("Contentid");
@@ -1029,13 +1029,13 @@ namespace Contensive.Addons.Housekeeping {
                 // convert FieldTypeLongText + htmlContent to FieldTypeHTML
                 //
                 logHousekeeping(core, "convert FieldTypeLongText + htmlContent to FieldTypeHTML.");
-                sql = "update ccfields set type=" + fieldTypeIdHTML + " where type=" + fieldTypeIdLongText + " and ( htmlcontent<>0 )";
+                sql = "update ccfields set type=" + (int)CPContentBaseClass.fileTypeIdEnum.HTML + " where type=" + (int)CPContentBaseClass.fileTypeIdEnum.LongText + " and ( htmlcontent<>0 )";
                 core.db.executeQuery(sql);
                 //
                 // convert FieldTypeTextFile + htmlContent to FieldTypeHTMLFile
                 //
                 //Call AppendClassLog(appName, "HouseKeep_App_Daily(" & appName & ")", "convert FieldTypeTextFile + htmlContent to FieldTypeHTMLFile.")
-                //SQL = "update ccfields set type=" & FieldTypeIdFileHTMLPrivate & " where type=" & FieldTypeIdFileTextPrivate & " and ( htmlcontent<>0 )"
+                //SQL = "update ccfields set type=" & CPContentBaseClass.fileTypeIdEnum.FileHTMLPrivate & " where type=" & CPContentBaseClass.fileTypeIdEnum.FileTextPrivate & " and ( htmlcontent<>0 )"
                 //Call core.app.executeSql(SQL)
                 //
                 // Log files Older then 30 days
