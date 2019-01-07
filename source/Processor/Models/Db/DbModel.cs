@@ -195,17 +195,20 @@ namespace Contensive.Processor.Models.Db {
         //
         //====================================================================================================
         /// <summary>
+        /// simple constructor needed for deserialization
+        /// </summary>
+        public DbModel() { }
+        //
+        //====================================================================================================
+        /// <summary>
         /// return the name of the database table associated to the derived content
         /// </summary>
         /// <param name="derivedType"></param>
         /// <returns></returns>
         public static string derivedTableName(Type derivedType) {
             FieldInfo fieldInfo = derivedType.GetField("contentTableName");
-            if (fieldInfo == null) {
-                throw new GenericException("Class [" + derivedType.Name + "] must declare constant [contentTableName].");
-            } else {
-                return fieldInfo.GetRawConstantValue().ToString();
-            }
+            if (fieldInfo == null) { throw new GenericException("Class [" + derivedType.Name + "] must declare constant [contentTableName]."); }
+            return fieldInfo.GetRawConstantValue().ToString();
         }
         //
         //====================================================================================================
@@ -216,11 +219,8 @@ namespace Contensive.Processor.Models.Db {
         /// <returns></returns>
         public static string derivedDataSourceName(Type derivedType) {
             FieldInfo fieldInfo = derivedType.GetField("contentDataSource");
-            if (fieldInfo == null) {
-                throw new GenericException("Class [" + derivedType.Name + "] must declare public constant [contentDataSource].");
-            } else {
-                return fieldInfo.GetRawConstantValue().ToString();
-            }
+            if (fieldInfo == null) { throw new GenericException("Class [" + derivedType.Name + "] must declare public constant [contentDataSource]."); }
+            return fieldInfo.GetRawConstantValue().ToString();
         }
         //
         //====================================================================================================
@@ -231,19 +231,8 @@ namespace Contensive.Processor.Models.Db {
         /// <returns></returns>
         public static bool derivedNameFieldIsUnique(Type derivedType) {
             FieldInfo fieldInfo = derivedType.GetField("nameFieldIsUnique");
-            if (fieldInfo == null) {
-                throw new GenericException("Class [" + derivedType.Name + "] must declare public constant [nameFieldIsUnique].");
-            } else {
-                return (bool)fieldInfo.GetRawConstantValue();
-            }
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// simple constructor needed for deserialization
-        /// </summary>
-        public DbModel() {
-            //
+            if (fieldInfo == null) { throw new GenericException("Class [" + derivedType.Name + "] must declare public constant [nameFieldIsUnique]."); }
+            return (bool)fieldInfo.GetRawConstantValue();
         }
         //
         //====================================================================================================
@@ -363,7 +352,6 @@ namespace Contensive.Processor.Models.Db {
                 LogController.handleError(core, ex);
                 throw;
             }
-            return result;
         }
         //
         //====================================================================================================
@@ -389,7 +377,7 @@ namespace Contensive.Processor.Models.Db {
             try {
                 T result = default(T);
                 if (isAppInvalid(core)) { return result; }
-                if ( recordId <= 0) { return result; }
+                if (recordId <= 0) { return result; }
                 result = readRecordCache<T>(core, recordId);
                 if (result == null) {
                     using (var db = new DbController(core, derivedDataSourceName(typeof(T)))) {
@@ -664,7 +652,7 @@ namespace Contensive.Processor.Models.Db {
                                 sqlPairs.add(instanceProperty.Name, DbController.encodeSQLText(instanceProperty.GetValue(this, null).ToString()));
                                 break;
                             default:
-                                CPContentBaseClass.fileTypeIdEnum  fieldTypeId = 0;
+                                CPContentBaseClass.fileTypeIdEnum fieldTypeId = 0;
                                 bool fileFieldContentUpdated = false;
                                 FieldTypeFileBase fileProperty = null;
                                 switch (instanceProperty.PropertyType.Name) {
@@ -708,7 +696,7 @@ namespace Contensive.Processor.Models.Db {
                                         sqlPairs.add(instanceProperty.Name, DbController.encodeSQLText(instanceProperty.GetValue(this, null).ToString()));
                                         break;
                                 }
-                                if (!fieldTypeId.Equals(0)) {
+                                if (!((int)fieldTypeId).Equals(0)) {
                                     fileProperty.internalcore = core;
                                     PropertyInfo fileFieldContentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
                                     fileFieldContentUpdated = (bool)fileFieldContentUpdatedProperty.GetValue(fileProperty);
