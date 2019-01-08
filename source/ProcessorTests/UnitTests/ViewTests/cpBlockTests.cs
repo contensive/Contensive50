@@ -1,26 +1,17 @@
 ﻿
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
-using System.Linq;
-
-using System.Xml.Linq;
-using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
 using Contensive.Processor;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using Contensive.BaseClasses;
-using static Contensive.Processor.Tests.testConstants;
+using static Tests.testConstants;
 
-namespace Contensive.Processor.Tests.UnitTests.Views {
+namespace Contensive.ProcessorTests.UnitTests.ViewTests {
 
     [TestClass()]
-    public class cpBlockTests {
+    public class CpBlockTests {
         //
         public const string layoutContent = "content";
         public const string layoutA = "<div id=\"aid\" class=\"aclass\">" + layoutContent + "</div>";
@@ -33,7 +24,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         // unit test - cp.blockNew
         //
         [TestMethod]
-        public void Views_cpBlock_InnerOuterTest() {
+        public void views_cpBlock_InnerOuterTest() {
             // arrange
             CPClass cpApp = new CPClass(testAppName);
             CPBlockBaseClass block = cpApp.BlockNew();
@@ -94,15 +85,16 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         /// test block load and clear
         /// </summary>
         [TestMethod]
-        public void Views_cpBlock_ClearTest() {
-            CPClass cp = new CPClass(testAppName);
-            CPBlockBaseClass block = cp.BlockNew();
-            // act
-            block.Load(layoutC);
-            Assert.AreEqual(layoutC, block.GetHtml());
-            block.Clear();
-            // assert
-            Assert.AreEqual(block.GetHtml(), "");
+        public void views_cpBlock_ClearTest() {
+            using (CPClass cp = new CPClass(testAppName)) {
+                CPBlockBaseClass block = cp.BlockNew();
+                // act
+                block.Load(layoutC);
+                Assert.AreEqual(layoutC, block.GetHtml());
+                block.Clear();
+                // assert
+                Assert.AreEqual(block.GetHtml(), "");
+            }
         }
         //
         //====================================================================================================
@@ -110,20 +102,21 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         /// test block import
         /// </summary>
         [TestMethod]
-        public void Views_cpBlock_ImportFileTest() {
-            CPClass cp = new CPClass(testAppName);
-            string filename = "cpBlockTest" + GetRandomInteger(cp.core).ToString() + ".html";
-            try {
-                CPBlockBaseClass block = cp.BlockNew();
-                // act
-                cp.core.wwwfiles.saveFile(filename, templateA);
-                block.ImportFile(filename);
-                // assert
-                Assert.AreEqual(layoutC, block.GetHtml());
-            } catch (Exception) {
-                //
-            } finally {
-                cp.core.wwwfiles.deleteFile(filename);
+        public void views_cpBlock_ImportFileTest() {
+            using (CPClass cp = new CPClass(testAppName)) {
+                string filename = "cpBlockTest" + GetRandomInteger(cp.core).ToString() + ".html";
+                try {
+                    CPBlockBaseClass block = cp.BlockNew();
+                    // act
+                    cp.core.wwwfiles.saveFile(filename, templateA);
+                    block.ImportFile(filename);
+                    // assert
+                    Assert.AreEqual(layoutC, block.GetHtml());
+                } catch (Exception) {
+                    //
+                } finally {
+                    cp.core.wwwfiles.deleteFile(filename);
+                }
             }
         }
         //
@@ -132,26 +125,28 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         /// test block openCopy
         /// </summary>
         [TestMethod]
-        public void Views_cpBlock_OpenCopyTest() {
-            CPClass cp = new CPClass(testAppName);
-            string recordName = "cpBlockTest" + GetRandomInteger(cp.core).ToString();
-            int recordId = 0;
-            try {
-                // arrange
-                CPBlockBaseClass block = cp.BlockNew();
-                CPCSBaseClass cs = cp.CSNew();
-                // act
-                if (cs.Insert("copy content")) {
-                    recordId = cs.GetInteger("id");
-                    cs.SetField("name", recordName);
-                    cs.SetField("copy", layoutC);
+        public void views_cpBlock_OpenCopyTest() {
+            using (CPClass cp = new CPClass(testAppName)) {
+                string recordName = "cpBlockTest" + GetRandomInteger(cp.core).ToString();
+                int recordId = 0;
+                try {
+                    // arrange
+                    CPBlockBaseClass block = cp.BlockNew();
+                    using (CPCSBaseClass cs = cp.CSNew()) {
+                        // act
+                        if (cs.Insert("copy content")) {
+                            recordId = cs.GetInteger("id");
+                            cs.SetField("name", recordName);
+                            cs.SetField("copy", layoutC);
+                        }
+                        cs.Close();
+                    }
+                    block.OpenCopy(recordName);
+                    // assert
+                    Assert.AreEqual(layoutC, block.GetHtml());
+                } finally {
+                    cp.Content.Delete("copy content", "id=" + recordId);
                 }
-                cs.Close();
-                block.OpenCopy(recordName);
-                // assert
-                Assert.AreEqual(layoutC, block.GetHtml());
-            } finally {
-                cp.Content.Delete("copy content", "id=" + recordId);
             }
         }
         //
@@ -160,17 +155,15 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         /// test block openFile
         /// </summary>
         [TestMethod]
-        public void Views_cpBlock_OpenFileTest() {
-            CPClass cp = new CPClass(testAppName);
-            string filename = "cpBlockTest" + GetRandomInteger(cp.core).ToString() + ".html";
-            try {
-                CPBlockBaseClass block = cp.BlockNew();
+        public void views_cpBlock_OpenFileTest() {
+            using (CPClass cp = new CPClass(testAppName)) {
+                string filename = "cpBlockTest" + GetRandomInteger(cp.core).ToString() + ".html";
                 // act
                 cp.core.wwwfiles.saveFile(filename, layoutA);
+                CPBlockBaseClass block = cp.BlockNew();
                 block.OpenFile(filename);
                 // assert
                 Assert.AreEqual(layoutA, block.GetHtml());
-            } finally {
                 cp.core.wwwfiles.deleteFile(filename);
             }
         }
@@ -180,25 +173,24 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         /// test block openCopy
         /// </summary>
         [TestMethod]
-        public void Views_cpBlock_OpenLayoutTest() {
-            CPClass cp = new CPClass(testAppName);
-            string recordName = "cpBlockTest" + GetRandomInteger(cp.core).ToString();
-            int recordId = 0;
-            try {
+        public void views_cpBlock_OpenLayoutTest() {
+            using (CPClass cp = new CPClass(testAppName)) {
+                string recordName = "cpBlockTest" + GetRandomInteger(cp.core).ToString();
+                int recordId = 0;
                 // arrange
                 CPBlockBaseClass block = cp.BlockNew();
-                CPCSBaseClass cs = cp.CSNew();
-                // act
-                if (cs.Insert("layouts")) {
-                    recordId = cs.GetInteger("id");
-                    cs.SetField("name", recordName);
-                    cs.SetField("layout", layoutC);
+                using (CPCSBaseClass cs = cp.CSNew()) {
+                    // act
+                    if (cs.Insert("layouts")) {
+                        recordId = cs.GetInteger("id");
+                        cs.SetField("name", recordName);
+                        cs.SetField("layout", layoutC);
+                    }
+                    cs.Close();
                 }
-                cs.Close();
                 block.OpenLayout(recordName);
                 // assert
                 Assert.AreEqual(layoutC, block.GetHtml());
-            } finally {
                 cp.Content.Delete("layouts", "id=" + recordId);
             }
         }
@@ -207,7 +199,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         // unit test - cp.blockNew
         //
         [TestMethod]
-        public void Views_cpBlock_AppendPrependTest() {
+        public void views_cpBlock_AppendPrependTest() {
             // arrange
             CPClass cpApp = new CPClass(testAppName);
             CPBlockBaseClass block = cpApp.BlockNew();
@@ -230,7 +222,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         //
     }
     //
-    public class coreCommonTests {
+    public class CoreCommonTests {
         //
         [TestMethod]
         public void normalizePath_unit() {
@@ -288,7 +280,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         }
         //
         [TestMethod]
-        public void ModifyQueryString_unit() {
+        public void modifyQueryString_unit() {
             // arrange
             // act
             // assert
@@ -300,7 +292,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         }
         //
         [TestMethod]
-        public void ModifyLinkQuery_unit() {
+        public void modifyLinkQuery_unit() {
             // arrange
             // act
             // assert
@@ -361,7 +353,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         // unit test - cp.appOk
         //
         [TestMethod]
-        public void Views_cpBlock_AppOk_unit() {
+        public void views_cpBlock_AppOk_unit() {
             // arrange
             CPClass cp = new CPClass();
             CPClass cpApp = new CPClass(testAppName);
@@ -379,7 +371,7 @@ namespace Contensive.Processor.Tests.UnitTests.Views {
         // unit test - sample
         //
         [TestMethod]
-        public void Views_cpBlock_sample_unit() {
+        public void views_cpBlock_sample_unit() {
             // arrange
             CPClass cp = new CPClass();
             // act

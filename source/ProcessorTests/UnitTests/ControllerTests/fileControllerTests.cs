@@ -6,9 +6,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Contensive.Processor.Tests.testConstants;
+using static Tests.testConstants;
+using Contensive.Processor;
 
-namespace Contensive.Processor.Tests.UnitTests.Controllers {
+namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
     //
     //====================================================================================================
     //
@@ -19,7 +20,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         //
         [TestMethod]
         public void Controllers_CdnFiles_AppendTest() {
-            using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
+            using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 string tmpFilename = "tmp" + GenericController.GetRandomInteger(cp.core).ToString() + ".txt";
                 string content = GenericController.GetRandomInteger(cp.core).ToString();
@@ -34,7 +35,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         //
         [TestMethod]
         public void Controllers_CdnFiles_SaveTest() {
-            using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
+            using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 string tmpFilename = "tmp" + GenericController.GetRandomInteger(cp.core).ToString() + ".txt";
                 string content = GenericController.GetRandomInteger(cp.core).ToString();
@@ -49,7 +50,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         //
         [TestMethod]
         public void Controllers_CdnFiles_CopyTest() {
-            using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
+            using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 string srcFilename = "src" + GenericController.GetRandomInteger(cp.core).ToString() + ".txt";
                 string tmpContent = GenericController.GetRandomInteger(cp.core).ToString();
@@ -66,7 +67,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         //
         [TestMethod]
         public void Controllers_CdnFiles_DeleteTest() {
-            using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
+            using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 string srcFilename = "src" + GenericController.GetRandomInteger(cp.core).ToString() + ".txt";
                 string tmpContent = GenericController.GetRandomInteger(cp.core).ToString();

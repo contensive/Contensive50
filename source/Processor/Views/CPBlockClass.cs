@@ -247,17 +247,18 @@ namespace Contensive.Processor {
             }
             this.disposed = true;
         }
+        //
         protected bool disposed { get; set; } = false;
+        //
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
-        public void Dispose() {
+        public override void Dispose() {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+        //
         ~CPBlockClass() {
             Dispose(false);
-            
-            
         }
         #endregion
         //

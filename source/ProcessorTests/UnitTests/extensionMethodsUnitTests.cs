@@ -3,7 +3,7 @@ using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Contensive.Processor.Controllers;
 
-namespace Contensive.Processor.Tests.UnitTests {
+namespace Contensive.ProcessorTests.UnitTests {
     [TestClass]
     public class extensionMethodsUnitTests {
         //

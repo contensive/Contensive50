@@ -2,9 +2,11 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Contensive.Processor.Controllers;
 using System.Collections.Generic;
-using static Contensive.Processor.Tests.testConstants;
+using static Tests.testConstants;
+using Contensive.Processor;
+using Contensive.BaseClasses;
 
-namespace Contensive.Processor.Tests.UnitTests.Controllers {
+namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
     //
     //====================================================================================================
     //
@@ -17,20 +19,20 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         //
         [TestMethod]
         public void controllers_Addon_simpleDoNothingAddon() {
-            using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
+            using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 var addon = Processor.Models.Db.AddonModel.addDefault(cp.core, Processor.Models.Domain.MetaModel.createByUniqueName(cp.core, Processor.Models.Db.AddonModel.contentName));
                 addon.save(cp.core);
                 // act
-                string result = cp.core.addon.execute(addon, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
-                    addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple,
+                string result = cp.core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() {
+                    addonType = CPUtilsBaseClass.addonContext.ContextSimple,
                     backgroundProcess = false,
                     cssContainerClass = "",
                     cssContainerId = "",
                     errorContextMessage = "",
                     forceHtmlDocument = false,
                     forceJavascriptToHead = false,
-                    hostRecord = new BaseClasses.CPUtilsBaseClass.addonExecuteHostRecordContext() {
+                    hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
                         contentName = "",
                         fieldName = "",
                         recordId = 0
@@ -59,21 +61,21 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         //====================================================================================================
         //
         public void controllers_Addon_copy() {
-            using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
+            using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 var addon = Processor.Models.Db.AddonModel.addDefault(cp.core, Processor.Models.Domain.MetaModel.createByUniqueName(cp.core, Processor.Models.Db.AddonModel.contentName));
                 addon.copy = "test" + GenericController.GetRandomInteger(cp.core).ToString();
                 addon.save(cp.core);
                 // act
-                string result = cp.core.addon.execute(addon, new BaseClasses.CPUtilsBaseClass.addonExecuteContext() {
-                    addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple,
+                string result = cp.core.addon.execute(addon, new CPUtilsBaseClass.addonExecuteContext() {
+                    addonType = CPUtilsBaseClass.addonContext.ContextSimple,
                     backgroundProcess = false,
                     cssContainerClass = "",
                     cssContainerId = "",
                     errorContextMessage = "",
                     forceHtmlDocument = false,
                     forceJavascriptToHead = false,
-                    hostRecord = new BaseClasses.CPUtilsBaseClass.addonExecuteHostRecordContext() {
+                    hostRecord = new CPUtilsBaseClass.addonExecuteHostRecordContext() {
                         contentName = "",
                         fieldName = "",
                         recordId = 0

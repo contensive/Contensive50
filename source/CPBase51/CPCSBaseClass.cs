@@ -372,7 +372,11 @@ namespace Contensive.BaseClasses {
         //
         [Obsolete("Use GetFormInput(string,string,int)", true)]
         public abstract object GetFormInput(string contentName, string fieldName, string height);
-
+        //
+        //====================================================================================================
+        /// <summary>
+        /// support IDisposable
+        /// </summary>
         public abstract void Dispose();
     }
 

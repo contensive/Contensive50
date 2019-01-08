@@ -4,9 +4,9 @@ using Contensive.BaseClasses;
 using System;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using static Contensive.Processor.Tests.testConstants;
+using static Tests.testConstants;
 
-namespace Contensive.Processor.Tests.UnitTests.Views {
+namespace Contensive.ProcessorTests.UnitTests.ViewTests {
     [TestClass()]
     public class cpUserTests {
         //====================================================================================================

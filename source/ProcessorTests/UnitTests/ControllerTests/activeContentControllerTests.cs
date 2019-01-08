@@ -6,9 +6,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Contensive.Processor.Tests.testConstants;
+using static Tests.testConstants;
+using Contensive.Processor;
+using Contensive.BaseClasses;
 
-namespace Contensive.Processor.Tests.UnitTests.Controllers {
+namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
     //
     //====================================================================================================
     //
@@ -19,12 +21,12 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         //
         [TestMethod]
         public void Controllers_ActiveContent_Content() {
-            using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
+            using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 string source = "<ac Type=\"content\">";
                 // act
                 DateTime dateBefore = DateTime.Now.AddSeconds(-1);
-                string resultString = Contensive.Processor.Controllers.ActiveContentController.renderHtmlForWeb(
+                string resultString = ActiveContentController.renderHtmlForWeb(
                     core: cp.core,
                     source: source,
                     contextContentName: "",
@@ -32,10 +34,10 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                     ContextContactPeopleID: 0,
                     ProtocolHostString: "",
                     DefaultWrapperID: 0,
-                    addonContext: BaseClasses.CPUtilsBaseClass.addonContext.ContextPage
+                    addonContext: CPUtilsBaseClass.addonContext.ContextPage
                 );
                 // assert
-                Assert.AreEqual(Contensive.Processor.Constants.fpoContentBox,resultString, "The result string was not the content fpo guid [" + resultString + "]");
+                Assert.AreEqual(Constants.fpoContentBox,resultString, "The result string was not the content fpo guid [" + resultString + "]");
             }
         }
 

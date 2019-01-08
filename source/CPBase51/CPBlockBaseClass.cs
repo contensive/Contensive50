@@ -1,4 +1,6 @@
 ﻿
+using System;
+
 namespace Contensive.BaseClasses {
     //
     //====================================================================================================
@@ -6,7 +8,7 @@ namespace Contensive.BaseClasses {
     /// CP.Block - an object that holds and manipulates a block of html
     /// </summary>
     /// <remarks></remarks>
-    public abstract class CPBlockBaseClass {
+    public abstract class CPBlockBaseClass : IDisposable {
         //
         //====================================================================================================
         /// <summary>
@@ -114,6 +116,12 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <remarks></remarks>
         public abstract void Clear();
+        //
+        //====================================================================================================
+        /// <summary>
+        /// support IDisposable
+        /// </summary>
+        public abstract void Dispose();
     }
 }
 

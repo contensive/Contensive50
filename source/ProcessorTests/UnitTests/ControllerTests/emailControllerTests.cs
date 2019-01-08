@@ -2,23 +2,24 @@
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Tests.testConstants;
+using static Tests.testConstants;
 using System.Linq;
+using Contensive.Processor;
 
-namespace Contensive.Processor.Tests.UnitTests.Controllers {
+namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
     [TestClass]
     public class emailControllerTests {
         //
         [TestMethod]
         public void Controllers_Email_GetBlockedList_test1() {
-            using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
+            using (CPClass cp = new CPClass(testAppName)) {
                 cp.core.mockSmtp = true;
                 // arrange
                 string test1 = GenericController.GetRandomInteger(cp.core).ToString() + "@kma.net";
                 string test2 = GenericController.GetRandomInteger(cp.core).ToString() + "@kma.net";
                 // act
                 EmailController.addToBlockList(cp.core, test1);
-                string blockList = Contensive.Processor.Controllers.EmailController.getBlockList(cp.core);
+                string blockList = Processor.Controllers.EmailController.getBlockList(cp.core);
                 // assert
                 Assert.IsTrue(EmailController.isOnBlockedList(cp.core, test1));
                 Assert.IsFalse(EmailController.isOnBlockedList(cp.core, test2));
@@ -27,7 +28,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         //
         [TestMethod]
         public void Controllers_Email_VerifyEmailAddress_test1() {
-            using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
+            using (CPClass cp = new CPClass(testAppName)) {
                 cp.core.mockSmtp = true;
                 // arrange
                 // act
@@ -42,7 +43,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         //
         [TestMethod]
         public void Controllers_Email_queueAdHocEmail_test1() {
-            using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
+            using (CPClass cp = new CPClass(testAppName)) {
                 cp.core.mockSmtp = true;
                 // arrange
                 string body = GenericController.GetRandomInteger(cp.core).ToString() ;
@@ -67,7 +68,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         //
         [TestMethod]
         public void Controllers_Email_queuePersonEmail_test1() {
-            using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
+            using (CPClass cp = new CPClass(testAppName)) {
                 cp.core.mockSmtp = true;
                 // arrange
                 string body = GenericController.GetRandomInteger(cp.core).ToString();

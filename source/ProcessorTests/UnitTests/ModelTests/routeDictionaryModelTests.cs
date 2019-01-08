@@ -1,21 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Contensive.Processor.Controllers;
-using Contensive.Processor.Models;
-using Contensive.Processor.Models.Domain;
-using Contensive.Processor.Models.Db;
-using static Contensive.Processor.Tests.testConstants;
+﻿
 
-namespace Contensive.Processor.Tests.UnitTests.Models {
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using static Tests.testConstants;
+using Contensive.Processor;
+using Contensive.Processor.Models.Domain;
+
+namespace Contensive.ProcessorTests.UnitTests.ModelTests {
     [TestClass()]
     public class routeMapModelTests {
         [TestMethod]
         public void Models_RouteMap_DictionaryHasAdmin() {
-            using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
+            using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 // act
                 var routes = RouteMapModel.create(cp.core);

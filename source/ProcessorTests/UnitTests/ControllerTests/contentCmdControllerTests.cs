@@ -7,9 +7,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Contensive.Processor.Controllers;
 using Contensive.Processor.Models.Db;
-using static Contensive.Processor.Tests.testConstants;
+using static Tests.testConstants;
+using Contensive.BaseClasses;
+using Contensive.Processor;
 
-namespace Contensive.Processor.Tests.UnitTests.Controllers {
+namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
     [TestClass()]
     public class contentCmdControllerTests {
         //
@@ -18,16 +20,16 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         /// </summary>
         [TestMethod]
         public void contentCmdController_SimpleSyntax_runAddon() {
-            using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
+            using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 AddonModel addon = AddonModel.addEmpty(cp.core);
                 addon.name = "testaddon-4-" + GenericController.GetRandomInteger(cp.core).ToString() ;
                 addon.copyText = "foo";
                 addon.save(cp.core);
                 string cmd = "<div>{% \"" + addon.name + "\" %}</div>";
-                BaseClasses.CPUtilsBaseClass.addonContext context = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple;
+                CPUtilsBaseClass.addonContext context = CPUtilsBaseClass.addonContext.ContextSimple;
                 // act
-                string result = Contensive.Processor.Controllers.ContentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
+                string result = ContentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
                 // assert
                 Assert.AreEqual("<div>foo</div>", result);
             }
@@ -38,7 +40,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         /// </summary>
         [TestMethod]
         public void contentCmdController_SimpleSyntax_mulipleContextSwitch() {
-            using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
+            using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 AddonModel addonFoo = AddonModel.addEmpty(cp.core);
                 addonFoo.name = "addonFoo" + GenericController.GetRandomInteger(cp.core).ToString();
@@ -50,9 +52,9 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 addonBar.copyText = "Bar";
                 addonBar.save(cp.core);
                 string cmd = "<div>{% \"" + addonFoo.name + "\" %}{% \"" + addonBar.name + "\" %}+{% \"" + addonFoo.name + "\" %}\n{% \"" + addonBar.name + "\" %}</div>";
-                BaseClasses.CPUtilsBaseClass.addonContext context = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple;
+                CPUtilsBaseClass.addonContext context = CPUtilsBaseClass.addonContext.ContextSimple;
                 // act
-                string result = Contensive.Processor.Controllers.ContentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
+                string result = ContentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
                 // assert
                 Assert.AreEqual("<div>fooBar+foo\nBar</div>", result);
             }
@@ -63,7 +65,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         /// </summary>
         [TestMethod]
         public void contentCmdController_SimpleSyntax_CommandList() {
-            using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
+            using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 AddonModel addonFoo = AddonModel.addEmpty(cp.core);
                 addonFoo.name = "addonFoo" + GenericController.GetRandomInteger(cp.core).ToString();
@@ -75,9 +77,9 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 addonBar.copyText = "Bar";
                 addonBar.save(cp.core);
                 string cmd = "<div>{%[{\"" + addonFoo.name + "\":\"commandArgument\"}]%}</div>";
-                BaseClasses.CPUtilsBaseClass.addonContext context = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple;
+                CPUtilsBaseClass.addonContext context = CPUtilsBaseClass.addonContext.ContextSimple;
                 // act
-                string result = Contensive.Processor.Controllers.ContentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
+                string result = ContentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
                 // assert
                 Assert.AreEqual("<div>foo</div>", result);
                 //throw new NotImplementedException();
@@ -89,7 +91,7 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         /// </summary>
         [TestMethod]
         public void contentCmdController_SimpleSyntax_CommandList_MultipleCommands() {
-            using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
+            using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 AddonModel addonFoo = AddonModel.addEmpty(cp.core);
                 addonFoo.name = "addonFoo" + GenericController.GetRandomInteger(cp.core).ToString();
@@ -101,9 +103,9 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
                 addonBar.copyText = "$cmdAccumulator$Bar";
                 addonBar.save(cp.core);
                 string cmd = "<div>{%[{\"" + addonFoo.name + "\":\"commandArgument\"},{\"" + addonBar.name + "\":\"commandArgument\"}]%}</div>";
-                BaseClasses.CPUtilsBaseClass.addonContext context = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple;
+                CPUtilsBaseClass.addonContext context = CPUtilsBaseClass.addonContext.ContextSimple;
                 // act
-                string result = Contensive.Processor.Controllers.ContentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
+                string result = ContentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
                 // assert
                 Assert.AreEqual("<div>fooBar</div>", result);
             }
@@ -114,16 +116,16 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         /// </summary>
         [TestMethod]
         public void contentCmdController_JsonSyntax() {
-            using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
+            using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 AddonModel addonFoo = AddonModel.addEmpty(cp.core);
                 addonFoo.name = "addonFoo" + GenericController.GetRandomInteger(cp.core).ToString();
                 addonFoo.copyText = "foo";
                 addonFoo.save(cp.core);
                 string cmd = "<div class=\"sample\">{% {\"addon\":{\"addon\":\"" + addonFoo.name + "\"}} %}</div>";
-                BaseClasses.CPUtilsBaseClass.addonContext context = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple;
+                CPUtilsBaseClass.addonContext context = CPUtilsBaseClass.addonContext.ContextSimple;
                 // act
-                string result = Contensive.Processor.Controllers.ContentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
+                string result = ContentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
                 // assert
                 Assert.AreEqual("<div class=\"sample\">foo</div>", result);
             }
@@ -134,16 +136,16 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         /// </summary>
         [TestMethod]
         public void contentCmdController_JsonSyntax_WithArgument() {
-            using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
+            using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 AddonModel addonFoo = AddonModel.addEmpty(cp.core);
                 addonFoo.name = "addonFoo" + GenericController.GetRandomInteger(cp.core).ToString();
                 addonFoo.copyText = "foo$ReplaceMe$";
                 addonFoo.save(cp.core);
                 string cmd = "<div class=\"sample\">{% {\"addon\":{\"addon\":\"" + addonFoo.name + "\",\"ReplaceMe\":\"BAR\"}} %}</div>";
-                BaseClasses.CPUtilsBaseClass.addonContext context = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple;
+                CPUtilsBaseClass.addonContext context = CPUtilsBaseClass.addonContext.ContextSimple;
                 // act
-                string result = Contensive.Processor.Controllers.ContentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
+                string result = ContentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
                 // assert
                 Assert.AreEqual("<div class=\"sample\">fooBAR</div>", result);
             }
@@ -154,16 +156,16 @@ namespace Contensive.Processor.Tests.UnitTests.Controllers {
         /// </summary>
         [TestMethod]
         public void Controllers_JsonSyntax_executeAddonTest_argumentReplacement() {
-            using (Contensive.Processor.CPClass cp = new Contensive.Processor.CPClass(testAppName)) {
+            using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 AddonModel addon = AddonModel.addEmpty(cp.core);
                 addon.name = "testaddon-3-" + GenericController.GetRandomInteger(cp.core).ToString();
                 addon.copyText = "foo$insert$";
                 addon.save(cp.core);
                 string cmd = "<div class=\"sample\">{% {\"addon\":{\"addon\":\"" + addon.name + "\",\"insert\":\"bar\"}} %}</div>";
-                BaseClasses.CPUtilsBaseClass.addonContext context = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple;
+                CPUtilsBaseClass.addonContext context = CPUtilsBaseClass.addonContext.ContextSimple;
                 // act
-                string result = Contensive.Processor.Controllers.ContentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
+                string result = ContentCmdController.executeContentCommands(cp.core, cmd, context, 0, false);
                 // assert
                 Assert.AreEqual("<div class=\"sample\">foobar</div>", result);
                 //throw new NotImplementedException();

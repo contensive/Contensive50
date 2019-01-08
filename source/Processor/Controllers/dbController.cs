@@ -9,7 +9,6 @@ using Contensive.Processor.Models.Domain;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Exceptions;
-using Contensive.Addons.AdminSite.Controllers;
 using Contensive.BaseClasses;
 
 namespace Contensive.Processor.Controllers {
@@ -131,70 +130,6 @@ namespace Contensive.Processor.Controllers {
             }
             return returnConnString;
         }
-        ////
-        ////====================================================================================================
-        ///// <summary>
-        ///// legacy db model for ole. Leave in place to help remember that future technologies may have to fit into the db model.
-        ///// </summary>
-        ///// <returns>
-        ///// </returns>
-        //private string getConnectionStringOLEDB(string catalogName) {
-        //    //
-        //    // (OLEDB) OLE DB Provider for SQL Server > "Provider=sqloledb;Data Source=MyServerName;Initial Catalog=MyDatabaseName;User Id=MyUsername;Password=MyPassword;"
-        //    //     https://www.codeproject.com/Articles/2304/ADO-Connection-Strings#OLE%20DB%20SqlServer
-        //    //
-        //    // (OLEDB) Microsoft OLE DB Provider for SQL Server connection strings > "Provider=sqloledb;Data Source=myServerAddress;Initial Catalog=myDataBase;User Id = myUsername;Password=myPassword;"
-        //    //     https://www.connectionstrings.com/microsoft-ole-db-provider-for-sql-server-sqloledb/
-        //    //
-        //    // (ADONET) .NET Framework Data Provider for SQL Server > Server=myServerAddress;Database=myDataBase;User Id=myUsername;Password = myPassword;
-        //    //     https://www.connectionstrings.com/sql-server/
-        //    //
-        //    string returnConnString = "";
-        //    try {
-        //        string normalizedDataSourceName = DataSourceModel.normalizeDataSourceName(dataSourceName);
-        //        string defaultConnString = "";
-        //        string serverUrl = core.serverConfig.defaultDataSourceAddress;
-        //        if (serverUrl.IndexOf(":") > 0) {
-        //            serverUrl = serverUrl.Left(serverUrl.IndexOf(":"));
-        //        }
-        //        defaultConnString += ""
-        //            + "Provider=sqloledb;"
-        //            + "Data Source=" + serverUrl + ";"
-        //            + "Initial Catalog=" + catalogName + ";"
-        //            + "User Id=" + core.serverConfig.defaultDataSourceUsername + ";"
-        //            + "Password=" + core.serverConfig.defaultDataSourcePassword + ";"
-        //            + "";
-        //        //
-        //        // -- lookup dataSource
-        //        if ((string.IsNullOrEmpty(normalizedDataSourceName)) || (normalizedDataSourceName == "default")) {
-        //            //
-        //            // -- default datasource
-        //            returnConnString = defaultConnString;
-        //        } else {
-        //            //
-        //            // -- custom datasource from Db in primary datasource
-        //            if (!core.dataSourceDictionary.ContainsKey(normalizedDataSourceName)) {
-        //                //
-        //                // -- not found, this is a hard error
-        //                throw new GenericException("Datasource [" + normalizedDataSourceName + "] was not found.");
-        //            } else {
-        //                //
-        //                // -- found in local cache
-        //                var tempVar = core.dataSourceDictionary[normalizedDataSourceName];
-        //                returnConnString += ""
-        //                    + "Provider=sqloledb;"
-        //                    + "Data Source=" + tempVar.endPoint + ";"
-        //                    + "User Id=" + tempVar.username + ";"
-        //                    + "Password=" + tempVar.password + ";"
-        //                    + "";
-        //            }
-        //        }
-        //    } catch (Exception ex) {
-        //        LogController.handleError( core,ex);
-        //        throw;
-        //    }
-        //    return returnConnString;
-        //}
         //
         //====================================================================================================
         /// <summary>
