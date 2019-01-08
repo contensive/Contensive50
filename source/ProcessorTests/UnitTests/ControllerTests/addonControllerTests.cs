@@ -13,7 +13,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
     [TestClass()]
     public class AddonControllerTests {
         //
-        private int localPropertyToFoolCodacyStaticMethodRequirement = 0;
+        private bool localPropertyToFoolCodacyStaticMethodRequirement;
         //
         //====================================================================================================
         //
@@ -54,7 +54,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 Assert.AreEqual(0, cp.core.doc.htmlMetaContent_OtherTags.Count);
                 Assert.AreEqual(0, cp.core.doc.htmlMetaContent_TitleList.Count);
                 //
-                if (localPropertyToFoolCodacyStaticMethodRequirement == 0) { localPropertyToFoolCodacyStaticMethodRequirement = 1; }
+                localPropertyToFoolCodacyStaticMethodRequirement = !localPropertyToFoolCodacyStaticMethodRequirement;
             }
         }
         //
