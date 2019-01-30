@@ -11,34 +11,34 @@
     min-height: 100vh;
 }
 
-#desktop {
+.ccCon #desktop {
     color: #333;
     background-color: #e8e8e8
 }
 
-.btn-primary {
+.ccCon .btn-primary {
     color: #fff;
     background-color: #04a;
     border-color: #04a;
 }
 
-    .btn-primary.disabled, .btn-primary:disabled {
+    .ccCon .btn-primary.disabled, .btn-primary:disabled {
         background-color: #04a;
         border-color: #04a;
     }
 
-.btn-danger {
+.ccCon .btn-danger {
     color: #fff;
     background-color: #a33;
     border-color: #a33;
 }
 
-    .btn-danger.disabled, .btn-danger:disabled {
+    .ccCon .btn-danger.disabled, .btn-danger:disabled {
         background-color: #a33;
         border-color: #a33;
     }
 
-.ccWarningBox {
+.ccCon .ccWarningBox {
     width: 300px;
     margin: 100px auto auto auto;
     text-align: center;
@@ -88,7 +88,7 @@
 /*
     edit page
 */
-.ccForm label {
+.ccCon .ccForm label {
     font-weight: 600;
     color: #233;
 }
@@ -236,55 +236,55 @@
     border-bottom: 1px solid #ddd;
 }
 
-    .ccCon .ccEditFieldCon .ccEditorCon .checkBox {
-        border: 1px solid #ccc;
-        padding: 4px;
-    }
+.ccCon .ccEditFieldCon .ccEditorCon .checkBox {
+    border: 1px solid #ccc;
+    padding: 4px;
+}
 
-    .ccCon .ccEditFieldCon .ccEditorCon .text {
-        border: 1px solid #ccc;
-        padding: 4px;
-    }
+.ccCon .ccEditFieldCon .ccEditorCon .text {
+    border: 1px solid #ccc;
+    padding: 4px;
+}
 
-    .ccCon .ccEditFieldCon .ccEditorCon .select {
-        border: 1px solid #ccc;
-        padding: 4px;
-    }
+.ccCon .ccEditFieldCon .ccEditorCon .select {
+    border: 1px solid #ccc;
+    padding: 4px;
+}
 
-    .ccCon .ccEditFieldCon .ccEditorCon .file {
-        border: 1px solid #ccc;
-        padding: 4px;
-    }
+.ccCon .ccEditFieldCon .ccEditorCon .file {
+    border: 1px solid #ccc;
+    padding: 4px;
+}
 
-    .ccCon .ccEditFieldCon .ccEditorCon .date {
-        border: 1px solid #ccc;
-        padding: 4px;
-    }
+.ccCon .ccEditFieldCon .ccEditorCon .date {
+    border: 1px solid #ccc;
+    padding: 4px;
+}
 
-    .ccCon .ccEditFieldCon .ccEditorCon .number {
-        border: 1px solid #ccc;
-        padding: 4px;
-    }
+.ccCon .ccEditFieldCon .ccEditorCon .number {
+    border: 1px solid #ccc;
+    padding: 4px;
+}
 
-    .ccCon .ccEditFieldCon .ccEditorCon .password {
-        border: 1px solid #ccc;
-        padding: 4px;
-    }
+.ccCon .ccEditFieldCon .ccEditorCon .password {
+    border: 1px solid #ccc;
+    padding: 4px;
+}
 
-    .ccCon .ccEditFieldCon .ccEditorCon .styles {
-        border: 1px solid #ccc;
-        padding: 4px;
-    }
+.ccCon .ccEditFieldCon .ccEditorCon .styles {
+    border: 1px solid #ccc;
+    padding: 4px;
+}
 
-    .ccCon .ccEditFieldCon .ccEditorCon .link {
-        border: 1px solid #ccc;
-        padding: 4px;
-    }
+.ccCon .ccEditFieldCon .ccEditorCon .link {
+    border: 1px solid #ccc;
+    padding: 4px;
+}
 
-    .ccCon .ccEditFieldCon .ccEditorCon .resourceLink {
-        border: 1px solid #ccc;
-        padding: 4px;
-    }
+.ccCon .ccEditFieldCon .ccEditorCon .resourceLink {
+    border: 1px solid #ccc;
+    padding: 4px;
+}
 
 .ccCon .ccEditFieldCon .ccEditorHelpCon {
     color: #888;
@@ -546,7 +546,7 @@
 /*
 styles used publicly by Contensive 
 */
-.ccButtonCon {
+.ccCon .ccButtonCon {
     color: black;
     background-color: #567694;
     padding: 5px !important;
@@ -556,52 +556,52 @@ styles used publicly by Contensive
     Border-right: 1px solid #f8f8f8;
 }
 
-div.ccJumpCon {
+.ccCon div.ccJumpCon {
     padding: 0;
     margin: 0;
 }
 
-.ccJumpCon ul {
+.ccCon .ccJumpCon ul {
     vertical-align: middle;
     white-space: nowrap;
     padding: 0;
     margin: 0;
 }
 
-    .ccJumpCon ul li {
-        display: inline;
-        vertical-align: middle;
-        text-align: center;
-        cursor: pointer;
-        list-style: none inside none;
-        padding: 4px 5px !important;
-        color: #233;
-        background-color: #ccc;
-    }
+.ccCon .ccJumpC on ul li {
+    display: inline;
+    vertical-align: middle;
+    text-align: center;
+    cursor: pointer;
+    list-style: none inside none;
+    padding: 4px 5px !important;
+    color: #233;
+    background-color: #ccc;
+}
 
-        .ccJumpCon ul li:hover {
-            color: #000;
-        }
+.ccCon .ccJumpCon ul li:hover {
+    color: #000;
+}
 
-        .ccJumpCon ul li.caption {
-            background-color: transparent;
-            border: 0;
-            cursor: default;
-        }
+.ccCon .ccJumpCon ul li.caption {
+    background-color: transparent;
+    border: 0;
+    cursor: default;
+}
 
-        .ccJumpCon ul li.delim {
-            background-color: transparent;
-            border: 0;
-            cursor: default;
-        }
+.ccCon .ccJumpCon ul li.delim {
+    background-color: transparent;
+    border: 0;
+    cursor: default;
+}
 
-        .ccJumpCon ul li.hit {
-            cursor: default;
-            background-color: #666;
-            color: #eee;
-        }
+.ccCon .ccJumpCon ul li.hit {
+    cursor: default;
+    background-color: #666;
+    color: #eee;
+}
 
-.ccBubbleCon {
+.ccCon .ccBubbleCon {
     position: absolute;
     border: 2px solid #444;
     margin: 0;
@@ -610,14 +610,14 @@ div.ccJumpCon {
     z-index: 1;
 }
 
-    .ccBubbleCon .ccHeaderCon {
+    .ccCon .ccBubbleCon .ccHeaderCon {
         position: static;
         width: 100%;
         color: white;
         background-color: #444;
     }
 
-        .ccBubbleCon .ccHeaderCon .bbLeft {
+        .ccCon .ccBubbleCon .ccHeaderCon .bbLeft {
             color: white;
             background-color: #444;
             text-align: left;
@@ -626,7 +626,7 @@ div.ccJumpCon {
             width: 99%
         }
 
-        .ccBubbleCon .ccHeaderCon .bbRight {
+        .ccCon .ccBubbleCon .ccHeaderCon .bbRight {
             color: white;
             background-color: #444;
             text-align: right;
@@ -634,7 +634,7 @@ div.ccJumpCon {
             width: 23px
         }
 
-    .ccBubbleCon .ccButtonCon {
+    .ccCon .ccBubbleCon .ccButtonCon {
         margin: 0;
         padding: 0;
         background-color: #567694;
@@ -644,35 +644,35 @@ div.ccJumpCon {
         Border-right: 1px solid #8be;
     }
 
-    .ccBubbleCon .ccContentCon {
+    .ccCon .ccBubbleCon .ccContentCon {
         margin: 0;
         padding: 10px;
         background-color: rgb(240,240,240);
         vertical-align: middle;
     }
 
-        .ccBubbleCon .ccContentCon td {
+        .ccCon .ccBubbleCon .ccContentCon td {
             margin: 0;
             padding: 5px;
             vertical-align: middle;
         }
 
-            .ccBubbleCon .ccContentCon td.bbLeft {
+            .ccCon .ccBubbleCon .ccContentCon td.bbLeft {
                 text-align: right;
                 white-space: nowrap;
             }
 
-            .ccBubbleCon .ccContentCon td.bbRight {
+            .ccCon .ccBubbleCon .ccContentCon td.bbRight {
                 text-align: left;
             }
 
-.ccDialogCon {
+.ccCon .ccDialogCon {
     margin: 0;
     padding: 0;
     background-color: rgb(240,240,240);
 }
 
-    .ccDialogCon .ccButtonCon {
+    .ccCon .ccDialogCon .ccButtonCon {
         margin: 0;
         padding: 0;
         background-color: #567694;
@@ -682,46 +682,46 @@ div.ccJumpCon {
         Border-right: 1px solid #8be;
     }
 
-    .ccDialogCon .ccContentCon {
+    .ccCon .ccDialogCon .ccContentCon {
         margin: 0;
         padding: 10px;
         background-color: rgb(240,240,240);
         vertical-align: middle;
     }
 
-        .ccDialogCon .ccContentCon td {
+        .ccCon .ccDialogCon .ccContentCon td {
             margin: 0;
             padding: 5px;
             vertical-align: middle;
         }
 
-            .ccDialogCon .ccContentCon td.left {
+            .ccCon .ccDialogCon .ccContentCon td.left {
                 text-align: right;
                 white-space: nowrap;
             }
 
-            .ccDialogCon .ccContentCon td.right {
+            .ccCon .ccDialogCon .ccContentCon td.right {
                 text-align: left;
             }
 
-.ccAddonFrameCon {
+.ccCon .ccAddonFrameCon {
     width: 100%;
     border: 0;
     overflow: auto;
 }
 
-.ccAddonEditCaption {
+.ccCon .ccAddonEditCaption {
     white-space: nowrap;
     clear: left;
     padding: 2px;
 }
 
-.ccAddonEditTools {
+.ccCon .ccAddonEditTools {
     clear: left;
     padding: 0px;
 }
 
-.ccHelpIcon a {
+.ccCon .ccHelpIcon a {
     cursor: help
 }
 /*
@@ -731,24 +731,24 @@ ul.ccChildList {
     text-align: left
 }
 
-ul.ccChildList li.ccListItem {
-    text-align: left
-}
+    ul.ccChildList li.ccListItem {
+        text-align: left
+    }
 
 
-ul.ccChildList li.ccListItemNoBullet {
-    text-align: left;
-    list-style: none;
-}
+    ul.ccChildList li.ccListItemNoBullet {
+        text-align: left;
+        list-style: none;
+    }
 
 ul.ccChildListInactive {
     text-align: left;
     border-top: 1px solid #233;
 }
 
-ul.ccChildListInactive li.ccListItem {
-    text-align: left
-}
+    ul.ccChildListInactive li.ccListItem {
+        text-align: left
+    }
 /*
     child list editing
 */
@@ -759,9 +759,9 @@ ul.ccChildListInactive li.ccListItem {
     border-left: 1px dashed #262;
 }
 
-.ccEditWrapper .ccChildList li:last-child, .ccEditWrapper .ccChildList li.ui-sortable-helper {
-    border-bottom: 1px dashed #262;
-}
+    .ccEditWrapper .ccChildList li:last-child, .ccEditWrapper .ccChildList li.ui-sortable-helper {
+        border-bottom: 1px dashed #262;
+    }
 
 .ccListItemDragHandle {
     display: none;
@@ -785,22 +785,22 @@ ul.ccChildListInactive li.ccListItem {
     vertical-align: middle;
 }
 
-    .ccCategoryListCon .caption {
-        padding-top: 5px;
-    }
+.ccCategoryListCon .caption {
+    padding-top: 5px;
+}
 
-    .ccCategoryListCon UL {
+.ccCategoryListCon UL {
+    margin: 0;
+    padding: 0;
+    padding-left: 20px;
+}
+
+    .ccCategoryListCon ul li {
         margin: 0;
         padding: 0;
-        padding-left: 20px;
+        padding-left: 2px;
+        padding-top: 5px;
     }
-
-        .ccCategoryListCon ul li {
-            margin: 0;
-            padding: 0;
-            padding-left: 2px;
-            padding-top: 5px;
-        }
 
 .ccFilterHead {
     margin-top: 10px;
