@@ -107,6 +107,15 @@ namespace Contensive.Processor.Controllers {
             public string value;
         }
         public Dictionary<string, CookieClass> requestCookies;
+        /// <summary>
+        /// The body of the request
+        /// </summary>
+        public string requestBody;
+        /// <summary>
+        /// The content type of the request
+        /// </summary>
+        public string requestContentType;
+        //
         //
         //====================================================================================================
         //
@@ -231,6 +240,14 @@ namespace Contensive.Processor.Controllers {
                 iisContext.Response.CacheControl = "no-cache";
                 iisContext.Response.Expires = -1;
                 iisContext.Response.Buffer = true;
+                //
+                // todo convert this to lazy read from stored iisContext
+                // -- read the request body into requestbody
+                httpContext.Request.InputStream.Position = 0;
+                System.IO.StreamReader str = new System.IO.StreamReader(httpContext.Request.InputStream);
+                requestBody = str.ReadToEnd();
+                //
+                requestContentType = httpContext.Request.ContentType;
                 //
                 //
                 // -- basic request environment

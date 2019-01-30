@@ -615,7 +615,7 @@ namespace Contensive.Addons.SafeAddonManager {
                                 LibCollections = new XmlDocument();
                                 bool parseError = false;
                                 try {
-                                    LibCollections.Load("http://support.contensive.com/GetCollectionList?iv=" + core.codeVersion());
+                                    LibCollections.Load("http://support.contensive.com/GetCollectionList?iv=" + core.codeVersion() + "&includeSystem=1&includeNonPublic=1");
                                 } catch (Exception) {
                                     UserError = "There was an error reading the Collection Library. The site may be unavailable.";
                                     HandleClassAppendLog("AddonManager", UserError);

@@ -133,6 +133,14 @@ namespace Contensive.BaseClasses {
         /// <param name="RequestName"></param>
         /// <returns></returns>
         public abstract bool OK(string RequestName);
+        /// <summary>
+        /// The body of the entire request entity. Use when iis does not parse the body into form elements, such as application/json
+        /// </summary>
+        public abstract string Body { get; }
+        /// <summary>
+        /// The content type of the request
+        /// </summary>
+        public abstract string ContentType { get; }
         //
         //====================================================================================================
         // deprecated

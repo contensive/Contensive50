@@ -36,6 +36,8 @@ namespace Contensive.BaseClasses {
         public abstract string RemoteIP { get; }
         public abstract bool Secure { get; }
         public abstract bool OK(string RequestName);
+        public abstract string Body { get; }
+        public abstract string ContentType { get; }
         //
         //====================================================================================================
         // deprecated

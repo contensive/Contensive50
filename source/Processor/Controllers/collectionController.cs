@@ -315,7 +315,7 @@ namespace Contensive.Processor.Controllers {
                                     //-----------------------------------------------------------------------------------------------
                                     //
                                     LibraryCollections = new XmlDocument();
-                                    string SupportURL = "http://support.contensive.com/GetCollectionList?iv=" + core.codeVersion() + "&guidlist=" + encodeRequestVariable(GuidList);
+                                    string SupportURL = "http://support.contensive.com/GetCollectionList?iv=" + core.codeVersion() + "&guidlist=" + encodeRequestVariable(GuidList) + "&includeSystem=1&includeNonPublic=1";
                                     bool loadOK = true;
                                     if ( packageNumber>1 ) {
                                         Thread.Sleep(2000);
@@ -2855,7 +2855,7 @@ namespace Contensive.Processor.Controllers {
                 var LibCollections = new XmlDocument();
                 bool parseError = false;
                 try {
-                    LibCollections.Load("http://support.contensive.com/GetCollectionList?iv=" + core.codeVersion());
+                    LibCollections.Load("http://support.contensive.com/GetCollectionList?iv=" + core.codeVersion() + "&includeSystem=1&includeNonPublic=1");
                 } catch (Exception) {
                     string UserError = "There was an error reading the Collection Library. The site may be unavailable.";
                     LogController.logInfo(core, UserError);

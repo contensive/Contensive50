@@ -92,6 +92,9 @@ namespace Contensive.CLI {
                                     if (argPtr < (args.Length + 1)) {
                                         argPtr++;
                                         collectionName = args[argPtr];
+                                        if (collectionName.Left(1).Equals("\"") && collectionName.Right(1).Equals("\"")) {
+                                            collectionName = collectionName.Substring(1, collectionName.Length - 2);
+                                        }
                                     }
                                     if (string.IsNullOrEmpty(collectionName)) {
                                         Console.WriteLine("Collection name is required after the --install command");

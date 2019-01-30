@@ -230,6 +230,20 @@ namespace Contensive.Processor {
         }
         //
         //====================================================================================================
+        public override string Body {
+            get {
+                return cp.core.webServer.requestBody;
+            }
+        }
+        //
+        //====================================================================================================
+        public override string ContentType {
+            get {
+                return cp.core.webServer.requestContentType;
+            }
+        }
+        //
+        //====================================================================================================
         public override bool OK(string RequestName) {
             return cp.core.docProperties.containsKey(RequestName);
         }
