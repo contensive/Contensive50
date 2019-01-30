@@ -268,7 +268,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- handle files
                 int filePtr = 0;
-                string instanceId = GenericController.getGUIDString();
+                string instanceId = GenericController.getGUIDNaked();
                 string[] formNames = iisContext.Request.Files.AllKeys;
                 foreach (string formName in formNames) {
                     System.Web.HttpPostedFile file = iisContext.Request.Files[formName];

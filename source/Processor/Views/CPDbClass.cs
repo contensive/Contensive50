@@ -88,7 +88,7 @@ namespace Contensive.Processor {
                         pageSize = 9999;
                     }
                     if (cs.Insert("Remote Queries")) {
-                        returnKey = GenericController.getGUIDString();
+                        returnKey = GenericController.getGUIDNaked();
                         int dataSourceID = cp.Content.GetRecordID("Data Sources", "");
                         cs.SetField("remotekey", returnKey);
                         cs.SetField("datasourceid", dataSourceID.ToString());
@@ -283,7 +283,7 @@ namespace Contensive.Processor {
                         pageSize = 9999;
                     }
                     if (cs.Insert("Remote Queries")) {
-                        returnKey = GenericController.getGUIDString();
+                        returnKey = GenericController.getGUIDNaked();
                         int dataSourceID = cp.Content.GetRecordID("Data Sources", db.dataSourceName);
                         cs.SetField("remotekey", returnKey);
                         cs.SetField("datasourceid", dataSourceID.ToString());

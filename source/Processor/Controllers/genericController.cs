@@ -54,7 +54,7 @@ namespace Contensive.Processor.Controllers {
         /// Get a GUID with no braces or dashes, just a simple string of characters
         /// </summary>
         /// <returns></returns>
-        public static string getGUIDString() => getGUID(false).Replace("-", "");
+        public static string getGUIDNaked() => getGUID(false).Replace("-", "");
         //
         //====================================================================================================
         /// <summary>

@@ -72,7 +72,7 @@ namespace Contensive.CLI {
                     domainName = cliController.promptForReply("Primary Domain Name", "www." + appName + ".com");
                     appConfig.domainList.Add(domainName);
                     appConfig.enabled = true;
-                    appConfig.privateKey = Processor.Controllers.GenericController.getGUIDString();
+                    appConfig.privateKey = Processor.Controllers.GenericController.getGUIDNaked();
                     //Console.Write("\n\rApplication Architecture");
                     //Console.Write("\n\r\t1 Local Mode, compatible with v4.1, cdn is virtual folder /" + appName + "/files/");
                     //Console.Write("\n\r\t2 Scale Mode, cdn as AWS S3 bucket, FilePrivate as AWS S3 bucket");

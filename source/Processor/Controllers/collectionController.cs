@@ -519,7 +519,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // move collection file to a temp directory
                     //
-                    string tmpInstallPath = "tmpInstallCollection" + GenericController.getGUIDString() + "\\";
+                    string tmpInstallPath = "tmpInstallCollection" + GenericController.getGUIDNaked() + "\\";
                     core.privateFiles.copyFile(collectionPathFilename, tmpInstallPath + collectionFilename);
                     if (collectionFilename.ToLowerInvariant().Substring(collectionFilename.Length - 4) == ".zip") {
                         core.privateFiles.UnzipFile(tmpInstallPath + collectionFilename);
