@@ -6,6 +6,8 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Exceptions;
 using Contensive.Addons.AdminSite.Controllers;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Contensive.Processor.Controllers {
     /// <summary>
@@ -1674,297 +1676,50 @@ namespace Contensive.Processor.Controllers {
         /// for html content, this routine optimizes images referenced in the html if they are from library file
         /// </summary>
         public static string optimizeLibraryFileImagesInHtmlContent(CoreController core, string htmlContent) {
-            string result = htmlContent;
             try {
-                // todo - upgradeActiveContent runs every render, can it be eliminated/minimized
-                string ContentFilesLinkPrefix = ContentFilesLinkPrefix = "/" + core.appConfig.name + "/files/";
-                string ResourceLibraryLinkPrefix = ContentFilesLinkPrefix + "ccLibraryFiles/";
-                bool ImageAllowUpdate = core.siteProperties.getBoolean("ImageAllowUpdate", true);
-                ImageAllowUpdate = ImageAllowUpdate && (htmlContent.IndexOf(ResourceLibraryLinkPrefix, System.StringComparison.OrdinalIgnoreCase) != -1);
-                bool SaveChanges = false;
-                bool ParseError = false;
-                if (ImageAllowUpdate) {
+                //
+                // -- exit if nothing there or not allowed
+                if (string.IsNullOrWhiteSpace(htmlContent)) { return htmlContent; }
+                if (!core.siteProperties.imageAllowUpdate) { return htmlContent; }
+                //
+                // this used to be "/" + core.appConfig.name + "/files/"
+                int posLink = htmlContent.IndexOf(core.appConfig.cdnFileUrl + "ccLibraryFiles/", StringComparison.OrdinalIgnoreCase);
+                if (posLink == -1) { return htmlContent; }
+                //
+                // ----- Process Resource Library Images (swap in most current file)
+                // -- LibraryFileSegments = an array that have key 1 and on start with core.appConfig.cdnFileUrl (usually /appname/files/)
+                List<string> libaryFileSegmentList = stringSplit(htmlContent, core.appConfig.cdnFileUrl).ToList();
+                string htmlContentUpdated = libaryFileSegmentList.First();
+                foreach (var libraryFileSegment in libaryFileSegmentList.Skip(1)) {
+                    string htmlContentSegment = libraryFileSegment;
                     //
-                    // ----- Process Resource Library Images (swap in most current file)
-                    string[] LinkSplit = GenericController.stringSplit(htmlContent, ContentFilesLinkPrefix);
-                    int LinkCnt = LinkSplit.GetUpperBound(0) + 1;
-                    bool InTag = false;
-                    for (int LinkPtr = 1; LinkPtr < LinkCnt; LinkPtr++) {
+                    // Determine if this sement is in a tag (<img src="...">) or in content (&quot...&quote)
+                    // For now, skip the ones in content
+                    int TagPosEnd = GenericController.vbInstr(1, htmlContentSegment, ">");
+                    int TagPosStart = GenericController.vbInstr(1, htmlContentSegment, "<");
+                    if ((TagPosStart != 0) && (TagPosEnd < TagPosStart)) {
                         //
-                        // Each LinkSplit(1...) is a segment that would have started with '/appname/files/'
-                        // Next job is to determine if this sement is in a tag (<img src="...">) or in content (&quot...&quote)
-                        // For now, skip the ones in content
-                        int TagPosEnd = GenericController.vbInstr(1, LinkSplit[LinkPtr], ">");
-                        int TagPosStart = GenericController.vbInstr(1, LinkSplit[LinkPtr], "<");
-                        if (TagPosEnd == 0 && TagPosStart == 0) {
-                            //
-                            // no tags found, skip it
-                            InTag = false;
-                        } else if (TagPosEnd == 0) {
-                            //
-                            // no end tag, but found a start tag -> in content
-                            InTag = false;
-                        } else if (TagPosEnd < TagPosStart) {
-                            //
-                            // Found end before start - > in tag
-                            InTag = true;
-                        } else {
-                            //
-                            // Found start before end -> in content
-                            InTag = false;
-                        }
-                        if (InTag) {
-                            string[] TableSplit = LinkSplit[LinkPtr].Split('/');
-                            if (TableSplit.GetUpperBound(0) > 2) {
-                                string TableName = TableSplit[0];
-                                string FieldName = TableSplit[1];
-                                int RecordID = GenericController.encodeInteger(TableSplit[2]);
-                                string FilenameSegment = TableSplit[3];
-                                if ((TableName.ToLowerInvariant() == "cclibraryfiles") && (FieldName.ToLowerInvariant() == "filename") && (RecordID != 0)) {
-                                    LibraryFilesModel file = LibraryFilesModel.create(core, RecordID);
-                                    if (file != null) {
-                                        FieldName = "filename";
-                                        if (true) {
-                                            //
-                                            // now figure out how the link is delimited by how it starts
-                                            //   go to the left and look for:
-                                            //   ' ' - ignore spaces, continue forward until we find one of these
-                                            //   '=' - means space delimited (src=/image.jpg), ends in ' ' or '>'
-                                            //   '"' - means quote delimited (src="/image.jpg"), ends in '"'
-                                            //   '>' - means this is not in an HTML tag - skip it (<B>image.jpg</b>)
-                                            //   '<' - means god knows what, but its wrong, skip it
-                                            //   '(' - means it is a URL(/image.jpg), go to ')'
-                                            //
-                                            // odd cases:
-                                            //   URL( /image.jpg) -
-                                            //
-                                            string RecordVirtualFilename = file.filename;
-                                            //RecordAltSizeList = file.AltSizeList;
-                                            if (RecordVirtualFilename == GenericController.EncodeJavascriptStringSingleQuote(RecordVirtualFilename)) {
-                                                //
-                                                // The javascript version of the filename must match the filename, since we have no way
-                                                // of differentiating a ligitimate file, from a block of javascript. If the file
-                                                // contains an apostrophe, the original code could have encoded it, but we can not here
-                                                // so the best plan is to skip it
-                                                //
-                                                // example:
-                                                // RecordVirtualFilename = "jay/files/cclibraryfiles/filename/000005/test.png"
-                                                //
-                                                // RecordFilename = "test.png"
-                                                // RecordFilenameAltSize = "" (does not exist - the record has the raw filename in it)
-                                                // RecordFilenameExt = "png"
-                                                // RecordFilenameNoExt = "test"
-                                                //
-                                                // RecordVirtualFilename = "jay/files/cclibraryfiles/filename/000005/test-100x200.png"
-                                                // this is a specail case - most cases to not have the alt size format saved in the filename
-                                                // RecordFilename = "test-100x200.png"
-                                                // RecordFilenameAltSize (does not exist - the record has the raw filename in it)
-                                                // RecordFilenameExt = "png"
-                                                // RecordFilenameNoExt = "test-100x200"
-                                                // this is wrong
-                                                //   xRecordFilenameAltSize = "100x200"
-                                                //   xRecordFilenameExt = "png"
-                                                //   xRecordFilenameNoExt = "test"
-                                                //
-                                                //hint = hint & ",080"
-                                                int Pos = RecordVirtualFilename.LastIndexOf("/") + 1;
-                                                string RecordVirtualPath = "";
-                                                string RecordFilename = "";
-                                                if (Pos > 0) {
-                                                    RecordVirtualPath = RecordVirtualFilename.Left(Pos);
-                                                    RecordFilename = RecordVirtualFilename.Substring(Pos);
-                                                }
-                                                Pos = RecordFilename.LastIndexOf(".") + 1;
-                                                string RecordFilenameNoExt = "";
-                                                string RecordFilenameExt = "";
-                                                if (Pos > 0) {
-                                                    RecordFilenameExt = GenericController.vbLCase(RecordFilename.Substring(Pos));
-                                                    RecordFilenameNoExt = GenericController.vbLCase(RecordFilename.Left(Pos - 1));
-                                                }
-                                                string FilePrefixSegment = LinkSplit[LinkPtr - 1];
-                                                if (FilePrefixSegment.Length > 1) {
-                                                    //
-                                                    // Look into FilePrefixSegment and see if we are in the querystring attribute of an <AC tag
-                                                    //   if so, the filename may be AddonEncoded and delimited with & (so skip it)
-                                                    Pos = FilePrefixSegment.LastIndexOf("<") + 1;
-                                                    if (Pos > 0) {
-                                                        if (GenericController.vbLCase(FilePrefixSegment.Substring(Pos, 3)) != "ac ") {
-                                                            //
-                                                            // look back in the FilePrefixSegment to find the character before the link
-                                                            //
-                                                            int EndPos = 0;
-                                                            bool exitFor = false;
-                                                            for (int Ptr = FilePrefixSegment.Length; Ptr >= 1; Ptr--) {
-                                                                if (exitFor) break;
-                                                                string TestChr = FilePrefixSegment.Substring(Ptr - 1, 1);
-                                                                switch (TestChr) {
-                                                                    case "=":
-                                                                        //
-                                                                        // Ends in ' ' or '>', find the first
-                                                                        //
-                                                                        int EndPos1 = GenericController.vbInstr(1, FilenameSegment, " ");
-                                                                        int EndPos2 = GenericController.vbInstr(1, FilenameSegment, ">");
-                                                                        if (EndPos1 != 0 & EndPos2 != 0) {
-                                                                            if (EndPos1 < EndPos2) {
-                                                                                EndPos = EndPos1;
-                                                                            } else {
-                                                                                EndPos = EndPos2;
-                                                                            }
-                                                                        } else if (EndPos1 != 0) {
-                                                                            EndPos = EndPos1;
-                                                                        } else if (EndPos2 != 0) {
-                                                                            EndPos = EndPos2;
-                                                                        } else {
-                                                                            EndPos = 0;
-                                                                        }
-                                                                        exitFor = true;
-                                                                        break;
-                                                                    case "\"":
-                                                                        //
-                                                                        // Quoted, ends is '"'
-                                                                        //
-                                                                        EndPos = GenericController.vbInstr(1, FilenameSegment, "\"");
-                                                                        exitFor = true;
-                                                                        break;
-                                                                    case "(":
-                                                                        //
-                                                                        // url() style, ends in ')' or a ' '
-                                                                        //
-                                                                        if (GenericController.vbLCase(FilePrefixSegment.Substring(Ptr - 1, 7)) == "(&quot;") {
-                                                                            EndPos = GenericController.vbInstr(1, FilenameSegment, "&quot;)");
-                                                                        } else if (GenericController.vbLCase(FilePrefixSegment.Substring(Ptr - 1, 2)) == "('") {
-                                                                            EndPos = GenericController.vbInstr(1, FilenameSegment, "')");
-                                                                        } else if (GenericController.vbLCase(FilePrefixSegment.Substring(Ptr - 1, 2)) == "(\"") {
-                                                                            EndPos = GenericController.vbInstr(1, FilenameSegment, "\")");
-                                                                        } else {
-                                                                            EndPos = GenericController.vbInstr(1, FilenameSegment, ")");
-                                                                        }
-                                                                        exitFor = true;
-                                                                        break;
-                                                                    case "'":
-                                                                        //
-                                                                        // Delimited within a javascript pair of apostophys
-                                                                        //
-                                                                        EndPos = GenericController.vbInstr(1, FilenameSegment, "'");
-                                                                        exitFor = true;
-                                                                        break;
-                                                                    case ">":
-                                                                    case "<":
-                                                                        //
-                                                                        // Skip this link
-                                                                        //
-                                                                        ParseError = true;
-                                                                        exitFor = true;
-                                                                        break;
-                                                                }
-                                                            }
-                                                            //
-                                                            // check link
-                                                            if (EndPos == 0) {
-                                                                ParseError = true;
-                                                                break;
-                                                            } else {
-                                                                string ImageFilename = null;
-                                                                string SegmentAfterImage = null;
-
-                                                                string ImageFilenameNoExt = null;
-                                                                string ImageFilenameExt = null;
-                                                                string ImageAltSize = null;
-
-                                                                //hint = hint & ",120"
-                                                                SegmentAfterImage = FilenameSegment.Substring(EndPos - 1);
-                                                                ImageFilename = GenericController.decodeResponseVariable(FilenameSegment.Left(EndPos - 1));
-                                                                ImageFilenameNoExt = ImageFilename;
-                                                                ImageFilenameExt = "";
-                                                                Pos = ImageFilename.LastIndexOf(".") + 1;
-                                                                if (Pos > 0) {
-                                                                    ImageFilenameNoExt = GenericController.vbLCase(ImageFilename.Left(Pos - 1));
-                                                                    ImageFilenameExt = GenericController.vbLCase(ImageFilename.Substring(Pos));
-                                                                }
-                                                                //
-                                                                // Get ImageAltSize
-                                                                //
-                                                                //hint = hint & ",130"
-                                                                ImageAltSize = "";
-                                                                if (ImageFilenameNoExt == RecordFilenameNoExt) {
-                                                                    //
-                                                                    // Exact match
-                                                                    //
-                                                                } else if (GenericController.vbInstr(1, ImageFilenameNoExt, RecordFilenameNoExt, 1) != 1) {
-                                                                    //
-                                                                    // There was a change and the recordfilename is not part of the imagefilename
-                                                                    //
-                                                                } else {
-                                                                    //
-                                                                    // the recordfilename is the first part of the imagefilename - Get ImageAltSize
-                                                                    //
-                                                                    ImageAltSize = ImageFilenameNoExt.Substring(RecordFilenameNoExt.Length);
-                                                                    if (ImageAltSize.Left(1) != "-") {
-                                                                        ImageAltSize = "";
-                                                                    } else {
-                                                                        ImageAltSize = ImageAltSize.Substring(1);
-                                                                        string[] SizeTest = ImageAltSize.Split('x');
-                                                                        if (SizeTest.GetUpperBound(0) != 1) {
-                                                                            ImageAltSize = "";
-                                                                        } else {
-                                                                            if (SizeTest[0].IsNumeric() & SizeTest[1].IsNumeric()) {
-                                                                                ImageFilenameNoExt = RecordFilenameNoExt;
-                                                                                //ImageFilenameNoExt = Mid(ImageFilenameNoExt, 1, Pos - 1)
-                                                                                //RecordFilenameNoExt = Mid(RecordFilename, 1, Pos - 1)
-                                                                            } else {
-                                                                                ImageAltSize = "";
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
+                        // break pathfilename off the quote to the end
+                        int posQuote = htmlContentSegment.IndexOf("\"");
+                        if (posQuote == -1) { continue; }
+                        string htmlContentSegment_file = htmlContentSegment.Substring(0, posQuote);
+                        string[] libraryFileSplit = htmlContentSegment_file.Split('/');
+                        if (libraryFileSplit.GetUpperBound(0) > 2) {
+                            int libraryRecordID = encodeInteger(libraryFileSplit[2]);
+                            if ((libraryFileSplit[0].ToLower() == "cclibraryfiles") && (libraryFileSplit[1].ToLower() == "filename") && (libraryRecordID != 0)) {
+                                LibraryFilesModel file = LibraryFilesModel.create(core, libraryRecordID);
+                                if ((file != null) && (htmlContentSegment_file != file.filename)) { htmlContentSegment_file = file.filename; }
                             }
                         }
-                        if (ParseError) {
-                            break;
-                        }
+                        htmlContentSegment = htmlContentSegment_file + htmlContentSegment.Substring(posQuote);
                     }
-                    //hint = hint & ",910"
-                    if (SaveChanges && (!ParseError)) {
-                        result = string.Join(ContentFilesLinkPrefix, LinkSplit);
-                    }
+                    htmlContentUpdated += core.appConfig.cdnFileUrl + htmlContentSegment;
                 }
-                //hint = hint & ",920"
-                if (!ParseError) {
-                    ////
-                    //// Convert ACTypeDynamicForm to Add-on
-                    ////
-                    //if (genericController.vbInstr(1, result, "<ac type=\"" + ACTypeDynamicForm, 1) != 0) {
-                    //    result = genericController.vbReplace(result, "type=\"DYNAMICFORM\"", "TYPE=\"aggregatefunction\"", 1, 99, 1);
-                    //    result = genericController.vbReplace(result, "name=\"DYNAMICFORM\"", "name=\"DYNAMIC FORM\"", 1, 99, 1);
-                    //}
-                }
-                //hint = hint & ",930"
-                if (ParseError) {
-                    result = ""
-                    + "\r\n<!-- warning: parsing aborted on ccLibraryFile replacement -->"
-                    + "\r\n" + result + "\r\n<!-- /warning: parsing aborted on ccLibraryFile replacement -->";
-                }
-                // 20180914 - deprecate -- content box is an addon run with either an image-icon, or json string
-                //
-                // {{content}} should be <ac type="templatecontent" etc>
-                // the merge is now handled in csv_EncodeActiveContent, but some sites have hand {{content}} tags entered
-                //
-                //hint = hint & ",940"
-                //if (genericController.vbInstr(1, result, "{{content}}", 1) != 0) {
-                //    result = genericController.vbReplace(result, "{{content}}", "<AC type=\"" + ACTypeTemplateContent + "\">", 1, 99, 1);
-                //}
+                return htmlContentUpdated;
             } catch (Exception ex) {
-                LogController.handleError( core,ex);
+                LogController.handleError(core, ex);
+                return htmlContent;
             }
-            return result;
         }
         //
         //====================================================================================================

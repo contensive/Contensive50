@@ -284,6 +284,16 @@ namespace Contensive.Processor.Controllers {
             }
         }
         private string _emailAdmin = null;
+        //====================================================================================================
+        //
+        public bool imageAllowUpdate {
+            get {
+                return booleanPropertyBase("ImageAllowUpdate", true, ref _imageAllowUpdate);
+            }
+        }
+        private bool? _imageAllowUpdate = null;
+        //
+        //
         //
         //========================================================================
         /// <summary>
