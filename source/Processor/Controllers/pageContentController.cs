@@ -1661,7 +1661,6 @@ namespace Contensive.Processor.Controllers {
         public static string getContentBox(CoreController core, string OrderByClause, bool AllowChildPageList, bool AllowReturnLink, bool ArchivePages, int ignoreme, bool UseContentWatchLink, bool allowPageWithoutSectionDisplay) {
             string returnHtml = "";
             try {
-                core.html.addHeadTag("<meta name=\"contentId\" content=\"" + core.doc.pageController.page.id + "\" >", "page content");
                 returnHtml = getContentBox_content(core, OrderByClause, AllowChildPageList, AllowReturnLink, ArchivePages, ignoreme, UseContentWatchLink, allowPageWithoutSectionDisplay);
                 //
                 // ----- If Link field populated, do redirect

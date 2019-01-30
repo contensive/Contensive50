@@ -97,7 +97,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 Assert.AreEqual(0, cp.core.doc.htmlMetaContent_OtherTags.Count);
                 Assert.AreEqual(0, cp.core.doc.htmlMetaContent_TitleList.Count);
                 //
-                localPropertyToFoolCodacyStaticMethodRequirement = 1;
+                localPropertyToFoolCodacyStaticMethodRequirement = true;
             }
         }
     }
