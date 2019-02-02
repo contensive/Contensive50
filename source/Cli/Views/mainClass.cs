@@ -177,9 +177,15 @@ namespace Contensive.CLI {
                                 case "--newapp":
                                 case "-n":
                                     //
+                                    // set application name
+                                    if (argPtr < (args.Length + 1)) {
+                                        argPtr++;
+                                        appName = args[argPtr];
+                                    }
+                                    //
                                     // -- start the new app wizard
                                     CreateAppClass createApp = new CreateAppClass();
-                                    createApp.createApp();
+                                    createApp.createApp(appName);
                                     exitArgumentProcessing = true;
                                     break;
                                 case "--configure":

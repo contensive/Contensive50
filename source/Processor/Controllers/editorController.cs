@@ -1,6 +1,7 @@
 ﻿
 using Contensive.BaseClasses;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using static Contensive.Processor.Constants;
 
@@ -117,14 +118,12 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static string getFieldTypeDefaultEditorAddonIdList(CoreController core) {
-            string result = "";
+        public static Dictionary<int, int> getFieldTypeDefaultEditorAddonIdDictionary(CoreController core) {
+            var result = new Dictionary<int, int>();
             try {
                 //
                 // load default editors into editors() - these are the editors used when there is no editorPreference
                 //   editors(fieldtypeid) = addonid
-                int fieldTypeIdMax = Enum.GetNames(typeof(CPContentBaseClass)).Length;
-                string[] editorAddonIds = new string[fieldTypeIdMax];
                 string SQL = ""
                     + " select"
                     + " t.id as contentfieldtypeid"
@@ -135,8 +134,8 @@ namespace Contensive.Processor.Controllers {
                 DataTable RS = core.db.executeQuery(SQL);
                 foreach (DataRow dr in RS.Rows) {
                     int fieldTypeID = GenericController.encodeInteger(dr["contentfieldtypeid"]);
-                    if (fieldTypeID <= fieldTypeIdMax) {
-                        editorAddonIds[fieldTypeID] = GenericController.encodeText(dr["editorAddonId"]);
+                    if ( !result.ContainsKey(fieldTypeID)) {
+                        result.Add(fieldTypeID, GenericController.encodeInteger(dr["editorAddonId"]));
                     }
                 }
                 //
@@ -145,18 +144,15 @@ namespace Contensive.Processor.Controllers {
                 RS = core.db.executeQuery(SQL);
                 foreach (DataRow dr in RS.Rows) {
                     int fieldTypeID = GenericController.encodeInteger(dr["contentfieldtypeid"]);
-                    if (fieldTypeID <= fieldTypeIdMax) {
-                        if (string.IsNullOrEmpty(editorAddonIds[fieldTypeID])) {
-                            editorAddonIds[fieldTypeID] = GenericController.encodeText(dr["editorAddonId"]);
-                        }
-
+                    if (!result.ContainsKey(fieldTypeID)) {
+                        result.Add(fieldTypeID, GenericController.encodeInteger(dr["editorAddonId"]));
                     }
                 }
-                result = string.Join(",", editorAddonIds);
+                return result;
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
+                return null;
             }
-            return result;
         }
         //
         //====================================================================================================

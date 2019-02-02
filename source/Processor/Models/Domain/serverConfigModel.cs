@@ -102,12 +102,10 @@ namespace Contensive.Processor.Models.Domain {
         public static ServerConfigModel getObject(CoreController core) {
             ServerConfigModel returnModel = null;
             try {
-                System.Web.Script.Serialization.JavaScriptSerializer json_serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
-                string JSONTemp;
                 //
                 // ----- read/create serverConfig
-                //
-                JSONTemp = core.programDataFiles.readFileText("config.json");
+                var json_serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+                string JSONTemp = core.programDataFiles.readFileText("config.json");
                 if (string.IsNullOrEmpty(JSONTemp)) {
                     //
                     // for now it fails, maybe later let it autobuild a local cluster

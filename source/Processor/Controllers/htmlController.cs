@@ -1832,8 +1832,7 @@ namespace Contensive.Processor.Controllers {
         public string getFormInputHTML(string htmlName, string DefaultValue = "", string styleHeight = "", string styleWidth = "", bool readOnlyfield = false, bool allowActiveContent = false, string addonListJSON = "", string styleList = "", string styleOptionList = "", bool allowResourceLibrary = false) {
             string returnHtml = "";
             try {
-                string FieldTypeDefaultEditorAddonIdList = EditorController.getFieldTypeDefaultEditorAddonIdList(core);
-                string[] FieldTypeDefaultEditorAddonIds = FieldTypeDefaultEditorAddonIdList.Split(',');
+                var FieldTypeDefaultEditorAddonIds = EditorController.getFieldTypeDefaultEditorAddonIdDictionary(core);
                 int FieldTypeDefaultEditorAddonId = GenericController.encodeInteger(FieldTypeDefaultEditorAddonIds[(int)CPContentBaseClass.fileTypeIdEnum.HTML]);
                 if (FieldTypeDefaultEditorAddonId == 0) {
                     //

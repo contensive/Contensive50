@@ -87,7 +87,7 @@ namespace Contensive.Processor.Controllers {
                 string iContentName = ContentName;
                 int ContentID = 0;
                 //DataTable dt = null;
-                string SQL = null;
+                string sqlFieldMeta = null;
                 if (!string.IsNullOrEmpty(iContentName)) {
                     using (var dt = core.db.executeQuery("select id from cccontent where name=" + DbController.encodeSQLText(iContentName))) {
                         if (dt.Rows.Count > 0) {
@@ -143,57 +143,56 @@ namespace Contensive.Processor.Controllers {
                     // select all the fields
                     //
                     if (ContentID != 0) {
-                        SQL = "select " + FieldSelectList + ""
+                        sqlFieldMeta = "select " + FieldSelectList + ""
                             + " from ccfields f left join ccfieldhelp h on h.fieldid=f.id"
                             + " where (f.Type<>0)and(f.contentid=" + ContentID + ")"
                             + "";
                     } else {
-                        SQL = "select " + FieldSelectList + ""
+                        sqlFieldMeta = "select " + FieldSelectList + ""
                             + " from ccfields f left join ccfieldhelp h on h.fieldid=f.id"
                             + " where (f.Type<>0)"
                             + "";
                     }
-                    if (!IncludeBaseFields) { SQL += " and ((f.IsBaseField is null)or(f.IsBaseField=0))"; }
-                    string[,] CFields = { };
+                    if (!IncludeBaseFields) { sqlFieldMeta += " and ((f.IsBaseField is null)or(f.IsBaseField=0))"; }
+                    string[,] fieldMeta = { };
                     int CFieldCnt = 0;
-                    SQL += " order by f.contentid,f.id,h.id desc";
-                    using (var dt = core.db.executeQuery(SQL)) {
-                        CFields = core.db.convertDataTabletoArray(dt);
-                        CFieldCnt = CFields.GetUpperBound(1) + 1;
+                    sqlFieldMeta += " order by f.contentid,f.id,h.id desc";
+                    using (var dt = core.db.executeQuery(sqlFieldMeta)) {
+                        fieldMeta = core.db.convertDataTabletoArray(dt);
+                        CFieldCnt = fieldMeta.GetUpperBound(1) + 1;
                     }
                     //
-                    // select the content
+                    // select the table Metadata
                     System.Text.StringBuilder sb = new System.Text.StringBuilder();
                     bool FoundMenuTable = false;
-                    using (var dt = core.db.executeQuery(SQL)) {
-                        //
-                        // create output
-                        if (ContentID != 0) {
-                            SQL = "select " + ContentSelectList + " from ccContent where (id=" + ContentID + ")and(contenttableid is not null)and(contentcontrolid is not null) order by id";
-                        } else {
-                            SQL = "select " + ContentSelectList + " from ccContent where (name<>'')and(name is not null)and(contenttableid is not null)and(contentcontrolid is not null) order by id";
-                        }
+                    string sqlTableMeta;
+                    if (ContentID != 0) {
+                        sqlTableMeta = "select " + ContentSelectList + " from ccContent where (id=" + ContentID + ")and(contenttableid is not null)and(contentcontrolid is not null) order by id";
+                    } else {
+                        sqlTableMeta = "select " + ContentSelectList + " from ccContent where (name<>'')and(name is not null)and(contenttableid is not null)and(contentcontrolid is not null) order by id";
+                    }
+                    using (var dataTableMeta = core.db.executeQuery(sqlTableMeta)) {
                         int CFieldPtr = 0;
-                        foreach (DataRow dr in dt.Rows) {
+                        foreach (DataRow rowTableMeta in dataTableMeta.Rows) {
                             //
                             // ----- <cdef>
                             //
-                            iContentName = encodeXmlAttributeFieldValue(appName, dr, "Name");
-                            ContentID = GenericController.encodeInteger(dr["ID"]);
+                            iContentName = encodeXmlAttributeFieldValue(appName, rowTableMeta, "Name");
+                            ContentID = GenericController.encodeInteger(rowTableMeta["ID"]);
                             sb.Append("\r\n\t<CDef");
                             sb.Append(" Name=\"" + iContentName + "\"");
-                            if ((!encodeBoolean(dr["isBaseContent"])) || IncludeBaseFields) {
-                                sb.Append(" Active=\"" + encodeXmlAttributeFieldValue(appName, dr, "Active") + "\"");
-                                sb.Append(" AdminOnly=\"" + encodeXmlAttributeFieldValue(appName, dr, "AdminOnly") + "\"");
-                                sb.Append(" AllowAdd=\"" + encodeXmlAttributeFieldValue(appName, dr, "AllowAdd") + "\"");
-                                sb.Append(" AllowCalendarEvents=\"" + encodeXmlAttributeFieldValue(appName, dr, "AllowCalendarEvents") + "\"");
-                                sb.Append(" AllowContentChildTool=\"" + encodeXmlAttributeFieldValue(appName, dr, "AllowContentChildTool") + "\"");
-                                sb.Append(" AllowContentTracking=\"" + encodeXmlAttributeFieldValue(appName, dr, "AllowContentTracking") + "\"");
-                                sb.Append(" AllowDelete=\"" + encodeXmlAttributeFieldValue(appName, dr, "AllowDelete") + "\"");
-                                sb.Append(" AllowTopicRules=\"" + encodeXmlAttributeFieldValue(appName, dr, "AllowTopicRules") + "\"");
-                                sb.Append(" AllowWorkflowAuthoring=\"" + encodeXmlAttributeFieldValue(appName, dr, "AllowWorkflowAuthoring") + "\"");
+                            if ((!encodeBoolean(rowTableMeta["isBaseContent"])) || IncludeBaseFields) {
+                                sb.Append(" Active=\"" + encodeXmlAttributeFieldValue(appName, rowTableMeta, "Active") + "\"");
+                                sb.Append(" AdminOnly=\"" + encodeXmlAttributeFieldValue(appName, rowTableMeta, "AdminOnly") + "\"");
+                                sb.Append(" AllowAdd=\"" + encodeXmlAttributeFieldValue(appName, rowTableMeta, "AllowAdd") + "\"");
+                                sb.Append(" AllowCalendarEvents=\"" + encodeXmlAttributeFieldValue(appName, rowTableMeta, "AllowCalendarEvents") + "\"");
+                                sb.Append(" AllowContentChildTool=\"" + encodeXmlAttributeFieldValue(appName, rowTableMeta, "AllowContentChildTool") + "\"");
+                                sb.Append(" AllowContentTracking=\"" + encodeXmlAttributeFieldValue(appName, rowTableMeta, "AllowContentTracking") + "\"");
+                                sb.Append(" AllowDelete=\"" + encodeXmlAttributeFieldValue(appName, rowTableMeta, "AllowDelete") + "\"");
+                                sb.Append(" AllowTopicRules=\"" + encodeXmlAttributeFieldValue(appName, rowTableMeta, "AllowTopicRules") + "\"");
+                                sb.Append(" AllowWorkflowAuthoring=\"" + encodeXmlAttributeFieldValue(appName, rowTableMeta, "AllowWorkflowAuthoring") + "\"");
                                 //
-                                int AuthoringTableID = GenericController.encodeInteger(dr["AuthoringTableID"]);
+                                int AuthoringTableID = GenericController.encodeInteger(rowTableMeta["AuthoringTableID"]);
                                 string TableName = "";
                                 string DataSourceName = "";
                                 int Ptr = 0;
@@ -215,7 +214,7 @@ namespace Contensive.Processor.Controllers {
                                 sb.Append(" AuthoringDataSourceName=\"" + encodeXMLattribute(DataSourceName) + "\"");
                                 sb.Append(" AuthoringTableName=\"" + encodeXMLattribute(TableName) + "\"");
                                 //
-                                int ContentTableID = GenericController.encodeInteger(dr["ContentTableID"]);
+                                int ContentTableID = GenericController.encodeInteger(rowTableMeta["ContentTableID"]);
                                 if (ContentTableID != AuthoringTableID) {
                                     if (ContentTableID != 0) {
                                         TableName = "";
@@ -235,28 +234,28 @@ namespace Contensive.Processor.Controllers {
                                 sb.Append(" ContentDataSourceName=\"" + encodeXMLattribute(DataSourceName) + "\"");
                                 sb.Append(" ContentTableName=\"" + encodeXMLattribute(TableName) + "\"");
                                 //
-                                int DefaultSortMethodID = GenericController.encodeInteger(dr["DefaultSortMethodID"]);
+                                int DefaultSortMethodID = GenericController.encodeInteger(rowTableMeta["DefaultSortMethodID"]);
                                 string DefaultSortMethod = cacheLookup(DefaultSortMethodID, Sorts);
                                 sb.Append(" DefaultSortMethod=\"" + encodeXMLattribute(DefaultSortMethod) + "\"");
                                 //
-                                sb.Append(" DeveloperOnly=\"" + encodeXmlAttributeFieldValue(appName, dr, "DeveloperOnly") + "\"");
-                                sb.Append(" DropDownFieldList=\"" + encodeXmlAttributeFieldValue(appName, dr, "DropDownFieldList") + "\"");
+                                sb.Append(" DeveloperOnly=\"" + encodeXmlAttributeFieldValue(appName, rowTableMeta, "DeveloperOnly") + "\"");
+                                sb.Append(" DropDownFieldList=\"" + encodeXmlAttributeFieldValue(appName, rowTableMeta, "DropDownFieldList") + "\"");
                                 //
-                                int EditorGroupID = GenericController.encodeInteger(dr["EditorGroupID"]);
+                                int EditorGroupID = GenericController.encodeInteger(rowTableMeta["EditorGroupID"]);
                                 string EditorGroupName = cacheLookup(EditorGroupID, Groups);
                                 sb.Append(" EditorGroupName=\"" + encodeXMLattribute(EditorGroupName) + "\"");
                                 //
-                                int ParentID = GenericController.encodeInteger(dr["ParentID"]);
+                                int ParentID = GenericController.encodeInteger(rowTableMeta["ParentID"]);
                                 string ParentName = cacheLookup(ParentID, Contents);
                                 sb.Append(" Parent=\"" + encodeXMLattribute(ParentName) + "\"");
                                 //
-                                sb.Append(" IconLink=\"" + encodeXmlAttributeFieldValue(appName, dr, "IconLink") + "\"");
-                                sb.Append(" IconHeight=\"" + encodeXmlAttributeFieldValue(appName, dr, "IconHeight") + "\"");
-                                sb.Append(" IconWidth=\"" + encodeXmlAttributeFieldValue(appName, dr, "IconWidth") + "\"");
-                                sb.Append(" IconSprites=\"" + encodeXmlAttributeFieldValue(appName, dr, "IconSprites") + "\"");
-                                sb.Append(" isbasecontent=\"" + encodeXmlAttributeFieldValue(appName, dr, "IsBaseContent") + "\"");
+                                sb.Append(" IconLink=\"" + encodeXmlAttributeFieldValue(appName, rowTableMeta, "IconLink") + "\"");
+                                sb.Append(" IconHeight=\"" + encodeXmlAttributeFieldValue(appName, rowTableMeta, "IconHeight") + "\"");
+                                sb.Append(" IconWidth=\"" + encodeXmlAttributeFieldValue(appName, rowTableMeta, "IconWidth") + "\"");
+                                sb.Append(" IconSprites=\"" + encodeXmlAttributeFieldValue(appName, rowTableMeta, "IconSprites") + "\"");
+                                sb.Append(" isbasecontent=\"" + encodeXmlAttributeFieldValue(appName, rowTableMeta, "IsBaseContent") + "\"");
                             }
-                            sb.Append(" guid=\"" + encodeXmlAttributeFieldValue(appName, dr, "ccGuid") + "\"");
+                            sb.Append(" guid=\"" + encodeXmlAttributeFieldValue(appName, rowTableMeta, "ccGuid") + "\"");
                             sb.Append(" >");
                             //
                             // ----- <field>
@@ -265,79 +264,79 @@ namespace Contensive.Processor.Controllers {
                             int fieldId = 0;
                             while (CFieldPtr < CFieldCnt) {
                                 int LastFieldID = fieldId;
-                                fieldId = GenericController.encodeInteger(CFields[f_ID, CFieldPtr]);
-                                string FieldName = GenericController.encodeText(CFields[f_Name, CFieldPtr]);
-                                int FieldContentID = GenericController.encodeInteger(CFields[f_contentid, CFieldPtr]);
+                                fieldId = GenericController.encodeInteger(fieldMeta[f_ID, CFieldPtr]);
+                                string FieldName = GenericController.encodeText(fieldMeta[f_Name, CFieldPtr]);
+                                int FieldContentID = GenericController.encodeInteger(fieldMeta[f_contentid, CFieldPtr]);
                                 if (FieldContentID > ContentID) {
                                     break;
                                 } else if ((FieldContentID == ContentID) && (fieldId != LastFieldID)) {
                                     if (IncludeBaseFields || (",id,dateadded,createdby,modifiedby,ContentControlID,CreateKey,ModifiedDate,ccguid,".IndexOf("," + FieldName + ",", System.StringComparison.OrdinalIgnoreCase) == -1)) {
                                         sb.Append("\r\n\t\t<Field");
-                                        string fieldType = MetaController.getFieldTypeNameFromFieldTypeId(core, (CPContentBaseClass.fileTypeIdEnum)encodeInteger(CFields[f_Type, CFieldPtr]));
+                                        string fieldType = MetaController.getFieldTypeNameFromFieldTypeId(core, (CPContentBaseClass.fileTypeIdEnum)encodeInteger(fieldMeta[f_Type, CFieldPtr]));
                                         sb.Append(" Name=\"" + xmlValueText(FieldName) + "\"");
-                                        sb.Append(" active=\"" + xmlValueBoolean(CFields[f_Active, CFieldPtr]) + "\"");
-                                        sb.Append(" AdminOnly=\"" + xmlValueBoolean(CFields[f_AdminOnly, CFieldPtr]) + "\"");
-                                        sb.Append(" Authorable=\"" + xmlValueBoolean(CFields[f_Authorable, CFieldPtr]) + "\"");
-                                        sb.Append(" Caption=\"" + xmlValueText(CFields[f_Caption, CFieldPtr]) + "\"");
-                                        sb.Append(" DeveloperOnly=\"" + xmlValueBoolean(CFields[f_DeveloperOnly, CFieldPtr]) + "\"");
-                                        sb.Append(" EditSortPriority=\"" + xmlValueText(CFields[f_EditSortPriority, CFieldPtr]) + "\"");
+                                        sb.Append(" active=\"" + xmlValueBoolean(fieldMeta[f_Active, CFieldPtr]) + "\"");
+                                        sb.Append(" AdminOnly=\"" + xmlValueBoolean(fieldMeta[f_AdminOnly, CFieldPtr]) + "\"");
+                                        sb.Append(" Authorable=\"" + xmlValueBoolean(fieldMeta[f_Authorable, CFieldPtr]) + "\"");
+                                        sb.Append(" Caption=\"" + xmlValueText(fieldMeta[f_Caption, CFieldPtr]) + "\"");
+                                        sb.Append(" DeveloperOnly=\"" + xmlValueBoolean(fieldMeta[f_DeveloperOnly, CFieldPtr]) + "\"");
+                                        sb.Append(" EditSortPriority=\"" + xmlValueText(fieldMeta[f_EditSortPriority, CFieldPtr]) + "\"");
                                         sb.Append(" FieldType=\"" + fieldType + "\"");
-                                        sb.Append(" HTMLContent=\"" + xmlValueBoolean(CFields[f_HTMLContent, CFieldPtr]) + "\"");
-                                        sb.Append(" IndexColumn=\"" + xmlValueText(CFields[f_IndexColumn, CFieldPtr]) + "\"");
-                                        sb.Append(" IndexSortDirection=\"" + xmlValueText(CFields[f_IndexSortDirection, CFieldPtr]) + "\"");
-                                        sb.Append(" IndexSortOrder=\"" + xmlValueText(CFields[f_IndexSortPriority, CFieldPtr]) + "\"");
-                                        sb.Append(" IndexWidth=\"" + xmlValueText(CFields[f_IndexWidth, CFieldPtr]) + "\"");
-                                        sb.Append(" RedirectID=\"" + xmlValueText(CFields[f_RedirectID, CFieldPtr]) + "\"");
-                                        sb.Append(" RedirectPath=\"" + xmlValueText(CFields[f_RedirectPath, CFieldPtr]) + "\"");
-                                        sb.Append(" Required=\"" + xmlValueBoolean(CFields[f_Required, CFieldPtr]) + "\"");
-                                        sb.Append(" TextBuffered=\"" + xmlValueBoolean(CFields[f_TextBuffered, CFieldPtr]) + "\"");
-                                        sb.Append(" UniqueName=\"" + xmlValueBoolean(CFields[f_UniqueName, CFieldPtr]) + "\"");
-                                        sb.Append(" DefaultValue=\"" + xmlValueText(CFields[f_DefaultValue, CFieldPtr]) + "\"");
-                                        sb.Append(" RSSTitle=\"" + xmlValueBoolean(CFields[f_RSSTitleField, CFieldPtr]) + "\"");
-                                        sb.Append(" RSSDescription=\"" + xmlValueBoolean(CFields[f_RSSDescriptionField, CFieldPtr]) + "\"");
-                                        sb.Append(" EditTab=\"" + xmlValueText(CFields[f_EditTab, CFieldPtr]) + "\"");
-                                        sb.Append(" Scramble=\"" + xmlValueBoolean(CFields[f_Scramble, CFieldPtr]) + "\"");
-                                        sb.Append(" LookupList=\"" + xmlValueText(CFields[f_LookupList, CFieldPtr]) + "\"");
-                                        sb.Append(" NotEditable=\"" + xmlValueBoolean(CFields[f_NotEditable, CFieldPtr]) + "\"");
-                                        sb.Append(" Password=\"" + xmlValueBoolean(CFields[f_Password, CFieldPtr]) + "\"");
-                                        sb.Append(" ReadOnly=\"" + xmlValueBoolean(CFields[f_ReadOnly, CFieldPtr]) + "\"");
-                                        sb.Append(" ManyToManyRulePrimaryField=\"" + xmlValueText(CFields[f_ManyToManyRulePrimaryField, CFieldPtr]) + "\"");
-                                        sb.Append(" ManyToManyRuleSecondaryField=\"" + xmlValueText(CFields[f_ManyToManyRuleSecondaryField, CFieldPtr]) + "\"");
-                                        sb.Append(" IsModified=\"" + (encodeInteger(CFields[f_ModifiedBy, CFieldPtr]) != 0) + "\"");
+                                        sb.Append(" HTMLContent=\"" + xmlValueBoolean(fieldMeta[f_HTMLContent, CFieldPtr]) + "\"");
+                                        sb.Append(" IndexColumn=\"" + xmlValueText(fieldMeta[f_IndexColumn, CFieldPtr]) + "\"");
+                                        sb.Append(" IndexSortDirection=\"" + xmlValueText(fieldMeta[f_IndexSortDirection, CFieldPtr]) + "\"");
+                                        sb.Append(" IndexSortOrder=\"" + xmlValueText(fieldMeta[f_IndexSortPriority, CFieldPtr]) + "\"");
+                                        sb.Append(" IndexWidth=\"" + xmlValueText(fieldMeta[f_IndexWidth, CFieldPtr]) + "\"");
+                                        sb.Append(" RedirectID=\"" + xmlValueText(fieldMeta[f_RedirectID, CFieldPtr]) + "\"");
+                                        sb.Append(" RedirectPath=\"" + xmlValueText(fieldMeta[f_RedirectPath, CFieldPtr]) + "\"");
+                                        sb.Append(" Required=\"" + xmlValueBoolean(fieldMeta[f_Required, CFieldPtr]) + "\"");
+                                        sb.Append(" TextBuffered=\"" + xmlValueBoolean(fieldMeta[f_TextBuffered, CFieldPtr]) + "\"");
+                                        sb.Append(" UniqueName=\"" + xmlValueBoolean(fieldMeta[f_UniqueName, CFieldPtr]) + "\"");
+                                        sb.Append(" DefaultValue=\"" + xmlValueText(fieldMeta[f_DefaultValue, CFieldPtr]) + "\"");
+                                        sb.Append(" RSSTitle=\"" + xmlValueBoolean(fieldMeta[f_RSSTitleField, CFieldPtr]) + "\"");
+                                        sb.Append(" RSSDescription=\"" + xmlValueBoolean(fieldMeta[f_RSSDescriptionField, CFieldPtr]) + "\"");
+                                        sb.Append(" EditTab=\"" + xmlValueText(fieldMeta[f_EditTab, CFieldPtr]) + "\"");
+                                        sb.Append(" Scramble=\"" + xmlValueBoolean(fieldMeta[f_Scramble, CFieldPtr]) + "\"");
+                                        sb.Append(" LookupList=\"" + xmlValueText(fieldMeta[f_LookupList, CFieldPtr]) + "\"");
+                                        sb.Append(" NotEditable=\"" + xmlValueBoolean(fieldMeta[f_NotEditable, CFieldPtr]) + "\"");
+                                        sb.Append(" Password=\"" + xmlValueBoolean(fieldMeta[f_Password, CFieldPtr]) + "\"");
+                                        sb.Append(" ReadOnly=\"" + xmlValueBoolean(fieldMeta[f_ReadOnly, CFieldPtr]) + "\"");
+                                        sb.Append(" ManyToManyRulePrimaryField=\"" + xmlValueText(fieldMeta[f_ManyToManyRulePrimaryField, CFieldPtr]) + "\"");
+                                        sb.Append(" ManyToManyRuleSecondaryField=\"" + xmlValueText(fieldMeta[f_ManyToManyRuleSecondaryField, CFieldPtr]) + "\"");
+                                        sb.Append(" IsModified=\"" + (encodeInteger(fieldMeta[f_ModifiedBy, CFieldPtr]) != 0) + "\"");
                                         if (true) {
-                                            sb.Append(" IsBaseField=\"" + xmlValueBoolean(CFields[f_IsBaseField, CFieldPtr]) + "\"");
+                                            sb.Append(" IsBaseField=\"" + xmlValueBoolean(fieldMeta[f_IsBaseField, CFieldPtr]) + "\"");
                                         }
                                         //
-                                        int RecordID = GenericController.encodeInteger(CFields[f_LookupContentID, CFieldPtr]);
+                                        int RecordID = GenericController.encodeInteger(fieldMeta[f_LookupContentID, CFieldPtr]);
                                         string RecordName = cacheLookup(RecordID, Contents);
                                         sb.Append(" LookupContent=\"" + HtmlController.encodeHtml(RecordName) + "\"");
                                         //
-                                        RecordID = GenericController.encodeInteger(CFields[f_RedirectContentID, CFieldPtr]);
+                                        RecordID = GenericController.encodeInteger(fieldMeta[f_RedirectContentID, CFieldPtr]);
                                         RecordName = cacheLookup(RecordID, Contents);
                                         sb.Append(" RedirectContent=\"" + HtmlController.encodeHtml(RecordName) + "\"");
                                         //
-                                        RecordID = GenericController.encodeInteger(CFields[f_ManyToManyContentID, CFieldPtr]);
+                                        RecordID = GenericController.encodeInteger(fieldMeta[f_ManyToManyContentID, CFieldPtr]);
                                         RecordName = cacheLookup(RecordID, Contents);
                                         sb.Append(" ManyToManyContent=\"" + HtmlController.encodeHtml(RecordName) + "\"");
                                         //
-                                        RecordID = GenericController.encodeInteger(CFields[f_ManyToManyRuleContentID, CFieldPtr]);
+                                        RecordID = GenericController.encodeInteger(fieldMeta[f_ManyToManyRuleContentID, CFieldPtr]);
                                         RecordName = cacheLookup(RecordID, Contents);
                                         sb.Append(" ManyToManyRuleContent=\"" + HtmlController.encodeHtml(RecordName) + "\"");
                                         //
-                                        RecordID = GenericController.encodeInteger(CFields[f_MemberSelectGroupId, CFieldPtr]);
+                                        RecordID = GenericController.encodeInteger(fieldMeta[f_MemberSelectGroupId, CFieldPtr]);
                                         RecordName = "";
                                         if (RecordID > 0) {
                                             RecordName = MetaController.getRecordName(core, "groups", RecordID);
                                         }
-                                        sb.Append(" MemberSelectGroup=\"" + xmlValueText(CFields[f_MemberSelectGroupId, CFieldPtr]) + "\"");
+                                        sb.Append(" MemberSelectGroup=\"" + xmlValueText(fieldMeta[f_MemberSelectGroupId, CFieldPtr]) + "\"");
 
 
                                         sb.Append(" >");
                                         //
                                         int HelpCnt = 0;
-                                        string HelpDefault = xmlValueText(CFields[f_helpcustom, CFieldPtr]);
+                                        string HelpDefault = xmlValueText(fieldMeta[f_helpcustom, CFieldPtr]);
                                         if (string.IsNullOrEmpty(HelpDefault)) {
-                                            HelpDefault = xmlValueText(CFields[f_helpdefault, CFieldPtr]);
+                                            HelpDefault = xmlValueText(fieldMeta[f_helpdefault, CFieldPtr]);
                                         }
                                         if (!string.IsNullOrEmpty(HelpDefault)) {
                                             sb.Append("\r\n\t\t\t<HelpDefault>" + HelpDefault + "</HelpDefault>");

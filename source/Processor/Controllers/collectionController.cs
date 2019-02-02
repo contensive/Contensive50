@@ -1176,7 +1176,7 @@ namespace Contensive.Processor.Controllers {
                                                     if (!isBaseCollection || includeBaseMetaDataInstall) {
                                                         string metaDataMiniCollection = "";
                                                         foreach (XmlNode metaDataSection in Doc.DocumentElement.ChildNodes) {
-                                                            switch (GenericController.vbLCase(metaDataSection.Name)) {
+                                                            switch (metaDataSection.Name.ToLower()) {
                                                                 case "contensivecdef":
                                                                     //
                                                                     // old metadata section -- take the inner

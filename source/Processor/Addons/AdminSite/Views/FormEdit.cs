@@ -158,8 +158,7 @@ namespace Contensive.Addons.AdminSite {
                 //   if nothing in field types, Contensive handles it internally
                 //
                 Stream.Add("\r<input type=\"hidden\" name=\"fieldEditorPreference\" id=\"fieldEditorPreference\" value=\"\">");
-                string fieldEditorList = EditorController.getFieldTypeDefaultEditorAddonIdList(core);
-                string[] fieldTypeDefaultEditors = fieldEditorList.Split(',');
+                var fieldTypeDefaultEditors = EditorController.getFieldTypeDefaultEditorAddonIdDictionary(core);
                 //
                 // load user's editor preferences to fieldEditorPreferences() - this is the editor this user has picked when there are >1
                 //   fieldId:addonId,fieldId:addonId,etc
@@ -610,7 +609,7 @@ namespace Contensive.Addons.AdminSite {
         /// <param name="IsTemplateTable"></param>
         /// <param name="editorAddonListJSON"></param>
         /// <returns></returns>
-        public static string getTab(CoreController core, AdminDataModel adminData, int RecordID, int ContentID, bool record_readOnly, bool IsLandingPage, bool IsRootPage, string EditTab, CPHtml5BaseClass.EditorContentType EditorContext, ref string return_NewFieldList, int TemplateIDForStyles, int HelpCnt, int[] HelpIDCache, string[] helpDefaultCache, string[] HelpCustomCache, bool AllowHelpMsgCustom, KeyPtrController helpIdIndex, string[] fieldTypeDefaultEditors, string fieldEditorPreferenceList, string styleList, string styleOptionList, int emailIdForStyles, bool IsTemplateTable, string editorAddonListJSON) {
+        public static string getTab(CoreController core, AdminDataModel adminData, int RecordID, int ContentID, bool record_readOnly, bool IsLandingPage, bool IsRootPage, string EditTab, CPHtml5BaseClass.EditorContentType EditorContext, ref string return_NewFieldList, int TemplateIDForStyles, int HelpCnt, int[] HelpIDCache, string[] helpDefaultCache, string[] HelpCustomCache, bool AllowHelpMsgCustom, KeyPtrController helpIdIndex, Dictionary<int, int > fieldTypeDefaultEditors, string fieldEditorPreferenceList, string styleList, string styleOptionList, int emailIdForStyles, bool IsTemplateTable, string editorAddonListJSON) {
             string returnHtml = "";
             try {
                 // todo
@@ -798,8 +797,8 @@ namespace Contensive.Addons.AdminSite {
                             }
                             fieldIdPos = GenericController.vbInstr(fieldIdPos + 1, "," + fieldEditorPreferenceList, "," + fieldId.ToString() + ":");
                         }
-                        if (editorAddonID == 0) {
-                            fieldTypeDefaultEditorAddonId = GenericController.encodeInteger(fieldTypeDefaultEditors[(int)fieldTypeId]);
+                        if ((editorAddonID == 0) &&(fieldTypeDefaultEditors.ContainsKey((int)fieldTypeId))) {
+                            fieldTypeDefaultEditorAddonId = fieldTypeDefaultEditors[(int)fieldTypeId];
                             editorAddonID = fieldTypeDefaultEditorAddonId;
                         }
                         bool useEditorAddon = false;
@@ -1543,7 +1542,7 @@ namespace Contensive.Addons.AdminSite {
         /// <param name="IsTemplateTable"></param>
         /// <param name="editorAddonListJSON"></param>
         /// <returns></returns>
-        public static string getTabs(CoreController core, AdminDataModel adminData, TabController adminMenu, bool readOnlyField, bool IsLandingPage, bool IsRootPage, CPHtml5BaseClass.EditorContentType EditorContext, bool allowAjaxTabs, int TemplateIDForStyles, string[] fieldTypeDefaultEditors, string fieldEditorPreferenceList, string styleList, string styleOptionList, int emailIdForStyles, bool IsTemplateTable, string editorAddonListJSON) {
+        public static string getTabs(CoreController core, AdminDataModel adminData, TabController adminMenu, bool readOnlyField, bool IsLandingPage, bool IsRootPage, CPHtml5BaseClass.EditorContentType EditorContext, bool allowAjaxTabs, int TemplateIDForStyles, Dictionary<int,int> fieldTypeDefaultEditors, string fieldEditorPreferenceList, string styleList, string styleOptionList, int emailIdForStyles, bool IsTemplateTable, string editorAddonListJSON) {
             string returnHtml = "";
             try {
                 // todo
