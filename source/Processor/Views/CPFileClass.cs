@@ -221,7 +221,7 @@ namespace Contensive.Processor {
         /// <param name="pageNumber"></param>
         /// <returns></returns>
         [Obsolete("Deprecated, please use cp.FileCdn, cp.FilePrivate, cp.FileAppRoot, or cp.FileTemp instead.", true)]
-        public override string fileList(string pathFolderName, int pageSize = 0, int pageNumber = 1) {
+        public override string fileList(string pathFolderName, int pageSize, int pageNumber) {
             string result = "";
             if (core.wwwfiles.isinLocalAbsDosPath(pathFolderName)) {
                 List<FileDetail> fi = core.wwwfiles.getFileList(pathFolderName);
@@ -236,6 +236,16 @@ namespace Contensive.Processor {
                 throw (new GenericException("Application cannot access this path [" + pathFolderName + "]"));
             }
             return result;
+        }
+        //
+        [Obsolete("Deprecated, please use cp.FileCdn, cp.FilePrivate, cp.FileAppRoot, or cp.FileTemp instead.", true)]
+        public override string fileList(string pathFolderName, int pageSize) {
+            return fileList(pathFolderName, pageSize, 1);
+        }
+        //
+        [Obsolete("Deprecated, please use cp.FileCdn, cp.FilePrivate, cp.FileAppRoot, or cp.FileTemp instead.", true)]
+        public override string fileList(string pathFolderName) {
+            return fileList(pathFolderName, 9999, 1);
         }
         //
         //==========================================================================================

@@ -112,7 +112,17 @@ namespace Contensive.Processor {
         }
         //
         //==========================================================================================
-        public override List<FileDetail> FileList(string folderName, int pageSize = 0, int pageNumber = 1) {
+        public override List<FileDetail> FileList(string folderName, int pageSize, int pageNumber) {
+            return fileSystemController.getFileList(folderName);
+        }
+        //
+        //==========================================================================================
+        public override List<FileDetail> FileList(string folderName, int pageSize) {
+            return fileSystemController.getFileList(folderName);
+        }
+        //
+        //==========================================================================================
+        public override List<FileDetail> FileList(string folderName) {
             return fileSystemController.getFileList(folderName);
         }
         //

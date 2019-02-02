@@ -161,7 +161,9 @@ namespace Contensive.BaseClasses {
         /// <param name="pageSize"></param>
         /// <param name="pageNumber"></param>
         /// <returns></returns>
-        public abstract List<FileDetail> FileList(string folderPath, int pageSize = 0, int pageNumber = 1);
+        public abstract List<FileDetail> FileList(string folderPath, int pageSize, int pageNumber);
+        public abstract List<FileDetail> FileList(string folderPath, int pageSize);
+        public abstract List<FileDetail> FileList(string folderPath);
         //
         //==========================================================================================
         /// <summary>

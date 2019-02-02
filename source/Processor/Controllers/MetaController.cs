@@ -1308,26 +1308,6 @@ namespace Contensive.Processor.Controllers {
             return returnFieldTypeName;
         }
         //
-        //========================================================================
-        //
-        [Obsolete("deprecated", true)]
-        public string[,] getContentRows(CoreController core, string ContentName, string Criteria = "", string SortFieldList = "", bool ActiveOnly = true, int MemberID = SystemMemberID, bool WorkflowRenderingMode = false, bool WorkflowEditingMode = false, string SelectFieldList = "", int PageSize = 9999, int PageNumber = 1) {
-            string[,] returnRows = { { } };
-            //try {
-            //    //
-            //    int CS = csOpen(ContentName, Criteria, SortFieldList, ActiveOnly, MemberID, WorkflowRenderingMode, WorkflowEditingMode, SelectFieldList, PageSize, PageNumber);
-            //    if (csOk(CS)) {
-            //        returnRows = contentSetStore[CS].readCache;
-            //    }
-            //    csClose(ref CS);
-            //    //
-            //} catch (Exception ex) {
-            //    LogController.handleError(core, ex);
-            //    throw;
-            //}
-            return returnRows;
-        }
-        //
         //=============================================================================
         /// <summary>
         /// Imports the named table into the content system

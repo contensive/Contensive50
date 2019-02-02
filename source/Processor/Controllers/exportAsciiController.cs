@@ -13,7 +13,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static string exportAscii_GetAsciiExport(CoreController core, string ContentName, int PageSize = 1000, int PageNumber = 1) {
+        public static string exportAscii_GetAsciiExport(CoreController core, string ContentName, int PageSize, int PageNumber) {
             string result = "";
             try {
                 string Delimiter = null;

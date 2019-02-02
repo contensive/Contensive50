@@ -98,7 +98,14 @@ namespace Contensive.BaseClasses {
         /// <returns></returns>
         /// <remarks></remarks>
         [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", true)]
-        public abstract string fileList(string folderName, int pageSize = 0, int pageNumber = 1);
+        public abstract string fileList(string folderName, int pageSize, int pageNumber);
+        //
+        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", true)]
+        public abstract string fileList(string folderName, int pageSize);
+        //
+        [Obsolete("Deprecated, please use cp.File.cdnFiles, cp.File.privateFiles, cp.File.appRootFiles, or cp.File.serverFiles instead.", true)]
+        public abstract string fileList(string folderName);
+        //
         /// <summary>
         /// Get a crlf delimited list of folders in a given path. Each row is a tab delimited list of attributes for each folder. The attributes are:
         /// Name

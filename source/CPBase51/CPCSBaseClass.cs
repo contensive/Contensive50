@@ -104,7 +104,6 @@ namespace Contensive.BaseClasses {
         /// <param name="pageNumber"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        //public abstract bool OpenSQL(string sql, string dataSourcename, int pageSize = 10, int pageNumber = 1);
         public abstract bool OpenSQL(string sql, string dataSourcename, int pageSize, int pageNumber);
         public abstract bool OpenSQL(string sql, string dataSourcename, int pageSize);
         public abstract bool OpenSQL(string sql, string dataSourcename);
@@ -353,7 +352,22 @@ namespace Contensive.BaseClasses {
         // Deprecated
         //
         [Obsolete("Use OpenGroupUsers instead. The GroupCommaList is a comma delimited list of groups and cannot handle group names that include a comma.", true)]
-        public abstract bool OpenGroupListUsers(string GroupCommaList, string SQLCriteria = "", string SortFieldList = "", bool ActiveOnly = true, int PageSize = 10, int PageNumber = 1);
+        public abstract bool OpenGroupListUsers(string GroupCommaList, string SQLCriteria, string SortFieldList, bool ActiveOnly, int PageSize, int PageNumber);
+        //
+        [Obsolete("Use OpenGroupUsers instead. The GroupCommaList is a comma delimited list of groups and cannot handle group names that include a comma.", true)]
+        public abstract bool OpenGroupListUsers(string GroupCommaList, string SQLCriteria, string SortFieldList, bool ActiveOnly, int PageSize);
+        //
+        [Obsolete("Use OpenGroupUsers instead. The GroupCommaList is a comma delimited list of groups and cannot handle group names that include a comma.", true)]
+        public abstract bool OpenGroupListUsers(string GroupCommaList, string SQLCriteria, string SortFieldList, bool ActiveOnly);
+        //
+        [Obsolete("Use OpenGroupUsers instead. The GroupCommaList is a comma delimited list of groups and cannot handle group names that include a comma.", true)]
+        public abstract bool OpenGroupListUsers(string GroupCommaList, string SQLCriteria, string SortFieldList);
+        //
+        [Obsolete("Use OpenGroupUsers instead. The GroupCommaList is a comma delimited list of groups and cannot handle group names that include a comma.", true)]
+        public abstract bool OpenGroupListUsers(string GroupCommaList, string SQLCriteria);
+        //
+        [Obsolete("Use OpenGroupUsers instead. The GroupCommaList is a comma delimited list of groups and cannot handle group names that include a comma.", true)]
+        public abstract bool OpenGroupListUsers(string GroupCommaList);
         //
         [Obsolete("Use SetField for all field types that store data in files (textfile, cssfile, etc)",true)]
         public abstract void SetFile(string FieldName, string Copy, string ContentName);
@@ -362,7 +376,16 @@ namespace Contensive.BaseClasses {
         public abstract string GetTextFile(string FieldName);
         //
         [Obsolete("Use OpenSql", true)]
-        public abstract bool OpenSQL2(string SQL, string DataSourcename = "default", int PageSize = 10, int PageNumber = 1);
+        public abstract bool OpenSQL2(string SQL, string DataSourcename, int PageSize, int PageNumber);
+        //
+        [Obsolete("Use OpenSql", true)]
+        public abstract bool OpenSQL2(string SQL, string DataSourcename, int PageSize);
+        //
+        [Obsolete("Use OpenSql", true)]
+        public abstract bool OpenSQL2(string SQL, string DataSourcename);
+        //
+        [Obsolete("Use OpenSql", true)]
+        public abstract bool OpenSQL2(string SQL);
         //
         [Obsolete("Use GetFormInput(string,string,int,int,string)", true)]
         public abstract object GetFormInput(string contentName, string fieldName, string height, string width, string htmlId);

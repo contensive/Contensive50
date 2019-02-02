@@ -1730,9 +1730,9 @@ namespace Contensive.Processor {
         /// <param name="PageSize"></param>
         /// <param name="PageNumber"></param>
         /// <returns></returns>
-        public bool openWhatsNew(CoreController core, string SortFieldList = "", bool ActiveOnly = true, int PageSize = 1000, int PageNumber = 1) {
+        public bool openWhatsNew(CoreController core, string SortFieldList) {
             try {
-                return openContentWatchList(core, "What's New", SortFieldList, ActiveOnly, PageSize, PageNumber);
+                return openContentWatchList(core, "What's New", SortFieldList);
             } catch (Exception ex) {
                 LogController.handleError(core, ex);
                 throw;
